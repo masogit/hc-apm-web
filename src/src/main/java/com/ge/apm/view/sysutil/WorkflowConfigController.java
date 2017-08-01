@@ -54,7 +54,7 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
         try{
             String sql = "select distinct u.id, u.name, o.name as hospital_name, o.id as hospital_id from user_account u, org_info o, user_role r where u.hospital_id=o.id and u.id=r.user_id and r.role_id in (2,3) and u.site_id=:#siteId and u.hospital_id=:#hospitalId " +
                          "union all " +
-                         "select distinct u.id, u.name, o.name as hospital_name, o.id as hospital_id from user_account u, org_info o, user_role r where u.hospital_id=o.id and u.id=r.user_id and r.role_id in (2,3) and u.site_id=:#siteId and u.hospital_id<>:#hospitalId";
+                         	"select distinct u.id, u.name, o.name as hospital_name, o.id as hospital_id from user_account u, org_info o, user_role r where u.hospital_id=o.id and u.id=r.user_id and r.role_id in (2,3) and u.site_id=:#siteId and u.hospital_id<>:#hospitalId";
 
             Map<String, Object> sqlParams = new HashMap<>();
             sqlParams.put("hospitalId", user.getHospitalId());
