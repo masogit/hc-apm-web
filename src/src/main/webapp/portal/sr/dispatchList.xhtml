@@ -47,21 +47,21 @@
 
                         <p:column headerText="#{msg.assetName}">
                             <h:outputText value="#{assetInfoService.getAssetInfoName(item.assetId)}"/>
-                        </p:column>  
+                        </p:column>
                         <p:column headerText="#{msg.requestorName}">
                             <h:outputText value="#{workOrderDispatchController.getServiceRequest(item.srId).requestorName}"/>
-                        </p:column>  
+                        </p:column>
                         <p:column headerText="#{msg.requestTime}">
                             <h:outputText value="#{workOrderDispatchController.getServiceRequest(item.srId).requestTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
-                        </p:column>  
+                        </p:column>
                         <p:column headerText="#{msg.status}">
                             <h:outputText value="#{item.currentStepName}"/>
-                        </p:column>  
+                        </p:column>
                         <p:column headerText="#{msg.intExtType}">
                             <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
-                        </p:column>  
+                        </p:column>
                         <p:column headerText="#{msg.currentPersonName}">
                             <h:outputText value="#{item.currentPersonName}"/>
                         </p:column>
@@ -76,14 +76,9 @@
                         </f:facet>
                     </p:dataTable>
                 </h:form>
-
                 <ui:include src="dispatchView.xhtml"/>
-
             </div>
         </div>
-
-
-
         <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
             <h:form id="dispatchDialogForm" >
                 <h:panelGroup id="display" rendered="#{not empty workOrderDispatchController.selectedWorkOrder}">
@@ -110,6 +105,6 @@
             </h:form>
         </p:dialog>
 
-    </ui:define> 
+    </ui:define>
 
 </ui:composition>

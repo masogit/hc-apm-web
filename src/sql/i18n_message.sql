@@ -214,6 +214,24 @@ INSERT INTO "public"."i18n_message" VALUES ('435', 'label', 'WorkOrderAssignee',
 INSERT INTO "public"."i18n_message" VALUES ('436', 'label', 'AckPass', '验收通过', 'Acknowledge pass', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('437', 'label', 'AckNoPass', '验收不通过', 'Acknowledge does not pass', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('438', 'label', 'Acknowledge', '验收', 'Acknowledge', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('439', 'label', 'startUsingDate', '启用时间', 'Start Using Date', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('440', 'label', 'FaultyDesc', '故障文字描述', 'Faulty Desc', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('441', 'label', 'newWorkOrder', '新建工单', 'New Work Order', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('442', 'label', 'Canceled', '已取消', 'Canceled', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('443', 'label', 'Closed', '已关单', 'Closed', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('444', 'label', 'toClose', '待关单', 'toClose', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('445', 'label', 'takeOrtrans', '接单/转单', 'takeOrtrans', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('446', 'label', 'takeorder', '接单', 'takeorder', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('447', 'label', 'transfer', '转单', 'transfer', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('448', 'label', 'workcomplete', '维修完成', 'workcomplete', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('449', 'label', 'closeWo', '关单', 'close work order', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('450', 'label', 'expensedetail', '费用明细', 'expensdetail', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('451', 'label', 'recoveryTime', '恢复时间', 'recoveryTime', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('452', 'label', 'estimatetime', '预估时间', 'estimatetime', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('453', 'label', 'repairType', '维修类别', 'repairType', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('454', 'label', 'coworker', '协作者', 'coworker', null, '-1');
+
 
 INSERT INTO "public"."i18n_message" VALUES ('600', 'field_name', 'accessory', '备件', 'Accessory', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('601', 'field_name', 'accessoryPrice', '单价(元)', 'Accessory Price', null, '-1');

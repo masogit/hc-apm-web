@@ -22,9 +22,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -35,7 +39,7 @@ public class V2_WorkOrderService {
 
     @Autowired
     private V2_WorkOrderRepository woDao;
-    
+
     @Autowired
     private AssetInfoRepository assetDao;
 
@@ -54,6 +58,8 @@ public class V2_WorkOrderService {
     @Autowired
     private ServiceRequestApiService srApi;
 
+    @Autowired
+    UserAccountRepository userAccountRepository;
     public List<V2_WorkOrder> getWorkOrdersBySR(String serviceRequest) {
 
         return woDao.findBySrId(serviceRequest);
@@ -98,11 +104,12 @@ public class V2_WorkOrderService {
     }
 
     public void dispatchWorkOrder(V2_WorkOrder selectedWorkOrder) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setAssigneeId(selectedWorkOrder.getCurrentPersonId().toString());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token,formData,"assign",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("dispatchWorkOrder"));
@@ -110,9 +117,10 @@ public class V2_WorkOrderService {
     }
 
     public void ackWorkOrder(V2_WorkOrder selectedWorkOrder) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token,formData,"ack",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
@@ -120,9 +128,10 @@ public class V2_WorkOrderService {
     }
 
     public void rejectWorkOrder(V2_WorkOrder selectedWorkOrder,String reason, Integer status, Date confirmedDowntime) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(reason);
         formData.setAssetStatus(String.valueOf(status));
         String res = srApi.invokeWorkOrderAction(token,formData,"ackFailed",selectedWorkOrder.getId());
@@ -132,9 +141,10 @@ public class V2_WorkOrderService {
     }
 
     public void rateWorkOrder(V2_WorkOrder selectedWorkOrder, Integer rating, String comments) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(comments);
         formData.setFeedbackRating(String.valueOf(rating));
         String res = srApi.invokeWorkOrderAction(token,formData,"rate",selectedWorkOrder.getId());
@@ -142,51 +152,53 @@ public class V2_WorkOrderService {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
         }
     }
-    
+
     public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, String extType,String comments) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setEstimatedCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(estimatedCloseTime));
         formData.setIntExtType(extType);
         formData.setDesc(comments);
-        
         String res = srApi.invokeWorkOrderAction(token,formData,"accept",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
         }
     }
-    
+
     public void takeWorkOrder(V2_WorkOrder selectedWorkOrder, Date takeTime, String taker) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setTakeTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(takeTime));
         formData.setEquipmentTaker(taker);
-        
         String res = srApi.invokeWorkOrderAction(token,formData,"take",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
         }
     }
-    
+
     public void reassignWorkOrder(V2_WorkOrder selectedWorkOrder, Integer assigneeId,String comments) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setAssigneeId(String.valueOf(assigneeId));
         formData.setDesc(comments);
-        
         String res = srApi.invokeWorkOrderAction(token,formData,"reassign",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
         }
     }
-    
+
     public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime,Integer assetStatus,List<V2_WorkOrder_Detail> details) {
+
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(selectedWorkOrder.getComment());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
@@ -196,17 +208,17 @@ public class V2_WorkOrderService {
         formData.setCaseType(selectedWorkOrder.getCaseType().toString());
         formData.setAssetStatus(assetStatus.toString());
         formData.setStepDetail(details);
-        
         String res = srApi.invokeWorkOrderAction(token,formData,"repair",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
         }
     }
-    
+
     public void closeWorkOrder(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> details) {
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
         formData.setDesc(selectedWorkOrder.getComment());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
@@ -214,13 +226,13 @@ public class V2_WorkOrderService {
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setCaseType(selectedWorkOrder.getCaseType().toString());
         formData.setStepDetail(details);
-        
+
         String res = srApi.invokeWorkOrderAction(token,formData,"close",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"关单");
         }
     }
-    
+
     public void reCreateWorkOrder(V2_WorkOrder selectedWorkOrder,Integer assigneeId, Integer assetSuatus,String reason,Integer extType) {
         String token = UserContextService.getAccessToken();
         WorkOrderForm formData = new WorkOrderForm();
@@ -230,12 +242,55 @@ public class V2_WorkOrderService {
         formData.setAssetStatus(assetSuatus.toString());
         formData.setRequestReason(reason);
         formData.setIntExtType(extType);
-        
-        
+
+
         String res = srApi.createWorkOrder(token,formData);
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"创建");
         }
     }
-    
+
+    public List<UserAccount> getAssetResponser(int assetId) {
+        List<UserAccount> userListTag = null;
+        try {
+            //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
+            userListTag = userAccountRepository.getResponserByAssetId(assetId);
+            //获取和资产绑定的owner
+            List<UserAccount> assetOwnerList=  userAccountRepository.getResponserWithAsset(assetId);
+            List<UserAccount> defaultUserList=null;
+            //如果该设备没有相应的owner并且根据设备标签找不到对应的负责人，就获取默认的医工.
+            if(CollectionUtils.isEmpty(userListTag) &  CollectionUtils.isEmpty(assetOwnerList)){
+                //search List from   (siteId and  roleid=3)
+                defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
+                //duplication remove
+                defaultUserList =new ArrayList<UserAccount>(new HashSet<UserAccount>(defaultUserList));
+                defaultUserList=  defaultUserList.stream().filter(id -> id != null).collect(Collectors.toList());
+                return defaultUserList;
+            }
+
+            if(CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)){
+                userListTag.addAll(assetOwnerList);
+                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+                userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+                return userListTag;
+            }else if(CollectionUtils.isEmpty(assetOwnerList)){
+                userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+                return userListTag;
+            }else if(CollectionUtils.isEmpty(userListTag)){
+                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(assetOwnerList));
+                defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
+                userListTag.addAll(defaultUserList);
+                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+                userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+                return userListTag;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return userListTag;
+    }
+
 }
+
+
