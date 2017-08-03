@@ -55,7 +55,7 @@
 
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                        <p:commandButton ajax="false" value="#{msg.Export}" actionListener="#{workOrderReportExportController.exportData()}" oncomplete="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s" validateClient="true">
+                        <p:commandButton ajax="false" value="#{msg.Export}" actionListener="#{workOrderReportExportController.exportData()}" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s" validateClient="true">
                             <p:fileDownload value="#{workOrderReportExportController.exportFile}" />
                         </p:commandButton>
                         </h:panelGroup>

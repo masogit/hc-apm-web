@@ -1,14 +1,10 @@
 package com.ge.apm.service.wo;
 
-import com.ge.apm.dao.ServiceRequestRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.dao.V2_WorkOrderStepRepository;
-import com.ge.apm.dao.WorkOrderDetailRepository;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -34,6 +30,8 @@ import java.util.Map;
 public class WorkOrderExportService {
 
     private static final String SHEET_WORKORDER = "WorkOrder List";
+    private static final String I18N_INT_EXT_TYPE="intExtType";
+    private static final String I18N_REPAIR_TYPE="repairType";
 
     @Autowired
     ServiceRequestRepository serviceRequestDao;
@@ -43,6 +41,12 @@ public class WorkOrderExportService {
     private V2_WorkOrderStepRepository v2WorkOrderStepDao;
     @Autowired
     WorkOrderDetailRepository workOrderDetailDao;
+    @Autowired
+    AssetInfoRepository assetInfoDao;
+    @Autowired
+    AssetFaultTypeRepository assetFaultTypeDao;
+    @Autowired
+    I18nMessageRepository i18nMessageDao;
 
 
     public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime){
@@ -77,11 +81,12 @@ public class WorkOrderExportService {
         }
 
         List<V2_WorkOrder> tempWorkOrderList = v2WorkOrderDao.findBySearchFilter(searchFilters);
-        //List<V2_WorkOrder> tempWorkOrderList = v2WorkOrderDao.find();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
         for (V2_WorkOrder workOrder: tempWorkOrderList) {
+            AssetInfo assetInfo = assetInfoDao.findById(workOrder.getAssetId());
             V2_ServiceRequest serviceRequest = serviceRequestDao.findOne(workOrder.getSrId());
             List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrder.getId());
             V2_WorkOrder_Step sendStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 2);
@@ -90,7 +95,7 @@ public class WorkOrderExportService {
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
             workOrderMap = new HashedMap();
             workOrderMap.put("报修单号", "");
-            workOrderMap.put("设备编号", "");
+            workOrderMap.put("设备编号", assetInfo.getFinancingNum());
             workOrderMap.put("设备名称", serviceRequest.getAssetName());
             workOrderMap.put("院区", serviceRequest.getHospitalName());
             workOrderMap.put("科室", serviceRequest.getFromDeptName());
@@ -101,8 +106,8 @@ public class WorkOrderExportService {
                 workOrderMap.put("派工人", sendStep.getOwnerName());
                 workOrderMap.put("派工时间", sendStep.getEndTime() != null ? sdf.format(sendStep.getEndTime()) : "");
             }
-            workOrderMap.put("工单类型", workOrder.getIntExtType());
-            workOrderMap.put("上门维修/送修", workOrder.getRepairType());
+            workOrderMap.put("工单类型", workOrder.getIntExtType() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_INT_EXT_TYPE, workOrder.getIntExtType().toString()).getValueZh() : "");
+            workOrderMap.put("上门维修/送修", workOrder.getRepairType() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()).getValueZh() : "");
             if(acceptStep != null){
                 workOrderMap.put("接单人", acceptStep.getOwnerName());
                 workOrderMap.put("接单时间", acceptStep.getEndTime() != null ? sdf.format(acceptStep.getEndTime()) : "");
@@ -111,7 +116,7 @@ public class WorkOrderExportService {
             workOrderMap.put("维修工时",workOrder.getTotalManHour());
             String info = "";
             for (V2_WorkOrder_Detail workOrderDetail:workOrderDetailList) {
-                info +=workOrderDetail.getParts()+",所用工时："+workOrderDetail.getManHours()+",费用:"+workOrderDetail.getPartsPrice()+";";
+                info += workOrderDetail.getParts()+",所用工时："+workOrderDetail.getManHours()+",费用:"+workOrderDetail.getPartsPrice()+";";
             }
             workOrderMap.put("维修备件", info);
             workOrderMap.put("价格", workOrder.getTotalPrice());
@@ -124,7 +129,7 @@ public class WorkOrderExportService {
                 workOrderMap.put("关单时间", closeStep.getEndTime() != null ? sdf.format(closeStep.getEndTime()) : "");
             }
             workOrderMap.put("最终评价", workOrder.getFeedbackRating());
-            workOrderMap.put("故障类型", workOrder.getCaseType());
+            workOrderMap.put("故障类型", workOrder.getCaseType() != null ? assetFaultTypeDao.findById(workOrder.getCaseType()).getFaultName() : "");
 
             resultList.add(workOrderMap);
         }
