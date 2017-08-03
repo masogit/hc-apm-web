@@ -1,5 +1,7 @@
 package com.ge.apm.domain;
 
+import java.io.Serializable;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -15,8 +17,12 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "v2_device_type")
-public class V2_DeviceType extends BaseDomain{
-    @Id
+//extends BaseDomain
+public class V2_DeviceType implements Serializable {
+	
+	private static final long serialVersionUID = -1;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
@@ -24,10 +30,22 @@ public class V2_DeviceType extends BaseDomain{
     
     @Column(name = "name")
     @Basic(optional = false)
-	private Integer name;
+	private String name;
     
     @Column(name = "description")
 	private String description;
+    
+	@Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+    private String tenantUID;
+    
+    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+    private String institutionUID;
+    
+    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+    
+    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+    private String siteUID;
     
 	public Integer getId() {
 		return id;
@@ -35,10 +53,10 @@ public class V2_DeviceType extends BaseDomain{
 	public void setId(Integer id) {
 		this.id = id;
 	}
-	public Integer getName() {
+	public String getName() {
 		return name;
 	}
-	public void setName(Integer name) {
+	public void setName(String name) {
 		this.name = name;
 	}
 	public String getDescription() {
