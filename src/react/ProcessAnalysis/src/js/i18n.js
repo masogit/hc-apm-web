@@ -26,6 +26,9 @@ i18n
     debug: conf.i18n.debug,
     cache: {
       enabled: conf.i18n.cache,
+      versions: {
+        zh: '1'
+      }
     },
     backend: {
       loadPath:  isProd ?  getPath() : 'assets/locales/{{lng}}/{{ns}}.json'
