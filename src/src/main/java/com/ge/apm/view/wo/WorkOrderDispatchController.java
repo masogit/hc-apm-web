@@ -39,9 +39,9 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
 
     //status：0-待派工/1-待接单/2-维修中/3-已完成/4-已派工/5-已取消
     private Integer queryIndex;
-    
+
     private V2_ServiceRequest selectedServiceRequest;
-    
+
     private V2_WorkOrder selectedWorkOrder;
 
     protected void init() {
@@ -90,33 +90,33 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
     public V2_ServiceRequest getServiceRequest(String srId){
         return srDao.findById(srId);
     }
-    
+
     public void onSelectWorkOrder() {
         selectedServiceRequest = srDao.findById(selected.getSrId());
     }
-    
+
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
-    
+
     public List<V2_WorkOrder_Detail> getWOrkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
     }
-    
+
     public void prepareDispatch(String woid){
         selectedWorkOrder = dao.findById(woid);
     }
-    
-    
+
+
     public List<UserAccount> getWorkerList(){
         return woService.getWorkerList();
     }
-    
+
     public void dispatchWorkOrder(){
         woService.dispatchWorkOrder(selectedWorkOrder);
         cancel();
     }
-    
+
 
     //getter and setter
     public Integer getQueryIndex() {
@@ -142,7 +142,7 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
     public void setSelectedWorkOrder(V2_WorkOrder selectedWorkOrder) {
         this.selectedWorkOrder = selectedWorkOrder;
     }
-    
-    
+
+
 
 }
