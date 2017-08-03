@@ -19,6 +19,7 @@
             if ('localStorage' in window) {
               var token = "#{userContextService.getAccessToken()}";
               localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+              localStorage.setItem("hc-apm-token-set-timestamp", Date.now())
             }
           }
         </script>
