@@ -47,7 +47,7 @@ public class AssetFileImportService {
     public static enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
-    
+
     private Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     private String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     private String orgUid = UserContextService.getCurrentUserAccount().getSiteUID();
@@ -67,6 +67,8 @@ public class AssetFileImportService {
     private QrCodeLibRepository qrcodeDao;
     @Autowired
     private AssetDepreciationService assetDepreciationService;
+    @Autowired
+    private QrCodeService qrCodeService;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -223,7 +225,7 @@ public class AssetFileImportService {
         }
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
+    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap, Boolean autoGenerateQrcode) {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -285,7 +287,13 @@ public class AssetFileImportService {
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
                 String qrCode = newAsset.getQrCode();
-                if (isAvailableQrcode(qrCode, item)) {
+
+                if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
+                    QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
+                    newAsset.setQrCode(newCode.getQrCode());
+                    createAsset(newAsset);
+                    item.put("status", ImportStatus.Created);
+                } else if (isAvailableQrcode(qrCode, item)) {
                     createAsset(newAsset);
                     item.put("status", ImportStatus.Created);
                 } else {

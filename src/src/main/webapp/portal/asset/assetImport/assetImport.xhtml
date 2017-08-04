@@ -70,6 +70,14 @@
                                     <h:outputText value="#{item.get('errmsg')}"/>
                                 </p:column>
                             </p:dataTable>
+                            <h:panelGroup>
+                                <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+                                    
+                                <h:outputText value="当二维码为空时自动生成" />
+                                <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateQrcode}" onLabel="Yes" offLabel="No" disabled="#{assetFileImportController.isImported}"/>
+                                </h:panelGrid>
+                                
+                            </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
                             <p:dataTable  value="#{assetFileImportController.importOrgMap.values()}" var="item" >
