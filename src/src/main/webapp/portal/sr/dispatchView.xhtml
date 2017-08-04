@@ -34,10 +34,6 @@
                             <p:outputLabel value="#{workOrderDispatchController.selectedServiceRequest.requestReason}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.status}</label>
-                            <p:outputLabel value="#{fieldMsg.fieldValue('status', workOrderDispatchController.selectedServiceRequest.status)}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
                             <label class="label">#{msg.equipmentTaker}</label>
                             <p:outputLabel value="#{workOrderDispatchController.selectedServiceRequest.equipmentTaker}" />
                         </h:panelGroup>
@@ -64,10 +60,6 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.currentPersonName}</label>
                                     <p:outputLabel value="#{workOrderDispatchController.selected.currentPersonName}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.status}</label>
-                                    <p:outputLabel value="#{fieldMsg.fieldValue('status',workOrderDispatchController.selected.status)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.feedbackRating}</label>
