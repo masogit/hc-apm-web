@@ -13,7 +13,7 @@
 
             <div class="ui-g-12 card">
                 <h:form >
-                    <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" actionListener="#{qrCodeLibController.viewQrCodeLibCreate}" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
+                    <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
                 	&#160;
                 	<p:commandButton id="generateQrCodesButton" icon="ui-icon-arrowthick-1-s" value="生成并导出二维码" 
                             	title="生成并导出二维码" actionListener="#{generateQrCodesController.createQrCode}" update=":generateQrCodesDlg" 
@@ -50,7 +50,7 @@
                                     <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{qrCodeLibController.getHospitalName(item.hospitalId)}"/>
+                            <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
                         </p:column>
                         <p:column headerText="二维码" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
@@ -59,7 +59,7 @@
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{qrCodeLibController.qrCodeLibStatusList}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('qrCodeLibStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('qrCodeLibStatus', item.status)}"/>

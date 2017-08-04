@@ -1,10 +1,13 @@
 package com.ge.apm.domain;
 
+import java.io.Serializable;
 import javax.persistence.Column;
 
-public class BaseDomain {
-	
-    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+public abstract class BaseDomain implements Serializable{
+
+	private static final long serialVersionUID = -1L;
+
+	@Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
     
     @Column(name="institution_uid",columnDefinition = "CHAR(32)")

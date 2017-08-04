@@ -9,6 +9,7 @@ export default {
   namespace: 'finance',
   state: {
     loading: false,
+    error: false,
     systemData: undefined,
     manualData: undefined,
     query: {}
@@ -150,7 +151,7 @@ export default {
           yield put({
             type: 'focus/node/set'
           })
-        }  
+        }
       } catch (err) {
         yield put({
           type: 'data/status/failed',
@@ -175,18 +176,21 @@ export default {
 
       }
     },
-    *['data/status/failed'] ({ payload: err }) {
+    *['data/status/failed'] ({ payload: err }, { put }) {
       notification.error({
         message: '数据加载出错，请尝试刷新页面',
         description: err.message
       })
+      yield put({ type: 'data/get/failed' })
+      yield put({ type: 'loading/off' })
     },
-    *['data/status/empty'] () {
+    *['data/status/empty'] (undefined, { put }) {
       notification.warning({
         message: '暂无可用设备数据',
         description: '请稍后再试'
-      })      
-    }    
+      })
+      yield put({ type: 'loading/off' })
+    }
   },
   reducers: {
     ['data/get/succeed'] (state, { payload }) {
@@ -194,6 +198,12 @@ export default {
         ...state,
         systemData: payload,
         manualData: payload
+      }
+    },
+    ['data/get/failed'] (state, { payload }) {
+      return {
+        ...state,
+        error: true
       }
     },
     ['data/put/succeed'] (state, { payload }) {
@@ -211,7 +221,8 @@ export default {
     ['loading/on'] (state, action) {
       return {
         ...state,
-        loading: true
+        loading: true,
+        error: false
       }
     },
     ['loading/off'] (state, action) {
@@ -219,6 +230,6 @@ export default {
         ...state,
         loading: false
       }
-    }    
+    }
   }
 }

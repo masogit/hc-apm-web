@@ -57,7 +57,7 @@ export default class Chart extends PureComponent<*, PropsT, *> {
 
     return (
       <div>
-        <svg width={width} height={height} onClick={this.props.backRoot}>
+        <svg width={width} height={Math.max(height, 650)} onClick={this.props.backRoot}>
           <g transform={`translate(${width / 2}, ${height / 2})`}>
             <Transition
               data={chartData}

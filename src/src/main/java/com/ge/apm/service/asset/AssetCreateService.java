@@ -43,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
+import javaslang.control.Option;
 
 /**
  *
@@ -260,9 +261,18 @@ public class AssetCreateService {
         file.delete();
     }
 
+    public String getOrgName(String orgUid) {
+        if (orgUid != null) {
+            OrgInfo org = orgDao.getByUid(orgUid);
+            return org==null?null:org.getName();
+        }
+        return null;
+    }
+    
     public String getOrgName(Integer orgId) {
         if (orgId != null) {
-            return orgDao.findById(orgId).getName();
+            OrgInfo org = orgDao.findById(orgId);
+            return org==null?null:org.getName();
         }
         return null;
     }
