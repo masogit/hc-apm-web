@@ -325,7 +325,7 @@
                 break;
               case 'fix':
                 d3.select(this).call(_this._renderDimension.bind(_this), d, height, true);
-                break;                
+                break;
               default:
                 d3.select(this).call(_this._renderDimension.bind(_this), d, height);
             }
@@ -436,8 +436,8 @@
                       '('+sectors[0].lastValue + ' : ' + sectors[sectors.length - 1].value + ')' +
                       ' - ' + _key + ':' + val);
                   }
-
-                  scale = d3.scaleLinear().domain([sec.lastValue, sec.value]).range([sec.y0, sec.y1]);
+                  let range = dimension.reverse ? [sec.y1, sec.y0] : [sec.y0, sec.y1];
+                  scale = d3.scaleLinear().domain([sec.lastValue, sec.value]).range(range);
                 }
 
                 return [x(_name) + _offset, scale(val)];
@@ -713,7 +713,8 @@
               name: "fix",
               scale: d3.scaleLinear().range([height, 0]),
               type: Number,
-              format: digit_short
+              format: digit_short,
+              reverse: true
             },
             {
               name: "rate",

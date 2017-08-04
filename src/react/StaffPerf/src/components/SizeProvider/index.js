@@ -31,7 +31,7 @@ const SizeProvider = WrappedComponent => {
 
     getSizes = () => {
       const { width, height } = this.client.getBoundingClientRect()
-      const diameter = Math.min(width, height)
+      const diameter = Math.max(Math.min(width, height), 650)
       this.setState((state, props) => {
         return {
           ...state,
