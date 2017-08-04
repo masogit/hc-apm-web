@@ -63,5 +63,22 @@
                 </h:form>
             </div>
         </div>
+
+        <p:dialog modal="true" id="statusDialog" widgetVar="statusDialog" draggable="false" closable="false" resizable="false">
+            <p:graphicImage name="img/ajaxloadingbar.gif" />
+        </p:dialog>
+
+        <script type="text/javascript">
+            function start() {
+                //$('#statusDialog').show();
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                //$('#statusDialog').hide();
+                PF('statusDialog').hide();
+            }
+        </script>
     </ui:define>
+
 </ui:composition>
