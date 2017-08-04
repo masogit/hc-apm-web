@@ -55,7 +55,7 @@
                                 <label class="label">#{msg.assetOwnerTel}</label>
                                 <p:inputText id="assetOwnerTel" value="#{assetInfoController.selected.assetOwnerTel}" readonly="true"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName2}</label>
                                 <p:selectOneMenu id="assetOwnerName2" value="#{assetInfoController.owner2}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
@@ -74,12 +74,12 @@
                                 <label class="label">#{msg.assetOwnerTel2}</label>
                                 <p:inputText id="assetOwnerTel2" value="#{assetInfoController.selected.assetOwnerTel2}" readonly="true"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
                                 <p:inputText id="hospitalId" value="#{assetInfoController.getHospital(assetInfoController.selected.hospitalId)}" readonly="true" rendered="#{!userContextService.hasRole('MultiHospital')}"/>
                                 <p:selectOneMenu id="hospitalIdSelect" value="#{assetInfoController.selected.hospitalId}" required="true" requiredMessage="#{msg.hospitalId} #{msg.ValidationRequire}" rendered="#{userContextService.hasRole('MultiHospital')}" >
-                                    <p:ajax  listener="#{assetInfoController.onHospitalChange}" update="clinicalDeptName assetOwnerName" />
+                                    <p:ajax  listener="#{assetInfoController.onHospitalChange}" update="clinicalDeptName assetOwnerName assetOwnerName2" />
                                     <!--<f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
                                     <f:selectItems value="#{assetInfoService.getHospitalList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
@@ -107,7 +107,7 @@
                                 <label class="label">#{msg.clinicalOwnerTel}</label>
                                 <p:inputText id="clinicalOwnerTel" value="#{assetInfoController.selected.clinicalOwnerTel}" readonly="true"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.manufacture}</label>
                                 <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}"/>
@@ -171,8 +171,8 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
-                                    <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" >
-                                </p:inputText>
+                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" />
+                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" id="iconOnly" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
