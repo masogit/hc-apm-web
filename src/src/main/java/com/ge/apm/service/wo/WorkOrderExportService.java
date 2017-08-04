@@ -116,7 +116,9 @@ public class WorkOrderExportService {
             workOrderMap.put("维修工时",workOrder.getTotalManHour());
             String info = "";
             for (V2_WorkOrder_Detail workOrderDetail:workOrderDetailList) {
-                info += workOrderDetail.getParts()+",所用工时："+workOrderDetail.getManHours()+",费用:"+workOrderDetail.getPartsPrice()+";";
+                Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
+                Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
+                info += workOrderDetail.getParts()+",数量："+ tempQuantity +",单价:"+ tempPrice +";";
             }
             workOrderMap.put("维修备件", info);
             workOrderMap.put("价格", workOrder.getTotalPrice());
@@ -129,7 +131,11 @@ public class WorkOrderExportService {
                 workOrderMap.put("关单时间", closeStep.getEndTime() != null ? sdf.format(closeStep.getEndTime()) : "");
             }
             workOrderMap.put("最终评价", workOrder.getFeedbackRating());
-            workOrderMap.put("故障类型", workOrder.getCaseType() != null ? assetFaultTypeDao.findById(workOrder.getCaseType()).getFaultName() : "");
+
+            if(workOrder.getCaseType() != null){
+                workOrderMap.put("故障类型", assetFaultTypeDao.findById(workOrder.getCaseType()) != null ? assetFaultTypeDao.findById(workOrder.getCaseType()).getFaultName() : "");
+            }
+
 
             resultList.add(workOrderMap);
         }
