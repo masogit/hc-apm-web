@@ -118,11 +118,11 @@
             <from uri="quartz://quartzWorkflowService?cron=20+*+*+*+*+?"/>
             <bean ref="workflowService"  method="execute"/>
         </route>
--->
+
         <route>
             <from uri="quartz://quartzAssetCostDataAggregation?cron=0+0+*/3+*+*+?"/>
             <to uri="direct:aggregateAssetCostData"/>
-        </route>
+        </route>-->
 
         <!--http://localhost:8087/geapm/ws/aggregateAssetExamData-->
         <route>
@@ -135,10 +135,10 @@
             <to uri="direct:aggregateExamSummitData"/>
         </route>
 
-        <route>
+<!--         <route>
             <from uri="servlet:///aggregateAssetCostData?servletName=MyServlet"/>
             <to uri="direct:aggregateAssetCostData"/>
-        </route>
+        </route> -->
         
         <route>
             <from uri="servlet:///aggregateAssetExamData?servletName=MyServlet"/>

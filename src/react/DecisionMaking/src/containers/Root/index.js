@@ -22,7 +22,7 @@ const roleFilterFn = isHead => n => {
 
 class Root extends PureComponent {
   render () {
-    const { loading, location, user } = this.props
+    const { loading, error, systemData, location, user } = this.props
     const { groupby, year } = location.query
 
     const filterOpts = [
@@ -62,7 +62,15 @@ class Root extends PureComponent {
           ? <div className={styles.statusWrapper}>
             <StatusBar type="loading" />
           </div>
-          : <div className={styles.content}>
+          :
+
+          !systemData || !Array.isArray(systemData.items) || systemData.items.length === 0
+          ?
+          <div className={styles.statusWrapper}>
+            <StatusBar type={error ? 'error' : 'empty'} />
+          </div>
+          :
+          <div className={styles.content}>
             <div className={styles.main}>
               <div className={styles.chartWrapper}>
                 <Chart />
@@ -104,6 +112,7 @@ class Root extends PureComponent {
 
 export default connect(state => ({
   user: state.user.info,
-  data: state.finance.data,
-  loading: state.finance.loading
+  loading: state.finance.loading,
+  error: state.finance.error,
+  systemData: state.finance.systemData
 }))(RoleProvider(Root))

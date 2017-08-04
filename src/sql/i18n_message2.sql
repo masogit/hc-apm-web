@@ -410,6 +410,11 @@ INSERT INTO "public"."i18n_message" VALUES ('774', 'label', 'ActiveAsset', '重�
 INSERT INTO "public"."i18n_message" VALUES ('775', 'label', 'InactiveAsset', '转入报废', 'inactive asset', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('776', 'label', 'BuildAsset', '资产建档', 'build asset', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('777', 'label', 'PwdTips', '密码必须6位以上，首字母大写,尾字母小写,必须包含数字,不可使用3个以上连续的数字或字母,不可使用3个以上相同的数字或字母,必须包含一个特殊字符(!@#$%&)', 'password tips', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('778', 'label', 'DeviceType', '资产类型', 'device type', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('779', 'label', 'V2_WorkFlowConfig', '资产类型工作流配置', 'v2 workflow config', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('780', 'label', 'UrgentTimeout', '紧急工单超时时间', 'urgent workorder timeout ', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('781', 'label', 'UrgentMaxMessageCount', '紧急工单超时提醒次数', 'urgent workorder remind times', null, '-1');
+
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1401', 'assetGroup', '2', '磁共振MRI类', '磁共振MRI类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1402', 'assetGroup', '3', '血管造影机(DSA)', '血管造影机(DSA)', null, '-1');

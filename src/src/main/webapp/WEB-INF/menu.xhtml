@@ -19,7 +19,12 @@
             if ('localStorage' in window) {
               var token = "#{userContextService.getAccessToken()}";
               localStorage.setItem("hc-apm-token", token || '#'); // # for test/dev perpose
+              localStorage.setItem("hc-apm-token-set-timestamp", Date.now())
             }
+
+            document.querySelector('.menu-content').addEventListener('mouseenter', function(evt) {
+              evt.target.focus();
+            })
           }
         </script>
     </h:form>

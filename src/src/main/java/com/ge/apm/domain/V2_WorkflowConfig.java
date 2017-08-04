@@ -41,26 +41,26 @@ public class V2_WorkflowConfig implements Serializable{
     @Column(name = "timeout_accept")
     private Integer timeoutAccept;
     
-    @Column(name = "timeout_repair")
-    private Integer timeoutRepair;
+/*    @Column(name = "timeout_repair")
+    private Integer timeoutRepair;*/
     
     @Column(name = "timeout_close")
     private Integer timeoutClose;
     
-    @Column(name="order_reopen_timeframe")
+/*    @Column(name="order_reopen_timeframe")
     private Integer orderReopenTimeframe;//二次开单的最大时间间隔
-    
+*/    
     @Column(name="max_message_count")
     private Integer maxMessageCount;//推送消息的次数上限
     
     @Column(name = "dispatch_user_id2")
-    private Integer dispatchUserId2;
+    private Integer dispatchUserId2;//第二派工人
     
     @Column(name = "dispatch_user_name2")
     private String dispatchUserName2;
      
-    @Column(name = "is_take_order_enabled")
-    private Boolean isTakeOrderEnabled; //是否允许抢单
+//    @Column(name = "is_take_order_enabled")
+//    private Boolean isTakeOrderEnabled; //是否允许抢单
     
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
@@ -158,22 +158,6 @@ public class V2_WorkflowConfig implements Serializable{
 		this.dispatchMode = dispatchMode;
 	}
 
-	public Boolean getIsTakeOrderEnabled() {
-		return isTakeOrderEnabled;
-	}
-
-	public void setIsTakeOrderEnabled(Boolean isTakeOrderEnabled) {
-		this.isTakeOrderEnabled = isTakeOrderEnabled;
-	}
-
-	public Integer getOrderReopenTimeframe() {
-		return orderReopenTimeframe;
-	}
-
-	public void setOrderReopenTimeframe(Integer orderReopenTimeframe) {
-		this.orderReopenTimeframe = orderReopenTimeframe;
-	}
-
 	public Integer getMaxMessageCount() {
 		return maxMessageCount;
 	}
@@ -246,14 +230,6 @@ public class V2_WorkflowConfig implements Serializable{
         this.timeoutAccept = timeoutAccept;
     }
 
-    public Integer getTimeoutRepair() {
-        return timeoutRepair;
-    }
-
-    public void setTimeoutRepair(Integer timeoutRepair) {
-        this.timeoutRepair = timeoutRepair;
-    }
-
     public Integer getTimeoutClose() {
         return timeoutClose;
     }
@@ -277,20 +253,14 @@ public class V2_WorkflowConfig implements Serializable{
 		builder.append(timeoutDispatch);
 		builder.append(", timeoutAccept=");
 		builder.append(timeoutAccept);
-		builder.append(", timeoutRepair=");
-		builder.append(timeoutRepair);
 		builder.append(", timeoutClose=");
 		builder.append(timeoutClose);
-		builder.append(", orderReopenTimeframe=");
-		builder.append(orderReopenTimeframe);
 		builder.append(", maxMessageCount=");
 		builder.append(maxMessageCount);
 		builder.append(", dispatchUserId2=");
 		builder.append(dispatchUserId2);
 		builder.append(", dispatchUserName2=");
 		builder.append(dispatchUserName2);
-		builder.append(", isTakeOrderEnabled=");
-		builder.append(isTakeOrderEnabled);
 		builder.append(", autoAck=");
 		builder.append(autoAck);
 		builder.append("]");

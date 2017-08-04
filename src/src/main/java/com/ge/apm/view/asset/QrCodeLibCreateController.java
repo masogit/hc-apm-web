@@ -101,8 +101,8 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         return acService.getTenantName(siteId);
     }
     
-    public String getOrgName(Integer orgId) {
-        return acService.getOrgName(orgId);
+    public String getOrgName(Integer orgid) {
+        return acService.getOrgName(orgid);
     }
     
     public List<OrgInfo> getHospitalList() {

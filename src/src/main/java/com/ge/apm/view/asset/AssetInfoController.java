@@ -24,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.ge.apm.service.asset.AssetDepreciationService;
 import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.QRCodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -73,6 +74,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String operation;
 
     private AssetDepreciationService assetDepreciationService;
+    
+    private QrCodeService qrCodeService;
 
     private String qrCode;
     Boolean terminate;
@@ -109,6 +112,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         attachDao = WebUtil.getBean(AssetFileAttachmentRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
+        qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
@@ -328,13 +332,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void renewQrcode(){
+        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(),1);
+        qrCode = qrcodeLib.getQrCode();
+    }
+    
     private boolean updateQrCode() {
         QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode);
         if (qrCodeLib == null) {
             WebUtil.addErrorMessage(WebUtil.getMessage("InvalidQRCode"));
             return false;
         }
-        if (qrCodeLib.getSiteId() != selected.getSiteId() || qrCodeLib.getHospitalId() != selected.getHospitalId()) {
+        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
@@ -345,8 +354,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode());
         if (null != oldQRCodeLib) {
-            oldQRCodeLib.setStatus(4);
-            qrcodeDao.save(oldQRCodeLib);
+           qrCodeService.discardQrCode(qrCode);
         }
         qrCodeLib.setStatus(3);
         qrcodeDao.save(qrCodeLib);
