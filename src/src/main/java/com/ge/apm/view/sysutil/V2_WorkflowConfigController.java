@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.V2_DeviceTypeRepository;
+import com.ge.apm.dao.DeviceTypeRepository;
 import com.ge.apm.dao.V2_WorkflowConfigRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_DeviceType;
@@ -24,7 +24,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 
 	private static final long serialVersionUID = 1L;
 	private V2_WorkflowConfigRepository dao = null;
-	private V2_DeviceTypeRepository deviceTypeDao;
+	private DeviceTypeRepository deviceTypeDao;
 	private UserAccountRepository userDao;
 	private UserAccount user;
 	private UserAccount owner;
@@ -36,7 +36,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(V2_WorkflowConfigRepository.class);
-		deviceTypeDao = WebUtil.getBean(V2_DeviceTypeRepository.class);
+		deviceTypeDao = WebUtil.getBean(DeviceTypeRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		
 		initDispatchUserList();
