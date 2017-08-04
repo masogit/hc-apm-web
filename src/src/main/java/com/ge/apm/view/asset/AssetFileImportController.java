@@ -42,6 +42,7 @@ public class AssetFileImportController {
     private Boolean hasExportData = false;
     
     private Boolean canbeImported = false;
+    private Boolean autoGenerateQrcode = true;
 
     private StreamedContent exportFile;
 
@@ -76,7 +77,7 @@ public class AssetFileImportController {
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap);
+            aiService.importData(importOrgMap, importAssetMap,autoGenerateQrcode);
             isImported = true;
 
             try {
@@ -131,6 +132,14 @@ public class AssetFileImportController {
 
     public Boolean getCanbeImported() {
         return canbeImported;
+    }
+
+    public Boolean getAutoGenerateQrcode() {
+        return autoGenerateQrcode;
+    }
+
+    public void setAutoGenerateQrcode(Boolean autoGenerateQrcode) {
+        this.autoGenerateQrcode = autoGenerateQrcode;
     }
     
 }
