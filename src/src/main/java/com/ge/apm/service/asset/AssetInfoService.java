@@ -32,14 +32,15 @@ public class AssetInfoService {
     AssetInfoRepository assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
     AssetContractRepository contractDao = WebUtil.getBean(AssetContractRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
-    
+
     UaaService uaaService = WebUtil.getBean(UaaService.class);
 
     public String getAssetInfoName(Integer id) {
-        if(null==id || id==0)
+        if (null == id || id == 0) {
             return "";
-        else
+        } else {
             return assetInfoDao.findById(id).getName();
+        }
     }
 
     public AssetInfo getAssetInfo(int id) {
@@ -53,29 +54,39 @@ public class AssetInfoService {
         List<AssetInfo> assetList = assetInfoDao.findBySearchFilter(assetInfoFilters);
         return assetList;
     }
-    
-    public List<AssetContract> getContractList(Integer assetId){
+
+    public List<AssetContract> getContractList(Integer assetId) {
         return contractDao.findByAssetId(assetId);
     }
-    
-    public List<OrgInfo> getHospitalList(){
+
+    public List<OrgInfo> getHospitalList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        if(user.getOrgLevel()==null) {
-            return null;
-        }
-        switch (user.getOrgLevel()){
-            case 0: orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID())); break;
-            case 1: orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID())); break;
-            case 2: orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID())); break;
-            case 3: orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID())); break;
-            default : return null;
+        if (user.getOrgLevel() == null) {
+            orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+        } else {
+            switch (user.getOrgLevel()) {
+                case 0:
+                    orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+                    break;
+                case 1:
+                    orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+                    break;
+                case 2:
+                    orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+                    break;
+                case 3:
+                    orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+                    break;
+                default:
+                    orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+            }
         }
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgDao.findBySearchFilter(orgInfoFilters);
     }
-    
-    public List<OrgInfo> getOrgDeptList(String siteUid){
+
+    public List<OrgInfo> getOrgDeptList(String siteUid) {
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
