@@ -131,7 +131,7 @@
 	                    <p:column headerText="#{msg.departNum}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.departNum}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.financingNum}" visible="false" exportable="true">
+	                    <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
 	                        <h:outputText value="#{item.financingNum}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.barcode}" visible="false" exportable="true">
@@ -253,7 +253,7 @@
                         <p:column headerText="#{msg.depreciationMethod}" visible="false" exportable="true">
 	                     	<h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList',item.depreciationMethod)}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150">
+	                    <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
 	                     	<h:outputText value="#{item.qrCode}"/>
 	                    </p:column>
 
