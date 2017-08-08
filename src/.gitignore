@@ -10,6 +10,7 @@ sql/insert-apm-data/
 about.html
 dist/
 src/main/webapp/react
+src/public/resources/*
 
 # Logs
 logs
