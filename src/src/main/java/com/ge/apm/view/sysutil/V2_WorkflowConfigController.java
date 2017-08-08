@@ -1,5 +1,6 @@
 package com.ge.apm.view.sysutil;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
@@ -15,6 +16,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_DeviceType;
 import com.ge.apm.domain.V2_WorkflowConfig;
 
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -38,21 +40,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 		dao = WebUtil.getBean(V2_WorkflowConfigRepository.class);
 		deviceTypeDao = WebUtil.getBean(DeviceTypeRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
-		
 		initDispatchUserList();
-		
 		deviceTypeList = deviceTypeDao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),
 				user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());
-		
-		selected = dao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),
-				user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());
-		if(selected == null){
-			selected = new V2_WorkflowConfig();
-			selected.setTenantUID(user.getTenantUID());
-			selected.setInstitutionUID(user.getInstitutionUID());
-			selected.setHospitalUID(user.getHospitalUID());
-			selected.setSiteUID(user.getSiteUID());
-		}
 	}
 
 	private void initDispatchUserList() {
@@ -74,12 +64,12 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 
 	@Override
 	protected Page<V2_WorkflowConfig> loadData(PageRequest pageRequest) {
-		return dao.findAll(pageRequest);
-//		if (this.searchFilters == null) {
-//			return dao.findAll(pageRequest);
-//		} else {
-//			return dao.findBySearchFilter(this.searchFilters, pageRequest);
-//		}
+        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+        return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
 	public void onOwnerChange() {
@@ -87,6 +77,15 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 			selected.setDispatchUserId(owner.getId());
 			selected.setDispatchUserName(owner.getName());
 		}
+	}
+	
+	public String getTypeName(Integer deviceType){
+		for (V2_DeviceType dt : deviceTypeList) {
+			if(dt.getId().equals(deviceType)){
+				return dt.getName();
+			}
+		}
+		return null;
 	}
 
 	@Override
@@ -112,20 +111,39 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 
 	@Override
 	public void onBeforeSave(V2_WorkflowConfig config) {
+		selected.setTenantUID(user.getTenantUID());
+		selected.setInstitutionUID(user.getInstitutionUID());
+		selected.setHospitalUID(user.getHospitalUID());
+		selected.setSiteUID(user.getSiteUID());
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
-			UserAccount dispather1 = uaDao.getById(selected.getDispatchUserId());
+			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
 			if (dispather1 != null) {
-				config.setDispatchUserName(dispather1.getName());
+				selected.setDispatchUserName(dispather1.getName());
 			}
 		}
 		if (selected.getDispatchUserId2() != null) {
-			UserAccount dispather2 = uaDao.getById(selected.getDispatchUserId2());
+			UserAccount dispather2 = uaDao.getById(config.getDispatchUserId2());
 			if (dispather2 != null) {
-				config.setDispatchUserName2(dispather2.getName());
+				selected.setDispatchUserName2(dispather2.getName());
 			}
 		}
 	}
+	
+    public void save() {
+        onBeforeSave(selected);
+        if (selected.hashCode() == 0) {
+    		V2_WorkflowConfig wfcFromDB = dao.findByDeviceTypeAndTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(selected.getDeviceType()
+    				,user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID());
+    		if(wfcFromDB != null){
+    			WebUtil.addErrorMessage("该类型工作流配置已存在!");
+    			return;
+    		}
+            create();
+        } else {
+            update();
+        }
+    }
 
 	public UserAccount getOwner() {
 		return owner;

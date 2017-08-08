@@ -14,7 +14,7 @@ import javax.persistence.Table;
 @Table(name = "v2_workflow_config")
 public class V2_WorkflowConfig implements Serializable{
 	
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = -1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
@@ -65,12 +65,12 @@ public class V2_WorkflowConfig implements Serializable{
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
     
-    @Column(name = "urgent_timeout_close")
+/*    @Column(name = "urgent_timeout_close")
     private Integer urgentTimeout;//紧急工单超时提醒时间
     
     @Column(name="urgent_max_message_count")
     private Integer urgentMaxMessageCount;//紧急工单提醒次数
-    
+*/    
 /*    @Column(name = "pm_remind_days")//提前提醒的天数
     private Integer pmRemindDays;
     
@@ -88,23 +88,6 @@ public class V2_WorkflowConfig implements Serializable{
     
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
-    
-    
-    public Integer getUrgentTimeout() {
-		return urgentTimeout;
-	}
-
-	public void setUrgentTimeout(Integer urgentTimeout) {
-		this.urgentTimeout = urgentTimeout;
-	}
-
-	public Integer getUrgentMaxMessageCount() {
-		return urgentMaxMessageCount;
-	}
-
-	public void setUrgentMaxMessageCount(Integer urgentMaxMessageCount) {
-		this.urgentMaxMessageCount = urgentMaxMessageCount;
-	}
 
 	public Integer getDeviceType() {
 		return deviceType;
@@ -266,6 +249,26 @@ public class V2_WorkflowConfig implements Serializable{
 		builder.append("]");
 		return builder.toString();
 	}
+	
+	@Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof V2_WorkflowConfig)) {
+            return false;
+        }
+        V2_WorkflowConfig other = (V2_WorkflowConfig) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
+    }
     
     
 }
