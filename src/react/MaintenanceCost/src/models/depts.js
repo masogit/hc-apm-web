@@ -1,10 +1,10 @@
 import axios from 'axios'
 import { API_HOST } from '#/constants'
 
-const isHeadEl = document.querySelector('#user-context #isHead')
+const isHeadEl = document.querySelector('#user-context #isHead') || { value: false }
 const isHead = isHeadEl ? JSON.parse(isHeadEl.value) : false
 
-const orgIdEl = document.querySelector('#user-context #orgId')
+const orgIdEl = document.querySelector('#user-context #orgId') || { value: false }
 const orgId = isHead ? undefined : parseInt(orgIdEl.value)
 
 export default {
