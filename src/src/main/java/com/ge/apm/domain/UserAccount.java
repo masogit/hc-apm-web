@@ -136,7 +136,7 @@ public class UserAccount implements Serializable {
     private boolean isUnbunding;
     
     @JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.LAZY)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
     private List<UserRole> userRoleList;
 
     @Column(name = "org_id")
@@ -342,6 +342,15 @@ public class UserAccount implements Serializable {
         return userRoleList;
     }
 
+    public String getUserRoleNames() {
+        String roleNames = "";
+        for(UserRole userRole: userRoleList){
+            roleNames = roleNames + userRole.getRole().getRoleDesc()+ " ";
+        }
+        
+        return roleNames;
+    }
+    
     public void setUserRoleList(List<UserRole> userRoleList) {
         this.userRoleList = userRoleList;
     }

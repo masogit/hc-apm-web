@@ -119,9 +119,9 @@
                                 <p:column headerText="#{msg.intExtType}">
                                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                                 </p:column>  
-                                <p:column headerText="#{msg.currentPersonName}">
+<!--                                <p:column headerText="#{msg.currentPersonName}">
                                     <h:outputText value="#{item.currentPersonName}"/>
-                                </p:column>
+                                </p:column>-->
                                 <p:column headerText="#{msg.Acknowledge}">
                                     <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderAckController.prepareAck(item.id)}" update="tabview:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
                                 </p:column>
@@ -167,9 +167,9 @@
                                 <p:column headerText="#{msg.intExtType}">
                                     <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
                                 </p:column>  
-                                <p:column headerText="#{msg.currentPersonName}">
+<!--                                <p:column headerText="#{msg.currentPersonName}">
                                     <h:outputText value="#{item.currentPersonName}"/>
-                                </p:column>
+                                </p:column>-->
                                 <p:column headerText="#{msg.feedback}">
                                     <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderRateController.prepareRate(item.id)}" update="tabview:rateDialogForm" oncomplete="PF('rateDialog').show()"/>
                                 </p:column>
