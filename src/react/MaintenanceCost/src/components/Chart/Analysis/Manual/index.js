@@ -37,7 +37,7 @@ class Manual extends React.PureComponent {
     const { rate } = assets
     const columns = [
       {title: '', width: '30%', dataIndex: 'name', key: 'name', className: styles['asset-name']},
-      {title: '开机率:', width: '25%', key: 'onrate_increase', render: (text, record) => (
+      {title: '开机率', width: '25%', key: 'onrate_increase', render: (text, record) => (
         <EditBlock
           className={styles.block}
           onChange={this.handleChange(record.id)('onrate_increase')}
