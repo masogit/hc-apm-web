@@ -37,8 +37,8 @@ public class AssetExamDataAggregator {
     @Autowired
     AssetInfoRepository assetInfoRepository;
 
-    /*该方法会由route id=aggregationAssetExamData来调用*/
-    public String aggregateExamData() throws Exception{
+    /*该方法会由route id=aggregationAssetSummit来调用*/
+    public String aggregateAssetSummit() throws Exception{
         logger.info("start to aggregateExamData");
         Date currentDate = new Date();
         aggregateForAssetSumit(currentDate);
@@ -124,6 +124,7 @@ return "success";
         asm1.setInjectCount(accrp.getInjectCounts());
         asm1.setDeptId(assinfo.getClinicalDeptId());
         asm1.setAssetGroup(assinfo.getAssetGroup());
+
         if(accrp.getExamCount()==null){
             logger.info("gl: accrp.getExamCount() should not be null");
         }else {

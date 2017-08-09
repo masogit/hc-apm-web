@@ -102,13 +102,12 @@
             <to uri="direct:initAssetAggregationData"/>
             <bean ref="assetCostDataAggregator" method="aggregateCostData"/>
         </route>
-        
-        <route id="aggregationAssetExamData">
+        <!--gl working-->
+        <route id="aggregationAssetSummit">
             <from uri="direct:aggregateAssetExamData"/>
             <to uri="direct:initAssetAggregationData"/>
-            <bean ref="assetExamDataAggregator" method="aggregateExamData"/>
+            <bean ref="assetExamDataAggregator" method="aggregateAssetSummit"/>
         </route>
-<!--gl working-->
         <route id="aggregationExamSummitData">
             <from uri="direct:aggregateExamSummitData"/>
             <bean ref="assetExamDataAggregator" method="aggregateExamSummit"/>
@@ -118,13 +117,12 @@
             <from uri="quartz://quartzWorkflowService?cron=20+*+*+*+*+?"/>
             <bean ref="workflowService"  method="execute"/>
         </route>
-
+-->
         <route>
             <from uri="quartz://quartzAssetCostDataAggregation?cron=0+0+*/3+*+*+?"/>
             <to uri="direct:aggregateAssetCostData"/>
-        </route>-->
+        </route>
 
-        <!--http://localhost:8087/geapm/ws/aggregateAssetExamData-->
         <route>
             <from uri="quartz://quartzAssetExamDataAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateAssetExamData"/>
@@ -135,10 +133,10 @@
             <to uri="direct:aggregateExamSummitData"/>
         </route>
 
-<!--         <route>
+        <route>
             <from uri="servlet:///aggregateAssetCostData?servletName=MyServlet"/>
             <to uri="direct:aggregateAssetCostData"/>
-        </route> -->
+        </route>
         
         <route>
             <from uri="servlet:///aggregateAssetExamData?servletName=MyServlet"/>
@@ -177,10 +175,11 @@
             <from uri="servlet:///aggregateAssetExamDataByAssetId?servletName=MyServlet"/>
             <to uri="direct:initAssetAggregationDataByAssetId"/>
             <log message="call bean: b=${body}, h=${headers}" loggingLevel="ERROR"/>
-            <bean ref="assetExamDataAggregator" method="aggregateExamData"/>
+            <bean ref="assetExamDataAggregator" method="aggregateExamSummit"/>
         </route>
         <!-- end of aggregate asset cost and exam data by assetId !-->
 
     </routeContext>
 
 </beans>
+>>>>>>> create work order on web

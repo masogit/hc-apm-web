@@ -105,7 +105,7 @@ public class AssetExamDataService {
                // assetExamDataAggregator.initAssetAggregationDataByDateRange(from.toDate(), to.toDate());
                 while(from.isBefore(to)||from.isEqual(to)){
                     logger.info("aggrateExamSummitbyRange begin ,current day is {}",from.toString());
-                    assetExamDataAggregator.aggregateForExamSumit(from.toDate());
+                    assetExamDataAggregator.aggregateForAssetSumit(from.toDate());
                     from = from.plusDays(DAY);
                 }
                 return "success";

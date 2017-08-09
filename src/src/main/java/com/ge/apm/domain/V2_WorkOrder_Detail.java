@@ -2,22 +2,14 @@ package com.ge.apm.domain;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 @Entity
@@ -25,11 +17,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class V2_WorkOrder_Detail implements Serializable {
 
     private static final long serialVersionUID = 1L;
-//    @Id
-//    @GeneratedValue(strategy = GenerationType.IDENTITY)
-//    @Basic(optional = false)
-//    @Column(name = "id")
-//    private Integer id;
+
 
     @Id
     @GeneratedValue(generator = "uuid")
@@ -41,9 +29,6 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "wo_id")
     private String woId;
 
-    @Column(name = "man_hours")
-    private Integer manHours;
-
     @Size(max = 60)
     @Column(name = "parts")
     private String parts;
@@ -54,17 +39,64 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "parts_price")
     private Double partsPrice;
 
-    @Column(name = "other_expense")
-    private Double otherExpense;
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
 
-    @Column(name = "cowoker_user_id")
-    private Integer cowokerUserId;
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
 
-    @Column(name = "cowoker_user_name")
-    private String cowokerUserName;
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
 
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
+
+    @Column(name = "created_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    private Date createdDate;
     public String getId() {
         return id;
+    }
+
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
     }
 
     public void setId(String id) {
@@ -79,13 +111,7 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.woId = woId;
     }
 
-    public Integer getManHours() {
-        return manHours;
-    }
 
-    public void setManHours(Integer manHours) {
-        this.manHours = manHours;
-    }
 
     public String getParts() {
         return parts;
@@ -111,29 +137,7 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.partsPrice = partsPrice;
     }
 
-    public Double getOtherExpense() {
-        return otherExpense;
-    }
 
-    public void setOtherExpense(Double otherExpense) {
-        this.otherExpense = otherExpense;
-    }
-
-    public Integer getCowokerUserId() {
-        return cowokerUserId;
-    }
-
-    public void setCowokerUserId(Integer cowokerUserId) {
-        this.cowokerUserId = cowokerUserId;
-    }
-
-    public String getCowokerUserName() {
-        return cowokerUserName;
-    }
-
-    public void setCowokerUserName(String cowokerUserName) {
-        this.cowokerUserName = cowokerUserName;
-    }
 
     @Override
     public int hashCode() {

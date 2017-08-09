@@ -59,16 +59,16 @@ public class AssetExamTest extends BaseJunit4Test{
     @Rollback(false)
     public void testAssetSummit()throws Exception{
         //by current day
-        assetExamDataAggregator.aggregateExamSummit();
+       //  assetExamDataAggregator.aggregateExamSummit();
         // by specific day
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date currentDate= sdf.parse("2017-02-18");
+        Date currentDate= sdf.parse("2017-08-07");
         assetExamDataAggregator.aggregateForAssetSumit(currentDate);
         //by range
-        BatchAssetExam batchAssetExam=new BatchAssetExam();
-        batchAssetExam.setFrom("2016-08-01");
-        batchAssetExam.setTo("2016-09-01");
-        assetExamDataService.aggregateAssetSummitRangeDay(batchAssetExam);
+            /*BatchAssetExam batchAssetExam=new BatchAssetExam();
+            batchAssetExam.setFrom("2017-07-06");
+            batchAssetExam.setTo("2016-07-07");
+            assetExamDataService.aggregateAssetSummitRangeDay(batchAssetExam);*/
     }
 
     @Autowired
