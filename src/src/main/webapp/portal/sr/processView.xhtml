@@ -125,9 +125,9 @@
                             <br/>
 
                             <p:dataTable value="#{workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}" var="detailItem"  rendered="#{not empty workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}">
-                                <p:column headerText="#{msg.manHours}">
+                               <!-- <p:column headerText="#{msg.manHours}">
                                     <h:outputText value="#{detailItem.manHours}" />
-                                </p:column>
+                                </p:column>-->
                                 <p:column headerText="#{msg.accessory}">
                                     <h:outputText value="#{detailItem.parts}" />
                                 </p:column>
@@ -140,9 +140,9 @@
                                 <p:column headerText="#{msg.otherExpense}">
                                     <h:outputText value="#{detailItem.otherExpense}" />
                                 </p:column>
-                                <p:column headerText="#{msg.cowokerUserName}">
+                               <!-- <p:column headerText="#{msg.cowokerUserName}">
                                     <h:outputText value="#{detailItem.cowokerUserName}" />
-                                </p:column>
+                                </p:column>-->
 
                             </p:dataTable>
 <!--                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{woItem.currentStepId le 3}">

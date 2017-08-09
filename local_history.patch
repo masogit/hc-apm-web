@@ -1,0 +1,8 @@
+Index: src/src/main/webapp/portal/sr/dlg/repairCompleteDlg.xhtmlIDEA additional info:Subsystem: com.intellij.openapi.diff.impl.patch.CharsetEP<+>UTF-8===================================================================--- src/src/main/webapp/portal/sr/dlg/repairCompleteDlg.xhtml	(revision )+++ src/src/main/webapp/portal/sr/dlg/repairCompleteDlg.xhtml	(revision )@@ -131,7 +131,7 @@                         <h:outputText value="#{item.cowokerUserName}"/>
+                     </p:column>
+                     <p:column headerText="#{msg.Actions}">
+-                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderListController.prepareCreateDetail()}" update=":coworkerDlg :coworkerDlgForm" oncomplete="PF('coworkerDlg').show()"/>
++                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderListController.prepareCreateCoWorkerDetail()}" update=":coworkerDlg :coworkerDlgForm" oncomplete="PF('coworkerDlg').show()"/>
+                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderListController.prepareEditDetail(item)}" update=":coworkerDlg" oncomplete="PF('coworkerDlg').show()"  />
+                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderListController.deleteItem(item.id,2)}" update=":repairCompleteDialogForm :repairCompleteDialogForm:coworkerList" >
+                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>

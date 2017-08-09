@@ -120,6 +120,7 @@ public class WorkOrderExportService {
                 Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
                 info += workOrderDetail.getParts()+",数量："+ tempQuantity +",单价:"+ tempPrice +";";
             }
+
             workOrderMap.put("维修备件", info);
             workOrderMap.put("价格", workOrder.getTotalPrice());
             if(evaluateStep != null){

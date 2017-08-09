@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -21,6 +22,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
@@ -30,71 +32,95 @@ import java.util.*;
 @ManagedBean
 @ViewScoped
 public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOrder> implements Serializable {
+    private Integer manHours;
+    private Double otherExpense;
     private Date esTime;
     private Date confirmedUpDate;
     private V2_WorkOrderRepository dao;
     private ServiceRequestRepository srDao;
     private V2_WorkOrderService woService;
     private List<I18nMessage>   msgModeList;
+    private String equipmentTaker;
+    private String takeTime;
     //status：0-待派工/1-待接单/2-维修中/3-已完成/4-已派工/10-已取消  待验收-5, 待关单-6, 已关单-7
     private Integer queryIndex;
     private Integer category=100;
     private boolean addOrUpdate;
     private V2_ServiceRequest selectedServiceRequest;
-    //private BiomedGroupRepository groupDao;
     private V2_WorkOrder selectedWorkOrder;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetInfoRepository;
     private UserAccount ua;
     private List<V2_WorkOrder_Detail> workOrderDetailsList;
+    private List<V2_WorkOrder_Detail> accessList;
+    private List<V2_WorkOrderCoworker> coWorkerList;
+    private WorkOrderCoworkerRepository coWorkerDao;
+    private WorkOrderDetailRepository woDetailDao;
+
     private V2_WorkOrder_Detail itemDetail ;
+    private V2_WorkOrderCoworker coWorkerDetail ;
     private UserAccountRepository userAccountRepository;
     private String testMethod;
     private String solution;
     private String problemDes;
     private String comments;
+    String woUid=null;
+    String woAccUid=null;
+    String woCoworkUid=null;
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         srDao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
-       // groupDao = WebUtil.getBean(BiomedGroupRepository.class);
         this.filterBySite = true;
         queryIndex = 3;
+        category=0;
         ua = UserContextService.getCurrentUserAccount();
         assetFaultTypeService=WebUtil.getBean(AssetFaultTypeService.class);
         assetInfoRepository=WebUtil.getBean(AssetInfoRepository.class);
         userAccountRepository=WebUtil.getBean(UserAccountRepository.class);
+        coWorkerDao=WebUtil.getBean(WorkOrderCoworkerRepository.class);
+        woDetailDao=WebUtil.getBean(WorkOrderDetailRepository.class);
         initWorkOrderDetailList();
     }
     public void initWorkOrderDetailList(){
-        itemDetail = new V2_WorkOrder_Detail();
+
         workOrderDetailsList = new ArrayList<V2_WorkOrder_Detail>();
+        accessList = new ArrayList<V2_WorkOrder_Detail>();
+        coWorkerList = new ArrayList<V2_WorkOrderCoworker>();
         woUid=UUID.randomUUID().toString().replace("-", "");
-        itemDetail.setId(woUid);
-        itemDetail.setManHours(0);
-        workOrderDetailsList.add(itemDetail);
+        confirmedUpDate=null;
+        manHours=null;
+        otherExpense=null;
+        //accessory list init
+        woAccUid=UUID.randomUUID().toString().replace("-", "");
+        itemDetail = new V2_WorkOrder_Detail();
+        itemDetail.setId(woAccUid);
+        //  itemDetail.setManHours(0);
+        accessList.add(itemDetail);
+        //co woker list init
+        coWorkerDetail = new V2_WorkOrderCoworker();
+        woCoworkUid=UUID.randomUUID().toString().replace("-", "");
+        coWorkerDetail.setId(woCoworkUid);
+        coWorkerDetail.setManHours(0);
+        coWorkerList.add(coWorkerDetail);
+
+        // workOrderDetailsList.add(itemDetail);
 
     }
 
 
-    public boolean isManHours(){
-       return  itemDetail.getManHours()==null?false:true;
-    }
+  /*  public boolean isManHours(){
+        if(itemDetail!=null)
+            return  itemDetail.getManHours()==null?false:true;
+        else
+            return false;
+    }*/
 
     public void saveDetail(){
-        String username=null;
-        if(woUid!=null){
-            Iterator<V2_WorkOrder_Detail> sListIterator = workOrderDetailsList.iterator();
-            while(sListIterator.hasNext()){
-                V2_WorkOrder_Detail workOrderDetail = sListIterator.next();
-                if(workOrderDetail.getId().equals(woUid)){
-                    sListIterator.remove();
-                }
-            }
-            woUid=null;
-        }
+        /*String username=null;
+        removeWoUid(workOrderDetailsList);
         V2_WorkOrder_Detail v2 = new V2_WorkOrder_Detail();
-        v2.setManHours(itemDetail.getManHours());
+       // v2.setManHours(itemDetail.getManHours());
         v2.setId(UUID.randomUUID().toString().replace("-", ""));
         v2.setParts(itemDetail.getParts());
         v2.setPartsPrice(itemDetail.getPartsPrice());
@@ -104,7 +130,80 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         if(itemDetail!=null)
          username=userAccountRepository.findById(itemDetail.getCowokerUserId()).getName();
         v2.setCowokerUserName(username);
-        workOrderDetailsList.add(v2);
+        workOrderDetailsList.add(v2);*/
+    }
+
+    public void addAcessItem(){
+        removeAcessListFirstItem(accessList);
+        V2_WorkOrder_Detail v2 = new V2_WorkOrder_Detail();
+        v2.setId(UUID.randomUUID().toString().replace("-", ""));
+        v2.setParts(itemDetail.getParts());
+        v2.setPartsPrice(itemDetail.getPartsPrice());
+        v2.setApartsQuantity(itemDetail.getApartsQuantity());
+      /*  v2.setManHours(manHours);
+        v2.setOtherExpense(otherExpense);*/
+        accessList.add(v2);
+    }
+    public void addCoWorkerItem(){
+        String username=null;
+        removeCoWorkerListFirstItem(coWorkerList);
+        V2_WorkOrderCoworker v2 = new V2_WorkOrderCoworker();
+        v2.setId(UUID.randomUUID().toString().replace("-", ""));
+        v2.setCowokerUserId(coWorkerDetail.getCowokerUserId());
+        if(coWorkerDetail!=null)
+            username=userAccountRepository.findById(coWorkerDetail.getCowokerUserId()).getName();
+        v2.setManHours(coWorkerDetail.getManHours());
+        v2.setCowokerUserName(username);
+        //  v2.setOtherExpense(otherExpense);
+        coWorkerList.add(v2);
+    }
+    private void removeWoUid(List<V2_WorkOrder_Detail> arrayList) {
+        if(woUid!=null){
+            Iterator<V2_WorkOrder_Detail> sListIterator = arrayList.iterator();
+            while(sListIterator.hasNext()){
+                V2_WorkOrder_Detail workOrderDetail = sListIterator.next();
+                if(workOrderDetail.getId().equals(woUid)){
+                    sListIterator.remove();
+                }
+            }
+            woUid=null;
+        }
+    }
+    private void removeAcessListFirstItem(List<V2_WorkOrder_Detail> arrayList) {
+        if(woAccUid!=null){
+            Iterator<V2_WorkOrder_Detail> sListIterator = arrayList.iterator();
+            while(sListIterator.hasNext()){
+                V2_WorkOrder_Detail workOrderDetail = sListIterator.next();
+                if(workOrderDetail.getId().equals(woAccUid)){
+                    sListIterator.remove();
+                }
+            }
+            woAccUid=null;
+        }
+    }
+    private void removeCoWorkerListFirstItem(List<V2_WorkOrderCoworker> arrayList) {
+        if(woCoworkUid!=null){
+            Iterator<V2_WorkOrderCoworker> sListIterator = arrayList.iterator();
+            while(sListIterator.hasNext()){
+                V2_WorkOrderCoworker coWorkerList = sListIterator.next();
+                if(coWorkerList.getId().equals(woCoworkUid)){
+                    sListIterator.remove();
+                }
+            }
+            woCoworkUid=null;
+        }
+    }
+    public void takeEquip(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        takeTime = sdf.format(new Date());
+        woService.takeEquip(selectedWorkOrder,equipmentTaker,takeTime);
+    }
+    public Double getOtherExpense() {
+        return otherExpense;
+    }
+
+    public void setOtherExpense(Double otherExpense) {
+        this.otherExpense = otherExpense;
     }
 
     public void createWorkOrder(){
@@ -119,11 +218,25 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void repairWorkOrder(){
-        //gl:1表示是正常
         if(woUid!=null){ //没有添加任何detail，将初始化时默认的detail去掉
             workOrderDetailsList=null;
         }
-        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,workOrderDetailsList);
+        if(woAccUid!=null){
+            accessList=null;
+        }
+        if(woCoworkUid!=null){
+            coWorkerList=null;
+        }
+        //gl:1表示是正常
+        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense);
+
+    }
+    private String checkInDate;
+    public void checkIn(){
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        checkInDate = sdf.format(new Date());
+        if(this.selectedWorkOrder!=null)
+            woService.checkIn(this.selectedWorkOrder);
 
     }
     public V2_WorkOrder_Detail getItemDetail() {
@@ -137,61 +250,174 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     public boolean isWoListEmpty(){
         return  (workOrderDetailsList.size()==0);
     }
-    String woUid=null;
 
 
-    public void prepareEdit(V2_WorkOrder_Detail workOrderDetail){
-         this.prepareEdit();
+    public boolean isAccessListEmpty(){
+        return  (accessList.size()==0);
     }
 
+    public void prepareEdit(V2_WorkOrder_Detail workOrderDetail){
+        this.prepareEdit();
+    }
+
+    public String getTakeTime() {
+        return takeTime;
+    }
+
+    public void setTakeTime(String takeTime) {
+        this.takeTime = takeTime;
+    }
 
     public void prepareDispatch(String woid){
         selectedWorkOrder = dao.findById(woid);
         initWorkOrderDetailList();
 
     }
+    //V2_WorkOrderRepository
 
     public void clickCloseOrder(String woid){
         selectedWorkOrder = dao.findById(woid);
-        initWorkOrderDetailList();
+
+        coWorkerList = coWorkerDao.getByWoIdOrderByCreatedDateAsc(woid);
+        accessList = woDetailDao.getByWoIdOrderByCreatedDateAsc(woid);
+
+
+
+        manHours=selectedWorkOrder.getManHours();
+        otherExpense=selectedWorkOrder.getOtherExpense();
+        System.out.println();
+
     }
     public void prepareEditDetail(V2_WorkOrder_Detail workOrderDetail){
         itemDetail =workOrderDetail;
-        System.out.println(itemDetail);
         setAddOrUpdate(false);
 
     }
+    public void prepareEditDetail(V2_WorkOrderCoworker coWorkerDetail){
+        this.coWorkerDetail =coWorkerDetail;
+        setAddOrUpdate(false);
+
+    }
+    public void accEditDetail(V2_WorkOrder_Detail workOrderDetail){
+        itemDetail =workOrderDetail;
+        setAddOrUpdate(false);
+
+    }
+    public void coworkerEditDetail(V2_WorkOrderCoworker v2co){
+        this.coWorkerDetail =v2co;
+        setAddOrUpdate(false);
+
+    }
+
     public void updateEditDetail(){
-        if(itemDetail!=null) {
+        System.out.println();
+        /*if(itemDetail!=null) {
             itemDetail.setCowokerUserName(userAccountRepository.getById(itemDetail.getCowokerUserId()).getName());
         }
+        setAddOrUpdate(false);*/
+        //   coWorkerDetail.setManHours();
+
+    }
+    public void coWorkerEditDetailConfirm(){
+        //   System.out.println(coWorkerDetail);
+        if(coWorkerDetail!=null){
+            coWorkerDetail.setCowokerUserName(userAccountRepository.getById(coWorkerDetail.getCowokerUserId()).getName());
+        }
+    }
+
+    public void updateAccessDetail(){
+
         setAddOrUpdate(false);
     }
     public void prepareCreateDetail(){
         itemDetail = new V2_WorkOrder_Detail();
         setAddOrUpdate(true);
     }
+    public void prepareCreateCoWorkerDetail(){
+        this.manHours=null;
+        coWorkerDetail = new V2_WorkOrderCoworker();
+        setAddOrUpdate(true);
+    }
+    public void newAccess(){
+        itemDetail = new V2_WorkOrder_Detail();
+        setAddOrUpdate(true);
+    }
+    public void deleteWoDetail(String itemId){
+        if(workOrderDetailsList.size()==1){
+            V2_WorkOrder_Detail v = new V2_WorkOrder_Detail();
+            workOrderDetailsList = new ArrayList<V2_WorkOrder_Detail>();
+            woUid=UUID.randomUUID().toString().replace("-", "");
 
-   public void deleteWoDetail(String itemId){
+            v.setId(woUid);
+            //  v.setManHours(0);
+            workOrderDetailsList.add(v);
+        }
+        else {
+            Iterator<V2_WorkOrder_Detail> sListIterator = workOrderDetailsList.iterator();
+            while (sListIterator.hasNext()) {
+                V2_WorkOrder_Detail workOrderDetail = sListIterator.next();
+                if (workOrderDetail.getId().equals(itemId)) {
+                    sListIterator.remove();
+                }
+            }
+        }
+    }
 
-       if(workOrderDetailsList.size()==1){
-           V2_WorkOrder_Detail v = new V2_WorkOrder_Detail();
-           workOrderDetailsList = new ArrayList<V2_WorkOrder_Detail>();
-           woUid=UUID.randomUUID().toString().replace("-", "");
-           v.setId(woUid);
-           v.setManHours(0);
-           workOrderDetailsList.add(v);
-       }
-       else {
-           Iterator<V2_WorkOrder_Detail> sListIterator = workOrderDetailsList.iterator();
-           while (sListIterator.hasNext()) {
-               V2_WorkOrder_Detail workOrderDetail = sListIterator.next();
-               if (workOrderDetail.getId().equals(itemId)) {
-                   sListIterator.remove();
-               }
-           }
-       }
-   }
+    public void deleteItem(String itemId,int type){
+        if(type ==1){ //删除附件表的记录
+            if(accessList.size()==1){
+                V2_WorkOrder_Detail v = new V2_WorkOrder_Detail();
+                accessList = new ArrayList<V2_WorkOrder_Detail>();
+                woAccUid=UUID.randomUUID().toString().replace("-", "");
+                v.setId(woAccUid);
+                accessList.add(v);
+            }
+            else {
+                Iterator<V2_WorkOrder_Detail> sListIterator = accessList.iterator();
+                while (sListIterator.hasNext()) {
+                    V2_WorkOrder_Detail workOrderDetail = sListIterator.next();
+                    if (workOrderDetail.getId().equals(itemId)) {
+                        sListIterator.remove();
+                    }
+                }
+            }
+        }
+        if(type ==2){ //删除协作者表的记录
+            if(coWorkerList.size()==1){
+                V2_WorkOrderCoworker v = new V2_WorkOrderCoworker();
+                coWorkerList = new ArrayList<V2_WorkOrderCoworker>();
+                woCoworkUid=UUID.randomUUID().toString().replace("-", "");
+                v.setId(woCoworkUid);
+                v.setManHours(0);
+                coWorkerList.add(v);
+            }
+            else {
+                Iterator<V2_WorkOrderCoworker> sListIterator = coWorkerList.iterator();
+                while (sListIterator.hasNext()) {
+                    V2_WorkOrderCoworker workOrderDetail = sListIterator.next();
+                    if (workOrderDetail.getId().equals(itemId)) {
+                        sListIterator.remove();
+                    }
+                }
+            }
+        }
+    }
+
+    public List<V2_WorkOrder_Detail> getAccessList() {
+        return accessList;
+    }
+
+    public void setAccessList(List<V2_WorkOrder_Detail> accessList) {
+        this.accessList = accessList;
+    }
+
+    public List<V2_WorkOrderCoworker> getCoWorkerList() {
+        return coWorkerList;
+    }
+
+    public void setCoWorkerList(List<V2_WorkOrderCoworker> coWorkerList) {
+        this.coWorkerList = coWorkerList;
+    }
 
 
     public String getTestMethod() {
@@ -223,10 +449,6 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         return dao;
     }
 
-    private PageRequest buildPageRequest(Integer pageNumber, int pagzSize) {
-        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
-        return new PageRequest(pageNumber, pagzSize, sort);
-    }
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         Page<V2_WorkOrder> pages = null;
@@ -240,8 +462,8 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         }
         if ( queryIndex ==  7) {//已关单
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, ua.getId()));
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+           // searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, ua.getId()));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             removeFilterOnField("currentStepId");
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         }
@@ -256,10 +478,15 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
-
-
     }
 
+    public String getEquipmentTaker() {
+        return equipmentTaker;
+    }
+
+    public void setEquipmentTaker(String equipmentTaker) {
+        this.equipmentTaker = equipmentTaker;
+    }
 
     public String getComments() {
         return comments;
@@ -285,7 +512,6 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         return assetResponser;
     }
 
-
     public Date getEsTime() {
         return esTime;
     }
@@ -294,26 +520,13 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         this.esTime = esTime;
     }
 
-    public Date getEstimatedClosedTime(){
-        V2_ServiceRequest sr = srDao.findById(this.selectedWorkOrder.getSrId());
-        return sr.getEstimatedCloseTime();
-    }
-    public void defineCategory(Integer cate){
-        this.category = cate;
-        cancel();
-    }
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
         cancel();
     }
-/*public void my(){
-        category =0;
-}
-    public void sameteam(){
-        category =1;
-    }*/
+
     public void defineCate(int cate){
-category =cate;
+        category =cate;
     }
     public void cancel() {
         selected=null;
@@ -322,9 +535,13 @@ category =cate;
         esTime=null;
         selectedWorkOrder=null;
     }
-public void expenseDialogClose(){
+    public void cancelNewWorkdetail(){
         itemDetail=null;
-}
+    }
+    public void cancelNewCoWoker(){
+        coWorkerDetail=null;
+    }
+
     public Integer getCategory() {
         return category;
     }
@@ -336,15 +553,15 @@ public void expenseDialogClose(){
     public V2_ServiceRequest getServiceRequest(String srId){
         return srDao.findById(srId);
     }
-    
+
     public void onSelectWorkOrder() {
         selectedServiceRequest = srDao.findById(selected.getSrId());
     }
-    
+
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
-    
+
     public List<V2_WorkOrder_Detail> getWOrkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
     }
@@ -357,14 +574,9 @@ public void expenseDialogClose(){
         AssetInfo assetinfo = assetInfoRepository.findById(this.selectedWorkOrder.getAssetId());
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
-    
-    public void dispatchWorkOrder(){
-        woService.dispatchWorkOrder(selectedWorkOrder);
-        cancel();
-    }
 
     public void closeWorkOrder(){
-        woService.closeWorkOrder(selectedWorkOrder,workOrderDetailsList);
+        woService.closeWorkOrder(selectedWorkOrder);
         cancel();
     }
 
@@ -377,7 +589,7 @@ public void expenseDialogClose(){
         woService.reassignWorkOrder(step,selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
-    
+
 
     //getter and setter
     public Integer getQueryIndex() {
@@ -403,9 +615,7 @@ public void expenseDialogClose(){
     public void setSelectedWorkOrder(V2_WorkOrder selectedWorkOrder) {
         this.selectedWorkOrder = selectedWorkOrder;
     }
-    
-    //费用明细字段
-    Integer manHours;
+
 
     public Integer getManHours() {
         return manHours;
@@ -431,14 +641,30 @@ public void expenseDialogClose(){
         this.dao = dao;
     }
 
-public boolean renderAddUpdate(){
+    public boolean renderAddUpdate(){
         return addOrUpdate;
-}
+    }
     public boolean isAddOrUpdate() {
         return addOrUpdate;
     }
 
     public void setAddOrUpdate(boolean addOrUpdate) {
         this.addOrUpdate = addOrUpdate;
+    }
+
+    public V2_WorkOrderCoworker getCoWorkerDetail() {
+        return coWorkerDetail;
+    }
+
+    public void setCoWorkerDetail(V2_WorkOrderCoworker coWorkerDetail) {
+        this.coWorkerDetail = coWorkerDetail;
+    }
+
+    public String getCheckInDate() {
+        return checkInDate;
+    }
+
+    public void setCheckInDate(String checkInDate) {
+        this.checkInDate = checkInDate;
     }
 }

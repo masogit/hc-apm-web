@@ -82,7 +82,7 @@
                         </p:column>
 
                         <p:column headerText="" rendered="#{workOrderListController.queryIndex==6}">
-                            <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderListController.clickCloseOrder(item.id)}" update=":toCloseDialogForm" oncomplete="PF('toCloseDialog').show()"/>
+                            <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderListController.clickCloseOrder(item.id)}" update=":toCloseDialogForm :toCloseDialogForm:accessList" oncomplete="PF('toCloseDialog').show()"/>
                         </p:column>
 
                         <f:facet name="{Toolbar}">

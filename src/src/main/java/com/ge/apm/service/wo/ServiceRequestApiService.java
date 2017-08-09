@@ -183,10 +183,9 @@ class ServiceRequestForm {
     }
 }
 
-class WorkOrderActionForm {
-
+class WorkOrderActionForm{
     String serviceRequestId;
-    String strDate;
+    String  strDate;
     String desc;
     String estimatedCloseTime;
     String assigneeId;
@@ -200,6 +199,9 @@ class WorkOrderActionForm {
     String assetStatus;
     String intExtType;
     Object stepDetail;
+    Object stepCoworker;
+    Integer manHours;
+    Double otherExpense;
     Integer currentStepId;
     String equipmentTaker;
     String takeTime;
@@ -364,6 +366,30 @@ class WorkOrderActionForm {
 
     public void setRepairType(Integer repairType) {
         this.repairType = repairType;
+    }
+
+    public Object getStepCoworker() {
+        return stepCoworker;
+    }
+
+    public void setStepCoworker(Object stepCoworker) {
+        this.stepCoworker = stepCoworker;
+    }
+
+    public Integer getManHours() {
+        return manHours;
+    }
+
+    public void setManHours(Integer manHours) {
+        this.manHours = manHours;
+    }
+
+    public Double getOtherExpense() {
+        return otherExpense;
+    }
+
+    public void setOtherExpense(Double otherExpense) {
+        this.otherExpense = otherExpense;
     }
 
 }

@@ -6,12 +6,7 @@
 package com.ge.apm.service.wo;
 
 import com.ge.apm.dao.*;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -20,6 +15,7 @@ import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
@@ -62,12 +58,10 @@ public class V2_WorkOrderService {
     @Autowired
     UserAccountRepository userAccountRepository;
     public List<V2_WorkOrder> getWorkOrdersBySR(String serviceRequest) {
-
         return woDao.findBySrId(serviceRequest);
     }
 
     public List<V2_ServiceRequest> getServiceRequestByAssetId(Integer id) {
-
         return srDao.findByAssetId(id);
     }
 
@@ -153,6 +147,28 @@ public class V2_WorkOrderService {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
         }
     }
+    public void checkIn(V2_WorkOrder selectedWorkOrder){
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
+        String res = srApi.invokeWorkOrderAction(token,formData,"checkIn",selectedWorkOrder.getId());
+        if (res==null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
+        }
+    }
+    public void takeEquip(V2_WorkOrder selectedWorkOrder,String taker, String takeTime){
+        V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(tmpwo.getCurrentStepId());
+        formData.setEquipmentTaker(taker);
+        formData.setTakeTime(takeTime);
+        String res = srApi.invokeWorkOrderAction(token,formData,"take",selectedWorkOrder.getId());
+        if (res==null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
+        }
+    }
 
     public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, String extType,String comments) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
@@ -204,9 +220,9 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime,Integer assetStatus,List<V2_WorkOrder_Detail> details) {
+    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Integer myhours, Double otherExpense) {
 
-       // V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+        // V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         selectedWorkOrder.setCurrentStepId(4);
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
@@ -220,29 +236,29 @@ public class V2_WorkOrderService {
         formData.setConfirmedUpTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedUpTime));
         formData.setCaseType(selectedWorkOrder.getCaseType().toString());
         formData.setAssetStatus(assetStatus.toString());
-        formData.setStepDetail(details);
+        formData.setStepDetail(accDetails);
+        formData.setStepCoworker(coDetails);
+       formData.setManHours(myhours);
+        formData.setOtherExpense(otherExpense);
         String res = srApi.invokeWorkOrderAction(token,formData,"repair",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
         }
     }
 
-    public void closeWorkOrder(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> details) {
 
+    public void closeWorkOrder(V2_WorkOrder selectedWorkOrder) {
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         selectedWorkOrder.setCurrentStepId(6);
         selectedWorkOrder.setCurrentStepName("待关单");
         formData.setCurrentStepId(6);
-
         formData.setDesc(selectedWorkOrder.getComment());
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setCaseType(selectedWorkOrder.getCaseType().toString());
-        formData.setStepDetail(details);
-
         String res = srApi.invokeWorkOrderAction(token,formData,"close",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"关单");
@@ -258,8 +274,6 @@ public class V2_WorkOrderService {
         formData.setAssetStatus(assetSuatus.toString());
         formData.setRequestReason(reason);
         formData.setIntExtType(extType);
-
-
         String res = srApi.createWorkOrder(token,formData);
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"创建");
@@ -308,7 +322,6 @@ public class V2_WorkOrderService {
     }
 //Type：0-我的/1-同一group的/2-同院区的/3-其它院区的
     public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, UserAccount ua) {
-       //PageRequest pr = buildPageRequest(page, pageSize);
         Page<V2_WorkOrder> pages = null;
         //base on the orgLevel
         Integer orgLevel = ua.getOrgLevel();

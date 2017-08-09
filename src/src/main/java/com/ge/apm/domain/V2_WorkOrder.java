@@ -21,14 +21,12 @@ import javax.persistence.TemporalType;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.*;
 
 @Entity
 @Table(name = "v2_work_order")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@Cacheable(true)
+/*@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
+@Cacheable(true)*/
 public class V2_WorkOrder implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -131,6 +129,11 @@ public class V2_WorkOrder implements Serializable {
     @JoinColumn(name = "wo_id")
     private List<V2_WorkOrder_Detail> v2_workOrder_detail_list;
 
+    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.LAZY)
+    @JoinColumn(name="wo_id")
+    @Fetch(FetchMode.SUBSELECT)
+    private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list ;
+
     @Column(name = "comment")
     private String comment;
 
@@ -158,6 +161,12 @@ public class V2_WorkOrder implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdDate;
+
+    @Column(name = "other_expense")
+    private Double otherExpense;
+
+    @Column(name = "man_hours")
+    private Integer manHours;
 
     public String getTenantUID() {
         return tenantUID;
@@ -229,6 +238,14 @@ public class V2_WorkOrder implements Serializable {
 
     public void setV2_workOrder_step_list(List<V2_WorkOrder_Step> v2_workOrder_step_list) {
         this.v2_workOrder_step_list = v2_workOrder_step_list;
+    }
+
+    public List<V2_WorkOrderCoworker> getV2_workOrder_coworker_list() {
+        return v2_workOrder_coworker_list;
+    }
+
+    public void setV2_workOrder_coworker_list(List<V2_WorkOrderCoworker> v2_workOrder_coworker_list) {
+        this.v2_workOrder_coworker_list = v2_workOrder_coworker_list;
     }
 
     public List<V2_WorkOrder_Detail> getV2_workOrder_detail_list() {
@@ -413,6 +430,22 @@ public class V2_WorkOrder implements Serializable {
 
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public Double getOtherExpense() {
+        return otherExpense;
+    }
+
+    public void setOtherExpense(Double otherExpense) {
+        this.otherExpense = otherExpense;
+    }
+
+    public Integer getManHours() {
+        return manHours;
+    }
+
+    public void setManHours(Integer manHours) {
+        this.manHours = manHours;
     }
 
     //		public V2_ServiceRequest getServiceRequest() {

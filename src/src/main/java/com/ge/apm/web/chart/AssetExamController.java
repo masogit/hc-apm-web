@@ -36,6 +36,7 @@ public class AssetExamController {
     @ResponseBody
     public String aggreExamFromTo(@RequestBody BatchAssetExam batchAssetExam) {
 
+        // assetExamDataAggregator.aggregateForAssetSumit(currentDate);
         return  assetExamDataService.aggregateExamSumitRangeDay(batchAssetExam);
     }
 
