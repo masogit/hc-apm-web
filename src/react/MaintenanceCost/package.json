@@ -55,7 +55,7 @@
     "less-loader": "^4.0.3",
     "lodash": "^4.17.4",
     "moment": "^2.18.1",
-    "node-sass": "^4.5.2",
+    "node-sass": "^4.5.3",
     "optimize-css-assets-webpack-plugin": "^1.3.0",
     "ora": "^1.2.0",
     "postcss-loader": "^1.3.3",
@@ -78,6 +78,7 @@
   },
   "dependencies": {
     "antd": "^2.11.0",
+    "ellipsus": "0.0.5",
     "react-hot-loader": "3.0.0-beta.6"
   }
 }

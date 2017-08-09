@@ -3,6 +3,7 @@ import { connect } from 'dva'
 import classnames from 'classnames'
 import { round, withUnit } from '#/utils'
 import styles from './index.scss'
+import Ellipsus from 'ellipsus'
 
 type Props = {
   filters: any,
@@ -28,7 +29,7 @@ class Center extends React.PureComponent<*, Props, *> {
     const { cursor, target } = filters
     return (
       <div className={styles['center']}>
-        <h1>{cursor[1] ? overview.data.name : cursor[0] ? '汇总' : '全部选中设备'}</h1>
+        <h1><Ellipsus>{cursor[1] ? overview.data.name : cursor[0] ? '汇总' : '全部选中设备'}</Ellipsus></h1>
         <table className={styles['cost']} onClick={this.toggleTarget('acyman')} data-active={target === 'acyman'}>
           <thead>
             <tr>
