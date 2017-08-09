@@ -151,7 +151,7 @@
           var uri = URI(this.resolveApiUrl('/api/health'));
           if (typeof category === 'number') {
             uri.addQuery('category', category);
-          } 
+          }
           if (this.user.isHead === 'false') { // this is insane...
             uri.addQuery('dept', this.user.orgId);
           }
@@ -318,11 +318,19 @@
                     .attr('fill', '#fff');
 
                     // title
+                    var titleText = node.data.name;
                     var title = label.append('tspan')
                     .attr('x', 0)
                     .attr('text-anchor', 'middle')
-                    .attr('transform', 'translate(' + [0, .4 * radius].join(',') + ')')
-                    .text(node.data.name);
+                    .text(titleText);
+                    if (title.node().getBBox().width > 100) {
+                      title.text(titleText.slice(0, titleText.length / 2))
+                      label.append('tspan')
+                      .attr('x', 0)
+                      .attr('text-anchor', 'middle')
+                      .attr('dy', '1.1em')
+                      .text(titleText.slice(titleText.length / 2));
+                    }
 
                     // stage
                     label.append('tspan')
@@ -345,7 +353,7 @@
                     .text(node.data.owner);
 
                     title.attr('dy', function() {
-                      return -label.node().getBBox().height / 3; 
+                      return -label.node().getBBox().height / 3;
                     })
 
                     var steps = _this._createSteps(node.data.stage);
@@ -389,10 +397,19 @@
                     .attr('fill', '#fff');
 
                     // title
+                    var titleText = node.data.name;
                     var title = label.append('tspan')
                     .attr('x', 0)
                     .attr('text-anchor', 'middle')
-                    .text(node.data.name);
+                    .text(titleText);
+                    if (title.node().getBBox().width > 100) {
+                      title.text(titleText.slice(0, titleText.length / 2))
+                      label.append('tspan')
+                      .attr('x', 0)
+                      .attr('text-anchor', 'middle')
+                      .attr('dy', '1.1em')
+                      .text(titleText.slice(titleText.length / 2));
+                    }
 
                     // date-time
                     label.append('tspan')
@@ -412,7 +429,7 @@
                       .text(node.data.desc);
                     }
                     title.attr('dy', function() {
-                      return -label.node().getBBox().height / 3; 
+                      return -label.node().getBBox().height / 3;
                     })
                     break;
                   }
