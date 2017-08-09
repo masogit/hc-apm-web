@@ -64,7 +64,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox id="isFinished" itemLabel="#{msg.isFinished}" value="#{inspectionOrderController.selected.isFinished}"  disabled="true"/>
+                                <p:selectBooleanCheckbox id="isFinished" itemLabel="#{msg.isFinished}" value="#{inspectionOrderController.selected.isFinished}"  disabled="false"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
@@ -92,9 +92,9 @@
                             <p:column headerText="#{msg.checkListItem}">
                                 <h:outputText value="#{item.itemName}" />
                             </p:column>
-                            <p:column headerText="#{msg.isPassed}" style="align-content: center; width: 10%">
+                            <!--<p:column headerText="#{msg.isPassed}" style="align-content: center; width: 10%">
                                 <p:selectBooleanCheckbox value="#{item.isPassed}"   disabled="true" />
-                            </p:column>
+                            </p:column>-->
                         </p:dataTable>
                     </p:fieldset>
 

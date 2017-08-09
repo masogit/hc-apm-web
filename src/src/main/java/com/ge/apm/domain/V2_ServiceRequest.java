@@ -161,6 +161,9 @@ public class V2_ServiceRequest  implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Column(name = "sr_num")
+    private String srNum;
+
     public String getTenantUID() {
         return tenantUID;
     }
@@ -399,6 +402,14 @@ public class V2_ServiceRequest  implements Serializable {
 
     public void setNearestSrId(String nearestSrId) {
         this.nearestSrId = nearestSrId;
+    }
+
+    public String getSrNum() {
+        return srNum;
+    }
+
+    public void setSrNum(String srNum) {
+        this.srNum = srNum;
     }
 
     @Override
