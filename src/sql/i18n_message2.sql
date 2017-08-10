@@ -415,6 +415,7 @@ INSERT INTO "public"."i18n_message" VALUES ('779', 'label', 'V2_WorkFlowConfig',
 INSERT INTO "public"."i18n_message" VALUES ('780', 'label', 'UrgentTimeout', '紧急工单超时时间', 'urgent workorder timeout ', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('781', 'label', 'UrgentMaxMessageCount', '紧急工单超时提醒次数', 'urgent workorder remind times', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('782', 'label', 'WorkOrderWorkflowConfig', '重要工单工作流配置', 'workorder workflow config ', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('783', 'label', 'DeviceTypeGroup', '设备类型分组配置', 'device type group ', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1401', 'assetGroup', '2', '磁共振MRI类', '磁共振MRI类', null, '-1');
