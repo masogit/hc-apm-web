@@ -5,7 +5,10 @@ import com.ge.apm.service.api.ListService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import javaslang.control.Option;
-import org.simpleflatmapper.tuple.*;
+import org.simpleflatmapper.tuple.Tuple20;
+import org.simpleflatmapper.tuple.Tuple5;
+import org.simpleflatmapper.tuple.Tuple6;
+import org.simpleflatmapper.tuple.Tuple9;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,9 +130,9 @@ public class ListApi {
         Integer dept, Integer type, String orderby,
         Observable<Tuple20<Integer, String, Integer, Integer, String, Double, Double, Integer, Double, Double, Integer, Double, Double, Integer, Double, Double, Double, Double, Double, Double>> asset_info ) {
 
-    asset_info = dept == null ? asset_info : asset_info.filter(t19 -> t19.getElement3()==dept);
+    asset_info = dept == null ? asset_info : asset_info.filter(t19 -> dept.equals(t19.getElement3()));
 
-    asset_info = type == null ? asset_info : asset_info.filter(t19 -> t19.getElement2()==type);
+    asset_info = type == null ? asset_info : asset_info.filter(t19 -> type.equals(t19.getElement2()));
 
     if (orderby.equals("rating"))
       return asset_info.sorted((r, l) -> (int) Math.ceil(100000*l.getElement5() - 100000*r.getElement5()) );
@@ -159,52 +162,52 @@ public class ListApi {
 
     case 10:
       return Math.min(
-          OperatorMinMax.min( ( Observable<Integer>) asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
     case 11:
       return Math.max(
-          OperatorMinMax.max( ( Observable<Integer>) asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
     case 20:
       return Math.min(
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement6())).toBlocking().single(),
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement14())).toBlocking().single() );
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement6())).toBlocking().single(),
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement14())).toBlocking().single() );
     case 21:
       return Math.max(
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement6())).toBlocking().single(),
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement14())).toBlocking().single() );
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement6())).toBlocking().single(),
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement14())).toBlocking().single() );
     case 30:
       return Math.min(
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement8())).toBlocking().single(),
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement16())).toBlocking().single() );
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement8())).toBlocking().single(),
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement16())).toBlocking().single() );
     case 31:
       return Math.max(
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement8())).toBlocking().single(),
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement16())).toBlocking().single() );
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement8())).toBlocking().single(),
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement16())).toBlocking().single() );
     case 40:
       return Math.min(
-          OperatorMinMax.min( ( Observable<Integer>) asset_info.map(asset -> asset.getElement10())).toBlocking().single() * 1.0,
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement18())).toBlocking().single() );
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement10())).toBlocking().single() * 1.0,
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement18())).toBlocking().single() );
     case 41:
       return Math.max(
-          OperatorMinMax.max( ( Observable<Integer>) asset_info.map(asset -> asset.getElement10())).toBlocking().single() * 1.0,
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement18())).toBlocking().single() );
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement10())).toBlocking().single() * 1.0,
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement18())).toBlocking().single() );
     case 50:
       return Math.min(
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement9())).toBlocking().single(),
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement17())).toBlocking().single() );
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement9())).toBlocking().single(),
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement17())).toBlocking().single() );
     case 51:
       return Math.max(
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement9())).toBlocking().single(),
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement17())).toBlocking().single() );
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement9())).toBlocking().single(),
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement17())).toBlocking().single() );
     case 60:
       return Math.min(
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
-          OperatorMinMax.min( ( Observable<Double>) asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
+          OperatorMinMax.min(asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
     case 61:
       return Math.max(
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
-          OperatorMinMax.max( ( Observable<Double>) asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
+          OperatorMinMax.max(asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
     default:
       return 0.0;
     }

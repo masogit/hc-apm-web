@@ -488,11 +488,11 @@ public class DmApiV2 {
     java.util.Map<Integer, String> depts = commonService.findDepts(user.getSiteId(), user.getHospitalId());
     if (Option.of(groupBy).isDefined() && Option.of(dept).isEmpty()) {
       if ("type".equals(groupBy))
-        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getHospitalId(), user.getSiteId(), null, ImmutableMap.of(), ImmutableMap.of(), groups, year));
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getSiteId(), user.getHospitalId(), null, ImmutableMap.of(), ImmutableMap.of(), groups, year));
       else
-        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByDept(user.getHospitalId(), user.getSiteId(), null, ImmutableMap.of(), ImmutableMap.of(), groups, depts, year));
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByDept(user.getSiteId(), user.getHospitalId(), null, ImmutableMap.of(), ImmutableMap.of(), groups, depts, year));
     } else if (Option.of(groupBy).isEmpty() && Option.of(dept).isDefined()) {
-      return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getHospitalId(), user.getSiteId(), dept, ImmutableMap.of(), ImmutableMap.of(), groups, year));
+      return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getSiteId(), user.getHospitalId(), dept, ImmutableMap.of(), ImmutableMap.of(), groups, year));
     } else {
       return ResponseEntity.badRequest().body(ImmutableMap.of("msg", "input data is not supported"));
     }
@@ -524,11 +524,11 @@ public class DmApiV2 {
     ).toJavaMap();
     if (Option.of(groupBy).isDefined() && Option.of(dept).isEmpty()) {
       if ("type".equals(groupBy))
-        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getHospitalId(), user.getSiteId(), null, userPredictedUsage, userInputThreshold, groups, year));
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getSiteId(), user.getHospitalId(), null, userPredictedUsage, userInputThreshold, groups, year));
       else
-        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByDept(user.getHospitalId(), user.getSiteId(), null, userPredictedUsage, userInputThreshold, groups, depts, year));
+        return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByDept(user.getSiteId(), user.getHospitalId(), null, userPredictedUsage, userInputThreshold, groups, depts, year));
     } else if (Option.of(groupBy).isEmpty() && Option.of(dept).isDefined()) {
-      return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getHospitalId(), user.getSiteId(), dept, ImmutableMap.of(), ImmutableMap.of(), groups, year));
+      return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(getResultByType(user.getSiteId(), user.getHospitalId(), dept, ImmutableMap.of(), ImmutableMap.of(), groups, year));
     } else {
       return ResponseEntity.badRequest().body(ImmutableMap.of("msg", "input data is not supported"));
     }
@@ -877,18 +877,18 @@ public class DmApiV2 {
     ));
   }
 
-  private java.util.Map<String, Object> getResultByType(Integer hospitalId, Integer siteId, Integer dept,
+  private java.util.Map<String, Object> getResultByType(Integer siteId, Integer hospitalId, Integer dept,
                                                         java.util.Map<Integer, Double> userPredictedUsage,
                                                         java.util.Map<Integer, java.util.List<Double>> userInputThreshold,
                                                         java.util.Map<Integer, String> groups,
                                                         int year) {
     List<Tuple4<Integer, Integer, Integer, Double>> predictData = predictDataPrepare(dmService.findMonthUsage(siteId, hospitalId, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now()));
     Seq<Tuple2<TypeInfo, List<Asset>>> tmp =
-      itemsDataCalculation(CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
-        CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
-        CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1), LocalDate.now()),
-        predictFutureData(CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
-          CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
+      itemsDataCalculation(CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
+        CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
+        CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1), LocalDate.now()),
+        predictFutureData(CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
+          CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
           predictUsage(predictData, ratios(predictData), year),
           userPredictedUsage, userInputThreshold,
           year)
@@ -909,7 +909,7 @@ public class DmApiV2 {
       .build();
   }
 
-  private java.util.Map<String, Object> getResultByDept(Integer hospitalId, Integer siteId, Integer dept,
+  private java.util.Map<String, Object> getResultByDept(Integer siteId, Integer hospitalId, Integer dept,
                                                         java.util.Map<Integer, Double> userPredictedUsage,
                                                         java.util.Map<Integer, java.util.List<Double>> userInputThreshold,
                                                         java.util.Map<Integer, String> groups,
@@ -917,11 +917,11 @@ public class DmApiV2 {
                                                         int year) {
     List<Tuple4<Integer, Integer, Integer, Double>> predictData = predictDataPrepare(dmService.findMonthUsage(siteId, hospitalId, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now()));
     Seq<Tuple2<DeptInfo, Seq<Tuple2<TypeInfo, List<Asset>>>>> tmp =
-      itemsDataCalculation(CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
-        CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
-        CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1), LocalDate.now()),
-        predictFutureData(CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
-          CalculateHistoryData(hospitalId, siteId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
+      itemsDataCalculation(CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
+        CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
+        CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1), LocalDate.now()),
+        predictFutureData(CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
+          CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
           predictUsage(predictData, ratios(predictData), year),
           userPredictedUsage, userInputThreshold,
           year)

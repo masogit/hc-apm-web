@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -320,8 +321,36 @@ public class V2_WorkOrderService {
         }
         return userListTag;
     }
+
+
 //Type：0-我的/1-同一group的/2-同院区的/3-其它院区的
-    public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, UserAccount ua) {
+public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, UserAccount ua) {
+    Page<V2_WorkOrder> pages = null;
+
+    if (type == 0 || type == 1) {
+        switch(type) {
+            case 0: pages = woDao.fetchAvailableWorkOrderByUser(ua.getId(), pr);break;
+            case 1: pages = woDao.fetchAvailableSameGroupWorkOrderByUser(ua.getId(),pr);
+        }
+        return pages;
+    }
+    Integer orgLevel = ua.getOrgLevel();
+    if (orgLevel == null || orgLevel == 0)
+        orgLevel = 3;
+    List<SearchFilter> searchFilters = new ArrayList<>();
+    switch (orgLevel) {
+        case 1: searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, ua.getInstitutionUID()));break;
+        case 2: searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, ua.getHospitalUID()));break;
+        case 3: searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, ua.getSiteUID()));
+    }
+
+    searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
+
+    return woDao.findBySearchFilter(searchFilters, pr);
+}
+
+    public Page<V2_WorkOrder> getWorkOrderListToPickup_backup(int type,PageRequest pr, UserAccount ua) {
         Page<V2_WorkOrder> pages = null;
         //base on the orgLevel
         Integer orgLevel = ua.getOrgLevel();

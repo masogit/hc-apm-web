@@ -16,9 +16,22 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
     List<V2_WorkOrder> findBySrId(String srId);
 
 
-    @Query(value = "select  wo.* from v2_work_order wo where wo.asset_id in  (select distinct(tr.asset_id) from biomed_group_user bgu,asset_tag_biomed_group tbg,asset_tag_rule tr where tbg.biomed_group_Id=bgu.group_Id and tbg.tag_id =tr.tag_id and bgu.user_id=?1) and wo.current_person_id='-1' and wo.current_step_id=3 and wo.status=1 or wo.current_person_id=?1 and wo.current_step_id=3 and wo.status=1 order by ?#{#pageable}",
+
+    @Query(value="select wo.* from V2_Work_Order wo where wo.asset_Id in (select distinct tr.asset_Id from Biomed_Group_User bgu, "
+            + "Asset_Tag_Biomed_Group tbg, Asset_Tag_Rule tr where bgu.group_Id = tbg.biomed_Group_Id and tbg.tag_Id = tr.tag_Id and bgu.user_Id = ?1) and wo.current_Person_Id = '-1' "
+            + "and wo.current_Step_Id = 3 and wo.status = 1 or wo.current_Person_Id = ?1 and wo.current_Step_Id = 3 and wo.status = 1 or wo.current_Step_Id = 3 and wo.current_Person_Id = '-1' "
+            + "and wo.status = 1 and wo.asset_Id in (select distinct ai.id from Asset_Info ai, User_Account ua, Asset_Tag_Rule tr where case ua.org_Level when 1 then ai.institution_UID = ua.institution_UID "
+            + "when 2 then ai.hospital_UID = ua.hospital_UID when 3 then ai.site_UID = ua.site_UID end and ua.id = ?1 and ai.is_Valid = true and tr.asset_Id <> ai.id) order by ?#{#pageable}",
+            countQuery="select count(1) from V2_Work_Order wo where wo.asset_Id in (select distinct tr.asset_Id from Biomed_Group_User bgu, "
+                    + "Asset_Tag_Biomed_Group tbg, Asset_Tag_Rule tr where bgu.group_Id = tbg.biomed_Group_Id and tbg.tag_Id = tr.tag_Id and bgu.user_Id = ?1) and wo.current_Person_Id = '-1' "
+                    + "and wo.current_Step_Id = 3 and wo.status = 1 or wo.current_Person_Id = ?1 and wo.current_Step_Id = 3 and wo.status = 1 or wo.current_Step_Id = 3 and wo.current_Person_Id = '-1' "
+                    + "and wo.status = 1 and wo.asset_Id in (select distinct ai.id from Asset_Info ai, User_Account ua, Asset_Tag_Rule tr where case ua.org_Level when 1 then ai.institution_UID = ua.institution_UID "
+                    + "when 2 then ai.hospital_UID = ua.hospital_UID when 3 then ai.site_UID = ua.site_UID end and ua.id = ?1 and ai.is_Valid = true and tr.asset_Id <> ai.id)",
+            nativeQuery = true)
+    Page<V2_WorkOrder> fetchAvailableWorkOrderByUser(Integer userId,Pageable pageable);
+    /*@Query(value = "select  wo.* from v2_work_order wo where wo.asset_id in  (select distinct(tr.asset_id) from biomed_group_user bgu,asset_tag_biomed_group tbg,asset_tag_rule tr where tbg.biomed_group_Id=bgu.group_Id and tbg.tag_id =tr.tag_id and bgu.user_id=?1) and wo.current_person_id='-1' and wo.current_step_id=3 and wo.status=1 or wo.current_person_id=?1 and wo.current_step_id=3 and wo.status=1 order by ?#{#pageable}",
             countQuery = "select  wo.* from v2_work_order wo where wo.asset_id in  (select distinct(tr.asset_id) from biomed_group_user bgu,asset_tag_biomed_group tbg,asset_tag_rule tr where tbg.biomed_group_Id=bgu.group_Id and tbg.tag_id =tr.tag_id and bgu.user_id=?1) and wo.current_person_id='-1' and wo.current_step_id=3 and wo.status=1 or wo.current_person_id=?1 and wo.current_step_id=3 and wo.status=1",nativeQuery = true)
-    Page<V2_WorkOrder> fetchAvailableWorkOrderByUser(Integer userId, Pageable pageable);
+    Page<V2_WorkOrder> fetchAvailableWorkOrderByUser(Integer userId, Pageable pageable);*/
 
     Page<V2_WorkOrder> findByHospitalIdAndStatusAndCurrentStepIdAndCurrentPersonIdIn(int hospitalId, int status, int currentStepId, Collection<Integer> c, Pageable pageable);
 
