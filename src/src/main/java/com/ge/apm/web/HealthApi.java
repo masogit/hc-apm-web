@@ -214,7 +214,7 @@ public class HealthApi {
     switch (category) {
 
       case 0:
-        return "待处理总设备";
+        return "待处理总事件";
 
       case 1:
         return "维修中";
@@ -235,19 +235,19 @@ public class HealthApi {
         return "设备巡检";
 
       case 11:
-        return "申请";
+        return "报修";
 
       case 12:
-        return "审核";
-
-      case 13:
         return "派工";
 
+      case 13:
+        return "接单";
+
       case 14:
-        return "领工";
+        return "维修";
 
       case 15:
-        return "维修";
+        return "验收";
 
       case 16:
         return "关单";
@@ -320,7 +320,7 @@ public class HealthApi {
             .put("display", getDisplay(category))
             .put("count",
               queryForCount(asset_health_1, asset_health_2, asset_health_3, asset_health_4, asset_health_5, asset_health_6))
-            .put("unit", getUnit())
+            //.put("unit", getUnit())
             .put("link",
               new ImmutableMap.Builder<String, Object>()
                 .put("ref", getRef("root"))
