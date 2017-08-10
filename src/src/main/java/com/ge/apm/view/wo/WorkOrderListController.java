@@ -454,7 +454,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         Page<V2_WorkOrder> pages = null;
         this.setSiteFilter();
         removeFilterOnField("status");
-        //7->已关单 3->待接单 4->维修中 6->待关单
+        //7->已关单 3->待接单 4->维修中 6->待关单 5-->待验收
         if (queryIndex == 5 ||queryIndex == 3||queryIndex == 4||queryIndex == 6) {
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, ua.getId()));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -467,7 +467,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             removeFilterOnField("currentStepId");
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         }
-        if(category!=100 && queryIndex == 3 ){
+        if(category!=100 && queryIndex == 3 ){//表示在待接单 并且catetory不为100表示属于 我的 或 同组 或 同院中的一个
             pages =woService.getWorkOrderListToPickup(category,pageRequest,ua);
             return pages;
         }
