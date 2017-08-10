@@ -22,7 +22,6 @@
                        		<label class="label">#{msg.deviceType}*</label>
                                <p:selectOneMenu id="deviceType" value="#{v2_WorkflowConfigController.selected.deviceType}" 
                              	required="true" requiredMessage="#{msg.deviceType}#{msg.ValidationRequire}" >
-                                  <!--  <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" /> -->
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{v2_WorkflowConfigController.deviceTypeList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                </p:selectOneMenu>
