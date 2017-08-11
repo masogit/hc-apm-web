@@ -2,17 +2,21 @@ package com.ge.apm.service.asset;
 
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.AssetDepreciationRepository;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetDepreciation;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.service.utils.TimeUtils;
@@ -28,6 +32,19 @@ public class AssetDepreciationService {
 	public static final String FORMAT="yyyy-MM";
 	private static final Logger logger = LoggerFactory.getLogger(AssetDepreciationService.class);
 	private AssetDepreciationRepository assetDepreciationRepository ;
+	
+    @Autowired
+    private AssetInfoRepository assetInfoRepository;
+	
+	@Transactional
+	public String initAssetDepreciation(){
+		List<AssetInfo> assets = (List<AssetInfo>) assetInfoRepository.findAll();
+		if(CollectionUtils.isNotEmpty(assets)){
+			assets.forEach((item) -> saveAssetDerpeciation(item));
+		}
+		return "success";
+	}
+	
 	/***
 	 * 计算资产的月平均成本
 	 */

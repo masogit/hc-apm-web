@@ -1,5 +1,6 @@
 package com.ge.apm.web;
 
+import com.ge.apm.dao.AssetFaultTypeRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.api.HealthService;
 import com.google.common.collect.ImmutableList;
@@ -35,7 +36,10 @@ public class HealthApi {
 
   @Autowired
   private HealthService healthService;
-
+  
+  @Autowired
+  AssetFaultTypeRepository assetTypeRepository;
+  
   private static final String redirect_1 = "/portal/wo/woList.xhtml?isClosed=false";
   private static final String redirect_2 = "/portal/asset/info/List.xhtml?assetStatus=2";
   private static final String redirect_3 = "/portal/asset/info/List.xhtml?model=1";
@@ -601,7 +605,8 @@ public class HealthApi {
         .put("date",
           Option.of(asset.getElement2()).getOrElse("N/A"))
         .put("desc",
-          Option.of(WebUtil.getFieldValueMessage("caseType", asset.getElement3().toString())).getOrElse("N/A"))
+//          Option.of(WebUtil.getFieldValueMessage("caseType", asset.getElement3().toString())).getOrElse("N/A"))
+        		Option.of(assetTypeRepository.getCaseTypeName(asset.getElement3() + 53)).getOrElse("N/A"))
         .put("link",
           new ImmutableMap.Builder<String, Object>()
             .put("ref", getRef("leaf"))
