@@ -98,7 +98,6 @@
           )) {
           item.revenue = 'category' in item ? item.count : 1;
         }
-        item['unit-label'] = '台';
         return item;
       }
 
@@ -244,13 +243,14 @@
               // level 0 and level 1
               case 0:
               // display text
+                var noUnit = node.data.unit === undefined
                 element.append('text')
                 .classed('node--text-label', 1)
                 .text(node.data.display)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', textPixels / 2 + 'px')
                 .attr('fill', '#fff')
-                .attr('transform', 'translate(' + [0, -.45 * radius].join(',') + ')')
+                .attr('transform', 'translate(' + [0, (noUnit ? -.32 : -.45) * radius].join(',') + ')')
                 .call(wrap, size - 10);
 
                 // count
@@ -261,16 +261,18 @@
                 .attr('font-size', textPixels / .8 + 'px')
                 .attr('font-weight', 'bold')
                 .attr('fill', '#fff')
-                .attr('transform', 'translate(' + [0, .22 * radius].join(',') + ')');
+                .attr('transform', 'translate(' + [0, (noUnit ? .32 : .22) * radius].join(',') + ')');
 
                 // unit
-                element.append('text')
-                .classed('node--text-label', 1)
-                .text(node.data['unit-label'])
-                .attr('text-anchor', 'middle')
-                .attr('font-size', textPixels / 2 + 'px')
-                .attr('fill', '#fff')
-                .attr('transform', 'translate(' + [0, .7 * radius].join(',') + ')');
+                if (!noUnit) {
+                  element.append('text')
+                  .classed('node--text-label', 1)
+                  .text(node.data.unit)
+                  .attr('text-anchor', 'middle')
+                  .attr('font-size', textPixels / 2 + 'px')
+                  .attr('fill', '#fff')
+                  .attr('transform', 'translate(' + [0, .7 * radius].join(',') + ')');
+                }
                 break;
 
               case 1:
@@ -298,7 +300,7 @@
                 // unit
                 element.append('text')
                 .classed('node--text-label', 1)
-                .text(node.data['unit-label'])
+                .text(node.data.unit)
                 .attr('text-anchor', 'middle')
                 .attr('font-size', textPixels / 3 + 'px')
                 .attr('fill', '#fff')
