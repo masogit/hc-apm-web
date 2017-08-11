@@ -545,13 +545,20 @@ public class DmApiV2 {
    * @param pdtData AssetBsc + PdtData for 2017 or 2018
    * @return All information needed for single Asset
    */
-  private List<Asset> itemsDataCalculation(Observable<Tuple2<AssetBsc, HisData>> lstSnd,
-                                           Observable<Tuple2<AssetBsc, HisData>> lstFst,
-                                           Observable<Tuple2<AssetBsc, HisData>> tsY,
-                                           Observable<Tuple2<AssetBsc, PdtData>> pdtData) {
-    return List.ofAll(Observable.zip(lstSnd, lstFst, tsY, pdtData,
-      (t1, t2, t3, t4) -> new Asset(t1._1, Tuple.of(t1._2, t2._2, t3._2), Tuple.of(t4._2)))
-      .toBlocking().toIterable());
+  private Seq<Asset> itemsDataCalculation(Seq<Tuple2<AssetBsc, HisData>> lstSnd,
+                                          Seq<Tuple2<AssetBsc, HisData>> lstFst,
+                                          Seq<Tuple2<AssetBsc, HisData>> tsY,
+                                          Seq<Tuple2<AssetBsc, PdtData>> pdtData) {
+    Map<Integer, Tuple2<AssetBsc, HisData>> lstSndMap = lstSnd.toMap(v -> Tuple.of(v._1.getId(), v));
+    Map<Integer, Tuple2<AssetBsc, HisData>> lstFstMap = lstFst.toMap(v -> Tuple.of(v._1.getId(), v));
+    Map<Integer, Tuple2<AssetBsc, HisData>> tsYMap = tsY.toMap(v -> Tuple.of(v._1.getId(), v));
+    Map<Integer, Tuple2<AssetBsc, PdtData>> pdtDataMap = pdtData.toMap(v -> Tuple.of(v._1.getId(), v));
+    return tsYMap.map((k, v) -> Tuple.of(k, new Asset(v._1,
+      Tuple.of(Try.of(() -> lstSndMap.get(k).get()._2).getOrElse(new HisData(LocalDate.now().minusYears(2), 0D, 0D)),
+        Try.of(() -> lstFstMap.get(k).get()._2).getOrElse(new HisData(LocalDate.now().minusYears(2), 0D, 0D)),
+        v._2),
+      Tuple.of(pdtDataMap.get(k).get()._2))))
+      .values();
   }
 
   /**
@@ -565,36 +572,47 @@ public class DmApiV2 {
    * @param end        end of the time slot
    * @return AssetBsc + HisData for all single Assets
    */
-  private Observable<Tuple2<AssetBsc, HisData>> CalculateHistoryData(Integer siteId, Integer hospitalId,
-                                                                     Integer dept, LocalDate start, LocalDate end) {
-    return dmService.findAssets(siteId, hospitalId, dept, start, end)
+  private List<Tuple2<AssetBsc, HisData>> CalculateHistoryData(Integer siteId, Integer hospitalId,
+                                                               Integer dept, LocalDate start, LocalDate end) {
+    return List.ofAll(dmService.findAssets(siteId, hospitalId, dept, start, end)
       .map(v -> Tuple.of(new AssetBsc(v._1, v._2, v._3, v._4, 1),
-        new HisData(start, v._6, v._5)));
+        new HisData(start, v._6, v._5))).toBlocking().toIterable());
   }
 
   /**
    * This function returns a set of generate Basic information + calculated data for a specific historical time slot
    * This function may change if the predict algorithm changes
    *
-   * @param lstsnd             AssetBsc + HisData at the time slot of the year before last
-   * @param lstfst             AssetBsc + HisData at the time slot of last year
+   * @param lstSnd             AssetBsc + HisData at the time slot of the year before last
+   * @param lstFst             AssetBsc + HisData at the time slot of last year
    * @param userPredictedUsage user predicted value of usage
    * @param userInputThreshold user predicted max/min threshold
    * @param year               year required to show
    * @return AssetBsc + PdtData for all single Assets
    */
-  private Observable<Tuple2<AssetBsc, PdtData>> predictFutureData(Observable<Tuple2<AssetBsc, HisData>> lstsnd,
-                                                                  Observable<Tuple2<AssetBsc, HisData>> lstfst,
-                                                                  java.util.Map<Integer, java.util.Map<Integer, Double>> systemPredictedUsage,
-                                                                  java.util.Map<Integer, Double> userPredictedUsage,
-                                                                  java.util.Map<Integer, java.util.List<Double>> userInputThreshold,
-                                                                  int year) {
-    return Observable.zip(lstsnd, lstfst, (snd, fst) -> Tuple.of(snd._1, fst._2.getDepre(),
-      Option.when(Option.of(userPredictedUsage.get(snd._1.getId())).isDefined(), (Option.of(userPredictedUsage.get(snd._1.getId())).getOrElse(0D) + 1D) * fst._2.getUsage()).getOrElse(
-        systemPredictedUsage.get(snd._1.getType()).get(snd._1.getId())),
-      Option.of(userInputThreshold.get(snd._1.getId())).getOrElse(defaultThreshold),
-      LocalDate.ofYearDay(year, 1), fst._2.getUsage()
+  private Seq<Tuple2<AssetBsc, PdtData>> predictFutureData(Seq<Tuple2<AssetBsc, HisData>> lstSnd,
+                                                           Seq<Tuple2<AssetBsc, HisData>> lstFst,
+                                                           java.util.Map<Integer, java.util.Map<Integer, Double>> systemPredictedUsage,
+                                                           java.util.Map<Integer, Double> userPredictedUsage,
+                                                           java.util.Map<Integer, java.util.List<Double>> userInputThreshold,
+                                                           int year) {
+    return lstFst.map(v -> Tuple.of(
+      v._1,
+      v._2.getDepre(),
+      Option.when(Option.of(userPredictedUsage.get(v._1.getId())).isDefined(), (Option.of(userPredictedUsage.get(v._1.getId())).getOrElse(0D) + 1D) * v._2.getUsage()).getOrElse(
+        systemPredictedUsage.get(v._1.getType()).get(v._1.getId())),
+      Option.of(userInputThreshold.get(v._1.getId())).getOrElse(defaultThreshold),
+      LocalDate.ofYearDay(year, 1),
+      v._2.getUsage()
     )).map(v -> Tuple.of(v._1, calculatePdtData(v._2, v._3, v._4, v._5, v._6)));
+//    return Observable.zip(lstsnd, lstfst, (snd, fst) -> Tuple.of(snd._1,
+//      fst._2.getDepre(),
+//      Option.when(Option.of(userPredictedUsage.get(snd._1.getId())).isDefined(), (Option.of(userPredictedUsage.get(snd._1.getId())).getOrElse(0D) + 1D) * fst._2.getUsage()).getOrElse(
+//        systemPredictedUsage.get(snd._1.getType()).get(snd._1.getId())),
+//      Option.of(userInputThreshold.get(snd._1.getId())).getOrElse(defaultThreshold),
+//      LocalDate.ofYearDay(year, 1),
+//      fst._2.getUsage()
+//    )).map(v -> Tuple.of(v._1, calculatePdtData(v._2, v._3, v._4, v._5, v._6)));
   }
 
   private Integer localDateToX(LocalDate input) {
@@ -676,7 +694,7 @@ public class DmApiV2 {
    * @param groups a map of asset_group with their ids as keys and names as value
    * @return information for a type of asset
    */
-  private TypeInfo calculateTypeInfo(List<Asset> items, java.util.Map<Integer, String> groups) {
+  private TypeInfo calculateTypeInfo(Seq<Asset> items, java.util.Map<Integer, String> groups) {
     int typeId = items.get(0).getAssetBsc().getType();
     return new TypeInfo(
       new TypeBsc(typeId, groups.get(typeId),
@@ -697,9 +715,9 @@ public class DmApiV2 {
    * @param lastYearUsage average usage for this type last year
    * @return predicted data of this type
    */
-  private Tuple1<TypePdtData> calculateTypePdtData(List<Tuple1<PdtData>> items, int count, Double lastYearUsage) {
+  private Tuple1<TypePdtData> calculateTypePdtData(Seq<Tuple1<PdtData>> items, int count, Double lastYearUsage) {
     //for first item of Tuple
-    List<PdtData> subItems = items.map(v -> v._1);
+    Seq<PdtData> subItems = items.map(v -> v._1);
     java.util.List<Integer> usageSum = ImmutableList.of(subItems.map(v -> v.getUsgSum().get(0)).sum().intValue(),
       subItems.map(v -> v.getUsgSum().get(1)).sum().intValue());
     double averageUsage = subItems.map(PdtData::getUsgPdt).average().getOrElse(0D);
@@ -883,7 +901,7 @@ public class DmApiV2 {
                                                         java.util.Map<Integer, String> groups,
                                                         int year) {
     List<Tuple4<Integer, Integer, Integer, Double>> predictData = predictDataPrepare(dmService.findMonthUsage(siteId, hospitalId, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now()));
-    Seq<Tuple2<TypeInfo, List<Asset>>> tmp =
+    Seq<Tuple2<TypeInfo, Seq<Asset>>> tmp =
       itemsDataCalculation(CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
         CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
         CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1), LocalDate.now()),
@@ -893,7 +911,7 @@ public class DmApiV2 {
           userPredictedUsage, userInputThreshold,
           year)
       ).groupBy(v -> v.getAssetBsc().getType()).values().map(v -> Tuple.of(calculateTypeInfo(v, groups), v));
-    Tuple2<AllAssetInfo, Seq<Tuple2<TypeInfo, List<Asset>>>> initResult = Tuple.of(calculateAllAssetInfoType(tmp.map(v -> v._1)), tmp);
+    Tuple2<AllAssetInfo, Seq<Tuple2<TypeInfo, Seq<Asset>>>> initResult = Tuple.of(calculateAllAssetInfoType(tmp.map(v -> v._1)), tmp);
     return new ImmutableMap.Builder<String, Object>()
       .putAll(mapAllAssets(initResult._1))
       .put("items", initResult._2.map(v ->
@@ -916,7 +934,7 @@ public class DmApiV2 {
                                                         java.util.Map<Integer, String> depts,
                                                         int year) {
     List<Tuple4<Integer, Integer, Integer, Double>> predictData = predictDataPrepare(dmService.findMonthUsage(siteId, hospitalId, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now()));
-    Seq<Tuple2<DeptInfo, Seq<Tuple2<TypeInfo, List<Asset>>>>> tmp =
+    Seq<Asset> tmp2 =
       itemsDataCalculation(CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(2), LocalDate.now().withDayOfYear(1).minusYears(1).minusDays(1)),
         CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
         CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1), LocalDate.now()),
@@ -925,11 +943,12 @@ public class DmApiV2 {
           predictUsage(predictData, ratios(predictData), year),
           userPredictedUsage, userInputThreshold,
           year)
-      ).groupBy(v -> v.getAssetBsc().getDept()).values().map(v ->
-        v.groupBy(v2 -> v2.getAssetBsc().getType()).values()
-          .map(v3 -> Tuple.of(calculateTypeInfo(v3, groups), v3))
-      ).map(v4 -> Tuple.of(calculateDeptInfo(v4.map(v5 -> v5._1), depts, v4.get(0)._2.get(0).getAssetBsc().getDept()), v4));
-    Tuple2<AllAssetInfo, Seq<Tuple2<DeptInfo, Seq<Tuple2<TypeInfo, List<Asset>>>>>> initResult = Tuple.of(calculateAllAssetInfoDept(tmp.map(v -> v._1)), tmp);
+      );
+    Seq<Tuple2<DeptInfo, Seq<Tuple2<TypeInfo, Seq<Asset>>>>> tmp = tmp2.groupBy(v -> v.getAssetBsc().getDept()).values().map(v ->
+      v.groupBy(v2 -> v2.getAssetBsc().getType()).values()
+        .map(v3 -> Tuple.of(calculateTypeInfo(v3, groups), v3))
+    ).map(v4 -> Tuple.of(calculateDeptInfo(v4.map(v5 -> v5._1), depts, v4.get(0)._2.get(0).getAssetBsc().getDept()), v4));
+    Tuple2<AllAssetInfo, Seq<Tuple2<DeptInfo, Seq<Tuple2<TypeInfo, Seq<Asset>>>>>> initResult = Tuple.of(calculateAllAssetInfoDept(tmp.map(v -> v._1)), tmp);
     return new ImmutableMap.Builder<String, Object>()
       .putAll(mapAllAssets(initResult._1))
       .put("items", initResult._2.map(v ->
