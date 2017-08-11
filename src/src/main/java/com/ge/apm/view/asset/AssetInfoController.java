@@ -263,6 +263,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         object.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
         object.setIsValid(true);
         object.setStatus(1);
+        object.setDeviceStatus(0);
         object.setIsDeleted(false);
 
         object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());

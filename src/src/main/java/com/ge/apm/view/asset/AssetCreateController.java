@@ -86,6 +86,7 @@ public class AssetCreateController {
         newAsset.setQrCode(createRequest.getQrCode());
         newAsset.setIsValid(true);
         newAsset.setStatus(1);
+        newAsset.setDeviceStatus(0);
         newAsset.setIsDeleted(Boolean.FALSE);
         newAsset.setName(createRequest.getAssetName());
         newAsset.setAssetGroup(createRequest.getAssetGroup());
