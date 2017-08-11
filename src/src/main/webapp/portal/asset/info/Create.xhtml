@@ -222,7 +222,12 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
-                            <p:spacer/>
+                            <h:panelGroup >
+                                <label class="label">#{msg.deviceStatus}*</label>
+                                <p:selectOneRadio id="deviceStatus" value="#{assetInfoController.selected.deviceStatus}" required="true" requiredMessage="#{msg.deviceStatus} #{msg.ValidationRequire}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.comments}</label>
                                 <p:inputTextarea value="#{assetInfoController.selected.comments}"  maxlength="256"/>
@@ -327,17 +332,6 @@
                                 <p:fileUpload id="type3" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="false"  sizeLimit="10000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
-                            <!--                            <h:panelGroup >
-                                                            <p:dataList id="guideList" value="#{assetInfoController.getAttachList(assetInfoController.selected.id,4)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                                                <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 4)}</f:facet>
-                            #{fileitem.name}
-                        <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.fileId)}" id="iconOnly" update="guideList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                        </p:commandButton>
-                    </p:dataList>
-                    <p:fileUpload id="type4" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                  multiple="false"  sizeLimit="10000000"  update="guideList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}"/>
-                </h:panelGroup>-->
                         </p:panelGrid>
                     </p:fieldset>
                     <h:panelGroup >

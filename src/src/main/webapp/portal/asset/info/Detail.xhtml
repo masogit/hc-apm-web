@@ -65,6 +65,12 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.deviceStatus}</label>
+                                <p:selectOneRadio id="deviceStatus"  label="#{msg.status}" value="#{assetInfoController.selected.deviceStatus}" disabled="true">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </div>
                     <div class="ui-g-4">
