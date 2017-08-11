@@ -196,6 +196,7 @@ INSERT INTO "public"."i18n_message" VALUES ('291', 'label', 'Text', '文本', 'T
 INSERT INTO "public"."i18n_message" VALUES ('292', 'label', 'field', '字段', 'Field', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('293', 'label', 'Color', '颜色', 'Field', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('294', 'label', 'type', '类型', 'Type', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('295', 'label', 'deviceStatus', '资产状态', 'Device Status', null, '-1');
 
 
 INSERT INTO "public"."i18n_message" VALUES ('401', 'label', 'SiteInfo', '医联体/租户信息', 'Site Info', null, '-1');
@@ -472,6 +473,8 @@ INSERT INTO "public"."i18n_message" VALUES ('1525', 'casePriority', '3', '一般
 INSERT INTO "public"."i18n_message" VALUES ('1530', 'attachmentType', '1', '照片', 'Photo', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1532', 'attachmentType', '2', '用户手册', 'User Manual', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1533', 'attachmentType', '3', '培训资料', 'Material for training', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1540', 'deviceStatus', '0', '正常', 'Normal', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1541', 'deviceStatus', '1', '备用', 'Standby', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1585', 'caseSubType', '1', '故障子类型1', null, null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1586', 'caseSubType', '2', '故障子类型2', null, null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1587', 'caseSubType', '3', '故障子类型3', null, null, '-1');

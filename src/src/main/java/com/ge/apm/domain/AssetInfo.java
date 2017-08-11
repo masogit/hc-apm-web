@@ -205,6 +205,9 @@ public class AssetInfo implements Serializable {
     private String systemNum5;
     @Column(name = "is_deleted")
     private Boolean isDeleted;
+    // 0-normal 1-standby
+    @Column(name = "device_status")
+    private Integer deviceStatus;
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
 
@@ -242,6 +245,14 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+    public Integer getDeviceStatus() {
+        return deviceStatus;
+    }
+
+    public void setDeviceStatus(Integer deviceStatus) {
+        this.deviceStatus = deviceStatus;
+    }
 
     public String getComments() {
         return comments;
