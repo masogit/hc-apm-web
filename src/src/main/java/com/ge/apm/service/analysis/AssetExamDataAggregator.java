@@ -125,6 +125,11 @@ return "success";
         asm1.setDeptId(assinfo.getClinicalDeptId());
         asm1.setAssetGroup(assinfo.getAssetGroup());
 
+        if(assinfo!=null){
+            asm1.setDeptId(assinfo.getClinicalDeptId());
+            asm1.setAssetGroup(assinfo.getAssetGroup());
+        }
+        
         if(accrp.getExamCount()==null){
             logger.info("gl: accrp.getExamCount() should not be null");
         }else {
