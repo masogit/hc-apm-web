@@ -225,10 +225,9 @@ public class WorkOrderController {
     
     @RequestMapping(value="unloginAssetInfo")
     public @ResponseBody Object unloginAssetInfo(HttpServletRequest request, String qrCode) {
-        List<AssetInfo> list = assetDao.getByQrCode(qrCode);
-        if (list.isEmpty())
+        AssetInfo info = assetDao.getByQrCode(qrCode);
+        if (info==null)
             return null;
-        AssetInfo info = list.get(0);
         Map map = new HashMap();
         map.put("assetId", info.getId());
         map.put("assetName", info.getName());
@@ -246,10 +245,9 @@ public class WorkOrderController {
         if (woId != null && !"".equals(woId)) {
             wo = woWcService.scanActionByWoId(Integer.parseInt(woId));
         } else {
-            List<AssetInfo> list = assetDao.getByQrCode(qrCode);
-            if (list.isEmpty())
+            AssetInfo info = assetDao.getByQrCode(qrCode);
+            if (info==null)
                 return null;
-            AssetInfo info = list.get(0);
             wo = woWcService.scanAction(info);
         }
         return wo;

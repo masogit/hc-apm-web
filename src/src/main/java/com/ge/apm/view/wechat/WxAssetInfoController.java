@@ -189,8 +189,8 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
             assetFlag = 0;
             return null;
         }
-        List<AssetInfo> resList = assetDao.getByQrCode(qrCode);
-        if (resList.isEmpty()) {
+        AssetInfo assetInfo = assetDao.getByQrCode(qrCode);
+        if (assetInfo==null) {
             QrCodeLib qrLib = qrLibDao.findByQrCode(qrCode);
             if (null == qrLib) {
                 assetFlag = 0;
@@ -199,11 +199,9 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
                 assetFlag = qrLib.getStatus();
                 return null;
             }
-        } else if (resList.size() == 1) {
-            return resList.get(0);
         } else {
-            return null;
-        }
+            return assetInfo;
+        } 
     }
 
     public void bindingAsset() {
