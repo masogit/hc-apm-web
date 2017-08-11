@@ -163,10 +163,12 @@ public class AssetFileImportService {
             asset.setIsValid(true);
             asset.setStatus(1);
             asset.setIsDeleted(Boolean.FALSE);
-            asset.setAssetOwnerName(ExcelDocument.getCellStringValue(rowMap.get("负责人")));
+            asset.setAssetOwnerName(ExcelDocument.getCellStringValue(rowMap.get("维修负责人")));
+            asset.setAssetOwnerName2(ExcelDocument.getCellStringValue(rowMap.get("维修负责人2")));
 
             asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用部门")));
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
+            asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
             String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("功能分组"));
             asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup));
@@ -255,6 +257,7 @@ public class AssetFileImportService {
                 newAsset.setClinicalDeptId(clinicalDept.getId());
             }
 
+            //for AssetOwner
             List<UserAccount> userList = getUserInfosByName(newAsset.getAssetOwnerName());
             if (userList != null && userList.size() == 1) {
                 UserAccount assetOwner = userList.get(0);
@@ -262,6 +265,16 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerTel(assetOwner.getTelephone());
             } else {
                 addErrMessage(item, "Warning:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无法关联");
+                newAsset.setAssetOwnerName(null);
+            }
+            //for AssetOwner2
+            userList = getUserInfosByName(newAsset.getAssetOwnerName2());
+            if (userList != null && userList.size() == 1) {
+                UserAccount assetOwner = userList.get(0);
+                newAsset.setAssetOwnerId2(assetOwner.getId());
+                newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
+            } else {
+                addErrMessage(item, "Warning:" + WebUtil.getMessage("AssetOwnerName"+"2") + newAsset.getAssetOwnerName2() + "无法关联");
                 newAsset.setAssetOwnerName(null);
             }
 
@@ -469,7 +482,7 @@ public class AssetFileImportService {
     public boolean checkDocVersion(ExcelDocument doc) {
         String[] keyRow = doc.getKeyRow(SHEET_ASSET, 6);
         for (String str : keyRow) {
-            if (str.equals("设备型号")) {
+            if (str.equals("注册证号")) {
                 return true;
             }
         }
