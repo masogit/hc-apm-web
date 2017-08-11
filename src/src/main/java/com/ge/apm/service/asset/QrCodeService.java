@@ -5,16 +5,29 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.dao.QrCodeTemplateRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
+import com.ge.apm.domain.QrCodeTemplate;
+import com.ge.apm.domain.QrCodeTemplateElement;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -29,12 +42,24 @@ public class QrCodeService {
     @Autowired
     OrgInfoRepository orgInfoDao;
 
-    public QrCodeLib createOneQrCode(String tenantUID, String siteUID,Integer status) {
+    @Autowired
+    AssetInfoRepository assetDao;
+
+    @Autowired
+    QrCodeTemplateService templateService;
+
+    @Autowired
+    QrCodeTemplateRepository templateDao;
+
+    @Autowired
+    QrCodeDrawService qrCodeDrawService;
+
+    public QrCodeLib createOneQrCode(String tenantUID, String siteUID, Integer status) {
         if (tenantUID == null || siteUID == null) {
             return null;
         }
         OrgInfo currentOrg = orgInfoDao.getByUid(siteUID);
-        return createOneQrCode(currentOrg,status);
+        return createOneQrCode(currentOrg, status);
     }
 
     public QrCodeLib createOneQrCode(OrgInfo currentOrg, Integer status) {
@@ -61,16 +86,16 @@ public class QrCodeService {
         }
         return qrCodeLib;
     }
-    
-    public List<QrCodeLib> createManyQrCode(String tenantUID, String siteUID,Integer count){
+
+    public List<QrCodeLib> createManyQrCode(String tenantUID, String siteUID, Integer count) {
         if (tenantUID == null || siteUID == null) {
             return null;
         }
         OrgInfo currentOrg = orgInfoDao.getByUid(siteUID);
-        
+
         List<QrCodeLib> result = new ArrayList();
-        for(int i=0;i<count;i++){
-            result.add(createOneQrCode(currentOrg,1));
+        for (int i = 0; i < count; i++) {
+            result.add(createOneQrCode(currentOrg, 1));
         }
         return result;
     }
@@ -79,6 +104,125 @@ public class QrCodeService {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode);
         qrCodeLib.setStatus(4);
         qrCodeLibDao.save(qrCodeLib);
+    }
+
+    public String getQrCodeImageBase64(String qrCode) {
+        QrCodeLib qrcodeLib = qrCodeLibDao.findByQrCode(qrCode);
+        QrCodeTemplate template = templateDao.findSiteTemplate(qrcodeLib.getSiteUID());
+        List<QrCodeTemplateElement> elementList;
+        if (template == null) {
+            template = templateService.getDefaultTemplate();
+            elementList = templateService.getDefaultTemplateElements();
+        } else {
+            elementList = templateService.getElementsByTemplate(template.getId());
+        }
+        elementList = getElementsValue(template, elementList, qrCode);
+        BufferedImage img = null;
+        try {
+            img = qrCodeDrawService.createQrCodeTag(template.getWidth(), template.getHeight(), elementList);
+        } catch (Exception ex) {
+            Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return qrCodeDrawService.getImageBase64(img);
+    }
+
+    private static Map<String, String> FieldsMap;
+
+    public Map<String, String> getFieldsMap() {
+        if (null == FieldsMap) {
+            FieldsMap = new HashMap<>();
+            FieldsMap.put("name", WebUtil.getMessage("name"));                   //设备名称  AssetInfo.name
+            FieldsMap.put("assetGroup", WebUtil.getMessage("assetGroup"));       //设备类型  AssetInfo.assetGroup
+            FieldsMap.put("hospital", WebUtil.getMessage("hospitalId"));         //所属院区  AssetInfo.siteUID -> OrgInfo.name
+            FieldsMap.put("functionType", WebUtil.getMessage("functionType"));   //设备型号  AssetInfo.functionType
+            FieldsMap.put("clinicalDept", WebUtil.getMessage("clinicalDeptId")); //使用科室  AssetInfo.clinicalDeptUID -> OrgInfo.name
+            FieldsMap.put("serialNum", WebUtil.getMessage("serialNum"));         //序列号(厂商SN)  AssetInfo.serialNum
+            FieldsMap.put("financingNum", WebUtil.getMessage("financingNum"));   //资产编号  AssetInfo.financingNum
+            FieldsMap.put("departNum", WebUtil.getMessage("departNum"));         //设备编号（院方）  AssetInfo.departNum
+            FieldsMap.put("modalityId", WebUtil.getMessage("modalityId"));       //院内IT系统编号  AssetInfo.modalityId
+
+        }
+        return FieldsMap;
+    }
+
+    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode) {
+
+        AssetInfo asset = assetDao.getByQrCode(qrCode);
+        if (asset == null) {
+            //Demo asset for preview
+            asset = new AssetInfo();
+            asset.setAssetGroup(1);
+            asset.setName("(待定)");
+            asset.setSerialNum("(待定)");
+            asset.setFinancingNum("(待定)");
+            asset.setDepartNum("(待定)");
+            asset.setModalityId("(待定)");
+            asset.setFunctionType("(待定)");
+        }
+        for (QrCodeTemplateElement item : elements) {
+            if (item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)) {
+                item.setTextValue(qrCode);
+            }
+            if (item.getFieldKey() != null && !item.getFieldKey().isEmpty()) {
+                if (item.getTextValue() == null) {
+                    item.setTextValue("");
+                }
+                switch (item.getFieldKey()) {
+                    case "name":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getName() == null ? "" : asset.getName()));
+                        break;
+                    case "assetGroup":
+                        item.setTextShowValue(item.getTextValue().concat(FieldValueMessageController.fieldValue("assetGroup", asset.getAssetGroup().toString())));
+                        break;
+                    case "hospital":
+                        String siteUid = asset.getSiteUID();
+                        if (siteUid == null) {
+                            QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode);
+                            siteUid = qrCodeLib == null ? null : qrCodeLib.getSiteUID();
+                        }
+                        if (siteUid == null) {
+                            siteUid = template.getSiteUID();
+                        }
+                        if (siteUid == null) {
+                            siteUid = UserContextService.getCurrentUserAccount().getSiteUID();
+                        }
+                        OrgInfo org = orgInfoDao.getByUid(siteUid);
+                        item.setTextShowValue(item.getTextValue().concat(org.getName()));
+                        break;
+                    case "functionType":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getFunctionType()));
+                        break;
+                    case "clinicalDept":
+                        if (asset.getClinicalDeptUID() != null) {
+                            OrgInfo clinicalDept = orgInfoDao.getByUid(asset.getClinicalDeptUID());
+                            item.setTextShowValue(item.getTextValue().concat(clinicalDept.getName()));
+                        } else {
+                            item.setTextShowValue(item.getTextValue().concat("(待定)"));
+                        }
+                        break;
+                    case "serialNum":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getSerialNum() == null ? "" : asset.getSerialNum()));
+                        break;
+                    case "financingNum":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getFinancingNum() == null ? "" : asset.getFinancingNum()));
+                        break;
+                    case "departNum":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getDepartNum() == null ? "" : asset.getFinancingNum()));
+                        break;
+                    case "modalityId":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getModalityId() == null ? "" : asset.getModalityId()));
+                        break;
+                }
+            }
+        }
+
+        return elements;
+
+    }
+
+    List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements) {
+
+        return getElementsValue(template, elements, "0000000000000000");
     }
 
 }

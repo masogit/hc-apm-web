@@ -4,12 +4,9 @@ import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.service.utils.QRCodeUtil;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -136,7 +133,8 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
     public void showQrCode() {
         qrCode = this.selected.getQrCode();
-        qrCodeImageBase64 = QRCodeUtil.getQRCodeImageBase64(this.selected.getQrCode());
+        qrCodeImageBase64 = qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
+//        qrCodeImageBase64 = QRCodeUtil.getQRCodeImageBase64(this.selected.getQrCode());
     }
 
     public void onSiteChange(){

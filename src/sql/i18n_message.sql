@@ -181,6 +181,23 @@ INSERT INTO "public"."i18n_message" VALUES ('276', 'label', 'BiomedGroup', '维�
 INSERT INTO "public"."i18n_message" VALUES ('277', 'label', 'AssetBrowser', '设备分布分析', 'Asset Browser', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('278', 'label', 'UsageAndClinicalPerformance', '运用与临床绩效', 'Usage And Clinical Performance', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('279', 'label', 'FinancialPerformanceAndForecast', '财务绩效与预测', 'Financial Performance And Forcast', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('280', 'label', 'QRCodeTemplateMgmt', '二维码模版管理', 'QRCode Template Config', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('281', 'label', 'Size', '尺寸', 'Size', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('282', 'label', 'setToUsing', '设置为使用', 'Set to Using', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('283', 'label', 'modify', '编辑', 'Modify', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('284', 'label', 'preview', '预览', 'Modify', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('285', 'label', 'template', '模版', 'Template', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('286', 'label', 'width', '宽', 'Width', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('287', 'label', 'height', '高', 'Height', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('288', 'label', 'positionX', '横向位置', 'Horizontal position', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('289', 'label', 'positionY', '纵向位置', 'Vertical position', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('290', 'label', 'font', '字体', 'Font', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('291', 'label', 'Text', '文本', 'Text', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('292', 'label', 'field', '字段', 'Field', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('293', 'label', 'Color', '颜色', 'Field', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('294', 'label', 'type', '类型', 'Type', null, '-1');
+
+
 INSERT INTO "public"."i18n_message" VALUES ('401', 'label', 'SiteInfo', '医联体/租户信息', 'Site Info', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('402', 'label', 'OrgInfo', '组织机构信息', 'Organization Info', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('403', 'label', 'UserAccount', '用户帐号信息', 'User Account Info', null, '-1');

@@ -1,0 +1,159 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.QRCode}#{msg.modify}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <h:form id="qrCodeEditForm">
+                    <p:fieldset legend="#{msg.preview}"  id="preView">
+                        <img  style="border: 1px;border-color: grey;border-style: solid" src="#{qrCodeTemplateCreateController.getPreViewBase64()}"  width="#{qrCodeTemplateCreateController.thisTemplate.width}px" height="#{qrCodeTemplateCreateController.thisTemplate.height}px"/>
+
+
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.modify}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                            <h:panelGroup>
+                                <label class="label">#{msg.template}#{msg.name}</label>
+                                <p:inputText value="#{qrCodeTemplateCreateController.thisTemplate.name}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.width}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.thisTemplate.width}" min="300" max="1000"  >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.height}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.thisTemplate.height}" min="300" max="1000" >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
+                             <h:panelGroup>
+                                <label class="label">#{msg.hospitalId}</label>
+                                <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeTemplateCreateController.thisTemplate.siteUID}"  autoWidth="false" style="max-width: 150px;">
+                                    <p:ajax  listener="#{qrCodeTemplateCreateController.onSiteChange}" update="qrCodeEditForm:preView"/>
+                                    <f:selectItems value="#{qrCodeTemplateController.hospitalFileterList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.QRCode}#{msg.Size}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.size}" min="100" max="500" >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.positionX}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.positionX}"  >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.positionY}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.positionY}"  >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
+                        </p:panelGrid>
+
+
+
+                        <p:dataTable id="elementTable"  value="#{qrCodeTemplateCreateController.getTextElementList()}" var="element" editable="true" >
+
+                            <f:facet name="header">
+                                #{msg.Text}#{msg.modify}
+                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  actionListener="#{qrCodeTemplateCreateController.createNewElement}" update="elementTable" />
+                            </f:facet>
+                            <p:ajax event="rowEdit" listener="#{qrCodeTemplateCreateController.onRowEdit}" update="qrCodeEditForm:preView :growl" />
+                            <p:ajax event="rowEditCancel" listener="#{qrCodeTemplateCreateController.onRowCancel}" update=":growl" />
+
+                            <p:column headerText="#{msg.Text}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{element.textValue}" /></f:facet>
+                                    <f:facet name="input"><p:inputText id="modelInput" value="#{element.textValue}" style="width:100%"/></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.field}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{qrCodeTemplateCreateController.fieldsMap.get(element.fieldKey)}" /></f:facet>
+                                    <f:facet name="input">
+                                        <h:selectOneMenu value="#{element.fieldKey}" style="width:100%">
+                                            <f:selectItems value="#{qrCodeTemplateCreateController.fieldsMap.entrySet()}" var="fieldItem" itemLabel="#{fieldItem.value}"  itemValue="#{fieldItem.key}" />
+                                        </h:selectOneMenu>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            
+                            <p:column headerText="#{msg.positionX}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{element.positionX}" /></f:facet>
+                                    <f:facet name="input"><p:inputText  value="#{element.positionX}"  /></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.positionY}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{element.positionY}" /></f:facet>
+                                    <f:facet name="input"><p:inputText  value="#{element.positionY}" /></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.font}#{msg.Size}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{element.fontSize}" /></f:facet>
+                                    <f:facet name="input"><p:inputText  value="#{element.fontSize}" /></f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.font}#{msg.type}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{element.fontType==0?'正常':element.fontType==1?'加粗':'斜体'}" /></f:facet>
+                                    <f:facet name="input">
+                                        <h:selectOneMenu value="#{element.fontType}" style="width:100%">
+                                            <f:selectItem itemLabel="正常" itemValue="0" />
+                                            <f:selectItem itemLabel="加粗" itemValue="1" />
+                                            <f:selectItem itemLabel="斜体" itemValue="2" />
+                                        </h:selectOneMenu>
+                                    </f:facet>
+
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.font}#{msg.name}">
+                                <p:cellEditor>
+                                    <f:facet name="output"><h:outputText value="#{qrCodeTemplateCreateController.fontNameMap.get(element.fontName)}" /></f:facet>
+                                    <f:facet name="input">
+                                        <h:selectOneMenu value="#{element.fontName}" >
+                                            <f:selectItems value="#{qrCodeTemplateCreateController.fontNameMap.entrySet()}" var="fontName" itemLabel="#{fontName.key}"  itemValue="#{fontName.value}"/>
+                                        </h:selectOneMenu>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.Color}">
+                                <p:colorPicker value="#{element.colorStr}" />   
+                                <h:outputText value="#{element.colorStr}"/>
+
+                            </p:column>
+                            <p:column style="width:32px">
+                                <p:rowEditor editTitle="#{msg.Edit}" />
+                                <p:commandLink process="@this" actionListener="#{qrCodeTemplateCreateController.removeElement(element)}" title="#{msg.Delete}" update="qrCodeEditForm:preView elementTable"><span class="ui-icon ui-icon-trash" /></p:commandLink>
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
+                    <h:panelGroup >
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{qrCodeTemplateCreateController.saveChange()}" validateClient="true" update="preView :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="qrCodeTemplate.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+                    </h:panelGroup>
+
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

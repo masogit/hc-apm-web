@@ -20,7 +20,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public List<AssetInfo> getBySiteId(int siteId);
 
     @Query("select o from AssetInfo o where o.qrCode = ?1")
-    public List<AssetInfo> getByQrCode(String qrCode);
+    public AssetInfo getByQrCode(String qrCode);
 
     @Modifying
     @Query("update AssetInfo ai set ai.lastPmDate = now() where id = ?1 and siteId = ?2")

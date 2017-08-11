@@ -582,7 +582,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getQrCodeImageBase64() {
-        return QRCodeUtil.getQRCodeImageBase64(selected.getQrCode());
+        return qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
+//        return QRCodeUtil.getQRCodeImageBase64(selected.getQrCode());
     }
 
     public boolean isTimeValidate() {
