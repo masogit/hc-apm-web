@@ -8,12 +8,11 @@ package com.ge.apm.service.utils;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -81,7 +80,7 @@ public class ExcelDocument {
     public Map<String, Object> getDataRowMap(String sheetName, String[] rowKey, Integer dataRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(dataRowNum - 1);
-        Map<String, Object> dataMap = new HashMap();
+        Map<String, Object> dataMap = new LinkedHashMap();
         for (int cellIndex = dataRow.getFirstCellNum(); cellIndex < dataRow.getLastCellNum(); cellIndex++) {
             Cell cell = dataRow.getCell(cellIndex);
             if (cell == null) {

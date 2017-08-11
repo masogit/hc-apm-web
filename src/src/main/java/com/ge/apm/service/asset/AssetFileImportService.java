@@ -21,8 +21,8 @@ import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +72,7 @@ public class AssetFileImportService {
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
-        Map<String, Map<String, Object>> result = new HashMap();
+        Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 4;
         int dataRow = 5;
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
@@ -96,7 +96,7 @@ public class AssetFileImportService {
             org.setOrgLevel(currentOrg.getOrgLevel());
             org.setOrgType(4);
 
-            Map<String, Object> map = new HashMap();
+            Map<String, Object> map = new LinkedHashMap();
             map.put("org", org);
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
@@ -106,7 +106,7 @@ public class AssetFileImportService {
     }
 
     public Map<String, Map<String, Object>> getUserMapFromTemplate(ExcelDocument doc) {
-        Map<String, Map<String, Object>> result = new HashMap();
+        Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 4;
         int dataRow = 5;
 
@@ -124,7 +124,7 @@ public class AssetFileImportService {
 //            user.setName(userName);
 //            user.setLoginName(loginName);
 
-            Map<String, Object> map = new HashMap();
+            Map<String, Object> map = new LinkedHashMap();
 //            map.put("user", user);
 //            map.put("org", orgName);
 //            map.put("status", ImportStatus.New);
@@ -136,7 +136,7 @@ public class AssetFileImportService {
 
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) {
 
-        Map<String, Map<String, Object>> result = new HashMap();
+        Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
         int dataRow = 7;
 
@@ -199,7 +199,7 @@ public class AssetFileImportService {
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
             asset.setQrCode((String) rowMap.get("二维码"));
 
-            Map<String, Object> map = new HashMap();
+            Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
