@@ -368,7 +368,7 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
         Date startTime = new Date();
         Calendar c = Calendar.getInstance();
         c.setTime(startTime);
-        c.add(Calendar.MONTH, 2);
+        c.add(Calendar.DAY_OF_WEEK, 2);
         varPlanTimeTo = c.getTime();
         searchFilters.add(new SearchFilter("planTime", SearchFilter.Operator.LTE, varPlanTimeTo));
         searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
