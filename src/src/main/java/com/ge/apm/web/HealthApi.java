@@ -6,7 +6,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import javaslang.control.Option;
 import org.simpleflatmapper.tuple.Tuple2;
-import org.simpleflatmapper.tuple.Tuple3;
 import org.simpleflatmapper.tuple.Tuple4;
 import org.simpleflatmapper.tuple.Tuple5;
 import org.simpleflatmapper.tuple.Tuple6;
@@ -287,7 +286,7 @@ public class HealthApi {
     return asset_health.count().toBlocking().single();
   }
 
-  private Integer queryForCount(Integer legend, Observable<Tuple6<Integer, String, Integer, String, String, Integer>> asset_health) {
+  private Integer queryForCount(int legend, Observable<Tuple6<Integer, String, Integer, String, String, Integer>> asset_health) {
 
     return asset_health.filter(t5 -> t5.getElement2() == legend).count().toBlocking().single();
 
