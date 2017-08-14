@@ -25,7 +25,7 @@ const Ranges = DatePresets.reduce((prev, cur) => {
 
 function mapState2Props(state) {
   let {
-    parameters: { filterBy, period },
+    failureAnalysis: { filterBy, period },
     context: { org, name },
     meta: { departments, assetTypes }
   } = state

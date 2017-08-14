@@ -70,9 +70,9 @@ function mapParamsPhase(params, phase) {
 
 function* fetchBriefs(action) {
   try {
-    let store = yield select(state => state.paPara)
+    let store = yield select(state => state.processAnalysis)
     let params = mapParamsBrief(store)
-    if (action.type === 'page/change') {
+    if (action.type === 'processAnalysis/page/change') {
       params.start = params.limit * (action.data.value - 1)
     }
     let briefs = yield call(API.paGetBriefs, params)
@@ -81,8 +81,8 @@ function* fetchBriefs(action) {
       total: briefs.page.total,
       skip: briefs.page.start,
     }
-    yield put({ type: 'update/param/pagination/sync', data: { type: 'left', value } })
-    EventBus.dispatch('brief-data', this, briefs)
+    yield put({ type: 'processAnalysis/update/param/pagination/sync', data: { type: 'left', value } })
+    EventBus.dispatch('process-analysis-brief-data', this, briefs)
   } catch (e) {
     error(e)
   }
@@ -90,9 +90,9 @@ function* fetchBriefs(action) {
 
 function* fetchDetails(action) {
   try {
-    let store = yield select(state => state.paPara)
+    let store = yield select(state => state.processAnalysis)
     let params = mapParamsDetail(store)
-    if (action.type === 'page/change') {
+    if (action.type === 'processAnalysis/page/change') {
       params.start = params.limit * (action.data.value - 1)
     }
 
@@ -102,8 +102,8 @@ function* fetchDetails(action) {
       total: details.page.total,
       skip: details.page.start,
     }
-    yield put({ type: 'update/param/pagination/sync', data: { type: 'right', value } })
-    EventBus.dispatch('detail-data', this, details)
+    yield put({ type: 'processAnalysis/update/param/pagination/sync', data: { type: 'right', value } })
+    EventBus.dispatch('process-analysis-detail-data', this, details)
   } catch (e) {
     error(e)
   }
@@ -111,10 +111,10 @@ function* fetchDetails(action) {
 
 function* fetchGross() {
   try {
-    let store = yield select(state => state.paPara)
+    let store = yield select(state => state.processAnalysis)
     let params = mapParamsGross(store)
     let gross = yield call(API.getGross, params)
-    EventBus.dispatch('gross-data', this, gross)
+    EventBus.dispatch('process-analysis-gross-data', this, gross)
   } catch (e) {
     error(e)
   }
@@ -122,11 +122,11 @@ function* fetchGross() {
 
 function* fetchPhase(action) {
   try {
-    let store = yield select(state => state.paPara)
+    let store = yield select(state => state.processAnalysis)
     let params = mapParamsPhase(store, action.data)
     let phase = yield call(API.getPhase, params)
     phase.phase = params.phase
-    EventBus.dispatch('phase-data', this, phase)
+    EventBus.dispatch('process-analysis-phase-data', this, phase)
   } catch (e) {
     error(e)
   }
@@ -135,7 +135,7 @@ function* fetchPhase(action) {
 function* fetchAll(action) {
   try {
     // distribution changes only effect phase data
-    if (action.type.startsWith('update/param/distribution')) {
+    if (action.type.startsWith('processAnalysis/update/param/distribution')) {
       yield call(fetchPhase, {})
       return
     }
@@ -161,28 +161,28 @@ function* pageChange(action) {
 }
 
 function* paramChangeSaga() {
-  yield takeLatest(act => act.type.startsWith('update/param/') && !act.type.endsWith('sync')
+  yield takeLatest(act => act.type.startsWith('processAnalysis/update/param/') && !act.type.endsWith('sync')
   , fetchAll)
 }
 
 function* pageChangeSaga() {
-  yield takeLatest('page/change', pageChange)
+  yield takeLatest('processAnalysis/page/change', pageChange)
 }
 
 function* getBriefsSaga() {
-  yield takeLatest('get/briefs', fetchBriefs)
+  yield takeLatest('processAnalysis/get/briefs', fetchBriefs)
 }
 
 function* getDetailsSaga() {
-  yield takeLatest('get/details', fetchDetails)
+  yield takeLatest('processAnalysis/get/details', fetchDetails)
 }
 
 function* getGrossSaga() {
-  yield takeLatest('get/gross', fetchGross)
+  yield takeLatest('processAnalysis/get/gross', fetchGross)
 }
 
 function* getPhase() {
-  yield takeEvery('get/phase', fetchPhase)
+  yield takeEvery('processAnalysis/get/phase', fetchPhase)
 }
 
 export default [

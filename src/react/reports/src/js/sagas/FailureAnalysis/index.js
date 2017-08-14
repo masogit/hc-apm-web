@@ -13,10 +13,10 @@ function* fetchBriefs(action) {
     targetPage = action.data.value
     delete action.data.type
   } else {
-    type = action.type.replace('update/briefs/', '')
+    type = action.type.replace('failureAnalysis/update/briefs/', '')
   }
   try {
-    let params = yield select(state => state.parameters)
+    let params = yield select(state => state.failureAnalysis)
     params = cloneDeep(params)
     let pag = params.pagination[type]
     if (targetPage) {
@@ -46,8 +46,8 @@ function* fetchBriefs(action) {
       total: briefs.pages.total,
       skip: briefs.pages.start,
     }
-    yield put({ type: 'update/param/pagination/sync', data: { type, value } })
-    EventBus.dispatch('brief-data', [ briefs, lastYear ])
+    yield put({ type: 'failureAnalysis/update/param/pagination/sync', data: { type, value } })
+    EventBus.dispatch('failure-analysis-brief-data', [ briefs, lastYear ])
   } catch (e) {
     error(e)
   }
@@ -55,9 +55,9 @@ function* fetchBriefs(action) {
 
 function* fetchReasons(action) {
   try {
-    let params = yield select(state => state.parameters)
+    let params = yield select(state => state.failureAnalysis)
     let reasons = yield call(API.getReasons, params, action.data)
-    EventBus.dispatch('reason-data', reasons)
+    EventBus.dispatch('failure-analysis-reason-data', reasons)
   } catch (e) {
     error(e)
   }
@@ -65,7 +65,7 @@ function* fetchReasons(action) {
 
 function* fetchAll() {
   try {
-    let params = yield select((state) => state.parameters)
+    let params = yield select((state) => state.failureAnalysis)
     yield all([
       call(fetchReasons, { data: {} }),
       call(fetchBriefs, {type: 'left', params}),
@@ -75,11 +75,11 @@ function* fetchAll() {
   }
 }
 function* briefSagaLeft() {
-  yield takeLatest('update/briefs/left', fetchBriefs)
+  yield takeLatest('failureAnalysis/update/briefs/left', fetchBriefs)
 }
 
 function* briefSagaRight() {
-  yield takeLatest('update/briefs/right', fetchBriefs)
+  yield takeLatest('failureAnalysis/update/briefs/right', fetchBriefs)
 }
 
 function* paramChangeSaga() {
@@ -88,7 +88,7 @@ function* paramChangeSaga() {
 }
 
 function* reasonSaga() {
-  yield takeLatest('update/reasons', fetchReasons)
+  yield takeLatest('failureAnalysis/update/reasons', fetchReasons)
 }
 
 function* pageChangeSaga() {

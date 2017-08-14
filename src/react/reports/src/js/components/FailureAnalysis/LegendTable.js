@@ -56,7 +56,7 @@ function conditionalStyle(b, style) {
 }
 
 function mapState2Props(state) {
-  let { dataType, showLastYear } = state.parameters
+  let { dataType, showLastYear } = state.failureAnalysis
   return { dataType, showLastYear }
 }
 
