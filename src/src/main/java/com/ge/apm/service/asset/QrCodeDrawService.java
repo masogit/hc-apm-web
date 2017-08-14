@@ -162,7 +162,7 @@ public class QrCodeDrawService {
             textSB.insert(14, "-");
 
             String os = System.getProperty("os.name").toLowerCase();
-            int textX = os.indexOf("windows") != -1 ? 23 : 10;
+            int textX = os.indexOf("windows") != -1 ? 23 : 0;
             int textY = 310;
             int fontSize = 26;
             Font font = new Font("TimesRoman", Font.BOLD, fontSize);

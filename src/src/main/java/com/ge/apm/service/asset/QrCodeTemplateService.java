@@ -43,8 +43,8 @@ public class QrCodeTemplateService {
     public QrCodeTemplate getDefaultTemplate() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         QrCodeTemplate template = new QrCodeTemplate();
-        template.setHeight(350);
-        template.setWidth(560);
+        template.setHeight(180);
+        template.setWidth(450);
         template.setHospitalUID(loginUser.getHospitalUID());
         template.setInstitutionUID(loginUser.getInstitutionUID());
         template.setTenantUID(loginUser.getTenantUID());
@@ -70,19 +70,19 @@ public class QrCodeTemplateService {
         List<QrCodeTemplateElement> elementList = new ArrayList();
         QrCodeTemplateElement qrcodeElement = new QrCodeTemplateElement();
         qrcodeElement.setType(QrCodeTemplateElement.QrCodeElementType.QrCode);
-        qrcodeElement.setSize(220);
-        qrcodeElement.setPositionX(30);
-        qrcodeElement.setPositionY(80);
+        qrcodeElement.setSize(150);
+        qrcodeElement.setPositionX(5);
+        qrcodeElement.setPositionY(10);
         elementList.add(qrcodeElement);
 
-        elementList.add(createTextElement("", "hospital", 200, 20, 40, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("设备名称   ", "name", 300, 100, 16, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("设备类型   ", "assetGroup", 300, 130, 16, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("使用部门   ", "clinicalDept", 300, 160, 16, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("序列号       ", "serialNum", 300, 190, 16, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("资产编号   ", "financingNum", 300, 220, 16, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("设备型号   ", "functionType", 300, 250, 16, 1, "TimesRoman", "000000"));
-        elementList.add(createTextElement("系统编号   ", "modalityId", 300, 280, 16, 1, "TimesRoman", "000000"));
+        elementList.add(createTextElement("", "hospital", 160, 20, 20, 1, "TimesRoman", "000000"));
+        elementList.add(createTextElement("设备名称   ", "name", 160, 120, 16, 1, "TimesRoman", "000000"));
+        elementList.add(createTextElement("使用部门   ", "clinicalDept", 160, 60, 16, 1, "TimesRoman", "000000"));
+        elementList.add(createTextElement("资产编号   ", "financingNum", 160, 90, 16, 1, "TimesRoman", "000000"));
+//        elementList.add(createTextElement("设备类型   ", "assetGroup", 300, 130, 16, 1, "TimesRoman", "000000"));
+//        elementList.add(createTextElement("序列号       ", "serialNum", 300, 190, 16, 1, "TimesRoman", "000000"));
+//        elementList.add(createTextElement("设备型号   ", "functionType", 300, 250, 16, 1, "TimesRoman", "000000"));
+//        elementList.add(createTextElement("系统编号   ", "modalityId", 300, 280, 16, 1, "TimesRoman", "000000"));
         return elementList;
     }
 

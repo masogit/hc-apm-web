@@ -9,6 +9,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -75,7 +76,7 @@ public class QrCodeTemplateElement implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
     
-    
+    @Transient
     private String textShowValue;
 
     public String getTextShowValue() {
@@ -85,9 +86,6 @@ public class QrCodeTemplateElement implements Serializable {
     public void setTextShowValue(String textShowValue) {
         this.textShowValue = textShowValue;
     }
-    
-    
-
     
     public String getFieldKey() {
         return fieldKey;
