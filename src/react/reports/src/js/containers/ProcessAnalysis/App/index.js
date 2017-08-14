@@ -17,7 +17,7 @@ import Orbit from 'components/ProcessAnalysis/OrbitChart'
 import ReversedRange from 'components/ProcessAnalysis/ReversedRange'
 import withClientRect from '../../../HOC/withClientRect'
 import selectHelper from 'components/ProcessAnalysis/SelectHelper'
-import { ParamUpdate, PageChange } from 'actions'
+import { PaParamUpdate, PaPageChange } from 'actions'
 import cache from 'utils/cache'
 import { CurrentPage, ToPrecentage } from 'utils/helpers'
 import { MetaUpdate } from 'actions'
@@ -92,10 +92,10 @@ function ensureSize(width, height) {
 
 function mapDispatch2Porps(dispatch) {
   return {
-    updateDisplayType: (value) => dispatch(ParamUpdate('display', value.key)),
-    updateDataType: (value) => dispatch(ParamUpdate('datatype', value)),
+    updateDisplayType: (value) => dispatch(PaParamUpdate('display', value.key)),
+    updateDataType: (value) => dispatch(PaParamUpdate('datatype', value)),
     updatePagination: (type, pageNumber) => {
-      dispatch(PageChange(type, pageNumber))
+      dispatch(PaPageChange(type, pageNumber))
     },
     updateDistribution: (value, dataType) => {
       let suffix = 'Response'
@@ -104,26 +104,26 @@ function mapDispatch2Porps(dispatch) {
       } else if (dataType === 'ettr') {
         suffix = 'Ettr'
       }
-      dispatch(ParamUpdate('distribution' + suffix, value))
+      dispatch(PaParamUpdate('distribution' + suffix, value))
     },
     fetchBriefs: extraParam => {
-      dispatch({ type: 'get/briefs', data: extraParam })
+      dispatch({ type: 'processAnalysis/get/briefs', data: extraParam })
     },
     fetchDetails: extraParam => {
-      dispatch({ type: 'get/details', data: extraParam })
+      dispatch({ type: 'processAnalysis/get/details', data: extraParam })
     },
     fetchGross: extraParam => {
-      dispatch({ type: 'get/gross', data: extraParam })
+      dispatch({ type: 'processAnalysis/get/gross', data: extraParam })
     },
     fetchPhase: phase => {
-      dispatch({ type: 'get/phase', data: phase })
+      dispatch({ type: 'processAnalysis/get/phase', data: phase })
     },
     updateMeta: () => dispatch(MetaUpdate())
   }
 }
 
 function mapState2Props(state) {
-  let { paPara : { pagination, display, dataType, distributionEttr, distributionResponse, distributionArrival } } = state
+  let { processAnalysis : { pagination, display, dataType, distributionEttr, distributionResponse, distributionArrival } } = state
   return { pagination, display, dataType, distributionEttr, distributionResponse, distributionArrival }
 }
 
@@ -267,11 +267,13 @@ export class App extends Component<void, Props, void> {
   }
 
   clearFocus(type) {
+    let chart
     if (type === 'left') {
-      this.refs.leftChart.clearFocus()
+      chart = this.refs.leftChart
     } else if (type === 'right') {
-      this.refs.rightChart.clearFocus()
+      chart = this.refs.rightChart
     }
+    chart && chart.clearFocus()
   }
 
   getLaneColor() {
@@ -365,10 +367,10 @@ export class App extends Component<void, Props, void> {
   }
   constructor(props) {
     super(props)
-    EventBus.addEventListener('brief-data', this.mountBriefData )
-    EventBus.addEventListener('detail-data', this.mountDetailData )
-    EventBus.addEventListener('gross-data', this.mountGrossData )
-    EventBus.addEventListener('phase-data', this.mountPhaseData )
+    EventBus.addEventListener('process-analysis-brief-data', this.mountBriefData )
+    EventBus.addEventListener('process-analysis-detail-data', this.mountDetailData )
+    EventBus.addEventListener('process-analysis-gross-data', this.mountGrossData )
+    EventBus.addEventListener('process-analysis-phase-data', this.mountPhaseData )
     let { updateMeta } = this.props
     if (!cache.get('departments') || !cache.get('assettypes')) {
       updateMeta()

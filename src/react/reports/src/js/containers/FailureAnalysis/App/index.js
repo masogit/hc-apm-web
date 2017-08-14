@@ -77,15 +77,15 @@ function mapDispatch2Props(dispatch) {
       dispatch(FaPageChange(type, pageNumber))
     },
     fetchBriefs: (type, extraParam) => {
-      dispatch({ type: 'update/briefs/' + type, data: extraParam })
+      dispatch({ type: 'failureAnalysis/update/briefs/' + type, data: extraParam })
     },
-    fetchReasons: (data = {}) => dispatch({type: 'update/reasons', data }),
+    fetchReasons: (data = {}) => dispatch({type: 'failureAnalysis/update/reasons', data }),
     updateMeta: () => dispatch(MetaUpdate())
   }
 }
 
 function mapState2Props(state) {
-  let { parameters : { pagination, display, dataType, showLastYear } } = state
+  let { failureAnalysis : { pagination, display, dataType, showLastYear } } = state
   return { pagination, display, dataType, showLastYear }
 }
 
@@ -269,17 +269,19 @@ export class App extends Component<void, Props, void> {
   }
 
   clearFocus(type) {
+    let chart
     if (type === 'left') {
-      this.refs.leftChart.clearFocus()
+      chart = this.refs.leftChart
     } else if (type === 'right') {
-      this.refs.rightChart.clearFocus()
+      chart = this.refs.rightChart
     }
+    chart && chart.clearFocus()
   }
 
   constructor(props) {
     super(props)
-    EventBus.addEventListener('brief-data', this.mountBriefData )
-    EventBus.addEventListener('reason-data', this.mountReason )
+    EventBus.addEventListener('failure-analysis-brief-data', this.mountBriefData )
+    EventBus.addEventListener('failure-analysis-reason-data', this.mountReason )
     let { updateMeta } = this.props
     if (!cache.get('departments') || !cache.get('assettypes')) {
       updateMeta()

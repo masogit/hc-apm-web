@@ -1,6 +1,6 @@
 import { cloneDeep } from 'lodash-es'
 import moment from 'moment'
-import { ACT_UPDATE_PARAM } from 'actions'
+import { PA_ACT_UPDATE_PARAM } from 'actions'
 
 const Current = moment()
 const YearStart = moment(new Date().getFullYear(), 'YYYY')
@@ -33,12 +33,12 @@ const initParameter = {
 }
 
 const reducers = {
-  ['update/param/filter'](next, data) {
+  ['processAnalysis/update/param/filter'](next, data) {
     next.filterBy[data.type] = data.data.key
     return next
   },
 
-  ['update/param/period'](next, data) {
+  ['processAnalysis/update/param/period'](next, data) {
     next.period = {
       from: data[0],
       to: data[1]
@@ -46,35 +46,35 @@ const reducers = {
     return next
   },
 
-  ['update/param/datatype'](next, data) {
+  ['processAnalysis/update/param/datatype'](next, data) {
     next.dataType = data
     return next
   },
 
-  ['update/param/showlastyear'](next, data) {
+  ['processAnalysis/update/param/showlastyear'](next, data) {
     next.showLastYear = data
     return next
   },
 
-  ['update/param/display'](next, data) {
+  ['processAnalysis/update/param/display'](next, data) {
     next.display = data
     return next
   },
 
-  ['update/param/distributionEttr'](next, data) {
+  ['processAnalysis/update/param/distributionEttr'](next, data) {
     next.distributionEttr = data
     return next
   },
-  ['update/param/distributionResponse'](next, data) {
+  ['processAnalysis/update/param/distributionResponse'](next, data) {
     next.distributionResponse = data
     return next
   },
-  ['update/param/distributionArrival'](next, data) {
+  ['processAnalysis/update/param/distributionArrival'](next, data) {
     next.distributionArrival = data
     return next
   },
 
-  ['update/param/pagination/sync'](next, data) {
+  ['processAnalysis/update/param/pagination/sync'](next, data) {
     let pag = next.pagination[data.type]
     Object.assign(pag, data.value)
     return next
@@ -83,7 +83,7 @@ const reducers = {
 
 export default (state = initParameter, action) => {
 
-  if (!action.type.startsWith(ACT_UPDATE_PARAM)) {
+  if (!action.type.startsWith(PA_ACT_UPDATE_PARAM)) {
     return state
   }
   return reducers[action.type](cloneDeep(state), action.data)

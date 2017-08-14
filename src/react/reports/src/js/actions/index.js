@@ -19,11 +19,22 @@ export function FaPageChange(leftOrRight, value) {
   }
 }
 
-export const ACT_UPDATE_PARAM = 'update/param/'
-export function ParamUpdate(type, data){
+export const PA_ACT_UPDATE_PARAM = 'processAnalysis/update/param/'
+export function PaParamUpdate(type, data){
   return {
-    type: ACT_UPDATE_PARAM + type,
+    type: PA_ACT_UPDATE_PARAM + type,
     data: data
+  }
+}
+
+export const PA_ACT_PAGE_CHANGE = 'processAnalysis/page/change'
+export function PaPageChange(leftOrRight, value) {
+  return {
+    type: PA_ACT_PAGE_CHANGE,
+    data: {
+      type: leftOrRight,
+      value: value
+    }
   }
 }
 
@@ -32,17 +43,5 @@ export function MetaUpdate(type = '', data) {
   return {
     type: ACT_UPDATE_META + type,
     data: data
-  }
-}
-
-export const ACT_PAGE_CHANGE = 'page/change'
-
-export function PageChange(leftOrRight, value) {
-  return {
-    type: ACT_PAGE_CHANGE,
-    data: {
-      type: leftOrRight,
-      value: value
-    }
   }
 }
