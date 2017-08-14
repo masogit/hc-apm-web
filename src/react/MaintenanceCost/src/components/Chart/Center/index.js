@@ -41,17 +41,17 @@ class Center extends React.PureComponent<*, Props, *> {
           <tbody>
             <tr>
               <td className={classnames(styles['with-rect'], styles['labor'])}>按成本类型</td>
-              <td>{withUnit(overview.data.labor + overview.data.parts)}({Center.getIncrease(overview.data.labor + overview.data.parts, overview.pastData.labor + overview.pastData.parts)})</td>
+              <td>{withUnit(overview.data.labor + overview.data.parts)}</td>
               <td>{withUnit(overview.pastData.labor + overview.pastData.parts)}</td>
             </tr>
             <tr>
               <td className={classnames(styles['with-rect'], styles['labor'])}>人力</td>
-              <td>{withUnit(overview.data.labor)}({Center.getIncrease(overview.data.labor, overview.pastData.labor)})</td>
+              <td>{withUnit(overview.data.labor)}</td>
               <td>{withUnit(overview.pastData.labor)}</td>
             </tr>
             <tr>
               <td className={classnames(styles['with-rect'], styles['parts'])}>备件</td>
-              <td>{withUnit(overview.data.parts)}({Center.getIncrease(overview.data.labor, overview.pastData.labor)})</td>
+              <td>{withUnit(overview.data.parts)}</td>
               <td>{withUnit(overview.pastData.parts)}</td>
             </tr>
           </tbody>
@@ -67,17 +67,17 @@ class Center extends React.PureComponent<*, Props, *> {
           <tbody>
             <tr>
               <td className={classnames(styles['with-rect'], styles['repair'])}>按派工单类型</td>
-              <td>{withUnit(overview.data.repair + overview.data.PM)}({Center.getIncrease(overview.data.repair + overview.data.PM, overview.pastData.repair + overview.pastData.PM)})</td>
+              <td>{withUnit(overview.data.repair + overview.data.PM)}</td>
               <td>{withUnit(overview.pastData.repair + overview.pastData.PM)}</td>
             </tr>
             <tr>
               <td className={classnames(styles['with-rect'], styles['repair'])}>维修</td>
-              <td>{withUnit(overview.data.repair)}({Center.getIncrease(overview.data.repair, overview.pastData.repair)})</td>
+              <td>{withUnit(overview.data.repair)}</td>
               <td>{withUnit(overview.pastData.repair)}</td>
             </tr>
             <tr>
               <td className={classnames(styles['with-rect'], styles['PM'])}>PM</td>
-              <td>{withUnit(overview.data.PM)}({Center.getIncrease(overview.data.PM, overview.pastData.PM)})</td>
+              <td>{withUnit(overview.data.PM)}</td>
               <td>{withUnit(overview.pastData.PM)}</td>
             </tr>
           </tbody>
