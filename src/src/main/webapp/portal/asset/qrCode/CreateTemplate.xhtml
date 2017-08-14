@@ -28,17 +28,17 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.width}</label>
-                                <p:spinner  value="#{qrCodeTemplateCreateController.thisTemplate.width}" min="300" max="1000"  >
+                                <p:spinner  value="#{qrCodeTemplateCreateController.thisTemplate.width}"  >
                                     <p:ajax  update="qrCodeEditForm:preView"/>
                                 </p:spinner>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.height}</label>
-                                <p:spinner  value="#{qrCodeTemplateCreateController.thisTemplate.height}" min="300" max="1000" >
+                                <p:spinner  value="#{qrCodeTemplateCreateController.thisTemplate.height}"  >
                                     <p:ajax  update="qrCodeEditForm:preView"/>
                                 </p:spinner>
                             </h:panelGroup>
-                             <h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
                                 <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeTemplateCreateController.thisTemplate.siteUID}"  autoWidth="false" style="max-width: 150px;">
                                     <p:ajax  listener="#{qrCodeTemplateCreateController.onSiteChange}" update="qrCodeEditForm:preView"/>
@@ -48,8 +48,8 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.QRCode}#{msg.Size}</label>
-                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.size}" min="100" max="500" >
-                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.size}" min="50" max="500" >
+                                    <p:ajax update="qrCodeEditForm:preView"/>
                                 </p:spinner>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -93,7 +93,7 @@
                                     </f:facet>
                                 </p:cellEditor>
                             </p:column>
-                            
+
                             <p:column headerText="#{msg.positionX}">
                                 <p:cellEditor>
                                     <f:facet name="output"><h:outputText value="#{element.positionX}" /></f:facet>
