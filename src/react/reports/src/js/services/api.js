@@ -4,7 +4,7 @@ import { AssetTypesConv, BriefConv, ReasonConv, BriefAssetConv } from 'converter
 import moment from 'moment'
 
 const UseMock = true
-if (process.env.NODE_ENV === 'development' && UseMock) {
+if (__USE_MOCK__ && UseMock) {
   load('./sample')
 }
 

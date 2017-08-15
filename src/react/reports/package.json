@@ -12,10 +12,11 @@
   "bugs": "https://github.com/noru/my-react-boilerplate/issues",
   "scripts": {
     "clean": "rimraf build",
-    "dev": "node ./src/devServer.js",
+    "dev": "USE_MOCK=true node ./src/devServer.js",
     "prod": "npm run build && node ./src/devServer.js",
     "build": "webpack --config ./config/webpack.config.prod.js && npm run symlink",
     "build:local": "LOCAL=true npm run build",
+    "build:v2": "USE_MOCK=true LOCAL=true npm run build",
     "symlink": "node ./symlink.js",
     "coverage": "NODE_ENV=test nyc mocha --compilers js:babel-core/register,css:./test/unit/cssNullCompiler.js --require ./test/unit/testHelper.js --recursive ./test/unit",
     "e2e": "node ./test/e2e/runner.js",

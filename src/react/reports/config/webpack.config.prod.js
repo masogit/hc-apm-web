@@ -11,6 +11,7 @@ const GLOBALS = {
     'NODE_ENV': JSON.stringify('production'),
     LOCAL: JSON.parse(process.env.LOCAL || 'false')
   },
+  __USE_MOCK__: JSON.stringify(JSON.parse(process.env.USE_MOCK || 'false')),
   __DEV__: JSON.stringify(JSON.parse(process.env.DEBUG || 'false')),
 }
 const pwd = path.resolve(__dirname, '../')

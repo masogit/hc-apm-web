@@ -1,5 +1,4 @@
 const path = require('path')
-const config = require('./index')
 
 const theme = {
   '@btn-border-radius-base': '14px',

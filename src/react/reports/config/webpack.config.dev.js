@@ -6,11 +6,11 @@ const path = require('path')
 
 const GLOBALS = {
   'process.env': {
-    'NODE_ENV': JSON.stringify('development')
+    'NODE_ENV': JSON.stringify('development'),
   },
+  __USE_MOCK__: JSON.stringify(JSON.parse(process.env.USE_MOCK || 'false')),
   __DEV__: JSON.stringify(JSON.parse(process.env.DEBUG || 'true'))
 }
-
 module.exports = merge(config, {
   cache: true,
   devtool: 'cheap-module-eval-source-map',
