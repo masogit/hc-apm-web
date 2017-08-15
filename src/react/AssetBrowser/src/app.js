@@ -12,7 +12,6 @@ import assetBrowser from '#/models/assetBrowser'
 const app = dva()
 
 app.model(assetBrowser)
-// app.model(board)
 
 app.router(router)
 

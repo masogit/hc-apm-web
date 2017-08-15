@@ -3,6 +3,9 @@ const webpack = require('webpack')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const config = require('../config')
+const GLOBALS = {
+  __USE_MOCK__: JSON.stringify(JSON.parse(process.env.USE_MOCK || 'false')),
+}
 
 module.exports = {
   devtool: 'source-map',
@@ -20,5 +23,8 @@ module.exports = {
     alias: {
       '#': path.resolve(__dirname, '../src')
     }
-  }
+  },
+  plugins: [
+    new webpack.DefinePlugin(GLOBALS)
+  ]
 }
