@@ -63,7 +63,7 @@ public class ProcessTimeApi {
                 .map(count -> ImmutableMap.of("total", count, "start", offset, "limit", Math.min(count - offset, limit))).toBlocking().single();
 
         Iterable<ImmutableMap<String, Object>> result = ptService.queryListByType(user.getSiteId(), user.getHospitalId(), fromTime, toTime, orderBy, groupby, typeId, deptId, supplier, offset, limit)
-                .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", groupby.contains("dept") ? t._2 : idMap.getOrDefault(t._1, "")).put("respond", t._3).put("arrived", t._4).put("ETTR", t._5).build()).toBlocking().toIterable();
+                .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", groupby.contains("dept") ? t._2 : idMap.getOrDefault(t._1, "")).put("respond", t._3).put("arrived", t._4).put("ack", t._5).put("ETTR", t._6).build()).toBlocking().toIterable();
 
         Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
                 .put("data", new ImmutableList.Builder<ImmutableMap<String, Object>>().addAll(result).build())
@@ -89,8 +89,8 @@ public class ProcessTimeApi {
                 .map(count -> ImmutableMap.of("total", count, "start", offset, "limit", Math.min(count - offset, limit))).toBlocking().single();
 
         Iterable<ImmutableMap<String, Object>> result = ptService.queryListByAsset(user.getSiteId(), user.getHospitalId(), fromTime, toTime, orderBy, typeId, deptId, supplier, offset, limit)
-                .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", t._2).put("respond", t._3).put("arrived", t._4).put("ETTR", t._5)
-                .put("dispatchTime", t._6).put("workingTime", t._7).build()).toBlocking().toIterable();
+                .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", t._2).put("respond", t._3).put("arrived", t._4).put("arrived", t._5).put("ETTR", t._6)
+                .put("dispatchTime", t._7).put("workingTime", t._8).build()).toBlocking().toIterable();
 
         Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
                 .put("data", new ImmutableList.Builder<ImmutableMap<String, Object>>().addAll(result).build())
@@ -114,7 +114,7 @@ public class ProcessTimeApi {
         
         if(count==0){
             Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
-                .put("data",new ImmutableMap.Builder<String, Object>().put("respond", 0).put("arrived", 0).put("ETTR", 0).put("dispatchTime", 0)
+                .put("data",new ImmutableMap.Builder<String, Object>().put("respond", 0).put("arrived", 0).put("ack", 0).put("ETTR", 0).put("dispatchTime", 0)
                         .put("workingTime", 0).put("ETTR75", 0).put("ETTR95", 0).build()).build();
             return ResponseEntity.ok().body(body);
         }
@@ -123,7 +123,8 @@ public class ProcessTimeApi {
         Integer ettr95 = ptService.queryDistribution(user.getSiteId(), user.getHospitalId(), fromTime, toTime, typeId, deptId, supplier, count*95/100).toBlocking().single();
 
         ImmutableMap<String, Integer> result = ptService.queryGross(user.getSiteId(), user.getHospitalId(), fromTime, toTime, typeId, deptId, supplier)
-                .map(t -> ImmutableMap.of("respond", t._1, "arrived", t._2, "ETTR", t._3, "dispatchTime", t._4, "workingTime", t._5)).toBlocking().single();
+                .map(t -> new ImmutableMap.Builder<String, Integer>().putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("respond", t._1).put("workingTime", t._6).build()).toBlocking().single();
+//                        .putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("workingTime", t._6).build()).toBlocking().single();
 
         Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
                 .put("data",new ImmutableMap.Builder<String, Object>().putAll(result).put("ETTR75", ettr75).put("ETTR95", ettr95).build()).build();
