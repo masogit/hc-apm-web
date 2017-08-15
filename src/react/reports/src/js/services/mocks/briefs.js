@@ -5,6 +5,7 @@ export const briefsByType = {
             "name": "DSA",
             "respond": 2032,
             "arrived": 3317,
+            "ack": 4900,
             "ETTR": 6114
         },
         {
@@ -19,6 +20,7 @@ export const briefsByType = {
             "name": "US",
             "respond": 2333,
             "arrived": 3212,
+            "ack": 5000,
             "ETTR": 5093
         },
         {
@@ -90,7 +92,7 @@ export const briefsByType = {
         "start": 0,
         "limit": 12
     }
-} 
+}
 
 export const briefsBySupplier = {
   "data": [{

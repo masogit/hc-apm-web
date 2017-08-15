@@ -43,6 +43,7 @@ const BallsStub = [
   { key: 'respond', i18n: 'accept_incident' },
   { key: 'arrived', i18n: 'signin_incident' },
   { key: 'workingTime', i18n: 'fixing_incident' },
+  { key: 'ack', i18n: 'acknowlege_incident' },
   { key: 'ETTR', i18n: 'close_incident' }
 ]
 
