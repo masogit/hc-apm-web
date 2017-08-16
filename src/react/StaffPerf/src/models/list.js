@@ -145,8 +145,8 @@ export default {
       notification.warning({
         message: '暂无可用设备数据',
         description: '请稍后再试'
-      })      
-    }    
+      })
+    }
   },
   reducers: {
     ['data/get/succeed'] (state, { payload }) {
@@ -185,6 +185,6 @@ export default {
         ...state,
         loading: false
       }
-    }    
+    }
   }
 }

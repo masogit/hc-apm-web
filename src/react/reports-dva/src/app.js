@@ -1,19 +1,25 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import dva from 'dva/mobile'
+import dva from 'dva'
 import { AppContainer } from 'react-hot-loader'
 import { useRouterHistory } from 'dva/router'
 import createHashHistory from 'history/lib/createHashHistory'
+import './polyfill'
 import './app.css'
+import './styles/index.scss'
 
 import router from '#/router'
 
 import assetBrowser from '#/models/assetBrowser'
+/* AssetPerf */
 import profit from '#/models/AssetPerf/profit'
 import config from '#/models/AssetPerf/config'
 import user from '#/models/AssetPerf/user'
 import filters from '#/models/AssetPerf/filters'
 import overview from '#/models/AssetPerf/overview'
+/* StaffPerf */
+import staffPerfModels from '#/models/StaffPerf'
+
 
 const historyEngine = useRouterHistory(createHashHistory)({
   queryKey: false,
@@ -33,6 +39,8 @@ app.model(config)
 app.model(user)
 app.model(filters)
 app.model(overview)
+staffPerfModels.forEach(model => app.model(model))
+
 app.router(router)
 
 function render(router) {

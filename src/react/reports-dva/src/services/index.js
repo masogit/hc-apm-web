@@ -10,6 +10,8 @@ const URLs = {
   AssetPerf_Forecast: '/api/profit/forecast',
   AssetPerf_ForecastRate: '/api/profit/forecastrate',
 
+  StaffPerf_Staff: '/api/staff',
+
 }
 
 if (process.env.NODE_ENV !== 'production') {
