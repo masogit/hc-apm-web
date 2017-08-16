@@ -32,6 +32,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import org.apache.commons.codec.binary.Base64;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 /**
@@ -50,8 +51,11 @@ public class QrCodeDrawService {
     // LOGO高度
     private static final int HEIGHT = 78;
     // LOGO路径
-    private static final String LOGO_PATH = "/logo.jpg";
-    private static final String BACKGROUND_PATH = "/background.png";
+//    private static final String LOGO_PATH = "/logo.jpg";
+//    private static final String BACKGROUND_PATH = "/background.png";
+    
+    @Value("#{wxProperties.suscribeLink}")
+    private String suscribeLink;
 
     private BufferedImage createBitMatrixImage(String content, Integer size) throws Exception {
         Map<EncodeHintType, Object> hints = new HashMap();
@@ -71,46 +75,46 @@ public class QrCodeDrawService {
         return image;
     }
 
-    private BufferedImage createImage(String content, String imgPath, boolean needCompress) throws Exception {
-
-        BufferedImage image = createBitMatrixImage(content, QRCODE_SIZE);
-        int width = image.getWidth();
-        int height = image.getHeight();
-        if (imgPath == null || "".equals(imgPath)) {
-            return image;
-        }
+//    private BufferedImage createImage(String content, String imgPath, boolean needCompress) throws Exception {
+//
+//        BufferedImage image = createBitMatrixImage(content, QRCODE_SIZE);
+//        int width = image.getWidth();
+//        int height = image.getHeight();
+//        if (imgPath == null || "".equals(imgPath)) {
+//            return image;
+//        }
         // 插入Logo图片
 
-        InputStream is = this.getClass().getResourceAsStream(LOGO_PATH);
-        if (null != is) {
-            Image logoSrc = ImageIO.read(is);
-            int srcWidth = logoSrc.getWidth(null);
-            int srcHeight = logoSrc.getHeight(null);
-            if (needCompress) { // 压缩LOGO
-                if (width > WIDTH) {
-                    width = WIDTH;
-                }
-                if (height > HEIGHT) {
-                    height = HEIGHT;
-                }
-                Image compressedImage = logoSrc.getScaledInstance(srcWidth, srcHeight, Image.SCALE_SMOOTH);
-                BufferedImage tag = new BufferedImage(srcWidth, srcHeight, BufferedImage.TYPE_INT_RGB);
-                Graphics g = tag.getGraphics();
-                g.drawImage(compressedImage, 0, 0, null); // 绘制缩小后的图
-                g.dispose();
-                logoSrc = compressedImage;
-            }
-            // 插入LOGO
-            Graphics2D graph = image.createGraphics();
-            int x = (QRCODE_SIZE - width) / 2;
-            int y = (QRCODE_SIZE - height) / 2;
-            graph.drawImage(logoSrc, x, y, width, height, null);
-            graph.setStroke(new BasicStroke(3f));
-            graph.dispose();
-        }
+//        InputStream is = this.getClass().getResourceAsStream(LOGO_PATH);
+//        if (null != is) {
+//            Image logoSrc = ImageIO.read(is);
+//            int srcWidth = logoSrc.getWidth(null);
+//            int srcHeight = logoSrc.getHeight(null);
+//            if (needCompress) { // 压缩LOGO
+//                if (width > WIDTH) {
+//                    width = WIDTH;
+//                }
+//                if (height > HEIGHT) {
+//                    height = HEIGHT;
+//                }
+//                Image compressedImage = logoSrc.getScaledInstance(srcWidth, srcHeight, Image.SCALE_SMOOTH);
+//                BufferedImage tag = new BufferedImage(srcWidth, srcHeight, BufferedImage.TYPE_INT_RGB);
+//                Graphics g = tag.getGraphics();
+//                g.drawImage(compressedImage, 0, 0, null); // 绘制缩小后的图
+//                g.dispose();
+//                logoSrc = compressedImage;
+//            }
+//            // 插入LOGO
+//            Graphics2D graph = image.createGraphics();
+//            int x = (QRCODE_SIZE - width) / 2;
+//            int y = (QRCODE_SIZE - height) / 2;
+//            graph.drawImage(logoSrc, x, y, width, height, null);
+//            graph.setStroke(new BasicStroke(3f));
+//            graph.dispose();
+//        }
 
-        return image;
-    }
+//        return image;
+//    }
 
     public String getImageBase64(BufferedImage src) {
         Base64 encoder = new Base64();
@@ -137,7 +141,7 @@ public class QrCodeDrawService {
 
         for (QrCodeTemplateElement item : elements) {
             if (item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)) {
-                drawQrcodeElement(g, "https://djdjj/ddjjjj", item);
+                drawQrcodeElement(g, suscribeLink, item);
             } else if (item.getType().equals(QrCodeTemplateElement.QrCodeElementType.Text)) {
                 drawTextElement(g, item);
             }
