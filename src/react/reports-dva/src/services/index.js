@@ -4,6 +4,8 @@ import { load } from './mocks/helper'
 
 const URLs = {
 
+  AllDepartments: '/api/org/all',
+
   AssetBrowser_Assets: '/api/assets',
 
   AssetPerf_Profit: '/api/profit',
@@ -11,6 +13,9 @@ const URLs = {
   AssetPerf_ForecastRate: '/api/profit/forecastrate',
 
   StaffPerf_Staff: '/api/staff',
+
+  ScanDetails_Detail: '/api/scan/detail',
+  ScanDetails_Brief: '/api/scan/brief',
 
 }
 
