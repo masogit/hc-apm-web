@@ -35,9 +35,11 @@ export default {
   },
   subscriptions: {
     setup ({ dispatch, history }) {
-      return history.listen(({query}) => {
-        const { from, to, page } = query
+      return history.listen(({query, pathname}) => {
 
+        if (pathname !== 'StaffPerf') return
+
+        const { from, to, page } = query
         if (!from || !to) {
           return dispatch(routerRedux.push({
             pathname: '/StaffPerf',
