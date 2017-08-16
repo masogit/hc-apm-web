@@ -19,7 +19,12 @@ import filters from '#/models/AssetPerf/filters'
 import overview from '#/models/AssetPerf/overview'
 /* StaffPerf */
 import staffPerfModels from '#/models/StaffPerf'
-
+/* Scan Details */
+import assets from '#/models/ScanDetails/assets'
+import briefs from '#/models/ScanDetails/briefs'
+import depts from '#/models/ScanDetails/depts'
+import sd_filters from '#/models/ScanDetails/filters'
+import steps from '#/models/ScanDetails/steps'
 
 const historyEngine = useRouterHistory(createHashHistory)({
   queryKey: false,
@@ -33,13 +38,22 @@ const app = dva({
   }
 })
 
+/** Asset Browser */
 app.model(assetBrowser)
+/* Asset Perf */
 app.model(profit)
 app.model(config)
 app.model(user)
 app.model(filters)
 app.model(overview)
+/* Staff Perf */
 staffPerfModels.forEach(model => app.model(model))
+/* Scan Details */
+app.model(assets)
+app.model(briefs)
+app.model(depts)
+app.model(sd_filters)
+app.model(steps)
 
 app.router(router)
 

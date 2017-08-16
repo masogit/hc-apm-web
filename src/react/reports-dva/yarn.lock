@@ -1715,7 +1715,7 @@ d3-scale@^1.0.5:
     d3-time "1"
     d3-time-format "2"
 
-d3-shape@^1.0.6:
+d3-shape@^1.0.6, d3-shape@^1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/d3-shape/-/d3-shape-1.2.0.tgz#45d01538f064bafd05ea3d6d2cb748fd8c41f777"
   dependencies:
@@ -4600,6 +4600,10 @@ rc@^1.1.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
+"react-HOCs@git+https://github.build.ge.com/foundry-sh/react-HOCs.git":
+  version "1.1.0"
+  resolved "git+https://github.build.ge.com/foundry-sh/react-HOCs.git#cf8789ef8db61a415c5e563581e22f707c6d250f"
+
 react-deep-force-update@^2.0.1:
   version "2.0.1"
   resolved "https://registry.npmjs.org/react-deep-force-update/-/react-deep-force-update-2.0.1.tgz#4f7f6c12c3e7de42f345992a3c518236fa1ecad3"
@@ -4636,6 +4640,14 @@ react-motion:
   resolved "https://registry.yarnpkg.com/react-motion/-/react-motion-0.4.7.tgz#f77331ec7920bdb0d0cfc37eb6ffa10571bf42c7"
   dependencies:
     performance-now "^0.2.0"
+    raf "^3.1.0"
+
+react-motion@^0.5.0:
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/react-motion/-/react-motion-0.5.0.tgz#1708fc2aee552900d21c1e6bed28346863e017b6"
+  dependencies:
+    performance-now "^0.2.0"
+    prop-types "^15.5.8"
     raf "^3.1.0"
 
 react-move@^1.1.8:
@@ -4942,6 +4954,14 @@ rimraf@2, rimraf@^2.2.8, rimraf@^2.5.1, rimraf@^2.6.1:
   resolved "https://registry.npmjs.org/rimraf/-/rimraf-2.6.1.tgz#c2338ec643df7a1b7fe5c54fa86f57428a55f33d"
   dependencies:
     glob "^7.0.5"
+
+"ring-sector-layout@git+https://github.build.ge.com/foundry-sh/ring-sector-layout.git":
+  version "2.1.0"
+  resolved "git+https://github.build.ge.com/foundry-sh/ring-sector-layout.git#dd15521f8920c7a5ae772e03515df2e6238ae209"
+  dependencies:
+    d3-shape "^1.2.0"
+    react-motion "^0.5.0"
+    uuid "^3.0.1"
 
 ripemd160@^1.0.0:
   version "1.0.1"

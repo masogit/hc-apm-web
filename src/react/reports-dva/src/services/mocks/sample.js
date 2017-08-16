@@ -1,6 +1,8 @@
 import { Assets } from './assetBrowser'
 import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
 import { StaffPerf } from './staffPerf'
+import { DetailByAsset, DetailByStep, Brief } from './scanDetails'
+import { Orgs } from './common'
 import { URLs } from '../index.js'
 
 const TAG = '[Mock]: '
@@ -8,6 +10,11 @@ const TAG = '[Mock]: '
 let info = msg => console.info(TAG + msg)
 
 export default function (mock) {
+
+  mock.onGet(URLs.AllDepartments).reply(function (config) {
+    info(config.url)
+    return [200, Orgs]
+  })
 
   mock.onGet(URLs.AssetBrowser_Assets).reply(function (config) {
     info(config.url)
@@ -37,6 +44,20 @@ export default function (mock) {
   mock.onGet(URLs.StaffPerf_Staff).reply(function (config) {
     info(config.url)
     return [200, StaffPerf]
+  })
+
+  mock.onGet(URLs.ScanDetails_Brief).reply(function (config) {
+    info(config.url)
+    return [200, Brief]
+  })
+
+  mock.onGet(URLs.ScanDetails_Detail).reply(function ({params, url}) {
+    info(url)
+    if (params.groupby === 'asset') {
+      return [200, DetailByAsset]
+    } else {
+      return [200, DetailByStep]
+    }
   })
 
 }
