@@ -98,3 +98,24 @@ export const colorSet = {
     'rgb(214, 194, 94)'
   ]
 }
+
+/* Maintenance Cost */
+export const MC_COLORS = {
+  'labor': '#6ab4a6',
+  'parts': '#7bbfb2',
+  'repair': '#86a07f',
+  'PM': '#99b992'
+}
+
+export const PAST_COLORS = {
+  'labor': '#49786e',
+  'parts': '#5c9489',
+  'repair': '#99b992',
+  'PM': '#99b992'
+}
+
+export const THRESHOLD_COLORS = [
+  '#82b1d1',
+  '#d5c165',
+  '#ce84b4'
+]

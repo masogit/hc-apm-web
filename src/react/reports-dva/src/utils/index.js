@@ -1,4 +1,7 @@
 // @flow
+import moment from 'moment'
+import axios from 'axios'
+import { pickBy } from 'lodash'
 import { ranges } from '#/constants'
 
 export function randRange(min:number, max:number):number {
@@ -157,4 +160,35 @@ export const isSameCursor = (a: cursorT, b: cursorT): boolean => {
 
 export const isFocusNode = (node: NodeT, cursor: cursorT): boolean => {
   return isSameCursor(getCursor(node), cursor)
+}
+
+/* Maintenance Cost */
+export function withUnit(number: number) {
+  if (number > 100000000) {
+    return round(number / 100000000) + '亿'
+  } else if (number > 10000000) {
+    return round(number / 10000000) + '千万'
+  } else if (number > 1000000) {
+    return round(number / 1000000) + '百万'
+  } else if (number > 10000) {
+    return round(number / 10000) + '万'
+  } else {
+    return round(number)
+  }
+}
+
+export function fetchData(api: string|string[], {params, data}: any) {
+  const isPast = moment(params.to).format('YYYY-MM-DD') <= moment().format('YYYY-MM-DD')
+  let url
+  if (Array.isArray(api)) {
+    url = api[isPast ? 0 : 1]
+  } else {
+    url = api + (isPast ? '' : '/forecast')
+  }
+  return axios({
+    method: isPast ? 'GET' : 'PUT',
+    url,
+    data,
+    params: pickBy(params, v => v !== undefined)
+  })
 }
