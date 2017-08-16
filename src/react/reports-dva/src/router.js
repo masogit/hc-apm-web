@@ -3,6 +3,7 @@ import AssetBrowser from '#/containers/AssetBrowser'
 import AssetPerf from '#/containers/AssetPerf'
 import StaffPerf from '#/containers/StaffPerf'
 import ScanDetails from '#/containers/ScanDetails'
+import MaintenanceCost from '#/containers/MaintenanceCost'
 import { Router, Route } from 'dva/router'
 
 export default ({history}) => (
@@ -11,5 +12,6 @@ export default ({history}) => (
     <Route exact path="/AssetPerf" component={AssetPerf} />
     <Route exact path="/StaffPerf" component={StaffPerf} />
     <Route exact path="/ScanDetails" component={ScanDetails} />
+    <Route exact path="/MaintenanceCost" component={MaintenanceCost} />
   </Router>
 )

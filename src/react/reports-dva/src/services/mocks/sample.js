@@ -2,7 +2,8 @@ import { Assets } from './assetBrowser'
 import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
 import { StaffPerf } from './staffPerf'
 import { DetailByAsset, DetailByStep, Brief } from './scanDetails'
-import { Orgs } from './common'
+import { Acyman20, TypeAcyman10, TypeAcyman, TypeMtpm, AssetAcyman, AssetMtpm } from './maintenanceCost'
+import { Orgs, AssetTypes } from './common'
 import { URLs } from '../index.js'
 
 const TAG = '[Mock]: '
@@ -10,6 +11,11 @@ const TAG = '[Mock]: '
 let info = msg => console.info(TAG + msg)
 
 export default function (mock) {
+
+  mock.onGet(URLs.AllAssetTypes).reply(function (config) {
+    info(config.url)
+    return [200, AssetTypes]
+  })
 
   mock.onGet(URLs.AllDepartments).reply(function (config) {
     info(config.url)
@@ -51,7 +57,7 @@ export default function (mock) {
     return [200, Brief]
   })
 
-  mock.onGet(URLs.ScanDetails_Detail).reply(function ({params, url}) {
+  mock.onGet(URLs.ScanDetails_Detail).reply(function ({ params, url }) {
     info(url)
     if (params.groupby === 'asset') {
       return [200, DetailByAsset]
@@ -60,4 +66,28 @@ export default function (mock) {
     }
   })
 
+  mock.onGet(URLs.MaintenanceCost_Ma).reply(function ({ params, url }) {
+    info(url)
+    let resp
+    if (params.limit == 20) {
+      resp = Acyman20
+    } else if (params.limit == 10 && params.groupby === 'type') {
+      resp = TypeAcyman10
+    } else if (params.rltgrp === 'mtpm') {
+      resp = TypeMtpm
+    } else if (params.rltgrp === 'acyman' && params.groupby === 'type') {
+      resp = TypeAcyman
+    }
+
+    return [200, resp]
+  })
+
+  mock.onGet(RegExp(URLs.MaintenanceCost_Asset)).reply(function ({ params, url }) {
+    info(url)
+    if (params.rltgrp === 'acyman') {
+      return [200, AssetAcyman]
+    } else {
+      return [200, AssetMtpm]
+    }
+  })
 }

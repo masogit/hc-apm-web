@@ -25,6 +25,17 @@ import briefs from '#/models/ScanDetails/briefs'
 import depts from '#/models/ScanDetails/depts'
 import sd_filters from '#/models/ScanDetails/filters'
 import steps from '#/models/ScanDetails/steps'
+/* Maintenance Cost */
+import mc_filters from '#/models/MaintenanceCost/filters'
+import assetTypes from '#/models/MaintenanceCost/assetTypes'
+import groups from '#/models/MaintenanceCost/groups'
+import mc_assets from '#/models/MaintenanceCost/assets'
+import mc_overview from '#/models/MaintenanceCost/overview'
+import forecastOverview from '#/models/MaintenanceCost/forecastOverview'
+import thresholds from '#/models/MaintenanceCost/thresholds'
+import suggestions from '#/models/MaintenanceCost/suggestions'
+import confirm from '#/models/MaintenanceCost/confirm'
+
 
 const historyEngine = useRouterHistory(createHashHistory)({
   queryKey: false,
@@ -54,6 +65,16 @@ app.model(briefs)
 app.model(depts)
 app.model(sd_filters)
 app.model(steps)
+/* Maintenance Cost */
+app.model(mc_filters)
+app.model(assetTypes)
+app.model(groups)
+app.model(mc_assets)
+app.model(mc_overview)
+app.model(forecastOverview)
+app.model(thresholds)
+app.model(suggestions)
+app.model(confirm)
 
 app.router(router)
 
