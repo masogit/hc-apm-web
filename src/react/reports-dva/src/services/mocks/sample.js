@@ -1,5 +1,6 @@
 import { Assets } from './assetBrowser'
 import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
+import { StaffPerf } from './staffPerf'
 import { URLs } from '../index.js'
 
 const TAG = '[Mock]: '
@@ -33,5 +34,9 @@ export default function (mock) {
     return [200, ForecastRate]
   })
 
+  mock.onGet(URLs.StaffPerf_Staff).reply(function (config) {
+    info(config.url)
+    return [200, StaffPerf]
+  })
 
 }

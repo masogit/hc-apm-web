@@ -1563,7 +1563,7 @@ crypto-browserify@^3.11.0:
     public-encrypt "^4.0.0"
     randombytes "^2.0.0"
 
-css-animation@1.x, css-animation@^1.2.5, css-animation@^1.3.0, css-animation@^1.3.2:
+css-animation@1.x, css-animation@^1.2.5, css-animation@^1.3.2:
   version "1.3.2"
   resolved "https://registry.yarnpkg.com/css-animation/-/css-animation-1.3.2.tgz#df515820ef5903733ad2db0999403b3037b8b880"
   dependencies:
@@ -1811,6 +1811,10 @@ detect-indent@^4.0.0:
   resolved "git+https://github.build.ge.com/foundry-sh/dew-filterbar.git#615102b9a514ced8a87bfb1df6123c9692117b4c"
   dependencies:
     dew-styles "git+https://github.build.ge.com/foundry-sh/dew-styles.git"
+
+"dew-pager@git+https://github.build.ge.com/foundry-sh/dew-pager.git":
+  version "1.3.1"
+  resolved "git+https://github.build.ge.com/foundry-sh/dew-pager.git#3f5d0bfb34004c090b33e665feedbfb922287065"
 
 "dew-statusbar@git+https://github.build.ge.com/foundry-sh/dew-statusbar.git":
   version "1.0.2"
@@ -4262,13 +4266,7 @@ rc-align@2.x:
     dom-align "1.x"
     rc-util "4.x"
 
-rc-animate@2.x:
-  version "2.3.3"
-  resolved "https://registry.yarnpkg.com/rc-animate/-/rc-animate-2.3.3.tgz#9f123990aa625c5867ace88412a185e46b307d03"
-  dependencies:
-    css-animation "^1.3.0"
-
-rc-animate@^2.0.2, rc-animate@^2.3.0, rc-animate@^2.3.6:
+rc-animate@2.x, rc-animate@^2.0.2, rc-animate@^2.3.0, rc-animate@^2.3.6:
   version "2.4.1"
   resolved "https://registry.yarnpkg.com/rc-animate/-/rc-animate-2.4.1.tgz#df3e0f56fe106afe4bf52ff408ced241c5178919"
   dependencies:
@@ -4520,13 +4518,7 @@ rc-time-picker@~2.4.1:
     prop-types "^15.5.8"
     rc-trigger "1.x"
 
-rc-tooltip@^3.4.2:
-  version "3.4.2"
-  resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-3.4.2.tgz#c5c89c347ed790f7f290ef825d5e24e8fb599166"
-  dependencies:
-    rc-trigger "1.x"
-
-rc-tooltip@~3.4.6:
+rc-tooltip@^3.4.2, rc-tooltip@~3.4.6:
   version "3.4.8"
   resolved "https://registry.yarnpkg.com/rc-tooltip/-/rc-tooltip-3.4.8.tgz#4a422374f57f3b00f4d04941863850ceddd24c56"
   dependencies:
@@ -4591,14 +4583,7 @@ rc-util@3.x:
     classnames "2.x"
     shallowequal "0.2.x"
 
-rc-util@4.x, rc-util@^4.0.2:
-  version "4.0.2"
-  resolved "https://registry.yarnpkg.com/rc-util/-/rc-util-4.0.2.tgz#5804f8b141a13c8c14d7c265a7d21d298195af46"
-  dependencies:
-    add-dom-event-listener "1.x"
-    shallowequal "^0.2.2"
-
-rc-util@^4.0.4:
+rc-util@4.x, rc-util@^4.0.2, rc-util@^4.0.4:
   version "4.0.4"
   resolved "https://registry.yarnpkg.com/rc-util/-/rc-util-4.0.4.tgz#99813dd90aee7e29b64939a70ac176ead3f4ff39"
   dependencies:
@@ -5522,6 +5507,10 @@ verror@1.3.6:
   resolved "https://registry.npmjs.org/verror/-/verror-1.3.6.tgz#cff5df12946d297d2baaefaa2689e25be01c005c"
   dependencies:
     extsprintf "1.0.2"
+
+viewport-units-buggyfill@^0.6.2:
+  version "0.6.2"
+  resolved "https://registry.yarnpkg.com/viewport-units-buggyfill/-/viewport-units-buggyfill-0.6.2.tgz#8b1ee8fb7afd06739460457657a61ba4fa38cbb1"
 
 vinyl-fs@^2.4.4:
   version "2.4.4"
