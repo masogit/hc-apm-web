@@ -197,6 +197,7 @@ INSERT INTO "public"."i18n_message" VALUES ('292', 'label', 'field', '字段', '
 INSERT INTO "public"."i18n_message" VALUES ('293', 'label', 'Color', '颜色', 'Field', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('294', 'label', 'type', '类型', 'Type', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('295', 'label', 'deviceStatus', '资产状态', 'Device Status', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('296', 'label', 'exportQrCode', '导出二维码图片', 'Qrcode Image export', null, '-1');
 
 
 INSERT INTO "public"."i18n_message" VALUES ('401', 'label', 'SiteInfo', '医联体/租户信息', 'Site Info', null, '-1');

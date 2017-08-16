@@ -17,6 +17,9 @@ import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,7 +27,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+import javax.imageio.ImageIO;
 import org.joda.time.DateTime;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -106,7 +114,7 @@ public class QrCodeService {
         qrCodeLibDao.save(qrCodeLib);
     }
 
-    public String getQrCodeImageBase64(String qrCode) {
+    public BufferedImage getQrCodeImage(String qrCode) {
         QrCodeLib qrcodeLib = qrCodeLibDao.findByQrCode(qrCode);
         QrCodeTemplate template = templateDao.findSiteTemplate(qrcodeLib.getSiteUID());
         List<QrCodeTemplateElement> elementList;
@@ -123,7 +131,11 @@ public class QrCodeService {
         } catch (Exception ex) {
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return qrCodeDrawService.getImageBase64(img);
+        return img;
+    }
+
+    public String getQrCodeImageBase64(String qrCode) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImage(qrCode));
     }
 
     private static Map<String, String> FieldsMap;
@@ -218,6 +230,27 @@ public class QrCodeService {
 
         return elements;
 
+    }
+
+    public StreamedContent exportQrCodeList(List<String> exportList) throws IOException {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        ZipOutputStream out = new ZipOutputStream(bout);
+
+        exportList.forEach(item -> {
+            try {
+                BufferedImage image = getQrCodeImage(item);
+                out.putNextEntry(new ZipEntry(item.concat(".jpg")));
+                ImageIO.write(image, "JPG", out);
+                out.closeEntry();
+            } catch (Exception e) {
+                WebUtil.addErrorMessage(item + "export fail;");
+            }
+        });
+        out.close();
+
+        DefaultStreamedContent zipFile = new DefaultStreamedContent(new ByteArrayInputStream(bout.toByteArray()));
+        zipFile.setName("qrCodes.zip");
+        return zipFile;
     }
 
     List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements) {
