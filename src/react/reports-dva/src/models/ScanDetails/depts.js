@@ -10,10 +10,14 @@ export default {
   state: isHead ? [] : null,
   subscriptions: {
     setup({history, dispatch}) {
-      dispatch({
-        type: 'get'
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'ScanDetails') return
+        dispatch({
+          type: 'get'
+        })
       })
     }
+
   },
   effects: {
     *['get']({ payload }, { put, call }) {

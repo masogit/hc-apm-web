@@ -157,9 +157,12 @@ export default {
     columns: []
   }),
   subscriptions: {
-    setup({ dispatch }) {
-      dispatch({
-        type: 'data/get'
+    setup({ dispatch, history }) {
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'AssetBrowser') return
+        dispatch({
+          type: 'data/get'
+        })
       })
     }
   },

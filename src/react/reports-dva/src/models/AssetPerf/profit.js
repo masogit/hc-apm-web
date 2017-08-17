@@ -13,11 +13,14 @@ export default {
     loading: true
   },
   subscriptions: {
-    setup({ dispatch, location }) {
-      dispatch({
-        type: 'data/get',
-        start: 0,
-        level: 0
+    setup({ dispatch, history }) {
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'AssetPerf') return
+        dispatch({
+          type: 'data/get',
+          start: 0,
+          level: 0
+        })
       })
     }
   },

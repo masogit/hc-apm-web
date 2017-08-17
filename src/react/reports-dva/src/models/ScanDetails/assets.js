@@ -13,9 +13,12 @@ export default {
     animationDirection: 0
   },
   subscriptions: {
-    setup({dispatch}) {
-      dispatch({
-        type: 'data/get'
+    setup({dispatch, history}) {
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'ScanDetails') return
+        dispatch({
+          type: 'data/get'
+        })
       })
     }
   },
