@@ -25,7 +25,10 @@ export default {
   },
   subscriptions: {
     setup ({ dispatch, history }) {
-      return history.listen(({ query }) => {
+      return history.listen(({ query, pathname }) => {
+
+        if (pathname !== 'MaintenanceStats') return
+
         const { from, to, groupby, groupPage, dept, type } = query
 
         if (!from || !to) {

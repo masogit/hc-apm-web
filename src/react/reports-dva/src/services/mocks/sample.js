@@ -1,10 +1,11 @@
+import { Orgs, AssetTypes } from './common'
 import { Assets } from './assetBrowser'
 import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
 import { StaffPerf } from './staffPerf'
 import { DetailByAsset, DetailByStep, Brief } from './scanDetails'
 import { Acyman20, TypeAcyman10, TypeAcyman, TypeMtpm, AssetAcyman, AssetMtpm } from './maintenanceCost'
 import { PmByAsset, PmByType } from './maintenanceStats'
-import { Orgs, AssetTypes } from './common'
+import { Dmv2 } from './decisionMaking'
 import { URLs } from '../index.js'
 
 const TAG = '[Mock]: '
@@ -99,6 +100,11 @@ export default function (mock) {
     } else {
       return [200, PmByType]
     }
+  })
+
+  mock.onGet(URLs.DecisionMaking_Dmv2).reply(function({ params, url }) {
+    info(url)
+    return [200, Dmv2]
   })
 
   mock.onAny().passThrough()
