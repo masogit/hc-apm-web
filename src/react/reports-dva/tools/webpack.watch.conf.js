@@ -121,7 +121,7 @@ module.exports = merge(baseWebpackConfig, {
       debug: false
     }),
     new webpack.DefinePlugin({
-      'process.env': 'development'
+      'process.env': '"development"'
     }),
     new HtmlWebpackPlugin({
       template: './public/index.xhtml',

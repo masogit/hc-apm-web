@@ -9,7 +9,7 @@ const info = {
 const userInfoEl = document.querySelector('#user-context')
 if (userInfoEl) {
   const children = Array.from(userInfoEl.children)
-  userInfo = children.reduce((prev, cur) => {
+  info = children.reduce((prev, cur) => {
     try {
       prev[cur.id] = JSON.parse(cur.value)
     } catch (err) {

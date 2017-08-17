@@ -14,7 +14,7 @@ function getRootDir () {
 function symlink (distDir, targetDir, cb) {
   const dirName = getRootDir()
 
-  vfs.src(distDir, {followSymlinks: false, base: 'dist'})
+  vfs.src(distDir, {followSymlinks: false, base: 'build'})
   .pipe(vfs.symlink(path.join(targetDir, dirName)))
   .on('end', () => {
     console.log(`🚀 Symlinked: ${distDir} -> ${targetDir} 🚀`)
