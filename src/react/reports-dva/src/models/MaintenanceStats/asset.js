@@ -2,8 +2,7 @@
 import axios from 'axios'
 import { routerRedux } from 'dva/router'
 import { notification } from 'antd'
-
-import { pageSize, defaultPage } from '#/constants'
+import { pageSize, defaultPage, API_HOST } from '#/constants'
 
 export default {
   namespace: 'asset',
@@ -25,7 +24,7 @@ export default {
 
         if (!assetPage) {
           return dispatch(routerRedux.push({
-            pathname: '/',
+            pathname: '/MaintenanceStats',
             query: {
               ...query,
               assetPage: defaultPage
@@ -60,10 +59,6 @@ export default {
         yield put({ type: 'loading/on' })
 
         let user = yield select(state => state.user.info)
-        if (!user.id) {
-          const action = yield take('user/info/set')
-          user = action.payload
-        }
 
         const persistParams = user.isHead ? params : {
           ...params,
@@ -75,7 +70,7 @@ export default {
         const { data } = yield call(
           axios,
           {
-            url: process.env.API_HOST + '/pm' + (process.env.NODE_ENV === 'development' ? '/right' : ''),
+            url: API_HOST + '/pm',
             params: {
               ...restQuery,
               groupby: 'asset',
@@ -123,8 +118,8 @@ export default {
       notification.warning({
         message: '暂无可用设备数据',
         description: '请稍后再试'
-      })      
-    }    
+      })
+    }
   },
   reducers: {
     ['data/get/succeed'] (state, { payload }) {
@@ -151,6 +146,6 @@ export default {
         ...state,
         loading: false
       }
-    }    
+    }
   }
 }

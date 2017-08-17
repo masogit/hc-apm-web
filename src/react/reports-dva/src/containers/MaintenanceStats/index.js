@@ -10,8 +10,7 @@ import AnnulusSector from 'ring-sector-layout/dist/AnnulusSector'
 import AnnulusSectorStack from 'ring-sector-layout/dist/AnnulusSectorStack'
 
 import { QUALITY, COMPLETION, defaultPage } from '#/constants'
-import CoreCircle from '#/components/CoreCircle'
-import RoleProvider from '#/components/RoleProvider'
+import CoreCircle from '#/components/MaintenanceStats/CoreCircle'
 
 import PartGroup from './PartGroup'
 import PartAsset from './PartAsset'
@@ -31,10 +30,9 @@ const roleFilterFn = (isHead, cb) => n => {
   root: state.root.data,
   group: state.group,
   asset: state.asset,
-  filter: state.filter,
+  filter: state.MaintenanceStats_filter,
   loading: state.group.loading || state.asset.loading
 }))
-@RoleProvider
 export default class Root extends Component {
   state = {
     groupAD: 0,
@@ -46,11 +44,11 @@ export default class Root extends Component {
     const { location, dispatch } = this.props
 
     dispatch({
-      type: 'filter/data/get'
+      type: 'MaintenanceStats_filter/data/get'
     })
     // remove selected asset and group when initial load
     dispatch(routerRedux.push({
-      pathname: '/',
+      pathname: '/MaintenanceStats',
       query: {
         ...location.query,
         assetId: undefined,
@@ -140,7 +138,7 @@ export default class Root extends Component {
               pageSize={asset.pageSize}
               total={asset.total}
               onChange={this.handleRightPageChange} />
-          </div>          
+          </div>
           <div className={styles.group}>
             <div className={styles.groupby}>
               <FilterBar options={groupbyOpts} onChange={this.handleGroupbyChange} />
@@ -176,7 +174,7 @@ export default class Root extends Component {
   handleSwitcherChange = key => e => {
     e.preventDefault()
     this.props.dispatch({
-      type: 'filter/switcher/set',
+      type: 'MaintenanceStats_filter/switcher/set',
       payload: key
     })
   }
@@ -243,7 +241,7 @@ export default class Root extends Component {
       groupId: undefined,
       assetId: undefined
     })
-    
+
     this.setState((state, props) => ({
       ...state,
       groupAD: last - current,
@@ -256,7 +254,7 @@ export default class Root extends Component {
       assetPage: current,
       assetId: undefined
     })
-    
+
     this.setState((state, props) => ({
       ...state,
       assetAD: last - current
@@ -296,11 +294,11 @@ export default class Root extends Component {
     const { dispatch, location } = this.props
 
     dispatch(routerRedux.push({
-      pathname: '/',
+      pathname: '/MaintenanceStats',
       query: {
         ...location.query,
         ...params
       }
-    }))    
+    }))
   }
 }

@@ -15,11 +15,9 @@ export function disabledDate(current) {
   return current && (current.valueOf() > now || current < moment(now).subtract(3, 'year'))
 }
 
-
 export const now = new Date()
 export const currentYear = now.getFullYear()
 export const dateFormat = 'YYYY-MM-DD'
-
 
 const momentNow = moment()
 
@@ -119,3 +117,10 @@ export const THRESHOLD_COLORS = [
   '#d5c165',
   '#ce84b4'
 ]
+
+/* Maintenance Stats */
+export const COMPLETION = 'completion'
+export const QUALITY = 'quality'
+export const purple = '#b781b4'
+export const prasinous = '#6ab6a6'
+export const gray = '#b7b7b7'

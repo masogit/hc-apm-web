@@ -192,3 +192,13 @@ export function fetchData(api: string|string[], {params, data}: any) {
     params: pickBy(params, v => v !== undefined)
   })
 }
+
+/* Maintenance Stats */
+export function mockRoot (root) {
+  return {
+    ...root,
+    id: '@@root##',
+    name: '全部设备',
+    isRoot: true
+  }
+}

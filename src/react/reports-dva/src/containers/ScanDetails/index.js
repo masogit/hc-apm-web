@@ -21,7 +21,7 @@ class ScanDetails extends React.PureComponent {
   })
 
   render() {
-    const { filters, depts, assets, steps} = this.props
+    const { filters, depts, assets, steps } = this.props
     const filterOptions = [
       { type: 'range', key: 'range', value: filters.range }
     ]
