@@ -12,7 +12,7 @@ const theme = {
 
 const { NODE_ENV } = process.env
 if (~['watch', 'production'].indexOf(NODE_ENV)) {
-  const { commonPrefix = '/' } = config[process.env.NODE_ENV]
+  const commonPrefix = '/geapm'
 
   const iconUrl = path.join(commonPrefix, 'resources/fonts/anticon/iconfont')
 

@@ -3,7 +3,6 @@ import { connect } from 'dva'
 import { routerRedux } from 'dva/router'
 import FilterBar from 'dew-filterbar'
 
-import RoleProvider from '#/components/DecisionMaking/RoleProvider'
 import SizeProvider from '#/components/DecisionMaking/SizeProvider'
 import PackChart from '#/components/DecisionMaking/PackChart'
 import SidePanel from '#/components/DecisionMaking/SidePanel'
@@ -115,4 +114,4 @@ export default connect(state => ({
   loading: state.finance.loading,
   error: state.finance.error,
   systemData: state.finance.systemData
-}))(RoleProvider(Root))
+}))(Root)
