@@ -41,8 +41,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 		deviceTypeDao = WebUtil.getBean(DeviceTypeRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		initDispatchUserList();
-		deviceTypeList = deviceTypeDao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),
-				user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());
+/*		deviceTypeList = deviceTypeDao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),
+				user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());*/
 	}
 
 	private void initDispatchUserList() {
@@ -131,14 +131,14 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 	}
 	
     public void save() {
-        onBeforeSave(selected);
+    	onBeforeSave(selected);
         if (selected.hashCode() == 0) {
-    		V2_WorkflowConfig wfcFromDB = dao.findByDeviceTypeAndTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(selected.getDeviceType()
-    				,user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID());
-    		if(wfcFromDB != null){
-    			WebUtil.addErrorMessage("该类型工作流配置已存在!");
-    			return;
-    		}
+        	V2_WorkflowConfig wfcFromDB = dao.findByDeviceTypeAndTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(selected.getDeviceType()
+        			,user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID());
+        	if(wfcFromDB != null){
+        		WebUtil.addErrorMessage("该类型工作流配置已存在!");
+        		return;
+        	}
             create();
         } else {
             update();

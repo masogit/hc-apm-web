@@ -26,7 +26,9 @@
                              	required="true" requiredMessage="#{msg.deviceType}#{msg.ValidationRequire}" >
                              		<p:ajax  listener="#{v2_DeviceTypeGroupController.getQueryAssetsList()}" update="AssetsPickList" />
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                   <f:selectItems value="#{v2_DeviceTypeGroupController.deviceTypeList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                   <f:selectItems value="#{fieldMsg.getFieldValueList('deviceType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                   <!-- <f:selectItems value="#{v2_DeviceTypeGroupController.deviceTypeList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/> -->
+                                   
                                </p:selectOneMenu>
                         </h:panelGroup>
                         </p:panelGrid>
