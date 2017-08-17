@@ -1,16 +1,16 @@
 /* @flow */
 import axios from 'axios'
 import { notification } from 'antd'
-import { COMPLETION, QUALITY } from '#/constants'
+import { COMPLETION, QUALITY, API_HOST } from '#/constants'
 
 export default {
-  namespace: 'filter',
+  namespace: 'MaintenanceStats_filter',
   state: {
     loading: false,
     depts: [],
     types: [],
     switcher: COMPLETION
-  }, 
+  },
   effects: {
     *['data/get'] (action, { put, call, select, take }) {
       try {
@@ -33,7 +33,7 @@ export default {
         const { data } = yield call(
           axios,
           {
-            url: process.env.API_HOST + '/org/all'
+            url: API_HOST + '/org/all'
           }
         )
 
@@ -54,7 +54,7 @@ export default {
         const { data } = yield call(
           axios,
           {
-            url: process.env.API_HOST + '/msg?type=assetGroup'
+            url: API_HOST + '/msg?type=assetGroup'
           }
         )
 
@@ -80,8 +80,8 @@ export default {
       notification.warning({
         message: '暂无可用设备数据',
         description: '请稍后再试'
-      })      
-    }    
+      })
+    }
   },
   reducers: {
     ['switcher/set'] (state, { payload }) {
@@ -101,7 +101,7 @@ export default {
         ...state,
         types: payload
       }
-    },        
+    },
     ['loading/on'] (state, action) {
       return {
         ...state,
@@ -113,6 +113,6 @@ export default {
         ...state,
         loading: false
       }
-    }    
+    }
   }
 }

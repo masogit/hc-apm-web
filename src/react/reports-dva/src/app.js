@@ -35,6 +35,8 @@ import forecastOverview from '#/models/MaintenanceCost/forecastOverview'
 import thresholds from '#/models/MaintenanceCost/thresholds'
 import suggestions from '#/models/MaintenanceCost/suggestions'
 import confirm from '#/models/MaintenanceCost/confirm'
+/* Maintenance Stats */
+import maintenanceStatsModels from '#/models/MaintenanceStats'
 
 
 const historyEngine = useRouterHistory(createHashHistory)({
@@ -75,6 +77,8 @@ app.model(forecastOverview)
 app.model(thresholds)
 app.model(suggestions)
 app.model(confirm)
+/* Maintenance Stats */
+maintenanceStatsModels.forEach(model => app.model(model))
 
 app.router(router)
 

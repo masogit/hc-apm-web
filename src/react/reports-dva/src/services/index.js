@@ -19,7 +19,9 @@ const URLs = {
   ScanDetails_Brief: '/api/scan/brief',
 
   MaintenanceCost_Ma: '/api/ma', // wtf is 'ma' ???
-  MaintenanceCost_Asset: '/api/ma/asset/*'
+  MaintenanceCost_Asset: '/api/ma/asset/*',
+
+  MaintenanceStats_Pm: '/api/pm', // wtf is 'pm' ???
 
 }
 

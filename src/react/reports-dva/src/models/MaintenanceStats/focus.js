@@ -1,6 +1,6 @@
 /* @flow */
 export default {
-  namespace: 'focus',
+  namespace: 'MaintenanceStats_focus',
   state: {
     data: undefined
   },

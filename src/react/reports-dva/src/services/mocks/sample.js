@@ -3,6 +3,7 @@ import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
 import { StaffPerf } from './staffPerf'
 import { DetailByAsset, DetailByStep, Brief } from './scanDetails'
 import { Acyman20, TypeAcyman10, TypeAcyman, TypeMtpm, AssetAcyman, AssetMtpm } from './maintenanceCost'
+import { PmByAsset, PmByType } from './maintenanceStats'
 import { Orgs, AssetTypes } from './common'
 import { URLs } from '../index.js'
 
@@ -90,4 +91,16 @@ export default function (mock) {
       return [200, AssetMtpm]
     }
   })
+
+  mock.onGet(URLs.MaintenanceStats_Pm).reply(function({ params, url }) {
+    info(url)
+    if (params.groupby === 'asset') {
+      return [200, PmByAsset]
+    } else {
+      return [200, PmByType]
+    }
+  })
+
+  mock.onAny().passThrough()
+
 }

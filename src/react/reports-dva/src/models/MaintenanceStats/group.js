@@ -4,7 +4,7 @@ import { routerRedux } from 'dva/router'
 import { notification } from 'antd'
 import moment from 'moment'
 
-import { now, dateFormat, pageSize, defaultPage } from '#/constants'
+import { now, dateFormat, pageSize, defaultPage, API_HOST } from '#/constants'
 import { mockRoot } from '#/utils'
 
 const defaultRange = {
@@ -30,7 +30,7 @@ export default {
 
         if (!from || !to) {
           return dispatch(routerRedux.push({
-            pathname: '/',
+            pathname: '/MaintenanceStats',
             query: {
               ...query,
               ...defaultRange
@@ -40,7 +40,7 @@ export default {
 
         if (!groupPage) {
           return dispatch(routerRedux.push({
-            pathname: '/',
+            pathname: '/MaintenanceStats',
             query: {
               ...query,
               groupPage: defaultPage
@@ -50,7 +50,7 @@ export default {
 
         if (!groupby) {
           return dispatch(routerRedux.push({
-            pathname: '/',
+            pathname: '/MaintenanceStats',
             query: {
               ...query,
               groupby: 'type',
@@ -92,7 +92,7 @@ export default {
         const { data } = yield call(
           axios,
           {
-            url: process.env.API_HOST + '/pm' + (process.env.NODE_ENV === 'development' ? '/left' : ''),
+            url: API_HOST + '/pm',
             params: {
               ...restQuery,
               start: (page - 1) * pageSize,
@@ -128,7 +128,7 @@ export default {
         })
 
         yield put({
-          type: 'focus/set',
+          type: 'MaintenanceStats_focus/set',
           payload: root
         })
 
@@ -150,8 +150,8 @@ export default {
       notification.warning({
         message: '暂无可用设备数据',
         description: '请稍后再试'
-      })      
-    }    
+      })
+    }
   },
   reducers: {
     ['data/get/succeed'] (state, { payload }) {
@@ -178,6 +178,6 @@ export default {
         ...state,
         loading: false
       }
-    }    
+    }
   }
 }
