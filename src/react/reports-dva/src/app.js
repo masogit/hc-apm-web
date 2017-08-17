@@ -37,6 +37,8 @@ import suggestions from '#/models/MaintenanceCost/suggestions'
 import confirm from '#/models/MaintenanceCost/confirm'
 /* Maintenance Stats */
 import maintenanceStatsModels from '#/models/MaintenanceStats'
+/* Decision Making */
+import decisionMakingModels from '#/models/DecisionMaking'
 
 
 const historyEngine = useRouterHistory(createHashHistory)({
@@ -79,6 +81,8 @@ app.model(suggestions)
 app.model(confirm)
 /* Maintenance Stats */
 maintenanceStatsModels.forEach(model => app.model(model))
+/* Decision Making */
+decisionMakingModels.forEach(model => app.model(model))
 
 app.router(router)
 

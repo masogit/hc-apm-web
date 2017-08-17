@@ -35,7 +35,7 @@ export default {
   },
   subscriptions: {
     setup ({ dispatch, history }) {
-      return history.listen(({query, pathname}) => {
+      return history.listen(({ query, pathname }) => {
 
         if (pathname !== 'StaffPerf') return
 
