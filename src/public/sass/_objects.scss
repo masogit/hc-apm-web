@@ -46,7 +46,6 @@ $body-padding-top: $topbar-height;
     min-height: 100vh;
     padding-left: 0;
     padding-right: 0;
-    background-color: $main-bg-color;
     padding: $body-padding-top 0 0 0;
 
     @for $i from 1 through 12 {
