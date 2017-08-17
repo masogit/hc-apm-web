@@ -14,9 +14,12 @@ export default {
     loading: true
   },
   subscriptions: {
-    setup({dispatch}) {
-      dispatch({
-        type: 'data/get'
+    setup({dispatch, history}) {
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'AssetPerf') return
+        dispatch({
+          type: 'data/get'
+        })
       })
     }
   },

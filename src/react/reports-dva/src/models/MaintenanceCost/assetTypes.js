@@ -5,8 +5,11 @@ export default {
   state: [],
   subscriptions: {
     setup({history, dispatch}) {
-      dispatch({
-        type: 'get'
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'MaintenanceCost') return
+        dispatch({
+          type: 'get'
+        })
       })
     }
   },

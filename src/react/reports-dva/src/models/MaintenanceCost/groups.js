@@ -17,7 +17,12 @@ export default {
   },
   subscriptions : {
     setup({history, dispatch}) {
-      dispatch({type: 'data/get'})
+      return history.listen(({ query, pathname }) => {
+        if (pathname !== 'MaintenanceCost') return
+        dispatch({
+          type: 'data/get'
+        })
+      })
     }
   },
   effects : {
