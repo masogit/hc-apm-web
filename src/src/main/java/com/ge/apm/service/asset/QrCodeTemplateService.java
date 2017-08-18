@@ -13,12 +13,9 @@ import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.ImmutableMap;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -35,8 +32,6 @@ public class QrCodeTemplateService {
     QrCodeTemplateRepository templateDao;
     @Autowired
     QrCodeTemplateElementRepository elementDao;
-    @Autowired
-    QrCodeDrawService qrCodeDrawService;
     @Autowired
     QrCodeService qrCodeService;
 
@@ -93,24 +88,6 @@ public class QrCodeTemplateService {
         return elementDao.findByTemplateId(id);
     }
 
-
-    public String getPreViewBase64(String templateId) {
-        QrCodeTemplate template = templateDao.findById(templateId);
-        List<QrCodeTemplateElement> elementList = getElementsByTemplate(templateId);
-        return getPreViewBase64(template, elementList);
-    }
-
-    public String getPreViewBase64(QrCodeTemplate template, List<QrCodeTemplateElement> elementList) {
-
-        elementList = qrCodeService.getElementsValue(template,elementList);
-        BufferedImage img = null;
-        try {
-            img = qrCodeDrawService.createQrCodeTag(template.getWidth(), template.getHeight(), elementList);
-        } catch (Exception ex) {
-            Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        return qrCodeDrawService.getImageBase64(img);
-    }
 
     public Map<String, Object> generateDefaultTemplate() {
         List<QrCodeTemplateElement> list = getDefaultTemplateElements();
