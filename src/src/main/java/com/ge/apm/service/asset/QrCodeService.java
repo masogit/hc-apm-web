@@ -257,5 +257,23 @@ public class QrCodeService {
 
         return getElementsValue(template, elements, "0000000000000000");
     }
+    
+    public String getPreViewBase64(QrCodeTemplate template, List<QrCodeTemplateElement> elementList) {
+
+        elementList = getElementsValue(template,elementList);
+        BufferedImage img = null;
+        try {
+            img = qrCodeDrawService.createQrCodeTag(template.getWidth(), template.getHeight(), elementList);
+        } catch (Exception ex) {
+            Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return qrCodeDrawService.getImageBase64(img);
+    }
+    
+    public String getPreViewBase64(String templateId) {
+        QrCodeTemplate template = templateDao.findById(templateId);
+        List<QrCodeTemplateElement> elementList = templateService.getElementsByTemplate(templateId);
+        return getPreViewBase64(template, elementList);
+    }
 
 }
