@@ -14,12 +14,12 @@
             <div class="ui-g-12 card">
                 <h:form >
                     <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
-                	&#160;
-                	<p:commandButton id="generateQrCodesButton" icon="ui-icon-arrowthick-1-s" value="生成并导出二维码" 
-                            	title="生成并导出二维码" actionListener="#{generateQrCodesController.createQrCode}" update=":generateQrCodesDlg" 
-                            	oncomplete="PF('generateQrCodesDialog').show()"/>
+                    &#160;
+                    <!--                    <p:commandButton id="generateQrCodesButton" icon="ui-icon-arrowthick-1-s" value="生成并导出二维码" 
+                                                         title="生成并导出二维码" actionListener="#{generateQrCodesController.createQrCode}" update=":generateQrCodesDlg" 
+                                                         oncomplete="PF('generateQrCodesDialog').show()"/>-->
                 </h:form>
-				
+
                 <h:form id="qrCodeLibListForm">
                     <p:dataTable id="datalist" value="#{qrCodeLibController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{qrCodeLibController.selected}"
@@ -81,16 +81,34 @@
                                 <p:dataExporter type="xls" target="datalist" fileName="qrCodeInfo_export"/>
                             </p:commandButton>
                             <p:commandButton id="viewButton" icon="ui-icon-search" title="#{msg.View}" actionListener="#{qrCodeLibController.showQrCode}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty qrCodeLibController.selected}"/>
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{qrCodeLibController.exportQrCode}" update=":growl" 
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                <p:fileDownload value="#{qrCodeLibController.zipFile}" />
+                            </p:commandButton>
                         </f:facet>
 
                     </p:dataTable>
 
                 </h:form>
 
+
                 <ui:include src="qrCodeLibCreate.xhtml"/>
                 <ui:include src="qrCodeLibShow.xhtml"/>
-                <ui:include src="generateQrCodes.xhtml"/>
+                <!--<ui:include src="generateQrCodes.xhtml"/>-->
             </div>
+            <p:dialog modal="true" id="statusDialog" widgetVar="statusDialog" draggable="false" closable="false" resizable="false">
+                <p:graphicImage name="img/ajaxloader.gif" />
+            </p:dialog>
         </div>
+
+        <script type="text/javascript">
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+        </script>
     </ui:define>
 </ui:composition>

@@ -162,6 +162,7 @@ public class AssetFileImportService {
 
             asset.setIsValid(true);
             asset.setStatus(1);
+            asset.setDeviceStatus(0);
             asset.setIsDeleted(Boolean.FALSE);
             asset.setAssetOwnerName(ExcelDocument.getCellStringValue(rowMap.get("维修负责人")));
             asset.setAssetOwnerName2(ExcelDocument.getCellStringValue(rowMap.get("维修负责人2")));

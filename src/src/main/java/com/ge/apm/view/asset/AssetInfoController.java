@@ -31,7 +31,11 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.IOException;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import static java.util.stream.Collectors.toList;
 import org.joda.time.DateTime;
+import org.primefaces.model.StreamedContent;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -55,6 +59,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private UserAccount clinicalOwner;
     private Supplier supplier;
+    
+    private StreamedContent zipFile;
 
     private UserAccount owner;
     private UserAccount owner2;
@@ -197,6 +203,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void exportQrCode() throws Exception {
+        List<AssetInfo> exportList = dao.findBySearchFilter(searchFilters);
+        List<String> qrCodeList = exportList.stream().filter(item->item.getQrCode()!=null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
+        zipFile = qrCodeService.exportQrCodeList(qrCodeList);
+    }
+     
     public void onSelectAsset() throws IOException {
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
@@ -263,6 +275,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         object.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
         object.setIsValid(true);
         object.setStatus(1);
+        object.setDeviceStatus(0);
         object.setIsDeleted(false);
 
         object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
@@ -845,5 +858,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setCode68List(List<I18nMessage> code68List) {
         this.code68List = code68List;
+    }
+    
+    public StreamedContent getZipFile() {
+        return zipFile;
+    }
+
+    public void setZipFile(StreamedContent zipFile) {
+        this.zipFile = zipFile;
     }
 }

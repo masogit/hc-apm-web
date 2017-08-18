@@ -1,0 +1,104 @@
+import { call, put, takeLatest, all, select } from 'redux-saga/effects'
+import Services from 'services'
+import { cloneDeep } from 'lodash-es'
+import { error } from 'utils/logger'
+import EventBus from 'eventbusjs'
+const API = Services.api
+
+/** TODO!!! refactor this */
+function* fetchBriefs(action) {
+  let type, targetPage
+  if (action.type === 'failureAnalysis/page/change') {
+    type = action.data.type
+    targetPage = action.data.value
+    delete action.data.type
+  } else {
+    type = action.type.replace('failureAnalysis/update/briefs/', '')
+  }
+  try {
+    let params = yield select(state => state.failureAnalysis)
+    params = cloneDeep(params)
+    let pag = params.pagination[type]
+    if (targetPage) {
+      pag.skip = (targetPage - 1) * pag.top
+    } else {
+      pag.skip = 0
+    }
+    let extraParam = action.data || {}
+    if ('type' in extraParam) {
+      params.filterBy.assettype = extraParam['type']
+    } else if ('dept' in extraParam) {
+      params.filterBy.dept = extraParam['dept']
+    } else if ('supplier' in extraParam) {
+      params.filterBy.supplier = extraParam['supplier']
+    }
+    let briefs = yield call(API.getBriefs, type, params)
+
+    briefs.type = type
+    let lastYear = undefined
+    if (params.showLastYear) {
+      params.keys = briefs.map(_ => _.data.key.id).join(',')
+      lastYear = yield call(API.getBriefs, type, params, true)
+      lastYear.type = type
+    }
+
+    let value = {
+      total: briefs.pages.total,
+      skip: briefs.pages.start,
+    }
+    yield put({ type: 'failureAnalysis/update/param/pagination/sync', data: { type, value } })
+    EventBus.dispatch('failure-analysis-brief-data', [ briefs, lastYear ])
+  } catch (e) {
+    error(e)
+  }
+}
+
+function* fetchReasons(action) {
+  try {
+    let params = yield select(state => state.failureAnalysis)
+    let reasons = yield call(API.getReasons, params, action.data)
+    EventBus.dispatch('failure-analysis-reason-data', reasons)
+  } catch (e) {
+    error(e)
+  }
+}
+
+function* fetchAll() {
+  try {
+    let params = yield select((state) => state.failureAnalysis)
+    yield all([
+      call(fetchReasons, { data: {} }),
+      call(fetchBriefs, {type: 'left', params}),
+      call(fetchBriefs, {type: 'right', params})])
+  } catch (e) {
+    error(e)
+  }
+}
+function* briefSagaLeft() {
+  yield takeLatest('failureAnalysis/update/briefs/left', fetchBriefs)
+}
+
+function* briefSagaRight() {
+  yield takeLatest('failureAnalysis/update/briefs/right', fetchBriefs)
+}
+
+function* paramChangeSaga() {
+  yield takeLatest(act => act.type.startsWith('failureAnalysis/update/param/') && !act.type.endsWith('sync')
+  , fetchAll)
+}
+
+function* reasonSaga() {
+  yield takeLatest('failureAnalysis/update/reasons', fetchReasons)
+}
+
+function* pageChangeSaga() {
+  yield takeLatest('failureAnalysis/page/change', fetchBriefs)
+}
+
+export default [
+  briefSagaLeft(),
+  briefSagaRight(),
+  reasonSaga(),
+  paramChangeSaga(),
+  pageChangeSaga()
+]
