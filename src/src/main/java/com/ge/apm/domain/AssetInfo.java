@@ -213,6 +213,11 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "inventory_status")
     private Integer inventoryStatus;
+    @Column(name = "inventory_owner_id")
+    private Integer inventoryOwnerId;
+    @Column(name = "inventory_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date inventoryTime;
     @Column(name = "asset_code68")
     private String assetCode68;
     
@@ -865,6 +870,22 @@ public class AssetInfo implements Serializable {
 
     public void setInventoryStatus(Integer inventoryStatus) {
         this.inventoryStatus = inventoryStatus;
+    }
+
+    public Integer getInventoryOwnerId() {
+        return inventoryOwnerId;
+    }
+
+    public void setInventoryOwnerId(Integer inventoryOwnerId) {
+        this.inventoryOwnerId = inventoryOwnerId;
+    }
+
+    public Date getInventoryTime() {
+        return inventoryTime;
+    }
+
+    public void setInventoryTime(Date inventoryTime) {
+        this.inventoryTime = inventoryTime;
     }
 
     public String getAssetCode68() {

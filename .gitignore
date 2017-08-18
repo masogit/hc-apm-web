@@ -10,7 +10,7 @@ src/public/css
 src/logs
 src/node_modules/
 src/target/
-src/src/main/webapp/resources
+#src/src/main/webapp/resources
 .idea/
 *.iml
 src/sql/test_data.sql
@@ -27,3 +27,5 @@ MyFunTest.java
 applicationContext-test.xml
 wx.properties
 /src/src/main/webapp/react/
+src/**/build
+src/src/main/webapp/resources

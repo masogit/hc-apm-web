@@ -52,13 +52,12 @@ public class QrCodeTemplateCreateController {
             Map<String, Object> defaultTemplate = templateService.generateDefaultTemplate();
             thisTemplate = (QrCodeTemplate) defaultTemplate.get("template");
             thisTemplateElementList = (List<QrCodeTemplateElement>) defaultTemplate.get("elementList");
-            qrcodeElement = (QrCodeTemplateElement) defaultTemplate.get("qrcodeElement");
         } else if (actionName.equals("Edit")) {
             String templateId = WebUtil.getRequestParameter("templateId");
             thisTemplate = templateDao.findById(templateId);
             thisTemplateElementList = templateService.getElementsByTemplate(thisTemplate.getId());
-            qrcodeElement = thisTemplateElementList.stream().filter(item -> item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)).findAny().orElse(null);
         }
+        qrcodeElement = thisTemplateElementList.stream().filter(item -> item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)).findAny().orElse(null);
     }
 
     public void createNewElement() {
@@ -68,7 +67,7 @@ public class QrCodeTemplateCreateController {
     }
 
     public String getPreViewBase64() {
-        return templateService.getPreViewBase64(thisTemplate, thisTemplateElementList);
+        return qrCodeService.getPreViewBase64(thisTemplate, thisTemplateElementList);
     }
 
     public void onSiteChange() {

@@ -18,14 +18,20 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('dispatchMode')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                              </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup >
+                      	<h:panelGroup>
+                            <label class = "label">#{msg.deviceType}*</label>
+                            <p:selectOneMenu id="deviceType" value="#{v2_WorkflowConfigController.selected.deviceType}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('deviceType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                             </p:selectOneMenu>
+                        </h:panelGroup>
+<!--                         <h:panelGroup >
                        		<label class="label">#{msg.deviceType}*</label>
                                <p:selectOneMenu id="deviceType" value="#{v2_WorkflowConfigController.selected.deviceType}" 
                              	required="true" requiredMessage="#{msg.deviceType}#{msg.ValidationRequire}" >
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{v2_WorkflowConfigController.deviceTypeList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup> -->
                         <h:panelGroup rendered="false">
                             <label class = "label">是否允许抢单?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}"/>
