@@ -89,8 +89,13 @@ public class V2_WorkflowConfig implements Serializable{
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
     
+    @Column(name="level_institution_id")
     private Integer levelInstitutionId;
+    
+    @Column(name="level_hospital_id")
     private Integer levelHospitalId;
+    
+    @Column(name="level_site_id")
     private Integer levelSiteId;
     
 	public String getTenantUID() {
