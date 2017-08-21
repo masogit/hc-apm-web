@@ -109,9 +109,15 @@ public class QrCodeService {
     }
 
     public void discardQrCode(String qrCode) {
+        updateQrCodeStatus(qrCode, 4);
+    }
+
+    public void updateQrCodeStatus(String qrCode, Integer status) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode);
-        qrCodeLib.setStatus(4);
-        qrCodeLibDao.save(qrCodeLib);
+        if (qrCodeLib != null) {
+            qrCodeLib.setStatus(status);
+            qrCodeLibDao.save(qrCodeLib);
+        }
     }
 
     public BufferedImage getQrCodeImage(String qrCode) {
@@ -257,10 +263,10 @@ public class QrCodeService {
 
         return getElementsValue(template, elements, "0000000000000000");
     }
-    
+
     public String getPreViewBase64(QrCodeTemplate template, List<QrCodeTemplateElement> elementList) {
 
-        elementList = getElementsValue(template,elementList);
+        elementList = getElementsValue(template, elementList);
         BufferedImage img = null;
         try {
             img = qrCodeDrawService.createQrCodeTag(template.getWidth(), template.getHeight(), elementList);
@@ -269,7 +275,7 @@ public class QrCodeService {
         }
         return qrCodeDrawService.getImageBase64(img);
     }
-    
+
     public String getPreViewBase64(String templateId) {
         QrCodeTemplate template = templateDao.findById(templateId);
         List<QrCodeTemplateElement> elementList = templateService.getElementsByTemplate(templateId);
