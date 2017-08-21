@@ -5,6 +5,7 @@ import com.github.davidmoten.rx.jdbc.Database;
 import org.simpleflatmapper.tuple.Tuple4;
 import org.simpleflatmapper.tuple.Tuple5;
 import org.simpleflatmapper.tuple.Tuple6;
+import org.simpleflatmapper.tuple.Tuple7;
 import org.springframework.stereotype.Service;
 import rx.Observable;
 
@@ -24,6 +25,12 @@ public class HealthService {
 		db = Database.from(connectionProvider);
 	}
 
+	private static final String asset_maintain7
+			= " SELECT v2_work_order.asset_id, asset_info.name, current_step_id, current_step_name, current_person_name, asset_info.clinical_dept_id,v2_work_order.id "
+			+ " FROM v2_work_order "
+			+ " LEFT JOIN asset_info "
+			+ " ON v2_work_order.asset_id = asset_info.id "
+			+ " WHERE v2_work_order.status = 1 AND asset_info.site_id=:site_id AND asset_info.hospital_id=:hospital_id ";
 
 
     private static final String asset_maintain
@@ -43,6 +50,37 @@ public class HealthService {
 				new Tuple6<Integer, String, Integer, String, String, Integer> (
 					rs.getInt("asset_id"), rs.getString("name"), rs.getInt("current_step_id"), rs.getString("current_step_name"), rs.getString("current_person_name"), rs.getInt("clinical_dept_id") ) )
 			.cache();
+
+	}
+
+	public Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> queryForMaintain7(Integer site_id, Integer hospital_id,Integer dept) {
+
+		return db
+				.select(asset_maintain7)
+				.parameter("site_id", site_id)
+				.parameter("hospital_id", hospital_id)
+				.get(rs ->
+						new Tuple7<Integer, String, Integer, String, String, Integer,String>(
+								rs.getInt("asset_id"), rs.getString("name"),
+								rs.getInt("current_step_id"), rs.getString("current_step_name"),
+								rs.getString("current_person_name"), rs.getInt("clinical_dept_id")
+						,rs.getString("id")) ).filter(t6 -> t6.getElement5()==dept)
+				.cache();
+
+	}
+
+	public Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> queryForMaintain7NoDept(Integer site_id, Integer hospital_id) {
+
+		return db
+				.select(asset_maintain7)
+				.parameter("site_id", site_id)
+				.parameter("hospital_id", hospital_id)
+				.get(rs ->
+						new Tuple7<Integer, String, Integer, String, String, Integer,String>(
+								rs.getInt("asset_id"), rs.getString("name"),
+								rs.getInt("current_step_id"), rs.getString("current_step_name"),
+								rs.getString("current_person_name"), rs.getInt("clinical_dept_id")
+								,rs.getString("id")) ).cache();
 
 	}
 
