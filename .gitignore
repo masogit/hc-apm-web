@@ -27,3 +27,5 @@ MyFunTest.java
 applicationContext-test.xml
 wx.properties
 /src/src/main/webapp/react/
+src/**/build
+src/src/main/webapp/resources

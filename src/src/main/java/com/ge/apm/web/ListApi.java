@@ -159,10 +159,11 @@ public class ListApi {
 
     if (asset_info.isEmpty().toBlocking().single())
       return 0.0;
-
+ /*
     switch(key) {
 
-      /*case 10:
+
+     case 10:
         return Math.min(
           OperatorMinMax.min(asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
           OperatorMinMax.min(asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
@@ -210,10 +211,11 @@ public class ListApi {
         return Math.max(
           OperatorMinMax.max(asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
           OperatorMinMax.max(asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
-     */ default:
-        return 0.0;
-    }
 
+
+        }
+    }*/
+    return 0.0;
 
   }
 

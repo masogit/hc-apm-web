@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
@@ -27,6 +28,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
 
     QrCodeTemplateRepository dao = null;
     QrCodeTemplateService templateService;
+    QrCodeService qrCodeService;
     QrCodeTemplateElementRepository elementDao;
     OrgInfoRepository orgDao;
 
@@ -34,6 +36,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     protected void init() {
         dao = WebUtil.getBean(QrCodeTemplateRepository.class);
         templateService = WebUtil.getBean(QrCodeTemplateService.class);
+        qrCodeService = WebUtil.getBean(QrCodeService.class);
         elementDao = WebUtil.getBean(QrCodeTemplateElementRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
     }
@@ -60,7 +63,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
 
     public String getPreViewBase64() {
-        return selected == null ? "" : templateService.getPreViewBase64(selected.getId());
+        return selected == null ? "" : qrCodeService.getPreViewBase64(selected.getId());
     }
 
     @Transactional
