@@ -1190,6 +1190,7 @@
                 var uri = URI(node.data.link.href);
                 uri.scheme(''); // use current scheme to avoid DNS issue
                 uri.addQuery('assetId', node.data.id);
+                uri.addQuery('woId', node.data.woId);
                 window.open(uri.toString(), '_blank');
               }
             })

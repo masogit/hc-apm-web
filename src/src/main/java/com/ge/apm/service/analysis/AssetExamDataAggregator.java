@@ -84,21 +84,21 @@ return "success";
     }
 
     @Transactional
-    public String aggregateForAssetSumit(Date date) throws Exception {
-        List<AssetClinicalRecordPojo> acrpList = assetClinicalRecordRepository.getAssetExamDataAggregatorByDate(date);
+    public String aggregateForAssetSumit(Date createdDate) throws Exception {
+        List<AssetClinicalRecordPojo> acrpList = assetClinicalRecordRepository.getAssetExamDataAggregatorByDate(createdDate);
         logger.info("Asset Clinical Record Aggregator records size-->"+acrpList.size());
          List<AssetSummit> asmList= new ArrayList<AssetSummit>();
         List<AssetSummit> newAsmList= new ArrayList<AssetSummit>();
         for(AssetClinicalRecordPojo accrp:acrpList){
-            AssetSummit asm1 =assetSummitRepository.getAssetSummitByAssetIdAndCreated(accrp.getAssetIds(),date);
+            AssetSummit asm1 =assetSummitRepository.getAssetSummitByAssetIdAndCreated(accrp.getAssetIds(),createdDate);
             //如果某资产已经在assumit中录入过了 ，那就只要更新该资产相对应的inject_count等信息
             if(asm1!=null){
-                logger.info(accrp.getAssetIds() +"-already in the asset_summit,only updated for the time being on date "+date);
-                extractor(date, asmList, accrp, asm1);
+                logger.info(accrp.getAssetIds() +"-already in the asset_summit,only updated for the time being on date "+createdDate);
+                extractorAssetSummit(createdDate, asmList, accrp, asm1);
             }else {
                 AssetSummit newAsm = new AssetSummit();
-                logger.info(accrp.getAssetIds() +" is new record that is to be inserted into asset_summit on date "+date);
-                extractor(date, newAsmList, accrp, newAsm);
+                logger.info(accrp.getAssetIds() +" is new record that is to be inserted into asset_summit on date "+createdDate);
+                extractorAssetSummit(createdDate, newAsmList, accrp, newAsm);
             }
         }
         if(asmList.size()>0) {
@@ -113,8 +113,15 @@ return "success";
 
     }
     //在将asset clininical中聚合的数据写到assetsummit中去，将数据放到列表里面
-    private void extractor(Date date, List<AssetSummit> asmList, AssetClinicalRecordPojo accrp, AssetSummit asm1) {
+    private void extractorAssetSummit(Date date, List<AssetSummit> asmList, AssetClinicalRecordPojo accrp, AssetSummit asm1) {
         AssetInfo assinfo = assetInfoRepository.findById(accrp.getAssetIds());
+        if(assinfo!=null){
+            asm1.setDeptId(assinfo.getClinicalDeptId());
+            asm1.setAssetGroup(assinfo.getAssetGroup());
+        }else{
+            logger.info("gl_Warning: asset_id  "+accrp.getAssetIds()+" from asset_clinical_record does not exist in asset_info");
+        return;
+        }
         asm1.setCreated(date);//gl: created这个字段是做聚合那天的日期?
         asm1.setAssetId(accrp.getAssetIds());
         asm1.setSiteId(accrp.getSiteIds());
@@ -122,14 +129,7 @@ return "success";
         asm1.setExposeCount(accrp.getExposeCounts());
         asm1.setFilmCount(accrp.getFilmCounts());
         asm1.setInjectCount(accrp.getInjectCounts());
-        asm1.setDeptId(assinfo.getClinicalDeptId());
-        asm1.setAssetGroup(assinfo.getAssetGroup());
 
-        if(assinfo!=null){
-            asm1.setDeptId(assinfo.getClinicalDeptId());
-            asm1.setAssetGroup(assinfo.getAssetGroup());
-        }
-        
         if(accrp.getExamCount()==null){
             logger.info("gl: accrp.getExamCount() should not be null");
         }else {
@@ -149,6 +149,13 @@ return "success";
     }
     private void extractorExamSummit(Date date, List<ExamSummit> asmList, AssetClinicalRecordPojo accrp, ExamSummit asm1) {
      AssetInfo assinfo = assetInfoRepository.findById(accrp.getAssetIds());
+        if(assinfo!=null){
+            asm1.setDeptId(assinfo.getClinicalDeptId());
+            asm1.setAssetGroup(assinfo.getAssetGroup());
+        }else{
+            logger.info("gl_Warning: asset_id "+accrp.getAssetIds()+" does not exist in asset_info");
+        return;
+        }
         asm1.setCreated(accrp.getExamDate());
         asm1.setAssetId(accrp.getAssetIds());
         asm1.setSiteId(accrp.getSiteIds());
@@ -156,11 +163,8 @@ return "success";
         asm1.setPartId(accrp.getProcedureId());
         asm1.setSubPartId(1);
         asm1.setStepId(1);
-        if(assinfo==null){
-            logger.info("gl: accrp.getAssetIds() is null not allowed"+accrp.getAssetIds());
-        }
-        asm1.setDeptId(assinfo.getClinicalDeptId());
-        asm1.setAssetGroup(assinfo.getAssetGroup());
+
+
         if(accrp.getExamCount()==null){
             logger.info("gl: accrp.getExamCount() should not be null");
         }else {

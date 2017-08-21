@@ -27,8 +27,8 @@
                 <p:messages autoUpdate="true" closable="true" showDetail="false"/>
 
                 <h:form id="SRListForm">
-                    <p:dataTable id="datalist" value="#{serviceRequestController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{serviceRequestController.selected}"
+                    <p:dataTable id="datalist" value="#{serviceRequestWoController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{serviceRequestWoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -36,8 +36,8 @@
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" listener="#{serviceRequestController.onSelectServiceRequest}" update=":WorkOrderEditForm"/>
-                        <p:ajax event="filter" listener="#{serviceRequestController.onFilter}" update="datalist :WorkOrderEditForm"/>
+                        <p:ajax event="rowSelect" listener="#{serviceRequestWoController.onSelectServiceRequest}" update=":WorkOrderEditForm"/>
+                        <p:ajax event="filter" listener="#{serviceRequestWoController.onFilter}" update="datalist :WorkOrderEditForm"/>
 
                         <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.casePriority}" filterBy="#{item.casePriority}" filterMatchMode="EQ">
                             <f:facet name="filter">
@@ -60,7 +60,7 @@
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{serviceRequestController.usersInHospital}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{serviceRequestWoController.usersInHospital}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{item.requestorName}"/>
@@ -69,7 +69,7 @@
                             <h:outputText value="#{item.assetName}"/>
                         </p:column><!--
 -->                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.requestReason}" filterBy="#{item.requestReason}" filterMatchMode="LIKE">
-                            <h:outputText value="#{serviceRequestController.getRequestReasonInShort(item)}" title="#{item.requestReason}"/>
+                            <h:outputText value="#{serviceRequestWoController.getRequestReasonInShort(item)}" title="#{item.requestReason}"/>
                         </p:column><!--
 -->                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                             <f:facet name="filter">

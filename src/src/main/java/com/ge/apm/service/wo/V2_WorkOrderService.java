@@ -350,7 +350,7 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
     return woDao.findBySearchFilter(searchFilters, pr);
 }
 
-    public Page<V2_WorkOrder> getWorkOrderListToPickup_backup(int type,PageRequest pr, UserAccount ua) {
+   /* public Page<V2_WorkOrder> getWorkOrderListToPickup_backup(int type,PageRequest pr, UserAccount ua) {
         Page<V2_WorkOrder> pages = null;
         //base on the orgLevel
         Integer orgLevel = ua.getOrgLevel();
@@ -381,7 +381,7 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
         }
 
         return woDao.findBySearchFilter(searchFilters, pr);
-    }
+    }*/
 
 }
 
