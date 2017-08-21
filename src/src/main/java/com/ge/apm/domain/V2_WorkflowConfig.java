@@ -21,9 +21,9 @@ public class V2_WorkflowConfig implements Serializable{
     @Column(name = "id")
     private Integer id;
     
-    @Basic(optional = false)
+/*    @Basic(optional = false)
     @Column(name = "device_type")
-    private Integer deviceType;
+    private Integer deviceType;*/
     
     @Basic(optional = false)
     @Column(name = "dispatch_mode")
@@ -88,15 +88,16 @@ public class V2_WorkflowConfig implements Serializable{
     
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
-
-	public Integer getDeviceType() {
-		return deviceType;
-	}
-
-	public void setDeviceType(Integer deviceType) {
-		this.deviceType = deviceType;
-	}
-
+    
+    @Column(name="level_institution_id")
+    private Integer levelInstitutionId;
+    
+    @Column(name="level_hospital_id")
+    private Integer levelHospitalId;
+    
+    @Column(name="level_site_id")
+    private Integer levelSiteId;
+    
 	public String getTenantUID() {
 		return tenantUID;
 	}
@@ -269,6 +270,30 @@ public class V2_WorkflowConfig implements Serializable{
         }
         return true;
     }
+
+	public Integer getLevelInstitutionId() {
+		return levelInstitutionId;
+	}
+
+	public void setLevelInstitutionId(Integer levelInstitutionId) {
+		this.levelInstitutionId = levelInstitutionId;
+	}
+
+	public Integer getLevelHospitalId() {
+		return levelHospitalId;
+	}
+
+	public void setLevelHospitalId(Integer levelHospitalId) {
+		this.levelHospitalId = levelHospitalId;
+	}
+
+	public Integer getLevelSiteId() {
+		return levelSiteId;
+	}
+
+	public void setLevelSiteId(Integer levelSiteId) {
+		this.levelSiteId = levelSiteId;
+	}
     
     
 }

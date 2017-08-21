@@ -67,7 +67,7 @@ public class QrCodeTemplateCreateController {
     }
 
     public String getPreViewBase64() {
-        return templateService.getPreViewBase64(thisTemplate, thisTemplateElementList);
+        return qrCodeService.getPreViewBase64(thisTemplate, thisTemplateElementList);
     }
 
     public void onSiteChange() {

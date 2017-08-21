@@ -1,0 +1,35 @@
+/* @flow */
+import { IsHead, getOrgId } from '#/utils'
+
+const info = {
+  id: '###', // for debug,
+  isHead: false,
+}
+
+const userInfoEl = document.querySelector('#user-context')
+if (userInfoEl) {
+  const children = Array.from(userInfoEl.children)
+  info = children.reduce((prev, cur) => {
+    try {
+      prev[cur.id] = JSON.parse(cur.value)
+    } catch (err) {
+      prev[cur.id] = cur.value
+    }
+    return prev
+  }, {})
+}
+
+export default {
+  namespace: 'user',
+  state: {
+    info
+  },
+  reducers: {
+    ['info/set'] (state, { payload }) {
+      return {
+        ...state,
+        info: payload
+      }
+    }
+  }
+}
