@@ -1,39 +1,32 @@
 {
   "presets": [
-    ["es2015", { "module": false }],
+    ["env", { "modules": false }],
     "react",
     "stage-0"
   ],
-  "plugins": [
-    "transform-runtime",
+  "plugins":[
     "transform-decorators-legacy",
-    "transform-flow-strip-types",
-    "react-hot-loader/babel",
-    ["import", {
-      "libraryName": "antd",
-      "style": true
-    }]
+    "transform-object-assign",
+    [
+      "transform-runtime",
+      {
+        "polyfill":false,
+        "regenerator":true
+      }
+    ],
+    [
+      "import",
+      {
+        "libraryName": "antd",
+        "style": true
+      }
+    ]
   ],
+  "comments": false,
   "env": {
-    "production": {
-      "plugins": [
-        "transform-react-remove-prop-types", 
-        "transform-react-constant-elements",
-        ["strip-function-call", {
-          "strip": [
-            "Perf.start",
-            "Perf.stop",
-            "Perf.printExclusive",
-            "Perf.printInclusive",
-            "Perf.getLastMeasurements",
-            "console.log"
-          ]
-        }]
-      ]
-    },
-    "test": {
-      "plugins": [
-        [ "babel-plugin-webpack-alias", { "config": "./config/webpack.config.base.js" } ]
+    "development":{
+      "plugins":[
+        "react-hot-loader/babel"
       ]
     }
   }
