@@ -12,7 +12,7 @@ i18n
     fallbackLng: 'zh',
     ns: ['common'],
     defaultNS: 'common',
-    debug: true,
+    debug: false,
     wait: true,
     cache: {
       enabled: false,
