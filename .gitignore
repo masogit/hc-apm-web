@@ -30,3 +30,4 @@ wx.properties
 src/**/build
 src/src/main/webapp/resources
 /src/src/main/resources/database.properties
+!/src/src/main/resources/database.properties
