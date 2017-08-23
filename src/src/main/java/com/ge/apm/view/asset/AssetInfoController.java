@@ -59,7 +59,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private UserAccount clinicalOwner;
     private Supplier supplier;
-    
+
     private StreamedContent zipFile;
 
     private UserAccount owner;
@@ -80,7 +80,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String operation;
 
     private AssetDepreciationService assetDepreciationService;
-    
+
     private QrCodeService qrCodeService;
 
     private String qrCode;
@@ -166,11 +166,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters = new ArrayList<SearchFilter>();
         }
 
-        if (terminate) {
-            this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
-        } else {
-            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-        }
+//        setUserSearchFilters();
     }
 
     public Boolean getTerminate() {
@@ -186,16 +182,29 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return dao;
     }
 
-    @Override
-    protected Page<AssetInfo> loadData(PageRequest pageRequest) {
-        selected = null;
-//        searchFilters.add(new SearchFilter("isDeleted",SearchFilter.Operator.EQ,false));
+    private void setUserSearchFilters() {
+
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
             this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
         } else {
             searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         }
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        if (orgUidList != null && !orgUidList.isEmpty()) {
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+    }
+
+    @Override
+    protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        selected = null;
+        setUserSearchFilters();
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
@@ -205,10 +214,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = dao.findBySearchFilter(searchFilters);
-        List<String> qrCodeList = exportList.stream().filter(item->item.getQrCode()!=null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
+        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
         zipFile = qrCodeService.exportQrCodeList(qrCodeList);
     }
-     
+
     public void onSelectAsset() throws IOException {
         String url = "actionName=View&selectedid="
                 + selected.getId().toString()
@@ -345,11 +354,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public void renewQrcode(){
-        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(),1);
+    public void renewQrcode() {
+        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
     }
-    
+
     private boolean updateQrCode() {
         QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode);
         if (qrCodeLib == null) {
@@ -367,7 +376,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode());
         if (null != oldQRCodeLib) {
-           qrCodeService.discardQrCode(qrCode);
+            qrCodeService.discardQrCode(qrCode);
         }
         qrCodeLib.setStatus(3);
         qrcodeDao.save(qrCodeLib);
@@ -551,12 +560,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         attachements = tempList;
     }
 
-    public OrgInfo getHospital(Integer id) {
-        if (id == 0) {
-            return orgDao.findById(UserContextService.getCurrentUserAccount().getHospitalId());
-        } else {
-            return orgDao.findById(id);
-        }
+    public String getHospitalName(String siteUid) {
+        OrgInfo org = orgDao.getByUid(siteUid);
+        return org==null?"":org.getName();
     }
 
     public void onHospitalChange() {
@@ -688,8 +694,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void deleteAsset(AssetInfo asset) {
-        if(asset.getQrCode()!=null){
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(),1);
+        if (asset.getQrCode() != null) {
+            qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);
@@ -863,7 +869,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setCode68List(List<I18nMessage> code68List) {
         this.code68List = code68List;
     }
-    
+
     public StreamedContent getZipFile() {
         return zipFile;
     }

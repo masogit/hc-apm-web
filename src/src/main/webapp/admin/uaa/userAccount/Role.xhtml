@@ -11,7 +11,9 @@
         <p:dialog id="RoleEditDlg" widgetVar="RoleEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AssignRole}">
             <h:form id="UserRoleEditForm">
                 <h:panelGroup id="display">
-                    <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
+                    <p:tabView class="ui-g-12" id="tabview"   dynamic="true"   cache="false">
+                        <p:tab title="#{msg.AssignRole}" class="ui-g-12" >
+                            <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
                         <p:outputLabel value="#{msg.login_name}"/>
                         <p:outputLabel value="#{userAccountController.selected.loginName}"/>
                         <p:outputLabel value="#{msg.userName}"/>
@@ -23,6 +25,19 @@
                         </p:selectManyCheckbox>
 
                     </p:panelGrid>
+                        </p:tab>
+                        <p:tab title="访问权限" class="ui-g-12" >
+                            <p:tree id="orgTree" class="tree" style="border:0;height:362px" value="#{userAccountController.accessOrgTree}" selection="#{userAccountController.selectedAccessOrgNodes}"  var="node"  dynamic="true"  cache="false" selectionMode="checkbox" highlight="true">
+<!--                                    <p:ajax event="select" listener="#{UserOrgScopeController.onSelectTreeNode}" update=":InspectionOrderEditForm:dataList"/>
+                                    <p:ajax event="unselect" listener="#{UserOrgScopeController.onUnselectTreeNode}" update=":InspectionOrderEditForm:dataList"/>-->
+
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                        </p:tab>
+                    </p:tabView>
+                    
                     
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{userAccountController.saveRoles}" value="#{msg.Save}" update="display,:RoleEditDlg, :UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'RoleEditDialog');"/>

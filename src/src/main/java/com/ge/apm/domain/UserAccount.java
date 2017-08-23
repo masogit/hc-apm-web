@@ -32,6 +32,7 @@ import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  *
@@ -144,8 +145,9 @@ public class UserAccount implements Serializable {
     @NotNull
     private Integer orgInfoId;
 
-    @Column(name = "uid")
-    @Size(max=32)
+    @Column(name = "uid",columnDefinition = "CHAR(32)")
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
     private String uid;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")

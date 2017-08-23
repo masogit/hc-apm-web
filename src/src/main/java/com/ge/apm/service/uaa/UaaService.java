@@ -21,14 +21,17 @@ import com.ge.apm.dao.InspectionChecklistRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SysRoleRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.dao.UserRoleRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InspectionChecklist;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import webapp.framework.web.WebUtil;
 
@@ -43,6 +46,9 @@ public class UaaService {
     public static final String ORG = "org";
     public static final String ASSET = "asset";
     private static Map<String, SysRole> sysRoles;
+    
+    @Autowired
+    OrgInfoRepository orgInfoDao;
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -144,23 +150,19 @@ public class UaaService {
     }
     
     public List<OrgInfo> getHospitalListBySiteId(int siteId){
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         return orgInfoDao.getHospitalBySiteId(siteId);
     }
     
     public List<OrgInfo> getOrgListByHospitalId(int hospitalId){
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         return orgInfoDao.getByHospitalId(hospitalId);
     }
     
     public List<OrgInfo> getFullOrgListBySiteId(int siteId) {
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         return orgInfoDao.getFullOrgListBySiteId(siteId);
     
     }
 
     public DefaultTreeNode getFullOrgTreeBySiteId(DefaultTreeNode rootNode, int siteId, Integer selectedOrgId){
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         List<OrgInfo> fullOrgList = orgInfoDao.getFullOrgListBySiteId(siteId);
 
         DefaultTreeNode root = new DefaultTreeNode("Root", null);
@@ -171,7 +173,6 @@ public class UaaService {
     }
     
     public DefaultTreeNode getFullOrgTreeBySiteId(int siteId, Integer selectedOrgId){
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         List<OrgInfo> fullOrgList = orgInfoDao.getFullOrgListBySiteId(siteId);
 
         DefaultTreeNode root = new DefaultTreeNode("Root", null);
@@ -222,7 +223,6 @@ public class UaaService {
     }
     
     public DefaultTreeNode getOrgTree(int hospitalId, boolean showHospitalAsRoot, Integer selectedOrgId, boolean ...type){
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         List<OrgInfo> orgList = null;
         if (type == null || type.length == 0) {
             orgList = orgInfoDao.getByHospitalId(hospitalId);
@@ -245,6 +245,52 @@ public class UaaService {
         buildOrgTree(orgList, root, selectedOrgId);
         
         return treeRoot;
+    }
+    
+    public List<OrgInfo> getOrgListByUser(String userUid){
+        return orgInfoDao.getByUser(userUid);
+    }
+    
+    public TreeNode getOrgTreeBySite(String siteUID){
+        List<OrgInfo> orgList = null;
+        orgList = orgInfoDao.getBySiteUID(siteUID);
+        TreeNode root = null;
+        
+        Map<String, TreeNode> treeMap = new HashMap<>();
+        
+        for(OrgInfo org: orgList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+        }
+        
+        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo)node.getData();
+            if(org.getParentUID()!=null){
+                TreeNode parentNode = treeMap.get(org.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+        
+        if(treeMap.get(siteUID)!=null){
+            root = treeMap.get(siteUID);
+        }
+        
+        return root;
+    }
+    
+    @Transactional
+    public void setDefaultScope(UserAccount user) {
+        OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
+        UserOrgInfo userOrg = new UserOrgInfo();
+        userOrg.setUserUid(user.getUid());
+        userOrg.setOrgUid(org.getUid());
+        userOrg.setOrgType(org.getOrgType());
+        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+        userOrgDao.save(userOrg);
     }
     
     public DefaultTreeNode getOrgTree(int hospitalId){
@@ -394,5 +440,5 @@ public class UaaService {
         UserAccountRepository userAccountDao = WebUtil.getBean(UserAccountRepository.class);
         return userAccountDao.findById(userId);
     }
-    
+
 }

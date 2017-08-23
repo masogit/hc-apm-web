@@ -3,6 +3,8 @@ package webapp.framework.dao;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import javaslang.Tuple2;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -23,7 +25,7 @@ public class BySearchFilterSpecification {
             public Predicate toPredicate(Root<T> root, CriteriaQuery<?> query, CriteriaBuilder builder) {
                 if (!filters.isEmpty()) {
 
-                    List<Predicate> predicates = new ArrayList();
+                    List<Tuple2<String, Predicate>> predicates = new ArrayList();
                     for (SearchFilter filter : filters) {
                         // nested path translate, eg, task's "user.name" to Task.user.name
                         String[] names = StringUtils.split(filter.fieldName, ".");
@@ -35,45 +37,79 @@ public class BySearchFilterSpecification {
                         // logic operator
                         switch (filter.operator) {
                             case EQ:
-                                predicates.add(builder.equal(expression, filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.equal(expression, filter.value)));
                                 break;
                             case NE:
-                                predicates.add(builder.notEqual(expression, filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.notEqual(expression, filter.value)));
                                 break;
                             case LIKE:
-                                predicates.add(builder.like(expression, "%" + filter.value + "%"));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.like(expression, "%" + filter.value + "%")));
                                 break;
                             case GT:
-                                predicates.add(builder.greaterThan(expression, (Comparable) filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.greaterThan(expression, (Comparable) filter.value)));
                                 break;
                             case LT:
-                                predicates.add(builder.lessThan(expression, (Comparable) filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.lessThan(expression, (Comparable) filter.value)));
                                 break;
                             case GTE:
-                                predicates.add(builder.greaterThanOrEqualTo(expression, (Comparable) filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.greaterThanOrEqualTo(expression, (Comparable) filter.value)));
                                 break;
                             case LTE:
-                                predicates.add(builder.lessThanOrEqualTo(expression, (Comparable) filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, builder.lessThanOrEqualTo(expression, (Comparable) filter.value)));
                                 break;
                             case IN:
-                                predicates.add(expression.in((List)filter.value));
+                                predicates.add(new Tuple2(filter.conditionPath, expression.in((List) filter.value)));
                                 break;
                             case IsNull:
-                                predicates.add(expression.isNull());
+                                predicates.add(new Tuple2(filter.conditionPath, expression.isNull()));
                                 break;
                             case IsNotNull:
-                                predicates.add(expression.isNotNull());
+                                predicates.add(new Tuple2(filter.conditionPath, expression.isNotNull()));
                                 break;
                         }
                     }
 
                     // and all predicates
                     if (!predicates.isEmpty()) {
-                        return builder.and(predicates.toArray(new Predicate[predicates.size()]));
+                        return buildConditions(predicates, predicates.get(0)._1, builder);
+//                        return builder.and(predicates.toArray(new Predicate[predicates.size()]));
                     }
                 }
 
                 return builder.conjunction();
+            }
+
+            private Predicate buildConditions(List<Tuple2<String, Predicate>> conditionList, String currentConditions, CriteriaBuilder builder) {
+                List<Tuple2<String, Predicate>> currentList = new ArrayList();
+                for (Tuple2<String, Predicate> item : conditionList) {
+                    if (item._1.startsWith(currentConditions)) {
+                        if (item._1.equals(currentConditions)) {
+                            currentList.add(item);
+                        } else {
+                            return buildConditions(conditionList, item._1, builder);
+                        }
+                    }
+                }
+
+                Predicate predicate = null;
+                Predicate[] predicateArray = currentList.stream().map(item -> item._2).collect(Collectors.toList()).toArray(new Predicate[currentList.size()]);
+                if (currentConditions.endsWith("*")) {
+                    predicate = builder.and(predicateArray);
+                } else if (currentConditions.endsWith("+")) {
+                    predicate = builder.or(predicateArray);
+                }
+                conditionList.removeAll(currentList);
+                do {
+                    currentConditions = currentConditions.substring(0, currentConditions.length() - 1);
+                } while (!currentConditions.isEmpty() && !currentConditions.endsWith("*") && !currentConditions.endsWith("+"));
+
+                conditionList.add(new Tuple2(currentConditions, predicate));
+                if (conditionList.size() == 1) {
+                    return predicate;
+                } else {
+                    return buildConditions(conditionList, currentConditions, builder);
+                }
+
             }
         };
     }

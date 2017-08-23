@@ -25,12 +25,26 @@ public class SearchFilter {
     public String fieldName;
     public Object value;
     public Operator operator;
+    
+    /**
+     *  conditionPath : the path build conditions with 'and' 'or'.
+     *  start with a node name and end with "*"(AND) and "+"(OR). 
+     *  such as     A and B         => (A, 1*), (B,1*)              ==> (A, AB*)(B,AB*)
+     *              A or B          => (A, 1+), (B,1+)              ==> (A, AB*)(B,AB*)
+     *              A and B or C    => (A, 1+2*),(B,1+2*),(C,1+)    ==> (A, ABC+AB*)(B,ABC+AB*)(C,ABC+)
+     *              A and (B or C)  => (A, 1*),(B,1*2+),(C,1*2+)    ==> (A, ABC*),(B,ABC*BC+),(C,ABC*BC+)
+    */
+    public String conditionPath;
 
     public SearchFilter(String fieldName, Operator operator, Object value) {
+        this(fieldName,operator,value,"1*");
+    }
+    
+    public SearchFilter(String fieldName, Operator operator, Object value,String conditionPath) {
         this.fieldName = fieldName;
         this.value = value;
         this.operator = operator;
-        
+        this.conditionPath = conditionPath;
         parseFieldName();
     }
 
