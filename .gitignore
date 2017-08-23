@@ -29,3 +29,4 @@ wx.properties
 /src/src/main/webapp/react/
 src/**/build
 src/src/main/webapp/resources
+/src/src/main/resources/database.properties
