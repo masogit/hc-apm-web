@@ -150,7 +150,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.hospitalId}</label>
-                        <p:inputText id="hospitalId" value="#{assetInfoController.getHospital(0).name}" readonly="true"/>
+                        <p:inputText id="hospitalId" value="#{assetInfoController.getHospitalName(assetInfoController.selected.siteUID)}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.functionType}</label>

@@ -11,6 +11,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PasswordUtil;
@@ -24,6 +25,8 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 
 @ManagedBean
@@ -193,12 +196,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         for(UserRole userRole: selected.getUserRoleList()){
             assignedRoles.add(userRole.getRole().getRoleDesc());
         }
+        prepareUserScope();
     }
-
+    
     public void saveRoles() {
         if(selected == null) return;
         
         uaaService.setUserRoles(selected, assignedRoles);
+        updateUserScope();
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
     }
  
@@ -247,6 +252,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     		List<String> role = new ArrayList<String>();
     		role.add(DEFAULT_USER_ROLE);
     		uaaService.setUserRoles(selected, role);
+                uaaService.setDefaultScope(selected);
     	}
     }
     
@@ -329,5 +335,80 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedUserOrgId = userOrg.getId();
         selectedUserOrgName = getOrgFullName(selectedUserOrgId);
     }
+    
+    
+    private TreeNode accessOrgTree;
+    private TreeNode[] selectedAccessOrgNodes;
+
+    private void prepareUserScope(){
+        accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
+        List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
+        setSelectedOrgTree(accessOrgTree,orgList);
+    }
+    
+    private void setSelectedOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
+        OrgInfo org = (OrgInfo) node.getData();
+        if (accessiableOrgList.contains(org)) {
+            node.setSelected(true);
+        } else if (node.getParent() != null && node.getParent().isSelected()) {
+            node.setSelected(true);
+        }
+        for (TreeNode item : node.getChildren()) {
+            setSelectedOrgTree(item, accessiableOrgList);
+        }
+    }
+    
+     private void readSelectedOrgTree(TreeNode node, List<TreeNode> selectedTreeNodeList) {
+        if(node.isSelected()){
+            if (node.getParent() != null && node.getParent().isSelected()) {
+                return;
+            }else{
+                selectedTreeNodeList.add(node);
+            }
+        }else{
+            for (TreeNode item : node.getChildren()) {
+                readSelectedOrgTree(item, selectedTreeNodeList);
+            }
+        }
+    }
+    
+    
+    @Transactional
+    private void updateUserScope(){
+        
+        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
+        userOrgDao.delete(orgList);
+        List<TreeNode> selectedOrgList = new ArrayList();
+        readSelectedOrgTree(accessOrgTree,selectedOrgList);
+        List<UserOrgInfo> userOrgList =  new ArrayList();
+        for(TreeNode node:selectedOrgList){
+            OrgInfo org = (OrgInfo)node.getData();
+            UserOrgInfo userOrg = new UserOrgInfo();
+            userOrg.setOrgType(org.getOrgType());
+            userOrg.setOrgUid(org.getUid());
+            userOrg.setUserUid(selected.getUid());
+            userOrgList.add(userOrg);
+        }
+        
+        userOrgDao.save(userOrgList);
+    }
+    
+    public TreeNode getAccessOrgTree() {
+        return accessOrgTree;
+    }
+
+    public void setAccessOrgTree(TreeNode accessOrgTree) {
+        this.accessOrgTree = accessOrgTree;
+    }
+
+    public TreeNode[] getSelectedAccessOrgNodes() {
+        return selectedAccessOrgNodes;
+    }
+
+    public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
+        this.selectedAccessOrgNodes = selectedAccessOrgNodes;
+    }
+    
 
 }

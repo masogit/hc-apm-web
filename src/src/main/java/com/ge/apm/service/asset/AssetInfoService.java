@@ -62,26 +62,9 @@ public class AssetInfoService {
     public List<OrgInfo> getHospitalList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        if (user.getOrgLevel() == null) {
-            orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-        } else {
-            switch (user.getOrgLevel()) {
-                case 0:
-                    orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-                    break;
-                case 1:
-                    orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-                    break;
-                case 2:
-                    orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-                    break;
-                case 3:
-                    orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-                    break;
-                default:
-                    orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-            }
-        }
+        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*2+"));
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*2+"));
+        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*2+"));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgDao.findBySearchFilter(orgInfoFilters);
     }
