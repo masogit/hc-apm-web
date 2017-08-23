@@ -55,7 +55,7 @@ public interface AssetClinicalRecordRepository extends GenericRepository<AssetCl
     )
     public List<AssetClinicalRecordPojo> getAssetExamDataAggregatorByDate(@Param("date") Date date);
 
-
+//test2
 @Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate, procedureId as procedureId,count(examDuration) as examCount) from AssetClinicalRecord group by examDate,siteId,hospitalId,assetId, procedureId having exam_date = :date")
 public List<AssetClinicalRecordPojo> aggregateForExamSummitByDate(@Param("date") Date date);
 
