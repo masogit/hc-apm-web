@@ -8,4 +8,6 @@ public interface TenantInfoRepository extends GenericRepository<TenantInfo> {
     
     public List<TenantInfo> getByName(String name);
 
+	public TenantInfo findByuid(String uid);
+
 }
