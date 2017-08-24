@@ -90,12 +90,13 @@ public class WorkOrderExportService {
             V2_ServiceRequest serviceRequest = serviceRequestDao.findOne(workOrder.getSrId());
             List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrder.getId());
             V2_WorkOrder_Step sendStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 2);
-            V2_WorkOrder_Step acceptStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 4);
+            V2_WorkOrder_Step acceptStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeAsc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
             workOrderMap = new HashedMap();
             workOrderMap.put("报修单号", serviceRequest.getSrNum() != null ? serviceRequest.getSrNum() : "");
-            workOrderMap.put("设备编号", assetInfo.getFinancingNum());
+            workOrderMap.put("设备编号", assetInfo.getDepartNum());
+            workOrderMap.put("资产编号", assetInfo.getFinancingNum());
             workOrderMap.put("设备名称", serviceRequest.getAssetName());
             workOrderMap.put("院区", serviceRequest.getHospitalName());
             workOrderMap.put("科室", serviceRequest.getFromDeptName());
@@ -110,9 +111,9 @@ public class WorkOrderExportService {
             workOrderMap.put("上门维修/送修", workOrder.getRepairType() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()).getValueZh() : "");
             if(acceptStep != null){
                 workOrderMap.put("接单人", acceptStep.getOwnerName());
-                workOrderMap.put("接单时间", acceptStep.getEndTime() != null ? sdf.format(acceptStep.getEndTime()) : "");
+                workOrderMap.put("接单时间", acceptStep.getStartTime() != null ? sdf.format(acceptStep.getStartTime()) : "");
             }
-            workOrderMap.put("签到时间", workOrder.getCheckin());
+            workOrderMap.put("签到时间", workOrder.getCheckinTime() != null ? sdf.format(workOrder.getCheckinTime()) : "");
             workOrderMap.put("维修工时",workOrder.getTotalManHour());
             String info = "";
             for (V2_WorkOrder_Detail workOrderDetail:workOrderDetailList) {
