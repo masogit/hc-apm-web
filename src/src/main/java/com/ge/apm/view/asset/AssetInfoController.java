@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ManagedProperty;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
@@ -22,18 +21,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.service.asset.AssetDepreciationService;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.QRCodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.IOException;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import static java.util.stream.Collectors.toList;
 import org.joda.time.DateTime;
 import org.primefaces.model.StreamedContent;
 
@@ -570,9 +565,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<OrgInfo> getClinicalDeptList() {
-        OrgInfo hospital = orgDao.findById(selected.getHospitalId());
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, hospital.getSiteUID()));
+        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getSiteUID()));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
         return orgDao.findBySearchFilter(orgInfoFilters);
     }
