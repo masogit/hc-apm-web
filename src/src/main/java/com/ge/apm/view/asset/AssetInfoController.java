@@ -561,6 +561,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onHospitalChange() {
+        OrgInfo org = orgDao.getByUid(selected.getSiteUID());
+        selected.setInstitutionUID(org.getInstitutionUID());
+        selected.setHospitalUID(org.getHospitalUID());
         this.owner = null;
     }
 
