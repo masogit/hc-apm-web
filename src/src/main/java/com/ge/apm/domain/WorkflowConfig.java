@@ -60,12 +60,76 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_take_order_enabled")
     private Boolean isTakeOrderEnabled; //是否允许抢单
     
+    @Column(name = "is_manual_enabled")
+    private Boolean isManualEnabled; //是否人工派工
+    
+    @Column(name = "is_auto_enabled")
+    private Boolean isAutoEnabled; //是否自动派工
+    
     @Column(name = "auto_ack")
-    private Boolean autoAck;
+    private Boolean autoAck;//是否需要验收
     
+    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+    private String tenantUID;
     
+    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+    private String institutionUID;
+    
+    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+    
+    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+    private String siteUID;
+    
+    public String getTenantUID() {
+		return tenantUID;
+	}
 
-    public Boolean getAutoAck() {
+	public void setTenantUID(String tenantUID) {
+		this.tenantUID = tenantUID;
+	}
+
+	public String getInstitutionUID() {
+		return institutionUID;
+	}
+
+	public void setInstitutionUID(String institutionUID) {
+		this.institutionUID = institutionUID;
+	}
+
+	public String getHospitalUID() {
+		return hospitalUID;
+	}
+
+	public void setHospitalUID(String hospitalUID) {
+		this.hospitalUID = hospitalUID;
+	}
+
+	public String getSiteUID() {
+		return siteUID;
+	}
+
+	public void setSiteUID(String siteUID) {
+		this.siteUID = siteUID;
+	}
+
+	public Boolean getIsManualEnabled() {
+		return isManualEnabled;
+	}
+
+	public void setIsManualEnabled(Boolean isManualEnabled) {
+		this.isManualEnabled = isManualEnabled;
+	}
+
+	public Boolean getIsAutoEnabled() {
+		return isAutoEnabled;
+	}
+
+	public void setIsAutoEnabled(Boolean isAutoEnabled) {
+		this.isAutoEnabled = isAutoEnabled;
+	}
+
+	public Boolean getAutoAck() {
 		return autoAck;
 	}
 
