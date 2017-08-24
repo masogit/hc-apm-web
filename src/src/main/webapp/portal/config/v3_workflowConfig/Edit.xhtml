@@ -43,10 +43,7 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('dispatchMode')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                              </p:selectOneMenu>
                         </h:panelGroup>
-                       <h:panelGroup rendered="false">
-                            <label class = "label">是否允许抢单?</label>
-                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}"/>
-                        </h:panelGroup >
+
                         <h:panelGroup >
                             <label class="label">#{msg.dispatchUserName}*</label>
                             <p:selectOneMenu id="dispatchUserId" value="#{v2_WorkflowConfigController.selected.dispatchUserId}" 
@@ -83,7 +80,19 @@
                             <label class = "label">工单完工不需要验收?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
                         </h:panelGroup >
-                        <p:spacer/>
+						<h:panelGroup rendered="true">
+                            <label class = "label">是否自动派工?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}"/>
+                        </h:panelGroup >
+                        	<h:panelGroup rendered="true">
+                            <label class = "label">是否允许抢单?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}"/>
+                        </h:panelGroup >
+                        	<h:panelGroup rendered="true">
+                            <label class = "label">是否人工派工?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}"/>
+                        </h:panelGroup >
+                        <!-- <p:spacer/> -->
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{v2_WorkflowConfigController.save}" value="#{msg.Save}" update="display,:V2_WorkflowConfigEditDlg, :V2_WorkflowConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'V2_WorkflowConfigEditDialog');"/>
