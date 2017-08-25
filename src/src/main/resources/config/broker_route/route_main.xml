@@ -97,11 +97,11 @@
             </doTry>
         </route>
 
-        <route id="aggregationAssetCostData">
+<!--         <route id="aggregationAssetCostData">
             <from uri="direct:aggregateAssetCostData"/>
             <to uri="direct:initAssetAggregationData"/>
             <bean ref="assetCostDataAggregator" method="aggregateCostData"/>
-        </route>
+        </route> -->
         <!--gl working-->
         <route id="aggregationAssetSummit">
             <from uri="direct:aggregateAssetExamData"/>
@@ -117,11 +117,11 @@
             <from uri="quartz://quartzWorkflowService?cron=20+*+*+*+*+?"/>
             <bean ref="workflowService"  method="execute"/>
         </route>
--->
+
         <route>
             <from uri="quartz://quartzAssetCostDataAggregation?cron=0+0+*/3+*+*+?"/>
             <to uri="direct:aggregateAssetCostData"/>
-        </route>
+        </route>-->
 
         <route>
             <from uri="quartz://quartzAssetExamDataAggregation?cron=0+0+*/1+*+*+?"/>
@@ -133,10 +133,10 @@
             <to uri="direct:aggregateExamSummitData"/>
         </route>
 
-        <route>
+<!--         <route>
             <from uri="servlet:///aggregateAssetCostData?servletName=MyServlet"/>
             <to uri="direct:aggregateAssetCostData"/>
-        </route>
+        </route> -->
         
         <route>
             <from uri="servlet:///aggregateAssetExamData?servletName=MyServlet"/>
@@ -164,12 +164,12 @@
             </setBody>
         </route>
         
-        <route>
+<!--         <route>
             <from uri="servlet:///aggregateAssetCostDataByAssetId?servletName=MyServlet"/>
             <to uri="direct:initAssetAggregationDataByAssetId"/>
             <log message="call bean: b=${body}, h=${headers}" loggingLevel="ERROR"/>
             <bean ref="assetCostDataAggregator" method="aggregateCostDataByAssetId"/>
-        </route>
+        </route> -->
         
         <route>
             <from uri="servlet:///aggregateAssetExamDataByAssetId?servletName=MyServlet"/>

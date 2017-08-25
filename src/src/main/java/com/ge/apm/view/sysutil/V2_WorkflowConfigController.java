@@ -37,15 +37,14 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private List<OrgInfo> institutionList;
 	private List<OrgInfo> hospitalList;
 	private List<OrgInfo> siteList;
-	private String selectedHospitalId;
-	private String selectedSiteId;
+//	private String selectedHospitalId;
+//	private String selectedSiteId;
+//	private String selectedInstitutionId;
 	private OrgInfoRepository orgInfoRepository;
-	private String selectedInstitutionId;
 	private TenantInfoRepository tenantInfoRepository;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
-		
 		dao = WebUtil.getBean(WorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
@@ -56,7 +55,25 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	private void initDispatchUserList() {
 		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-		if(selectedSiteId != null){
+		String tenantUID = user.getTenantUID();
+		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
+		if(selected != null){
+			String institutionUID =selected.getInstitutionUID();
+			String hospitalUID = selected.getHospitalUID();
+			String siteUID = selected.getSiteUID();
+			if(institutionUID != null && !institutionUID.equals(tenantUID)){
+				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, institutionUID));
+				if(hospitalUID != null && !hospitalUID.equals(institutionUID)){
+					searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
+					if(siteUID != null && !siteUID.equals(hospitalUID)){
+						searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID));
+					}
+				}
+			}
+		}
+		
+		
+/*		if(selectedSiteId != null){
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 	        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
 	        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
@@ -70,7 +87,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
 		}else{
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-		}
+		}*/
 		dispatchUserList = userDao.findBySearchFilter(searchFilters);
 	}
 
@@ -163,7 +180,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		selected.setTenantUID(user.getTenantUID());
 		selected.setSiteId(user.getSiteId());
 		selected.setHospitalId(user.getHospitalId());
-		if(selectedSiteId != null){
+/*		if(selectedSiteId != null){
 			selected.setInstitutionUID(selectedInstitutionId);
 			selected.setHospitalUID(selectedHospitalId);
 			selected.setSiteUID(selectedSiteId);
@@ -183,7 +200,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 					selected.setSiteUID(user.getTenantUID());
 				}
 			}
-		} 
+		} */
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
 			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
@@ -210,9 +227,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         } else {
             update();
         }
-    	selectedHospitalId = null;
-    	selectedSiteId = null;
-    	selectedInstitutionId = null;
+//    	selectedHospitalId = null;
+//    	selectedSiteId = null;
+//    	selectedInstitutionId = null;
 //        selected.setInstitutionUID(null);
 //		selected.setHospitalUID(null);
 //		selected.setSiteUID(null);
@@ -258,7 +275,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		this.siteList = siteList;
 	}
 
-	public String getSelectedHospitalId() {
+/*	public String getSelectedHospitalId() {
 		return selectedHospitalId;
 	}
 
@@ -280,6 +297,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public void setSelectedInstitutionId(String selectedInstitutionId) {
 		this.selectedInstitutionId = selectedInstitutionId;
-	}
+	}*/
 	
 }
