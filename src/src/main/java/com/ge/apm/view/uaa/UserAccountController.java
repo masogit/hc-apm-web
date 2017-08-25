@@ -26,6 +26,7 @@ import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
+import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.util.TimeUtil;
 
@@ -375,7 +376,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     
     @Transactional
     private void updateUserScope(){
-        
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
         userOrgDao.delete(orgList);
@@ -392,6 +392,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         
         userOrgDao.save(userOrgList);
+    }
+    
+    public void onSelectAccessTreeNode(NodeSelectEvent event){
+        setTreeNodes(event.getTreeNode(), true);
+    }
+     public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
+         TreeNode node = event.getTreeNode();
+         setTreeNodes(node, false);
+         while(node!=null){
+             node.getParent().setSelected(false);
+             node = node.getParent();
+         }
+    }
+    private void setTreeNodes(TreeNode root, Boolean isSelected){
+        root.setSelected(isSelected);
+        for(TreeNode item : root.getChildren()){
+            setTreeNodes(item,isSelected);
+        }
     }
     
     public TreeNode getAccessOrgTree() {

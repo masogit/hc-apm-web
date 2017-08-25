@@ -22,7 +22,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <p:ajax event="rowSelect" update="editButton"/>
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{assetTagController.onFilter}" />
 
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -38,6 +38,9 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetTagController.prepareCreate}" update=":AssetTagEditDlg" oncomplete="PF('AssetTagEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetTagController.prepareEdit}" update=":AssetTagEditDlg" oncomplete="PF('AssetTagEditDialog').show()" disabled="#{empty assetTagController.selected}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{assetTagController.delete}" update="datalist" disabled="#{empty assetTagController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>        
                         </f:facet>
                     </p:dataTable>
                 </h:form>
