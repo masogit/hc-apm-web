@@ -10,22 +10,19 @@ import com.ge.apm.service.api.CommonService;
 import com.ge.apm.service.api.ProcessTimeService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import java.util.Map;
 import javaslang.control.Option;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Pattern;
 import org.joda.time.DateTime;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import rx.Observable;
 import webapp.framework.web.service.UserContext;
+
+import javax.validation.constraints.Past;
+import javax.validation.constraints.Pattern;
+import java.util.Map;
 
 /**
  *
@@ -89,7 +86,7 @@ public class ProcessTimeApi {
                 .map(count -> ImmutableMap.of("total", count, "start", offset, "limit", Math.min(count - offset, limit))).toBlocking().single();
 
         Iterable<ImmutableMap<String, Object>> result = ptService.queryListByAsset(user.getSiteId(), user.getHospitalId(), fromTime, toTime, orderBy, typeId, deptId, supplier, offset, limit)
-                .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", t._2).put("respond", t._3).put("arrived", t._4).put("arrived", t._5).put("ETTR", t._6)
+                .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", t._2).put("respond", t._3).put("arrived", t._4).put("ack", t._5).put("ETTR", t._6)
                 .put("dispatchTime", t._7).put("workingTime", t._8).build()).toBlocking().toIterable();
 
         Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
@@ -123,7 +120,7 @@ public class ProcessTimeApi {
         Integer ettr95 = ptService.queryDistribution(user.getSiteId(), user.getHospitalId(), fromTime, toTime, typeId, deptId, supplier, count*95/100).toBlocking().single();
 
         ImmutableMap<String, Integer> result = ptService.queryGross(user.getSiteId(), user.getHospitalId(), fromTime, toTime, typeId, deptId, supplier)
-                .map(t -> new ImmutableMap.Builder<String, Integer>().putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("respond", t._1).put("workingTime", t._6).build()).toBlocking().single();
+                .map(t -> new ImmutableMap.Builder<String, Integer>().putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("workingTime", t._6).build()).toBlocking().single();
 //                        .putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("workingTime", t._6).build()).toBlocking().single();
 
         Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
