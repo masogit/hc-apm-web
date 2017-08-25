@@ -180,27 +180,19 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		selected.setTenantUID(user.getTenantUID());
 		selected.setSiteId(user.getSiteId());
 		selected.setHospitalId(user.getHospitalId());
-/*		if(selectedSiteId != null){
-			selected.setInstitutionUID(selectedInstitutionId);
-			selected.setHospitalUID(selectedHospitalId);
-			selected.setSiteUID(selectedSiteId);
-		}else{
-			if(selectedHospitalId != null){
-				selected.setInstitutionUID(selectedInstitutionId);
-				selected.setHospitalUID(selectedHospitalId);
-				selected.setSiteUID(selectedHospitalId);
-			}else{
-				if(selectedInstitutionId != null){
-					selected.setInstitutionUID(selectedInstitutionId);
-					selected.setHospitalUID(selectedInstitutionId);
-					selected.setSiteUID(selectedInstitutionId);
-				}else{
-					selected.setInstitutionUID(user.getTenantUID());
-					selected.setHospitalUID(user.getTenantUID());
-					selected.setSiteUID(user.getTenantUID());
-				}
-			}
-		} */
+		if(selected.getInstitutionUID() == null){//租户级别
+			selected.setInstitutionUID(selected.getTenantUID());
+			selected.setHospitalUID(selected.getTenantUID());
+			selected.setSiteUID(selected.getTenantUID());
+		}
+		if(selected.getHospitalUID() == null){//集团级别
+			selected.setHospitalUID(selected.getInstitutionUID());
+			selected.setSiteUID(selected.getInstitutionUID());
+		}
+		if(selected.getSiteUID() == null){//医院级别
+			selected.setSiteUID(selected.getHospitalUID());
+		}
+
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
 			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
