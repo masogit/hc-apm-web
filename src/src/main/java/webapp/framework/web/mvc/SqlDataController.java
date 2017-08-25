@@ -151,7 +151,7 @@ public abstract class SqlDataController implements Serializable {
             }
 
             searchFilterList.add(createSearchFilter(fieldName, matchMode, filterValue));
-        }
+        } 
     }
     
     protected void onPrepareDataTableModel(){
@@ -166,6 +166,7 @@ public abstract class SqlDataController implements Serializable {
         }
 
         if(fieldList==null) fieldList = new ArrayList<FieldInfo>();
+        fieldList.clear();
         
         String[] columnNames = colNameList.split(" ");
         for(String columnName : columnNames) {

@@ -1,0 +1,59 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="title">SQL</ui:define>
+
+    <ui:define name="content">
+        <h:form id="searchForm">
+            <h:panelGrid id="searchPanel" columns="10">
+                <p:inputTextarea id="sql" placeholder="SQL here" cols="100" rows="3" value="#{sqlDynaColumnController.sql}"/>
+                <p:commandButton value="Query" update="listForm"/>
+                <p:commandButton value="Execute" actionListener="#{sqlDynaColumnController.executeSql}"/>
+            </h:panelGrid>
+
+        </h:form>
+
+        <h:form id="listForm">
+
+            <p:dataTable id="datalist" value="#{sqlDynaColumnController.lazyModel}" var="item" widgetVar="varDataList"
+                         selectionMode="single" selection="#{sqlDynaColumnController.selected}"
+                         lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                         rowKey="#{item.hashCode()}" sortMode="single" sortOrder="descending"
+                         paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                         rows="15" emptyMessage="#{msg.noRecordFound}" scrollable="true" scrollWidth="1000" resizableColumns="false"
+                         rowsPerPageTemplate="20,40,60,90">
+
+                <p:ajax event="rowSelect" update=":listForm:deltailInfo"/>
+
+                <f:facet name="header">
+                    SQL Result
+                    <p:commandButton rendered="true" id="toggler" value="Columns" style="float:right;top: -5px;height: 25px;" icon="ui-icon-calculator"/>
+                    <p:columnToggler datasource="datalist" trigger="toggler" rendered="true">
+                        <p:ajax event="toggle" listener="#{sqlDynaColumnController.onToggleColumn}" />
+                    </p:columnToggler>
+                </f:facet>
+
+                <p:columns width="200" value="#{sqlDynaColumnController.fieldList}" var="column" visible="#{column.isVisible}">
+                    <f:facet name="header">
+                        <h:outputText value="#{column.headerName}"/>
+                    </f:facet>
+                    <h:outputText value="#{sqlDynaColumnController.getFieldValue(item, column.fieldName)}"/>
+                </p:columns>
+                <f:facet name="{Toolbar}">
+                    <p:commandButton value="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                        <p:dataExporter type="xls" target="datalist" fileName="xls_export"/>
+                    </p:commandButton>
+                </f:facet>
+            </p:dataTable>
+            <p:panel id="deltailInfo">
+                <p:inputTextarea  cols="50" autoResize="true" value="#{sqlDynaColumnController.selectedRowData}" rendered="#{sqlDynaColumnController.selected ne null}"/>
+            </p:panel>
+        </h:form>
+    </ui:define>
+
+</ui:composition>
