@@ -112,7 +112,8 @@ public class StaffApi {
       .zip(queryWo, queryOther, (t1, t2) ->
         new Tuple11<Integer, String, Integer, Double, Integer, Integer, Integer, Integer, Integer, Integer, Integer>(
           t1.getElement0(), t1.getElement1(), t1.getElement2(), t1.getElement3(), t1.getElement4(), t1.getElement5(), t1.getElement6(),
-          t2.getElement1(), t2.getElement2(), t2.getElement3(), t1.getElement2() + t2.getElement1() + t2.getElement2() + t2.getElement3()));
+          t2.getElement1(), t2.getElement2(), t2.getElement3(), t1.getElement2() + t2.getElement1() + t2.getElement2() + t2.getElement3()))
+            .cache();
      /* .filter(v -> staffs.getOrDefault(v.getElement0(), 0).equals(3)) //3 means user
       .cache();*/
   }
