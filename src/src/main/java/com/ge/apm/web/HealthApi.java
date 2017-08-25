@@ -75,9 +75,9 @@ public class HealthApi {
           healthService.queryForMeterqa(site_id, hospital_id, 2),
           healthService.queryForMeterqa(site_id, hospital_id, 1));
       case 1:
-       // return createResponseBody(category, request, healthService.queryForMaintain(site_id, hospital_id), start, limit);
+        // return createResponseBody(category, request, healthService.queryForMaintain(site_id, hospital_id), start, limit);
 
-        return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(site_id, hospital_id), start, limit);
+       return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(site_id, hospital_id), start, limit);
 
       case 2:
         return createResponseBody(category, healthService.queryForOutage(site_id, hospital_id), request, start, limit);
@@ -297,7 +297,7 @@ public class HealthApi {
 
   private Integer queryForCount7(int legend, Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> asset_health) {
 
-    return asset_health.count().toBlocking().single();
+    return asset_health.filter(t5 -> t5.getElement2() == legend).count().toBlocking().single();
 
   }
 
@@ -649,12 +649,12 @@ public class HealthApi {
                     .put("count", queryForCount7(6, asset_health))
                     .put("unit", getUnit())
                     .build())
-            .add(new ImmutableMap.Builder<String, Object>()
+            /*.add(new ImmutableMap.Builder<String, Object>()
                     .put("id", 7)
                     .put("display", getDisplay(17))
                     .put("count", queryForCount7(7, asset_health))
                     .put("unit", getUnit())
-                    .build())
+                    .build())*/
 
             .build();
   }
