@@ -93,7 +93,11 @@ public class OrgInfo implements Serializable {
         if(uid==null)
             uid = UUID.randomUUID().toString().replace("-", "");
     }
-    
+
+    @Column(name = "asset_owner_id")
+    private Integer assetOwnerId;
+    @Column(name = "asset_owner_id2")
+    private Integer assetOwnerId2;
     public OrgInfo() {
     }
 
@@ -259,5 +263,20 @@ public class OrgInfo implements Serializable {
         else if(this.orgType.equals(4))  return WebUtil.getMessage("Department");
         else return "";
     }
-    
+
+    public Integer getAssetOwnerId() {
+        return assetOwnerId;
+    }
+
+    public void setAssetOwnerId(Integer assetOwnerId) {
+        this.assetOwnerId = assetOwnerId;
+    }
+
+    public Integer getAssetOwnerId2() {
+        return assetOwnerId2;
+    }
+
+    public void setAssetOwnerId2(Integer assetOwnerId2) {
+        this.assetOwnerId2 = assetOwnerId2;
+    }
 }

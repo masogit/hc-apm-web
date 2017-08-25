@@ -71,8 +71,8 @@ function mapDispatch2Props(dispatch) {
     updateDisplayType: (value) => {
       dispatch({ type: 'FailureAnalysis/update/display', data: value.key })
     },
-    fetchBriefs: (chart, pageNumber) => {
-      dispatch({ type: 'FailureAnalysis/get/briefs', data: { chart, value: pageNumber } })
+    fetchBriefs: (chart, pageNumber, params) => {
+      dispatch({ type: 'FailureAnalysis/get/briefs', data: { chart, value: pageNumber, ...params } })
     },
     fetchReasons: (data = {}) => dispatch({ type: 'FailureAnalysis/get/reasons', data }),
   }
@@ -142,7 +142,7 @@ export class App extends Component<void, Props, void> {
     // 1, central chart: fetch reasons
     let param = {}
     let isFocused = this.refs.leftChart.isFocused()
-    if (!isFocused) {
+    if (!isFocused || !this.isSameDevice(evt)) {
       let { display } = this.props
       let key = evt.stripData.data.key
       if (display === 'display_asset_type') {
@@ -161,7 +161,7 @@ export class App extends Component<void, Props, void> {
       this.showDevice(evt.strips)
     }
     // 3 refesh right chart
-    this.props.fetchBriefs('right')
+    this.props.fetchBriefs('right', 0, param)
     this.clearFocus('right')
   }
 
