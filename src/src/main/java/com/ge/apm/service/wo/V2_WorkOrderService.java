@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
@@ -55,7 +56,10 @@ public class V2_WorkOrderService {
 
     @Autowired
     private ServiceRequestApiService srApi;
-
+    @Autowired
+    OrgInfoRepository orgInfoRepository;
+    @Autowired
+    AssetInfoRepository assetInfoRepository;
     @Autowired
     UserAccountRepository userAccountRepository;
     public List<V2_WorkOrder> getWorkOrdersBySR(String serviceRequest) {
@@ -280,45 +284,75 @@ public class V2_WorkOrderService {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"创建");
         }
     }
+    public List<UserAccount> getAssetResponser2(int assetId) {
 
+        AssetInfo assetInfo = assetInfoRepository.getById(assetId);
+
+        //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
+        List<UserAccount> userListTag =  userAccountRepository.getResponserByAssetId(assetId);
+        //获取和资产绑定的owner
+        List<UserAccount> defaultUserList=new ArrayList<UserAccount>();
+
+        // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID-->tenanent
+        if(CollectionUtils.isEmpty(userListTag)){
+
+            if(!StringUtils.isEmpty(assetInfo.getSiteUID()) )
+                return userAccountRepository.getBySiteUID(assetInfo.getSiteUID());
+            if(!StringUtils.isEmpty(assetInfo.getHospitalUID()) )
+                return userAccountRepository.getByHospitalUID(assetInfo.getHospitalUID());
+            if(!StringUtils.isEmpty(assetInfo.getInstitutionUID()) )
+                return userAccountRepository.getByInstitutionUID(assetInfo.getInstitutionUID());
+            if(!StringUtils.isEmpty(assetInfo.getTenantUID()) )
+                return userAccountRepository.getByTenantUID(assetInfo.getInstitutionUID());
+
+            return defaultUserList;
+        }else
+            return userListTag;
+    }
     public List<UserAccount> getAssetResponser(int assetId) {
         List<UserAccount> userListTag = null;
-        try {
-            //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
-            userListTag = userAccountRepository.getResponserByAssetId(assetId);
-            //获取和资产绑定的owner
-            List<UserAccount> assetOwnerList=  userAccountRepository.getResponserWithAsset(assetId);
-            List<UserAccount> defaultUserList=null;
-            //如果该设备没有相应的owner并且根据设备标签找不到对应的负责人，就获取默认的医工.
-            if(CollectionUtils.isEmpty(userListTag) &  CollectionUtils.isEmpty(assetOwnerList)){
-                //search List from   (siteId and  roleid=3)
-                defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
-                //duplication remove
-                defaultUserList =new ArrayList<UserAccount>(new HashSet<UserAccount>(defaultUserList));
-                defaultUserList=  defaultUserList.stream().filter(id -> id != null).collect(Collectors.toList());
-                return defaultUserList;
-            }
+        AssetInfo assetInfo = assetInfoRepository.getById(assetId);
 
-            if(CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)){
-                userListTag.addAll(assetOwnerList);
-                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
-                userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-                return userListTag;
-            }else if(CollectionUtils.isEmpty(assetOwnerList)){
-                userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
-                return userListTag;
-            }else if(CollectionUtils.isEmpty(userListTag)){
-                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(assetOwnerList));
-                defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
-                userListTag.addAll(defaultUserList);
-                userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
-                userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-                return userListTag;
+        //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
+        userListTag = userAccountRepository.getResponserByAssetId(assetId);
+        //获取和资产绑定的owner
+        List<UserAccount> assetOwnerList=  userAccountRepository.getResponserWithAsset(assetId);
+        List<UserAccount> defaultUserList=new ArrayList<UserAccount>();
+
+        // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID
+        if(CollectionUtils.isEmpty(userListTag) &  CollectionUtils.isEmpty(assetOwnerList)){
+            OrgInfo orgInfo = orgInfoRepository.getByuid( assetInfo.getClinicalDeptUID());
+            if(orgInfo!=null) {
+                if(orgInfo.getAssetOwnerId()!=null) {
+                    UserAccount user1 = userAccountRepository.findById(orgInfo.getAssetOwnerId());
+                    defaultUserList.add(user1);
+                }
+                if(orgInfo.getAssetOwnerId2()!=null) {
+                    UserAccount user2 = userAccountRepository.findById(orgInfo.getAssetOwnerId2());
+                    defaultUserList.add(user2);
+                }
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            return defaultUserList;
+
         }
+        if(CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)){
+            userListTag.addAll(assetOwnerList);
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            return userListTag;
+        }else if(CollectionUtils.isEmpty(assetOwnerList)){
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            return userListTag;
+        }else if(CollectionUtils.isEmpty(userListTag)){
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(assetOwnerList));
+            defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
+            userListTag.addAll(defaultUserList);
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            return userListTag;
+        }
+
         return userListTag;
     }
 

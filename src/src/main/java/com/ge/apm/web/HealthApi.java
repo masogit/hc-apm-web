@@ -76,6 +76,7 @@ public class HealthApi {
           healthService.queryForMeterqa(site_id, hospital_id, 1));
       case 1:
        // return createResponseBody(category, request, healthService.queryForMaintain(site_id, hospital_id), start, limit);
+
         return createResponseBody7(category, request, healthService.queryForMaintain7NoDept(site_id, hospital_id), start, limit);
 
       case 2:
@@ -371,10 +372,9 @@ public class HealthApi {
             .build())
         .build());
   }
-
+ //this method exist for  getting extra field work_order_id
   private ResponseEntity<Map<String, Object>> createResponseBody7(Integer category, HttpServletRequest request,
                                                                   Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> asset_health_1, Integer start, Integer limit) {
-
     return ResponseEntity.ok()
 
             .cacheControl(
