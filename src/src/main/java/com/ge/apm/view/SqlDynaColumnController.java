@@ -1,30 +1,76 @@
 package com.ge.apm.view;
 
+import java.util.List;
+import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import webapp.framework.web.WebUtil;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.web.mvc.SqlDataController;
 
 @ManagedBean
 @ViewScoped
 public class SqlDynaColumnController extends SqlDataController {
 
-    @Override
-    public void init(){
-        //SQL format: select xxx from xxx where xxx :#searchFilter :#orderBy
-        this.sql = "select e.exam_id, e.exam_status, p.patient_name, p.gender_id,p.birthday from exam_info e, patient_info p :#searchFilter and p.patient_intra_id=e.patient_intra_id :#orderBy";
-        //this.sqlParams.put("examStatus", "3");
+    private String sqlColumns = "";
+
+    public String getSql() {
+        return sql;
+    }
+
+    public void setSql(String sql) {
+        this.sql = sql;
     }
     
-    public void onRowSelected(){
-        WebUtil.addSuccessMessageKey("test", "AAA", "BBB");
-        WebUtil.addErrorMessageKey("test", "CCC", "DDD");
-        String str = WebUtil.getMessage("test", 
-                WebUtil.getFieldValueMessage("exam_status", "6"),
-                WebUtil.getFieldValueMessage("gender", "1"));
+    @Override
+    public String getColumnNameList() {
+        return sqlColumns;
+    }
+    
+    @Override
+    protected Page<Map<String, Object>> loadData(PageRequest pageRequest, String searchFilterSQL, String orderBySQL, Map<String, Object> params) {
+        try{
+            this.countSql = "select count(*) from ("+sql+ ") tmp";
+
+            Page<Map<String, Object>> data = super.loadData(pageRequest, searchFilterSQL, orderBySQL, params);
+
+            // updateTableColumns
+            sqlColumns = "";
+            List<Map<String, Object>> list = data.getContent();
+            if(list.size()>1){
+                Map<String, Object> row = list.get(0);
+                
+                for(Object field: row.keySet().toArray()){
+                    sqlColumns = sqlColumns + " " + field.toString();
+                }
+            }
+            sqlColumns = sqlColumns.trim();
+            updateTableColumns();
+            
+            return data;
+        }
+        catch(Exception ex){
+            return emptyPage;
+        }
+   }
+    
+    public String getSelectedRowData(){
+        if(selected==null) return "";
+        String result = "";
         
-        System.out.println("*************"+ WebUtil.getMessage("exam_status"));
-        System.out.println("*************"+ WebUtil.getFieldValueMessage("exam_status", "6"));
+        for(Map.Entry<String, Object> field: selected.entrySet()){
+            result = result + field.getKey()+"="+field.getValue() + "\n";
+        }
+        return result;
+    }
+    
+    public void executeSql(){
+        if(sql==null) return;
         
+        sql = sql.trim();
+        if("".equals(sql)) return;
+        
+        NativeSqlUtil.execute(sql, null);
     }
 }
