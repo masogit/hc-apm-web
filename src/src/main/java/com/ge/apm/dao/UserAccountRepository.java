@@ -60,5 +60,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 	List<UserInfo> findByInstitutionUID(String institutionUID);
 
     /* sysrole.id=2*/
+    public List<UserAccount> getBySiteUID(String siteUID);
+    public List<UserAccount> getByHospitalUID(String hospitalUID);
+    public List<UserAccount> getByInstitutionUID(String InsitiUID);
+    public List<UserAccount> getByTenantUID(String tenantUID);
 
 }
