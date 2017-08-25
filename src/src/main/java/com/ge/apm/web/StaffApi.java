@@ -4,6 +4,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.api.StaffService;
 import com.google.common.collect.ImmutableMap;
 import javaslang.Tuple;
+import javaslang.collection.List;
 import javaslang.control.Option;
 import org.simpleflatmapper.tuple.Tuple11;
 import org.simpleflatmapper.tuple.Tuple2;
@@ -22,10 +23,14 @@ import webapp.framework.web.service.UserContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.Min;
+import java.sql.Array;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unused")
 @RestController
@@ -239,8 +244,25 @@ public class StaffApi {
       case 2:
         return OperatorSum.sumIntegers(staff_info.map(staff -> staff.getElement2())).toBlocking().single().doubleValue();
 
-      case 3:
-        return javaslang.collection.List.ofAll(staff_info.map(staff -> staff.getElement3()).toBlocking().toIterable()).average().getOrElse(0D);
+      case 3: {
+        List <Double> sorceList = javaslang.collection.List.ofAll(staff_info.map(staff -> staff.getElement3()).toBlocking().toIterable());
+
+         Double total = 0D;
+         int count = 0;
+        for (Iterator it = sorceList.iterator(); it.hasNext();) {
+          Double obj = (Double) it.next();
+          if (obj != null && obj != 0D) {
+            total += obj;
+            count++;
+          }
+        }
+
+        if(count == 0){
+          return 0;
+        }else {
+          return total/count;
+        }
+      }
 
       case 4:
         return OperatorSum.sumIntegers(staff_info.map(staff -> staff.getElement4())).toBlocking().single().doubleValue();
