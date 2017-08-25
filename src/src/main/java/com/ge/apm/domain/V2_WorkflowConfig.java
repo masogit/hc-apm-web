@@ -21,9 +21,9 @@ public class V2_WorkflowConfig implements Serializable{
     @Column(name = "id")
     private Integer id;
     
-/*    @Basic(optional = false)
+    @Basic(optional = false)
     @Column(name = "device_type")
-    private Integer deviceType;*/
+    private Integer deviceType;
     
     @Basic(optional = false)
     @Column(name = "dispatch_mode")
@@ -270,6 +270,14 @@ public class V2_WorkflowConfig implements Serializable{
         }
         return true;
     }
+
+	public Integer getDeviceType() {
+		return deviceType;
+	}
+
+	public void setDeviceType(Integer deviceType) {
+		this.deviceType = deviceType;
+	}
 
 	public Integer getLevelInstitutionId() {
 		return levelInstitutionId;

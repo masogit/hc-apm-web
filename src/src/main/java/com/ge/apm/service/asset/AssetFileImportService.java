@@ -200,7 +200,8 @@ public class AssetFileImportService {
             asset.setMaitanance(ExcelDocument.getCellStringValue(rowMap.get("维护商")));
             Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
-            asset.setQrCode((String) rowMap.get("二维码"));
+            String inputQrcode = (String) rowMap.get("二维码");
+            asset.setQrCode(inputQrcode.replace("-", ""));
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
@@ -275,27 +276,29 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerId2(assetOwner.getId());
                 newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
             } else {
-                addErrMessage(item, "Warning:" + WebUtil.getMessage("AssetOwnerName"+"2") + newAsset.getAssetOwnerName2() + "无法关联");
+                addErrMessage(item, "Warning:" + WebUtil.getMessage("AssetOwnerName" + "2") + newAsset.getAssetOwnerName2() + "无法关联");
                 newAsset.setAssetOwnerName(null);
             }
 
-            List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
-            if (null == supplierList || supplierList.isEmpty()) {
-                Supplier newSupplier = new Supplier();
-                newSupplier.setSiteId(currentOrg.getSiteId());
-                newSupplier.setName(newAsset.getVendor());
-                newSupplier.setTenantUID(currentOrg.getTenantUID());
-                newSupplier.setHospitalUID(currentOrg.getHospitalUID());
-                newSupplier.setInstitutionUID(currentOrg.getInstitutionUID());
-                newSupplier.setSiteUID(currentOrg.getSiteUID());
-                supplierDao.save(newSupplier);
-                newAsset.setSupplierId(newSupplier.getId());
-            } else if (supplierList.size() == 1) {
-                Supplier supplier = supplierList.get(0);
-                newAsset.setSupplierId(supplier.getId());
-            } else {
-                addErrMessage(item, "Warning:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
-                newAsset.setVendor(null);
+            if (newAsset.getVendor() != null && !newAsset.getVendor().isEmpty()) {
+                List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
+                if (null == supplierList || supplierList.isEmpty()) {
+                    Supplier newSupplier = new Supplier();
+                    newSupplier.setSiteId(currentOrg.getSiteId());
+                    newSupplier.setName(newAsset.getVendor());
+                    newSupplier.setTenantUID(currentOrg.getTenantUID());
+                    newSupplier.setHospitalUID(currentOrg.getHospitalUID());
+                    newSupplier.setInstitutionUID(currentOrg.getInstitutionUID());
+                    newSupplier.setSiteUID(currentOrg.getSiteUID());
+                    supplierDao.save(newSupplier);
+                    newAsset.setSupplierId(newSupplier.getId());
+                } else if (supplierList.size() == 1) {
+                    Supplier supplier = supplierList.get(0);
+                    newAsset.setSupplierId(supplier.getId());
+                } else {
+                    addErrMessage(item, "Warning:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
+                    newAsset.setVendor(null);
+                }
             }
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);

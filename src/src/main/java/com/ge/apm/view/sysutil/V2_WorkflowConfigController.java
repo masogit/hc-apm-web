@@ -8,22 +8,26 @@ import javax.faces.bean.ViewScoped;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.V2_WorkflowConfigRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_DeviceType;
 import com.ge.apm.domain.V2_WorkflowConfig;
+import com.ge.apm.domain.WorkflowConfig;
+
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
-public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowConfig> {
+public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfig> {
 
 	private static final long serialVersionUID = 1L;
-	private V2_WorkflowConfigRepository dao = null;
+	private WorkflowConfigRepository dao = null;
 	private UserAccountRepository userDao;
 	private UserAccount user;
 	private UserAccount owner;
@@ -33,16 +37,19 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 	private List<OrgInfo> institutionList;
 	private List<OrgInfo> hospitalList;
 	private List<OrgInfo> siteList;
-	private Integer selectedHospitalId;
-	private Integer selectedSiteId;
+	private String selectedHospitalId;
+	private String selectedSiteId;
 	private OrgInfoRepository orgInfoRepository;
-	private Integer selectedInstitutionId;
+	private String selectedInstitutionId;
+	private TenantInfoRepository tenantInfoRepository;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
-		dao = WebUtil.getBean(V2_WorkflowConfigRepository.class);
+		
+		dao = WebUtil.getBean(WorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
 		initDispatchUserList();
 	}
@@ -67,8 +74,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 		dispatchUserList = userDao.findBySearchFilter(searchFilters);
 	}
 
-	public List<OrgInfo> getIncludeOrgInfo(Integer orgId,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgType(orgInfoRepository.findById(orgId).getUid(),orgType);
+	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
+		return orgInfoRepository.findByParentUIDAndOrgType(parentUID,orgType);
 	}
 	
 	public List<UserInfo> getUserList() {
@@ -80,25 +87,37 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 	}
 
 	@Override
-	protected V2_WorkflowConfigRepository getDAO() {
+	protected WorkflowConfigRepository getDAO() {
 		return dao;
 	}
 	
 	public String getOrgNameById(Integer orgId){
-		return orgInfoRepository.findById(orgId).getName();
+		OrgInfo oi = orgInfoRepository.findById(orgId);
+		if(oi == null){
+			return null;
+		}
+		return oi.getName();
 	}
 	
-/*	public void test(){
-		System.out.println("++++++++++++++"+selectedInstitutionId);
-	}*/
+	public String getOrgNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		return oi.getName();
+	}
+	
+	public String getTenantName(String tenantUID){
+		return tenantInfoRepository.findByuid(tenantUID).getName();
+	}
 
 	@Override
-	protected Page<V2_WorkflowConfig> loadData(PageRequest pageRequest) {
+	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+//        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+//        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
@@ -119,7 +138,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 	}
 
 	@Override
-	public List<V2_WorkflowConfig> getItemList() {
+	public List<WorkflowConfig> getItemList() {
 		return dao.find();
 	}
 
@@ -140,26 +159,47 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 	}
 
 	@Override
-	public void onBeforeSave(V2_WorkflowConfig config) {
+	public void onBeforeSave(WorkflowConfig config) {
 		selected.setTenantUID(user.getTenantUID());
-		selected.setInstitutionUID(user.getInstitutionUID());
-		selected.setHospitalUID(user.getHospitalUID());
-		selected.setSiteUID(user.getSiteUID());
-		selected.setLevelInstitutionId(selectedInstitutionId);
-		selected.setLevelHospitalId(selectedHospitalId);
-		selected.setLevelSiteId(selectedSiteId);
+		selected.setSiteId(user.getSiteId());
+		selected.setHospitalId(user.getHospitalId());
+		if(selectedSiteId != null){
+			selected.setInstitutionUID(selectedInstitutionId);
+			selected.setHospitalUID(selectedHospitalId);
+			selected.setSiteUID(selectedSiteId);
+		}else{
+			if(selectedHospitalId != null){
+				selected.setInstitutionUID(selectedInstitutionId);
+				selected.setHospitalUID(selectedHospitalId);
+				selected.setSiteUID(selectedHospitalId);
+			}else{
+				if(selectedInstitutionId != null){
+					selected.setInstitutionUID(selectedInstitutionId);
+					selected.setHospitalUID(selectedInstitutionId);
+					selected.setSiteUID(selectedInstitutionId);
+				}else{
+					selected.setInstitutionUID(user.getTenantUID());
+					selected.setHospitalUID(user.getTenantUID());
+					selected.setSiteUID(user.getTenantUID());
+				}
+			}
+		} 
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
 			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
 			if (dispather1 != null) {
 				selected.setDispatchUserName(dispather1.getName());
 			}
+		}else{
+			selected.setDispatchUserName(null);
 		}
 		if (selected.getDispatchUserId2() != null) {
 			UserAccount dispather2 = uaDao.getById(config.getDispatchUserId2());
 			if (dispather2 != null) {
 				selected.setDispatchUserName2(dispather2.getName());
 			}
+		}else{
+			selected.setDispatchUserName2(null);
 		}
 	}
 	
@@ -170,9 +210,12 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
         } else {
             update();
         }
-        selected.setLevelInstitutionId(null);
-		selected.setLevelHospitalId(null);
-		selected.setLevelSiteId(null);
+    	selectedHospitalId = null;
+    	selectedSiteId = null;
+    	selectedInstitutionId = null;
+//        selected.setInstitutionUID(null);
+//		selected.setHospitalUID(null);
+//		selected.setSiteUID(null);
     }
 
 	public UserAccount getOwner() {
@@ -215,29 +258,28 @@ public class V2_WorkflowConfigController extends JpaCRUDController<V2_WorkflowCo
 		this.siteList = siteList;
 	}
 
-	public Integer getSelectedHospitalId() {
+	public String getSelectedHospitalId() {
 		return selectedHospitalId;
 	}
 
-	public void setSelectedHospitalId(Integer selectedHospitalId) {
+	public void setSelectedHospitalId(String selectedHospitalId) {
 		this.selectedHospitalId = selectedHospitalId;
 	}
 
-	public Integer getSelectedSiteId() {
+	public String getSelectedSiteId() {
 		return selectedSiteId;
 	}
 
-	public void setSelectedSiteId(Integer selectedSiteId) {
+	public void setSelectedSiteId(String selectedSiteId) {
 		this.selectedSiteId = selectedSiteId;
 	}
 
-	public Integer getSelectedInstitutionId() {
+	public String getSelectedInstitutionId() {
 		return selectedInstitutionId;
 	}
 
-	public void setSelectedInstitutionId(Integer selectedInstitutionId) {
+	public void setSelectedInstitutionId(String selectedInstitutionId) {
 		this.selectedInstitutionId = selectedInstitutionId;
 	}
-	
 	
 }
