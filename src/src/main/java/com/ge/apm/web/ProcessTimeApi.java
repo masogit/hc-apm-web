@@ -120,7 +120,7 @@ public class ProcessTimeApi {
         Integer ettr95 = ptService.queryDistribution(user.getSiteId(), user.getHospitalId(), fromTime, toTime, typeId, deptId, supplier, count*95/100).toBlocking().single();
 
         ImmutableMap<String, Integer> result = ptService.queryGross(user.getSiteId(), user.getHospitalId(), fromTime, toTime, typeId, deptId, supplier)
-                .map(t -> new ImmutableMap.Builder<String, Integer>().putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("respond", t._1).put("workingTime", t._6).build()).toBlocking().single();
+                .map(t -> new ImmutableMap.Builder<String, Integer>().putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("workingTime", t._6).build()).toBlocking().single();
 //                        .putAll(ImmutableMap.of("respond", t._1, "arrived", t._2,"ack", t._3, "ETTR", t._4, "dispatchTime", t._5)).put("workingTime", t._6).build()).toBlocking().single();
 
         Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
