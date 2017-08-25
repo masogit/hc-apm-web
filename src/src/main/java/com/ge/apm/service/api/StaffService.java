@@ -49,7 +49,7 @@ public class StaffService {
           "    (select current_person_id as current_person_id, SUM(total_man_hour) as wo_hour, count(*) as count,SUM(CASE WHEN status = 2 THEN 1 ELSE 0 END) as closed, SUM(CASE WHEN status = 1 THEN 1 ELSE 0 END) as open from v2_work_order WHERE site_id = :site_id AND hospital_id = :hospital_id AND created_date >= :from AND created_date <= :to and status !=3 GROUP BY current_person_id) as right_table " +
           "      ON right_table.current_person_id=left_table.person_id " +
           "        LEFT JOIN " +
-          "        (SELECT current_person_id, AVG(feedback_rating) as score FROM v2_work_order WHERE feedback_rating > 0 AND site_id = 7 AND hospital_id = 40 AND created_date >= :from AND created_date <= :to and status !=3 GROUP BY current_person_id) as right_table_2 " +
+          "        (SELECT current_person_id, AVG(feedback_rating) as score FROM v2_work_order WHERE feedback_rating > 0 AND site_id = :site_id AND hospital_id = :hospital_id AND created_date >= :from AND created_date <= :to and status !=3 GROUP BY current_person_id) as right_table_2 " +
           "          ON right_table_2.current_person_id=left_table.person_id";
 
   public Observable<Tuple7<Integer, String, Integer, Double, Integer, Integer, Integer>> queryForWo(Integer site_id, Integer hospital_id, Date from, Date to) {
@@ -80,12 +80,12 @@ public class StaffService {
     + " ORDER BY asset_owner_id ";*/
   private static final String staff_other
           ="select person_id, pm_hour, insp_hour, meter_hour from " +
-          "  (SELECT DISTINCT(ua.id) as person_id,ua.name as person_name  from user_account ua,user_role ur WHERE ua.id=ur.user_id and ur.role_id=3 and site_id = 7 and ua.hospital_id = 40) as left_table " +
+          "  (SELECT DISTINCT(ua.id) as person_id,ua.name as person_name  from user_account ua,user_role ur WHERE ua.id=ur.user_id and ur.role_id=3 and site_id = :site_id and ua.hospital_id = :hospital_id) as left_table " +
           "    LEFT JOIN " +
-          "      (SELECT owner_id, SUM(man_hours) as pm_hour FROM pm_order WHERE site_id = 7 AND hospital_id = 40 AND create_time >= '2017-02-22' AND create_time <= '2017-08-22' GROUP BY owner_id) as right_table " +
+          "      (SELECT owner_id, SUM(man_hours) as pm_hour FROM pm_order WHERE site_id = :site_id AND hospital_id = :hospital_id AND create_time >= :from AND create_time <= :to GROUP BY owner_id) as right_table " +
           "        on left_table.person_id = right_table.owner_id " +
           "          LEFT JOIN " +
-          "            (SELECT owner_id, SUM(CASE WHEN order_type = 1 THEN man_hours ELSE 0 END) as insp_hour, SUM(CASE WHEN order_type = 2 THEN man_hours ELSE 0 END) as meter_hour FROM inspection_order WHERE site_id = 7 AND hospital_id = 40 AND create_time >= '2017-02-22' AND create_time <= '2017-08-22' GROUP BY owner_id) right_table_2 " +
+          "            (SELECT owner_id, SUM(CASE WHEN order_type = 1 THEN man_hours ELSE 0 END) as insp_hour, SUM(CASE WHEN order_type = 2 THEN man_hours ELSE 0 END) as meter_hour FROM inspection_order WHERE site_id = :site_id AND hospital_id = :hospital_id AND create_time >= :from AND create_time <= :to GROUP BY owner_id) right_table_2 " +
           "              on left_table.person_id = right_table_2.owner_id";
 
   public Observable<Tuple4<Integer, Integer, Integer, Integer>> queryForOther(Integer site_id, Integer hospital_id, Date from, Date to) {
