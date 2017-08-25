@@ -16,10 +16,28 @@
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value=" #{assetInfoController.getAssetListTitle()}"/>
-               
             </div>
 
             <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="8">
+                        <label class="label">#{msg.name}</label>
+                        <p:inputText id="search_LIKE_name"/>
+                        <label class="label">#{msg.financingNum}</label>
+                        <p:inputText id="search_LIKE_financingNum"/>
+                        <label class="label">#{msg.departNum}</label>
+                        <p:inputText id="search_LIKE_departNum"/>
+                        <label class="label">#{msg.qrCode}</label>
+                        <p:inputText id="search_LIKE_qrCode"/>
+                        <label class="label">#{msg.serialNum}</label>
+                        <p:inputText id="search_LIKE_serialNum"/>
+                        <label class="label">#{msg.manufacture}</label>
+                        <p:inputText id="search_LIKE_manufacture"/>
+
+                        <p:commandButton value="#{msg.Search}" actionListener="#{assetInfoController.setSearchFilter()}" update=":AssetInfoListForm"/>
+                    </h:panelGrid>
+                </h:form>
+                <br/>
                 <h:form id="AssetInfoListForm">
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetInfoController.selected}"
