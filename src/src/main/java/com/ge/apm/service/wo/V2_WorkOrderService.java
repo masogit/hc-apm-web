@@ -321,7 +321,7 @@ public class V2_WorkOrderService {
 
         // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID
         if(CollectionUtils.isEmpty(userListTag) &  CollectionUtils.isEmpty(assetOwnerList)){
-            OrgInfo orgInfo = orgInfoRepository.getByuid( assetInfo.getClinicalDeptUID());
+            OrgInfo orgInfo = orgInfoRepository.getByUid( assetInfo.getClinicalDeptUID());
             if(orgInfo!=null) {
                 if(orgInfo.getAssetOwnerId()!=null) {
                     UserAccount user1 = userAccountRepository.findById(orgInfo.getAssetOwnerId());
