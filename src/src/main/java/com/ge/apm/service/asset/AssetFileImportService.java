@@ -42,7 +42,7 @@ public class AssetFileImportService {
 
     private static final String SHEET_ASSET = "Asset List";
     private static final String SHEET_ORG = "Org List";
-    private static final String SHEET_USER = "User List";
+//    private static final String SHEET_USER = "User List";
 
     public static enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -105,34 +105,24 @@ public class AssetFileImportService {
         return result;
     }
 
-    public Map<String, Map<String, Object>> getUserMapFromTemplate(ExcelDocument doc) {
-        Map<String, Map<String, Object>> result = new LinkedHashMap();
-        int keyRow = 4;
-        int dataRow = 5;
-
-        for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_USER, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_USER, keyRow, ++dataRow)) {
-//            UserAccount user = new UserAccount();
-            String userName = ExcelDocument.getCellStringValue(rowMap.get("人员名字"));
-            String loginName = ExcelDocument.getCellStringValue(rowMap.get("用户名"));
-            if (userName == null || userName.isEmpty() || loginName == null || loginName.isEmpty()) {
-                break;
-            }
-//            String orgName = (String) rowMap.get("所属科室");
-//            user.setHospitalId(hospitalId);
-//            user.setSiteId(siteId);
-//            user.setTelephone(ExcelDocument.getCellDoubleValue(rowMap.get("电话")).toString());
-//            user.setName(userName);
-//            user.setLoginName(loginName);
-
-            Map<String, Object> map = new LinkedHashMap();
-//            map.put("user", user);
-//            map.put("org", orgName);
-//            map.put("status", ImportStatus.New);
-            map.put("rowData", rowMap);
-            result.put(userName, map);
-        }
-        return result;
-    }
+//    public Map<String, Map<String, Object>> getUserMapFromTemplate(ExcelDocument doc) {
+//        Map<String, Map<String, Object>> result = new LinkedHashMap();
+//        int keyRow = 4;
+//        int dataRow = 5;
+//
+//        for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_USER, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_USER, keyRow, ++dataRow)) {
+//            String userName = ExcelDocument.getCellStringValue(rowMap.get("人员名字"));
+//            String loginName = ExcelDocument.getCellStringValue(rowMap.get("用户名"));
+//            if (userName == null || userName.isEmpty() || loginName == null || loginName.isEmpty()) {
+//                break;
+//            }
+//
+//            Map<String, Object> map = new LinkedHashMap();
+//            map.put("rowData", rowMap);
+//            result.put(userName, map);
+//        }
+//        return result;
+//    }
 
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) {
 
@@ -363,12 +353,12 @@ public class AssetFileImportService {
             hasFailData = item.get("status").equals(ImportStatus.Failure);
         }
 
-        Integer keyRowUser = 4;
-        Integer dataRowUser = 5;
-        doc.clearRowsData(SHEET_USER, 5, 4 + importUserMap.values().size());
-        for (Map<String, Object> item : importUserMap.values()) {
-            doc.writeRowData(SHEET_USER, keyRowUser, dataRowUser++, (Map<String, Object>) item.get("rowData"));
-        }
+//        Integer keyRowUser = 4;
+//        Integer dataRowUser = 5;
+//        doc.clearRowsData(SHEET_USER, 5, 4 + importUserMap.values().size());
+//        for (Map<String, Object> item : importUserMap.values()) {
+//            doc.writeRowData(SHEET_USER, keyRowUser, dataRowUser++, (Map<String, Object>) item.get("rowData"));
+//        }
 
         Integer keyRowAsset = 6;
         Integer dataRowAsset = 7;
@@ -485,12 +475,7 @@ public class AssetFileImportService {
     }
 
     public boolean checkDocVersion(ExcelDocument doc) {
-        String[] keyRow = doc.getKeyRow(SHEET_ASSET, 6);
-        for (String str : keyRow) {
-            if (str.equals("注册证号")) {
-                return true;
-            }
-        }
-        return false;
+        String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET,2,3));
+        return "v1.4".equalsIgnoreCase(inputVersion);
     }
 }
