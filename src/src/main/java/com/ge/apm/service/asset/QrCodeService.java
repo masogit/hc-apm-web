@@ -205,15 +205,15 @@ public class QrCodeService {
                             siteUid = UserContextService.getCurrentUserAccount().getSiteUID();
                         }
                         OrgInfo org = orgInfoDao.getByUid(siteUid);
-                        item.setTextShowValue(item.getTextValue().concat(org.getName()));
+                        item.setTextShowValue(item.getTextValue().concat(org.getName() ==null ? "" : org.getName()));
                         break;
                     case "functionType":
-                        item.setTextShowValue(item.getTextValue().concat(asset.getFunctionType()));
+                        item.setTextShowValue(item.getTextValue().concat(asset.getFunctionType() ==null? "" : asset.getFunctionType()));
                         break;
                     case "clinicalDept":
                         if (asset.getClinicalDeptUID() != null) {
                             OrgInfo clinicalDept = orgInfoDao.getByUid(asset.getClinicalDeptUID());
-                            item.setTextShowValue(item.getTextValue().concat(clinicalDept.getName()));
+                            item.setTextShowValue(item.getTextValue().concat(clinicalDept.getName() ==null ? "" : clinicalDept.getName()));
                         } else {
                             item.setTextShowValue(item.getTextValue().concat("(待定)"));
                         }
