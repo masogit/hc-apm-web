@@ -201,7 +201,8 @@ public class AssetFileImportService {
             Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
             String inputQrcode = (String) rowMap.get("二维码");
-            asset.setQrCode(inputQrcode.replace("-", ""));
+            if(inputQrcode!=null)
+                asset.setQrCode(inputQrcode.replace("-", ""));
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
