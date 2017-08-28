@@ -120,7 +120,7 @@
                             <p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">
                                 <p:fileDownload value="#{assetFileImportController.exportFile}" />
                             </p:commandButton>
-                            <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" action="assetImport?faces-redirect=true"  update=":growl"/>
+                            <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="assetImport?faces-redirect=true"  update=":growl"/>
                         </h:panelGroup>
                     </p:panelGrid>
                 </h:form>
