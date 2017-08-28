@@ -62,7 +62,7 @@ public class AssetFileImportController {
             }
             importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
             importAssetMap = aiService.getAssetMapFromTemplate(doc);
-            importUserMap = aiService.getUserMapFromTemplate(doc);
+//            importUserMap = aiService.getUserMapFromTemplate(doc);
             
             canbeImported = aiService.checkData(importOrgMap,importAssetMap,importUserMap);
 
