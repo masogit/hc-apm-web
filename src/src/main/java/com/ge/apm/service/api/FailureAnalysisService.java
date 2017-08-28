@@ -74,11 +74,15 @@ public class FailureAnalysisService {
     QuerySelect.Builder builder = db.select(new SQL() {{
       SELECT("w.case_type", "count(w.case_type) as reason_count");
       FROM("asset_info a");
-      JOIN("v2_work_order w on a.site_id = w.site_id and a.hospital_id = w.hospital_id and a.id = w.asset_id");
+      JOIN("v2_work_order w on a.id = w.asset_id");
+      JOIN("v2_service_request sr on a.id=sr.asset_id");
       WHERE("a.site_id = :site");
       WHERE("a.hospital_id = :hospital");
       WHERE("w.created_date between :from and :to");
       WHERE("w.case_type is not null");
+      WHERE("sr.status=2");
+      WHERE("sr.confirmed_down_time IS NOT NULL");
+      WHERE("sr.confirmed_up_time IS NOT NULL");
       if (Option.of(type).filter(i -> i > 0).isDefined()) {
         WHERE("a.asset_group = :type");
       }

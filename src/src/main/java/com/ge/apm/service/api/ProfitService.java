@@ -261,7 +261,11 @@ public class ProfitService {
   //input: Historical Seq<Tuple2<id,revenue/cost>>for one type
   //output: Seq<Tuple2<id,revenue/cost>>for one type including future data
   private Seq<Tuple2<Integer, Double>> predictOneType(Seq<Tuple2<Integer, Double>> monthlyData, int year) {
-    monthlyData = monthlyData.removeLast(v -> true);
+    if(monthlyData.length()>1) {
+      monthlyData = monthlyData.removeLast(v -> true);
+    }else{
+      monthlyData.map(v->Tuple.of(v._1,0.0D));
+    }
     LocalDate lastHisDay = xToLocaldate(monthlyData.last()._1);
     for (int i = 0; i < (int) lastHisDay.until(LocalDate.now().withDayOfMonth(1).minusMonths(1), ChronoUnit.MONTHS); i++) {
       monthlyData = monthlyData.append(Tuple.of(localDateToX(lastHisDay.plusMonths(i + 1)), 0D));
