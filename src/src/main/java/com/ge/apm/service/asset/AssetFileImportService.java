@@ -123,7 +123,6 @@ public class AssetFileImportService {
 //        }
 //        return result;
 //    }
-
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
@@ -191,8 +190,9 @@ public class AssetFileImportService {
             Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
             String inputQrcode = (String) rowMap.get("二维码");
-            if(inputQrcode!=null)
+            if (inputQrcode != null) {
                 asset.setQrCode(inputQrcode.replace("-", ""));
+            }
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
@@ -243,7 +243,7 @@ public class AssetFileImportService {
             OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
             if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "Warning:" + WebUtil.getMessage("OrgIngo") + orgName + "无法关联");
+                addErrMessage(item, "警告:" + WebUtil.getMessage("OrgIngo") + orgName + "无法关联");
                 newAsset.setClinicalDeptName(null);
             } else {
                 newAsset.setClinicalDeptName(orgName);
@@ -257,7 +257,11 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerId(assetOwner.getId());
                 newAsset.setAssetOwnerTel(assetOwner.getTelephone());
             } else {
-                addErrMessage(item, "Warning:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无法关联");
+                if (newAsset.getAssetOwnerName() == null) {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
+                } else {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
+                }
                 newAsset.setAssetOwnerName(null);
             }
             //for AssetOwner2
@@ -267,8 +271,12 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerId2(assetOwner.getId());
                 newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
             } else {
-                addErrMessage(item, "Warning:" + WebUtil.getMessage("AssetOwnerName" + "2") + newAsset.getAssetOwnerName2() + "无法关联");
-                newAsset.setAssetOwnerName(null);
+                if (newAsset.getAssetOwnerName2() == null) {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
+                } else {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
+                }
+                newAsset.setAssetOwnerName2(null);
             }
 
             if (newAsset.getVendor() != null && !newAsset.getVendor().isEmpty()) {
@@ -287,7 +295,7 @@ public class AssetFileImportService {
                     Supplier supplier = supplierList.get(0);
                     newAsset.setSupplierId(supplier.getId());
                 } else {
-                    addErrMessage(item, "Warning:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
                     newAsset.setVendor(null);
                 }
             }
@@ -359,7 +367,6 @@ public class AssetFileImportService {
 //        for (Map<String, Object> item : importUserMap.values()) {
 //            doc.writeRowData(SHEET_USER, keyRowUser, dataRowUser++, (Map<String, Object>) item.get("rowData"));
 //        }
-
         Integer keyRowAsset = 6;
         Integer dataRowAsset = 7;
         doc.clearRowsData(SHEET_ASSET, 7, 6 + importAssetMap.values().size());
@@ -475,7 +482,7 @@ public class AssetFileImportService {
     }
 
     public boolean checkDocVersion(ExcelDocument doc) {
-        String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET,2,3));
+        String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
         return "v1.4".equalsIgnoreCase(inputVersion);
     }
 }
