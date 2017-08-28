@@ -178,6 +178,10 @@ public class ExcelDocument {
         }
         return null;
     }
+    
+    public Object getCellValue(String sheetName,Integer dataRowNum, Integer cellnum ){
+        return workBook.getSheet(sheetName).getRow(dataRowNum-1).getCell(cellnum-1);
+    }
 
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
         Sheet sheet = workBook.getSheet(sheetName);
