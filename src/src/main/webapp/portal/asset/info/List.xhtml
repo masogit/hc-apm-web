@@ -20,24 +20,17 @@
 
             <div class="ui-g-12 card">
                 <h:form id="searchForm">
-                    <h:panelGrid id="searchPanel" columns="8">
-                        <label class="label">#{msg.name}</label>
-                        <p:inputText id="search_LIKE_name"/>
-                        <label class="label">#{msg.financingNum}</label>
-                        <p:inputText id="search_LIKE_financingNum"/>
-                        <label class="label">#{msg.departNum}</label>
-                        <p:inputText id="search_LIKE_departNum"/>
-                        <label class="label">#{msg.qrCode}</label>
-                        <p:inputText id="search_LIKE_qrCode"/>
-                        <label class="label">#{msg.serialNum}</label>
-                        <p:inputText id="search_LIKE_serialNum"/>
-                        <label class="label">#{msg.manufacture}</label>
-                        <p:inputText id="search_LIKE_manufacture"/>
+                    <h:panelGrid id="searchPanel" columns="2">
+                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}" maxlength="100" style="width: 420px">
+                            <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
+                        </p:inputText>
 
-                        <p:commandButton value="#{msg.Search}" actionListener="#{assetInfoController.setSearchFilter()}" update=":AssetInfoListForm"/>
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetInfoController.oneSearchStr}"/>
+                            <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
+                        </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
-                <br/>
                 <h:form id="AssetInfoListForm">
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetInfoController.selected}"
