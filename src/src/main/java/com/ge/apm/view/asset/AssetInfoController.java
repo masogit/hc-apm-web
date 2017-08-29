@@ -78,6 +78,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private QrCodeService qrCodeService;
 
+    private String oneSearchStr;
     private String qrCode;
     Boolean terminate;
 
@@ -178,7 +179,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setUserSearchFilters() {
-
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
             this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
@@ -194,6 +194,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+
+        this.removeFilterOnField("name");
+        this.removeFilterOnField("departNum");
+        this.removeFilterOnField("financingNum");
+        this.removeFilterOnField("qrCode");
+        this.removeFilterOnField("serialNum");
+        this.removeFilterOnField("manufacture");
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+
     }
 
     @Override
@@ -557,7 +573,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public String getHospitalName(String siteUid) {
         OrgInfo org = orgDao.getByUid(siteUid);
-        return org==null?"":org.getName();
+        return org == null ? "" : org.getName();
     }
 
     public void onHospitalChange() {
@@ -873,5 +889,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setZipFile(StreamedContent zipFile) {
         this.zipFile = zipFile;
+    }
+
+    public String getOneSearchStr() {
+        return oneSearchStr;
+    }
+
+    public void setOneSearchStr(String oneSearchStr) {
+        this.oneSearchStr = oneSearchStr;
     }
 }
