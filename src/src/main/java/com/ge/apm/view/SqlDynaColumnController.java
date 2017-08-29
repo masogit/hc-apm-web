@@ -28,8 +28,24 @@ public class SqlDynaColumnController extends SqlDataController {
         return sqlColumns;
     }
     
+    public void resetSqlResult(){
+        sqlColumns = "";
+        updateTableColumns();
+        selected = null;
+    }
+    
     @Override
     protected Page<Map<String, Object>> loadData(PageRequest pageRequest, String searchFilterSQL, String orderBySQL, Map<String, Object> params) {
+        resetSqlResult();
+        
+        if(sql==null) return emptyPage;
+        sql = sql.trim();
+        if("".equals(sql)) return emptyPage;
+        if(!sql.toLowerCase().startsWith("select ")){
+            NativeSqlUtil.execute(sql, null);
+            return emptyPage;
+        }
+        
         try{
             this.countSql = "select count(*) from ("+sql+ ") tmp";
 
@@ -38,7 +54,7 @@ public class SqlDynaColumnController extends SqlDataController {
             // updateTableColumns
             sqlColumns = "";
             List<Map<String, Object>> list = data.getContent();
-            if(list.size()>1){
+            if(list.size()>0){
                 Map<String, Object> row = list.get(0);
                 
                 for(Object field: row.keySet().toArray()){
