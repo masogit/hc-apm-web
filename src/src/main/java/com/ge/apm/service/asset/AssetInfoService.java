@@ -16,6 +16,8 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import webapp.framework.dao.SearchFilter;
@@ -61,18 +63,37 @@ public class AssetInfoService {
 
     public List<OrgInfo> getHospitalList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
+
+        List<OrgInfo> accessList = uaaService.getOrgListByUser(user.getUid());
+        //for accessible sites
+        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
+        //for sites of accessible departments
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
+
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*2+"));
-        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*2+"));
-        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getSiteUID(),"1*2+"));
+        if (!orgUidSet1.isEmpty()) {
+        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        }
+        if (!orgUidSet2.isEmpty()) {
+            orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
+        }
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgDao.findBySearchFilter(orgInfoFilters);
     }
 
     public List<OrgInfo> getOrgDeptList(String siteUid) {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<OrgInfo> accessList = uaaService.getOrgListByUser(user.getUid());
+        Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgDao.findBySearchFilter(orgInfoFilters);
+        if (orgUidSet.contains(siteUid)) {
+            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
+        } else {
+            orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
+            orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
+            return orgDao.findBySearchFilter(orgInfoFilters);
+        }
     }
 }
