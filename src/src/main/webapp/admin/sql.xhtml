@@ -12,7 +12,7 @@
             <h:panelGrid id="searchPanel" columns="10">
                 <p:inputTextarea id="sql" placeholder="SQL here" cols="100" rows="3" value="#{sqlDynaColumnController.sql}"/>
                 <p:commandButton value="Query" update="listForm"/>
-                <p:commandButton value="Execute" actionListener="#{sqlDynaColumnController.executeSql}"/>
+                <p:commandButton value="Execute" rendered="false" actionListener="#{sqlDynaColumnController.executeSql}"/>
             </h:panelGrid>
 
         </h:form>
