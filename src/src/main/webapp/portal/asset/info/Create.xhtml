@@ -172,7 +172,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
                                 <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" />
-                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" id="iconOnly" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" id="iconOnly" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
