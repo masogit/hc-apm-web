@@ -272,9 +272,9 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
             } else {
                 if (newAsset.getAssetOwnerName2() == null) {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 }
                 newAsset.setAssetOwnerName2(null);
             }
