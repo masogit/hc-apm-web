@@ -360,17 +360,29 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
     
      private void readSelectedOrgTree(TreeNode node, List<TreeNode> selectedTreeNodeList) {
-        if(node.isSelected()){
+         if(node.isSelected()){
             if (node.getParent() != null && node.getParent().isSelected()) {
                 return;
             }else{
                 selectedTreeNodeList.add(node);
             }
-        }else{
+         }else{
             for (TreeNode item : node.getChildren()) {
                 readSelectedOrgTree(item, selectedTreeNodeList);
             }
         }
+//        }else{
+//            boolean tempStatus = true;
+//            for (TreeNode item : node.getChildren()) {
+//                readSelectedOrgTree(item, selectedTreeNodeList);
+//                tempStatus = tempStatus & item.isSelected();
+//            }
+//            if(tempStatus){
+//                selectedTreeNodeList.add(node);
+//                selectedTreeNodeList.removeAll(node.getChildren());
+//            }
+//            node.setSelected(tempStatus);
+//        }
     }
     
     
@@ -400,7 +412,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
          TreeNode node = event.getTreeNode();
          setTreeNodes(node, false);
-         while(node!=null){
+         while(node.getParent()!=null){
              node.getParent().setSelected(false);
              node = node.getParent();
          }
