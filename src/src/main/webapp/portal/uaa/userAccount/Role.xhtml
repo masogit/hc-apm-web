@@ -11,7 +11,7 @@
         <p:dialog id="RoleEditDlg" widgetVar="RoleEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.AssignRole}">
             <h:form id="UserRoleEditForm">
                 <h:panelGroup id="display">
-                    <p:tabView class="ui-g-12" id="tabview"   dynamic="true"   cache="false">
+                    <p:tabView class="ui-g-12" id="tabview"   dynamic="false"   cache="false">
                         <p:tab title="#{msg.AssignRole}" class="ui-g-12" >
                     <p:panelGrid columns="2" rendered="#{userAccountController.selected != null}">
                         <p:outputLabel value="#{msg.login_name}"/>
