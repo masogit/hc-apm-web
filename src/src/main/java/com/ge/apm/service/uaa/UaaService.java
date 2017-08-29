@@ -251,10 +251,26 @@ public class UaaService {
         return orgInfoDao.getByUser(userUid);
     }
     
+    //get tree for user to access
+    public TreeNode getOrgAccessTreeByUser(UserAccount user){
+        OrgInfo rootOrg = orgInfoDao.getByUid(user.getSiteUID());
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        List<OrgInfo> userScopeList = getOrgListByUser(user.getUid());
+        for (OrgInfo item : userScopeList) {
+            if (item.getOrgType() == 4) {
+                new DefaultTreeNode("org", item, root);
+            } else {
+                root.getChildren().add(getOrgTreeBySite(item.getSiteUID()).getChildren().get(0));
+            }
+        }
+        return root;
+    }
+    
+    //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
         List<OrgInfo> orgList = null;
         orgList = orgInfoDao.getBySiteUID(siteUID);
-        TreeNode root = null;
+        TreeNode root  = new DefaultTreeNode("root", null, null);;
         
         Map<String, TreeNode> treeMap = new HashMap<>();
         
@@ -276,7 +292,7 @@ public class UaaService {
         }
         
         if(treeMap.get(siteUID)!=null){
-            root = treeMap.get(siteUID);
+            root.getChildren().add(treeMap.get(siteUID));
         }
         
         return root;
