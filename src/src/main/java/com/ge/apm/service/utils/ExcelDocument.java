@@ -96,7 +96,7 @@ public class ExcelDocument {
         String[] rowKey = getKeyRow(sheetName, keyRowNum);
         return getDataRowMap(sheetName, rowKey, dataRowNum);
     }
-    
+
     public Map<String, Object> getDataRowMap(Integer keyRowNum, Integer dataRowNum) {
         String sheetName = workBook.getSheetName(0);
         return getDataRowMap(sheetName, keyRowNum, dataRowNum);
@@ -131,7 +131,6 @@ public class ExcelDocument {
         }
     }
 
-    
     static public String getCellStringValue(Object value) {
         if (value == null) {
             return null;
@@ -147,6 +146,7 @@ public class ExcelDocument {
         }
         return value.toString();
     }
+
     static public Integer getCellIntegerValue(Object value) {
         if (value == null) {
             return null;
@@ -178,9 +178,9 @@ public class ExcelDocument {
         }
         return null;
     }
-    
-    public Object getCellValue(String sheetName,Integer dataRowNum, Integer cellnum ){
-        return workBook.getSheet(sheetName).getRow(dataRowNum-1).getCell(cellnum-1);
+
+    public Object getCellValue(String sheetName, Integer dataRowNum, Integer cellnum) {
+        return workBook.getSheet(sheetName).getRow(dataRowNum - 1).getCell(cellnum - 1);
     }
 
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
@@ -230,22 +230,13 @@ public class ExcelDocument {
 
     }
 
-    public void clearRowData(String sheetName, Integer dataRowNum) {
-        Sheet sheet = workBook.getSheet(sheetName);
-        Row dataRow = sheet.getRow(dataRowNum - 1);
-        for (int cellIndex = dataRow.getFirstCellNum(); cellIndex < dataRow.getLastCellNum(); cellIndex++) {
-            Cell cell = dataRow.getCell(cellIndex);
-            if (!cell.getCellTypeEnum().equals(CellType.FORMULA)) {
-
-            }
-            cell.setCellType(CellType.BLANK);
-            cell.setCellValue((String) null);
-        }
-    }
-
     public void clearRowsData(String sheetName, Integer startRow, Integer endRow) {
-        for (int i = startRow; i <= endRow; i++) {
-            clearRowData(sheetName, i);
+        Sheet sheet = workBook.getSheet(sheetName);
+        for (int i = endRow; i >= startRow; i--) {
+            Row dataRow = sheet.getRow(i - 1);
+            if (dataRow != null) {
+                sheet.removeRow(dataRow);
+            }
         }
     }
 
