@@ -156,13 +156,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             prepareDelete();
         }
 
-//        ownerList = uuaService.getUserList(UserContextService.getCurrentUserAccount().getHospitalId());
         ownerOrgList = uuaService.getOrgListByHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
 
-//        setUserSearchFilters();
     }
 
     public Boolean getTerminate() {
@@ -510,22 +508,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-//
-//        String type = event.getComponent().getId();
-//        type = type.substring(type.indexOf("type") + 4);
-//        AssetFileAttachment attach = new AssetFileAttachment();
-//        String fileName = fileService.getFileName(event.getFile());
-//        attach.setName(fileName);
-//        attach.setFileType(type);
-//        attach.setSiteId(UserContextService.getCurrentUserAccount().getSiteId());
-//        attach.setAssetId(selected.getId());
-//        attach.setHospitalId(selected.getHospitalId());
-//        Integer uploadFileId = fileService.uploadFile(event.getFile());
-//        if (uploadFileId > 0) {
-//            attach.setFileId(uploadFileId);
-//            WebUtil.addSuccessMessage(fileName + WebUtil.getMessage("SuccessUploaded"));
-//            attachements.add(attach);
-//        }
 
     }
 
@@ -581,13 +563,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         selected.setInstitutionUID(org.getInstitutionUID());
         selected.setHospitalUID(org.getHospitalUID());
         this.owner = null;
-    }
-
-    public List<OrgInfo> getClinicalDeptList() {
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getSiteUID()));
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgDao.findBySearchFilter(orgInfoFilters);
     }
 
     public List<UserAccount> getOwnerList() {
