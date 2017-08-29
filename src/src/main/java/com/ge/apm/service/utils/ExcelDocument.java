@@ -81,6 +81,11 @@ public class ExcelDocument {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(dataRowNum - 1);
         Map<String, Object> dataMap = new LinkedHashMap();
+        
+        if(dataRow==null){
+            return dataMap;
+        }
+        
         for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
             Cell cell = dataRow.getCell(cellIndex);
             if (cell == null) {
