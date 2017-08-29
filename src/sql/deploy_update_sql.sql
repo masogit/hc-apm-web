@@ -15,4 +15,6 @@ insert into user_org (id,user_uid,org_uid,org_type) (select replace('' || uuid_g
 
 update asset_info set clinical_dept_uid=o.uid from org_info o where o.id=asset_info.clinical_dept_id;
 
+-- set clinical_dept_uid for asset_info 
+update asset_info a set clinical_dept_uid=(select uid from org_info o where o.id=a.clinical_dept_id) where clinical_dept_id is not null and a.clinical_dept_uid is null
 
