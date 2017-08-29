@@ -46,7 +46,8 @@
                         <p:column headerText="#{msg.status}">
                             <h:outputText value="未启用"  rendered="#{not item.isUsing}"/>
                             <h:outputText value="使用中"  rendered="#{item.isUsing}"/>
-                            <p:commandButton icon="ui-icon-check" title="#{msg.setToUsing}" actionListener="#{qrCodeTemplateController.setToUsing(item.id)}" update=":qrCodeLibListForm:datalist"  rendered="#{not item.isUsing}"/>
+                            <p:spacer/>
+                            <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{qrCodeTemplateController.setToUsing(item.id)}" update=":qrCodeLibListForm:datalist"  rendered="#{not item.isUsing}"/>
                         </p:column>
 
 
