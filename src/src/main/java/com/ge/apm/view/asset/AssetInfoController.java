@@ -78,6 +78,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private QrCodeService qrCodeService;
 
+    private String oneSearchStr;
     private String qrCode;
     Boolean terminate;
 
@@ -155,13 +156,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             prepareDelete();
         }
 
-//        ownerList = uuaService.getUserList(UserContextService.getCurrentUserAccount().getHospitalId());
         ownerOrgList = uuaService.getOrgListByHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
 
-//        setUserSearchFilters();
     }
 
     public Boolean getTerminate() {
@@ -178,7 +177,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setUserSearchFilters() {
-
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
             this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
@@ -194,6 +192,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+
+        this.removeFilterOnField("name");
+        this.removeFilterOnField("departNum");
+        this.removeFilterOnField("financingNum");
+        this.removeFilterOnField("qrCode");
+        this.removeFilterOnField("serialNum");
+        this.removeFilterOnField("manufacture");
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            searchFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+
     }
 
     @Override
@@ -494,22 +508,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-//
-//        String type = event.getComponent().getId();
-//        type = type.substring(type.indexOf("type") + 4);
-//        AssetFileAttachment attach = new AssetFileAttachment();
-//        String fileName = fileService.getFileName(event.getFile());
-//        attach.setName(fileName);
-//        attach.setFileType(type);
-//        attach.setSiteId(UserContextService.getCurrentUserAccount().getSiteId());
-//        attach.setAssetId(selected.getId());
-//        attach.setHospitalId(selected.getHospitalId());
-//        Integer uploadFileId = fileService.uploadFile(event.getFile());
-//        if (uploadFileId > 0) {
-//            attach.setFileId(uploadFileId);
-//            WebUtil.addSuccessMessage(fileName + WebUtil.getMessage("SuccessUploaded"));
-//            attachements.add(attach);
-//        }
 
     }
 
@@ -557,7 +555,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public String getHospitalName(String siteUid) {
         OrgInfo org = orgDao.getByUid(siteUid);
-        return org==null?"":org.getName();
+        return org == null ? "" : org.getName();
     }
 
     public void onHospitalChange() {
@@ -565,13 +563,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         selected.setInstitutionUID(org.getInstitutionUID());
         selected.setHospitalUID(org.getHospitalUID());
         this.owner = null;
-    }
-
-    public List<OrgInfo> getClinicalDeptList() {
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getSiteUID()));
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgDao.findBySearchFilter(orgInfoFilters);
     }
 
     public List<UserAccount> getOwnerList() {
@@ -873,5 +864,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setZipFile(StreamedContent zipFile) {
         this.zipFile = zipFile;
+    }
+
+    public String getOneSearchStr() {
+        return oneSearchStr;
+    }
+
+    public void setOneSearchStr(String oneSearchStr) {
+        this.oneSearchStr = oneSearchStr;
     }
 }
