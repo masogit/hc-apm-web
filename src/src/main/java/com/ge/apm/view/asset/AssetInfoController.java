@@ -179,7 +179,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setUserSearchFilters() {
-        if(assetId != null){
+        if (assetId != null) {
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
         }
 
@@ -199,13 +199,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
-        this.removeFilterOnField("name");
-        this.removeFilterOnField("departNum");
-        this.removeFilterOnField("financingNum");
-        this.removeFilterOnField("qrCode");
-        this.removeFilterOnField("serialNum");
-        this.removeFilterOnField("manufacture");
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            this.removeFilterOnField("name");
+            this.removeFilterOnField("departNum");
+            this.removeFilterOnField("financingNum");
+            this.removeFilterOnField("qrCode");
+            this.removeFilterOnField("serialNum");
+            this.removeFilterOnField("manufacture");
             searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
