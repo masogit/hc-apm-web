@@ -181,7 +181,7 @@ public class HealthService {
     	+ " ON pm_order.asset_id = asset_info.id "
     	+ " WHERE asset_info.site_id=:site_id AND asset_info.hospital_id=:hospital_id AND pm_order.is_finished=false AND pm_order.start_time<(NOW() + interval '1 weeks') "
     	+ " ORDER BY start_time ";*/
-			= " SELECT asset_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
+			= " SELECT pm_order.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
 			+ " FROM pm_order "
 			+ " LEFT JOIN asset_info "
 			+ " ON pm_order.asset_id = asset_info.id "
@@ -196,7 +196,8 @@ public class HealthService {
 			.parameter("hospital_id", hospital_id)
 			.get(rs ->
 				new Tuple4<Integer, String, String, Integer> (
-					rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+						rs.getInt("pm_order_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.cache();
 
 	}
