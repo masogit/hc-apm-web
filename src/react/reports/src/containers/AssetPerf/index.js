@@ -54,7 +54,8 @@ class AssetPerf extends React.PureComponent {
       })
 
     const filterOptions = [
-      { type: 'radio', key: 'type', options: [{id: 'history', name: '历史'}, {id: 'future', name: '预测'}], value: type},
+      /* As Jianbin's request, hide '预测' option for the time being. */
+      // { type: 'radio', key: 'type', options: [{id: 'history', name: '历史'}, {id: 'future', name: '预测'}], value: type},
       { type: 'range', key: 'range', value: filters.range },
       { type: 'radio', key: 'groupBy', options: [{id: 'type', name: '按设备类型'}, {id: 'month', name: '按月份'}], value: groupBy},
     ]
