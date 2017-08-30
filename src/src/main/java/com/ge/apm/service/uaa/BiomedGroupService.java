@@ -1,5 +1,6 @@
 package com.ge.apm.service.uaa;
 
+import com.ge.apm.dao.AssetTagBiomedGroupRepository;
 import com.ge.apm.dao.BiomedGroupRepository;
 import com.ge.apm.dao.BiomedGroupUserRepository;
 import com.ge.apm.dao.UserAccountRepository;
@@ -24,6 +25,8 @@ public class BiomedGroupService {
     private BiomedGroupRepository biomedGroupDao;
     @Autowired
     private BiomedGroupUserRepository biomedGroupUserDao;
+    @Autowired
+    private AssetTagBiomedGroupRepository assetTagBiomedGroupDao;
     @Autowired
     private UserAccountRepository userDao;
 
@@ -64,6 +67,12 @@ public class BiomedGroupService {
             biomedGroupUserDao.save(tempBiomedGroupUser);
         }
 
+    }
+
+    @Transactional
+    public void deleteBiomedGroup(BiomedGroup biomedGroup){
+        assetTagBiomedGroupDao.deleteByBiomedGroupId(biomedGroup.getId());
+        biomedGroupDao.delete(biomedGroup);
     }
 
 }
