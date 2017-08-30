@@ -21,7 +21,7 @@ export default ({history}) => (
     <Route exact path="/FailureAnalysis" component={FailureAnalysis}/>
     <Route exact path="/MaintenanceCost" component={MaintenanceCost} />
     <Route exact path="/MaintenanceStats" component={MaintenanceStats} />
-    <Route exact path="/processAnalysis" component={ProcessAnalysis} />
+    <Route exact path="/ProcessAnalysis" component={ProcessAnalysis} />
     <Route exact path="/ScanDetails" component={ScanDetails} />
     <Route exact path="/StaffPerf" component={StaffPerf} />
   </Router>
