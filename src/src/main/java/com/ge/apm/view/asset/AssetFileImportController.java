@@ -33,7 +33,6 @@ public class AssetFileImportController {
     private UploadedFile file;
 
     private Map<String, Map<String, Object>> importOrgMap;
-    private Map<String, Map<String, Object>> importUserMap;
     private Map<String, Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
@@ -62,9 +61,8 @@ public class AssetFileImportController {
             }
             importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
             importAssetMap = aiService.getAssetMapFromTemplate(doc);
-//            importUserMap = aiService.getUserMapFromTemplate(doc);
             
-            canbeImported = aiService.checkData(importOrgMap,importAssetMap,importUserMap);
+            canbeImported = aiService.checkData(importOrgMap,importAssetMap);
 
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
@@ -84,7 +82,7 @@ public class AssetFileImportController {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
 //                InputStream stream = this.file.getInputstream();
                 ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap,importUserMap);
+                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
             } catch (IOException ex) {
                 Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
@@ -96,14 +94,25 @@ public class AssetFileImportController {
         this.file = null;
 
     }
+    
+    public Integer getAssetErrorCounts(){
+        if(null!=importAssetMap && !importAssetMap.isEmpty()){
+           return Integer.parseInt(String.valueOf(importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+        }else{
+            return 0;
+        }
+    }
+    public Integer getOrgErrorCounts(){
+        if(null!=importOrgMap &&!importOrgMap.isEmpty()){
+           return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+        }else{
+            return 0;
+        }
+    }
 
     //Getter and Setter
     public Map<String, Map<String, Object>> getImportOrgMap() {
         return importOrgMap;
-    }
-
-    public Map<String, Map<String, Object>> getImportUserMap() {
-        return importUserMap;
     }
 
     public Map<String, Map<String, Object>> getImportAssetMap() {
