@@ -1,3 +1,4 @@
+/* This script is Obsoleted !!! remove in the future */
 var fs = require('fs')
 var path = require('path')
 var childProcess = require('child_process')
