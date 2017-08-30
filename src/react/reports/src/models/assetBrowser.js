@@ -185,7 +185,9 @@ export default {
               dimension: 'price',
               ticks: [ 1e4, 1e5, 5e5, 1e6, 5e6, 1e7]
             }],
-            dimensions: ['func', 'type', 'dept', 'supplier', 'price', 'yoi']
+            // As Jianbin's request, remove 'func' for good, hide 'supplier' for the time being
+            // dimensions: ['func', 'type', 'dept', 'supplier', 'price', 'yoi']
+            dimensions: ['type', 'dept', 'price', 'yoi']
           }
         })
       } catch(err) {
