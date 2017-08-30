@@ -71,10 +71,14 @@ public class AssetInfoService {
         Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        if (!orgUidSet1.isEmpty()) {
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
         orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-        orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
+        }
+        if (!orgUidSet2.isEmpty()) {
+            orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
+        }
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgDao.findBySearchFilter(orgInfoFilters);
     }
@@ -85,7 +89,7 @@ public class AssetInfoService {
         Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         if (orgUidSet.contains(siteUid)) {
-            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType()==4).collect(Collectors.toList());
+            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
         } else {
             orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
             orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));

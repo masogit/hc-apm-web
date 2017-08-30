@@ -229,7 +229,7 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Created);
             } else if (orgs.size() > 1) {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "Error:" + WebUtil.getMessage("InvalidParameter") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
+                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo")+":" + ((OrgInfo) item.get("org")).getName());
             } else {
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
@@ -272,9 +272,9 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
             } else {
                 if (newAsset.getAssetOwnerName2() == null) {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 }
                 newAsset.setAssetOwnerName2(null);
             }
@@ -319,7 +319,7 @@ public class AssetFileImportService {
 
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "Error:" + WebUtil.getMessage("InvalidParameter") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
+                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
                 item.put("asset", assetList.get(0));
                 item.put("status", ImportStatus.Exist);
@@ -336,22 +336,22 @@ public class AssetFileImportService {
 
         QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
         if (qrCodeLib == null) {
-            addErrMessage(item, "Error:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
+            addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
             return false;
         }
         if (!qrCodeLib.getSiteUID().equals(orgUid)) {
-            addErrMessage(item, "Error:" + WebUtil.getMessage("WrongHospitalQRCode"));
+            addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
         if (qrCodeLib.getStatus() != 1) {
-            addErrMessage(item, "Error:" + WebUtil.getMessage("AlreadyUsingQrCode"));
+            addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
             return false;
         }
 
         return true;
     }
 
-    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap, Map<String, Map<String, Object>> importUserMap) {
+    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
         Boolean hasFailData = false;
@@ -431,7 +431,7 @@ public class AssetFileImportService {
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap, Map<String, Map<String, Object>> importUserMap) {
+    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
 
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
@@ -440,7 +440,7 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.New);
             } else if (orgs.size() > 1) {
                 item.put("status", ImportStatus.CheckFail);
-                addErrMessage(item, "Error:" + WebUtil.getMessage("InvalidParameter") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
+                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
                 result.add(Boolean.FALSE);
             } else {
                 item.put("org", orgs.get(0));
@@ -465,7 +465,7 @@ public class AssetFileImportService {
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
-                addErrMessage(item, "Error:" + WebUtil.getMessage("InvalidParameter") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
+                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
                 item.put("asset", assetList.get(0));
                 item.put("status", ImportStatus.Exist);
@@ -474,7 +474,7 @@ public class AssetFileImportService {
             if (null == newAsset.getAssetGroup()) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
-                addErrMessage(item, "Error:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
+                addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
         });
