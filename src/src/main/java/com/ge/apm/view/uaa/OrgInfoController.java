@@ -88,11 +88,11 @@ UserAccountRepository userDao;
         return userList;
     }
     public void buildOrdTree(){
-        if(selected!=null)
-            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, selected.getId());
-        else
-            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, null);
-        
+//        if(selected!=null)
+//            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, selected.getId());
+//        else
+//            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, null);
+        orgTree = uaaService.getOrgTreeBySite(UserContextService.getCurrentUserAccount().getSiteUID());
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
         }
@@ -104,8 +104,8 @@ UserAccountRepository userDao;
         return uaaService.getHospitalListBySiteId(tenantId);
     }
     
-    private DefaultTreeNode orgTree;
-    public DefaultTreeNode getOrgTree(){
+    private TreeNode orgTree;
+    public TreeNode getOrgTree(){
         return orgTree;
     }
     private TreeNode selectedNode;

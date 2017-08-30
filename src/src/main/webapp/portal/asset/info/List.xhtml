@@ -74,11 +74,11 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptId}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetInfoController.ownerOrgList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptList()}" />
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
