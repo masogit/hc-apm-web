@@ -12,4 +12,5 @@ public interface AssetTagBiomedGroupRepository extends GenericRepository<AssetTa
 
     public List<AssetTagBiomedGroup> findByTagId(Integer tagId);
     public void deleteByTagId(Integer tagId);
+    public void deleteByBiomedGroupId(Integer biomedGroupId);
 }

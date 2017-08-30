@@ -192,6 +192,10 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         this.getQueryUserAccountList();
     }
 
+    public void deleteBiomedGroup(){
+        biomedGroupService.deleteBiomedGroup(this.getSelected());
+    }
+
     /*
     @Override
     public void onAfterNewObject(BiomedGroup object, boolean isOK) {
