@@ -16,10 +16,11 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.model.SelectItem;
+import javax.faces.model.SelectItemGroup;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -63,37 +64,26 @@ public class AssetInfoService {
 
     public List<OrgInfo> getHospitalList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
-
-        List<OrgInfo> accessList = uaaService.getOrgListByUser(user.getUid());
-        //for accessible sites
-        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
-        //for sites of accessible departments
-        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
-
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        if (!orgUidSet1.isEmpty()) {
-        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-        }
-        if (!orgUidSet2.isEmpty()) {
-            orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
-        }
-        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
-        return orgDao.findBySearchFilter(orgInfoFilters);
+        return uaaService.getUserAccessibleSiteList(user.getUid());
     }
 
     public List<OrgInfo> getOrgDeptList(String siteUid) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<OrgInfo> accessList = uaaService.getOrgListByUser(user.getUid());
-        Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        if (orgUidSet.contains(siteUid)) {
-            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
-        } else {
-            orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
-            orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-            return orgDao.findBySearchFilter(orgInfoFilters);
+        return uaaService.getOrgDeptList(siteUid,user.getUid());
+    }
+    
+    public List<SelectItem> getAllAccessibleOrgDeptList(){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<OrgInfo> sitesList = uaaService.getUserAccessibleSiteList(user.getUid());
+        List<SelectItem> dropdownList = new ArrayList<SelectItem>();
+        for(OrgInfo item : sitesList){
+            SelectItemGroup group = new SelectItemGroup(item.getName());
+            List<SelectItem> itemList = uaaService.getOrgDeptList(item.getUid(),user.getUid()).stream()
+                    .map(itemDept -> new SelectItem(itemDept.getUid(),itemDept.getName())).collect(Collectors.toList());
+            
+            group.setSelectItems(itemList.toArray(new SelectItem[itemList.size()]));
+            dropdownList.add(group);
         }
+        return dropdownList;
     }
 }
