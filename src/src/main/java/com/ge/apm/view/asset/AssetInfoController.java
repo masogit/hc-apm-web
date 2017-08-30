@@ -81,6 +81,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String oneSearchStr;
     private String qrCode;
     Boolean terminate;
+    private Integer assetId;
 
     private List<AssetInfo> parentAssetList;
     private List<I18nMessage> code68List;
@@ -128,6 +129,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         String encodeStr = request.getParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         // String actionName = WebUtil.getRequestParameter("actionName");
+        assetId = request.getParameter("assetId") != null ? Integer.valueOf(request.getParameter("assetId")) : null;
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
@@ -177,6 +179,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setUserSearchFilters() {
+        if(assetId != null){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
+        }
+
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
             this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));

@@ -39,7 +39,7 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{biomedGroupController.prepareCreate}" update=":BiomedGroupEditDlg" oncomplete="PF('BiomedGroupEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{biomedGroupController.prepareEdit}" update=":BiomedGroupEditDlg" oncomplete="PF('BiomedGroupEditDialog').show()" disabled="#{empty biomedGroupController.selected}"/>
 
-                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{biomedGroupController.delete}" update="datalist" disabled="#{empty biomedGroupController.selected}">
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{biomedGroupController.deleteBiomedGroup}" update="datalist" disabled="#{empty biomedGroupController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>        
                             
