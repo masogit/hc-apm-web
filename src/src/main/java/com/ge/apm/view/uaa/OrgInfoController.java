@@ -1,8 +1,11 @@
 package com.ge.apm.view.uaa;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import com.ge.apm.dao.UserAccountRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -28,8 +31,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     OrgInfoRepository dao = null;
     UaaService uaaService;
-
     private TenantInfo selectedTenant;
+    UserAccount userAccount;
+
+    private boolean acShow=false;
 
     @Override
     protected void init() {
@@ -37,7 +42,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         
         dao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        
+        userDao = WebUtil.getBean(UserAccountRepository.class);
+        userAccount = new UserAccount();
+        //userAccount.set
+        findPerson();
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
         buildOrdTree();
@@ -50,6 +58,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     @Override
     protected Page<OrgInfo> loadData(PageRequest pageRequest) {
+
         return dao.getBySiteId(pageRequest, tenantId);
     }
 
@@ -66,11 +75,18 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.selected = null;
         buildOrdTree();
     }
-
+UserAccountRepository userDao;
     public TenantInfo getSelectedTenant() {
         return selectedTenant;
     }
-    
+    public List<UserAccount> findPerson(){
+        List<UserAccount> userList = new ArrayList<UserAccount>();
+        if(this.selected!=null && this.selected.getOrgType()==4) {//类型是科室
+                if(this.selected.getParentOrg()!=null)
+                    userList= userDao.findByOrgInfoId(this.selected.getParentOrg().getId());
+        }
+        return userList;
+    }
     public void buildOrdTree(){
         if(selected!=null)
             orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, selected.getId());
@@ -222,6 +238,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //node.setExpanded(!node.isExpanded());
         
         selected = (OrgInfo)node.getData();
+        if(selected!=null) {
+            if (selected.getOrgType() == 4) {
+                acShow = true;
+            } else {
+                acShow = false;
+            }
+        }
     }
  
     @Override
@@ -243,7 +266,15 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
                 
         return false;
     }
-    
+
+    public boolean getAcShow() {
+        return acShow;
+    }
+
+    public void setAcShow(boolean acShow) {
+        this.acShow = acShow;
+    }
+
     public boolean getIsCreateHospitalDisabled(){
         return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()!=1);
     }
@@ -253,5 +284,12 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public boolean getIsCreateDepartmentDisabled(){
         return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()==4);
     }
-    
+
+    public UserAccount getUserAccount() {
+        return userAccount;
+    }
+
+    public void setUserAccount(UserAccount userAccount) {
+        this.userAccount = userAccount;
+    }
 }
