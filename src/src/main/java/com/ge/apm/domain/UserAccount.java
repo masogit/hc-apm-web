@@ -145,6 +145,10 @@ public class UserAccount implements Serializable {
     @Basic(optional = false)
     @NotNull
     private Integer orgInfoId;
+    
+    @Column(name = "org_uid", columnDefinition = "CHAR(32)")
+    @Size(max=32)
+    private String orgInfoUID;
 
     @Column(name = "uid",columnDefinition = "CHAR(32)")
     @GeneratedValue(generator = "uuid")
@@ -179,6 +183,14 @@ public class UserAccount implements Serializable {
         isLocalAdmin = false;
         isActive = true;
         isOnline = false;
+    }
+
+    public String getOrgInfoUID() {
+        return orgInfoUID;
+    }
+
+    public void setOrgInfoUID(String orgInfoUID) {
+        this.orgInfoUID = orgInfoUID;
     }
 
     public String getUid() {

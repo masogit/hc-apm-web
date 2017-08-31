@@ -14,16 +14,16 @@
             <div class="ui-g-12 card">
                 <h:form id="UserAccountListForm">
 
-                    <p:commandButton id="btnSite" value="#{userAccountController.selectedSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:commandButton id="btnSite" value="#{userAccountController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false">
-                        <p:selectOneListbox style="border: none;" value="#{userAccountController.siteId}">
-                            <p:ajax process="@this" event="click" update=":UserAccountListForm" listener="#{userAccountController.setSiteId(userAccountController.siteId)}" oncomplete="PF('varPanelSite').hide();"/>
+                        <p:selectOneListbox style="border: none;" value="#{userAccountController.tenantUid}">
+                            <p:ajax process="@this" event="click" update=":UserAccountListForm" listener="#{userAccountController.setTenantUid(userAccountController.tenantUid)}" oncomplete="PF('varPanelSite').hide();"/>
 
-                            <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            <f:selectItems value="#{tenantInfoController.itemList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                         </p:selectOneListbox>
                     </p:overlayPanel>
 
-                    <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?msg.AllHospitals:userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}" var="node" selectionMode="single">
@@ -52,7 +52,7 @@
                         <p:ajax event="filter" listener="#{userAccountController.onFilter}" update="createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
 
                         <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
-                            <h:outputText value="#{userAccountController.getOrgFullName(item.orgInfoId)}"/>
+                            <h:outputText value="#{userAccountController.getOrgFullNameByUid(item.orgInfoUID)}"/>
                         </p:column>
                         <p:column headerText="#{msg.login_name}" sortBy="#{item.loginName}">
                             <h:outputText value="#{item.loginName}"/>
