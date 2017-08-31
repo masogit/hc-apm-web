@@ -414,9 +414,11 @@ INSERT INTO "public"."i18n_message" VALUES ('778', 'label', 'DeviceType', '资�
 INSERT INTO "public"."i18n_message" VALUES ('779', 'label', 'V2_WorkFlowConfig', '资产类型工作流配置', 'v2 workflow config', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('780', 'label', 'UrgentTimeout', '紧急工单超时时间', 'urgent workorder timeout ', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('781', 'label', 'UrgentMaxMessageCount', '紧急工单超时提醒次数', 'urgent workorder remind times', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('782', 'label', 'WorkOrderWorkflowConfig', '重要工单工作流配置', 'workorder workflow config ', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('782', 'label', 'WorkOrderWorkflowConfig', '紧急工单工作流配置', 'workorder workflow config ', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('783', 'label', 'DeviceTypeGroup', '设备类型分组配置', 'device type group ', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('784', 'label', 'V3_WorkFlowConfig', '院区工作流配置', 'config for hospital', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('785', 'label', 'V2_WorkOrderWorkflowConfig', '紧急工单工作流配置', 'workorder workflow config ', null, '-1');
+
 
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1401', 'assetGroup', '2', '磁共振MRI类', '磁共振MRI类', null, '-1');
@@ -586,6 +588,10 @@ INSERT INTO "public"."i18n_message" VALUES ('3039', 'message', 'InvalidQRCode', 
 INSERT INTO "public"."i18n_message" VALUES ('3040', 'message', 'WrongHospitalQRCode', '非本院二维码!', 'Not for this Hospital!', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('3041', 'message', 'AlreadyUsingQrCode', '已经使用中二维码!', 'Already using Code!', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('3042', 'message', 'DeleteAssetConformationMsg', '确认删除设备?', 'Confirm to remove this asset?', null, '-1');
+--3043~3055已存在
+INSERT INTO "public"."i18n_message" VALUES ('3056', 'message', 'ManualAndGrapMsg', '允许抢单和允许人工至少选一个!', 'There should be at least one config for manual or grap mode! ', null, '-1');
+
+
 INSERT INTO "public"."i18n_message" VALUES ('5000', 'label', 'deviceScanhd', '设备扫描量（次）', 'Scan #', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5001', 'label', 'deviceScanlg', '扫描次数', 'Scan', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5002', 'label', 'deviceExpohd', '设备曝光量（次）', 'Exposure #', null, '-1');

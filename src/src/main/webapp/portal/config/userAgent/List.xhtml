@@ -1,0 +1,79 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+                <p align="center">
+                    <b>#{msg.UserAgent}</b>
+                </p>
+            <h:form id="UserAgentListForm">
+                <p:dataTable id="datalist" value="#{userAgentController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{userAgentController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{userAgentController.onFilter}" update="createButton editButton viewButton deleteButton"/>
+                    
+                    <p:column headerText="#{msg.id}" sortBy="#{item.id}" filterBy="#{item.id}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.id}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.fromUserId}" sortBy="#{item.fromUserId}" filterBy="#{item.fromUserId}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.fromUserId}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.toUserId}" sortBy="#{item.toUserId}" filterBy="#{item.toUserId}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.toUserId}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.fromDate}" sortBy="#{item.fromDate}" filterBy="#{item.fromDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                        </f:facet>
+                        <h:outputText value="#{item.fromDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.toDate}" sortBy="#{item.toDate}" filterBy="#{item.toDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                        </f:facet>
+                        <h:outputText value="#{item.toDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.remarks}" sortBy="#{item.remarks}" filterBy="#{item.remarks}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.remarks}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.agentType}" sortBy="#{item.agentType}" filterBy="#{item.agentType}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.agentType}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton value="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="UserAgent_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" value="#{msg.Create}" actionListener="#{userAgentController.prepareCreate}" update=":UserAgentEditDlg" oncomplete="PF('UserAgentEditDialog').show()"/>
+                        <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray" value="#{msg.View}" actionListener="#{userAgentController.prepareView}" update=":UserAgentViewDlg" oncomplete="PF('UserAgentViewDialog').show()" disabled="#{empty userAgentController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" value="#{msg.Edit}" actionListener="#{userAgentController.prepareEdit}" update=":UserAgentEditDlg" oncomplete="PF('UserAgentEditDialog').show()" disabled="#{empty userAgentController.selected}"/>
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" value="#{msg.Delete}" actionListener="#{userAgentController.prepareDelete}" update=":UserAgentViewDlg" oncomplete="PF('UserAgentViewDialog').show()" disabled="#{empty userAgentController.selected}"/>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>

@@ -8,5 +8,7 @@ public interface V2_WorkOrderWorkflowConfigRepository extends GenericRepository<
 
 	V2_WorkOrderWorkflowConfig findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(String tenantUID, String institutionUID,String hospitalUID, String siteUID);
 
+	V2_WorkOrderWorkflowConfig findByTenantUID(String tenantUID);
+
 	
 }
