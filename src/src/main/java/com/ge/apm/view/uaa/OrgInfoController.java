@@ -92,7 +92,8 @@ UserAccountRepository userDao;
 //            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, selected.getId());
 //        else
 //            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, null);
-        orgTree = uaaService.getOrgTreeBySite(UserContextService.getCurrentUserAccount().getSiteUID());
+
+        orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
         }
