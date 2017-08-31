@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="UserAgentViewDlg" widgetVar="UserAgentViewDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{userAgentController.CRUDActionName} #{msg.UserAgent}">
+            <h:form id="UserAgentViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{userAgentController.selected != null}">
+                        <h:outputLabel value="#{msg.id}" for="id" />
+                        <h:outputText value="#{userAgentController.selected.id}"/>
+                        <h:outputLabel value="#{msg.fromUserId}" for="fromUserId" />
+                        <h:outputText value="#{userAgentController.selected.fromUserId}"/>
+                        <h:outputLabel value="#{msg.toUserId}" for="toUserId" />
+                        <h:outputText value="#{userAgentController.selected.toUserId}"/>
+                        <h:outputLabel value="#{msg.fromDate}" for="fromDate" />
+                        <h:outputText value="#{userAgentController.selected.fromDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        <h:outputLabel value="#{msg.toDate}" for="toDate" />
+                        <h:outputText value="#{userAgentController.selected.toDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        <h:outputLabel value="#{msg.remarks}" for="remarks" />
+                        <h:outputText value="#{userAgentController.selected.remarks}"/>
+                        <h:outputLabel value="#{msg.agentType}" for="agentType" />
+                        <h:outputText value="#{userAgentController.selected.agentType}"/>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton rendered="#{userAgentController.deleteAction}" icon="ui-icon-trash" actionListener="#{userAgentController.delete}" value="#{msg.Delete}" update="display,:UserAgentViewDlg, :UserAgentListForm:datalist, :growl" oncomplete="handleSubmit(args, 'UserAgentViewDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Close}" icon="glyphicon-off" onclick="PF('UserAgentViewDialog').hide()"/>
+                    
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

@@ -35,14 +35,18 @@ public class V2_WorkOrderWorkflowConfigController extends JpaCRUDController<V2_W
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		initDispatchUserList();
 		
-		selected = dao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());
+		selected = dao.findByTenantUID(user.getTenantUID());
+				//dao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());
 		if(selected == null){
 			selected = new V2_WorkOrderWorkflowConfig();
 			selected.setEventName(EVENT_NAME);
 			selected.setTenantUID(user.getTenantUID());
-			selected.setInstitutionUID(user.getInstitutionUID());
-			selected.setHospitalUID(user.getHospitalUID());
-			selected.setSiteUID(user.getSiteUID());
+			selected.setInstitutionUID(user.getTenantUID());
+			selected.setHospitalUID(user.getTenantUID());
+			selected.setSiteUID(user.getTenantUID());
+//			selected.setInstitutionUID(user.getInstitutionUID());
+//			selected.setHospitalUID(user.getHospitalUID());
+//			selected.setSiteUID(user.getSiteUID());
 		}
 	}
 
@@ -100,9 +104,12 @@ public class V2_WorkOrderWorkflowConfigController extends JpaCRUDController<V2_W
 	@Override
 	public void onBeforeSave(V2_WorkOrderWorkflowConfig config) {
 		selected.setTenantUID(user.getTenantUID());
-		selected.setInstitutionUID(user.getInstitutionUID());
-		selected.setHospitalUID(user.getHospitalUID());
-		selected.setSiteUID(user.getSiteUID());
+		selected.setInstitutionUID(user.getTenantUID());
+		selected.setHospitalUID(user.getTenantUID());
+		selected.setSiteUID(user.getTenantUID());
+//		selected.setInstitutionUID(user.getInstitutionUID());
+//		selected.setHospitalUID(user.getHospitalUID());
+//		selected.setSiteUID(user.getSiteUID());
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
 			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
