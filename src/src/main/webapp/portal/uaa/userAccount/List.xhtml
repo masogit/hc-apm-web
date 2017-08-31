@@ -14,7 +14,7 @@
             <div class="ui-g-12 card">
                 <h:form id="UserAccountListForm">
 
-                    <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:commandButton id="btnOrg" value="#{userAccountController.selectedOrg==null?msg.AllHospitals:userAccountController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                     <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                         <p:scrollPanel style="height:300px;border: 0" mode="native">
                             <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}" var="node" selectionMode="single">
@@ -43,7 +43,7 @@
                         <p:ajax event="filter" listener="#{userAccountController.onFilter}" update="createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
 
                         <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
-                            <h:outputText value="#{userAccountController.getOrgFullName(item.orgInfoId)}"/>
+                            <h:outputText value="#{userAccountController.getOrgFullNameByUid(item.orgInfoUID)}"/>
                         </p:column>
                         <p:column headerText="#{msg.login_name}" sortBy="#{item.loginName}">
                             <h:outputText value="#{item.loginName}"/>
