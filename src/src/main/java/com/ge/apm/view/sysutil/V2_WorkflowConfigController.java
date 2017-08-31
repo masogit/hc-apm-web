@@ -212,13 +212,20 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 	}
 	
-    public void save() {
+    public void onSave() {
+    	Boolean isManual = selected.getIsManualEnabled();
+    	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
+    	if(isManual !=  null && isTakeOrder != null && !isManual && !isTakeOrder){
+    		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
+    		 return;
+    	}
     	onBeforeSave(selected);
-        if (selected.hashCode() == 0) {
-            create();
-        } else {
-            update();
-        }
+    	super.save();
+//        if (selected.hashCode() == 0) {
+//            create();
+//        } else {
+//            update();
+//        }
 //    	selectedHospitalId = null;
 //    	selectedSiteId = null;
 //    	selectedInstitutionId = null;

@@ -116,7 +116,7 @@ public class CodeGenEngine {
     }
     
     private static List<FieldInfo> getFieldInfoList(Class clazz, String entityName, String managedBean){
-        managedBean = managedBean + "Crud";
+        //managedBean = managedBean + "Crud";
         FieldInfo.dataTableEnableFilter = dataTableEnableFilter;
         FieldInfo.dataTableEnableSort = dataTableEnableSort;
         
