@@ -18,3 +18,5 @@ update asset_info set clinical_dept_uid=o.uid from org_info o where o.id=asset_i
 -- set clinical_dept_uid for asset_info 
 update asset_info a set clinical_dept_uid=(select uid from org_info o where o.id=a.clinical_dept_id) where clinical_dept_id is not null and a.clinical_dept_uid is null
 
+-- update orgUID for userAccount
+update user_account u set org_uid=(select uid from org_info o where u.org_id=o.id ) where org_uid is null;
