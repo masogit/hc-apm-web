@@ -236,10 +236,8 @@
             var textPixels = 50;
             var radius = node.circle.r;
             var size = radius * 2;
-
             var label;
             switch(node.orbitIndex) {
-
               // level 0 and level 1
               case 0:
               // display text
@@ -276,7 +274,8 @@
                 break;
 
               case 1:
-
+                // As Jianbin's requested, remove all unit label
+                var noUnit = true;
                 // display text
                 element.append('text')
                 .classed('node--text-label', 1)
@@ -284,7 +283,7 @@
                 .attr('text-anchor', 'middle')
                 .attr('font-size', textPixels / 3 + 'px')
                 .attr('fill', '#fff')
-                .attr('transform', 'translate(' + [0, -.45 * radius].join(',') + ')')
+                .attr('transform', 'translate(' + [0, (noUnit ? -.32 : -.45) * radius].join(',') + ')')
                 .call(wrap, size - 10);
 
                 // count
@@ -295,16 +294,18 @@
                 .attr('font-size', textPixels / 1.2 + 'px')
                 .attr('font-weight', 'bold')
                 .attr('fill', '#fff')
-                .attr('transform', 'translate(' + [0, .25 * radius].join(',') + ')');
+                .attr('transform', 'translate(' + [0, (noUnit ? .35 : .22) * radius].join(',') + ')');
 
                 // unit
-                element.append('text')
-                .classed('node--text-label', 1)
-                .text(node.data.unit)
-                .attr('text-anchor', 'middle')
-                .attr('font-size', textPixels / 3 + 'px')
-                .attr('fill', '#fff')
-                .attr('transform', 'translate(' + [0, .7 * radius].join(',') + ')');
+                if (!noUnit) {
+                  element.append('text')
+                  .classed('node--text-label', 1)
+                  .text(node.data.unit)
+                  .attr('text-anchor', 'middle')
+                  .attr('font-size', textPixels / 3 + 'px')
+                  .attr('fill', '#fff')
+                  .attr('transform', 'translate(' + [0, .7 * radius].join(',') + ')');
+                }
                 break;
 
               // level 2
