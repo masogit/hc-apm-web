@@ -199,6 +199,9 @@ public class AssetFileImportService {
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
 
+            if(departNum==null){
+                departNum="";
+            }
             result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
         }
 
