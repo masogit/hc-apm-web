@@ -53,8 +53,27 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		initDispatchUserList();
 	}
 
-	private void initDispatchUserList() {
-		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+	public void initDispatchUserList() {
+		String tenantUID = user.getTenantUID();
+		if(selected == null){
+			dispatchUserList = userDao.getByTenantUID(tenantUID);
+		}else{
+			if(selected.getSiteUID() != null){
+				dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
+				return;
+			}else if(selected.getHospitalUID() != null){
+				dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
+				return;
+			}else if(selected.getInstitutionUID() != null){
+				dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
+				return;
+			}else {
+				dispatchUserList = userDao.getByTenantUID(tenantUID);
+			}
+			
+		}
+		
+/*		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 		String tenantUID = user.getTenantUID();
 		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 		if(selected != null){
@@ -71,6 +90,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				}
 			}
 		}
+		dispatchUserList = userDao.findBySearchFilter(searchFilters);*/
 		
 		
 /*		if(selectedSiteId != null){
@@ -88,7 +108,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		}*/
-		dispatchUserList = userDao.findBySearchFilter(searchFilters);
+	
 	}
 
 	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
@@ -212,13 +232,20 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 	}
 	
-    public void save() {
+    public void onSave() {
+    	Boolean isManual = selected.getIsManualEnabled();
+    	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
+    	if(isManual !=  null && isTakeOrder != null && !isManual && !isTakeOrder){
+    		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
+    		 return;
+    	}
     	onBeforeSave(selected);
-        if (selected.hashCode() == 0) {
-            create();
-        } else {
-            update();
-        }
+    	super.save();
+//        if (selected.hashCode() == 0) {
+//            create();
+//        } else {
+//            update();
+//        }
 //    	selectedHospitalId = null;
 //    	selectedSiteId = null;
 //    	selectedInstitutionId = null;

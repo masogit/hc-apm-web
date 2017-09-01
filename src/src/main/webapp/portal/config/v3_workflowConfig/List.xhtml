@@ -43,6 +43,9 @@
                     <p:column headerText="#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.dispatchUserName}"/>
                     </p:column>
+                     <p:column headerText="#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.dispatchUserName2}"/>
+                    </p:column>
                     <p:column headerText="#{msg.timeoutDispatch}" sortBy="#{item.timeoutDispatch}" filterBy="#{item.timeoutDispatch}" filterMatchMode="EQ">
                         <h:outputText value="#{item.timeoutDispatch}"/>
                     </p:column>
@@ -55,9 +58,7 @@
                     <p:column headerText="#{msg.maxMessageCount}" sortBy="#{item.maxMessageCount}" filterBy="#{item.maxMessageCount}" filterMatchMode="EQ">
                         <h:outputText value="#{item.maxMessageCount}"/>
                     </p:column>
-                    <p:column headerText="#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.dispatchUserName2}"/>
-                    </p:column>
+                   
                     <p:column headerText="#{msg.autoAck}" sortBy="#{item.autoAck}" filterBy="#{item.autoAck}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()">

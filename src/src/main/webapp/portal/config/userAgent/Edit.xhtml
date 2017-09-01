@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="UserAgentEditDlg" widgetVar="UserAgentEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{userAgentController.CRUDActionName} #{msg.UserAgent}">
+            <h:form id="UserAgentEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{userAgentController.selected != null}">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="id" value="#{userAgentController.selected.id}"  required="true" requiredMessage="#{msg.id} #{msg.ValidationRequire}"/>
+                            <label>#{msg.id}*</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="fromUserId" value="#{userAgentController.selected.fromUserId}"  required="true" requiredMessage="#{msg.fromUserId} #{msg.ValidationRequire}"/>
+                            <label>#{msg.fromUserId}*</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="toUserId" value="#{userAgentController.selected.toUserId}"  required="true" requiredMessage="#{msg.toUserId} #{msg.ValidationRequire}"/>
+                            <label>#{msg.toUserId}*</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:calendar id="from" pattern="yyyy/MM/dd HH:mm:ss" value="#{userAgentController.selected.fromDate}" required="true" requiredMessage="#{msg.from} #{msg.ValidationRequire}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                            <label>#{msg.fromDate}*</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:calendar id="toDate" pattern="yyyy/MM/dd HH:mm:ss" value="#{userAgentController.selected.toDate}" required="true" requiredMessage="#{msg.to} #{msg.ValidationRequire}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                            <label>#{msg.toDate}*</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="remarks" value="#{userAgentController.selected.remarks}" />
+                            <label>#{msg.remarks}</label>
+                        </h:panelGroup>
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="agentType" value="#{userAgentController.selected.agentType}"  required="true" requiredMessage="#{msg.agentType} #{msg.ValidationRequire}"/>
+                            <label>#{msg.agentType}*</label>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{userAgentController.save}" value="#{msg.Save}" update="display,:UserAgentEditDlg, :UserAgentListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'UserAgentEditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('UserAgentEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
