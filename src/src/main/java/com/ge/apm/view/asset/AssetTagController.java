@@ -242,6 +242,13 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         this.getQueryAssetsList();
     }
 
+    public void delete() {
+        AssetTag assetTag = this.selected;
+        assetTagService.delete(assetTag);
+        this.selected = null;
+
+    }
+
     public Integer getSiteId() {
         return siteId;
     }
