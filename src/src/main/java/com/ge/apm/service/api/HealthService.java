@@ -185,7 +185,7 @@ public class HealthService {
 			+ " FROM pm_order "
 			+ " LEFT JOIN asset_info "
 			+ " ON pm_order.asset_id = asset_info.id "
-			+ " WHERE asset_info.site_id=:site_id AND asset_info.hospital_id=:hospital_id AND pm_order.is_finished=false AND pm_order.plan_time<(NOW() + interval '1 weeks') "
+			+ " WHERE pm_order.site_id=:site_id AND pm_order.hospital_id=:hospital_id AND pm_order.is_finished=false AND pm_order.plan_time<(NOW() + interval '1 weeks') "
 			+ " ORDER BY plan_time ";
 
 	public Observable<Tuple4<Integer, String, String, Integer>> queryForPm(Integer site_id, Integer hospital_id) {
@@ -210,7 +210,8 @@ public class HealthService {
 			.parameter("hospital_id", hospital_id)
 			.get(rs ->
 				new Tuple4<Integer, String, String, Integer> (
-					rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+						rs.getInt("pm_order_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.filter(t4 -> t4.getElement3()==dept)
 			.cache();
 
@@ -227,8 +228,8 @@ public class HealthService {
     	+ " LEFT JOIN asset_info "
     	+ " ON left_table.asset_id = asset_info.id "
     	+ " ORDER BY asset_id ";*/
-			= " SELECT left_table.asset_id, left_table.asset_name, left_table.to_char, asset_info.clinical_dept_id "
-			+ " FROM ( SELECT DISTINCT asset_id, asset_name, to_char(plan_time, 'YYYY-MM-DD') "
+			= " SELECT left_table.oid, left_table.asset_name, left_table.to_char, asset_info.clinical_dept_id "
+			+ " FROM ( SELECT DISTINCT inspection_order.id as oid, asset_id, asset_name, to_char(plan_time, 'YYYY-MM-DD') "
 			+ " FROM inspection_order "
 			+ " INNER JOIN inspection_order_detail "
 			+ " ON inspection_order.id = inspection_order_detail.order_id "
@@ -246,7 +247,8 @@ public class HealthService {
 			.parameter("hospital_id", hospital_id)
 			.get(rs ->
 				new Tuple4<Integer, String, String, Integer> (
-					rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+						rs.getInt("oid"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.cache();
 
 	}
@@ -259,7 +261,8 @@ public class HealthService {
 			.parameter("hospital_id", hospital_id)
 			.get(rs ->
 				new Tuple4<Integer, String, String, Integer> (
-					rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+						rs.getInt("oid"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.filter(t4 -> t4.getElement3()==dept)
 			.cache();
 

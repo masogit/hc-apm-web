@@ -16,6 +16,7 @@
         <f:event type="preRenderView" listener="#{inspectionOrderController.setStartTimeFilter()}"/>-->
         <f:metadata>
             <f:viewParam name="model" value="#{inspectionOrderController.filterPlanTime}"/>
+            <f:viewParam name="assetId" value="#{inspectionOrderController.orderId}"/>
         </f:metadata>
         <f:event type="preRenderView" listener="#{inspectionOrderController.setPlanTimeFilter()}"/>
     </ui:define>
