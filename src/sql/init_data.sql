@@ -1124,6 +1124,9 @@ INSERT INTO public.proc_map (id, asset_group, part_id, subpart_id, step_id) VALU
 INSERT INTO public.proc_map (id, asset_group, part_id, subpart_id, step_id) VALUES (9899, 22, 9, null, 44);
 INSERT INTO public.proc_map (id, asset_group, part_id, subpart_id, step_id) VALUES (9900, 22, 9, null, 45);
 
+delete from brand;
+INSERT INTO brand (name) (SELECT DISTINCT manufacture as name from asset_info where manufacture IS NOT NULL and trim(manufacture) != '') ;
+
 /*insert into supplier(site_id,name) values (1, '通用电气');
 insert into supplier(site_id,name) values (1, '西门子');
 insert into supplier(site_id,name) values (1, '飞利浦');

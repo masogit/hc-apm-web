@@ -1,16 +1,21 @@
 package com.ge.apm.view.insp;
 
 import com.ge.apm.dao.InspectionOrderRepository;
+import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.WorkOrderRepository;
 import com.ge.apm.domain.InspectionOrder;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.WorkOrder;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import webapp.framework.web.WebUtil;
 
 @ManagedBean
@@ -19,7 +24,7 @@ public class InspectionServiceController {
 
     InspectionOrderRepository inspectionDao = WebUtil.getBean(InspectionOrderRepository.class);
     WorkOrderRepository workOrderDao = WebUtil.getBean(WorkOrderRepository.class);
-    
+    ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
     UaaService uuaService = WebUtil.getBean(UaaService.class);
     
     public List<InspectionOrder> getInspectionOrderList(Integer assetId,Integer orderType,Integer limit){
@@ -27,10 +32,10 @@ public class InspectionServiceController {
         return res.subList(0, Math.min(limit, res.size()));
     }
     
-    public List<WorkOrder> getWorkOrderList(Integer assetId,Integer limit){
-        
-        List<WorkOrder> res = workOrderDao.findByAssetId(assetId);
-        return res.subList(0, Math.min(limit, res.size()));
+    public List<V2_ServiceRequest> getWorkOrderList(Integer assetId,Integer limit){
+        Sort sort = new Sort(Sort.Direction.DESC, "requestTime");
+        PageRequest pr =  new PageRequest(0, limit, sort);
+        return srDao.findByAssetId(assetId, pr).getContent();
     }
     
     public List<UserAccount> getOwnerList(){

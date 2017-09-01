@@ -5,24 +5,21 @@
  */
 package com.ge.apm.view.asset;
 
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeAttachment;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.BrandRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.utils.TimeUtils;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.web.WebUtil;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -36,11 +33,12 @@ public class AssetCreateController {
     private QrCodeLib createRequest;
     private AssetCreateService acServie;
     private AttachmentFileService attachFileService;
+    private BrandRepository brandDao;
 
     private String[] selectedPictures;
 
     private UserAccount owner;
-
+    private Brand brand;
     private String rejectText;
     private List<String> rejectTextHistory;
     private List<String> commentsList;
@@ -55,6 +53,7 @@ public class AssetCreateController {
         String qrCode = WebUtil.getRequestParameter("qrCode");
         acServie = WebUtil.getBean(AssetCreateService.class);
         attachFileService = WebUtil.getBean(AttachmentFileService.class);
+        brandDao = WebUtil.getBean(BrandRepository.class);
         createRequest = acServie.getCreateRequest(qrCode);
 
         assetInfo = createAssetInfo();
@@ -77,6 +76,12 @@ public class AssetCreateController {
             Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
         }
 
+    }
+
+    public void onBrandChange() {
+        if (null != brand) {
+            assetInfo.setBrand(brandDao.findById(brand.getId()));
+        }
     }
 
     private AssetInfo createAssetInfo() {
@@ -175,6 +180,10 @@ public class AssetCreateController {
 
     }
 
+    public List<Brand> getBrandList() {
+        return acServie.getBrandList();
+    }
+
     //getter and setter
     public QrCodeLib getCreateRequest() {
         return createRequest;
@@ -198,6 +207,14 @@ public class AssetCreateController {
 
     public UserAccount getOwner() {
         return owner;
+    }
+
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brand brand) {
+        this.brand = brand;
     }
 
     public void setOwner(UserAccount owner) {
