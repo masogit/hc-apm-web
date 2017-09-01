@@ -494,6 +494,24 @@ CREATE TABLE "exam_summit" (
 CONSTRAINT "exam_summit_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE brand
+(
+  id                 SERIAL                NOT NULL,
+  created_by         CHARACTER VARYING(50),
+  created_date       BYTEA,
+  last_modified_by   CHARACTER VARYING(50),
+  last_modified_date BYTEA,
+  name               CHARACTER VARYING(64) NOT NULL,
+  uid                CHARACTER(32),
+  hospital_uid       CHARACTER(32),
+  institution_uid    CHARACTER(32),
+  site_uid           CHARACTER(32),
+  tenant_uid         CHARACTER(32),
+  CONSTRAINT brand_pkey PRIMARY KEY (id)
+) WITH (
+OIDS = FALSE
+);
+
 ALTER TABLE asset_info ADD PRIMARY KEY (id);
 ALTER TABLE asset_file_attachment ADD PRIMARY KEY (id);
 ALTER TABLE inspection_checklist ADD PRIMARY KEY (id);

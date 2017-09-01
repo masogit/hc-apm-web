@@ -89,7 +89,7 @@
           var radius = node.circle.r;
           var locationX = -parseInt(config.width) / 2;
           var locationY = -parseInt(config.height) / 2;
-          var fillPercent = data.revenue ? data.profit / data.revenue : 1;
+          var fillPercent = 1;
           var waveHeightScale;
           if (config.waveHeightScaling) {
             waveHeightScale = d3.scaleLinear()
@@ -184,209 +184,11 @@
           .attr('cx', radius)
           .attr('cy', radius);
 
-
-          // Text to show current node's name
-          // at least depth over 0
-          if(config.showLabel) {
-            var distance = 50;
-            var _radius = radius + distance;
-
-            // position according to center of the circle
-            var absolutePos = project(node.x, node.y);
-            var x0 = Math.abs(absolutePos[0]);
-            var y0 = Math.abs(absolutePos[1]);
-
-            // distance tree root center of the circle
-            // the line between these two pointers is vertical
-            var root2Center = Math.sin(START_ANGEL * Math.PI/180) * node.y;
-
-            // position according to tree root node
-            var x = x0;
-            var y = Math.abs(y0 - root2Center);
-
-            var distance2Parent = Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-
-            var x0 = x / distance2Parent * _radius;
-            var y0 = y / distance2Parent * _radius;
-
-            var pos = [x0, y0];
-            if (absolutePos[0] === 0) pos = [0, y0];
-            if (absolutePos[0] > 0) pos = [-x0, y0];
-
-            // draw text to this group
-            var labelGroup = gauge.append('g')
-            .attr('class', 'labels')
-            .attr('transform', function() {
-              return 'translate(' + pos.join(',') + ')';
-            });
-
-            var labelFontSize = 14;
-
-            var _text = node.data.name;
-            var lineCount = 1;
-
-            labelGroup.append('text')
-            .attr('fill', config.waveColor)
-            .attr('text-anchor', 'middle')
-            .attr('font-size', labelFontSize)
-            .text(_text.slice(0, 6));
-
-            if (_text.length > 7) {
-              labelGroup.append('text')
-              .attr('fill', config.waveColor)
-              .attr('text-anchor', 'middle')
-              .attr('font-size', labelFontSize)
-              .attr('transform', 'translate(' + [0, labelFontSize] + ')')
-              .text(_text.length > 12 ? _text.slice(6, 11) + '...' : _text.slice(6));
-
-              lineCount = 2;
-            }
-
-            if (node.orbitIndex === 1) {
-              var ratioInProfit = node.data.profit / node.parent.data.profit;
-
-              labelGroup.append('text')
-              .attr('class', 'profit-ratio')
-              .attr('font-size', labelFontSize)
-              .attr('text-anchor', 'middle')
-              .attr('fill', config.waveColor)
-              .attr('transform', 'translate(' + [0, labelFontSize * lineCount] + ')')
-              .text('占总成本' + parseInt(ratioInProfit * 100) + '%');
-            }
-          }
-
-          if(config.showWave) {
-            // The clipping wave area.
-            var clipArea = d3.area().x(function(d) { return waveScaleX(d.x); }).y0(function(d) {
-              return waveScaleY(Math.sin(Math.PI * 2 * config.waveOffset * -1 + Math.PI * 2 * (
-                  1 - config.waveCount
-                ) + d.y * 2 * Math.PI));
-            }).y1(function(d) {
-              return (
-                fillCircleRadius * 2 + waveHeight
-              );
-            });
-            var clip_wave_id = gauge.attr('id');
-            var waveGroup = gaugeGroup.append("defs").append("clipPath").attr("id", "clipWave" + clip_wave_id);
-            var wave = waveGroup.append("path").datum(data).attr("d", clipArea).attr("T", 0);
-            // The inner circle with the clipping wave attached.
-            var fillCircleGroup = gaugeGroup.append("g").attr("clip-path", "url(#clipWave" + clip_wave_id + ")");
-            fillCircleGroup.append("circle").
-            attr("cx", radius).
-            attr("cy", radius).
-            attr("r", fillCircleRadius).
-            attr("fill", config.waveColor);
-
-            // Make the wave rise. wave and waveGroup are separate so that horizontal and vertical movement can be controlled independently.
-            var waveGroupXPosition = fillCircleMargin + fillCircleRadius * 2 - waveClipWidth;
-            if (config.waveRise) {
-              waveGroup.attr('transform', 'translate(' + waveGroupXPosition + ',' + waveRiseScale(0) + ')').
-              transition().
-              duration(config.waveRiseTime).
-              attr('transform', 'translate(' + waveGroupXPosition + ',' + waveRiseScale(fillPercent) + ')')
-              // This transform is necessary to get the clip wave positioned correctly when waveRise=true and waveAnimate=false. The wave will not position correctly without this, but it's not clear why this is actually necessary.
-              .on("start", function() { wave.attr('transform', 'translate(1,0)'); });
-            } else {
-              waveGroup.attr('transform', 'translate(' + waveGroupXPosition + ',' + waveRiseScale(fillPercent) + ')');
-            }
-            if (config.waveAnimate) {
-              animateWave();
-            }
-          }
-
           var labelsGroup = gaugeGroup.append('g')
           .attr('fill', config.textColor)
           .attr('transform', 'translate(' + [radius, radius].join(',') + ')');
 
-          var func = this.renderGauge;
-          if (func) {
-            func(labelsGroup.node(), node, config);
-          } else {
-
-            // text group to show revenue and profit value with text tips
-            var fullTipGroup = labelsGroup.append('g')
-            .attr('class', 'full-tips');
-            // text group to show revenue and profit value
-            var lightTipGroup = labelsGroup.append('g')
-            .attr('class', 'light-tips');
-            // revenue value
-            var revenue = +node.data.revenue_label;
-            var text1FinalVal = +revenue;
-            var text1Unit = node.data.revenue_label_unit;
-            var text1StartVal = config.valueCountUp ? config.minValue : text1FinalVal;
-            fullTipGroup.append('text')
-            .text('收入')
-            .attr('text-anchor', 'middle')
-            .attr('font-size', textPixels + 'px')
-            .attr('transform', 'translate(' + [0, -textPixels].join(',') + ')');
-            fullTipGroup.append('text')
-            .text(textFormat(text1FinalVal, text1Unit))
-            .attr('text-anchor', 'middle')
-            .attr('font-size', textPixels + 'px');
-            var text1 = lightTipGroup.append("text")
-            .text(textFormat(text1FinalVal, text1Unit))
-            .attr("class", "liquidFillGaugeText")
-            .attr("text-anchor", "middle")
-            .attr("font-size", textPixels + "px");
-            // profit value
-            var profit = +node.data.profit_label;
-            var text2FinalVal = +profit;
-            var text2Unit = node.data.profit_label_unit;
-            var text2StartVal = config.valueCountUp ? config.minValue : text2FinalVal;
-            var text2 = lightTipGroup.append("text")
-            .text(textFormat(text2StartVal, text2Unit))
-            .attr("class", "liquidFillGaugeText")
-            .attr("text-anchor", "middle")
-            .attr("font-size", textPixels + "px")
-            .attr('transform', 'translate(' + [0, textPixels].join(',') + ')');
-            fullTipGroup.append('text')
-            .text('成本')
-            .attr('text-anchor', 'middle')
-            .attr('font-size', textPixels + 'px')
-            .attr('transform', 'translate(' + [0, textPixels].join(',') + ')');
-            fullTipGroup.append('text')
-            .text(textFormat(text2FinalVal, text2Unit))
-            .attr('text-anchor', 'middle')
-            .attr('font-size', textPixels + 'px')
-            .attr('transform', 'translate(' + [0, textPixels * 2].join(',') + ')');
-
-            // Make the value count up.
-            if (config.valueCountUp) {
-              function textTweenFn(start, final, unit) {
-                return function() {
-                  var node = this;
-                  var i = d3.interpolate(start, final);
-                  return function(t) {
-                    node.textContent = textFormat(+i(t).toFixed(1), unit);
-                  }
-                }
-              }
-
-              var textTween1 = textTweenFn(text1StartVal, text1FinalVal, text1Unit);
-              var textTween2 = textTweenFn(text2StartVal, text2FinalVal, text2Unit);
-              text1.transition().duration(config.waveRiseTime).tween('text', textTween1);
-              text2.transition().duration(config.waveRiseTime).tween('text', textTween2);
-            }
-          }
-
-          // Rounding functions so that the correct number of decimal places
-          // is always displayed as the value counts up.
-          function textFormat(value, unit) { return value + unit; };
-
-          function animateWave() {
-            wave.attr('transform', 'translate(' + waveAnimateScale(wave.attr('T')) + ',0)');
-            wave.transition()
-            .duration(config.waveAnimateTime * (
-                1 - wave.attr('T')
-              ))
-            .ease(d3.easeLinear)
-            .attr('transform', 'translate(' + waveAnimateScale(1) + ',0)')
-            .attr('T', 1)
-            .on('end', function() {
-              wave.attr('T', 0);
-              animateWave(config.waveAnimateTime);
-            });
-          }
+          this.renderGauge(labelsGroup.node(), node, config);
         }
 
         function nodeRadius(node) {
@@ -1376,30 +1178,26 @@
               return fetch(url, {
                 credentials: 'same-origin'
               }).then(function(res) {
-                // check "Cache-Control" for cache expiration
-                var cache_control = res.headers.get('Cache-Control');
-                var max_age;
-                if(cache_control) {
-                  max_age = cache_control.match(HTTP_MAXAGE_REGEXP);
-                  if (max_age) {
-                    max_age = +max_age[1] / 60;
-                  }
-                }
-
                 return res.json().then(function(data) {
-                  return {
-                    maxAge: max_age,
-                    data: data
-                  };
+                  // As Jianbin's requested, remove '停机中', substract count from the sum
+                  try {
+                    var hideItemIndex = data.items.findIndex(i => i.category === 2);
+                    if (hideItemIndex > -1) {
+                      data.root.count -= data.items[hideItemIndex].count;
+                      data.items.splice(hideItemIndex, 1);
+                      data.pages.total -= 1;
+                    }
+                  } catch (error) {
+                    console.error(error);
+                  }
+                  return data;
                 });
               }).then(function(res) {
-                var data = _this.transformData(res.data);
-                var cache_age = res.maxAge;
+                var data = _this.transformData(res);
                 list = list.concat(data.items);
-                cache_age = 1;
-                lscache.set(cacheKey, list, cache_age);
-                lscache.set(cacheKey + '/root', data.root, cache_age);
-                lscache.set(cacheKey + '/pages', data.pages, cache_age);
+                lscache.set(cacheKey, list);
+                lscache.set(cacheKey + '/root', data.root);
+                lscache.set(cacheKey + '/pages', data.pages);
               }).then(setMaxData);
             } {
               return Promise.resolve().then(setMaxData);
