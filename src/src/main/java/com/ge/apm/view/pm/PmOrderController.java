@@ -31,6 +31,8 @@ import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -75,6 +77,7 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     private Date startPlanTime;
     private Date endPlanTime;
     private Integer pmCount;
+    private Integer pmOrderId;
     
     @Override
     protected void init() {
@@ -100,6 +103,7 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
         queryAsset = new AssetInfo();
         queryAsset.setSiteId(currentUser.getSiteId());
         this.getQueryAssetsListByHospital();
+
     }
 
     @Override
@@ -358,7 +362,7 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     }
 
     public void setPlanTimeFilter() {
-        if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
+        /*if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
             return;
         }
         if (searchFilters == null) {
@@ -373,7 +377,14 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
         searchFilters.add(new SearchFilter("planTime", SearchFilter.Operator.LTE, varPlanTimeTo));
         searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
         filterPlanTime = null;
-        filterIsFinished = "false";
+        filterIsFinished = "false";*/
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if(pmOrderId != null){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderId));
+        }
     }
 
     private Date varPlanTimeTo = null;
@@ -519,5 +530,13 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
 
     public void setPmCount(Integer pmCount) {
         this.pmCount = pmCount;
+    }
+
+    public Integer getPmOrderId() {
+        return pmOrderId;
+    }
+
+    public void setPmOrderId(Integer pmOrderId) {
+        this.pmOrderId = pmOrderId;
     }
 }
