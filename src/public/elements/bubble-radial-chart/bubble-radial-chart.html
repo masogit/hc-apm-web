@@ -1178,30 +1178,26 @@
               return fetch(url, {
                 credentials: 'same-origin'
               }).then(function(res) {
-                // check "Cache-Control" for cache expiration
-                var cache_control = res.headers.get('Cache-Control');
-                var max_age;
-                if(cache_control) {
-                  max_age = cache_control.match(HTTP_MAXAGE_REGEXP);
-                  if (max_age) {
-                    max_age = +max_age[1] / 60;
-                  }
-                }
-
                 return res.json().then(function(data) {
-                  return {
-                    maxAge: max_age,
-                    data: data
-                  };
+                  // As Jianbin's requested, remove '停机中', substract count from the sum
+                  try {
+                    var hideItemIndex = data.items.findIndex(i => i.category === 2);
+                    if (hideItemIndex > -1) {
+                      data.root.count -= data.items[hideItemIndex].count;
+                      data.items.splice(hideItemIndex, 1);
+                      data.pages.total -= 1;
+                    }
+                  } catch (error) {
+                    console.error(error);
+                  }
+                  return data;
                 });
               }).then(function(res) {
-                var data = _this.transformData(res.data);
-                var cache_age = res.maxAge;
+                var data = _this.transformData(res);
                 list = list.concat(data.items);
-                cache_age = 1;
-                lscache.set(cacheKey, list, cache_age);
-                lscache.set(cacheKey + '/root', data.root, cache_age);
-                lscache.set(cacheKey + '/pages', data.pages, cache_age);
+                lscache.set(cacheKey, list);
+                lscache.set(cacheKey + '/root', data.root);
+                lscache.set(cacheKey + '/pages', data.pages);
               }).then(setMaxData);
             } {
               return Promise.resolve().then(setMaxData);
