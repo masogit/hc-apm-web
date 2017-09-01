@@ -71,6 +71,7 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
     private String operation;
 
     Integer hospitalId;
+    private Integer orderId;
 
     @Override
     protected void init() {
@@ -394,7 +395,7 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
     }
 
     public void setStartTimeFilter() {
-        if (filterStartTime == null || !"1".equals(filterStartTime)) {
+        /*if (filterStartTime == null || !"1".equals(filterStartTime)) {
             return;
         }
         if (searchFilters == null) {
@@ -409,7 +410,15 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
         searchFilters.add(new SearchFilter("startTime", SearchFilter.Operator.LTE, varStartTimeTo));
         searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
         filterStartTime = null;
-        filterIsFinished = "false";
+        filterIsFinished = "false";*/
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if(orderId != null){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId));
+        }
+
     }
 
     private Date varStartTimeTo = null;
@@ -452,4 +461,11 @@ public class QualityCtrlOrderController extends JpaCRUDController<InspectionOrde
         this.hospitalId = hospitalId;
     }
 
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
 }
