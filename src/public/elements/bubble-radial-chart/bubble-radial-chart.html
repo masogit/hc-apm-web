@@ -2,7 +2,6 @@
 <link rel="import" href="../../bower_components/iron-resizable-behavior/iron-resizable-behavior.html">
 <link rel="import" href="../d3/d3.html">
 <link rel="import" href="../lodash/lodash.html">
-<link rel="import" href="../../lscache.html"/>
 <link rel="import" href="bubble-radial-chart-styles.html">
 <link rel="import" href="../behavior/context.html">
 
@@ -17,10 +16,21 @@
     </div>
   </template>
   <script>
+    // Quick fix for cache issue: shadow lscache
+    // who the fxxk uses localStorage to pass data ?!?!
+    function Cache() {
+      this._cache = {};
+    }
+    Cache.prototype.set = function(key, data) {
+      this._cache[key] = data;
+    }
+    Cache.prototype.get = function(key) {
+      return this._cache[key];
+    }
     define('bubble-radial-chart', [
-      'lscache',
       'behavior/context'
-    ], function(lscache, ContextBehavior) {
+    ], function(ContextBehavior) {
+        var lscache = new Cache()
         function project(x, radius) {
           var angle = ( x - 180 ) / 180 * Math.PI;
           return [radius * Math.cos(angle), radius * Math.sin(angle)];
@@ -1386,7 +1396,7 @@
                 var data = _this.transformData(res.data);
                 var cache_age = res.maxAge;
                 list = list.concat(data.items);
-                cache_age = 0;
+                cache_age = 1;
                 lscache.set(cacheKey, list, cache_age);
                 lscache.set(cacheKey + '/root', data.root, cache_age);
                 lscache.set(cacheKey + '/pages', data.pages, cache_age);
