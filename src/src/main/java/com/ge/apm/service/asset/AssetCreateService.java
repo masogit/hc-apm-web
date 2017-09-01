@@ -5,45 +5,23 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.dao.AssetFileAttachmentRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeAttachmentRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetFileAttachment;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeAttachment;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.WorkOrderPhoto;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
-import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-import com.ge.apm.dao.TenantInfoRepository;
-import javaslang.control.Option;
+
+import java.io.File;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -71,6 +49,8 @@ public class AssetCreateService {
     AssetFileAttachmentRepository attachDao;
     @Autowired
     QrCodeAttachmentRepository qrCodeAttachDao;
+    @Autowired
+    BrandRepository brandDao;
     @Autowired
     CoreService coreService;
     @Autowired
@@ -275,6 +255,10 @@ public class AssetCreateService {
             return org==null?null:org.getName();
         }
         return null;
+    }
+
+    public List<Brand> getBrandList() {
+        return brandDao.find();
     }
 
 }

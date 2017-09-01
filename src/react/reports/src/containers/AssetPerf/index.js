@@ -59,7 +59,7 @@ class AssetPerf extends React.PureComponent {
       { type: 'range', key: 'range', value: filters.range },
       { type: 'radio', key: 'groupBy', options: [{id: 'type', name: '按设备类型'}, {id: 'month', name: '按月份'}], value: groupBy},
     ]
-    if (isHead) filterOptions[2].options.unshift({id: 'dept', name: '按科室'})
+    if (isHead) filterOptions[1].options.unshift({id: 'dept', name: '按科室'})
     return (
       <div className={styles['asset-perf']}>
         <FilterBar options={filterOptions} onChange={this.onFilterChange}/>

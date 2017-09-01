@@ -45,6 +45,7 @@ alter table asset_info add COLUMN registration_no varchar(64);
 alter table asset_info add COLUMN factory_warranty_date date;
 alter table asset_info add COLUMN supplier_id int4;
 alter table asset_info add COLUMN qr_code varchar(256);
+alter table asset_info add COLUMN brand_id int4;
 
 alter table asset_contract add COLUMN contract_type int;
 
