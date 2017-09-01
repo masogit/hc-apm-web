@@ -224,7 +224,11 @@ public class AssetInfo implements Serializable {
     @Column(name = "comments")
     @Size(min = 0, max = 256)
     private String comments;
-    
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "brand_id")
+    private Brand brand;
+
     @Column(name = "start_using_date")
     @Temporal(TemporalType.DATE)
     private Date startUsingDate;
@@ -266,8 +270,7 @@ public class AssetInfo implements Serializable {
     public void setComments(String comments) {
         this.comments = comments;
     }
-    
-    
+
     public String getTenantUID() {
         return tenantUID;
     }
@@ -337,7 +340,15 @@ public class AssetInfo implements Serializable {
     public void setUid(String uid) {
         this.uid = uid;
     }
-    
+
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brand brand) {
+        this.brand = brand;
+    }
+
     public Integer getId() {
         return id;
     }
@@ -911,7 +922,7 @@ public class AssetInfo implements Serializable {
     public void setStartUsingDate(Date startUsingDate) {
         this.startUsingDate = startUsingDate;
     }
-    
+
     @Override
     public int hashCode() {
         int hash = 0;
