@@ -1386,7 +1386,7 @@
                 var data = _this.transformData(res.data);
                 var cache_age = res.maxAge;
                 list = list.concat(data.items);
-                cache_age = 1;
+                cache_age = 0;
                 lscache.set(cacheKey, list, cache_age);
                 lscache.set(cacheKey + '/root', data.root, cache_age);
                 lscache.set(cacheKey + '/pages', data.pages, cache_age);

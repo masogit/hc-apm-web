@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -33,26 +34,38 @@ import webapp.framework.util.TimeUtil;
 @ManagedBean
 @ViewScoped
 public class UserAccountController extends JpaCRUDController<UserAccount> {
-	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = -1L;
 
-	public static final String DEFAULT_USER_ROLE = "设备科科员";
+    /**
+     *
+     */
+    private static final long serialVersionUID = -1L;
+
+    public static final String DEFAULT_USER_ROLE = "设备科科员";
 
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
 
+    private String tenantUid;
+
+    private TenantInfo selectedTenant;
+
+    private OrgInfo selectedOrg = null;
+
+    private OrgInfoRepository orgInfoDao;
+    
+    private OrgInfo selectedUserOrg;
+
     @Override
     protected void init() {
         filterBySite = false;
-        
+
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
+        orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-        setSiteId(loginUser.getSiteId());
+
+        setTenantUid(loginUser.getTenantUID());
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -62,85 +75,47 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         catch(Exception ex){
         }*/
     }
-    private int siteId;
-    public int getSiteId() {
-        return siteId;
-    }
-    public void setSiteId(int siteId) {
-        this.siteId = siteId;
-        TenantInfoRepository siteDao = WebUtil.getBean(TenantInfoRepository.class);
-        selectedSite = siteDao.findById(siteId);
-        orgList = uaaService.getFullOrgListBySiteId(siteId);
-        buildOrgTree(siteId, null);
-    }
-    
-    private TenantInfo selectedSite;
-    public TenantInfo getSelectedSite() {
-        return selectedSite;
+
+    public String getTenantUid() {
+        return tenantUid;
     }
 
-    private List<OrgInfo> orgList;
-    public List<OrgInfo> getOrgList() {
-        return orgList;
-    }
-
-    public String getOrgFullName(Integer orgId){
-        OrgInfo org = null;
-        for(OrgInfo item: orgList){
-            if(item.getId().equals(orgId)){
-                org = item;
-                break;
-            }
-        }
-        if(org==null) return "";
-        
-        String name = org.getName();
-        while(org.getParentOrg()!=null){
-            org = org.getParentOrg();
-            name = org.getName()+"/"+name;
-        }
-        
-        return name;
-    }
-     
-    public String getOrgFullName(OrgInfo org){
-        String name = org.getName();
-        while(org.getParentOrg()!=null){
-            org = org.getParentOrg();
-            name = org.getName()+"/"+name;
-        }
-        
-        return name;
-    }
-    
-    public TreeNode buildOrgTree(int siteId, Integer selectedOrgId){
+    public void setTenantUid(String tenantUid) {
+        this.tenantUid = tenantUid;
+        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
+        selectedTenant = tenantDao.findByuid(tenantUid);
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        
-        DefaultTreeNode rootNode = new DefaultTreeNode("org", rootOrg, null);
-        rootNode.setRowKey("org_"+rootOrg.getId());
+        orgTree = new DefaultTreeNode("root",null,null);
+        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
         rootNode.setExpanded(true);
-        
-        orgTree = uaaService.getFullOrgTreeBySiteId(rootNode, siteId, selectedOrgId);
+        selectedOrg = null;
+    }
 
-        try{
-            selectedOrg = null;
-            DefaultTreeNode selectedNode = (DefaultTreeNode)orgTree.getData();
-            selectedOrg = (OrgInfo) selectedNode.getData();
+    public TenantInfo getSelectedTenant() {
+        return selectedTenant;
+    }
+
+    public String getOrgFullNameByUid(String orgUid) {
+        OrgInfo org = orgInfoDao.getByUid(orgUid);
+        return org == null ? "" : getOrgFullName(org);
+    }
+
+    public String getOrgFullName(OrgInfo org) {
+        if(null==org || org.getId()==-1){
+            return null;
         }
-        catch(Exception ex){
+        String name = org.getName();
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + "/" + name;
         }
-        try{
-            if(selectedOrg==null)
-                selectedOrg = (OrgInfo)((DefaultTreeNode)orgTree.getChildren().get(0)).getData();
-        }
-        catch(Exception ex){
-            
-        }
-        
-        return orgTree;
-    }    
+
+        return name;
+    }
+
     @Override
     protected UserAccountRepository getDAO() {
         return dao;
@@ -149,28 +124,30 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Override
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
         //this.selected = null;
-        if ( selectedOrg == null) {
-            return dao.getBySiteId(pageRequest, this.siteId);
+        if (selectedOrg == null) {
+            return dao.getByTenantUID(pageRequest, this.tenantUid);
         } else {
-            if(selectedOrg.getId()==-1)
-                return dao.getBySiteId(pageRequest, this.siteId);
-            else
+            if (selectedOrg.getId() == -1) {
+                return dao.getByTenantUID(pageRequest, this.tenantUid);
+            } else {
                 return dao.getByOrgInfoId(pageRequest, selectedOrg.getId());
+            }
         }
     }
 
     @Override
-    public String getErrorMessageForDuplicateKey(UserAccount userAccount){
+    public String getErrorMessageForDuplicateKey(UserAccount userAccount) {
         return String.format(WebUtil.getMessage("DuplicateLoginName"), userAccount.getLoginName());
     }
-    
+
     @Override
-    public String getKeyFieldNameValue(UserAccount obj){
-        return WebUtil.getMessage("login_name")+"="+obj.getLoginName();
+    public String getKeyFieldNameValue(UserAccount obj) {
+        return WebUtil.getMessage("login_name") + "=" + obj.getLoginName();
     }
-    
+
     private List<String> allRoles;
     private List<String> assignedRoles;
+
     public List<String> getAllRoles() {
         return allRoles;
     }
@@ -186,38 +163,42 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setAssignedRoles(List<String> assignedRoles) {
         this.assignedRoles = assignedRoles;
     }
-    
+
     public void prepareRoleData() {
-        if(selected == null) return;
+        if (selected == null) {
+            return;
+        }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
-        
+
         allRoles = uaaService.getSysRoleNames();
-        
+
         assignedRoles = new ArrayList<String>();
-        for(UserRole userRole: selected.getUserRoleList()){
+        for (UserRole userRole : selected.getUserRoleList()) {
             assignedRoles.add(userRole.getRole().getRoleDesc());
         }
         prepareUserScope();
     }
-    
+
     public void saveRoles() {
-        if(selected == null) return;
-        
+        if (selected == null) {
+            return;
+        }
         uaaService.setUserRoles(selected, assignedRoles);
         updateUserScope();
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
     }
- 
-    private OrgInfo selectedOrg = null;
+
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
     }
- 
+
     private TreeNode orgTree;
+
     public TreeNode getOrgTree() {
         return orgTree;
     }
     private TreeNode selectedNode;
+
     public TreeNode getSelectedNode() {
         return selectedNode;
     }
@@ -226,70 +207,82 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.selectedNode = selectedNode;
     }
 
-    public void onSelectTreeNode(NodeSelectEvent event){
+    public void onSelectTreeNode(NodeSelectEvent event) {
         selected = null;
-
         TreeNode node = event.getTreeNode();
         //node.setExpanded(!node.isExpanded());
-        selectedOrg = (OrgInfo)node.getData();
+        selectedOrg = (OrgInfo) node.getData();
     }
 
     @Override
-    public void prepareCreate() throws InstantiationException, IllegalAccessException{
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
-        
+
         selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
         try {
             selected.entryptPassword();
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
         }
+        
+        this.selectedUserOrg=null;
 
     }
-    
+
     @Override
-    public void onAfterNewObject(UserAccount userAccount,boolean isOk ){
-    	if(isOk && this.crudActionName.equals("Create")){
-    		List<String> role = new ArrayList<String>();
-    		role.add(DEFAULT_USER_ROLE);
-    		uaaService.setUserRoles(selected, role);
-                uaaService.setDefaultScope(selected);
-    	}
+    public void onAfterNewObject(UserAccount userAccount, boolean isOk) {
+        if (isOk && this.crudActionName.equals("Create")) {
+            List<String> role = new ArrayList<String>();
+            role.add(DEFAULT_USER_ROLE);
+            uaaService.setUserRoles(selected, role);
+            uaaService.setDefaultScope(selected);
+        }
     }
+
+    @Override
+    public void onAfterDeleteObject(UserAccount object, boolean isOk) {
+        if (isOk && this.crudActionName.equals("Delete")) {
+            uaaService.clearUserScope(object.getUid());
+        }
+    }
+
     
     @Override
-    public void onBeforeSave(UserAccount user){
-        user.setOrgInfoId(selectedUserOrgId);
-        
+    public void onAfterUpdateObject(UserAccount object, boolean isOk) {
+        if (isOk && this.crudActionName.equals("Edit")) {
+            uaaService.clearUserScope(object.getUid());
+            uaaService.setDefaultScope(object);
+        }
+    }
+
+    
+    @Override
+    public void onBeforeSave(UserAccount user) {
         //remove space charactors.
         String loginName = user.getLoginName();
-        if(loginName==null) return;
-        
+        if (loginName == null) {
+            return;
+        }
+
         loginName = loginName.replace(" ", "");
         user.setLoginName(loginName);
-        
-        OrgInfo org = selectedOrg;
-        if(selected.getOrgInfoId()!=null){
-            for(OrgInfo orgItem: orgList){
-                if(orgItem.getId().equals(selected.getOrgInfoId())){
-                    org = orgItem;
-                    break;
-                }                    
-            }
-        }
-        
-        selected.setOrgInfoId(org.getId());
 
-        selected.setSiteId(org.getSiteId());
-        selected.setHospitalId(org.getHospitalId());
-        
-        selected.setTenantUID(org.getTenantUID());
-        selected.setInstitutionUID(org.getInstitutionUID());
-        selected.setHospitalUID(org.getHospitalUID());
-        selected.setSiteUID(org.getSiteUID());
-        selected.setOrgLevel(org.getOrgLevel());
+        if (selectedUserOrg != null) {
+            user.setOrgInfoId(selectedUserOrg.getId());
+            user.setOrgInfoUID(selectedUserOrg.getUid());
+
+            user.setSiteId(selectedUserOrg.getSiteId());
+            user.setHospitalId(selectedUserOrg.getHospitalId());
+
+            user.setTenantUID(selectedUserOrg.getTenantUID());
+            user.setInstitutionUID(selectedUserOrg.getInstitutionUID());
+            user.setHospitalUID(selectedUserOrg.getHospitalUID());
+            user.setSiteUID(selectedUserOrg.getSiteUID());
+            user.setOrgLevel(selectedUserOrg.getOrgLevel());
+        }
+
     }
-    
+
     public void resetPassword() {
         selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
         try {
@@ -313,40 +306,31 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selected.setPasswordErrorCount(0);
         dao.save(selected);
     }
-    
+
     @Override
-    public void setSelected(UserAccount selectedUser) {
-        super.setSelected(selectedUser);
-        if(selectedUser==null) return;
-        
-        selectedUserOrgId = selectedUser.getOrgInfoId();
-        selectedUserOrgName = getOrgFullName(selectedUserOrgId);
+    public void prepareEdit() {
+        super.prepareEdit(); 
+        selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
     }
 
-    private String selectedUserOrgName;
-    private Integer selectedUserOrgId;
-
-    public String getSelectedUserOrgName() {
-        return selectedUserOrgName;
+    public OrgInfo getSelectedUserOrg() {
+        return selectedUserOrg;
     }
-    
-    public void onSelectOrgForUser(NodeSelectEvent event){
+
+    public void onSelectOrgForUser(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
-        OrgInfo userOrg = (OrgInfo)node.getData();
-        selectedUserOrgId = userOrg.getId();
-        selectedUserOrgName = getOrgFullName(selectedUserOrgId);
+        selectedUserOrg = (OrgInfo) node.getData();
     }
-    
-    
+
     private TreeNode accessOrgTree;
     private TreeNode[] selectedAccessOrgNodes;
 
-    private void prepareUserScope(){
+    private void prepareUserScope() {
         accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
-        setSelectedOrgTree(accessOrgTree,orgList);
+        setSelectedOrgTree(accessOrgTree, orgList);
     }
-    
+
     private void setSelectedOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
         OrgInfo org = (OrgInfo) node.getData();
         if (accessiableOrgList.contains(org)) {
@@ -358,72 +342,61 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             setSelectedOrgTree(item, accessiableOrgList);
         }
     }
-    
-     private void readSelectedOrgTree(TreeNode node, List<TreeNode> selectedTreeNodeList) {
-         if(node.isSelected()){
+
+    private void readSelectedOrgTree(TreeNode node, List<TreeNode> selectedTreeNodeList) {
+        if (node.isSelected()) {
             if (node.getParent() != null && node.getParent().isSelected()) {
                 return;
-            }else{
+            } else {
                 selectedTreeNodeList.add(node);
             }
-         }else{
+        } else {
             for (TreeNode item : node.getChildren()) {
                 readSelectedOrgTree(item, selectedTreeNodeList);
             }
         }
-//        }else{
-//            boolean tempStatus = true;
-//            for (TreeNode item : node.getChildren()) {
-//                readSelectedOrgTree(item, selectedTreeNodeList);
-//                tempStatus = tempStatus & item.isSelected();
-//            }
-//            if(tempStatus){
-//                selectedTreeNodeList.add(node);
-//                selectedTreeNodeList.removeAll(node.getChildren());
-//            }
-//            node.setSelected(tempStatus);
-//        }
     }
-    
-    
+
     @Transactional
-    private void updateUserScope(){
+    private void updateUserScope() {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
         userOrgDao.delete(orgList);
         List<TreeNode> selectedOrgList = new ArrayList();
-        readSelectedOrgTree(accessOrgTree,selectedOrgList);
-        List<UserOrgInfo> userOrgList =  new ArrayList();
-        for(TreeNode node:selectedOrgList){
-            OrgInfo org = (OrgInfo)node.getData();
+        readSelectedOrgTree(accessOrgTree, selectedOrgList);
+        List<UserOrgInfo> userOrgList = new ArrayList();
+        for (TreeNode node : selectedOrgList) {
+            OrgInfo org = (OrgInfo) node.getData();
             UserOrgInfo userOrg = new UserOrgInfo();
             userOrg.setOrgType(org.getOrgType());
             userOrg.setOrgUid(org.getUid());
             userOrg.setUserUid(selected.getUid());
             userOrgList.add(userOrg);
         }
-        
+
         userOrgDao.save(userOrgList);
     }
-    
-    public void onSelectAccessTreeNode(NodeSelectEvent event){
+
+    public void onSelectAccessTreeNode(NodeSelectEvent event) {
         setTreeNodes(event.getTreeNode(), true);
     }
-     public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
-         TreeNode node = event.getTreeNode();
-         setTreeNodes(node, false);
-         while(node.getParent()!=null){
-             node.getParent().setSelected(false);
-             node = node.getParent();
-         }
-    }
-    private void setTreeNodes(TreeNode root, Boolean isSelected){
-        root.setSelected(isSelected);
-        for(TreeNode item : root.getChildren()){
-            setTreeNodes(item,isSelected);
+
+    public void onUnselectAccessTreeNode(NodeUnselectEvent event) {
+        TreeNode node = event.getTreeNode();
+        setTreeNodes(node, false);
+        while (node.getParent() != null) {
+            node.getParent().setSelected(false);
+            node = node.getParent();
         }
     }
-    
+
+    private void setTreeNodes(TreeNode root, Boolean isSelected) {
+        root.setSelected(isSelected);
+        for (TreeNode item : root.getChildren()) {
+            setTreeNodes(item, isSelected);
+        }
+    }
+
     public TreeNode getAccessOrgTree() {
         return accessOrgTree;
     }
@@ -439,6 +412,5 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
         this.selectedAccessOrgNodes = selectedAccessOrgNodes;
     }
-    
 
 }

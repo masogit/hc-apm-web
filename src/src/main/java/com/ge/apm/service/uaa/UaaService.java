@@ -302,14 +302,23 @@ public class UaaService {
     }
     
     @Transactional
+    public void clearUserScope(String userUid){
+        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(userUid);
+        userOrgDao.delete(orgList);
+    }
+    
+    @Transactional
     public void setDefaultScope(UserAccount user) {
         OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
-        UserOrgInfo userOrg = new UserOrgInfo();
-        userOrg.setUserUid(user.getUid());
-        userOrg.setOrgUid(org.getUid());
-        userOrg.setOrgType(org.getOrgType());
-        UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-        userOrgDao.save(userOrg);
+        if (org != null) {
+            UserOrgInfo userOrg = new UserOrgInfo();
+            userOrg.setUserUid(user.getUid());
+            userOrg.setOrgUid(org.getUid());
+            userOrg.setOrgType(org.getOrgType());
+            UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+            userOrgDao.save(userOrg);
+        }
     }
     
     public DefaultTreeNode getOrgTree(int hospitalId){
@@ -491,5 +500,19 @@ public class UaaService {
             orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
             return orgInfoDao.findBySearchFilter(orgInfoFilters);
         }
+    }
+
+    public TreeNode getOrgFullTreeByTenant(String tenantUid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
+        orgInfoFilters.add(new SearchFilter("parentUID", SearchFilter.Operator.IsNull, tenantUid));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
+        List<OrgInfo> orgList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        for(OrgInfo item : orgList){
+            TreeNode siteNode = getOrgTreeBySite(item.getUid());
+            root.getChildren().addAll(siteNode.getChildren());
+        }
+        return root;
     }
 }

@@ -64,5 +64,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<UserAccount> getByHospitalUID(String hospitalUID);
     public List<UserAccount> getByInstitutionUID(String InsitiUID);
     public List<UserAccount> getByTenantUID(String tenantUID);
+    public Page<UserAccount> getByTenantUID(Pageable pageRequest,String tenantUID);
+    public List<UserAccount> findByOrgInfoId(Integer id);
+
 
 }
