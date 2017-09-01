@@ -111,7 +111,10 @@
                         <label class="label">#{msg.functionGrade}</label>
                         <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoController.selected.functionGrade)}" readonly="true"/>
                     </h:panelGroup>
-
+                    <h:panelGroup>
+                        <label class="label">#{msg.brand}</label>
+                        <p:inputText id="brand" value="#{assetInfoController.selected.brand.name}" readonly="true"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.manufacture}</label>
                         <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}" readonly="true"/>
