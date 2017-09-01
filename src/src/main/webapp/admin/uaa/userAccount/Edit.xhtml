@@ -44,11 +44,11 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.email}*</label>
-                            <p:inputText id="email" value="#{userAccountController.selected.email}" required="true" requiredMessage="#{msg.email} #{msg.ValidationRequire}"/>
+                            <p:inputText id="email" label="#{msg.email}" value="#{userAccountController.selected.email}" required="true" requiredMessage="#{msg.email} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.telephone}</label>
-                            <p:inputText id="telephone" value="#{userAccountController.selected.telephone}" />
+                            <p:inputText id="telephone" label="#{msg.telephone}" value="#{userAccountController.selected.telephone}" />
                         </h:panelGroup>
                         <h:panelGroup rendered="false">
                             <p:selectBooleanCheckbox itemLabel="#{msg.isSiteAdmin}*" value="#{userAccountController.selected.isSiteAdmin}" required="true" requiredMessage="#{msg.isSiteAdmin} #{msg.ValidationRequire}"/>
