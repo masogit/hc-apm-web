@@ -311,8 +311,8 @@ public class HealthApi {
 
     return ResponseEntity.ok()
 
-      .cacheControl(
-        CacheControl.maxAge(1, TimeUnit.DAYS))
+      /*.cacheControl(
+        CacheControl.maxAge(1, TimeUnit.DAYS))*/
 
       .body(new ImmutableMap.Builder<String, Object>()
         .put("pages",
@@ -344,8 +344,8 @@ public class HealthApi {
 
     return ResponseEntity.ok()
 
-      .cacheControl(
-        CacheControl.maxAge(1, TimeUnit.DAYS))
+      /*.cacheControl(
+        CacheControl.maxAge(1, TimeUnit.DAYS))*/
 
       .body(new ImmutableMap.Builder<String, Object>()
 
@@ -377,8 +377,8 @@ public class HealthApi {
                                                                   Observable<Tuple7<Integer, String, Integer, String, String, Integer,String>> asset_health_1, Integer start, Integer limit) {
     return ResponseEntity.ok()
 
-            .cacheControl(
-                    CacheControl.maxAge(1, TimeUnit.DAYS))
+            /*.cacheControl(
+                    CacheControl.maxAge(1, TimeUnit.DAYS))*/
 
             .body(new ImmutableMap.Builder<String, Object>()
 
@@ -410,8 +410,8 @@ public class HealthApi {
 
     return ResponseEntity.ok()
 
-      .cacheControl(
-        CacheControl.maxAge(1, TimeUnit.DAYS))
+      /*.cacheControl(
+        CacheControl.maxAge(1, TimeUnit.DAYS))*/
 
       .body(new ImmutableMap.Builder<String, Object>()
 
@@ -442,8 +442,8 @@ public class HealthApi {
 
     return ResponseEntity.ok()
 
-      .cacheControl(
-        CacheControl.maxAge(1, TimeUnit.DAYS))
+      /*.cacheControl(
+        CacheControl.maxAge(1, TimeUnit.DAYS))*/
 
       .body(new ImmutableMap.Builder<String, Object>()
 
