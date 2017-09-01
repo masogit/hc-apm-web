@@ -111,7 +111,10 @@
                         <label class="label">#{msg.functionGrade}</label>
                         <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoController.selected.functionGrade)}" readonly="true"/>
                     </h:panelGroup>
-
+                    <h:panelGroup>
+                        <label class="label">#{msg.brand}</label>
+                        <p:inputText id="brand" value="#{assetInfoController.selected.brand.name}" readonly="true"/>
+                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.manufacture}</label>
                         <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}" readonly="true"/>
@@ -306,8 +309,8 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.workOrderName}" >
-                            <h:outputText value="#{item.id}"/>
+                        <p:column headerText="#{msg.requestReason}" >
+                            <h:outputText value="#{item.requestReason}"/>
                         </p:column>
                         <p:column headerText="#{msg.requestorName}" >
                             <h:outputText value="#{item.requestorName}"/>
