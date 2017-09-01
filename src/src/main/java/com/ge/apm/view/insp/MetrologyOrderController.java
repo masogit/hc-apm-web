@@ -71,6 +71,7 @@ public class MetrologyOrderController extends JpaCRUDController<InspectionOrder>
     private String operation;
 
     Integer hospitalId;
+    private Integer orderId;
 
     @Override
     protected void init() {
@@ -404,7 +405,7 @@ public class MetrologyOrderController extends JpaCRUDController<InspectionOrder>
     }
 
     public void setPlanTimeFilter() {
-        if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
+        /*if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
             return;
         }
         if (searchFilters == null) {
@@ -419,7 +420,14 @@ public class MetrologyOrderController extends JpaCRUDController<InspectionOrder>
         searchFilters.add(new SearchFilter("planTime", SearchFilter.Operator.LTE, varPlanTimeTo));
         searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
         filterPlanTime = null;
-        filterIsFinished = "false";
+        filterIsFinished = "false";*/
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if(orderId != null){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, orderId));
+        }
     }
 
     private Date varPlanTimeTo = null;
@@ -462,4 +470,11 @@ public class MetrologyOrderController extends JpaCRUDController<InspectionOrder>
         this.hospitalId = hospitalId;
     }
 
+    public Integer getOrderId() {
+        return orderId;
+    }
+
+    public void setOrderId(Integer orderId) {
+        this.orderId = orderId;
+    }
 }

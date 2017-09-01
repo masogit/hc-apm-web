@@ -165,6 +165,32 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         zipFile = qrCodeService.exportQrCodeList(qrCodeList);
     }
 
+    public String getFullorgName(String uid){
+        OrgInfo tempOrgInfo = orgInfoDao.getByUid(uid);
+        String tempInstitutionName = orgInfoDao.getByUid(tempOrgInfo.getInstitutionUID()).getName();
+        String tempHospitalName = orgInfoDao.getByUid(tempOrgInfo.getHospitalUID()).getName();
+        String tempSiteName = orgInfoDao.getByUid(tempOrgInfo.getSiteUID()).getName();
+
+
+        switch(tempOrgInfo.getOrgLevel()){
+
+            case 1:{
+                return tempInstitutionName;
+            }
+
+            case 2:{
+                return tempInstitutionName + "/" + tempHospitalName;
+            }
+
+            case 3:{
+                return tempInstitutionName + "/" + tempHospitalName + "/" + tempSiteName;
+            }
+
+            default:return "";
+
+        }
+    }
+
     public Boolean isChooseTenant() {
         return this.filterBySite;
     }
