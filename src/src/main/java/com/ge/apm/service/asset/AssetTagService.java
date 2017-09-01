@@ -26,6 +26,8 @@ public class AssetTagService {
     private AssetInfoRepository assetDao;
     @Autowired
     private OrgInfoRepository orgDao;
+    @Autowired
+    private AssetTagRepository assetTagDao;
 
     public List<BiomedGroup> getBiomedGroupList(BiomedGroup queryBiomedGroup){
         List<SearchFilter> biomedGroupFilters = new ArrayList<>();
@@ -99,5 +101,12 @@ public class AssetTagService {
             tempAssetTagRule.setTagId(tempAssetTag.getId());
             assetTagRuleDao.save(tempAssetTagRule);
         }
+    }
+
+    @Transactional
+    public void delete(AssetTag item){
+        assetTagRuleDao.deleteByTagId(item.getId());
+        AssetTag assetTag = assetTagDao.findById(item.getId());
+        assetTagDao.delete(assetTag);
     }
 }
