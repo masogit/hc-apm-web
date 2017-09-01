@@ -134,7 +134,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton immediate="false" validateClient="false" actionListener="#{workOrderRateController.rateWorkOrder()}" value="#{msg.feedbackRating}" update="tabview:WorkOrderRateForm tabview:rateDetailForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'rateDialog');"/>
+                        <p:commandButton immediate="false" validateClient="false" actionListener="#{workOrderRateController.rateWorkOrder()}" value="#{msg.Confirm}" update="tabview:WorkOrderRateForm tabview:rateDetailForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'rateDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('rateDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
