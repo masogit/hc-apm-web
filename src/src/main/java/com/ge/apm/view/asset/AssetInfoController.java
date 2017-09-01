@@ -1,5 +1,29 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AssetDepreciationService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.joda.time.DateTime;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.StreamedContent;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -8,33 +32,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
-import org.primefaces.event.FileUploadEvent;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.service.asset.AssetDepreciationService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.QrCodeService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import java.io.IOException;
 import java.util.stream.Collectors;
-import org.joda.time.DateTime;
-import org.primefaces.model.StreamedContent;
-
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
@@ -50,10 +48,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private QrCodeLibRepository qrcodeDao;
 
+    private BrandRepository brandDao;
+
     private boolean resultStatus;
 
     private UserAccount clinicalOwner;
+
     private Supplier supplier;
+
+    private Brand brand;
 
     private StreamedContent zipFile;
 
@@ -114,6 +117,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         attachDao = WebUtil.getBean(AssetFileAttachmentRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        brandDao = WebUtil.getBean(BrandRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -491,6 +495,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void onBrandChange() {
+        if (null != brand) {
+            selected.setBrand(brandDao.findById(brand.getId()));
+        }
+    }
+
     public void handleFileUpload(FileUploadEvent event) {
 
         V2_BlobObject blobObject = blobService.uploadFile(event);
@@ -762,6 +772,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.supplier = supplier;
     }
 
+    public Brand getBrand() {
+        return brand;
+    }
+
+    public void setBrand(Brand brand) {
+        this.brand = brand;
+    }
+
     public UserAccount getOwner2() {
         return owner2;
     }
@@ -878,5 +896,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
+    }
+
+    public List<Brand> getBrandList() {
+        return brandDao.find();
     }
 }

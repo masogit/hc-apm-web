@@ -418,6 +418,8 @@ INSERT INTO "public"."i18n_message" VALUES ('782', 'label', 'WorkOrderWorkflowCo
 INSERT INTO "public"."i18n_message" VALUES ('783', 'label', 'DeviceTypeGroup', '设备类型分组配置', 'device type group ', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('784', 'label', 'V3_WorkFlowConfig', '院区工作流配置', 'config for hospital', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('785', 'label', 'V2_WorkOrderWorkflowConfig', '紧急工单工作流配置', 'workorder workflow config ', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('786', 'field_name', 'brand', '品牌', 'Brand', null, '-1');
+
 
 
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
