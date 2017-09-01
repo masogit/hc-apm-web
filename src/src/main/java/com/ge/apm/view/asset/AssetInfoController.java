@@ -129,7 +129,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         String encodeStr = request.getParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         // String actionName = WebUtil.getRequestParameter("actionName");
-        assetId = request.getParameter("assetId") != null ? Integer.valueOf(request.getParameter("assetId")) : null;
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
@@ -179,10 +178,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setUserSearchFilters() {
-        if (assetId != null) {
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
-        }
-
         searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
             this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
@@ -219,7 +214,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         selected = null;
-        setUserSearchFilters();
+
+        if (assetId == null) {
+            setUserSearchFilters();
+        }
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
@@ -675,7 +673,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (filterAssetStatus != null) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
         }
-        if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
+        if (assetId != null) {
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
+        }
+        /*if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
             Date warrantyDate = new Date();
             //2个月内，则是保修到期时间在2个月后时间之前所有
             Calendar c = Calendar.getInstance();
@@ -684,7 +685,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             varWarrantyDateTo = c.getTime();
             searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
             filterWarrantyDate = null;
-        }
+        }*/
     }
 
     public void deleteAsset(AssetInfo asset) {
@@ -878,5 +879,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
+    }
+
+    public Integer getAssetId() {
+        return assetId;
+    }
+
+    public void setAssetId(Integer assetId) {
+        this.assetId = assetId;
     }
 }

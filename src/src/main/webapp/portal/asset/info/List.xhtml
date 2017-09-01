@@ -8,6 +8,7 @@
         <f:metadata>
             <f:viewParam name="assetStatus" value="#{assetInfoController.filterAssetStatus}"/>
             <f:viewParam name="model" value="#{assetInfoController.filterWarrantyDate}"/>
+			<f:viewParam name="assetId" value="#{assetInfoController.assetId}"/>
         </f:metadata>
         <f:event type="preRenderView" listener="#{assetInfoController.setAssetStatusFilter()}"/>
     </ui:define>
