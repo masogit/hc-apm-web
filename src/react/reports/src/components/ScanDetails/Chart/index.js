@@ -20,7 +20,7 @@ class Chart extends React.PureComponent {
         <Briefs />
         <Parts />
         <Assets />
-        <Steps />
+        {/* <Steps /> */}
         <Center />
       </div>
     )
