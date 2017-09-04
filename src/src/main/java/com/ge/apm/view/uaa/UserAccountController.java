@@ -185,6 +185,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         uaaService.setUserRoles(selected, assignedRoles);
         updateUserScope();
+        selected.getUserRoleList().clear();
+        selected = null;
         WebUtil.addSuccessMessage(WebUtil.getMessage("UserRole") + WebUtil.getMessage("Updated"));
     }
 
@@ -252,6 +254,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (isOk && this.crudActionName.equals("Edit")) {
             uaaService.clearUserScope(object.getUid());
             uaaService.setDefaultScope(object);
+            
         }
     }
 
