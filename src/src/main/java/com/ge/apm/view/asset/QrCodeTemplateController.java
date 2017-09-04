@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeTemplateElementRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -11,14 +12,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
@@ -31,6 +35,11 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     QrCodeService qrCodeService;
     QrCodeTemplateElementRepository elementDao;
     OrgInfoRepository orgDao;
+    UaaService uaaService;
+    TenantInfoRepository tenantInfoDao ;
+    UserContextService userContextService;
+    
+    String selectedTenantUid; 
 
     @Override
     protected void init() {
@@ -39,6 +48,10 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         elementDao = WebUtil.getBean(QrCodeTemplateElementRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
+        
     }
 
     @Override
@@ -49,13 +62,24 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     @Override
     protected Page<QrCodeTemplate> loadData(PageRequest pageRequest) {
 
-        this.setSiteFilter();
-
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            this.searchFilters = new ArrayList<SearchFilter>();
         }
+        if (selectedTenantUid != null) {
+            this.removeFilterOnField("tenantUID");
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedTenantUid));
+        }
+        if (!userContextService.hasRole("SuperAdmin")) {
+            if (!hasFilterOnField("siteUID")) {
+                List<String> orgList = getHospitalFileterList().stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgList));
+            }
+        }
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+    
+    public String getTenantName(String tenantUid){
+        return tenantInfoDao.findByuid(tenantUid).getName();
     }
 
     public String getEditLink() {
@@ -90,13 +114,36 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         dao.save(usingTemplate);
     }
     
+    public void onTenantChange(){
+        
+    }
+    
     public List<OrgInfo> getHospitalFileterList(){
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        return  orgDao.findByTenantUIDAndOrgType(user.getTenantUID(), user.getOrgLevel());
+        if (null != selectedTenantUid) {
+            return orgDao.getByTenantUID(selectedTenantUid).stream().filter(item-> item.getOrgType()<4).collect(Collectors.toList());
+        } else {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            return uaaService.getUserAccessibleSiteList(user.getUid());
+        }
     }
     
     public String getHospitalName(String orgUid) {
         return orgDao.getByUid(orgUid).getName();
     }
+    
+    public List<TenantInfo> getTenantList() {
+        List<TenantInfo> tenantList = tenantInfoDao.find();
+        return tenantList;
+    }
+
+    public String getSelectedTenantUid() {
+        return selectedTenantUid;
+    }
+
+    public void setSelectedTenantUid(String selectedTenantUid) {
+        this.selectedTenantUid = selectedTenantUid;
+    }
+    
+    
 
 }
