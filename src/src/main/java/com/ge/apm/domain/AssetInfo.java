@@ -84,6 +84,10 @@ public class AssetInfo implements Serializable {
     private String maitananceTel;
 
     @Size(max = 64)
+    @Column(name = "national_standard_code")
+    private String nationalStandardCode;
+
+    @Size(max = 64)
     @Column(name = "serial_num")
     private String serialNum;
 
@@ -514,6 +518,10 @@ public class AssetInfo implements Serializable {
     public void setMaitananceTel(String maitananceTel) {
         this.maitananceTel = maitananceTel;
     }
+
+    public String getNationalStandardCode() { return nationalStandardCode; }
+
+    public void setNationalStandardCode(String nationalStandardCode) { this.nationalStandardCode = nationalStandardCode; }
 
     public String getSerialNum() {
         return serialNum;
