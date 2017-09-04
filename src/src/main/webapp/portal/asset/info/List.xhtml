@@ -84,13 +84,13 @@
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" filterBy="#{item.assetOwnerId}" filterMatchMode="EQ">
-                            <f:facet name="filter">
+                        <p:column headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" >
+<!--                            <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
-                            </f:facet>
+                            </f:facet>-->
                             <h:outputText value="#{item.assetOwnerName}"/>
                         </p:column>
 						<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">
