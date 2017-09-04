@@ -44,180 +44,242 @@ public class AssetInfo implements Serializable {
     @NotNull
     @Column(name = "site_id")
     private int siteId;
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+
     @Size(max = 64)
     @Column(name = "alias_name")
     private String aliasName;
+
     @Column(name = "function_group")
     private Integer functionGroup;
+
     @Column(name = "function_type")
     private String functionType;
+
     @Column(name = "function_grade")
     private Integer functionGrade;
+
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;
+
     @Size(max = 64)
     @Column(name = "vendor")
     private String vendor;
+
     @Column(name = "supplier_id")
     private Integer supplierId;
+
     @Size(max = 64)
     @Column(name = "maitanance")
     private String maitanance;
+
     @Size(max = 32)
     @Column(name = "maitanance_tel")
     private String maitananceTel;
+
     @Size(max = 64)
     @Column(name = "serial_num")
     private String serialNum;
+
     @Size(max = 64)
     @Column(name = "depart_num")
     private String departNum;
+
     @Size(max = 64)
     @Column(name = "financing_num")
     private String financingNum;
+
     @Size(max = 64)
     @Column(name = "barcode")
     private String barcode;
+
     @Size(max = 64)
     @Column(name = "modality_id")
     private String modalityId;
+
     @Size(max = 64)
     @Column(name = "location_code")
     private String locationCode;
+
     @Size(max = 64)
     @Column(name = "location_name")
     private String locationName;
+
     @Column(name = "clinical_dept_id")
     private Integer clinicalDeptId;//设备使用科室
+
     @Column(name = "clinical_dept_uid" , columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
+
     @Size(max = 64)
     @Column(name = "clinical_dept_name")
     private String clinicalDeptName;
+
     @Column(name = "asset_group")
     private Integer assetGroup;
+
     @Column(name = "asset_dept_id")
     private int assetDeptId;//设备所属科室
+
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;
+
     @Size(min = 1, max = 32)
     @Column(name = "asset_owner_name")
     private String assetOwnerName;
+
     @Size(max = 16)
     @Column(name = "asset_owner_tel")
     private String assetOwnerTel;
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "is_valid")
     private boolean isValid;
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
     private int status;
+
     @Column(name = "manufact_date")
     @Temporal(TemporalType.DATE)
     private Date manufactDate;
+
     @Column(name = "purchase_date")
     @Temporal(TemporalType.DATE)
     private Date purchaseDate;
+
     @Column(name = "arrive_date")
     @Temporal(TemporalType.DATE)
     private Date arriveDate;
+
     @Column(name = "install_date")
     @Temporal(TemporalType.DATE)
     private Date installDate;
+
     @Column(name = "warranty_date")
     @Temporal(TemporalType.DATE)
     private Date warrantyDate;
+
     @Column(name = "terminate_date")
     @Temporal(TemporalType.DATE)
     private Date terminateDate;
+
     @Column(name = "last_pm_date")
     @Temporal(TemporalType.DATE)
     private Date lastPmDate;
+
     @Column(name = "last_metering_date")
     @Temporal(TemporalType.DATE)
     private Date lastMeteringDate;
+
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
     private Date lastQaDate;
+
     @Column(name = "last_stocktake_date")
     @Temporal(TemporalType.DATE)
     private Date lastStockTakeDate;
+
     @Column(name = "clinical_owner_id")
     private Integer clinicalOwnerId;
+
     @Size(max = 32)
     @Column(name = "clinical_owner_name")
     private String clinicalOwnerName;
+
     @Size(max = 16)
     @Column(name = "clinical_owner_tel")
     private String clinicalOwnerTel;
+
     @Size(max = 64)
     @Column(name = "registration_no")
     private String registrationNo;
+
     @Column(name = "factory_warranty_date")
     @Temporal(TemporalType.DATE)
     private Date factoryWarrantyDate;
+
     @Size(max = 256)
     @Column(name = "qr_code")
     private String qrCode;
     
     @Column(name = "asset_owner_id2")
     private Integer assetOwnerId2;
+
     @Column(name = "asset_owner_name2")
     private String assetOwnerName2;
+
     @Column(name = "asset_owner_tel2")
     private String assetOwnerTel2;
+
     @Column(name = "fe_user_id")
     private Integer feUserId;
+
     @Column(name = "dispatch_mode")
     private Integer dispatchMode;
     
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "purchase_price")
     private Double purchasePrice;
+
     @Column(name = "salvage_value")
     private Double salvageValue;
+
     @Column(name = "lifecycle")
     private Integer lifecycle;
+
     @Column(name = "depreciation_method")
     private Integer depreciationMethod;
 
     @Column(name = "eam_id")
     private String eamId;
+
     @Column(name = "system_id")
     private String systemId;
+
     @Column(name = "system_num1")
     private String systemNum1;
+
     @Column(name = "system_num2")
     private String systemNum2;
+
     @Column(name = "system_num3")
     private String systemNum3;
+
     @Column(name = "system_num4")
     private String systemNum4;
+
     @Column(name = "system_num5")
     private String systemNum5;
+
     @Column(name = "is_deleted")
     private Boolean isDeleted;
+
     // 0-normal 1-standby
     @Column(name = "device_status")
     private Integer deviceStatus;
+
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
 
     @Column(name = "inventory_status")
     private Integer inventoryStatus;
+
     @Column(name = "inventory_owner_id")
     private Integer inventoryOwnerId;
+
     @Column(name = "inventory_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date inventoryTime;
+
     @Column(name = "asset_code68")
     private String assetCode68;
     
