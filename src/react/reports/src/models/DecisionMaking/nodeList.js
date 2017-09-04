@@ -74,10 +74,9 @@ function getNodes (data: Object, diameter: number, margin: number) {
   .padding(2)
 
   const root = d3.hierarchy(data, d => d[childKey])
-  .sum(d => d.size) // sizeKey hard code here
+  .sum(d => d.size + .1) // sizeKey hard code here. YHAAO-178, if size == 0
   .sort((a, b) => b.value - a.value)
 
   const nodes = pack(root).descendants()
-
   return nodes
 }
