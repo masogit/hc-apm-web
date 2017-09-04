@@ -109,17 +109,17 @@ export default {
     },
     *['page/change'](action, { put }) {
       if (action.data.type === 'brief') {
-        yield put({ type: 'get/briefs' })
+        yield put({ type: 'get/briefs', data: { type: action.type, pageNumber: action.data.value } })
       } else {
-        yield put({ type: 'get/details' })
+        yield put({ type: 'get/details', data: { type: action.type, pageNumber: action.data.value } })
       }
     },
     *['get/briefs'](action, { put, select, call }) {
       try {
         let store = yield select(state => state[REPORT_NAME])
         let params = mapParamsBrief(store)
-        if (action.type === 'page/change') {
-          params.start = params.limit * (action.data.value - 1)
+        if (action.data && action.data.type === 'ProcessAnalysis/page/change') {
+          params.start = params.limit * (action.data.pageNumber - 1)
         }
         let briefs = yield call(API.getBriefs, params)
         // sync pagination
@@ -137,8 +137,8 @@ export default {
       try {
         let store = yield select(state => state[REPORT_NAME])
         let params = mapParamsDetail(store)
-        if (action.type === 'page/change') {
-          params.start = params.limit * (action.data.value - 1)
+        if (action.data && action.data.type === 'ProcessAnalysis/page/change') {
+          params.start = params.limit * (action.data.pageNumber - 1)
         }
 
         let details = yield call(API.getDetails, params)
