@@ -25,6 +25,17 @@
 
                         <p:ajax event="rowSelect" update="viewButton editButton createButton deleteButton"/>
                         <p:ajax event="filter" listener="#{qrCodeTemplateController.onFilter}" />
+                        
+                        <p:column headerText="租户"  filterBy="#{item.tenantUID}" filterMatchMode="EQ" rendered="#{userContextService.hasRole('SuperAdmin')}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{qrCodeTemplateController.selectedTenantUid}" autoWidth="false" style="max-width: 150px;" >
+                                    <p:ajax  update="datalist" />
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{qrCodeTemplateController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{qrCodeTemplateController.getTenantName(item.tenantUID)}"/>
+                        </p:column>
 
                         <p:column headerText="医院" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
                             <f:facet name="filter">
