@@ -10,9 +10,6 @@ body, html, #root, #root>div {
   flex-direction: column;
   position: relative;
   :global .dew-filterbar {
-    position: absolute;
-    top: 0;
-    left: 0;
     z-index: 10;
     ul, li {
       margin: 0;
