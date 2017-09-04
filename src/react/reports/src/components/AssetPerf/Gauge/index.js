@@ -3,7 +3,9 @@ import React from 'react'
 import { scaleLinear } from 'd3-scale'
 import { Motion, spring } from 'react-motion'
 import withHover from '#/HOC/withHover'
+import { ellipsis } from '#/utils/helpers'
 
+const NAME_MAX_LENGTH = 6 // for text ellipsis
 
 class Gauge extends React.PureComponent<*, *, *> {
 
@@ -45,9 +47,10 @@ class Gauge extends React.PureComponent<*, *, *> {
   }
 
   render() {
-    const { color, r, background, data, hovered } = this.props
+    const { color, r, background, data, hovered, dispatch } = this.props
     const { root } = data
     const percent = root.revenue === 0 ? 1 : root.cost / root.revenue
+
     return (
       <Motion
         defaultStyle={{
@@ -82,64 +85,16 @@ class Gauge extends React.PureComponent<*, *, *> {
                 d={this.getWavePath(r * 0.9, percent)}
               />
               <g opacity={1 - opacity}>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={-r / 3}
-                >
-                  {root.name === 'total' ? '' :root.name}
-                </text>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={0}
-                >
-                  {root.revenue_label + root.revenue_label_unit}
-                </text>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={r / 3}
-                >
-                  {root.cost_label + root.cost_label_unit}
-                </text>
+                <Text y={-r / 3} children={root.name === 'total' ? '' : ellipsis(root.name, NAME_MAX_LENGTH)} />
+                <Text y={0} children={root.revenue_label + root.revenue_label_unit} />
+                <Text y={r / 3} children={root.cost_label + root.cost_label_unit} />
               </g>
               <g opacity={opacity}>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={-r / 2}
-                >
-                  {root.revenue_text || '收入'}
-                </text>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={-r / 6}
-                >
-                  {root.revenue_label + root.revenue_label_unit}
-                </text>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={r / 6}
-                >
-                  {root.cost_text || '成本'}
-                </text>
-                <text
-                  fill="#595959"
-                  textAnchor="middle"
-                  dy="0.35em"
-                  y={r / 2}
-                >
-                  {root.cost_label + root.cost_label_unit}
-                </text>
+                { getNodeName(root.name, NAME_MAX_LENGTH, r) }
+                <Text y={-r / 2} children={root.revenue_text || '收入'} />
+                <Text y={-r / 6} children={root.revenue_label + root.revenue_label_unit} />
+                <Text y={r / 6} children={root.cost_text || '成本'} />
+                <Text y={r / 2} children={root.cost_label + root.cost_label_unit} />
               </g>
             </g>
           )
@@ -149,5 +104,27 @@ class Gauge extends React.PureComponent<*, *, *> {
   }
 }
 
-export default
-withHover(Gauge)
+function Text({ y, children }) {
+  return <text
+    fill="#595959"
+    textAnchor="middle"
+    dy="0.35em"
+    y={y}
+  >
+    {children}
+  </text>
+}
+
+function getNodeName(name, limit, offset) {
+  if (name.length <= limit) {
+    return <Text y={-offset - 20} children={name} />
+  } else {
+    let splitAt = name.length / 2
+    return <Text y={-offset - 40}>
+        <tspan textAnchor="middle" x="0" dy="1em">{name.substring(0, splitAt)}</tspan>
+        <tspan textAnchor="middle" x="0" dy="1em">{name.substring(splitAt)}</tspan>
+      </Text>
+  }
+}
+
+export default withHover(Gauge)
