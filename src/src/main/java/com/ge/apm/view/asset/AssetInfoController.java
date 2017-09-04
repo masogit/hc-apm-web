@@ -581,15 +581,23 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
 
-        Integer hospitalId;
-        if (selected != null) {
-            hospitalId = selected.getHospitalId();
-        } else {
-            hospitalId = UserContextService.getCurrentUserAccount().getHospitalId();
+        List<String> orgList = new ArrayList();
+        if(selected.getClinicalDeptUID()!=null && !selected.getClinicalDeptUID().isEmpty()){
+            orgList.add(selected.getClinicalDeptUID());
         }
-
-        List<UserAccount> res = userDao.getAssetOnwers(UserContextService.getSiteId(), hospitalId);
-        return res;
+        if(selected.getSiteUID()!=null && !selected.getSiteUID().isEmpty()){
+            orgList.add(selected.getSiteUID());
+        }
+        if(selected.getHospitalUID()!=null && !selected.getHospitalUID().isEmpty()){
+            orgList.add(selected.getHospitalUID());
+        }
+        if(selected.getInstitutionUID()!=null && !selected.getInstitutionUID().isEmpty()){
+            orgList.add(selected.getInstitutionUID());
+        }
+        if(selected.getTenantUID()!=null && !selected.getTenantUID().isEmpty()){
+            orgList.add(selected.getTenantUID());
+        }
+       return userDao.findByAssetAccess(orgList);
     }
 
     public List<UserAccount> getClinicalOwnerList() {
@@ -910,4 +918,5 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setAssetId(Integer assetId) {
         this.assetId = assetId;
     }
+
 }
