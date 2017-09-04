@@ -22,7 +22,7 @@ export const Profit = {
   },
   "items": [{
     "id": 181,
-    "name": "影像科",
+    "name": "宇宙无敌超级影像科",
     "type": "dept",
     "revenue": 1.385182E7,
     "cost": 334925.0,
