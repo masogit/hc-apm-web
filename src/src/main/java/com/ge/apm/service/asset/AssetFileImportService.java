@@ -251,6 +251,7 @@ public class AssetFileImportService {
             } else {
                 newAsset.setClinicalDeptName(orgName);
                 newAsset.setClinicalDeptId(clinicalDept.getId());
+                newAsset.setClinicalDeptUID(clinicalDept.getUid());
             }
 
             //for AssetOwner
