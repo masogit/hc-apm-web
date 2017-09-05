@@ -708,7 +708,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void deleteAsset(AssetInfo asset) {
         if (asset.getQrCode() != null) {
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
+            qrCodeService.discardQrCode(asset.getQrCode());
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);
