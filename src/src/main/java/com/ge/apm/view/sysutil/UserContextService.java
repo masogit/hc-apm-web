@@ -228,7 +228,7 @@ public class UserContextService implements Serializable {
     public Boolean isDispatcher() {
         if (isDispatcher == null) {
             WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-            WorkflowConfig workflowConfig = wcDao.getBySiteIdAndHospitalId(userAccount.getSiteId(), userAccount.getHospitalId());
+            WorkflowConfig workflowConfig = wcDao.getBySiteUID(userAccount.getSiteUID());
             if (null != workflowConfig) {
                 boolean res1 = workflowConfig.getDispatchUserId() != null && workflowConfig.getDispatchUserId().equals(userAccount.getId());
                 boolean res2 = workflowConfig.getDispatchUserId2() != null && workflowConfig.getDispatchUserId2().equals(userAccount.getId());
