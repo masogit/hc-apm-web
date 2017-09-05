@@ -87,9 +87,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.filterBySite = true;
-        if (!userContextService.hasRole("MultiHospital")) {
-            this.filterByHospital = true;
-        }
+
         this.setSiteFilter();
     }
 

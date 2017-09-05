@@ -48,11 +48,7 @@ public class WorkOrderController extends JpaCRUDController<WorkOrder> {
         //gl:init()
         loginUser = UserContextService.getCurrentUserAccount();
 
-        this.filterByHospital = true;
         this.filterBySite = true;
-        if (UserContextService.checkRole("MultiHospital")) {
-            this.filterByHospital = false;
-        }
 
         dao = WebUtil.getBean(WorkOrderRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);

@@ -112,15 +112,6 @@ public class WechatAssetCreateController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public void onHospitalChange() {
-        List<UserAccount> ownerList = getOwnerList();
-        if (!ownerList.contains(this.assetOwner)) {
-            this.assetOwner = null;
-        }
-        this.selected.setClinicalDeptId(null);
-        this.onClinicalDeptChange();
-    }
-
     public void onClinicalDeptChange() {
         this.clinicalOwner = null;
 //        selected.setClinicalOwnerId(null);
@@ -142,19 +133,6 @@ public class WechatAssetCreateController extends JpaCRUDController<AssetInfo> {
         } else {
             return new ArrayList<>();
         }
-    }
-
-    public List<UserAccount> getOwnerList() {
-
-        Integer hospitalId;
-        if (selected != null) {
-            hospitalId = selected.getHospitalId();
-        } else {
-            hospitalId = UserContextService.getCurrentUserAccount().getHospitalId();
-        }
-
-        List<UserAccount> res = userDao.getAssetOnwers(UserContextService.getSiteId(), hospitalId);
-        return res;
     }
 
     @Override
