@@ -410,6 +410,7 @@ public class AssetFileImportService {
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false))
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
         assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
