@@ -70,12 +70,6 @@
 
               checkSessionTimeout(res.url);
 
-              // check "Cache-Control" for cache expiration
-              var cache_control = res.headers.get('Cache-Control');
-              if (cache_control) {
-                var max_age = cache_control.match(MAXAGE_REGEX);
-                if (max_age) max_age = +max_age[1] / 60;
-              }
               res.json().then(function(data) {
 
                 if (is_paging) {
@@ -87,7 +81,7 @@
                 }
 
                 // update cache copy
-                lscache.set(url, data, max_age);
+                lscache.set(url, data, 1);
                 resolve(data);
               });
             });
