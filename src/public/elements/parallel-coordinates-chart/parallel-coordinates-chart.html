@@ -239,7 +239,7 @@
             // the ordinal axis
             else {
               domain = data.map(function(d) {
-                return d[dimension.name];
+                return d.id;
               });
             }
             dimension.scale.domain(domain);
@@ -415,6 +415,7 @@
                 // Ordinal Scale
                 if (dimension.type === String) {
                   scale = dimension.scale;
+                  val = d.id;
                 } else {
                   scale = dimension.scale;
                   sec = sectors.find(function(sec, i) {
@@ -456,7 +457,7 @@
           .attr('dy', '.35em')
           .attr('class', 'label')
           .attr('transform', d3Transform().translate(function(d) {
-            return [24, scale(d.name)];
+            return [24, scale(d.id)];
           }));
 
           deviceNameTxt.append('tspan')
@@ -728,7 +729,6 @@
           return dimensions.map(function(dimension) {
             var name = dimension.name;
             var defs = scales[name];
-
             if (name === 'name') {
               dimension.label = '';
             } else {
