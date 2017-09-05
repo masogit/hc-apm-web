@@ -16,6 +16,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -42,7 +43,7 @@ public class AssetInfoService {
         if (null == id || id == 0) {
             return "";
         } else {
-            return assetInfoDao.findById(id).getName();
+            return Optional.ofNullable(assetInfoDao.findById(id)).map(t -> t.getName()).orElse("");
         }
     }
 

@@ -16,8 +16,10 @@ import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
@@ -64,18 +66,22 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
 
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
+        this.selected = null;
         this.setSiteFilter();
         removeFilterOnField("status");
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
-        searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-
-        this.selected = null;
-        if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
-        }
+        List<String> srList = getUnfinishedSRList();
+        srList.add("");
+        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+    
+    private List<String> getUnfinishedSRList() {
+        List<SearchFilter> srSearchFilters = new ArrayList();
+        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+        return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
     public void cancel() {
