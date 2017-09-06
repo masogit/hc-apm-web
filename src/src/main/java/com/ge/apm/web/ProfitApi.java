@@ -29,6 +29,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Pattern;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -90,7 +91,7 @@ public class ProfitApi {
     }
   }
 
-  private Observable<Tuple4<Integer, String, Money, Money>> calcRoot(Map<Integer, String> map, Observable<Tuple4<Integer, Money, Money, Money>> rvnCsts) {
+  /*private Observable<Tuple4<Integer, String, Money, Money>> calcRoot(Map<Integer, String> map, Observable<Tuple4<Integer, Money, Money, Money>> rvnCsts) {
     return rvnCsts.map(v -> Tuple.of(v._1, map.get(v._1), v._2, v._3.add(v._4)))
       .filter(t -> Option.of(t._2).isDefined()).sorted((l, r) -> r._3.getNumber().intValue() - l._3.getNumber().intValue()).cache();
   }
@@ -98,6 +99,16 @@ public class ProfitApi {
   private Observable<Tuple4<Integer, String, Money, Money>> calcChild(Observable<Tuple5<Integer, String, Money, Money, Money>> rvnCsts) {
     return rvnCsts.map(v -> Tuple.of(v._1, v._2, v._3, v._4.add(v._5)))
       .filter(t -> Option.of(t._2).isDefined()).sorted((l, r) -> r._3.getNumber().intValue() - l._3.getNumber().intValue()).cache();
+  }*/
+
+  private Observable<Tuple4<Integer, String, Money, Money>> calcRoot(Map<Integer, String> map, Observable<Tuple4<Integer, Money, Money, Money>> rvnCsts) {
+    return rvnCsts.map(v -> Tuple.of(v._1, map.get(v._1), v._2, v._3.add(v._4)))
+            .filter(t -> Option.of(t._2).isDefined()).sorted((l, r) -> Comparator.<Tuple4<Integer, String, Money, Money>, Double>comparing(t -> t._3.getNumber().doubleValue()).thenComparing(t -> t._2).reversed().compare(l, r)).cache();
+  }
+
+  private Observable<Tuple4<Integer, String, Money, Money>> calcChild(Observable<Tuple5<Integer, String, Money, Money, Money>> rvnCsts) {
+    return rvnCsts.map(v -> Tuple.of(v._1, v._2, v._3, v._4.add(v._5)))
+            .filter(t -> Option.of(t._2).isDefined()).sorted((l, r) -> Comparator.<Tuple4<Integer, String, Money, Money>, Double>comparing(t -> t._3.getNumber().doubleValue()).thenComparing(t -> t._2).reversed().compare(l, r)).cache();
   }
 
   private Observable<Tuple4<Integer, String, Money, Money>> forecastRvnCst(Observable<Tuple4<Integer, String, Money, Money>> rvnCsts) {
