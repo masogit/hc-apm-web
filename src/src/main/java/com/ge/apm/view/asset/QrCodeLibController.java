@@ -73,11 +73,6 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
             tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
             this.filterBySite = true;
             hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
-            if (!userContextService.hasRole("MultiHospital")) {
-                this.filterByHospital = false;
-            } else {
-                this.filterByHospital = true;
-            }
         }
 
     }

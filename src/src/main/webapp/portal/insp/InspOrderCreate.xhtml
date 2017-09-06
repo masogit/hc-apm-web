@@ -20,9 +20,9 @@
                 <h:form id="InspectionOrderEditForm">
                     <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <h:panelGroup rendered="#{userContextService.hasRole('MultiHospital')}">
+                            <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
-                                <p:selectOneMenu id="hospitalIdSelect" value="#{inspectionOrderController.hospitalId}" required="true" requiredMessage="#{msg.hospitalId} #{msg.ValidationRequire}" rendered="#{userContextService.hasRole('MultiHospital')}" >
+                                <p:selectOneMenu id="hospitalIdSelect" value="#{inspectionOrderController.hospitalId}" required="true" requiredMessage="#{msg.hospitalId} #{msg.ValidationRequire}">
                                     <p:ajax   listener="#{inspectionOrderController.onHospitalChange}"  update="assetTree ownerName ownerOrgId" />
                                     <f:selectItems value="#{assetInfoService.getHospitalList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
