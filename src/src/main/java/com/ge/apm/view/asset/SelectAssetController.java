@@ -35,10 +35,6 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
-        this.filterByHospital = true;
-        if (UserContextService.checkRole("MultiHospital")) {
-            this.filterByHospital = false;
-        }
     }
 
     @Override

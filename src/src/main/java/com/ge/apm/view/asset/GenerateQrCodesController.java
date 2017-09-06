@@ -56,11 +56,6 @@ public class GenerateQrCodesController extends JpaCRUDController<QrCodeLib>{
             this.filterBySite = false;
         } else {
             this.filterBySite = true;
-            if (userContextService.hasRole("MultiHospital")) {
-                this.filterByHospital = false;
-            } else {
-                this.filterByHospital = true;
-            }
         }
     }
     

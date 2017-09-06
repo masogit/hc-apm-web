@@ -82,9 +82,6 @@ public class MetrologyOrderController extends JpaCRUDController<InspectionOrder>
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
 
         this.filterBySite = true;
-        if (!userContextService.hasRole("MultiHospital")) {
-        this.filterByHospital = true;
-        }
 
         hospitalId = UserContextService.getCurrentUserAccount().getHospitalId();
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();

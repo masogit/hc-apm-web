@@ -54,9 +54,7 @@ public class AssetFileAttachmentController extends JpaCRUDController<AssetFileAt
         currentUser = UserContextService.getCurrentUserAccount();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         this.filterBySite = true;
-        if (!userContextService.hasRole("MultiHospital")) {
-            this.filterByHospital = true;
-        }
+
         this.setSiteFilter();
 
         AssetInfoService service = (AssetInfoService) WebUtil.getBean(AssetInfoService.class);

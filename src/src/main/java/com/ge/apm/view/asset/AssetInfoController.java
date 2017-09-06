@@ -125,9 +125,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         this.filterBySite = true;
-        if (!userContextService.hasRole("MultiHospital")) {
-            this.filterByHospital = true;
-        }
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");

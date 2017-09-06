@@ -120,9 +120,6 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
             if (assetInfo.getSiteId() != currentUser.getSiteId()) {
                 assetInfo = null;
                 assetFlag = 3;
-            } else if (!assetInfo.getHospitalId().equals(currentUser.getHospitalId()) && !userContextService.hasRole("MultiHospital")) {
-                assetInfo = null;
-                assetFlag = 3;
             }
         }
         if (null != assetInfo) {
@@ -141,23 +138,17 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<Object[]> getSearchDeptList() {
         List<Object[]> res = new ArrayList();
-        if (userContextService.hasRole("MultiHospital")) {
-            List<OrgInfo> hospitals = uaaService.getHospitalListBySiteId(UserContextService.getCurrentUserAccount().getSiteId());
 
-            for (OrgInfo item : hospitals) {
-                List<OrgInfo> oneHospital = acService.getOrgListByHospital(item.getHospitalId());
-                for (OrgInfo dept : oneHospital) {
-                    Object[] o = {item.getName().concat("-").concat(dept.getName()), dept.getId()};
-                    res.add(o);
-                }
-            }
-        } else {
-            List<OrgInfo> depts = acService.getClinicalDeptList(currentUser.getHospitalId());
-            for (OrgInfo item : depts) {
-                Object[] o = {item.getName(), item.getId()};
+        List<OrgInfo> hospitals = uaaService.getHospitalListBySiteId(UserContextService.getCurrentUserAccount().getSiteId());
+
+        for (OrgInfo item : hospitals) {
+            List<OrgInfo> oneHospital = acService.getOrgListByHospital(item.getHospitalId());
+            for (OrgInfo dept : oneHospital) {
+                Object[] o = {item.getName().concat("-").concat(dept.getName()), dept.getId()};
                 res.add(o);
             }
         }
+
         return res;
     }
 
@@ -221,9 +212,7 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
         sfs.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getSiteId()));
         sfs.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         sfs.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        if (!userContextService.hasRole("MultiHospital")) {
-            sfs.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getHospitalId()));
-        }
+
         if (null != searchDept) {
             sfs.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, searchDept));
         }
