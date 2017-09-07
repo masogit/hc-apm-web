@@ -31,7 +31,7 @@ public class FailureAnalysisService {
     db = Database.from(connectionProvider);
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'failureAnalysisService.briefs.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#groupBy+'.'+#dept+'.'+#type+'.'+#supplier+'.'+#asset+'.'+#pmv")
+  //@Cacheable(cacheNames = "springCache", key = "'failureAnalysisService.briefs.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#groupBy+'.'+#dept+'.'+#type+'.'+#supplier+'.'+#asset+'.'+#pmv")
   public Observable<Tuple4<Integer, Double, Double, Integer>> briefs(int site, int hospital, Date from, Date to, String groupBy, Integer dept, Integer type, Integer supplier, Integer asset, Integer pmv) {
     QuerySelect.Builder builder = db.select(new SQL() {{
       SELECT(String.format("ai.%s as agg", groupBy), "(1-(sum(extract(epoch from (confirmed_up_time-confirmed_down_time))) / (count(distinct sr.asset_id) * 86400 * (date (:to) - date (:from))))) as up_rate", "sum(case WHEN sr.nearest_sr_days > :pmv THEN 0 ELSE 1 END) as ftfr_num", "count(*) as wo_num");
@@ -57,6 +57,7 @@ public class FailureAnalysisService {
       }
       GROUP_BY("agg");
       ORDER_BY("agg");
+
     }}.toString()).parameter("site", site).parameter("hospital", hospital).parameter("from", from).parameter("to", to);
     return Option.of(builder).filter(s -> Option.of(type).isDefined()).map(o -> o.parameter("type", type))
       .orElse(Option.of(builder)).filter(o -> Option.of(dept).isDefined()).map(o -> o.parameter("dept", dept))
@@ -69,7 +70,7 @@ public class FailureAnalysisService {
       .cache();
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'failureAnalysisService.reasons.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#dept+'.'+#type+'.'+#supplier+'.'+#asset")
+  //@Cacheable(cacheNames = "springCache", key = "'failureAnalysisService.reasons.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#dept+'.'+#type+'.'+#supplier+'.'+#asset")
   public Observable<Tuple2<Integer, Integer>> reasons(int site, int hospital, Date from, Date to, Integer dept, Integer type, Integer supplier, Integer asset) {
     QuerySelect.Builder builder = db.select(new SQL() {{
       SELECT("w.case_type", "count(w.case_type) as reason_count");

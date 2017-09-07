@@ -102,7 +102,7 @@ public class ProfitService {
   }
 
 
-  @Cacheable(cacheNames = "springCache", key = "'profitService.findRvnCstForEachItem.'+#siteId+'.'+#hospitalId+'.endDate'+#endDate+'.startDate'+#startDate+'.dept'+#dept+'.month'+#month+'.type'+#type")
+  //@Cacheable(cacheNames = "springCache", key = "'profitService.findRvnCstForEachItem.'+#siteId+'.'+#hospitalId+'.endDate'+#endDate+'.startDate'+#startDate+'.dept'+#dept+'.month'+#month+'.type'+#type")
   public Observable<Tuple5<Integer, String, Money, Money, Money>> findRvnCstForEachItem(Integer siteId, Integer hospitalId, LocalDate startDate, LocalDate endDate, Integer dept, Integer month, Integer type) {
     log.info("siteId:{}, hospitalId:{}, startDate:{}, endDate:{}, dept:{}, month:{}, type:{}", siteId, hospitalId, startDate, endDate, dept, month, type);
     return db.select(new SQL() {{
@@ -136,7 +136,7 @@ public class ProfitService {
       .map(tuple5 -> Tuple.of(tuple5._1(), tuple5._2(), CNY.money(tuple5._3()), CNY.money(tuple5._4()), CNY.money(tuple5._5()))).cache();
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'profitService.findRvnCstForEachGroup.'+#siteId+'.'+#hospitalId+'.endDate'+#endDate+'.startDate'+#startDate+'.groupBy'+#groupBy+'.dept'+#dept+'.month'+#month+'.type'+#type")
+  //@Cacheable(cacheNames = "springCache", key = "'profitService.findRvnCstForEachGroup.'+#siteId+'.'+#hospitalId+'.endDate'+#endDate+'.startDate'+#startDate+'.groupBy'+#groupBy+'.dept'+#dept+'.month'+#month+'.type'+#type")
   public Observable<Tuple4<Integer, Money, Money, Money>> findRvnCstForEachGroup(Integer siteId, Integer hospitalId, LocalDate startDate, LocalDate endDate, String groupBy, Integer dept, Integer month, Integer type) {
     log.info("siteId:{}, hospitalId:{}, startDate:{}, endDate:{}, groupBy:{}, dept:{}, month:{}, type:{}", siteId, hospitalId, startDate, endDate, groupBy, dept, month, type);
     return db.select(new SQL() {{

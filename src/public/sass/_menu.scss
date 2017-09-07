@@ -13,7 +13,7 @@
     top: 0 !important;
     width: $menu-width;
     .brand {
-      padding: 1.5em 0 0;
+      padding: 1.5em 0 .8em;
       h1 {
         color: $brand-color;
         font-weight: 200;
@@ -34,6 +34,10 @@
       h1 {
         display: none;
       }
+    }
+
+    #menu-button {
+      transform: none;
     }
 
     .layout-menu.layout-menu-dark {
@@ -64,5 +68,12 @@
     .ink {
       display: none;
     }
+  }
+  #menu-button {
+    transform: rotate(180deg);
+  }
+  .menu-content {
+    margin-top: 1em;
+    outline: none;
   }
 }

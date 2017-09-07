@@ -33,26 +33,20 @@ public class V2_WorkOrderWorkflowConfigController extends JpaCRUDController<V2_W
 		user = UserContextService.getCurrentUserAccount();
 		dao = WebUtil.getBean(V2_WorkOrderWorkflowConfigRepository.class);
 		userDao = WebUtil.getBean(UserAccountRepository.class);
-		initDispatchUserList();
-		
+		//initDispatchUserList();
 		selected = dao.findByTenantUID(user.getTenantUID());
-				//dao.findByTenantUIDAndInstitutionUIDAndHospitalUIDAndSiteUID(user.getTenantUID(),user.getInstitutionUID(), user.getHospitalUID(), user.getSiteUID());
 		if(selected == null){
 			selected = new V2_WorkOrderWorkflowConfig();
-			selected.setEventName(EVENT_NAME);
 			selected.setTenantUID(user.getTenantUID());
 			selected.setInstitutionUID(user.getTenantUID());
 			selected.setHospitalUID(user.getTenantUID());
 			selected.setSiteUID(user.getTenantUID());
-//			selected.setInstitutionUID(user.getInstitutionUID());
-//			selected.setHospitalUID(user.getHospitalUID());
-//			selected.setSiteUID(user.getSiteUID());
 		}
 	}
 
-	private void initDispatchUserList() {
+/*	private void initDispatchUserList() {
 		userList = userDao.findByInstitutionUID(user.getInstitutionUID());
-	}
+	}*/
 
 	public List<UserInfo> getUserList() {
 		return userList;
@@ -73,12 +67,12 @@ public class V2_WorkOrderWorkflowConfigController extends JpaCRUDController<V2_W
 		return dao.findAll(pageRequest);
 	}
 
-	public void onOwnerChange() {
-		if (null != owner) {
-			selected.setDispatchUserId(owner.getId());
-			selected.setDispatchUserName(owner.getName());
-		}
-	}
+//	public void onOwnerChange() {
+//		if (null != owner) {
+//			selected.setDispatchUserId(owner.getId());
+//			selected.setDispatchUserName(owner.getName());
+//		}
+//	}
 
 	@Override
 	public List<V2_WorkOrderWorkflowConfig> getItemList() {
@@ -110,19 +104,19 @@ public class V2_WorkOrderWorkflowConfigController extends JpaCRUDController<V2_W
 //		selected.setInstitutionUID(user.getInstitutionUID());
 //		selected.setHospitalUID(user.getHospitalUID());
 //		selected.setSiteUID(user.getSiteUID());
-		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
-		if (selected.getDispatchUserId() != null) {
-			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
-			if (dispather1 != null) {
-				selected.setDispatchUserName(dispather1.getName());
-			}
-		}
-		if (selected.getDispatchUserId2() != null) {
-			UserAccount dispather2 = uaDao.getById(config.getDispatchUserId2());
-			if (dispather2 != null) {
-				selected.setDispatchUserName2(dispather2.getName());
-			}
-		}
+//		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
+//		if (selected.getDispatchUserId() != null) {
+//			UserAccount dispather1 = uaDao.getById(config.getDispatchUserId());
+//			if (dispather1 != null) {
+//				selected.setDispatchUserName(dispather1.getName());
+//			}
+//		}
+//		if (selected.getDispatchUserId2() != null) {
+//			UserAccount dispather2 = uaDao.getById(config.getDispatchUserId2());
+//			if (dispather2 != null) {
+//				selected.setDispatchUserName2(dispather2.getName());
+//			}
+//		}
 	}
 
 	public UserAccount getOwner() {
