@@ -42,8 +42,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     AssetInfoRepository dao = null;
 
-    AssetFileAttachmentRepository attachDao = null;
-
     private UserAccountRepository userDao;
 
     private QrCodeLibRepository qrcodeDao;
@@ -65,7 +63,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     //    private List<UserAccount> ownerList;
     private List<OrgInfo> ownerOrgList;
 
-    private List<AssetFileAttachment> attachements;
+    private List<V2_BlobObject> attachements;
 
     private BlobFileService blobService;
 
@@ -115,7 +113,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        attachDao = WebUtil.getBean(AssetFileAttachmentRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
@@ -275,14 +272,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         operation = "/portal/sr/srList?faces-redirect=true";
     }
 
-    @Override
-    public void onAfterNewObject(AssetInfo object, boolean isOK) {
-        resultStatus = isOK;
-        if (isOK) {
-            saveAttachements();
-        }
-    }
-
     public String getContractListLink() {
         return "/portal/asset/contract/List?assetId=" + selected.getId();
     }
@@ -342,14 +331,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (null != object.getTerminateDate()) {
             temp = new DateTime(object.getTerminateDate());
             object.setTerminateDate(temp.plusHours(12).toDate());
-        }
-    }
-
-    @Override
-    public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
-        resultStatus = isOK;
-        if (isOK) {
-            saveAttachements();
         }
     }
 
@@ -501,14 +482,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (null != blobObject) {
             String type = event.getComponent().getId();
             type = type.substring(type.indexOf("type") + 4);
-            AssetFileAttachment attach = new AssetFileAttachment();
-            attach.setName(blobObject.getObjectName());
-            attach.setFileType(type);
-            attach.setSiteId(UserContextService.getCurrentUserAccount().getSiteId());
-            attach.setAssetId(selected.getId());
-            attach.setHospitalId(selected.getHospitalId());
-            attach.setFileUrl(blobObject.getObjectStorageId());
-            attachements.add(attach);
+//            AssetFileAttachment attach = new AssetFileAttachment();
+//            attach.setName(blobObject.getObjectName());
+//            attach.setFileType(type);
+//            attach.setSiteId(UserContextService.getCurrentUserAccount().getSiteId());
+//            attach.setAssetId(selected.getId());
+//            attach.setHospitalId(selected.getHospitalId());
+//            attach.setFileUrl(blobObject.getObjectStorageId());
+            attachements.add(blobObject);
             blobObject.setBoId(selected.getId());
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             blobObject.setBoSubType(type);
@@ -521,46 +502,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public List<AssetFileAttachment> getAttachList(Integer assetid, String type) {
+    public List<V2_BlobObject> getAttachList(String assetuid, String type) {
         if (attachements == null || attachements.isEmpty()) {
             List<SearchFilter> sfs = new ArrayList();
             //sfs.addAll(this.searchFilters);
-            sfs.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetid));
-            attachements = attachDao.findBySearchFilter(sfs);
+            sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, assetuid));
+            attachements = blobDao.findBySearchFilter(sfs);
         }
-
-        List<AssetFileAttachment> result = new ArrayList();
-
-        for (AssetFileAttachment item : attachements) {
-            if (item.getFileType().equals(type)) {
-                result.add(item);
-            }
-        }
-        return result;
+        return attachements.stream().filter(item -> item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
-    private void saveAttachements() {
-        for (AssetFileAttachment item : attachements) {
-            if (null == item.getId()) {
-                item.setAssetId(selected.getId());
-                attachDao.save(item);
-            }
-        }
-        attachements.clear();
-    }
 
     public void removeAttachment(String objectId) {
-        List<AssetFileAttachment> tempList = new ArrayList();
-        for (AssetFileAttachment item : attachements) {
-            if (objectId.equals(item.getFileUrl())) {
-                if (blobService.deleteBlobFileByStorageId(objectId)) {
-                    attachDao.delete(item);
-                }
-            } else {
-                tempList.add(item);
-            }
-        }
-        attachements = tempList;
+        
+        blobService.deleteBlobFileByStorageId(objectId);
+        attachements = attachements.stream().filter(item -> !item.getObjectStorageId().equals(objectId)).collect(Collectors.toList());
+        
     }
 
     public String getHospitalName(String siteUid) {
@@ -608,7 +565,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public String getQrCodeImageBase64() {
         return qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
-//        return QRCodeUtil.getQRCodeImageBase64(selected.getQrCode());
     }
 
     public boolean isTimeValidate() {
@@ -901,6 +857,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
+        if(oneSearchStr.isEmpty()){
+            this.removeFilterOnField("name");
+            this.removeFilterOnField("departNum");
+            this.removeFilterOnField("financingNum");
+            this.removeFilterOnField("qrCode");
+            this.removeFilterOnField("serialNum");
+            this.removeFilterOnField("manufacture");
+        }
     }
 
     public List<Brand> getBrandList() {
