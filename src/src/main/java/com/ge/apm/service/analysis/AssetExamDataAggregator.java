@@ -56,31 +56,38 @@ public class AssetExamDataAggregator {
 
     @Transactional
     public String aggregateForExamSumit(Date date)throws Exception{
-
         List<AssetClinicalRecordPojo> acrpList = assetClinicalRecordRepository
                 .aggregateForExamSummitByDate(date);
         List<ExamSummit> asmList= new ArrayList<ExamSummit>();
         List<ExamSummit> newAsmList= new ArrayList<ExamSummit>();
+        List<String> udpateIdList= new ArrayList<String>();
+        List<String> newIdList= new ArrayList<String>();
         for(AssetClinicalRecordPojo accrp:acrpList){
             ExamSummit asm1 =examSummitRepository.getExamSummitByAssetIdAndCreated(accrp.getAssetIds(),accrp.getHospitalIds(),accrp.getProcedureId(),accrp.getSiteIds(), date);
             if(asm1!=null){
-                logger.info(accrp.getAssetIds() +"-already in the exam_summit,only updated for the time being on date "+date);
-                extractorExamSummit(date, asmList, accrp, asm1);
+             //   if(accrp.getExamCount()!=null && asm1.getExamCount()!=null)
+             //       if(asm1.getExamCount().intValue()!=accrp.getExamCount().intValue()) {//如果exam count不相等才更新
+                        extractorExamSummit(date, asmList, accrp, asm1);
+               //     }
+
             }else {
                 ExamSummit newAsm = new ExamSummit();
-                logger.info(accrp.getAssetIds() +" is new record that is to be inserted into exam_summit on date "+date);
                 extractorExamSummit(date, newAsmList, accrp, newAsm);
             }
         }
         if(asmList.size()>0) {
-            logger.info("how many records have already been in exam_summit--> "+asmList.size());
+           // logger.info("how many records have already been in exam_summit --> "+asmList.size());
+            //asmList.forEach(exam->udpateIdList.add(exam.getAssetId().toString()+":"+exam.getPartId()+":"+exam.getCreated()));
+            logger.info(" updated assetIds with [assetId:partId:date] are --> "+udpateIdList.toString());
             examSummitRepository.save(asmList);
         }
         if(newAsmList.size()>0) {
-            logger.info("how many new records to be inserted into exam_summit--> "+newAsmList.size());
+          //  logger.info("how many new records to be inserted into exam_summit--> "+newAsmList.size());
+           // newAsmList.forEach(exam->newIdList.add(exam.getAssetId().toString()+":"+exam.getPartId()+":"+exam.getCreated()));
+            logger.info(" new assetIds with [assetId:partId:date] are --> "+newIdList.toString());
             examSummitRepository.save(newAsmList);
         }
-return "success";
+            return "success";
     }
 
     @Transactional
@@ -89,24 +96,26 @@ return "success";
         logger.info("Asset Clinical Record Aggregator records size-->"+acrpList.size());
          List<AssetSummit> asmList= new ArrayList<AssetSummit>();
         List<AssetSummit> newAsmList= new ArrayList<AssetSummit>();
+        List<String> udpateIdList= new ArrayList<String>();
+        List<String> newIdList= new ArrayList<String>();
         for(AssetClinicalRecordPojo accrp:acrpList){
             AssetSummit asm1 =assetSummitRepository.getAssetSummitByAssetIdAndCreated(accrp.getAssetIds(),createdDate);
             //如果某资产已经在assumit中录入过了 ，那就只要更新该资产相对应的inject_count等信息
             if(asm1!=null){
-                logger.info(accrp.getAssetIds() +"-already in the asset_summit,only updated for the time being on date "+createdDate);
                 extractorAssetSummit(createdDate, asmList, accrp, asm1);
             }else {
                 AssetSummit newAsm = new AssetSummit();
-                logger.info(accrp.getAssetIds() +" is new record that is to be inserted into asset_summit on date "+createdDate);
                 extractorAssetSummit(createdDate, newAsmList, accrp, newAsm);
             }
         }
         if(asmList.size()>0) {
-            logger.info("how many records  have already been asset_summit--> "+asmList.size());
+            asmList.forEach(exam->udpateIdList.add(exam.getAssetId()+":"+exam.getCreated()));
+            logger.info("updated assetIds with [assetId:date] are --> "+asmList.size());
              assetSummitRepository.save(asmList);
         }
         if(newAsmList.size()>0) {
-            logger.info("how many new records to be inserted into asset_summit--> "+newAsmList.size());
+            asmList.forEach(exam->newIdList.add(exam.getAssetId()+":"+exam.getCreated()));
+            logger.info("new assetIds with [assetId:date] are --> "+newAsmList.size());
             assetSummitRepository.save(newAsmList);
         }
         return "success";
@@ -153,7 +162,7 @@ return "success";
             asm1.setDeptId(assinfo.getClinicalDeptId());
             asm1.setAssetGroup(assinfo.getAssetGroup());
         }else{
-            logger.info("gl_Warning: asset_id "+accrp.getAssetIds()+" does not exist in asset_info");
+            logger.warn("gl_Warning: asset_id "+accrp.getAssetIds()+" does not exist in asset_info");
         return;
         }
         asm1.setCreated(accrp.getExamDate());
