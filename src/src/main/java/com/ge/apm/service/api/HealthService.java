@@ -49,7 +49,8 @@ public class HealthService {
 			.get(rs ->
 				new Tuple6<Integer, String, Integer, String, String, Integer> (
 					rs.getInt("asset_id"), rs.getString("name"), rs.getInt("current_step_id"), rs.getString("current_step_name"), rs.getString("current_person_name"), rs.getInt("clinical_dept_id") ) )
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -65,7 +66,8 @@ public class HealthService {
 								rs.getInt("current_step_id"), rs.getString("current_step_name"),
 								rs.getString("current_person_name"), rs.getInt("clinical_dept_id")
 						,rs.getString("id")) ).filter(t6 -> t6.getElement5()==dept)
-				.cache();
+		;
+		//.cache();
 
 	}
 
@@ -80,7 +82,7 @@ public class HealthService {
 								rs.getInt("asset_id"), rs.getString("name"),
 								rs.getInt("current_step_id"), rs.getString("current_step_name"),
 								rs.getString("current_person_name"), rs.getInt("clinical_dept_id")
-								,rs.getString("id")) ).cache();
+								,rs.getString("id")) );//.cache();
 
 	}
 
@@ -94,7 +96,8 @@ public class HealthService {
 				new Tuple6<Integer, String, Integer, String, String, Integer> (
 					rs.getInt("asset_id"), rs.getString("name"), rs.getInt("current_step_id"), rs.getString("current_step_name"), rs.getString("current_person_name"), rs.getInt("clinical_dept_id") ) )
 			.filter(t6 -> t6.getElement5()==dept)
-			.cache();
+				;
+			//.cache();
 
 	}
 
@@ -123,7 +126,8 @@ public class HealthService {
 			.get(rs ->
 				new Tuple5<Integer, String, String, Integer, Integer> (
 					rs.getInt("id"), rs.getString("name"), rs.getString("to_char"), rs.getInt("case_type"), rs.getInt("clinical_dept_id") ) )
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -137,7 +141,8 @@ public class HealthService {
 				new Tuple5<Integer, String, String, Integer, Integer> (
 					rs.getInt("id"), rs.getString("name"), rs.getString("to_char"), rs.getInt("case_type"), rs.getInt("clinical_dept_id") ) )
 			.filter(t5 -> t5.getElement4()==dept)
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -156,7 +161,8 @@ public class HealthService {
 			.get(rs ->
 				new Tuple4<Integer, String, String, Integer> (
 					rs.getInt("id"), rs.getString("name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -170,7 +176,8 @@ public class HealthService {
 				new Tuple4<Integer, String, String, Integer> (
 					rs.getInt("id"), rs.getString("name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.filter(t4 -> t4.getElement3()==dept)
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -198,7 +205,8 @@ public class HealthService {
 				new Tuple4<Integer, String, String, Integer> (
 						rs.getInt("pm_order_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -213,7 +221,8 @@ public class HealthService {
 						rs.getInt("pm_order_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.filter(t4 -> t4.getElement3()==dept)
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -249,7 +258,8 @@ public class HealthService {
 				new Tuple4<Integer, String, String, Integer> (
 						rs.getInt("oid"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
-			.cache();
+		;
+		//.cache();
 
 	}
 
@@ -264,7 +274,8 @@ public class HealthService {
 						rs.getInt("oid"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 			.filter(t4 -> t4.getElement3()==dept)
-			.cache();
+		;
+		//.cache();
 
 	}
 }

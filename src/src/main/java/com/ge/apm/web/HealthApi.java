@@ -62,7 +62,7 @@ public class HealthApi {
       category = 0;
     if (Option.of(limit).isEmpty()) limit = Integer.MAX_VALUE;
 
-    if (Option.of(dept).isEmpty())
+    //if (Option.of(dept).isEmpty())
 
     switch (category) {
 
@@ -99,7 +99,7 @@ public class HealthApi {
 
     }
 
-    else
+    /*else
 
     switch (category) {
 
@@ -132,7 +132,7 @@ public class HealthApi {
       default:
         return ResponseEntity.badRequest().body(ImmutableMap.of("msg", "Bad Request"));
 
-    }
+    }*/
 
   }
 
@@ -219,7 +219,7 @@ public class HealthApi {
         return "待处理总事件";
 
       case 1:
-        return "维修中";
+        return "未完成报修";
 
       case 2:
         return "停机中";
@@ -240,19 +240,19 @@ public class HealthApi {
         return "报修";
 
       case 12:
-        return "派工";
+        return "待派工";
 
       case 13:
-        return "接单";
+        return "待接单";
 
       case 14:
-        return "维修";
+        return "维修中";
 
       case 15:
-        return "验收";
+        return "待验收";
 
       case 16:
-        return "关单";
+        return "待关单";
 
       default:
         return "";
