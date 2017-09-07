@@ -53,13 +53,22 @@ public class AssetExamController {
         return  assetExamDataService.calRating();
 
     }
-    // entry for pro  http...geapm/web/assetExam/assetSummitFromToLinks?from=2017-08-17&to=2017-09-05
+    // entry for pro  http://localhost:8087/geapm/web/assetExam/assetSummitFromToLinks?from=2017-08-17&to=2017-09-05
     @RequestMapping(value = "/assetSummitFromToLinks", method = RequestMethod.GET )
-    public @ResponseBody void getData(@RequestParam(name="from",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String from, @RequestParam(name="to",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String to) {
+    public @ResponseBody void assetSummitFromToLinks(@RequestParam(name="from",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String from, @RequestParam(name="to",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String to) {
         BatchAssetExam ba = new BatchAssetExam();
         ba.setFrom(from);
         ba.setTo(to);
         assetExamDataService.aggregateAssetSummitRangeDay(ba);
+    }
+
+    // entry for pro  http://localhost:8087/geapm/web/assetExam/examSummitFromToLinks?from=2017-05-15&to=2017-09-01
+    @RequestMapping(value = "/examSummitFromToLinks", method = RequestMethod.GET )
+    public @ResponseBody void examSummitFromToLinks(@RequestParam(name="from",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String from, @RequestParam(name="to",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String to) {
+        BatchAssetExam ba = new BatchAssetExam();
+        ba.setFrom(from);
+        ba.setTo(to);
+        assetExamDataService.aggregateExamSumitRangeDay(ba);
     }
 
 
