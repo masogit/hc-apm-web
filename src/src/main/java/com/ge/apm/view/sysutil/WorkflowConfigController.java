@@ -4,6 +4,8 @@ import com.ge.apm.dao.UserAccountRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -42,17 +44,24 @@ public class WorkflowConfigController extends JpaCRUDController<WorkflowConfig> 
             dispatchUserList = uuaService.getUsersWithAssetHeadOrStaffRole(user.getHospitalId());
             
             initDispatchUserList();
-            List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+            List<WorkflowConfig> configs = dao.findBySiteUID(user.getInstitutionUID());
+            if(CollectionUtils.isNotEmpty(configs)){
+            	selected = configs.get(configs.size()-1);
+            }else{
+            	initWorkflowConfig(user);
+            }
+            /*List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 	        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
 	        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
 	        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
 	        Page<WorkflowConfig> config =dao.findBySearchFilter(searchFilters, buildPageRequest(0,1));
+	        System.out.println(selected);
 	        if(config.hasContent()){
 	        	selected = config.getContent().get(0);
 	        }else{
 	        	initWorkflowConfig(user);
-	        }
+	        }*/
 	}
         
     private List<UserInfo> userList;

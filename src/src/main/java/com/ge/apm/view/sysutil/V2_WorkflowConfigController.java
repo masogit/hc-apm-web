@@ -232,7 +232,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 	}
 	
-    public void onSave() {
+    public void applyChange() {
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
     	if(isManual !=  null && isTakeOrder != null && !isManual && !isTakeOrder){

@@ -21,61 +21,17 @@ public class V2_WorkOrderWorkflowConfig implements Serializable{
     @Column(name = "id")
     private Integer id;
     
-    @Basic(optional = false)
-    @Column(name = "event_name")
-    private String eventName;
-    
-    @Basic(optional = false)
-    @Column(name = "dispatch_mode")
-    private Integer dispatchMode;
-    
-    @Column(name = "dispatch_user_id")
-    private Integer dispatchUserId;
-    
-    @Column(name = "dispatch_user_name")
-    private String dispatchUserName;
-    
     @Column(name = "timeout_dispatch")
     private Integer timeoutDispatch;
     
     @Column(name = "timeout_accept")
     private Integer timeoutAccept;
-    
-/*    @Column(name = "timeout_repair")
-    private Integer timeoutRepair;*/
-    
+   
     @Column(name = "timeout_close")
     private Integer timeoutClose;
     
-/*    @Column(name="order_reopen_timeframe")
-    private Integer orderReopenTimeframe;//二次开单的最大时间间隔
-*/    
     @Column(name="max_message_count")
     private Integer maxMessageCount;//推送消息的次数上限
-    
-    @Column(name = "dispatch_user_id2")
-    private Integer dispatchUserId2;//第二派工人
-    
-    @Column(name = "dispatch_user_name2")
-    private String dispatchUserName2;
-     
-//    @Column(name = "is_take_order_enabled")
-//    private Boolean isTakeOrderEnabled; //是否允许抢单
-    
-    @Column(name = "auto_ack")
-    private Boolean autoAck;//是否需要验收
-    
-/*    @Column(name = "urgent_timeout_close")
-    private Integer urgentTimeout;//紧急工单超时提醒时间
-    
-    @Column(name="urgent_max_message_count")
-    private Integer urgentMaxMessageCount;//紧急工单提醒次数
-*/    
-/*    @Column(name = "pm_remind_days")//提前提醒的天数
-    private Integer pmRemindDays;
-    
-    @Column(name = "pm_remind_times")//提醒次数
-    private Integer pmRemindTimes;*/
     
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -88,14 +44,6 @@ public class V2_WorkOrderWorkflowConfig implements Serializable{
     
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
-
-	public String getEventName() {
-		return eventName;
-	}
-
-	public void setEventName(String eventName) {
-		this.eventName = eventName;
-	}
 
 	public String getTenantUID() {
 		return tenantUID;
@@ -129,18 +77,6 @@ public class V2_WorkOrderWorkflowConfig implements Serializable{
 		this.siteUID = siteUID;
 	}
 
-	public Boolean getAutoAck() {
-		return autoAck;
-	}
-
-	public void setAutoAck(Boolean autoAck) {
-		this.autoAck = autoAck;
-	}
-
-	public void setDispatchMode(Integer dispatchMode) {
-		this.dispatchMode = dispatchMode;
-	}
-
 	public Integer getMaxMessageCount() {
 		return maxMessageCount;
 	}
@@ -149,52 +85,12 @@ public class V2_WorkOrderWorkflowConfig implements Serializable{
 		this.maxMessageCount = maxMessageCount;
 	}
 
-	public Integer getDispatchUserId2() {
-		return dispatchUserId2;
-	}
-
-	public void setDispatchUserId2(Integer dispatchUserId2) {
-		this.dispatchUserId2 = dispatchUserId2;
-	}
-
-	public String getDispatchUserName2() {
-		return dispatchUserName2;
-	}
-
-	public void setDispatchUserName2(String dispatchUserName2) {
-		this.dispatchUserName2 = dispatchUserName2;
-	}
-
     public Integer getId() {
         return id;
     }
 
     public void setId(Integer id) {
         this.id = id;
-    }
-
-    public Integer getDispatchMode() {
-        return dispatchMode;
-    }
-
-    public void setDispatchMode(int dispatchMode) {
-        this.dispatchMode = dispatchMode;
-    }
-
-    public Integer getDispatchUserId() {
-        return dispatchUserId;
-    }
-
-    public void setDispatchUserId(Integer dispatchUserId) {
-        this.dispatchUserId = dispatchUserId;
-    }
-
-    public String getDispatchUserName() {
-        return dispatchUserName;
-    }
-
-    public void setDispatchUserName(String dispatchUserName) {
-        this.dispatchUserName = dispatchUserName;
     }
 
     public Integer getTimeoutDispatch() {
@@ -220,35 +116,6 @@ public class V2_WorkOrderWorkflowConfig implements Serializable{
     public void setTimeoutClose(Integer timeoutClose) {
         this.timeoutClose = timeoutClose;
     }
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("V2_WorkflowConfig [id=");
-		builder.append(id);
-		builder.append(", dispatchMode=");
-		builder.append(dispatchMode);
-		builder.append(", dispatchUserId=");
-		builder.append(dispatchUserId);
-		builder.append(", dispatchUserName=");
-		builder.append(dispatchUserName);
-		builder.append(", timeoutDispatch=");
-		builder.append(timeoutDispatch);
-		builder.append(", timeoutAccept=");
-		builder.append(timeoutAccept);
-		builder.append(", timeoutClose=");
-		builder.append(timeoutClose);
-		builder.append(", maxMessageCount=");
-		builder.append(maxMessageCount);
-		builder.append(", dispatchUserId2=");
-		builder.append(dispatchUserId2);
-		builder.append(", dispatchUserName2=");
-		builder.append(dispatchUserName2);
-		builder.append(", autoAck=");
-		builder.append(autoAck);
-		builder.append("]");
-		return builder.toString();
-	}
 	
 	@Override
     public int hashCode() {
