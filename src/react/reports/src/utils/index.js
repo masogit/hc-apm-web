@@ -164,6 +164,9 @@ export const isFocusNode = (node: NodeT, cursor: cursorT): boolean => {
 
 /* Maintenance Cost */
 export function withUnit(number: number) {
+  if (!number) {
+    return 0
+  }
   if (number > 100000000) {
     return round(number / 100000000) + '亿'
   } else if (number > 10000000) {
