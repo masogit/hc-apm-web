@@ -37,7 +37,7 @@
     }
 
     #menu-button {
-      transform: rotate(180deg);
+      transform: none;
     }
 
     .layout-menu.layout-menu-dark {
@@ -69,10 +69,11 @@
       display: none;
     }
   }
+  #menu-button {
+    transform: rotate(180deg);
+  }
   .menu-content {
     margin-top: 1em;
-    &::focus {
-      outline: none;
-    }
+    outline: none;
   }
 }
