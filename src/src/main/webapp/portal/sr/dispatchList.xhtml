@@ -48,6 +48,9 @@
                         <p:column headerText="#{msg.assetName}">
                             <h:outputText value="#{assetInfoService.getAssetInfoName(item.assetId)}"/>
                         </p:column>
+                        <p:column headerText="#{msg.srNum}">
+                            <h:outputText value="#{workOrderDispatchController.getServiceRequest(item.srId).srNum}"/>
+                        </p:column>
                         <p:column headerText="#{msg.requestorName}">
                             <h:outputText value="#{workOrderDispatchController.getServiceRequest(item.srId).requestorName}"/>
                         </p:column>
