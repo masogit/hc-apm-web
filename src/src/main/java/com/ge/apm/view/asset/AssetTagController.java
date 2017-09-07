@@ -209,11 +209,6 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         return tempDeptList;
     }
 
-    public List<UserAccount> getOwnerList() {
-        List<UserAccount> res = acService.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
-        return res;
-    }
-
     public void save(){
         super.save();
         assetTagService.saveAssetTag(this.getSelected(), targetBiomedGroup, targetAssets);

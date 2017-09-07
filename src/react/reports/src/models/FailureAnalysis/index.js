@@ -99,8 +99,8 @@ export default {
     },
 
     *['get/briefs'](action, { put, select, call }) {
-      let type = action.data.chart, targetPage = undefined
-
+      let type = action.data.chart
+      let targetPage = action.data.value
       try {
         let params = yield select(state => state.FailureAnalysis)
         params = cloneDeep(params)

@@ -20,6 +20,8 @@ import javax.servlet.http.HttpServletRequest;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.WorkflowConfig;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @ManagedBean(name = "userContextService")
 @SessionScoped
@@ -227,15 +229,12 @@ public class UserContextService implements Serializable {
 
     public Boolean isDispatcher() {
         if (isDispatcher == null) {
+            UaaService uuaService = WebUtil.getBean(UaaService.class);
+            List<String> orgList= uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item->item.getUid()).collect(Collectors.toList());
             WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-            WorkflowConfig workflowConfig = wcDao.getBySiteUID(userAccount.getSiteUID());
-            if (null != workflowConfig) {
-                boolean res1 = workflowConfig.getDispatchUserId() != null && workflowConfig.getDispatchUserId().equals(userAccount.getId());
-                boolean res2 = workflowConfig.getDispatchUserId2() != null && workflowConfig.getDispatchUserId2().equals(userAccount.getId());
-                isDispatcher = res1 || res2;
-            } else {
-                isDispatcher = false;
-            }
+            List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList);
+            isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId()) 
+                    || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
         }
         return isDispatcher;
     }
