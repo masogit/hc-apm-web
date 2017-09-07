@@ -51,6 +51,7 @@
                                 <p:ajax  event="rowSelect" listener="#{serviceRequestController.onSelectServiceRequest}" update="tabview:WorkOrderEditForm" process="datalist"/>
                                 <p:ajax event="filter" listener="#{serviceRequestController.onFilter}" update="datalist tabview:WorkOrderEditForm"/>
 
+                                
                                 <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.casePriority}" filterBy="#{item.casePriority}" filterMatchMode="EQ">
                                     <f:facet name="filter">
                                         <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -59,6 +60,9 @@
                                         </p:selectOneMenu>
                                     </f:facet>
                                     <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.srNum}" filterBy="#{item.srNum}" sortBy="#{item.srNum}" filterMatchMode="LIKE">
+                                    <h:outputText value="#{item.srNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.requestTime}" sortBy="#{item.requestTime}" filterBy="#{item.requestTime}" filterMatchMode="GTE">
                                     <f:facet name="filter">
