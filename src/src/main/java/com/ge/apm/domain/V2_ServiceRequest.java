@@ -78,7 +78,7 @@ public class V2_ServiceRequest  implements Serializable {
     @NotNull
     @Column(name = "request_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date requestTime;
 
     @Basic(optional = false)
@@ -97,11 +97,11 @@ public class V2_ServiceRequest  implements Serializable {
 
     @Column(name = "confirmed_down_time")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     private Date confirmedDownTime;
 
     @Column(name = "confirmed_up_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date confirmedUpTime;
 
@@ -115,7 +115,9 @@ public class V2_ServiceRequest  implements Serializable {
     @Column(name = "reponse_time")
     private Date responseTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Column(name = "estimated_close_time")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedCloseTime;
 
     @Column(name = "close_time")
@@ -134,7 +136,7 @@ public class V2_ServiceRequest  implements Serializable {
     private String nearestSrId;//上次报修的id 
 
     @Column(name = "take_time")
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
     private Date takeTime;
 
@@ -144,11 +146,17 @@ public class V2_ServiceRequest  implements Serializable {
     //@Where(clause="bo_uuid=id")
 //    private List<V2_BlobObject> attachments;
 
-    @JoinColumn(name = "sr_id")
-    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @JoinColumn(name="sr_id")
+    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.EAGER)
     @Fetch(FetchMode.SUBSELECT)
-    private List<V2_WorkOrder> v2_workOrder_List;
+    private List<V2_WorkOrder> v2_workOrder_List ;
 
+    @Column(name = "cancel_person")
+    private String cancelPerson;
+    
+    @Column(name = "cancel_reason")
+    private String cancelReason;
+    
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
