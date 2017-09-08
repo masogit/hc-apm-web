@@ -75,11 +75,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         
         return dao.loadDataForPage(orgUidList, boSubType, boName, pageRequest);
         
-//        if (this.searchFilters == null) {
-//            return dao.findAll(pageRequest);
-//        } else {
-//            return dao.findBySearchFilter(this.searchFilters, pageRequest);
-//        }
     }
 
     @Override
@@ -100,7 +95,7 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
             WebUtil.addErrorMessage(WebUtil.getMessage("fileType") + WebUtil.getMessage("ValidationRequire"));
         } else if (null == selected.getObjectName() || selected.getObjectName().isEmpty()) {
             WebUtil.addErrorMessage(WebUtil.getMessage("SelectUploadFile"));
-        } else if (selected.getBoSubType().equals("1") && !selected.getBoSubType().matches("^.*?\\.(jpg|jpeg|bmp|gif|png)$")) {
+        } else if (selected.getBoSubType().equals("1") && !selected.getObjectName().toLowerCase().matches("^.*?\\.(jpg|jpeg|bmp|gif|png)$")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("InvalidPictureFileType"));
         } else {
             selected.setBoId(selectedAsset.getId());
@@ -129,8 +124,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             selected = blobObject;
-//            selected.setName(blobObject.getObjectName());
-//            selected.setFileUrl(blobObject.getObjectStorageId());
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
@@ -167,7 +160,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
 
     public void onSelectedChange() {
         selectedAsset = assetService.getAssetInfo(selected.getBoId());
-//        blobObject = blobService.getBlobObjectByStorageId(selected.getObjectStorageId());
         crudActionName = "Edit";
     }
 
@@ -175,14 +167,6 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         return "Create".equals(crudActionName);
     }
     
-//     public List<AssetInfo> getAssetList() {
-//        return assetList;
-//    }
-//
-//    public void setAssetList(List<AssetInfo> assetList) {
-//        this.assetList = assetList;
-//    }
-
     public AssetInfo getSelectedAsset() {
         return selectedAsset;
     }
