@@ -37,7 +37,7 @@
                                  selectionMode="single" selection="#{assetInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
