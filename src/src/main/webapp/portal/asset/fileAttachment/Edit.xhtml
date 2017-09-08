@@ -15,7 +15,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.fileType}*</label>
-                            <p:selectOneMenu id="fileType" value="#{assetFileAttachmentController.selected.fileType}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu id="fileType" value="#{assetFileAttachmentController.selected.boSubType}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
@@ -28,15 +28,15 @@
                         </h:panelGroup>
 
                         <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
-                        <h:panelGroup rendered="#{assetFileAttachmentController.isCreatAction() and assetFileAttachmentController.selected.name==null}">
+                        <h:panelGroup rendered="#{assetFileAttachmentController.isCreatAction() and assetFileAttachmentController.selected.objectName==null}">
                             <p:fileUpload fileUploadListener="#{assetFileAttachmentController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                           multiple="false" sizeLimit="10000000" update=":AssetFileAttachmentEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
                             <!--<p:growl id="messages" showDetail="true" />-->
                         </h:panelGroup>
-                        <h:panelGroup id="namepanel" rendered="#{assetFileAttachmentController.selected.name!=null}">
+                        <h:panelGroup id="namepanel" rendered="#{assetFileAttachmentController.selected.objectName!=null}">
                             <label class="label">#{msg.name}*</label>
-                            <p:inputText id="name" value="#{assetFileAttachmentController.selected.name}"  required="false" requiredMessage="#{msg.SelectUploadFile}" readonly="true"/>
-                            <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachment(assetFileAttachmentController.selected.fileId)}" id="iconOnly" update=":AssetFileAttachmentEditForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetFileAttachmentController.isCreatAction()}">
+                            <p:inputText id="name" value="#{assetFileAttachmentController.selected.objectName}"  required="false" requiredMessage="#{msg.SelectUploadFile}" readonly="true"/>
+                            <p:commandButton actionListener="#{assetFileAttachmentController.removeAttachment(assetFileAttachmentController.selected.boId)}" id="iconOnly" update=":AssetFileAttachmentEditForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetFileAttachmentController.isCreatAction()}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </h:panelGroup>

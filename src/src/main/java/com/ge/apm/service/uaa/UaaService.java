@@ -250,6 +250,7 @@ public class UaaService {
         return treeRoot;
     }
     
+    //origin user accessible org list
     public List<OrgInfo> getOrgListByUser(String userUid){
         return orgInfoDao.getByUser(userUid);
     }
@@ -469,26 +470,26 @@ public class UaaService {
         return userAccountDao.findById(userId);
     }
 
+    //用户可以显示的医院列表(包含含指定科室的医院)
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
         List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
+        orgUidSet1.add("");
         //for sites of accessible departments
         Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
+        orgUidSet2.add("");
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
-        if (!orgUidSet1.isEmpty()) {
-            orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-            orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-            orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-        }
-        if (!orgUidSet2.isEmpty()) {
-            orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
-        }
+        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
     
+    //用户对指定医院访问的科室列表
     public List<OrgInfo> getOrgDeptList(String siteUid,String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
