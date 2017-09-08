@@ -17,8 +17,10 @@ import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -123,7 +125,7 @@ public class AssetFileImportService {
 //        }
 //        return result;
 //    }
-    public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) {
+    public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
@@ -177,15 +179,15 @@ public class AssetFileImportService {
             asset.setLifecycleInYear(ExcelDocument.getCellDoubleValue(rowMap.get("使用年限")));
             String depreciationMethodNmae = ExcelDocument.getCellStringValue(rowMap.get("折旧算法"));
             asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae));
-            asset.setManufactDate((Date) rowMap.get("生产日期"));
-            asset.setPurchaseDate((Date) rowMap.get("采购日期"));
-            asset.setArriveDate((Date) rowMap.get("到货日期"));
-            asset.setInstallDate((Date) rowMap.get("安装日期"));
-            asset.setWarrantyDate((Date) rowMap.get("维保截止日期"));
-            asset.setTerminateDate((Date) rowMap.get("报废日期"));
-            asset.setLastPmDate((Date) rowMap.get("上次维护日期"));
-            asset.setLastMeteringDate((Date) rowMap.get("上次计量日期"));
-            asset.setLastQaDate((Date) rowMap.get("上次质检日期"));
+            asset.setManufactDate(getDateField(rowMap.get("生产日期"),"生产日期"));
+            asset.setPurchaseDate(getDateField(rowMap.get("采购日期"),"采购日期"));
+            asset.setArriveDate(getDateField(rowMap.get("到货日期"),"到货日期"));
+            asset.setInstallDate(getDateField(rowMap.get("安装日期"),"安装日期"));
+            asset.setWarrantyDate(getDateField(rowMap.get("维保截止日期"),"维保截止日期"));
+            asset.setTerminateDate(getDateField( rowMap.get("报废日期"),"报废日期"));
+            asset.setLastPmDate(getDateField(rowMap.get("上次维护日期"),"上次维护日期"));
+            asset.setLastMeteringDate(getDateField(rowMap.get("上次计量日期"),"上次计量日期"));
+            asset.setLastQaDate(getDateField(rowMap.get("上次质检日期"),"上次质检日期"));
             asset.setMaitanance(ExcelDocument.getCellStringValue(rowMap.get("维护商")));
             Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
@@ -206,6 +208,33 @@ public class AssetFileImportService {
         }
 
         return result;
+    }
+    
+    private Date getDateField(Object object,String filedSrcName) throws Exception{
+        if(object ==null){
+            return null;
+        }
+        if(object instanceof Date){
+            return (Date) object;
+        }
+        if(object instanceof String){
+            Date res = TimeUtils.getDateFromStr((String)object, "dd/MM/yy");
+            if(res != null && res instanceof Date){
+                return res;
+            }
+            res = TimeUtils.getDateFromStr((String)object, "dd/MM/yyyy");
+            if(res != null && res instanceof Date){
+                return res;
+            }
+            res = TimeUtils.getDateFromStr((String)object, "yyyy-MM-dd");
+            if(res != null && res instanceof Date){
+                return res;
+            }
+            throw new Exception(filedSrcName + "[" + (String)object + "]无效的日期格式");
+        }
+        else{
+            throw new Exception(filedSrcName + "无效的日期格式");
+        }
     }
 
     private Integer getI18nMsgKey(List<I18nMessage> msgList, String value) {
@@ -488,6 +517,6 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.5".equalsIgnoreCase(inputVersion);
+        return "v1.4".equalsIgnoreCase(inputVersion);
     }
 }
