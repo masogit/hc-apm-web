@@ -5,8 +5,12 @@ import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
@@ -195,6 +199,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		this.dispatchUserList = dispatchUserList;
 	}
 
+	@Transactional
 	@Override
 	public void onBeforeSave(WorkflowConfig config) {
 		selected.setTenantUID(user.getTenantUID());
@@ -230,12 +235,15 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setDispatchUserName2(null);
 		}
+		dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
+	@Transactional
     public void applyChange() {
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
     	if(isManual !=  null && isTakeOrder != null && !isManual && !isTakeOrder){
+    		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
     		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
     		 return;
     	}
