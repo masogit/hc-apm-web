@@ -3,8 +3,12 @@ package com.ge.apm.dao;
 import java.util.List;
 
 import com.ge.apm.domain.WorkflowConfig;
+
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+
 import webapp.framework.dao.GenericRepository;
 import java.util.List;
 
@@ -20,5 +24,10 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     public WorkflowConfig getBySiteUID(@Param("uid")String site_uid);
     
 	public List<WorkflowConfig> findBySiteUID(String institutionUID);
+	
+	 @Query(value="delete from WorkflowConfig wc where wc.siteUID = ?1")
+	 @Modifying
+	 @Transactional
+	public void deleteBySiteUID(String siteUID);
 
 }
