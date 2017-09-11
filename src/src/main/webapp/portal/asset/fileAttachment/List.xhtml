@@ -26,11 +26,11 @@
                         <p:ajax event="rowSelect" listener="#{assetFileAttachmentController.onSelectedChange}" update="createButton  deleteButton :AssetFileAttachmentEditForm"/>
                         <p:ajax event="filter" listener="#{assetFileAttachmentController.onFilter}" oncomplete="rc();"/>
 
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetId}" >
-                            <h:outputText value="#{assetInfoService.getAssetInfoName(item.assetId)}"/>
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.boId}" >
+                            <h:outputText value="#{assetInfoService.getAssetInfoName(item.boId)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.fileType}" sortBy="#{item.fileType}" filterBy="#{item.fileType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.fileType)}"/>
+                        <p:column headerText="#{msg.fileType}" sortBy="#{item.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -38,11 +38,11 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.name}"/>
+                        <p:column headerText="#{msg.name}" sortBy="#{item.objectName}" filterBy="#{item.objectName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.objectName}"/>
                         </p:column>
                         <p:column headerText="#{msg.download}" exportable="false">
-                            <p:link href="#{fileDownloadService.getFileUrl(item.fileUrl)}">下载</p:link>
+                            <p:link href="#{fileDownloadService.getFileUrl(item.objectStorageId)}">下载</p:link>
                             
 <!--                            <p:commandButton value="#{msg.download}" ajax="false" onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download">
                                 <p:fileDownload value="#{fileDownloadService.getFile(item.fileUrl)}" />

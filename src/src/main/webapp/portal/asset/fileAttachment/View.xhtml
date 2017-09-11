@@ -13,11 +13,11 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" rendered="#{assetFileAttachmentController.selected != null}">
                         <h:outputLabel value="#{msg.name}" for="name" />
-                        <h:outputText value="#{assetFileAttachmentController.selected.name}"/>
+                        <h:outputText value="#{assetFileAttachmentController.selected.objectName}"/>
                         <h:outputLabel value="#{msg.fileType}" for="fileType" />
-                        <h:outputText value="#{fieldMsg.fieldValue('attachmentType', assetFileAttachmentController.selected.fileType)}"/>
+                        <h:outputText value="#{fieldMsg.fieldValue('attachmentType', assetFileAttachmentController.selected.boSubType)}"/>
                         <h:outputLabel value="#{msg.assetName}" for="assetId" />
-                        <h:outputText value="#{assetInfoService.getAssetInfoName(assetFileAttachmentController.selected.assetId)}"/>
+                        <h:outputText value="#{assetInfoService.getAssetInfoName(assetFileAttachmentController.selected.boId)}"/>
                     </p:panelGrid>
                     <br/>
                     <p:commandButton rendered="#{assetFileAttachmentController.deleteAction}" icon="ui-icon-trash" actionListener="#{assetFileAttachmentController.delete}" value="#{msg.Delete}" update=":AssetFileAttachmentListForm :AssetFileAttachmentEditForm :growl" oncomplete="handleSubmit(args, 'AssetFileAttachmentViewDialog');"/>
