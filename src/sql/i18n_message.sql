@@ -433,7 +433,7 @@ INSERT INTO "public"."i18n_message" VALUES ('777', 'label', 'PwdTips', '密码�
 insert into i18n_message(id, msg_type, msg_key, value_zh, value_en, site_id) values(784, 'label', 'V3_WorkFlowConfig', '院区工作流配置', 'config for hospital', -1);
 insert into i18n_message(id, msg_type, msg_key, value_zh, value_en, site_id) values(785, 'label', 'V2_WorkOrderWorkflowConfig', '紧急工单工作流配置', 'workorder workflow config', -1);
 INSERT INTO "public"."i18n_message" VALUES ('786', 'field_name', 'brand', '品牌', 'Brand', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('787', 'field_name', 'nationalStandardCode', '2010国标码', 'National Standard Code', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('787', 'field_name', 'nationalStandardCode', '2010国家编码', 'National Standard Code', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('788', 'field_name', 'srNum', '报修单号', 'Service Request Number', null, '-1');
 
 
