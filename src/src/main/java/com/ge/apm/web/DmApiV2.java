@@ -653,7 +653,11 @@ public class DmApiV2 {
   //input: Historical Seq<Tuple2<id,usage>>for one type
   //output: Seq<Tuple2<id,usage>>for one type including future data
   private Double predictOneType(Seq<Tuple2<Integer, Double>> monthlyData, int year) {
-    monthlyData = monthlyData.removeLast(v -> true);
+    if (monthlyData.length() > 1) {
+      monthlyData = monthlyData.removeLast(v -> true);
+    } else {
+      monthlyData = monthlyData.map(v -> Tuple.of(v._1, 0D));
+    }
     LocalDate lastHisDay = xToLocaldate(monthlyData.last()._1);
     for (int i = 0; i < (int) lastHisDay.until(LocalDate.now().withDayOfMonth(1).minusMonths(1), ChronoUnit.MONTHS); i++) {
       monthlyData = monthlyData.append(Tuple.of(localDateToX(lastHisDay.plusMonths(i + 1)), 0D));
@@ -912,7 +916,7 @@ public class DmApiV2 {
           CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
           predictUsage(predictData, ratios(predictData), year),
           userPredictedUsage, userInputThreshold,
-          year), year,userInputThreshold
+          year), year, userInputThreshold
       ).groupBy(v -> v.getAssetBsc().getType()).values().map(v -> Tuple.of(calculateTypeInfo(v, groups), v));
     Tuple2<AllAssetInfo, Seq<Tuple2<TypeInfo, Seq<Asset>>>> initResult = Tuple.of(calculateAllAssetInfoType(tmp.map(v -> v._1)), tmp);
     return new ImmutableMap.Builder<String, Object>()
@@ -945,7 +949,7 @@ public class DmApiV2 {
           CalculateHistoryData(siteId, hospitalId, dept, LocalDate.now().withDayOfYear(1).minusYears(1), LocalDate.now().withDayOfYear(1).minusDays(1)),
           predictUsage(predictData, ratios(predictData), year),
           userPredictedUsage, userInputThreshold,
-          year), year,userInputThreshold
+          year), year, userInputThreshold
       );
     Seq<Tuple2<DeptInfo, Seq<Tuple2<TypeInfo, Seq<Asset>>>>> tmp = tmp2.groupBy(v -> v.getAssetBsc().getDept()).values().map(v ->
       v.groupBy(v2 -> v2.getAssetBsc().getType()).values()

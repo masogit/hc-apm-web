@@ -430,9 +430,12 @@ INSERT INTO "public"."i18n_message" VALUES ('774', 'label', 'ActiveAsset', '重�
 INSERT INTO "public"."i18n_message" VALUES ('775', 'label', 'InactiveAsset', '转入报废', 'inactive asset', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('776', 'label', 'BuildAsset', '资产建档', 'build asset', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('777', 'label', 'PwdTips', '密码必须6位以上，首字母大写,尾字母小写,必须包含数字,不可使用3个以上连续的数字或字母,不可使用3个以上相同的数字或字母,必须包含一个特殊字符(!@#$%&)', 'password tips', null, '-1');
+insert into i18n_message(id, msg_type, msg_key, value_zh, value_en, site_id) values(784, 'label', 'V3_WorkFlowConfig', '院区工作流配置', 'config for hospital', -1);
+insert into i18n_message(id, msg_type, msg_key, value_zh, value_en, site_id) values(785, 'label', 'V2_WorkOrderWorkflowConfig', '紧急工单工作流配置', 'workorder workflow config', -1);
 INSERT INTO "public"."i18n_message" VALUES ('786', 'field_name', 'brand', '品牌', 'Brand', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('787', 'field_name', 'nationalStandardCode', '2010国标码', 'National Standard Code', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('788', 'field_name', 'srNum', '报修单号', 'Service Request Number', null, '-1');
+
 
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1401', 'assetGroup', '2', '磁共振MRI类', '磁共振MRI类', null, '-1');
