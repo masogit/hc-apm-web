@@ -272,15 +272,21 @@ public class AssetFileImportService {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             String orgName = newAsset.getClinicalDeptName();
-            OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
-            if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
+            if (importOrgMap.containsKey(orgName)) {
+                OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
+                if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
+                    item.put("status", ImportStatus.Failure);
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "无法关联");
+                    newAsset.setClinicalDeptName(null);
+                } else {
+                    newAsset.setClinicalDeptName(orgName);
+                    newAsset.setClinicalDeptId(clinicalDept.getId());
+                    newAsset.setClinicalDeptUID(clinicalDept.getUid());
+                }
+            }else{
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "警告:" + WebUtil.getMessage("OrgIngo") + orgName + "无法关联");
+                addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "不在列表页中");
                 newAsset.setClinicalDeptName(null);
-            } else {
-                newAsset.setClinicalDeptName(orgName);
-                newAsset.setClinicalDeptId(clinicalDept.getId());
-                newAsset.setClinicalDeptUID(clinicalDept.getUid());
             }
 
             //for AssetOwner
