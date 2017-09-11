@@ -1,7 +1,9 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.V2_BlobObject;
-import org.springframework.data.jpa.repository.Modifying;
+import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 
@@ -10,4 +12,7 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
     
     public V2_BlobObject findByObjectStorageId(String objectId);
 
+    @Query(value="select o from V2_BlobObject o,AssetInfo a where o.boUuid=a.uid and o.boType='AssetInfo' and  (a.siteUID in ?1 or a.clinicalDeptUID in ?1"
+            + " or a.institutionUID in ?1 or a.hospitalUID in ?1 or a.tenantUID in ?1 ) and o.boSubType like ?2 and o.objectName like ?3")
+    public Page<V2_BlobObject> loadDataForPage(List<String> siteUidList, String boSubType, String boName,Pageable pageable);
 }

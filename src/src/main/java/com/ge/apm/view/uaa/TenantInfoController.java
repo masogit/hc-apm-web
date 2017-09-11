@@ -10,9 +10,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import java.util.UUID;
-import javax.faces.context.FacesContext;
 import org.springframework.dao.DataIntegrityViolationException;
-import webapp.framework.dao.NativeSqlUtil;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 
@@ -62,7 +60,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     }
 
     @Override
-    public void onAfterNewObject(TenantInfo site, boolean isOK) {
+    public void onAfterNewObject(TenantInfo tenant, boolean isOK) {
         if(!isOK) return;
 /*
         // import field code type data for this site
@@ -76,20 +74,20 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 */
 
         // and create an default org for this site
-        String orgUID = UUID.randomUUID().toString().replace("-", "");
+//        String orgUID = UUID.randomUUID().toString().replace("-", "");
         OrgInfo org = new OrgInfo();
-        org.setSiteId(site.getId());
-
-        //for new UUIDs
-        org.setOrgLevel(1);
-        org.setOrgType(1);
-        org.setUid(orgUID);
-        org.setTenantUID(selected.getUid());
-        org.setInstitutionUID(orgUID);
-        org.setHospitalUID(orgUID);
-        org.setSiteUID(orgUID);
+        org.setSiteId(tenant.getId());
         
-        org.setName(WebUtil.getMessage("DefaultHospitalName"));
+        //for new UUIDs
+        org.setOrgLevel(0);
+        org.setOrgType(0);
+        org.setUid(tenant.getUid());
+        org.setTenantUID(tenant.getUid());
+        org.setInstitutionUID(tenant.getUid());
+        org.setHospitalUID(tenant.getUid());
+        org.setSiteUID(tenant.getUid());
+        
+        org.setName(tenant.getName());
         
         OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
         orgDao.save(org);

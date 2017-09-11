@@ -1,6 +1,5 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="zoom-pack-chart-styles.html">
-<link rel="stylesheet" href="../../css/dewIcons.css">
 <link rel="import" href="../d3/d3.html">
 
 <dom-module id="zoom-pack-chart">
@@ -12,7 +11,7 @@
           <div class="btn" on-tap="handleBackUpper">返回上一层</div>
           <div class="btn" on-tap="handleBackRoot">返回顶层</div>
         </div>
-      </template>      
+      </template>
       <svg id="svg" width$="[[width]]" height$="[[height]]">
         <g id="content" transform$="[[getCenter(width, height)]]">
           <g id="assetList"></g>
@@ -131,7 +130,7 @@
       .text(function(d) {
         return parseInt(d.data[waveFillKey] * 100) + '%';
       });
-      
+
       // Text for overload assets
       selection.each(function(d) {
         var usage_sum = d.data.usage_sum;
@@ -144,7 +143,7 @@
           var overloadTxt = d3.select(this)
           .append('text')
           .attr('y', '2em')
-          .attr('font-size', '0.8em')                
+          .attr('font-size', '0.8em')
           .call(commonTextAttr);
 
           // icon: fa-clock-o
@@ -199,7 +198,7 @@
           computed: 'calcDiameter(width, height)'
         },
         // Each view is defined as an array of three numbers: cx, cy and width
-        view: Array    
+        view: Array
       },
       observers: [
         'redraw(chartData, width, height)'
@@ -233,7 +232,7 @@
       },
       /*
        * data converter
-      */      
+      */
       dataBeautify: function(chartData) {
         // set placeholder for those single-child parent
         var sizeKey = this.sizeKey;
@@ -256,13 +255,13 @@
           var children = obj[childKey];
           if (children && Array.isArray(children)) {
             obj[childKey] = setPlaceHolder(children);
-            
+
             obj[childKey].map(function(n) {
               insertDatum(n);
               return n;
             });
           }
-          
+
           return obj;
         }
 
@@ -277,7 +276,7 @@
       formatView: function(d) {
         // Each view is defined as an array of three numbers: cx, cy and width
         return [d.x, d.y, d.r * 2 + constants.margin];
-      },      
+      },
       getRootNode: function(chartData) {
         var _this = this;
         var rootNode = d3.hierarchy(chartData, function(d) {
@@ -307,7 +306,7 @@
         var pack = d3.pack()
         .size([this.diameter - constants.margin, this.diameter - constants.margin])
         .padding(2);
-        
+
         var data = this.dataBeautify(this.chartData);
 
         var root = this.getRootNode(data);
@@ -410,7 +409,7 @@
           var fontSize = this.parentNode.attributes['font-size'].value;
           var coefficient = getScaleCoefficient(fontSize);
 
-          return 'translate(' + 0 + ',' + -d.r * constants.textTopPosition * k / coefficient  + ')';  
+          return 'translate(' + 0 + ',' + -d.r * constants.textTopPosition * k / coefficient  + ')';
         });
 
         var _this = this;
@@ -440,7 +439,7 @@
         assetGroup
         .selectAll('g.wave')
         .attr('transform', 'scale(' + k + ')');
-      },  
+      },
       render: function() {
         var margin = constants.margin;
         var sizeKey = this.sizeKey;
@@ -450,14 +449,14 @@
         });
 
         if (!nodes.length) return;
- 
+
         var focus = this.getFocus(nodes, this.focusInfo);
         this.focus = focus;
         // fire `focus-changed` event
         this.fire('focus-changed', { value: focus});
- 
+
         var _this = this;
- 
+
         var svg = d3.select(this.$.svg);
         var assetList = d3.select(this.$.assetList);
         var textList = d3.select(this.$.textList);
@@ -468,7 +467,7 @@
         .enter().append('g')
         .attr('class', 'asset');
 
-        assetGroup        
+        assetGroup
         .append('circle')
         .attr('r', function(d) {
           return d.r;
@@ -481,7 +480,7 @@
           return getColorByPercent(d.data[waveFillKey], d.data.usage_threshold);
         })
         .attr('fill', function(d) {
-          return (d !== focus && d.parent !== focus) ? 'none' : constants.circleColor;   
+          return (d !== focus && d.parent !== focus) ? 'none' : constants.circleColor;
         })
         .on('click', function(d) {
           if (_this.focus !== d) {
@@ -532,8 +531,8 @@
           .style('display', function(d) {
             if (d.parent === focus) return 'inline';
             if (d === focus && !d.children) return 'inline';
-            return 'none';        
-          })        
+            return 'none';
+          })
           .style('fill-opacity', function() {
             if (d.parent === focus) return 1;
             if (d === focus && !d.children) return 1;
@@ -549,8 +548,8 @@
             .attr('transform', 'translate(0, 0)')
             .style('display', function() {
               if (d === focus) return 'inline';
-              return 'none';        
-            })        
+              return 'none';
+            })
             .style('fill-opacity', function() {
               if (d === focus) return 1;
               return 0;
