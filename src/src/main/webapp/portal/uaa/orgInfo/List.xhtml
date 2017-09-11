@@ -55,7 +55,7 @@
                                                 <label class="label">设备负责人A</label>
                                                 <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.loginName}" itemValue="#{item.id}"/>
+                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
 
@@ -63,7 +63,7 @@
                                                 <label class="label">设备负责人B</label>
                                                 <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.loginName}" itemValue="#{item.id}"/>
+                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                                 </p:selectOneMenu>
                                             </h:panelGroup>
                                       <!-- </p:panelGrid>-->

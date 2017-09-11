@@ -83,7 +83,7 @@ UserAccountRepository userDao;
         List<UserAccount> userList = new ArrayList<UserAccount>();
         if(this.selected!=null && this.selected.getOrgType()==4) {//类型是科室
                 if(this.selected.getParentOrg()!=null)
-                    userList= userDao.findByOrgInfoId(this.selected.getParentOrg().getId());
+                    userList= userDao.findBySiteUID(this.selected.getSiteUID());
         }
         return userList;
     }
