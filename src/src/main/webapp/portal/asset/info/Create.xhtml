@@ -77,11 +77,20 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
-                                <p:selectOneMenu id="hospitalIdSelect" value="#{assetInfoController.selected.siteUID}" required="true" requiredMessage="#{msg.hospitalId} #{msg.ValidationRequire}">
-                                    <p:ajax  listener="#{assetInfoController.onHospitalChange}" update="clinicalDeptName assetOwnerName assetOwnerName2" />
-                                    <!--<f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
-                                    <f:selectItems value="#{assetInfoService.getHospitalList()}" var="item" itemLabel="#{item.name}(#{item.orgTypeName})" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                                <p:commandButton id="btnOrg" value="#{assetInfoController.selectedOrg==null?msg.AllHospitals:assetInfoController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.orgTree}" selection="#{assetInfoController.selectedNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}</label>
