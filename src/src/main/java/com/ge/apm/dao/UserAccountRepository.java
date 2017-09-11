@@ -66,7 +66,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<UserAccount> getByTenantUID(String tenantUID);
 
     public Page<UserAccount> getByTenantUID(Pageable pageRequest,String tenantUID);
-    public List<UserAccount> findByOrgInfoId(Integer id);
+    public List<UserAccount> findBySiteUID(String id);
+
 
     @Query(value="select u from UserAccount u, UserOrgInfo o where u.uid=o.userUid and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);

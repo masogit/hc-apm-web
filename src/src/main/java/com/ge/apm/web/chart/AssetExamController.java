@@ -62,7 +62,7 @@ public class AssetExamController {
         assetExamDataService.aggregateAssetSummitRangeDay(ba);
     }
 
-    // entry for pro  http://localhost:8087/geapm/web/assetExam/examSummitFromToLinks?from=2017-05-15&to=2017-09-01
+    // entry for pro  http://localhost:8087/geapm/web/assetExam/examSummitFromToLinks?from=2016-11-15&to=2017-01-01
     @RequestMapping(value = "/examSummitFromToLinks", method = RequestMethod.GET )
     public @ResponseBody void examSummitFromToLinks(@RequestParam(name="from",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String from, @RequestParam(name="to",required = true) @DateTimeFormat(pattern="yyyy-mm-dd") String to) {
         BatchAssetExam ba = new BatchAssetExam();
