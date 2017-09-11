@@ -88,6 +88,7 @@ PrimeFaces.locales ['en'] = {
         'javax.validation.constraints.Null.message': '输入不可为空',
         'javax.validation.constraints.Past.message': 'must be in the past',
         'javax.validation.constraints.Pattern.message': '输入必须与"{0}"相匹配',
+        'javax.validation.constraints.Pattern.email.message': '无效Email地址',
         'javax.validation.constraints.Size.message': '输入字符的长度必须在 {0} 与 {1}之间'
     }
 };
@@ -181,6 +182,7 @@ PrimeFaces.locales ['zh'] = {
         'javax.validation.constraints.Null.message': '输入不可为空',
         'javax.validation.constraints.Past.message': 'must be in the past',
         'javax.validation.constraints.Pattern.message': '输入必须与"{0}"相匹配',
+        'javax.validation.constraints.Pattern.email.message': '无效Email地址',
         'javax.validation.constraints.Size.message': '输入字符的长度必须在 {0} 与 {1}之间'
     }
 };
