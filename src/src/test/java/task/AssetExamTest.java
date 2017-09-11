@@ -45,12 +45,12 @@ public class AssetExamTest extends BaseJunit4Test{
         //by range day
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         BatchAssetExam batchAssetExam=new BatchAssetExam();
-        batchAssetExam.setFrom("2016-08-01");
-        batchAssetExam.setTo("2016-09-01");
+        batchAssetExam.setFrom("2017-08-17");
+        batchAssetExam.setTo("2017-09-04");
         assetExamDataService.aggregateExamSumitRangeDay(batchAssetExam);
         //by specific day
-        Date date = sdf.parse("2017-01-21");
-        assetExamDataAggregator.aggregateForExamSumit(date);
+       // Date date = sdf.parse("2017-01-21");
+      //  assetExamDataAggregator.aggregateForExamSumit(date);
     }
 
 
@@ -62,7 +62,7 @@ public class AssetExamTest extends BaseJunit4Test{
        //  assetExamDataAggregator.aggregateExamSummit();
         // by specific day
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        Date currentDate= sdf.parse("2017-08-07");
+        Date currentDate= sdf.parse("2017-08-30");
         assetExamDataAggregator.aggregateForAssetSumit(currentDate);
         //by range
             /*BatchAssetExam batchAssetExam=new BatchAssetExam();

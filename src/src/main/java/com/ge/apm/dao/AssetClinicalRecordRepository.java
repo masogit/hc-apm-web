@@ -25,17 +25,7 @@ public interface AssetClinicalRecordRepository extends GenericRepository<AssetCl
     public List<AssetClinicalRecordPojo> getAssetExamDataAggregator();
 
     //按指定日期聚合
-    @Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(" +
-            "siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate," +
-            "count(examDuration) as examCount," +
-            "sum(examDuration) as examDurations ," +
-            "sum(priceAmount) as priceAmounts ," +
-            "sum(injectCount) as injectsCounts ," +
-            "sum(exposeCount) as exposeCounts," +
-            "sum(filmCount) as filmCounts  ) " +
-            "from AssetClinicalRecord  acr " +
-            "GROUP BY acr.examDate,acr.siteId,acr.hospitalId,acr.assetId "+
-            "having exam_date >= :from and exam_date <= :to"
+    @Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate,count(examDuration) as examCount,sum(examDuration) as examDurations ,sum(priceAmount) as priceAmounts ,sum(injectCount) as injectsCounts ,sum(exposeCount) as exposeCounts,sum(filmCount) as filmCounts  ) from AssetClinicalRecord  acr GROUP BY acr.examDate,acr.siteId,acr.hospitalId,acr.assetId having exam_date >= :from and exam_date <= :to"
     )
     public List<AssetClinicalRecordPojo> aggreateAssetByRange(@Param("from") Date date1, @Param("to") Date date2);
 
