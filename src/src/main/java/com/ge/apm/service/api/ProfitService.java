@@ -106,8 +106,8 @@ public class ProfitService {
   public Observable<Tuple5<Integer, String, Money, Money, Money>> findRvnCstForEachItem(Integer siteId, Integer hospitalId, LocalDate startDate, LocalDate endDate, Integer dept, Integer month, Integer type) {
     log.info("siteId:{}, hospitalId:{}, startDate:{}, endDate:{}, dept:{}, month:{}, type:{}", siteId, hospitalId, startDate, endDate, dept, month, type);
     return db.select(new SQL() {{
-      SELECT("ai.id", "ai.name", "COALESCE(sum(asu.revenue), 0)",
-        "COALESCE(sum(asu.mt_manpower), 0) + COALESCE(sum(asu.mt_accessory), 0) + COALESCE(sum(asu.pm_manpower), 0) + COALESCE(sum(asu.pm_accessory), 0)",
+      SELECT("ai.id", "ai.name", "COALESCE(sum(asu.revenue), 0) as totalRevenue",
+        "(COALESCE(sum(asu.mt_manpower), 0) + COALESCE(sum(asu.mt_accessory), 0) + COALESCE(sum(asu.pm_manpower), 0) + COALESCE(sum(asu.pm_accessory), 0)) as totalCost",
         "COALESCE(sum(asu.deprecation_cost), 0)");
       FROM("asset_info as ai");
       INNER_JOIN("asset_summit as asu on ai.id = asu.asset_id");
@@ -126,14 +126,16 @@ public class ProfitService {
         WHERE("ai.asset_group = " + String.format("%s", type));
       }
       GROUP_BY("ai.id");
-      ORDER_BY("ai.id");
+      //ORDER_BY("ai.id");
+      ORDER_BY("totalRevenue desc, totalCost desc");
     }}.toString())
       .parameter("start_day", Date.valueOf(startDate))
       .parameter("end_day", Date.valueOf(endDate))
       .parameter("site_id", siteId)
       .parameter("hospital_id", hospitalId)
       .getAs(Integer.class, String.class, Double.class, Double.class, Double.class)
-      .map(tuple5 -> Tuple.of(tuple5._1(), tuple5._2(), CNY.money(tuple5._3()), CNY.money(tuple5._4()), CNY.money(tuple5._5()))).cache();
+      .map(tuple5 -> Tuple.of(tuple5._1(), tuple5._2(), CNY.money(tuple5._3()), CNY.money(tuple5._4()), CNY.money(tuple5._5())));
+            //.cache();
   }
 
   //@Cacheable(cacheNames = "springCache", key = "'profitService.findRvnCstForEachGroup.'+#siteId+'.'+#hospitalId+'.endDate'+#endDate+'.startDate'+#startDate+'.groupBy'+#groupBy+'.dept'+#dept+'.month'+#month+'.type'+#type")
@@ -141,8 +143,8 @@ public class ProfitService {
     log.info("siteId:{}, hospitalId:{}, startDate:{}, endDate:{}, groupBy:{}, dept:{}, month:{}, type:{}", siteId, hospitalId, startDate, endDate, groupBy, dept, month, type);
     return db.select(new SQL() {{
       SELECT(String.format("%s as group_id", Option.when("dept".equals(groupBy), "ai.clinical_dept_id").getOrElse(Option.when("type".equals(groupBy), "ai.asset_group").getOrElse("extract(year from asu.created)*100+extract(month from asu.created)"))),
-        "COALESCE(sum(asu.revenue), 0)",
-        "COALESCE(sum(asu.mt_manpower), 0) + COALESCE(sum(asu.mt_accessory), 0) + COALESCE(sum(asu.pm_manpower), 0) + COALESCE(sum(asu.pm_accessory), 0)",
+        "COALESCE(sum(asu.revenue), 0) as totalRevenue",
+        "(COALESCE(sum(asu.mt_manpower), 0) + COALESCE(sum(asu.mt_accessory), 0) + COALESCE(sum(asu.pm_manpower), 0) + COALESCE(sum(asu.pm_accessory), 0)) as totalCost",
         "COALESCE(sum(asu.deprecation_cost), 0)");
       FROM("asset_info as ai");
       INNER_JOIN("asset_summit as asu on ai.id = asu.asset_id");
@@ -160,14 +162,16 @@ public class ProfitService {
         WHERE("ai.asset_group = " + String.format("%s", type));
       }
       GROUP_BY("group_id");
-      ORDER_BY("group_id");
+      //ORDER_BY("group_id");
+      ORDER_BY("totalRevenue desc, totalCost desc");
     }}.toString())
       .parameter("start_day", Date.valueOf(startDate))
       .parameter("end_day", Date.valueOf(endDate))
       .parameter("site_id", siteId)
       .parameter("hospital_id", hospitalId)
       .getAs(Integer.class, Double.class, Double.class, Double.class)
-      .map(tuple4 -> Tuple.of(tuple4._1(), CNY.money(tuple4._2()), CNY.money(tuple4._3()), CNY.money(tuple4._4()))).cache();
+      .map(tuple4 -> Tuple.of(tuple4._1(), CNY.money(tuple4._2()), CNY.money(tuple4._3()), CNY.money(tuple4._4())));
+            //.cache();
   }
 
   interface Asset {
@@ -208,8 +212,9 @@ public class ProfitService {
       WHERE("ai.is_valid = true");
       GROUP_BY("ai.id");
       GROUP_BY("created_day");
-      ORDER_BY("ai.id");
-      ORDER_BY("created_day");
+      //ORDER_BY("ai.id");
+      //ORDER_BY("created_day");
+      ORDER_BY("revenue desc, costs desc");
     }}.toString())
       .parameter("start_day", Date.valueOf(startDate))
       .parameter("end_day", Date.valueOf(endDate))
@@ -217,7 +222,8 @@ public class ProfitService {
       .parameter("hospital_id", hospitalId)
       .parameter("time_unit", "month")
       .get(rs -> Tuple.of(rs.getInt("id"), rs.getString("name"), Option.of(rs.getDate("created_day")).map(Date::toLocalDate).getOrElse(LocalDate.now()), rs.getInt("type"), rs.getInt("dept"), rs.getDouble("revenue"), rs.getDouble("costs")))
-      .cache();
+      ;
+    //.cache();
   }
 
   private Integer localDateToX(LocalDate input) {
@@ -279,7 +285,7 @@ public class ProfitService {
     return monthlyData.filter(v -> xToLocaldate(v._1).getYear() == year);
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'profitService.predict'+#siteId+'.'+#hospitalId+'.startDate'+#startDate+'.endDate'+#endDate+'.year'+#year")
+  //@Cacheable(cacheNames = "springCache", key = "'profitService.predict'+#siteId+'.'+#hospitalId+'.startDate'+#startDate+'.endDate'+#endDate+'.year'+#year")
   public Seq<Tuple7<Integer, String, Integer, Integer, Integer, Double, Double>> predict(Integer siteId, Integer hospitalId, LocalDate startDate, LocalDate endDate, Integer year) {
     Seq<Tuple7<Integer, String, LocalDate, Integer, Integer, Double, Double>> items = dataTransform(findRvnCstForForecast(siteId, hospitalId, startDate, endDate));
     return predictRvnCst(ratios(items), items, year)
@@ -288,7 +294,7 @@ public class ProfitService {
   }
 
   //for forecast rate
-  @Cacheable(cacheNames = "springCache", key = "'profitService.lastYearData'+#siteId+'.'+#hospitalId")
+  //@Cacheable(cacheNames = "springCache", key = "'profitService.lastYearData'+#siteId+'.'+#hospitalId")
   public Seq<Tuple7<Integer, String, Integer, Integer, Integer, Double, Double>> lastYearData(Integer siteId, Integer hospitalId) {
     return List.ofAll(findRvnCstForForecast(siteId, hospitalId, LocalDate.now().minusYears(1).withDayOfYear(1), LocalDate.now().withDayOfYear(1).minusDays(1))
       .map(v -> Tuple.of(v._1, v._2, v._3.getMonthValue(), v._4, v._5, v._6, v._7))
