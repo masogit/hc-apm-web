@@ -56,7 +56,7 @@ public class AssetFileImportController {
             this.file = event.getFile();
             ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
             if(!aiService.checkDocVersion(doc)){
-                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError"));
+                WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
                 return;
             }
             importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
@@ -67,8 +67,8 @@ public class AssetFileImportController {
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
             Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (Throwable e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError"));
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
             Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, e);
         }
     }

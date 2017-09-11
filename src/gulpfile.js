@@ -10,8 +10,6 @@ const sass = require('gulp-sass');
 const gulp = require('gulp');
 const cssmin = require('gulp-cssmin');
 const importOnce = require('node-sass-import-once');
-const iconfont = require('gulp-iconfont');
-const iconfontCss = require('gulp-iconfont-css');
 
 const src = 'public/sass/*.scss';
 const src_comp = 'public/elements/**/*.scss';
@@ -87,30 +85,6 @@ gulp.task('sass:compile:module', function() {
   .pipe(gulp.dest(function(file) {
     return file.base;
   }));
-});
-
-// -------------------------------------
-//   Task: Custom Icon Fonts
-// -------------------------------------
-const fontName = 'DewIcon';
-gulp.task('iconfont', function() {
-  return gulp.src([
-    'public/assets/*.svg'
-  ])
-  .pipe(iconfontCss({
-    fontName,
-    path: 'public/sass/_icons-template.scss',
-    targetPath: '../sass/dewIcons.scss',
-    fontPath: '../fonts/',
-    cssClass: 'dewicon'
-  }))
-  .pipe(iconfont({
-    fontName,
-    prependUnicode: true,
-    formats: ['ttf', 'eot', 'woff', 'woff2', 'svg'],
-    // timestamp: Math.round(Date.now() / 1000)
-  }))
-  .pipe(gulp.dest('public/fonts/'));
 });
 
 // -------------------------------------

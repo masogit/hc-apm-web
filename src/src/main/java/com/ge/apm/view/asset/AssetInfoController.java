@@ -335,6 +335,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     @Override
+    public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
+        resultStatus = isOK;
+    }
+
+    @Override
+    public void onAfterNewObject(AssetInfo object, boolean isOK) {
+        resultStatus = isOK;
+    }
+
+    @Override
     public void onAfterDeleteObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
     }

@@ -131,6 +131,9 @@ UserAccountRepository userDao;
         
         org.setOrgLevel(1);
         org.setOrgType(1);
+        
+        org.setParentUID(selectedTenant.getUid());
+        org.setParentOrg(dao.getByUid(selectedTenant.getUid()));
         this.selected = org;
     }
 
