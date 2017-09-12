@@ -38,7 +38,6 @@ public class AssetCreateService {
     protected BlobFileService blobService;
     @Autowired
     private OrgInfoRepository orgDao;
-
     @Autowired
     private QrCodeLibRepository qrLibDao;
     @Autowired
@@ -121,11 +120,11 @@ public class AssetCreateService {
         attachDao.save(attachList);
     }
 
-    public List<QrCodeAttachment> getQrCodePictureList(Integer qrCodeLibId) {
+    public List<V2_BlobObject> getQrCodePictureList(String  qrCodeLibUid) {
         List<SearchFilter> qrCodeFilters = new ArrayList<>();
-        qrCodeFilters.add(new SearchFilter("qrCodeId", SearchFilter.Operator.EQ, qrCodeLibId));
-        qrCodeFilters.add(new SearchFilter("fileType", SearchFilter.Operator.EQ, 1));
-        List<QrCodeAttachment> picsList = qrCodeAttachDao.findBySearchFilter(qrCodeFilters);
+        qrCodeFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, qrCodeLibUid));
+        qrCodeFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "1"));
+        List<V2_BlobObject> picsList = blobDao.findBySearchFilter(qrCodeFilters);
         return picsList;
     }
 
@@ -135,12 +134,12 @@ public class AssetCreateService {
         qrLibDao.save(qrLibItem);
     }
 
-    public List<QrCodeAttachment> getQrCodeAudioList(Integer qrCodeLibId) {
+    public List<V2_BlobObject> getQrCodeAudioList(String  qrCodeLibUid) {
         List<SearchFilter> qrCodeFilters = new ArrayList<>();
-        qrCodeFilters.add(new SearchFilter("qrCodeId", SearchFilter.Operator.EQ, qrCodeLibId));
-        qrCodeFilters.add(new SearchFilter("fileType", SearchFilter.Operator.EQ, 2));
-        List<QrCodeAttachment> picsList = qrCodeAttachDao.findBySearchFilter(qrCodeFilters);
-        return picsList;
+        qrCodeFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, qrCodeLibUid));
+        qrCodeFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "2"));
+        List<V2_BlobObject> audioList = blobDao.findBySearchFilter(qrCodeFilters);
+        return audioList;
     }
 
     public boolean rejectReturn(QrCodeLib request, String rejectText) {

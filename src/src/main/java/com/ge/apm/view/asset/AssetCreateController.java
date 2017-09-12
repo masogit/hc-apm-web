@@ -43,8 +43,8 @@ public class AssetCreateController {
     private List<String> rejectTextHistory;
     private List<String> commentsList;
 
-    List<QrCodeAttachment> pictureList;
-    List<QrCodeAttachment> audioList;
+    List<V2_BlobObject> pictureList;
+    List<V2_BlobObject> audioList;
 
     private UserAccount clinicalOwner;
 
@@ -58,13 +58,13 @@ public class AssetCreateController {
 
         assetInfo = createAssetInfo();
 
-        pictureList = acServie.getQrCodePictureList(createRequest.getId());
-        audioList = acServie.getQrCodeAudioList(createRequest.getId());
+        pictureList = acServie.getQrCodePictureList(createRequest.getUid());
+        audioList = acServie.getQrCodeAudioList(createRequest.getUid());
 
         //默认图片全选
         selectedPictures = new String[pictureList.size()];
         for (int i = 0; i < pictureList.size(); i++) {
-            selectedPictures[i] = pictureList.get(i).getObjectId();
+            selectedPictures[i] = pictureList.get(i).getObjectStorageId();
         }
 
         rejectTextHistory = new ArrayList();
@@ -221,11 +221,11 @@ public class AssetCreateController {
         this.owner = owner;
     }
 
-    public List<QrCodeAttachment> getPictureList() {
+    public List<V2_BlobObject> getPictureList() {
         return pictureList;
     }
 
-    public List<QrCodeAttachment> getAudioList() {
+    public List<V2_BlobObject> getAudioList() {
         return audioList;
     }
 
