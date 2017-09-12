@@ -51,7 +51,7 @@
                 <p:fieldset legend="基本资料" id="accordion" >
                     <div class="ui-g-7">
                         <p:galleria value="#{assetCreateController.pictureList}" var="attach" panelWidth="500" panelHeight="313" showCaption="false"  autoPlay="false">
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectId)}" /> 
+                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" /> 
                         </p:galleria>
                     </div>
                     <div class="ui-g-5">
@@ -77,7 +77,7 @@
                                     </ul>
                                 </div>
                                 <c:forEach items="#{assetCreateController.audioList}" var="item" varStatus="status">
-                                    <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectId)}" id="audio#{status.index}"/>
+                                    <h:inputHidden class="mp3Link" value="#{fileDownloadService.getFileUrl(item.objectStorageId)}" id="audio#{status.index}"/>
                                 </c:forEach>
                             </p:panelGrid>
                         </p:fieldset>
@@ -245,11 +245,11 @@
 
                             <p:fieldset legend="选择图片作为资产附件保存"  style="margin-bottom:20px">
                                 <p:selectManyCheckbox id="custom" value="#{assetCreateController.selectedPictures}"  layout="custom">
-                                    <f:selectItems value="#{assetCreateController.pictureList}" var="item"  itemValue="#{item.objectId}" />
+                                    <f:selectItems value="#{assetCreateController.pictureList}" var="item"  itemValue="#{item.objectStorageId}" />
                                 </p:selectManyCheckbox>
                                 <c:forEach items="#{assetCreateController.pictureList}" var="item" varStatus="status">
                                     <div class="ui-grid-col-2" style="text-align:center">
-                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(item.objectId)}"  height="60"  width="80" />
+                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(item.objectStorageId)}"  height="60"  width="80" />
                                         <p:checkbox id="opt#{item.id}" for="custom" itemIndex="#{status.index}" />
                                     </div>
                                 </c:forEach>
