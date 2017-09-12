@@ -1,6 +1,5 @@
 @import "predix";
 
-
 .layout-compact .layout-wrapper {
   $brand-color: #d1d0d8;
   $menu-width: 190px;
@@ -13,7 +12,7 @@
     top: 0 !important;
     width: $menu-width;
     .brand {
-      padding: 1.5em 0 .8em;
+      padding: 1em 0 .5em;
       h1 {
         color: $brand-color;
         font-weight: 200;
@@ -43,6 +42,7 @@
     .layout-menu.layout-menu-dark {
       margin-left: 0;
       width: $menu-width / 3.5;
+      overflow-y: hidden;
 
       ul.ultima-menu li a {
         text-align: center;
@@ -73,7 +73,35 @@
     transform: rotate(180deg);
   }
   .menu-content {
-    margin-top: 1em;
     outline: none;
+    height: calc(100vh - 110px);
+    overflow-y: hidden;
+
+    -ms-overflow-style: none;
+
+    &:hover {
+      overflow-y: overlay;
+    }
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      -border-radius: 5px;
+      border-radius: 5px;
+      background: rgba(0,0,0,.3);
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: transparent;
+      -webkit-border-radius: 5px;
+      border-radius: 5px;
+      background: rgba($primary-blue, .8);
+    }
+    &::-webkit-scrollbar-thumb:window-inactive {
+      background: transparent;
+    }
+
   }
 }
