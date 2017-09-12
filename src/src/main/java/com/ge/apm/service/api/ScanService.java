@@ -33,7 +33,7 @@ public class ScanService {
     db = Database.from(connectionProvider);
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'ScanService.brief.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset")
+  //@Cacheable(cacheNames = "springCache", key = "'ScanService.brief.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset")
   public Observable<Tuple3<Integer, Integer, Integer>> brief(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset) {
     Objects.requireNonNull(from);
     Objects.requireNonNull(to);
@@ -74,7 +74,7 @@ public class ScanService {
       .cache();
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'ScanService.assetDetail.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset+'.'+#part")
+  //@Cacheable(cacheNames = "springCache", key = "'ScanService.assetDetail.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset+'.'+#part")
   public Observable<Tuple4<Integer, Integer, Integer, Integer>> assetDetail(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset, Integer part) {
     QuerySelect.Builder builder = db.select(new SQL() {{
       SELECT_DISTINCT("l.asset_group", "l.asset_id", "l.part_id", "COALESCE(r.exam_num,0)");
@@ -129,7 +129,7 @@ public class ScanService {
       .cache();
   }
 
-  @Cacheable(cacheNames = "springCache", key = "'ScanService.stepDetail.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset+'.'+#part+'.'+#step")
+  //@Cacheable(cacheNames = "springCache", key = "'ScanService.stepDetail.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset+'.'+#part+'.'+#step")
   public Observable<Tuple4<Integer, Integer, Integer, Integer>> stepDetail(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset, Integer part, Integer step) {
     QuerySelect.Builder builder = db.select(new SQL() {{
       SELECT_DISTINCT("l.asset_group", "l.part_id", "l.step_id", "COALESCE(r.exam_num,0)");
