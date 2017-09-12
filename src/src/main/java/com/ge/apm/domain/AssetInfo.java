@@ -320,6 +320,86 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+    
+    //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
+    @Column(name = "asset_type")
+    private Integer assetType;
+    //用途[1:诊断类,2:治疗类,3:辅助类]
+    @Column(name = "asset_usage")
+    private Integer assetUsage;
+    //资金来源[1:科研,2:教学,3:医疗,4:干保]
+    @Column(name = "capital_source")
+    private Integer capitalSource;
+    //风险等级[1:1类A,2:1类B,3:2类,4:3类]
+    @Column(name = "risk_grade")
+    private Integer riskGrade;
+    //计量[1:A,2:B,3:C,4:D]
+    @Column(name = "measure_grade")
+    private Integer measureGrade;
+    //是否急救设备[1:急救 类,2:非急救类]
+    @Column(name = "emergency_equipment")
+    private Integer emergencyEquipment;
+    //是否进口设备[1:进口,2:国产]
+    @Column(name = "import_equipment")
+    private Integer importEquipment;
+
+    public Integer getAssetType() {
+        return assetType;
+    }
+
+    public void setAssetType(Integer assetType) {
+        this.assetType = assetType;
+    }
+
+    public Integer getAssetUsage() {
+        return assetUsage;
+    }
+
+    public void setAssetUsage(Integer assetUsage) {
+        this.assetUsage = assetUsage;
+    }
+
+    public Integer getCapitalSource() {
+        return capitalSource;
+    }
+
+    public void setCapitalSource(Integer capitalSource) {
+        this.capitalSource = capitalSource;
+    }
+
+    public Integer getRiskGrade() {
+        return riskGrade;
+    }
+
+    public void setRiskGrade(Integer riskGrade) {
+        this.riskGrade = riskGrade;
+    }
+
+    public Integer getMeasureGrade() {
+        return measureGrade;
+    }
+
+    public void setMeasureGrade(Integer measureGrade) {
+        this.measureGrade = measureGrade;
+    }
+
+    public Integer getEmergencyEquipment() {
+        return emergencyEquipment;
+    }
+
+    public void setEmergencyEquipment(Integer emergencyEquipment) {
+        this.emergencyEquipment = emergencyEquipment;
+    }
+
+    public Integer getImportEquipment() {
+        return importEquipment;
+    }
+
+    public void setImportEquipment(Integer importEquipment) {
+        this.importEquipment = importEquipment;
+    }
+    
+    
 
     public Integer getDeviceStatus() {
         return deviceStatus;
