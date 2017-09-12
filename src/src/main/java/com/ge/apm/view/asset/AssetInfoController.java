@@ -938,15 +938,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root",null,null);
-        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
-//        List tenantChildNodes = uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren();
-        List tenantChildNodes = uaaService.getOrgTreeBySite(selected.getSiteUID()).getChildren();
-        rootNode.getChildren().addAll(tenantChildNodes);
-        rootNode.setExpanded(true);
+
+        List tenantChildNodes = uaaService.getOrgTreeBySiteExceptClinicalDept(loginUser.getSiteUID()).getChildren();
+        List<OrgInfo> orgInfoList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
+        orgTree.getChildren().addAll(tenantChildNodes);
+        orgTree.setExpanded(true);
+
+        setSelectableOrgTree(orgTree, orgInfoList);
+
+    }
+
+    private void setSelectableOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
+        OrgInfo org = (OrgInfo) node.getData();
+        node.setSelectable(false);
+        if (accessiableOrgList.contains(org)) {
+            node.setSelectable(true);
+        }
+        for (TreeNode item : node.getChildren()) {
+            setSelectableOrgTree(item, accessiableOrgList);
+        }
     }
 
 }

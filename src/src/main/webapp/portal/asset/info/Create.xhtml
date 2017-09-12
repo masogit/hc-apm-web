@@ -77,11 +77,11 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
-                                <p:commandButton id="btnOrg" value="#{assetInfoController.selectedOrg==null?msg.AllHospitals:assetInfoController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                                <p:commandButton id="btnOrg" value="#{assetInfoController.selectedOrg==null?'':assetInfoController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                                 <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.orgTree}" selection="#{assetInfoController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="select" update="clinicalDeptName assetOwnerName assetOwnerName2" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
