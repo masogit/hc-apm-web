@@ -937,9 +937,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-        TreeNode treeNode = uaaService.getOrgTreebyParentId(loginUser.getSiteUID(), loginUser.getUid());
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
         orgTree = new DefaultTreeNode("root",null,null);
-        orgTree.getChildren().addAll(treeNode.getChildren());
+        orgTree.getChildren().add(treeNode);
         orgTree.setExpanded(true);
 
     }
