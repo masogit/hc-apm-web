@@ -435,7 +435,13 @@ insert into i18n_message(id, msg_type, msg_key, value_zh, value_en, site_id) val
 INSERT INTO "public"."i18n_message" VALUES ('786', 'field_name', 'brand', '品牌', 'Brand', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('787', 'field_name', 'nationalStandardCode', '2010国家编码', 'National Standard Code', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('788', 'field_name', 'srNum', '报修单号', 'Service Request Number', null, '-1');
-
+INSERT INTO "public"."i18n_message" VALUES ('789', 'field_name', 'assetCategory', '设备分类', 'Asset Category', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('790', 'field_name', 'assetUsage', '用途', 'Asset Usage', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('791', 'field_name', 'capitalSource', '资金来源', 'Capital Source', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('792', 'field_name', 'riskGrade', '分险等级', 'Risk Grade', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('793', 'field_name', 'measureGrade', '计量', 'Measure Grade', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('794', 'field_name', 'emergencyEquipment', '是否急救设备', 'Emergency Equipment', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('795', 'field_name', 'importEquipment', '是否进口设备', 'Import Equipment', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1401', 'assetGroup', '2', '磁共振MRI类', '磁共振MRI类', null, '-1');
