@@ -336,7 +336,7 @@ public class AssetInfo implements Serializable {
     //计量[1:A,2:B,3:C,4:D]
     @Column(name = "measure_grade")
     private Integer measureGrade;
-    //是否急救设备[1:急救 类,2:非急救类]
+    //是否急救设备[1:急救类,2:非急救类]
     @Column(name = "emergency_equipment")
     private Integer emergencyEquipment;
     //是否进口设备[1:进口,2:国产]
