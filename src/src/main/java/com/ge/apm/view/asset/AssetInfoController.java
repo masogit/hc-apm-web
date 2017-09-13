@@ -11,7 +11,10 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +44,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
+
+    OrgInfoRepository orgInfoRepository;
 
     private UserAccountRepository userDao;
 
@@ -104,6 +109,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         qrCode = selected.getQrCode();
+
+        selectedOrg = orgInfoRepository.getByUid(selected.getSiteUID());
     }
 
     @Override
@@ -121,6 +128,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         this.filterBySite = true;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -159,6 +167,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
+
+        if (this.selected != null) {
+            initOrgTree();
+        }
+
 
     }
 
@@ -524,10 +537,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
 
     public void removeAttachment(String objectId) {
-        
+
         blobService.deleteBlobFileByStorageId(objectId);
         attachements = attachements.stream().filter(item -> !item.getObjectStorageId().equals(objectId)).collect(Collectors.toList());
-        
+
     }
 
     public String getHospitalName(String siteUid) {
@@ -887,6 +900,48 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setAssetId(Integer assetId) {
         this.assetId = assetId;
+    }
+
+    private TreeNode orgTree;
+
+    private TreeNode selectedNode;
+
+    private OrgInfo selectedOrg;
+
+    private UaaService uaaService = WebUtil.getBean(UaaService.class);
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+//        selected = null;
+        TreeNode node = event.getTreeNode();
+        //node.setExpanded(!node.isExpanded());
+        selectedOrg = (OrgInfo) node.getData();
+        selected.setSiteUID(selectedOrg.getUid());
+    }
+
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        TreeNode treeNode = uaaService.getOrgTreebyParentId(loginUser.getSiteUID(), loginUser.getUid());
+        orgTree = new DefaultTreeNode("root",null,null);
+        orgTree.getChildren().addAll(treeNode.getChildren());
+        orgTree.setExpanded(true);
+
     }
 
 }
