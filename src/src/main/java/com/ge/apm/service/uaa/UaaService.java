@@ -569,4 +569,45 @@ public class UaaService {
             setSelectableOrgTree(item, accessiableOrgList);
         }
     }
+
+    public TreeNode getOrgTreeByParentIdWithSelectedChildren(String parentOrgId, String userUid) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getOrgInfosByParentId(parentOrgId);
+        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteList(userUid);
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+
+        for(OrgInfo org: orgInfoFullList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(false);
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+        }
+
+        TreeNode rootNode = null;
+
+        for(OrgInfo org: orgInfoSelectableList){
+            TreeNode node = treeMap.get(org.getUid());
+
+            if (node == null) continue;
+            node.setSelectable(true);
+
+            OrgInfo current = org;
+            while(current.getParentUID()!=null){
+                TreeNode currentNode = treeMap.get(current.getUid());
+                TreeNode parentNode = treeMap.get(current.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(currentNode);
+                    current = (OrgInfo)parentNode.getData();
+                }
+            }
+
+            if (current.getParentUID() == null && rootNode == null) {
+                rootNode = treeMap.get(current.getUid());
+
+            }
+        }
+
+        return rootNode;
+    }
 }
