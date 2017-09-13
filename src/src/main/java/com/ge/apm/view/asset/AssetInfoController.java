@@ -935,29 +935,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void initOrgTree() {
-        OrgInfoRepository orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
+        TreeNode treeNode = uaaService.getOrgTreebyParentId(loginUser.getSiteUID(), loginUser.getUid());
         orgTree = new DefaultTreeNode("root",null,null);
-
-        List tenantChildNodes = uaaService.getOrgTreeBySiteExceptClinicalDept(loginUser.getSiteUID()).getChildren();
-        List<OrgInfo> orgInfoList = uaaService.getUserAccessibleSiteList(loginUser.getUid());
-        orgTree.getChildren().addAll(tenantChildNodes);
+        orgTree.getChildren().addAll(treeNode.getChildren());
         orgTree.setExpanded(true);
 
-        setSelectableOrgTree(orgTree, orgInfoList);
-
-    }
-
-    private void setSelectableOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
-        OrgInfo org = (OrgInfo) node.getData();
-        node.setSelectable(false);
-        if (accessiableOrgList.contains(org)) {
-            node.setSelectable(true);
-        }
-        for (TreeNode item : node.getChildren()) {
-            setSelectableOrgTree(item, accessiableOrgList);
-        }
     }
 
 }

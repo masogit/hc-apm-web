@@ -548,4 +548,25 @@ public class UaaService {
         }
         return root;
     }
+
+    public TreeNode getOrgTreebyParentId(String parentOrgId, String userUid) {
+
+        TreeNode treeNode = getOrgTreeBySiteExceptClinicalDept(parentOrgId);
+        List<OrgInfo> orgInfoList = getUserAccessibleSiteList(userUid);
+
+        setSelectableOrgTree(treeNode, orgInfoList);
+
+        return treeNode;
+    }
+
+    private void setSelectableOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {
+        OrgInfo org = (OrgInfo) node.getData();
+        node.setSelectable(false);
+        if (accessiableOrgList.contains(org)) {
+            node.setSelectable(true);
+        }
+        for (TreeNode item : node.getChildren()) {
+            setSelectableOrgTree(item, accessiableOrgList);
+        }
+    }
 }
