@@ -108,16 +108,12 @@
       opacity: 1
     }
     &.donut-chart-ettr {
-      top: 115px;
-      left: -13px;
-    }
-    &.donut-chart-arrival {
-      top: 1px;
-      left: 97px;
+      right: 9%;
+      bottom: 0;
     }
     &.donut-chart-response {
-      top: 154px;
-      left: 140px;
+      top: 0;
+      left: 9%;
     }
   }
   .range-wrapper {
@@ -165,31 +161,6 @@
 
     .slider-ettr {
       $base-color: #B276AF;
-      &:not(.hidden) ~ button {
-        background-color: $base-color;
-        border-color: $base-color;
-      }
-      &:not(.hidden) ~ .ant-input-group .ant-radio-group label.ant-radio-button-wrapper-checked {
-        background-color: $base-color;
-        border-color: $base-color;
-        box-shadow: -1px 0 0 0 $base-color;
-      }
-      .rc-slider-handle {
-        border-color: $base-color;
-      }
-      .rc-slider-track-1 {
-        background-color: darken($base-color, 28%)
-      }
-      .rc-slider-track-2 {
-        background-color: darken($base-color, 14%)
-      }
-      .rc-slider-track-3 {
-        background-color: $base-color;
-      }
-    }
-
-    .slider-arrival_time {
-      $base-color: #5CAC9C;
       &:not(.hidden) ~ button {
         background-color: $base-color;
         border-color: $base-color;

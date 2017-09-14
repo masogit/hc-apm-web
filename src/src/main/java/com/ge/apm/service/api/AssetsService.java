@@ -38,6 +38,7 @@ public class AssetsService {
       FROM("asset_info");
       WHERE("site_id = :site_id");
       WHERE("hospital_id = :hospital_id");
+      WHERE("is_deleted = false");
       if (Option.of(dept).filter(d -> d > 0).isDefined()) {
         WHERE("clinical_dept_id = :dept");
       }
