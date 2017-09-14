@@ -15,8 +15,8 @@ const SampleData = [
 
 let wrapperStyle = radius => {
   return {
-    width: radius * 2,
-    height: radius * 2,
+    width: radius * 2.2,
+    height: radius * 2.2,
     position: 'absolute',
   }
 }
@@ -38,12 +38,12 @@ let titleStyle = {
   fontWeight: 'bold'
 }
 
-function rowHelper(rowData) {
+function rowHelper(rowData, i) {
   if (!rowData.value) {
     return null
   }
   return (
-    <div>
+    <div key={i}>
       <span>{rowData.label}: {rowData.value}</span>
     </div>
   )
@@ -75,9 +75,9 @@ export default class DonutChart extends PureComponent {
     }
     let colorGradation = DonutChart.getColorGradation({ baseColor, number: data.length})
     return (
-      <div 
-        style={wrapperStyle(radius)} 
-        className={classnames('donut-chart', className)} 
+      <div
+        style={wrapperStyle(radius)}
+        className={classnames('donut-chart', className)}
         onClick={onClick && this.onClickProxy}
         {...restPorps}
       >

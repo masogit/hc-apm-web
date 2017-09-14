@@ -38,7 +38,6 @@ const BallsStub = [
   { key: 'reportTime', i18n: 'report_incident' },
   { key: 'dispatchTime', i18n: 'dispatch_incident' },
   { key: 'respond', i18n: 'accept_incident' },
-  { key: 'arrived', i18n: 'signin_incident' },
   { key: 'workingTime', i18n: 'fixing_incident' },
   { key: 'ack', i18n: 'acknowlege_incident' },
   { key: 'ETTR', i18n: 'close_incident' }
@@ -106,12 +105,7 @@ function mapDispatch2Porps(dispatch) {
       })
     },
     updateDistribution: (value, dataType) => {
-      let suffix = 'Response'
-      if (dataType === 'arrival_time') {
-        suffix = 'Arrival'
-      } else if (dataType === 'ettr') {
-        suffix = 'Ettr'
-      }
+      let suffix = dataType === 'ettr' ? 'Ettr' : 'Response'
       dispatch({
         type: 'ProcessAnalysis/update/distribution' + suffix,
         data: value
@@ -133,8 +127,8 @@ function mapDispatch2Porps(dispatch) {
 }
 
 function mapState2Props(state) {
-  let { ProcessAnalysis : { pagination, display, dataType, distributionEttr, distributionResponse, distributionArrival } } = state
-  return { pagination, display, dataType, distributionEttr, distributionResponse, distributionArrival }
+  let { ProcessAnalysis : { pagination, display, dataType, distributionEttr, distributionResponse } } = state
+  return { pagination, display, dataType, distributionEttr, distributionResponse }
 }
 
 @connect(mapState2Props, mapDispatch2Porps)
@@ -153,7 +147,6 @@ export class App extends Component<void, Props, void> {
     distriMax: 0,
     distriUnit: 'min',
     distriEttr: [],
-    distriArrival: [],
     distriResponse: [],
     tooltipX: -861112,
     tooltipY: -861112,
@@ -258,8 +251,6 @@ export class App extends Component<void, Props, void> {
     distri.sum = last(phases) // max
     if (phaseData.phase === 'ETTR') {
       this.setState({ distriEttr: distri })
-    } else if (phaseData.phase === 'arrived') {
-      this.setState({ distriArrival: distri })
     } else { // respond
       this.setState({ distriResponse: distri })
     }
@@ -282,8 +273,6 @@ export class App extends Component<void, Props, void> {
         return colors.purple
       case 'response_time':
         return colors.yellow
-      case 'arrival_time':
-        return colors.green
       default:
         throw Error(`Invalid dataType: ${dataType}, no base color found`)
     }
@@ -308,9 +297,6 @@ export class App extends Component<void, Props, void> {
         break
       case 'response_time':
         connectIndex = 2
-        break
-      case 'arrival_time':
-        connectIndex = 3
         break
       default:
         warn('Invalid type')
@@ -347,13 +333,11 @@ export class App extends Component<void, Props, void> {
   }
 
   getCurrentDistribution(type) {
-    let { dataType, distributionEttr, distributionArrival, distributionResponse } = this.props
+    let { dataType, distributionEttr, distributionResponse } = this.props
     type = type || dataType
     let distribution
     if (type === 'ettr') {
       distribution = distributionEttr
-    } else if (type === 'arrival_time') {
-      distribution = distributionArrival
     } else { // response_time
       distribution = distributionResponse
     }
@@ -381,12 +365,10 @@ export class App extends Component<void, Props, void> {
   }
 
   componentWillReceiveProps(nextProps) {
-    let { dataType, distributionEttr, distributionArrival, distributionResponse } = nextProps
+    let { dataType, distributionEttr, distributionResponse } = nextProps
     let distribution
     if (dataType === 'ettr') {
       distribution = distributionEttr
-    } else if (dataType === 'arrival_time') {
-      distribution = distributionArrival
     } else { // response_time
       distribution = distributionResponse
     }
@@ -398,10 +380,10 @@ export class App extends Component<void, Props, void> {
 
   render() {
     let { briefs, details, selected, generalGross, distriMax, distriUnit, leftClockwise, rightClockwise,
-      distriArrival, distriEttr, distriResponse, tooltipX, tooltipY, tooltipData
+      distriEttr, distriResponse, tooltipX, tooltipY, tooltipData
     } = this.state
     let { t, updateDisplayType, pagination, clientRect, display, dataType,
-      distributionEttr, distributionResponse, distributionArrival
+      distributionEttr, distributionResponse
     } = this.props
     let { left, right } = pagination
     let { outer_R, outer_r, inner_R } = ensureSize(clientRect.width, clientRect.height)
@@ -454,17 +436,6 @@ export class App extends Component<void, Props, void> {
                 onMouseLeave={this.onDonutHover}
               />
               <Donut
-                id="arrival_time"
-                className={classnames("donut-chart-arrival", dataType === 'arrival_time' ? 'active' : '' )}
-                baseColor={colors.green}
-                onClick={onClickDonut}
-                title={t('arrival_time')}
-                data={distriArrival}
-                rows={[GetDonutChartRow(t('average'), gross.arrived)]}
-                onMouseMove={evt => this.onDonutHover(evt, distriArrival, distributionArrival)}
-                onMouseLeave={this.onDonutHover}
-              />
-              <Donut
                 id="response_time"
                 className={classnames("donut-chart-response", dataType === 'response_time' ? 'active' : '' )}
                 baseColor={colors.yellow}
@@ -494,14 +465,6 @@ export class App extends Component<void, Props, void> {
                 showTooltip={dataType === 'ettr'}
                 unit="d"
                 step={.5}
-                onChange={this.onSliderChange}
-              />
-              <ReversedRange
-                className={classnames('slider-arrival_time', dataType === 'arrival_time' ? '' : 'hidden')}
-                showTooltip={dataType === 'arrival_time'}
-                value={distributionArrival}
-                unit="h"
-                step={1}
                 onChange={this.onSliderChange}
               />
               <ReversedRange

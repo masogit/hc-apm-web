@@ -20,7 +20,7 @@ export default {
       from: moment(new Date().getFullYear(), 'YYYY'),
       to: moment()
     },
-    dataType: 'arrival_time',
+    dataType: 'response_time',
     display: 'display_asset_type', // type | supplier | name
     pagination: {
       left: {
@@ -36,7 +36,6 @@ export default {
     },
     distributionEttr: [0, 24 * 3600, 3 * 24 * 3600 , 7 * 24 * 3600], // 1, 3, 7 days
     distributionResponse: [0, 15 * 60, 30 * 60 , 3600], // 15, 30, 60 mins
-    distributionArrival: [0, 12 * 3600, 24 * 3600 , 48 * 3600], // 12, 24, 48 hours
   },
 
   reducers: {
@@ -59,12 +58,6 @@ export default {
     ['update/datatype'](state, { data }) {
       state = cloneDeep(state)
       state.dataType = data
-      return state
-    },
-
-    ['update/showlastyear'](state, { data }) {
-      state = cloneDeep(state)
-      state.showLastYear = data
       return state
     },
 
@@ -91,11 +84,6 @@ export default {
       state.distributionResponse = data
       return state
     },
-    ['update/distributionArrival'](state, { data }) {
-      state = cloneDeep(state)
-      state.distributionArrival = data
-      return state
-    },
   },
 
   effects: {
@@ -104,7 +92,6 @@ export default {
       yield put({ type: 'get/details' })
       yield put({ type: 'get/gross' })
       yield put({ type: 'get/phase', data: 'ettr' })
-      yield put({ type: 'get/phase', data: 'arrival_time' })
       yield put({ type: 'get/phase', data: 'response_time' })
     },
     *['page/change'](action, { put }) {
@@ -233,14 +220,12 @@ function mapParamsPhase(params, phase) {
   let {
     filterBy: { assettype, dept },
     period, dataType,
-    distributionEttr, distributionResponse, distributionArrival
+    distributionEttr, distributionResponse
   } = params
   dataType = phase || dataType
   let distribution
   if (dataType === 'ettr') {
     distribution = distributionEttr
-  } else if (dataType === 'arrival_time') {
-    distribution = distributionArrival
   } else { // response_time
     distribution = distributionResponse
   }
