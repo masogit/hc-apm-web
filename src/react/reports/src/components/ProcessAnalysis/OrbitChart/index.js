@@ -57,16 +57,36 @@ function trail(cx, cy, r) {
 
 // In case neighbors got overlap, comb them up with a min interval
 function combBalls(balls) {
+  if (balls.filter(b => b.distance > 0).length === 0) {
+    return
+  }
   balls.forEach((ball, i) => {
-    let lastBall = balls[i - 1]
-    if (lastBall) {
-      let interval = ball.distance - lastBall.distance
-      let overlap = MIN_BALL_INTERVAL - interval
-      if (overlap > 0 && ball.distance + overlap < 300) {
-        ball.distance += overlap
-      }
+    // skip first and last
+    if (i ===0 || i === balls.length - 1) {
+      return
+    }
+    let prevBall = balls[i - 1]
+    let interval = ball.distance - prevBall.distance
+    let overlap = MIN_BALL_INTERVAL - interval
+    if (overlap > 0 && ball.distance + overlap < 300) {
+      ball.distance += overlap
     }
   })
+  // do it again backwards
+  for(let i in balls) {
+    // skip first and last
+    if (i == 0 || i == balls.length - 1) {
+      continue
+    }
+    let _i = balls.length - 1 - i
+    let ball = balls[_i]
+    let nextBall = balls[_i + 1]
+    let interval = nextBall.distance - ball.distance
+    let overlap = MIN_BALL_INTERVAL - interval
+    if (overlap > 0) {
+      ball.distance -= overlap
+    }
+  }
 }
 
 export default class OrbitChart extends PureComponent {
