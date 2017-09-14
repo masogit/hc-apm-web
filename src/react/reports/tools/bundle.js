@@ -17,10 +17,6 @@ const webpackConfig = require(`./webpack.${mode}.conf`)
 
 const compiler = webpack(webpackConfig)
 
-ensureDir(config.distDir).then(() => {
-  utils.symlink(config.distDir, config.targetDir, bundler)
-})
-
 function bundler() {
   const spinner = ora({
     color: 'green',
