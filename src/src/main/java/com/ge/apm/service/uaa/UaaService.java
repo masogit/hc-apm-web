@@ -1,12 +1,6 @@
 package com.ge.apm.service.uaa;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
@@ -31,7 +25,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.LinkedHashMap;
+
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.SearchFilter;
@@ -518,6 +512,30 @@ public class UaaService {
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
+
+    //用户可以显示的医院列表(包含含指定科室的医院)
+    public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid) {
+        List<OrgInfo> accessList = getOrgListByUser(userUid);
+        //for accessible sites
+        List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
+        //for sites of accessible departments
+        Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
+
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
+        List<OrgInfo> accessList2 = orgInfoDao.findBySearchFilter(orgInfoFilters);
+
+        for (OrgInfo orgInfo: accessList2) {
+            if (!accessList.contains(orgInfo)) {
+                accessList.add(orgInfo);
+            }
+        }
+        return accessList;
+    }
     
     //用户对指定医院访问的科室列表
     public List<OrgInfo> getOrgDeptList(String siteUid,String userUid) {
@@ -608,4 +626,45 @@ public class UaaService {
 
         return rootNode;
     }
+
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelected(String parentOrgId, String userUid) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+
+        for(OrgInfo org: orgInfoFullList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setSelectable(org.getOrgType() == 4);
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+        }
+
+        TreeNode rootNode = null;
+
+        for(OrgInfo org: orgInfoSelectableList){
+            TreeNode node = treeMap.get(org.getUid());
+
+            if (node == null) continue;
+
+            OrgInfo current = org;
+            while(current.getParentUID()!=null){
+                TreeNode currentNode = treeMap.get(current.getUid());
+                TreeNode parentNode = treeMap.get(current.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(currentNode);
+                    current = (OrgInfo)parentNode.getData();
+                }
+            }
+
+            if (current.getParentUID() == null && rootNode == null) {
+                rootNode = treeMap.get(current.getUid());
+
+            }
+        }
+
+        return rootNode;
+    }
+
 }
