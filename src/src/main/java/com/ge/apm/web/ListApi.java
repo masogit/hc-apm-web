@@ -4,6 +4,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.api.ListService;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import javaslang.collection.List;
 import javaslang.control.Option;
 import org.simpleflatmapper.tuple.Tuple20;
 import org.simpleflatmapper.tuple.Tuple5;
@@ -17,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import rx.Observable;
-import rx.math.operators.OperatorMinMax;
 import rx.math.operators.OperatorSum;
 import webapp.framework.web.service.UserContext;
 
@@ -155,68 +155,36 @@ public class ListApi {
 
 
   private Double calculateTicks(Observable<Tuple20<Integer, String, Integer, Integer, String, Double, Double, Integer, Double, Double, Integer, Double, Double, Integer, Double, Double, Double, Double, Double, Double>> asset_info,
-                                Integer key){
-
-    if (asset_info.isEmpty().toBlocking().single())
-      return 0.0;
- /*
-    switch(key) {
-
-
-     case 10:
-        return Math.min(
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
+                                Integer key) {
+    List<Tuple20<Integer, String, Integer, Integer, String, Double, Double, Integer, Double, Double, Integer, Double, Double, Integer, Double, Double, Double, Double, Double, Double>> assets = List.ofAll(asset_info.toList().toBlocking().single());
+    switch (key) {
+      case 10:
+        return Math.min(assets.map(Tuple20::getElement7).min().getOrElse(0) * 1.0, assets.map(Tuple20::getElement15).min().getOrElse(0D));
       case 11:
-        return Math.max(
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement7())).toBlocking().single() * 1.0,
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement15())).toBlocking().single() );
+        return Math.max(assets.map(Tuple20::getElement7).min().getOrElse(0) * 1.0, assets.map(Tuple20::getElement15).max().getOrElse(0D));
       case 20:
-        return Math.min(
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement6())).toBlocking().single(),
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement14())).toBlocking().single() );
+        return Math.min(assets.map(Tuple20::getElement6).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement14).min().getOrElse(0D));
       case 21:
-        return Math.max(
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement6())).toBlocking().single(),
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement14())).toBlocking().single() );
+        return Math.max(assets.map(Tuple20::getElement6).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement14).max().getOrElse(0D));
       case 30:
-        return Math.min(
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement8())).toBlocking().single(),
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement16())).toBlocking().single() );
+        return Math.min(assets.map(Tuple20::getElement8).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement16).min().getOrElse(0D));
       case 31:
-        return Math.max(
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement8())).toBlocking().single(),
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement16())).toBlocking().single() );
+        return Math.max(assets.map(Tuple20::getElement8).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement16).max().getOrElse(0D));
       case 40:
-        return Math.min(
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement10())).toBlocking().single() * 1.0,
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement18())).toBlocking().single() );
+        return Math.min(assets.map(Tuple20::getElement10).min().getOrElse(0) * 1.0, assets.map(Tuple20::getElement18).min().getOrElse(0D));
       case 41:
-        return Math.max(
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement10())).toBlocking().single() * 1.0,
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement18())).toBlocking().single() );
+        return Math.max(assets.map(Tuple20::getElement10).min().getOrElse(0) * 1.0, assets.map(Tuple20::getElement18).max().getOrElse(0D));
       case 50:
-        return Math.min(
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement9())).toBlocking().single(),
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement17())).toBlocking().single() );
+        return Math.min(assets.map(Tuple20::getElement9).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement17).min().getOrElse(0D));
       case 51:
-        return Math.max(
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement9())).toBlocking().single(),
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement17())).toBlocking().single() );
+        return Math.max(assets.map(Tuple20::getElement9).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement17).max().getOrElse(0D));
       case 60:
-        return Math.min(
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
-          OperatorMinMax.min(asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
+        return Math.min(assets.map(Tuple20::getElement12).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement19).min().getOrElse(0D));
       case 61:
-        return Math.max(
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement12())).toBlocking().single(),
-          OperatorMinMax.max(asset_info.map(asset -> asset.getElement19())).toBlocking().single() );
-
-
-        }
-    }*/
-    return 0.0;
-
+        return Math.max(assets.map(Tuple20::getElement12).min().getOrElse(0D) * 1.0, assets.map(Tuple20::getElement19).max().getOrElse(0D));
+      default:
+        return 0.0;
+    }
   }
 
   private ImmutableMap<String, Object> jsonRuler(
