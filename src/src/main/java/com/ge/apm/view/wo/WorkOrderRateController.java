@@ -72,7 +72,6 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
         List<String> srList = getUnfinishedSRList();
-        srList.add("");
         searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }

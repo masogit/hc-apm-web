@@ -1,7 +1,7 @@
 /* @flow */
 import { IsHead, getOrgId } from '#/utils'
 
-const info = {
+let info = {
   id: '###', // for debug,
   isHead: false,
 }
