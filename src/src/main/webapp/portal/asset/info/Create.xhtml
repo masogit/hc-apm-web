@@ -265,7 +265,7 @@
                                 <label class="label">#{msg.assetCategory}</label>
                                 <p:selectOneMenu id="assetCategory" value="#{assetInfoController.selected.assetCategory}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
