@@ -198,12 +198,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        if (orgUidList != null && !orgUidList.isEmpty()) {
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.removeFilterOnField("name");
@@ -355,6 +353,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     public void onAfterNewObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
+        if(isOK){
+            attachements.forEach(item->{
+                if(item.getBoId()==null){
+                    item.setBoId(object.getId());
+                    item.setBoUuid(object.getUid());
+                    blobDao.save(item);
+                }
+            });
+        }
     }
 
     @Override
