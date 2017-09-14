@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -56,6 +57,13 @@ public class AssetFileImportService {
     private List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
     private List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
     private List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
+    private List<I18nMessage> assetTypeList = FieldValueMessageController.getFieldValueList("assetType", siteId);
+    private List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
+    private List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
+    private List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
+    private List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
+    private List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
+    private List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -164,6 +172,13 @@ public class AssetFileImportService {
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
             String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("功能分组"));
             asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup));
+            if (functionGroup != null && functionGroup.length() > 4) {
+                String assetCode68 = ExcelDocument.getCellStringValue(rowMap.get("医疗器械子分类"));
+                String str = functionGroup.substring(0, 3);
+                List<I18nMessage> list = FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId);
+                Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68);
+                asset.setAssetCode68(msgKey==null? null:msgKey.toString());
+            }
             String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
             asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName));
             asset.setFunctionGrade(ExcelDocument.getCellIntegerValue(rowMap.get("功能等级")));
@@ -195,6 +210,25 @@ public class AssetFileImportService {
             if (inputQrcode != null) {
                 asset.setQrCode(inputQrcode.replace("-", ""));
             }
+            asset.setLocationCode(ExcelDocument.getCellStringValue(rowMap.get("安装位置编码")));
+            asset.setLocationName(ExcelDocument.getCellStringValue(rowMap.get("安装位置")));
+            asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
+            asset.setStartUsingDate(getDateField(rowMap.get("启用时间"),"启用时间"));
+            asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
+            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
+            asset.setAssetCategory(getI18nMsgKey(assetTypeList, assetType));
+            String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
+            asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage));
+            String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
+            asset.setCapitalSource(getI18nMsgKey(capitalSourceList, capitalSource));
+            String measureGrade = ExcelDocument.getCellStringValue(rowMap.get("计量等级"));
+            asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade));
+            String riskGrade = ExcelDocument.getCellStringValue(rowMap.get("风险等级"));
+            asset.setRiskGrade(getI18nMsgKey(riskGradeList, riskGrade));
+            String emergencyEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否急救设备"));
+            asset.setEmergencyEquipment(getI18nMsgKey(emergencyEquipmentList, emergencyEquipment));
+            String importEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否进口设备"));
+            asset.setImportEquipment(getI18nMsgKey(importEquipmentList, importEquipment));
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
@@ -317,6 +351,22 @@ public class AssetFileImportService {
                 }
                 newAsset.setAssetOwnerName2(null);
             }
+            
+            //for ClinicalOwner
+            userList = getUserInfosByName(newAsset.getClinicalOwnerName());
+            if (userList != null && userList.size() == 1) {
+                UserAccount clinicalOwner = userList.get(0);
+                newAsset.setClinicalOwnerId(clinicalOwner.getId());
+                newAsset.setClinicalOwnerName(clinicalOwner.getTelephone());
+            } else {
+                if (newAsset.getClinicalOwnerName() == null) {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
+                } else {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
+                }
+                newAsset.setClinicalOwnerName(null);
+            }
+            
 
             if (newAsset.getVendor() != null && !newAsset.getVendor().isEmpty()) {
                 List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
@@ -523,6 +573,6 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.4".equalsIgnoreCase(inputVersion);
+        return "v1.5".equalsIgnoreCase(inputVersion);
     }
 }
