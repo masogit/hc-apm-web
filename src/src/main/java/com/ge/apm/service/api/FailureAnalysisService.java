@@ -10,7 +10,6 @@ import javaslang.control.Option;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import rx.Observable;
 
@@ -34,18 +33,15 @@ public class FailureAnalysisService {
   //@Cacheable(cacheNames = "springCache", key = "'failureAnalysisService.briefs.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#groupBy+'.'+#dept+'.'+#type+'.'+#supplier+'.'+#asset+'.'+#pmv")
   public Observable<Tuple4<Integer, Double, Double, Integer>> briefs(int site, int hospital, Date from, Date to, String groupBy, Integer dept, Integer type, Integer supplier, Integer asset, Integer pmv) {
     QuerySelect.Builder builder = db.select(new SQL() {{
-      SELECT(String.format("ai.%s as agg", groupBy), "(1-(sum(extract(epoch from (confirmed_up_time-confirmed_down_time))) / (count(distinct sr.asset_id) * 86400 * (date (:to) - date (:from))))) as up_rate", "sum(case WHEN sr.nearest_sr_days > :pmv THEN 0 ELSE 1 END) as ftfr_num", "count(*) as wo_num");
+      SELECT(String.format("ai.%s as agg", groupBy), "(1-(sum(am.down_time) / (count(distinct ai.id) * 86400 * (date (:to) - date (:from))))) as up_rate", "sum(case WHEN w.nearest_days > :pmv THEN 0 ELSE 1 END) as ftfr_num", "count(distinct w.id) as wo_num");
       FROM("asset_info ai");
-      /*JOIN("v2_service_request sr on ai.site_id = sr.site_id and ai.hospital_id =sr.hospital_id and ai.id=sr.asset_id");*/
       JOIN("v2_work_order w on ai.id = w.asset_id");
-      JOIN("v2_service_request sr on ai.id = sr.asset_id");
+      JOIN("asset_summit am on ai.id = am.asset_id");
       WHERE("ai.site_id = :site");
       WHERE("ai.hospital_id = :hospital");
-      WHERE("sr.request_time between :from and :to");
+      WHERE("w.created_date between :from and :to");
       WHERE("w.case_type is not null");
-      WHERE("sr.status=2");
-      WHERE("sr.confirmed_down_time IS NOT NULL");
-      WHERE("sr.confirmed_up_time IS NOT NULL");
+      WHERE("w.status=2");
       if (Option.of(type).filter(i -> i > 0).isDefined()) {
         WHERE("ai.asset_group = :type");
       }
@@ -79,15 +75,11 @@ public class FailureAnalysisService {
       SELECT("w.case_type", "count(w.case_type) as reason_count");
       FROM("asset_info a");
       JOIN("v2_work_order w on a.id = w.asset_id");
-      JOIN("v2_service_request sr on a.id=sr.asset_id");
       WHERE("a.site_id = :site");
       WHERE("a.hospital_id = :hospital");
-      //WHERE("w.created_date between :from and :to");
-      WHERE("sr.request_time between :from and :to");
+      WHERE("w.created_date between :from and :to");
       WHERE("w.case_type is not null");
-      WHERE("sr.status=2");
-      WHERE("sr.confirmed_down_time IS NOT NULL");
-      WHERE("sr.confirmed_up_time IS NOT NULL");
+      WHERE("w.status=2");
       if (Option.of(type).filter(i -> i > 0).isDefined()) {
         WHERE("a.asset_group = :type");
       }
