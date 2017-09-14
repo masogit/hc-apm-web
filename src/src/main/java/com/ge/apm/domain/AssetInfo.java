@@ -284,6 +284,7 @@ public class AssetInfo implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date inventoryTime;
 
+    //医疗器械子分类
     @Column(name = "asset_code68")
     private String assetCode68;
     

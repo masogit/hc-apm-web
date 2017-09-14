@@ -15,7 +15,7 @@ import Tooltip from 'dew-tooltip'
 import Orbit from '#/components/ProcessAnalysis/OrbitChart'
 import ReversedRange from '#/components/ProcessAnalysis/ReversedRange'
 import withClientRect from '../../../HOC/withClientRect'
-import selectHelper from '#/components/ProcessAnalysis/SelectHelper'
+import selectHelper from '#/components/common/SelectHelper'
 import cache from '#/utils/cache'
 import { CurrentPage, ToPrecentage } from '#/utils/helpers'
 import classnames from 'classnames'
@@ -31,7 +31,7 @@ const InputGroup = Input.Group
 const Placeholder = { strips: { color: '#F9F9F9', weight: 1, type: 'placeholder' } }
 const DisplayOptions = [
   { key: 'display_asset_type' },
-  { key: 'display_brand' },
+  // { key: 'display_brand' }, // hide "品牌" as requested
   { key: 'display_dept' },
 ]
 const BallsStub = [

@@ -58,7 +58,11 @@ public class BySearchFilterSpecification {
                                 predicates.add(new Tuple2(filter.conditionPath, builder.lessThanOrEqualTo(expression, (Comparable) filter.value)));
                                 break;
                             case IN:
-                                predicates.add(new Tuple2(filter.conditionPath, expression.in((List) filter.value)));
+                                List list = (List) filter.value;
+                                if (list.isEmpty()) {
+                                    list.add("");
+                                }
+                                predicates.add(new Tuple2(filter.conditionPath, expression.in(list)));
                                 break;
                             case IsNull:
                                 predicates.add(new Tuple2(filter.conditionPath, expression.isNull()));

@@ -75,7 +75,6 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
         List<String> srList = getUnfinishedSRList();
-        srList.add("");
         searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
