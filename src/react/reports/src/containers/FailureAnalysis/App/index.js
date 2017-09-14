@@ -14,7 +14,7 @@ import LastYearMarker from '#/components/FailureAnalysis/LastYearMarker'
 import Tooltip from 'dew-tooltip'
 import Pagination from '#/components/FailureAnalysis/Pagination'
 import withClientRect from '../../../HOC/withClientRect'
-import selectHelper from '#/components/FailureAnalysis/SelectHelper'
+import selectHelper from '#/components/common/SelectHelper'
 import colors from '#/utils/colors'
 import './app.scss'
 import cache from '#/utils/cache'
@@ -36,7 +36,7 @@ const CheckBoxes = [
 ]
 const DisplayOptions = [
   { key: 'display_asset_type' },
-  { key: 'display_brand' },
+  // { key: 'display_brand' }, // hide "品牌" choice as requested
   { key: 'display_dept' },
 ]
 
