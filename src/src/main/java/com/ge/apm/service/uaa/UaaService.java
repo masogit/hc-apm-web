@@ -506,10 +506,8 @@ public class UaaService {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
         List<String> orgUidSet1 = accessList.stream().filter(item -> item.getOrgType() != 4).map(item -> item.getUid()).collect(Collectors.toList());
-        orgUidSet1.add("");
         //for sites of accessible departments
         Set<String> orgUidSet2 = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
-        orgUidSet2.add("");
 
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
