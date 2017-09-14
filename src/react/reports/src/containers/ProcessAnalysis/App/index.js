@@ -352,6 +352,15 @@ export class App extends Component<void, Props, void> {
     }
   }
 
+  onToothHover = (evt) => {
+    if (evt.type === 'mouseleave') {
+      this.setState({ tooltipX: -861112, tooltipY: -861112 })
+    } else {
+      let name = evt.stripData.data.name
+      this.setState({ tooltipX: evt.clientX, tooltipY: evt.clientY, tooltipData: name })
+    }
+  }
+
   constructor(props) {
     super(props)
     EventBus.addEventListener('process-analysis-brief-data', this.mountBriefData )
@@ -411,6 +420,8 @@ export class App extends Component<void, Props, void> {
               outerRadius={outer_R} innerRadius={outer_r}
               margin={7}
               onClick={this.clickLeftTooth}
+              onMouseMove={this.onToothHover}
+              onMouseLeave={this.onToothHover}
               clockwise={false}
               clockwiseAnimate={leftClockwise}
               items={DataOrPlaceHolder(briefs, pagination.left.top)}
@@ -456,6 +467,8 @@ export class App extends Component<void, Props, void> {
               margin={3}
               clockwiseAnimate={rightClockwise}
               onClick={this.clickRightTooth}
+              onMouseMove={this.onToothHover}
+              onMouseLeave={this.onToothHover}
               items={DataOrPlaceHolder(details, pagination.right.top)} />
 
             <div className="range-wrapper">
@@ -488,7 +501,10 @@ export class App extends Component<void, Props, void> {
         </div>
         <Tooltip mouseX={tooltipX} mouseY={tooltipY} anchor="lvc" offsetX={30} >
           <div className="donut-tooltip">
-            { tooltipData.map((row, i) => (
+            { typeof tooltipData === 'string' ?
+              tooltipData
+              :
+              tooltipData.map((row, i) => (
               <tr key={String(i)}>
                 <td style={{color:row.color}}>◼</td>
                 { Number.isFinite(row.range[1]) ?
