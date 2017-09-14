@@ -8,18 +8,12 @@ const utils = require('./utils')
 const ensureDir = require('ensure-dir')
 
 const config = require('../config')
-
 const isWatchMode = process.env.NODE_ENV === 'watch'
-
 const mode = isWatchMode ? 'watch' : 'prod'
-
 const webpackConfig = require(`./webpack.${mode}.conf`)
-
 const compiler = webpack(webpackConfig)
 
-ensureDir(config.distDir).then(() => {
-  utils.symlink(config.distDir, config.targetDir, bundler)
-})
+bundler()
 
 function bundler() {
   const spinner = ora({
