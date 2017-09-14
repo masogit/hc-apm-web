@@ -4,6 +4,7 @@ import { Motion, spring } from 'react-motion'
 import RingSectorLayout, { AnnulusSector, AnnulusSectorStack } from 'ring-sector-layout'
 import { groupBy, flatMap } from 'lodash'
 import { showTooltip, hideTooltip } from '#/utils/tooltip'
+import { ellipsis } from '#/utils/helpers'
 import styles from './index.scss'
 
 @connect(({briefs, ScanDetails_filters}) => ({briefs, filters: ScanDetails_filters}))
@@ -65,7 +66,7 @@ class Briefs extends React.PureComponent {
                           startAngle={startAngle}
                           endAngle={endAngle}
                           text={{
-                            content: item.data.type.name,
+                            content: ellipsis(item.data.type.name, 8),
                             offset: (outerRadius - innerRadius) / 10,
                             fontSize: (outerRadius - innerRadius) / 5,
                             fill: '#8c8c8c'

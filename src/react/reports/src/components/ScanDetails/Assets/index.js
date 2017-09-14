@@ -7,6 +7,7 @@ import { groupBy, flatMap } from 'lodash'
 import Arrow from '#/components/ScanDetails/Arrow'
 import { PAGE_SIZE } from '#/models/ScanDetails/assets'
 import { showTooltip, hideTooltip } from '#/utils/tooltip'
+import { ellipsis } from '#/utils/helpers'
 import styles from './index.scss'
 
 @withClientRect
@@ -128,7 +129,7 @@ class Assets extends React.PureComponent {
                                   startAngle={startAngle}
                                   endAngle={endAngle}
                                   text={{
-                                    content: item.data.asset.name,
+                                    content: ellipsis(item.data.asset.name, 7),
                                     offset: (outerRadius - innerRadius) / 10,
                                     fontSize: (outerRadius - innerRadius) / 5,
                                     fill: '#8c8c8c'
