@@ -219,7 +219,7 @@ export class App extends Component<void, Props, void> {
     if (briefs.length === 0) {
       message.info(t('group_info') + ': ' + t('no_more_data'))
     }
-    this.setState({ briefs: PaBriefConv(briefs, dataType) })
+    this.setState({ briefs: PaBriefConv(briefs, dataType), selected: null })
     this.clearFocus('left')
   }
 
@@ -229,7 +229,7 @@ export class App extends Component<void, Props, void> {
     if (details.length === 0) {
       message.info(t('asset_info') + ': ' + t('no_more_data'))
     }
-    this.setState({ details: DetailConv(details, dataType) })
+    this.setState({ details: DetailConv(details, dataType), selected: null })
     this.clearFocus('right')
   }
 

@@ -49,26 +49,27 @@ class Chart extends React.PureComponent {
   }
   render() {
     const { filters, depts, assetTypes } = this.props
-    let filterOptions = [{type: 'radio', key: 'type', value: filters.type, options: [{id: 'history', name: '历史'}, {id: 'forecast', name: '预测'}]}]
-    if (filters.type === 'history') {
-      filterOptions.push({
-        type: 'range',
-        key: 'range',
-        value: filters.range
-      })
-    } else {
-      const curYear = new Date().getFullYear()
-      filterOptions.push({
-        type: 'select',
-        key: 'range',
-        value: filters.range.from ? new Date(filters.range.from).getFullYear() : curYear,
-        options: [
-          {id: curYear, name: `${curYear}年预测`},
-          {id: curYear + 1, name: `${curYear + 1}年预测`}
-        ],
-        allowClear: false
-      })
-    }
+    // let filterOptions = [{type: 'radio', key: 'type', value: filters.type, options: [{id: 'history', name: '历史'}, {id: 'forecast', name: '预测'}]}]
+    // if (filters.type === 'history') {
+    //   filterOptions.push({
+    //     type: 'range',
+    //     key: 'range',
+    //     value: filters.range
+    //   })
+    // } else {
+    //   const curYear = new Date().getFullYear()
+    //   filterOptions.push({
+    //     type: 'select',
+    //     key: 'range',
+    //     value: filters.range.from ? new Date(filters.range.from).getFullYear() : curYear,
+    //     options: [
+    //       {id: curYear, name: `${curYear}年预测`},
+    //       {id: curYear + 1, name: `${curYear + 1}年预测`}
+    //     ],
+    //     allowClear: false
+    //   })
+    // }
+    let filterOptions = []
     if (depts) {
       filterOptions.push({
         type: 'select',

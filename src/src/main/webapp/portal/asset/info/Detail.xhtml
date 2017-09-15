@@ -132,6 +132,14 @@
                         <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <label class="label">主设备</label>
+                        <p:inputText id="parentAssetId" value="#{assetInfoController.getParentAssetName()}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.systemId}</label>
+                        <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.financingNum}</label>
                         <p:inputText id="financingNum2" value="#{assetInfoController.selected.financingNum}" readonly="true"/>
                     </h:panelGroup>
@@ -189,7 +197,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.assetCategory}</label>
-                        <p:inputText id="assetCategory" value="#{fieldMsg.fieldValue('assetType', assetInfoController.selected.assetCategory)}" readonly="true"/>
+                        <p:inputText id="assetCategory" value="#{fieldMsg.fieldValue('assetCategory', assetInfoController.selected.assetCategory)}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.assetUsage}</label>
