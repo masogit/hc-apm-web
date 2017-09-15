@@ -865,6 +865,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.parentAssetList = parentAssetList;
     }
 
+    public String getParentAssetName() {
+        if (this.selected.getParentAssetId() != null) {
+            AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
+            if (assetInfo != null) {
+                return assetInfo.getName();
+            }
+        }
+
+        return "";
+    }
+
     public List<I18nMessage> getCode68List() {
         return code68List;
     }
