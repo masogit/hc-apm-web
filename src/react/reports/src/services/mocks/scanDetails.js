@@ -31,7 +31,7 @@ export const Brief = {
         "name": "下肢"
       }, {
         "id": 9,
-        "name": "其它"
+        "name": "其他"
       }],
       "data": [{
         "id": 1,
@@ -50,16 +50,16 @@ export const Brief = {
         "count": 69
       }, {
         "id": 6,
-        "count": 0
+        "count": 1231
       }, {
         "id": 7,
-        "count": 0
+        "count": 121
       }, {
         "id": 8,
-        "count": 0
+        "count": 20
       }, {
         "id": 9,
-        "count": 0
+        "count": 1013
       }]
     }
   }, {

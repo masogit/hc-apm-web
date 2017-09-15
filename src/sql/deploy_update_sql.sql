@@ -22,7 +22,7 @@ update asset_info a set clinical_dept_uid=(select uid from org_info o where o.id
 update user_account u set org_uid=(select uid from org_info o where u.org_id=o.id ) where org_uid is null;
 
 -- update v2_blob_object set uid and bo_sub_type for asset
-update v2_blob_object b set bo_uuid=(select uid from asset_info a where b.id=cast(a.id as text)) where b.bo_uuid is null and b.bo_type='AssetInfo';
+update v2_blob_object b set bo_uuid=(select uid from asset_info a where b.bo_id=a.id )) where b.bo_uuid is null and b.bo_type='AssetInfo';
 update v2_blob_object b set bo_sub_type=1 where b.bo_sub_type is null and b.bo_type='AssetInfo' and b.object_type='image/jpeg';
 
 
@@ -39,3 +39,7 @@ update org_info set parent_uid=tenant_uid where org_type=1 and parent_uid is nul
 update v2_blob_object o set bo_uuid=(select uid from qr_code_lib q where q.id=o.bo_id) where bo_id is not null and bo_uuid is null and bo_type='QrCodeLib'
 update v2_blob_object set bo_sub_type='1' where bo_type='QrCodeLib' and object_type='image/jpeg'
 update v2_blob_object set bo_sub_type='2' where bo_type='QrCodeLib' and object_type='audio/mp3'
+
+
+-- added depatment uid for serviceRequest
+update v2_service_request s set from_dept_uid=(select uid from org_info o where s.from_dept_id=o.id) where s.from_dept_uid is null

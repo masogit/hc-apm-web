@@ -85,7 +85,7 @@
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptList()}" />
+                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
@@ -315,5 +315,14 @@
             <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
+         <script>
+            window.onload = function(){
+                $("#searchForm\\:searchText").keypress(function(e){
+                    if(e.keyCode==13){
+                        e.preventDefault();
+                    }
+                });   
+            }
+        </script>
     </ui:define>
 </ui:composition>
