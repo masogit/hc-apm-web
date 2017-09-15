@@ -62,7 +62,9 @@ class AssetPerf extends React.PureComponent {
     if (isHead) filterOptions[1].options.unshift({id: 'dept', name: '按科室'})
     return (
       <div className={styles['asset-perf']}>
-        <FilterBar options={filterOptions} onChange={this.onFilterChange}/>
+        <div className="filter-bar">
+          <FilterBar options={filterOptions} onChange={this.onFilterChange}/>
+        </div>
         <BubbleChart data={chartData} depth={data.length} type={type}/>
         {
           filters.type === 'future'
