@@ -7,6 +7,7 @@ package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_WorkOrder;
@@ -16,8 +17,10 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.primefaces.event.SelectEvent;
@@ -44,6 +47,8 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
     List<V2_WorkOrder> workOrders;
 
     private V2_WorkOrderService woService;
+    
+    private UaaService uaaService;
 
     Integer queryIndex;
 
@@ -60,8 +65,11 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
     protected void init() {
         dao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         this.filterBySite = true;
         queryIndex = 1;
+        this.filterBySite = false;
+        this.filterByHospital = false;
 
     }
 
@@ -72,13 +80,13 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
 
     @Override
     protected Page<V2_ServiceRequest> loadData(PageRequest pageRequest) {
-        this.setSiteFilter();
+        
+        setSearchFilter();
         removeFilterOnField("status");
         if (queryIndex == 5) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else {
             removeFilterOnField("requestorId");
-            removeFilterOnField("fromDeptId");
             if (queryIndex == 1 || queryIndex == 3) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             } else {
@@ -86,9 +94,7 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
             }
             if (queryIndex == 1 || queryIndex == 2) {
                 searchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-            } else {
-                searchFilters.add(new SearchFilter("fromDeptId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoId()));
-            }
+            } 
         }
 
         this.selected = null;
@@ -97,6 +103,18 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
+    }
+
+    @Override
+    public void setSearchFilter() {
+         if(this.searchFilters==null){
+            searchFilters = new ArrayList();
+        }
+        if(!this.hasFilterOnField("siteUID")){
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList,"1*2+"));
+            searchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.IN, orgUidList,"1*2+"));
         }
     }
 
