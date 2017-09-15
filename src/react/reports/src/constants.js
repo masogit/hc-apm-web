@@ -1,6 +1,17 @@
 import moment from 'moment'
 
 export const COLORS = ['#8fd3c7', '#cbb862', '#ba82bb', '#9eb7f2', '#82b1d1', '#b8bb83', '#9d9cbe', '#99b992']
+export const COLORS_SCAN_DETAILS = [
+  '#6ab4a6',
+  '#d5c165',
+  '#ba82b7',
+  '#83b2d1',
+  '#99ba93',
+  '#ba9cbb',
+  '#829fd1',
+  '#93bab3',
+  '#9aa5b5'
+]
 export const BACKGROUND_COLORS = ['#d7e5e3', '#e4e0cf', '#e1d5e1', '#dbe0ec', '#d5dfe5', '#e0e1d5', '#dbdae1', '#dae0d8']
 export const ROOT_COLOR = "#77a3e7"
 export const ROOT_BACKGROUND_COLOR = "#d3dce9"
