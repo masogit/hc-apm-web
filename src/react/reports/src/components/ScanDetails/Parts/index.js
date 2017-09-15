@@ -43,7 +43,6 @@ class Parts extends React.PureComponent {
       data = asset.items.data
     }
 
-
     const maxCount = Math.max(...data.map(({count}) => count))
     return (
       <div className={styles['parts']}>
@@ -84,7 +83,7 @@ class Parts extends React.PureComponent {
                           startAngle={startAngle}
                           endAngle={endAngle}
                           text={{
-                            content: parts[item.data.id] ? parts[item.data.id].name : '',
+                            content: (parts[item.data.id] && parts[item.data.id].name) || '其他',
                             offset: (outerRadius - innerRadius) / 10,
                             fontSize: (outerRadius - innerRadius) / 5,
                             fill: '#8c8c8c'

@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { groupBy, flatMap, uniqBy } from 'lodash'
-import { API_HOST, COLORS } from '#/constants'
+import { API_HOST, COLORS_SCAN_DETAILS } from '#/constants'
 
 const PAGE_SIZE = 15
 
@@ -57,7 +57,7 @@ export default {
     },
     ['data/get/succeeded'](state, { payload }) {
       const parts = uniqBy(flatMap(payload, item => item.items.desc), item => item.id)
-        .reduce((prev, cur, index) => (prev[cur.id] = {...cur, color: COLORS[index]}, prev), {})
+        .reduce((prev, cur, index) => (prev[cur.id] = {...cur, color: COLORS_SCAN_DETAILS[index]}, prev), {})
       return {
         ...state,
         data: payload,
