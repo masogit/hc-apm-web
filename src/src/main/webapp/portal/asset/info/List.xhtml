@@ -315,5 +315,14 @@
             <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
+         <script>
+            window.onload = function(){
+                $("#searchForm\\:searchText").keypress(function(e){
+                    if(e.keyCode==13){
+                        e.preventDefault();
+                    }
+                });   
+            }
+        </script>
     </ui:define>
 </ui:composition>
