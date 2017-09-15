@@ -242,24 +242,20 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     public void applyChange() {
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
-    	if(isManual !=  null && isTakeOrder != null && !isManual && !isTakeOrder){
+    	if(isManual != null && isManual){
+    		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
+    			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+       		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedDispather"));
+       		 	return;
+    		}
+    	}
+    	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
     		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
     		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
     		 return;
     	}
     	onBeforeSave(selected);
     	super.save();
-//        if (selected.hashCode() == 0) {
-//            create();
-//        } else {
-//            update();
-//        }
-//    	selectedHospitalId = null;
-//    	selectedSiteId = null;
-//    	selectedInstitutionId = null;
-//        selected.setInstitutionUID(null);
-//		selected.setHospitalUID(null);
-//		selected.setSiteUID(null);
     }
 
 	public UserAccount getOwner() {
@@ -301,29 +297,5 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void setSiteList(List<OrgInfo> siteList) {
 		this.siteList = siteList;
 	}
-
-/*	public String getSelectedHospitalId() {
-		return selectedHospitalId;
-	}
-
-	public void setSelectedHospitalId(String selectedHospitalId) {
-		this.selectedHospitalId = selectedHospitalId;
-	}
-
-	public String getSelectedSiteId() {
-		return selectedSiteId;
-	}
-
-	public void setSelectedSiteId(String selectedSiteId) {
-		this.selectedSiteId = selectedSiteId;
-	}
-
-	public String getSelectedInstitutionId() {
-		return selectedInstitutionId;
-	}
-
-	public void setSelectedInstitutionId(String selectedInstitutionId) {
-		this.selectedInstitutionId = selectedInstitutionId;
-	}*/
 	
 }

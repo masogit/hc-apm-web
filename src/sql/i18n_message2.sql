@@ -592,7 +592,8 @@ INSERT INTO "public"."i18n_message" VALUES ('3041', 'message', 'AlreadyUsingQrCo
 INSERT INTO "public"."i18n_message" VALUES ('3042', 'message', 'DeleteAssetConformationMsg', '确认删除设备?', 'Confirm to remove this asset?', null, '-1');
 --3043~3055已存在
 INSERT INTO "public"."i18n_message" VALUES ('3056', 'message', 'ManualAndGrapMsg', '允许抢单和允许人工至少选一个!', 'There should be at least one config for manual or grap mode! ', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('3057', 'message', '工单完工不需要验收?', '', 'need ack', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('3057', 'message', 'autoAck', '是否需要验收', 'need ack', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('3058', 'message', 'NeedDispather', '允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', null, '-1');
 
 
 INSERT INTO "public"."i18n_message" VALUES ('5000', 'label', 'deviceScanhd', '设备扫描量（次）', 'Scan #', null, '-1');
