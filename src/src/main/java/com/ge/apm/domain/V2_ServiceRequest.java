@@ -107,6 +107,9 @@ public class V2_ServiceRequest  implements Serializable {
 
     @Column(name = "from_dept_id")
     private Integer fromDeptId;
+    
+    @Column(name = "from_dept_uid")
+    private String fromDeptUID;
 
     @Column(name = "from_dept_name")
     @Size(max = 64)
@@ -419,6 +422,15 @@ public class V2_ServiceRequest  implements Serializable {
     public void setSrNum(String srNum) {
         this.srNum = srNum;
     }
+
+    public String getFromDeptUID() {
+        return fromDeptUID;
+    }
+
+    public void setFromDeptUID(String fromDeptUID) {
+        this.fromDeptUID = fromDeptUID;
+    }
+    
 
     @Override
     public int hashCode() {
