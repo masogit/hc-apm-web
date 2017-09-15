@@ -865,6 +865,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.parentAssetList = parentAssetList;
     }
 
+    public String getParentAssetName() {
+        if (this.selected.getParentAssetId() != null) {
+            AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
+            if (assetInfo != null) {
+                return assetInfo.getName();
+            }
+        }
+
+        return "";
+    }
+
     public List<I18nMessage> getCode68List() {
         return code68List;
     }
@@ -944,9 +955,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-        TreeNode treeNode = uaaService.getOrgTreebyParentId(loginUser.getSiteUID(), loginUser.getUid());
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
         orgTree = new DefaultTreeNode("root",null,null);
-        orgTree.getChildren().addAll(treeNode.getChildren());
+        orgTree.getChildren().add(treeNode);
         orgTree.setExpanded(true);
 
     }

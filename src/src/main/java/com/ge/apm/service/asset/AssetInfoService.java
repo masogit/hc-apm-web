@@ -22,6 +22,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
+
+import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -87,4 +89,40 @@ public class AssetInfoService {
         }
         return dropdownList;
     }
+
+    public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel(){
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
+
+        List<SelectItem> dropdownList = new ArrayList<SelectItem>();
+        traverse(rootNode, dropdownList);
+
+        return dropdownList;
+    }
+
+    private void traverse(TreeNode node, List<SelectItem> itemList) {
+
+        OrgInfo orgInfo = (OrgInfo)node.getData();
+
+//        String name = padLeft(orgInfo.getName(), orgInfo.getOrgType());
+        SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
+        itemList.add(selectItem);
+
+        if (!node.isLeaf()) {
+            for (TreeNode nodeItem: node.getChildren()) {
+                traverse(nodeItem, itemList);
+            }
+        }
+
+    }
+
+    private String padLeft(String name, int level) {
+
+        StringBuilder sb = new StringBuilder();
+        for (int index = 0; index < level; index++) {
+            sb.append(" ");
+        }
+        return sb.toString() + name;
+    }
+
 }
