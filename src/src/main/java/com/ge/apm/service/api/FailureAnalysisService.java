@@ -33,12 +33,14 @@ public class FailureAnalysisService {
   //@Cacheable(cacheNames = "springCache", key = "'failureAnalysisService.briefs.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#groupBy+'.'+#dept+'.'+#type+'.'+#supplier+'.'+#asset+'.'+#pmv")
   public Observable<Tuple4<Integer, Double, Double, Integer>> briefs(int site, int hospital, Date from, Date to, String groupBy, Integer dept, Integer type, Integer supplier, Integer asset, Integer pmv) {
     QuerySelect.Builder builder = db.select(new SQL() {{
-      SELECT(String.format("ai.%s as agg", groupBy), "(1-(sum(am.down_time) / (count(distinct ai.id) * 86400 * (date (:to) - date (:from))))) as up_rate", "sum(case WHEN w.nearest_days > :pmv THEN 0 ELSE 1 END) as ftfr_num", "count(distinct w.id) as wo_num");
+      SELECT(String.format("ai.%s as agg", groupBy), "(1-(sum(am.down_time) / (count(distinct ai.id) * 86400 * (date (:to) - date (:from))))) as up_rate", "(sum(case WHEN sr.nearest_sr_days > :pmv THEN 0 ELSE 1 END)/count(w.id)) as ftfr_num", "count(distinct w.id) as wo_num");
       FROM("asset_info ai");
       JOIN("v2_work_order w on ai.id = w.asset_id");
       JOIN("asset_summit am on ai.id = am.asset_id");
+      JOIN("v2_service_request sr on ai.id = sr.asset_id");
       WHERE("ai.site_id = :site");
       WHERE("ai.hospital_id = :hospital");
+      WHERE("am.created_date between :from and :to");
       WHERE("w.created_date between :from and :to");
       WHERE("w.case_type is not null");
       WHERE("w.status=2");
@@ -65,7 +67,8 @@ public class FailureAnalysisService {
       .orElse(Option.of(builder)).filter(o -> Option.of(pmv).isDefined()).map(o -> o.parameter("pmv", pmv))
       .orElse(Option.of(builder)).get()
       .getAs(Integer.class, Double.class, Integer.class, Integer.class)
-      .map(t -> Tuple.of(t._1(), t._2(), t._3().doubleValue() / t._4().doubleValue(), t._4()))
+      //.map(t -> Tuple.of(t._1(), t._2(), t._3().doubleValue() / t._4().doubleValue(), t._4()))
+            .map(t -> Tuple.of(t._1(), t._2(), t._3().doubleValue(), t._4()))
       .cache();
   }
 
