@@ -34,7 +34,7 @@ public class ScanService {
   }
 
   //@Cacheable(cacheNames = "springCache", key = "'ScanService.brief.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset")
-  public Observable<Tuple3<Integer, Integer, Integer>> brief(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset) {
+  /*public Observable<Tuple3<Integer, Integer, Integer>> brief(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset) {
     Objects.requireNonNull(from);
     Objects.requireNonNull(to);
     QuerySelect.Builder builder = db.select(new SQL() {{
@@ -72,10 +72,39 @@ public class ScanService {
       .getAs(Integer.class, Integer.class, Integer.class)
       .map(t -> Tuple.of(t._1(), t._2(), t._3()))
       .cache();
+  }*/
+  public Observable<Tuple3<Integer, Integer, Integer>> brief(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset) {
+      Objects.requireNonNull(from);
+      Objects.requireNonNull(to);
+      QuerySelect.Builder builder = db.select(new SQL() {{
+          SELECT("ai.asset_group, acr.procedure_id, count(*)");
+          FROM("asset_info as ai");
+          INNER_JOIN("asset_clinical_record acr on ai.id = acr.asset_id");
+          WHERE("ai.site_id = :site");
+          WHERE("ai.hospital_id = :hospital");
+          WHERE("acr.exam_date between :from and :to");
+          if (Option.of(type).filter(i -> i > 0).isDefined()) {
+              WHERE("ai.asset_group = :type");
+          }
+          if (Option.of(dept).filter(i -> i > 0).isDefined()) {
+              WHERE("ai.clinical_dept_id = :dept");
+          }
+          if (Option.of(asset).filter(i -> i > 0).isDefined()) {
+              WHERE("ai.id = :asset");
+          }
+          GROUP_BY("ai.asset_group, acr.procedure_id");
+      }}.toString()).parameter("site", site).parameter("hospital", hospital).parameter("from", from).parameter("to", to);
+      return Option.of(builder).filter(s -> Option.of(type).isDefined()).map(o -> o.parameter("type", type))
+              .orElse(Option.of(builder)).filter(o -> Option.of(dept).isDefined()).map(o -> o.parameter("dept", dept))
+              .orElse(Option.of(builder)).filter(o -> Option.of(asset).isDefined()).map(o -> o.parameter("asset", asset))
+              .orElse(Option.of(builder)).get()
+              .getAs(Integer.class, Integer.class, Integer.class)
+              .map(t -> Tuple.of(t._1(), t._2(), t._3()))
+              .cache();
   }
 
   //@Cacheable(cacheNames = "springCache", key = "'ScanService.assetDetail.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset+'.'+#part")
-  public Observable<Tuple4<Integer, Integer, Integer, Integer>> assetDetail(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset, Integer part) {
+  /*public Observable<Tuple4<Integer, Integer, Integer, Integer>> assetDetail(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset, Integer part) {
     QuerySelect.Builder builder = db.select(new SQL() {{
       SELECT_DISTINCT("l.asset_group", "l.asset_id", "l.part_id", "COALESCE(r.exam_num,0)");
       FROM("(".concat(new SQL() {{
@@ -127,6 +156,37 @@ public class ScanService {
       .getAs(Integer.class, Integer.class, Integer.class, Integer.class)
       .map(t -> Tuple.of(t._1(), t._2(), t._3(), t._4()))
       .cache();
+  }*/
+  public Observable<Tuple4<Integer, Integer, Integer, Integer>> assetDetail(int site, int hospital, Date from, Date to, Integer type, Integer dept, Integer asset, Integer part) {
+      QuerySelect.Builder builder = db.select(new SQL() {{
+          SELECT("ai.asset_group, ai.id, acr.procedure_id, count(*)");
+          FROM("asset_info as ai");
+          INNER_JOIN("asset_clinical_record acr on ai.id = acr.asset_id");
+          WHERE("ai.site_id = :site");
+          WHERE("ai.hospital_id = :hospital");
+          WHERE("acr.exam_date between :from and :to");
+          if (Option.of(type).filter(i -> i > 0).isDefined()) {
+              WHERE("ai.asset_group = :type");
+          }
+          if (Option.of(dept).filter(i -> i > 0).isDefined()) {
+              WHERE("ai.clinical_dept_id = :dept");
+          }
+          if (Option.of(asset).filter(i -> i > 0).isDefined()) {
+              WHERE("ai.id = :asset");
+          }
+          if (Option.of(part).filter(i -> i > 0).isDefined()) {
+              WHERE("acr.procedure_id = :part");
+          }
+          GROUP_BY("ai.asset_group, ai.id, acr.procedure_id");
+      }}.toString()).parameter("site", site).parameter("hospital", hospital).parameter("from", from).parameter("to", to);
+      return Option.of(builder).filter(s -> Option.of(type).isDefined()).map(o -> o.parameter("type", type))
+              .orElse(Option.of(builder)).filter(o -> Option.of(dept).isDefined()).map(o -> o.parameter("dept", dept))
+              .orElse(Option.of(builder)).filter(o -> Option.of(asset).isDefined()).map(o -> o.parameter("asset", asset))
+              .orElse(Option.of(builder)).filter(o -> Option.of(part).isDefined()).map(o -> o.parameter("part", part))
+              .orElse(Option.of(builder)).get()
+              .getAs(Integer.class, Integer.class, Integer.class, Integer.class)
+              .map(t -> Tuple.of(t._1(), t._2(), t._3(), t._4()))
+              .cache();
   }
 
   //@Cacheable(cacheNames = "springCache", key = "'ScanService.stepDetail.'+#site+'.'+#hospital+'.'+#from+'.'+#to+'.'+#type+'.'+#dept+'.'+#asset+'.'+#part+'.'+#step")
