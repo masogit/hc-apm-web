@@ -618,6 +618,11 @@ INSERT INTO "public"."i18n_message" VALUES ('1864', 'accountingCategory', '4', '
 INSERT INTO "public"."i18n_message" VALUES ('1865', 'accountingCategory', '5', '仪器仪表计量标准器具', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1866', 'accountingCategory', '6', '其他设备', '', null, '-1');
 
+INSERT INTO "public"."i18n_message" VALUES ('1871', 'usageStatus', '1', '在用', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1872', 'usageStatus', '2', '停用', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1873', 'usageStatus', '3', '待报废', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1874', 'usageStatus', '4', '报废', '', null, '-1');
+
 INSERT INTO "public"."i18n_message" VALUES ('2001', 'assetFunctionType', '6801', '6801基础外科手术器械', null, null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('2002', 'assetFunctionType', '6802', '6802显微外科手术器械', null, null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('2003', 'assetFunctionType', '6803', '6803神经外科手术器械', null, null, '-1');
