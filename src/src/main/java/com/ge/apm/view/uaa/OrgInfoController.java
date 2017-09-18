@@ -232,11 +232,21 @@ UserAccountRepository userDao;
         }
     }
 
-    public void deleteSelectedOrg(){
-        super.delete();
-        buildOrdTree();
+    public void deleteSelectedOrg() {
+        if (canDelete()) {
+            super.delete();
+            buildOrdTree();
+        } 
     }
 
+    private Boolean canDelete(){
+        List<UserAccount> userList = userDao.getByOrgInfoUID(selected.getUid());
+        if(userList!=null && !userList.isEmpty()){
+            WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
+            return false;
+        }
+        return true;
+    }
     public void onSelectTreeNode(NodeSelectEvent event){
         TreeNode node = event.getTreeNode();
         //node.setExpanded(!node.isExpanded());
