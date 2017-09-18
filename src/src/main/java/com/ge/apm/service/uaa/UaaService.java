@@ -612,16 +612,21 @@ public class UaaService {
             while(current.getParentUID()!=null){
                 TreeNode currentNode = treeMap.get(current.getUid());
                 TreeNode parentNode = treeMap.get(current.getParentUID());
-                if(parentNode!=null){
-                    parentNode.getChildren().add(currentNode);
-                    current = (OrgInfo)parentNode.getData();
+                if (parentNode == null) break;
+
+                parentNode.getChildren().add(currentNode);
+                current = (OrgInfo)parentNode.getData();
+
+            }
+
+            if (rootNode == null) {
+                if (current.getParentUID() == null) {
+                    rootNode = treeMap.get(current.getUid());
+                } else if (treeMap.get(current.getParentUID()) == null){
+                    rootNode = treeMap.get(current.getUid());
                 }
             }
 
-            if (current.getParentUID() == null && rootNode == null) {
-                rootNode = treeMap.get(current.getUid());
-
-            }
         }
 
         return rootNode;
@@ -652,15 +657,18 @@ public class UaaService {
             while(current.getParentUID()!=null){
                 TreeNode currentNode = treeMap.get(current.getUid());
                 TreeNode parentNode = treeMap.get(current.getParentUID());
-                if(parentNode!=null){
-                    parentNode.getChildren().add(currentNode);
-                    current = (OrgInfo)parentNode.getData();
-                }
+                if (parentNode == null) break;
+
+                parentNode.getChildren().add(currentNode);
+                current = (OrgInfo)parentNode.getData();
             }
 
-            if (current.getParentUID() == null && rootNode == null) {
-                rootNode = treeMap.get(current.getUid());
-
+            if (rootNode == null) {
+                if (current.getParentUID() == null) {
+                    rootNode = treeMap.get(current.getUid());
+                } else if (treeMap.get(current.getParentUID()) == null){
+                    rootNode = treeMap.get(current.getUid());
+                }
             }
         }
 
