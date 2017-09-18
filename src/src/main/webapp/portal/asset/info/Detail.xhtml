@@ -232,6 +232,18 @@
                         <p:inputText id="importEquipment" value="#{fieldMsg.fieldValue('importEquipment', assetInfoController.selected.importEquipment)}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <label class="label">#{msg.measuringItemCategory}</label>
+                        <p:inputText id="measuringItemCategory" value="#{fieldMsg.fieldValue('measuringItemCategory', assetInfoController.selected.measuringItemCategory)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.usageStatus}</label>
+                        <p:inputText id="usageStatus" value="#{fieldMsg.fieldValue('usageStatus', assetInfoController.selected.usageStatus)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.accountingCategory}</label>
+                        <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoController.selected.accountingCategory)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.manufactDate}</label>
                         <p:inputText id="manufactDate" value="#{assetInfoController.selected.manufactDate}" readonly="true">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
