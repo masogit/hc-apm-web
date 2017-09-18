@@ -336,6 +336,30 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
+                            <h:panelGroup>
+                                <label class="label">#{msg.measuringItemCategory}</label>
+                                <p:selectOneMenu id="measuringItemCategory" value="#{assetInfoController.selected.measuringItemCategory}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.usageStatus}</label>
+                                <p:selectOneMenu id="usageStatus" value="#{assetInfoController.selected.usageStatus}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('usageStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.accountingCategory}</label>
+                                <p:selectOneMenu id="accountingCategory" value="#{assetInfoController.selected.accountingCategory}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset  style="margin-bottom:20px">

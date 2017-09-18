@@ -442,6 +442,10 @@ INSERT INTO "public"."i18n_message" VALUES ('792', 'field_name', 'riskGrade', '�
 INSERT INTO "public"."i18n_message" VALUES ('793', 'field_name', 'measureGrade', '计量', 'Measure Grade', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('794', 'field_name', 'emergencyEquipment', '是否急救设备', 'Emergency Equipment', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('795', 'field_name', 'importEquipment', '是否进口设备', 'Import Equipment', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('796', 'field_name', 'measuringItemCategory', '计量项目类别', 'Measuring Item Category', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('797', 'field_name', 'usageStatus', '设备状态', 'Usage Status', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('798', 'field_name', 'measuringStatus', '计量状态', 'Measuring Status', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('799', 'field_name', 'accountingCategory', '核算类别', 'Accounting Category', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1400', 'assetGroup', '1', 'CT类', 'CT类', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1401', 'assetGroup', '2', '磁共振MRI类', '磁共振MRI类', null, '-1');
