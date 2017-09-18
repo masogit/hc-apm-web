@@ -224,6 +224,15 @@ public class AssetInfo implements Serializable {
     @Column(name = "asset_owner_tel2")
     private String assetOwnerTel2;
 
+    @Column(name = "asset_owner_id3")
+    private Integer assetOwnerId3;
+
+    @Column(name = "asset_owner_name3")
+    private String assetOwnerName3;
+
+    @Column(name = "asset_owner_tel3")
+    private String assetOwnerTel3;
+
     @Column(name = "fe_user_id")
     private Integer feUserId;
 
@@ -325,24 +334,42 @@ public class AssetInfo implements Serializable {
     //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
     @Column(name = "asset_category")
     private Integer assetCategory;
+
     //用途[1:诊断类,2:治疗类,3:辅助类]
     @Column(name = "asset_usage")
     private Integer assetUsage;
+
     //资金来源[1:科研,2:教学,3:医疗,4:干保]
     @Column(name = "capital_source")
     private Integer capitalSource;
+
     //风险等级[1:1类A,2:1类B,3:2类,4:3类]
     @Column(name = "risk_grade")
     private Integer riskGrade;
+
     //计量[1:A,2:B,3:C,4:D]
     @Column(name = "measure_grade")
     private Integer measureGrade;
+
     //是否急救设备[1:急救类,2:非急救类]
     @Column(name = "emergency_equipment")
     private Integer emergencyEquipment;
+
     //是否进口设备[1:进口,2:国产]
     @Column(name = "import_equipment")
     private Integer importEquipment;
+
+    //计量项目类别[1:医用CT,2:普通X光机, ...]
+    @Column(name = "measuring_item_category")
+    private Integer measuringItemCategory;
+
+    //设备状态[1:在用,2:停用,3:待报废,4:报废]
+    @Column(name = "usage_status")
+    private Integer usageStatus;
+
+    //计量状态[1:已检,2:待检,3:过期]
+    @Column(name = "accounting_category")
+    private Integer accountingCategory;
 
     public Integer getAssetCategory() {
         return assetCategory;
@@ -399,8 +426,54 @@ public class AssetInfo implements Serializable {
     public void setImportEquipment(Integer importEquipment) {
         this.importEquipment = importEquipment;
     }
-    
-    
+
+    public Integer getAssetOwnerId3() {
+        return assetOwnerId3;
+    }
+
+    public void setAssetOwnerId3(Integer assetOwnerId3) {
+        this.assetOwnerId3 = assetOwnerId3;
+    }
+
+    public String getAssetOwnerName3() {
+        return assetOwnerName3;
+    }
+
+    public void setAssetOwnerName3(String assetOwnerName3) {
+        this.assetOwnerName3 = assetOwnerName3;
+    }
+
+    public String getAssetOwnerTel3() {
+        return assetOwnerTel3;
+    }
+
+    public void setAssetOwnerTel3(String assetOwnerTel3) {
+        this.assetOwnerTel3 = assetOwnerTel3;
+    }
+
+    public Integer getMeasuringItemCategory() {
+        return measuringItemCategory;
+    }
+
+    public void setMeasuringItemCategory(Integer measuringItemCategory) {
+        this.measuringItemCategory = measuringItemCategory;
+    }
+
+    public Integer getUsageStatus() {
+        return usageStatus;
+    }
+
+    public void setUsageStatus(Integer usageStatus) {
+        this.usageStatus = usageStatus;
+    }
+
+    public Integer getAccountingCategory() {
+        return accountingCategory;
+    }
+
+    public void setAccountingCategory(Integer accountingCategory) {
+        this.accountingCategory = accountingCategory;
+    }
 
     public Integer getDeviceStatus() {
         return deviceStatus;
