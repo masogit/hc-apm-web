@@ -574,6 +574,9 @@ INSERT INTO "public"."i18n_message" VALUES ('1801', 'emergencyEquipment', '1', '
 INSERT INTO "public"."i18n_message" VALUES ('1802', 'emergencyEquipment', '2', '非急救类', 'not emergency', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1805', 'importEquipment', '1', '进口', 'Import', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1806', 'importEquipment', '2', '国产', 'Domestic', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1901', 'arrivalListStatus', '1', '未完成', 'New List', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1902', 'arrivalListStatus', '2', '部分完成', 'Partial Finished', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1903', 'arrivalListStatus', '3', '已完成', 'Finished', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('2001', 'assetFunctionType', '6801', '6801基础外科手术器械', null, null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('2002', 'assetFunctionType', '6802', '6802显微外科手术器械', null, null, '-1');
