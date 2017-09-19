@@ -570,17 +570,14 @@ INSERT INTO "public"."i18n_message" VALUES ('1790', 'measureGrade', '1', 'A类�
 INSERT INTO "public"."i18n_message" VALUES ('1791', 'measureGrade', '2', 'B类计量设备', 'B', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1792', 'measureGrade', '3', 'C类计量设备', 'C', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1793', 'measureGrade', '4', '非计量设备', 'D', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1795', 'riskGrade', '1', '1类A', '1A', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1796', 'riskGrade', '2', '1类B', '1B', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1797', 'riskGrade', '3', '2类', '2', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1798', 'riskGrade', '4', '3类', '3', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1801', 'emergencyEquipment', '1', '急救类', 'emergency', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1802', 'emergencyEquipment', '2', '非急救类', 'not emergency', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1795', 'riskGrade', '1', '一级A', '1A', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1796', 'riskGrade', '2', '一级B', '1B', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1797', 'riskGrade', '3', '二级', '2', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1798', 'riskGrade', '4', '三级', '3', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1801', 'emergencyEquipment', '1', '急救设备', 'emergency', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1802', 'emergencyEquipment', '2', '非急救设备', 'not emergency', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1805', 'importEquipment', '1', '进口', 'Import', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1806', 'importEquipment', '2', '国产', 'Domestic', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1901', 'arrivalListStatus', '1', '未完成', 'New List', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1902', 'arrivalListStatus', '2', '部分完成', 'Partial Finished', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1903', 'arrivalListStatus', '3', '已完成', 'Finished', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1811', 'measuringItemCategory', '1', '医用CT', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1812', 'measuringItemCategory', '2', '普通X光机', '', null, '-1');
@@ -632,6 +629,10 @@ INSERT INTO "public"."i18n_message" VALUES ('1874', 'usageStatus', '4', '报废'
 
 INSERT INTO "public"."i18n_message" VALUES ('1881', 'field_name', 'assetOwnerName3', '维修责任人3', '3rd Asset Owner Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1882', 'field_name', 'assetOwnerTel3', '维修责任人3电话', '3rd Asset Owner Tel', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('1901', 'arrivalListStatus', '1', '未完成', 'New List', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1902', 'arrivalListStatus', '2', '部分完成', 'Partial Finished', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1903', 'arrivalListStatus', '3', '已完成', 'Finished', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('2001', 'assetFunctionType', '6801', '6801基础外科手术器械', null, null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('2002', 'assetFunctionType', '6802', '6802显微外科手术器械', null, null, '-1');
