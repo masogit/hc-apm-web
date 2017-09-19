@@ -39,7 +39,7 @@
                                  rowsPerPageTemplate="20,40,60,90">
 
                         <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
-                        <p:ajax event="filter" listener="#{inspectionOrderController.onFilter}" update=":InspectionOrderListForm" oncomplete="rc();"/>
+                        <p:ajax event="filter" listener="#{inspectionOrderController.onFilter}" oncomplete="rc();"/>
 
                         <!--<p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton :InspectionOrderListForm:excuteButton"/>
                         <p:ajax event="filter" listener="#{inspectionOrderController.onFilter}" update=":InspectionOrderListForm:excuteButton" oncomplete="rc();"/>-->
