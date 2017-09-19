@@ -64,6 +64,9 @@ public class AssetFileImportService {
     private List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
     private List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
     private List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
+    private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
+    private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
+    private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -165,6 +168,7 @@ public class AssetFileImportService {
             asset.setIsDeleted(Boolean.FALSE);
             asset.setAssetOwnerName(ExcelDocument.getCellStringValue(rowMap.get("维修负责人")));
             asset.setAssetOwnerName2(ExcelDocument.getCellStringValue(rowMap.get("维修负责人2")));
+            asset.setAssetOwnerName3(ExcelDocument.getCellStringValue(rowMap.get("维修负责人3")));
 
             asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用部门")));
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
@@ -221,14 +225,20 @@ public class AssetFileImportService {
             asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage));
             String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
             asset.setCapitalSource(getI18nMsgKey(capitalSourceList, capitalSource));
-            String measureGrade = ExcelDocument.getCellStringValue(rowMap.get("计量等级"));
-            asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade));
             String riskGrade = ExcelDocument.getCellStringValue(rowMap.get("风险等级"));
             asset.setRiskGrade(getI18nMsgKey(riskGradeList, riskGrade));
+            String measureGrade = ExcelDocument.getCellStringValue(rowMap.get("计量等级"));
+            asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade));
+            String measuringItemCategory = ExcelDocument.getCellStringValue(rowMap.get("计量项目类别"));
+            asset.setAccountingCategory(getI18nMsgKey(measuringItemCategoryList, measuringItemCategory));
             String emergencyEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否急救设备"));
             asset.setEmergencyEquipment(getI18nMsgKey(emergencyEquipmentList, emergencyEquipment));
             String importEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否进口设备"));
             asset.setImportEquipment(getI18nMsgKey(importEquipmentList, importEquipment));
+            String usageStatus = ExcelDocument.getCellStringValue(rowMap.get("使用状态"));
+            asset.setUsageStatus(getI18nMsgKey(usageStatusList, usageStatus));
+            String accountingCategory = ExcelDocument.getCellStringValue(rowMap.get("核算类别"));
+            asset.setAccountingCategory(getI18nMsgKey(accountingCategoryList, accountingCategory));
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
@@ -350,6 +360,21 @@ public class AssetFileImportService {
                     addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 }
                 newAsset.setAssetOwnerName2(null);
+            }
+            
+            //for AssetOwner3
+            userList = getUserInfosByName(newAsset.getAssetOwnerName3());
+            if (userList != null && userList.size() == 1) {
+                UserAccount assetOwner = userList.get(0);
+                newAsset.setAssetOwnerId3(assetOwner.getId());
+                newAsset.setAssetOwnerTel3(assetOwner.getTelephone());
+            } else {
+                if (newAsset.getAssetOwnerName3() == null) {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
+                } else {
+                    addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
+                }
+                newAsset.setAssetOwnerName3(null);
             }
             
             //for ClinicalOwner

@@ -75,6 +75,25 @@
                                 <p:inputText id="assetOwnerTel2" value="#{assetInfoController.selected.assetOwnerTel2}" readonly="true"/>
                             </h:panelGroup>
 
+                            <h:panelGroup >
+                                <label class="label">#{msg.assetOwnerName3}</label>
+                                <p:selectOneMenu id="assetOwnerName3" value="#{assetInfoController.owner3}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
+                                    <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel3"/>
+                                    <f:selectItem itemLabel="" />
+                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
+                                    </p:column>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerTel3}</label>
+                                <p:inputText id="assetOwnerTel3" value="#{assetInfoController.selected.assetOwnerTel3}" readonly="true"/>
+                            </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
                                 <p:commandButton id="btnOrg" value="#{assetInfoController.selectedOrg==null?'':assetInfoController.selectedOrg.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
@@ -314,6 +333,30 @@
                                 <p:selectOneMenu id="importEquipment" value="#{assetInfoController.selected.importEquipment}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.measuringItemCategory}</label>
+                                <p:selectOneMenu id="measuringItemCategory" value="#{assetInfoController.selected.measuringItemCategory}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.usageStatus}</label>
+                                <p:selectOneMenu id="usageStatus" value="#{assetInfoController.selected.usageStatus}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('usageStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.accountingCategory}</label>
+                                <p:selectOneMenu id="accountingCategory" value="#{assetInfoController.selected.accountingCategory}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
 

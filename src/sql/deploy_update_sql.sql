@@ -26,9 +26,6 @@ update v2_blob_object b set bo_uuid=(select uid from asset_info a where b.bo_id=
 update v2_blob_object b set bo_sub_type=1 where b.bo_sub_type is null and b.bo_type='AssetInfo' and b.object_type='image/jpeg';
 
 
--- find all orgs which tenant has been deleted 
-select * from org_info where tenant_uid not in(select uid from tenant_info);
-
 --create new root org for each tenant
 insert into org_info (site_id,uid,org_level,org_type,tenant_uid,institution_uid,hospital_uid,site_uid,"name") (select id,uid,0,0,uid,uid,uid,uid,"name" from tenant_info where uid not in(select uid from org_info where org_type=0)) 
 update org_info set hospital_id=id where hospital_id is null and org_type=0
