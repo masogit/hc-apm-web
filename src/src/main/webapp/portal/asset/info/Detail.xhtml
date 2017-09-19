@@ -188,6 +188,14 @@
                         <p:inputText id="assetOwnerTel2" value="#{assetInfoController.selected.assetOwnerTel2}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <label class="label">#{msg.assetOwnerName3}</label>
+                        <p:inputText id="assetOwnerName3" value="#{assetInfoController.selected.assetOwnerName3}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetOwnerTel3}</label>
+                        <p:inputText id="assetOwnerTel3" value="#{assetInfoController.selected.assetOwnerTel3}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.clinicalOwnerName}</label>
                         <p:inputText id="clinicalOwnerName" value="#{assetInfoController.selected.clinicalOwnerName}" readonly="true"/>
                     </h:panelGroup>
@@ -222,6 +230,18 @@
                     <h:panelGroup>
                         <label class="label">#{msg.importEquipment}</label>
                         <p:inputText id="importEquipment" value="#{fieldMsg.fieldValue('importEquipment', assetInfoController.selected.importEquipment)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.measuringItemCategory}</label>
+                        <p:inputText id="measuringItemCategory" value="#{fieldMsg.fieldValue('measuringItemCategory', assetInfoController.selected.measuringItemCategory)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.usageStatus}</label>
+                        <p:inputText id="usageStatus" value="#{fieldMsg.fieldValue('usageStatus', assetInfoController.selected.usageStatus)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.accountingCategory}</label>
+                        <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoController.selected.accountingCategory)}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.manufactDate}</label>
