@@ -6,6 +6,7 @@
 package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.ServiceRequestRepository;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -137,6 +138,16 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
 
     public void onSelectServiceRequest() {
         workOrders = woService.getWorkOrdersBySR(selected.getId());
+        AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        selectedAsset =  assetDao.findById(selected.getAssetId());
+        currentStatus = selectedAsset.getStatus();
+        needConfirmTime = false;
+    }
+    
+    public void updateDownTime(){
+        V2_WorkOrder wo = workOrders.stream().filter(item -> item.getCloseTime()==null).findAny().orElse(null);
+        woService.updateDownTime(wo,selected.getConfirmedDownTime());
+        needConfirmTime = false;
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
@@ -153,11 +164,14 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
     }
 
     public void createServiceRequest() {
+        cancel();
+        selected=null;
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+        
     }
 
     public void cancel() {
@@ -190,6 +204,9 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
 
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
+        if(currentStatus==1){
+            currentStatus = 3;
+        }
         needConfirmTime = false;
     }
 
