@@ -96,6 +96,7 @@ public class WorkOrderExportService {
             workOrderMap = new HashedMap();
             workOrderMap.put("报修单号", serviceRequest.getSrNum() != null ? serviceRequest.getSrNum() : "");
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
+            workOrderMap.put("工单状态", workOrder.getStatus() != null ? FieldValueMessageController.fieldValue("status",workOrder.getStatus().toString()) : "");
             workOrderMap.put("资产编号", assetInfo.getFinancingNum());
             workOrderMap.put("设备名称", serviceRequest.getAssetName());
             workOrderMap.put("院区", serviceRequest.getHospitalName());
