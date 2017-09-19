@@ -126,6 +126,18 @@ public class V2_WorkOrderService {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
         }
     }
+    
+    public void updateDownTime(V2_WorkOrder wo,Date confirmedDowntime) {
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(wo.getCurrentStepId());
+        formData.setAssetStatus("2");
+        formData.setConfirmedDownTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(confirmedDowntime));
+        String res = srApi.invokeWorkOrderAction(token,formData,"updateTime",wo.getId());
+        if (res==null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
+        }
+    }
 
     public void rejectWorkOrder(V2_WorkOrder selectedWorkOrder,String reason, Integer status, Date confirmedDowntime) {
         V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());

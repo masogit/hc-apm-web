@@ -578,6 +578,60 @@ INSERT INTO "public"."i18n_message" VALUES ('1801', 'emergencyEquipment', '1', '
 INSERT INTO "public"."i18n_message" VALUES ('1802', 'emergencyEquipment', '2', '非急救类', 'not emergency', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1805', 'importEquipment', '1', '进口', 'Import', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1806', 'importEquipment', '2', '国产', 'Domestic', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1901', 'arrivalListStatus', '1', '未完成', 'New List', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1902', 'arrivalListStatus', '2', '部分完成', 'Partial Finished', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1903', 'arrivalListStatus', '3', '已完成', 'Finished', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('1811', 'measuringItemCategory', '1', '医用CT', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1812', 'measuringItemCategory', '2', '普通X光机', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1813', 'measuringItemCategory', '3', '磁共振类', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1814', 'measuringItemCategory', '4', 'B超', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1815', 'measuringItemCategory', '5', 'X线胃肠', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1816', 'measuringItemCategory', '6', '医用DSA', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1817', 'measuringItemCategory', '7', '乳腺X光机', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1818', 'measuringItemCategory', '8', '医用直线加速器', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1819', 'measuringItemCategory', '9', '射线骨密度仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1820', 'measuringItemCategory', '10', '超声多普勒胎儿监护仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1821', 'measuringItemCategory', '11', '超声多普勒胎心仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1822', 'measuringItemCategory', '12', '血压计（表）', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1823', 'measuringItemCategory', '13', '电子血压计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1824', 'measuringItemCategory', '14', '心电图机', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1825', 'measuringItemCategory', '15', '脑电图仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1826', 'measuringItemCategory', '16', '听力计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1827', 'measuringItemCategory', '17', '验光仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1828', 'measuringItemCategory', '18', '验光镜片组', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1829', 'measuringItemCategory', '19', '氧气吸入器', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1830', 'measuringItemCategory', '20', '酸度计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1831', 'measuringItemCategory', '21', '分光光度计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1832', 'measuringItemCategory', '22', '天平', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1833', 'measuringItemCategory', '23', '电子体重秤', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1834', 'measuringItemCategory', '24', '指针式机械体重秤', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1835', 'measuringItemCategory', '25', '温湿度计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1836', 'measuringItemCategory', '26', '体温计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1837', 'measuringItemCategory', '27', '电导率仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1838', 'measuringItemCategory', '28', '剂量仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1839', 'measuringItemCategory', '29', '活度计', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1840', 'measuringItemCategory', '30', '标准器', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1841', 'measuringItemCategory', '31', '测试仪', '', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('1851', 'measuringStatus', '1', '已检', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1852', 'measuringStatus', '2', '待检', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1853', 'measuringStatus', '3', '过期', '', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('1861', 'accountingCategory', '1', '医用电子仪器', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1862', 'accountingCategory', '2', '光学仪器及内窥镜', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1863', 'accountingCategory', '3', '医用机械设备', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1864', 'accountingCategory', '4', '电子产品及通讯设备', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1865', 'accountingCategory', '5', '仪器仪表计量标准器具', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1866', 'accountingCategory', '6', '其他设备', '', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('1871', 'usageStatus', '1', '在用', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1872', 'usageStatus', '2', '停用', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1873', 'usageStatus', '3', '待报废', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1874', 'usageStatus', '4', '报废', '', null, '-1');
+
+INSERT INTO "public"."i18n_message" VALUES ('1881', 'field_name', 'assetOwnerName3', '维修责任人3', '3rd Asset Owner Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1882', 'field_name', 'assetOwnerTel3', '维修责任人3电话', '3rd Asset Owner Tel', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1811', 'measuringItemCategory', '1', '医用CT', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1812', 'measuringItemCategory', '2', '普通X光机', '', null, '-1');
