@@ -70,7 +70,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     public List<UserAccount> findBySiteUID(String id);
 
 
-    @Query(value="select u from UserAccount u, UserOrgInfo o where u.uid=o.userUid and o.orgUid in ?1")
+    @Query(value="select u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=3 and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);
 
 
