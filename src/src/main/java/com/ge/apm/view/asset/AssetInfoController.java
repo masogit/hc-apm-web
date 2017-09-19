@@ -65,6 +65,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private UserAccount owner;
     private UserAccount owner2;
+    private UserAccount owner3;
     //    private List<UserAccount> ownerList;
     private List<OrgInfo> ownerOrgList;
 
@@ -98,6 +99,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         owner = selected.getAssetOwnerId() == null ? null : userDao.findById(selected.getAssetOwnerId());
         owner2 = selected.getAssetOwnerId2() == null ? null : userDao.findById(selected.getAssetOwnerId2());
+        owner3 = selected.getAssetOwnerId3() == null ? null : userDao.findById(selected.getAssetOwnerId3());
 
         if (null != selected.getClinicalOwnerId()) {
             clinicalOwner = userDao.findById(selected.getClinicalOwnerId());
@@ -476,6 +478,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setAssetOwnerName2(owner2.getName());
             selected.setAssetOwnerTel2(owner2.getTelephone());
         }
+        if (null != owner3) {
+            selected.setAssetOwnerId3(owner3.getId());
+            selected.setAssetOwnerName3(owner3.getName());
+            selected.setAssetOwnerTel3(owner3.getTelephone());
+        }
+
     }
 
     public void onClinicalDeptChange() {
@@ -777,6 +785,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOwner2(UserAccount owner2) {
         this.owner2 = owner2;
+    }
+
+    public UserAccount getOwner3() {
+        return owner3;
+    }
+
+    public void setOwner3(UserAccount owner3) {
+        this.owner3 = owner3;
     }
 
     public String getQrCode() {

@@ -95,7 +95,9 @@ public class AssetInfoService {
         TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
 
         List<SelectItem> dropdownList = new ArrayList<SelectItem>();
-        traverse(rootNode, dropdownList);
+        if (rootNode != null) {
+            traverse(rootNode, dropdownList);
+        }
 
         return dropdownList;
     }
