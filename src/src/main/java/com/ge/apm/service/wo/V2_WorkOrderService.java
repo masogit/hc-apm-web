@@ -95,8 +95,12 @@ public class V2_WorkOrderService {
         }
     }
 
-    public List<UserAccount> getWorkerList() {
-        return userDao.getUsersWithAssetStaffRole(UserContextService.getCurrentUserAccount().getHospitalId());
+    public List<UserAccount> getWorkerList(Integer assetId) {
+        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId);
+        if(null!=res){
+            return (List<UserAccount>)res.get("data");
+        }
+        return null;
     }
     
     public AssetInfo getAssetInfo(Integer assetId){
