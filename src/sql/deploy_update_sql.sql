@@ -40,3 +40,6 @@ update v2_blob_object set bo_sub_type='2' where bo_type='QrCodeLib' and object_t
 
 -- added depatment uid for serviceRequest
 update v2_service_request s set from_dept_uid=(select uid from org_info o where s.from_dept_id=o.id) where s.from_dept_uid is null
+
+-- update asset_group for "其他"
+update Asset_info set asset_group=99 where asset_group=22
