@@ -52,6 +52,18 @@
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                             <p:commandButton value="更新停机时间" rendered="#{serviceRequestController.needConfirmTime}" actionListener="#{serviceRequestController.updateDownTime}" process="@(.updateDownTime)" update="@(.updateDownTime)"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.confirmedDownTime}</label>
+                            <p:outputLabel value="#{serviceRequestController.selected.confirmedDownTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">开机时间</label>
+                            <p:outputLabel value="#{serviceRequestController.selected.confirmedUpTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </p:outputLabel>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <c:forEach items="#{serviceRequestController.workOrders}" var="woItem" varStatus="rowIndex" >
                         <p:fieldset legend="#{msg.WorkOrder}#{rowIndex.index+1}" toggleable="false" >
