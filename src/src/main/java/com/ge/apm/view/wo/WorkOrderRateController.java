@@ -85,6 +85,8 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void cancel() {
         selected = null;
+        comments = null;
+        rating = null;
     }
 
     public V2_ServiceRequest getServiceRequest(String srId) {

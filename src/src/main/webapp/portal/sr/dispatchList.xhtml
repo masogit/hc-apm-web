@@ -29,8 +29,8 @@
                 <h:form id="dispatchListForm">
                     <h:panelGrid id="buttonSet" columns="6" cellpadding="5">
                         <p:commandButton value="#{fieldMsg.fieldValue('woSteps',2)}" id="btnCreate" process="@this" update="datalist buttonSet :dispatchDetailForm " actionListener="#{workOrderDispatchController.searchList(2)}" disabled="#{workOrderDispatchController.queryIndex==2}" />
-                        <p:commandButton value="#{fieldMsg.fieldValue('woSteps',3)}" id="btn1" process="@this" update="datalist buttonSet :dispatchDetailForm " actionListener="#{workOrderDispatchController.searchList(3)}"  disabled="#{workOrderDispatchController.queryIndex==3}" />
-                        <p:commandButton value="#{fieldMsg.fieldValue('woSteps',4)}" id="btn2" process="@this" update="datalist buttonSet :dispatchDetailForm " actionListener="#{workOrderDispatchController.searchList(4)}" disabled="#{workOrderDispatchController.queryIndex==4}"/>
+                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet :dispatchDetailForm " actionListener="#{workOrderDispatchController.searchList(3)}"  disabled="#{workOrderDispatchController.queryIndex==3}" />
+                        <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet :dispatchDetailForm " actionListener="#{workOrderDispatchController.searchList(4)}" disabled="#{workOrderDispatchController.queryIndex==4}"/>
                         <p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet :dispatchDetailForm " actionListener="#{workOrderDispatchController.searchList(5)}" disabled="#{workOrderDispatchController.queryIndex==5}"/>
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{workOrderDispatchController.lazyModel}" var="item" widgetVar="varDataList"
