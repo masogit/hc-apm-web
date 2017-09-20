@@ -132,7 +132,7 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
 
 
     public List<UserAccount> getWorkerList(){
-        return woService.getWorkerList();
+        return woService.getWorkerList(selectedWorkOrder.getAssetId());
     }
 
     public void dispatchWorkOrder(){
