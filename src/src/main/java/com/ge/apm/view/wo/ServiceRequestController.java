@@ -62,11 +62,14 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
     private Boolean needConfirmTime = false;
     
     private String cancelReason;
+    
+    private UserContextService userContextService;
 
     protected void init() {
         dao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         this.filterBySite = true;
         queryIndex = 1;
         this.filterBySite = false;
@@ -84,27 +87,32 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
         
         setSearchFilter();
         removeFilterOnField("status");
-        if (queryIndex == 5) {
+        if (queryIndex == 6){
+            removeFilterOnField("requestorId");
+            removeFilterOnField("fromDeptUID");
+        }else if (queryIndex == 5) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else {
-            removeFilterOnField("requestorId");
             if (queryIndex == 1 || queryIndex == 3) {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             } else {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             }
             if (queryIndex == 1 || queryIndex == 2) {
+                removeFilterOnField("fromDeptUID");
+                removeFilterOnField("requestorId");
                 searchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-            } 
+                searchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*2+"));
+            }else{
+                removeFilterOnField("fromDeptUID");
+                removeFilterOnField("requestorId");
+                searchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID()));
+            }
         }
 
         this.selected = null;
         this.workOrders = null;
-        if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
-        }
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     @Override
@@ -115,7 +123,6 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
         if(!this.hasFilterOnField("siteUID")){
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList,"1*2+"));
-            searchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.IN, orgUidList,"1*2+"));
         }
     }
 
