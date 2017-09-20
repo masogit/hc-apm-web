@@ -63,7 +63,7 @@
                         <p:column headerText="#{msg.isLocked}" sortBy="#{item.isLocked}">
                             <h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }"/>
                         </p:column>
-                        <p:column headerText="#{msg.roleId}" sortBy="#{item.userRoleNames}">
+                        <p:column headerText="#{msg.roleId}" >
                             <h:outputText value="#{item.userRoleNames}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
