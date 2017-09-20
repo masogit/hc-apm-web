@@ -43,7 +43,7 @@
                         </h:panelGroup>
                         <h:panelGroup id="assetstatus" class="updateDownTime">
                             <label class="label">#{msg.status}</label>
-                            <p:selectOneRadio id="status" value="#{serviceRequestController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{serviceRequestController.currentStatus eq 2}">
+                            <p:selectOneRadio id="status" value="#{serviceRequestController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{serviceRequestController.currentStatus ne 3}">
                                 <p:ajax  listener="#{serviceRequestController.onStatusChange()}"  update="assetstatus" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 

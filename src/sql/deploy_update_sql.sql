@@ -27,9 +27,9 @@ update v2_blob_object b set bo_sub_type=1 where b.bo_sub_type is null and b.bo_t
 
 
 --create new root org for each tenant
-insert into org_info (site_id,uid,org_level,org_type,tenant_uid,institution_uid,hospital_uid,site_uid,"name") (select id,uid,0,0,uid,uid,uid,uid,"name" from tenant_info where uid not in(select uid from org_info where org_type=0)) 
-update org_info set hospital_id=id where hospital_id is null and org_type=0
-update org_info set parent_uid=tenant_uid where org_type=1 and parent_uid is null
+insert into org_info (site_id,uid,org_level,org_type,tenant_uid,institution_uid,hospital_uid,site_uid,"name") (select id,uid,0,0,uid,uid,uid,uid,"name" from tenant_info where uid not in(select uid from org_info where org_type=0)); 
+update org_info set hospital_id=id where hospital_id is null and org_type=0;
+update org_info set parent_uid=tenant_uid where org_type=1 and parent_uid is null;
 
 
 -- update v2_blob_object set bo_uuid and bo_sub_type for QrCodeLib
