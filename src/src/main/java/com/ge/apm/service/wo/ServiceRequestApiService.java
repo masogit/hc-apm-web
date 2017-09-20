@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -33,6 +35,22 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
     private String url_workOrderAction;
     @Value("#{urlProperties.url_createWorkOrder}")
     private String url_createWorkOrder;
+    @Value("#{urlProperties.url_getReponserByAsset}")
+    private String url_getReponserByAsset;
+    
+    public Map<String, Object> getReponserByAsset(String token, Integer assetid) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        
+        String url = url_getReponserByAsset.replace("{assetId}", assetid.toString());
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
 
     public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset) {
         ServiceRequestForm formData = new ServiceRequestForm();

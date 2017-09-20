@@ -168,6 +168,20 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "man_hours")
     private Integer manHours;
 
+    /**
+     * 1: auto dispatch 2: grab and manual 3: grab 4: manual
+     */
+    @Column(name = "dispatch_mode")
+    private Integer dispatchMode;
+
+    public Integer getDispatchMode() {
+        return dispatchMode;
+    }
+
+    public void setDispatchMode(Integer dispatchMode) {
+        this.dispatchMode = dispatchMode;
+    }
+
     public String getTenantUID() {
         return tenantUID;
     }

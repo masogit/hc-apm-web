@@ -12,9 +12,14 @@ import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
@@ -36,8 +41,9 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
 
     private ServiceRequestRepository srDao;
     private V2_WorkOrderService woService;
+    private UaaService uaaService;
 
-    //status：0-待派工/1-待接单/2-维修中/3-已完成/4-已派工/5-已取消
+    //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
     private V2_ServiceRequest selectedServiceRequest;
@@ -48,8 +54,10 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         srDao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
-        this.filterBySite = true;
+        uaaService = WebUtil.getBean(UaaService.class);
         queryIndex = 2;
+        this.filterBySite = false;
+        this.filterByHospital = false;
 
     }
 
@@ -60,20 +68,35 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
 
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
-        this.setSiteFilter();
+        this.setSearchFilter();
         removeFilterOnField("status");
+        removeFilterOnField("currentStepId");
+        removeFilterOnField("dispatchMode");
         if (queryIndex == 5) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
-        } else {
+        }else if(queryIndex == 2){
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-            removeFilterOnField("currentStepId");
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,4)));
+        }else if(queryIndex == 3){
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GT, 2));
+        }else if(queryIndex == 4){
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ,2 ));
         }
+        
         this.selected = null;
-        if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
-        } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+    
+    @Override
+    public void setSearchFilter() {
+         if(this.searchFilters==null){
+            searchFilters = new ArrayList();
+        }
+        if(!this.hasFilterOnField("siteUID")){
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList,"1*2+"));
         }
     }
 
@@ -109,7 +132,7 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
 
 
     public List<UserAccount> getWorkerList(){
-        return woService.getWorkerList();
+        return woService.getWorkerList(selectedWorkOrder.getAssetId());
     }
 
     public void dispatchWorkOrder(){
