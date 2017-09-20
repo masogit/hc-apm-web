@@ -44,6 +44,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     Page<UserAccount> getBySiteId(Pageable pageRequest, int siteId);
     Page<UserAccount> getByOrgInfoId(Pageable pageRequest, int orgInfoId);
+    @Query("select u from UserAccount u where u.tenantUID=?1 or u.institutionUID=?1 or u.hospitalUID=?1 or u.siteUID=?1 or u.orgInfoUID=?1")
+    Page<UserAccount> getByOrgInfoUID(Pageable pageRequest, String getByOrgInfoUID);
     UserAccount getByWeChatId(String weChatId);
     List<UserAccount> getByOrgInfoId(int orgInfoId);
 
