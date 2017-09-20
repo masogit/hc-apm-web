@@ -130,7 +130,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             if (selectedOrg.getId() == -1) {
                 return dao.getByTenantUID(pageRequest, this.tenantUid);
             } else {
-                return dao.getByOrgInfoId(pageRequest, selectedOrg.getId());
+                return dao.getByOrgInfoUID(pageRequest, selectedOrg.getUid());
             }
         }
     }
