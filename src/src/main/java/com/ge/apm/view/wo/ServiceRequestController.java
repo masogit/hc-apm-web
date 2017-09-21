@@ -107,6 +107,7 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
                 removeFilterOnField("fromDeptUID");
                 removeFilterOnField("requestorId");
                 searchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID()));
+                searchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(),"1*2+"));
             }
         }
 
