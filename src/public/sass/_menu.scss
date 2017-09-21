@@ -4,6 +4,11 @@
   $brand-color: #d1d0d8;
   $menu-width: 190px;
 
+  h1 {
+    margin: .67em 0;
+    line-height: 1.1em;
+  }
+
   .layout-main {
     margin-left: $menu-width;
   }
