@@ -183,7 +183,7 @@ public class AssetFileImportService {
                 Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68);
                 asset.setAssetCode68(msgKey==null? null:msgKey.toString());
             }
-            String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
+            String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
             asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName));
             asset.setFunctionGrade(ExcelDocument.getCellIntegerValue(rowMap.get("功能等级")));
             asset.setFunctionType(ExcelDocument.getCellStringValue(rowMap.get("设备型号")));
@@ -218,7 +218,7 @@ public class AssetFileImportService {
             asset.setLocationName(ExcelDocument.getCellStringValue(rowMap.get("安装位置")));
             asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
             asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
-            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
+            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
             asset.setAssetCategory(getI18nMsgKey(assetTypeList, assetType));
             String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
             asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage));
@@ -597,6 +597,6 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.5".equalsIgnoreCase(inputVersion);
+        return "v1.6".equalsIgnoreCase(inputVersion);
     }
 }
