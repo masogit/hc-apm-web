@@ -10,10 +10,9 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.springframework.cache.annotation.CacheEvict;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -24,7 +23,6 @@ import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import org.apache.commons.collections.CollectionUtils;
 
 /**
  *
@@ -574,7 +572,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public List<UserAccount> getWorkerList(){
-        return woService.getWorkerList();
+        return woService.getWorkerList(this.selectedWorkOrder.getAssetId());
     }
 
     public List<AssetFaultType> getAssetFaultType(){

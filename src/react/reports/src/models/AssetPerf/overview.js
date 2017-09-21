@@ -56,25 +56,26 @@ export default {
               dept: orgId
             })
           }),
-          axios({
-            method: 'get',
-            url: API_HOST + '/profit/forecast',
-            params: pickBy({
-              from: now.clone().startOf('year').format(dateFormat),
-              to: now.clone().endOf('year').format(dateFormat),
-              dept: orgId
-            })
-          }),
-          axios({
-            method: 'get',
-            url: API_HOST + '/profit/forecastrate',
-            params: pickBy({
-              from: now.clone().startOf('year').format(dateFormat),
-              to: now.clone().endOf('year').format(dateFormat),
-              groupby: 'type',
-              dept: orgId
-            })
-          })
+          // forecast tab is already hidden
+          // axios({
+          //   method: 'get',
+          //   url: API_HOST + '/profit/forecast',
+          //   params: pickBy({
+          //     from: now.clone().startOf('year').format(dateFormat),
+          //     to: now.clone().endOf('year').format(dateFormat),
+          //     dept: orgId
+          //   })
+          // }),
+          // axios({
+          //   method: 'get',
+          //   url: API_HOST + '/profit/forecastrate',
+          //   params: pickBy({
+          //     from: now.clone().startOf('year').format(dateFormat),
+          //     to: now.clone().endOf('year').format(dateFormat),
+          //     groupby: 'type',
+          //     dept: orgId
+          //   })
+          // })
         ])
         const data = res.map(item => item.data.root)
         yield put({

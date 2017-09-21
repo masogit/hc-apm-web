@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import java.util.ArrayList;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -23,7 +24,9 @@ import org.primefaces.model.TreeNode;
 import org.springframework.dao.DataIntegrityViolationException;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.AssetInfo;
 import java.util.UUID;
+import webapp.framework.dao.SearchFilter;
 
 @ManagedBean
 @ViewScoped
@@ -243,6 +246,14 @@ UserAccountRepository userDao;
         List<UserAccount> userList = userDao.getByOrgInfoUID(selected.getUid());
         if(userList!=null && !userList.isEmpty()){
             WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
+            return false;
+        }
+        AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        List<SearchFilter> assetFilters = new ArrayList<>();
+        assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selected.getUid()));
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(assetFilters);
+        if(assetList!=null && !assetList.isEmpty()){
+            WebUtil.addErrorMessage("该组织下有资产存在,不能删除.");
             return false;
         }
         return true;
