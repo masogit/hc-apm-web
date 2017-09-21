@@ -5,17 +5,20 @@
  */
 package com.ge.apm.view.wo;
 
-import com.ge.apm.domain.*;
+import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
- *
  * @author 212579464
  */
 @ManagedBean
@@ -25,30 +28,38 @@ public class ServiceRequestByAssetIdController extends ServiceRequestController 
     private static final long serialVersionUID = 1L;
     private boolean isClosed;
     private Integer assetId;
+    private String woId;
 
     @Override
     protected void init() {
         super.init();
-        try{
-            assetId=Integer.valueOf(WebUtil.getRequestParameter("assetId"));
-        }
-        catch(Exception ex){
+        try {
+            assetId = Integer.valueOf(WebUtil.getRequestParameter("assetId"));
+            woId = WebUtil.getRequestParameter("woId");
+        } catch (Exception ex) {
             assetId = -1;
         }
     }
 
     @Override
     protected Page<V2_ServiceRequest> loadData(PageRequest pageRequest) {
-        this.setSiteFilter();
+        if (!Strings.isNullOrEmpty(woId)) {
+            V2_WorkOrder workOrder = woService.getWorkOrderById(woId);
+            return dao.findById(workOrder.getSrId(), pageRequest);
+        }
 
-        if(assetId!=-1){
+        this.setSiteFilter();
+        if (searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+        if (assetId != -1) {
             searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetId));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1)); //query Closed service request
         }
-        
+
         this.selected = null;
         this.workOrders = null;
-        if (this.searchFilters == null) {
+        if (this.searchFilters.isEmpty()) {
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);

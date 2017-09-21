@@ -5,25 +5,12 @@
  */
 package com.ge.apm.view.wo;
 
-import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.V2_WorkOrder_Detail;
-import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.dao.ServiceRequestRepository;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
 import org.primefaces.event.SelectEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +19,14 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -47,7 +42,7 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
 
     List<V2_WorkOrder> workOrders;
 
-    private V2_WorkOrderService woService;
+    V2_WorkOrderService woService;
     
     private UaaService uaaService;
 
