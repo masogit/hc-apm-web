@@ -257,12 +257,6 @@
                         </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.startUsingDate}</label>
-                        <p:inputText  value="#{assetInfoController.selected.startUsingDate}" readonly="true">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                        </p:inputText>
-                    </h:panelGroup>
-                    <h:panelGroup>
                         <label class="label">#{msg.installDate}</label>
                         <p:inputText id="installDate" value="#{assetInfoController.selected.installDate}" readonly="true">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
