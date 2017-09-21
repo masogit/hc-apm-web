@@ -1,11 +1,11 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.V2_ServiceRequest;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.List;
 
 public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_ServiceRequest> {
 
@@ -29,6 +29,6 @@ public interface ServiceRequestRepository extends GenericRepositoryUUID<V2_Servi
 
     public List<V2_ServiceRequest> findByAssetIdAndStatus(int assetId, int srStatus);
 
-
+    Page<V2_ServiceRequest> findById(String id, Pageable pageRequest);
 
 }

@@ -1181,7 +1181,7 @@
                 return res.json().then(function(data) {
                   // As Jianbin's requested, remove '停机中', substract count from the sum
                   try {
-                    var hideItemIndex = data.items.findIndex(i => i.category === 2);
+                    var hideItemIndex = data.items.findIndex(function(i) { return i.category === 2; });
                     if (hideItemIndex > -1) {
                       data.root.count -= data.items[hideItemIndex].count;
                       data.items.splice(hideItemIndex, 1);
@@ -1205,15 +1205,6 @@
 
             function setMaxData() {
               var root = lscache.get(cacheKey + '/root');
-              // As requested, open a new tab when '未完成报修' got clicked
-              try {
-                if (root.category === 1 && list.length > 0) {
-                  window.open(list[0].link.href)
-                }
-              } catch (error) {
-                // don't want to break any sh*t for this sh*t
-              }
-
               // notify the chart data load
               _this.fire('data-load', {
                 items: list,

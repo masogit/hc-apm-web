@@ -10,55 +10,31 @@ class Center extends React.PureComponent {
   render() {
     const { cursor } = this.props
     const config = {
-      '1': {
+      '1': { // head
         padding: spring(0.15),
         scale: spring(5),
         percentX: spring(0.5),
         percentY: spring(-0.01)
       },
-      '2': {
-        padding: spring(0.15),
-        scale: spring(6),
-        percentX: spring(0.5),
-        percentY: spring(0.06)
-      },
-      '3': {
+      '2': { // chest
         padding: spring(0.15),
         scale: spring(4),
         percentX: spring(0.5),
         percentY: spring(0.12)
       },
-      '4': {
+      '3': { // abdomen
         padding: spring(0.15),
         scale: spring(4),
         percentX: spring(0.5),
         percentY: spring(0.3)
       },
-      '5': {
-        padding: spring(0.15),
-        scale: spring(4),
-        percentX: spring(0.5),
-        percentY: spring(0.42)
-      },
-      '6': {
-        padding: spring(0.15),
-        scale: spring(2),
-        percentX: spring(0.5),
-        percentY: spring(0.2)
-      },
-      '7': {
+      '4': { // limbs
         padding: spring(0.15),
         scale: spring(2.8),
         percentX: spring(1.6),
         percentY: spring(0.35)
       },
-      '8': {
-        padding: spring(0.15),
-        scale: spring(3),
-        percentX: spring(0.6),
-        percentY: spring(0.8)
-      },
-      '9': {
+      '5': { // others
         padding: spring(0.175),
         scale: spring(1),
         percentX: spring(0.5),
@@ -73,7 +49,7 @@ class Center extends React.PureComponent {
           percentX: 0.5,
           percentY: 0.5
         }}
-        style={config[cursor['part'] || 9]}
+        style={config[cursor['part'] || 5]}
       >
         {
           style => (

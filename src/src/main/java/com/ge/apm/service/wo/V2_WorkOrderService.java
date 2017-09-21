@@ -8,21 +8,16 @@ package com.ge.apm.service.wo;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +57,11 @@ public class V2_WorkOrderService {
     AssetInfoRepository assetInfoRepository;
     @Autowired
     UserAccountRepository userAccountRepository;
+
+    public V2_WorkOrder getWorkOrderById(String woId) {
+        return woDao.findById(woId);
+    }
+
     public List<V2_WorkOrder> getWorkOrdersBySR(String serviceRequest) {
         return woDao.findBySrId(serviceRequest);
     }
