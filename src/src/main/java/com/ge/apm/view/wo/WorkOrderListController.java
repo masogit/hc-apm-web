@@ -571,9 +571,9 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         return woService.getWorkOrderDetails(woId);
     }
 
-//    public List<UserAccount> getWorkerList(){
-//        return woService.getWorkerList();
-//    }
+    public List<UserAccount> getWorkerList(){
+        return woService.getWorkerList(this.selectedWorkOrder.getAssetId());
+    }
 
     public List<AssetFaultType> getAssetFaultType(){
         AssetInfo assetinfo = assetInfoRepository.findById(this.selectedWorkOrder.getAssetId());

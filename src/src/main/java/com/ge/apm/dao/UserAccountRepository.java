@@ -62,10 +62,18 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 	List<UserInfo> findByInstitutionUID(String institutionUID);
 
     /* sysrole.id=2*/
+    @Query(value= "select * from user_account where id > 0 and site_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
     public List<UserAccount> getBySiteUID(String siteUID);
+    
+    @Query(value= "select * from user_account where id > 0 and hospital_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
     public List<UserAccount> getByHospitalUID(String hospitalUID);
+    
+    @Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     public List<UserAccount> getByInstitutionUID(String InsitiUID);
+    
+    @Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     public List<UserAccount> getByTenantUID(String tenantUID);
+    
     public List<UserAccount> getByOrgInfoUID(String orgUID);
 
     public Page<UserAccount> getByTenantUID(Pageable pageRequest,String tenantUID);

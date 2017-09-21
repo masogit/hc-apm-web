@@ -2,6 +2,7 @@ package com.ge.apm.view.sysutil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -61,6 +62,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		String tenantUID = user.getTenantUID();
 		if(selected == null){
 			dispatchUserList = userDao.getByTenantUID(tenantUID);
+			return;
 		}else{
 			if(selected.getSiteUID() != null){
 				dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
@@ -73,6 +75,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				return;
 			}else {
 				dispatchUserList = userDao.getByTenantUID(tenantUID);
+				return;
 			}
 			
 		}
