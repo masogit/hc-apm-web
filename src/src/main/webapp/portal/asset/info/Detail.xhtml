@@ -30,47 +30,93 @@
             <p:tab title="#{msg.BasicInfo}">
                 <div class="ui-g">
                     <div class="ui-g-8 ui-g-nopad">
-                        <p:panelGrid columns="3"  layout="grid" styleClass="ui-panelgrid-blank">
+                        <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
+                            <h:panelGroup>
+                                <label class="label">#{msg.serialNum}</label>
+                                <p:inputText id="serialNum" value="#{assetInfoController.selected.serialNum}" readonly="true"/>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.name}</label>
                                 <p:inputText value="#{assetInfoController.selected.name}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.vendor}</label>
-                                <p:inputText value="#{assetInfoController.selected.vendor}" readonly="true"/>
+                                <label class="label">#{msg.aliasName}</label>
+                                <p:inputText id="aliasName" value="#{assetInfoController.selected.aliasName}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.departNum}</label>
-                                <p:inputText value="#{assetInfoController.selected.departNum}" readonly="true"/>
+                                <label class="label">#{msg.assetGroup}</label>
+                                <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup', assetInfoController.selected.assetGroup)}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerName}</label>
+                                <p:inputText id="assetOwnerName" value="#{assetInfoController.selected.assetOwnerName}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerTel}</label>
+                                <p:inputText id="assetOwnerTel" value="#{assetInfoController.selected.assetOwnerTel}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerName2}</label>
+                                <p:inputText id="assetOwnerName2" value="#{assetInfoController.selected.assetOwnerName2}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerTel2}</label>
+                                <p:inputText id="assetOwnerTel2" value="#{assetInfoController.selected.assetOwnerTel2}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerName3}</label>
+                                <p:inputText id="assetOwnerName3" value="#{assetInfoController.selected.assetOwnerName3}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.assetOwnerTel3}</label>
+                                <p:inputText id="assetOwnerTel3" value="#{assetInfoController.selected.assetOwnerTel3}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.hospitalId}</label>
+                                <p:inputText id="hospitalId" value="#{assetInfoController.getHospitalName(assetInfoController.selected.siteUID)}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}</label>
                                 <p:inputText value="#{assetInfoController.selected.clinicalDeptName}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.purchaseDate}</label>
-                                <p:inputText value="#{assetInfoController.selected.purchaseDate}" readonly="true"/>
+                                <label class="label">#{msg.clinicalOwnerName}</label>
+                                <p:inputText id="clinicalOwnerName" value="#{assetInfoController.selected.clinicalOwnerName}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.warrantyDate}</label>
-                                <p:inputText value="#{assetInfoController.selected.warrantyDate}" readonly="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.purchasePrice}</label>
-                                <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
+                                <label class="label">#{msg.clinicalOwnerTel}</label>
+                                <p:inputText id="clinicalOwnerTel" value="#{assetInfoController.selected.clinicalOwnerTel}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.status}</label>
-                                <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoController.selected.status}" disabled="true">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneRadio>
+                                <label class="label">#{msg.brand}</label>
+                                <p:inputText id="brand" value="#{assetInfoController.selected.brand.name}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.deviceStatus}</label>
-                                <p:selectOneRadio id="deviceStatus"  label="#{msg.status}" value="#{assetInfoController.selected.deviceStatus}" disabled="true">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneRadio>
+                                <label class="label">#{msg.manufacture}</label>
+                                <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}" readonly="true"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.vendor}</label>
+                                <p:inputText value="#{assetInfoController.selected.vendor}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.maitanance}</label>
+                                <p:inputText id="maitanance" value="#{assetInfoController.selected.maitanance}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.maitananceTel}</label>
+                                <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.nationalStandardCode}</label>
+                                <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" readonly="true"/>
+                            </h:panelGroup>
+
+
+
+
+
+
                         </p:panelGrid>
                     </div>
                     <div class="ui-g-4">
@@ -83,54 +129,9 @@
         </p:accordionPanel>
         <p:accordionPanel id="accordion2">
             <p:tab title="#{msg.AssetInfoDetail}">
+                <div class="ui-g">
+                <div class="ui-g-8 ui-g-nopad">
                 <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
-
-                    <h:panelGroup>
-                        <label class="label">#{msg.serialNum}</label>
-                        <p:inputText id="serialNum" value="#{assetInfoController.selected.serialNum}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.aliasName}</label>
-                        <p:inputText id="aliasName" value="#{assetInfoController.selected.aliasName}" readonly="true"/>
-                    </h:panelGroup>
-
-                    <h:panelGroup>
-                        <label class="label">#{msg.assetGroup}</label>
-                        <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup', assetInfoController.selected.assetGroup)}" readonly="true"/>
-                    </h:panelGroup>
-
-                    <h:panelGroup>
-                        <label class="label">医疗器械分类</label>
-                        <p:inputText id="functionGroup" value="#{fieldMsg.fieldValue('assetFunctionType', assetInfoController.selected.functionGroup)}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">医疗器械子分类</label>
-                        <p:inputText id="assetCode68" value="#{fieldMsg.fieldValue(assetInfoController.selected.functionGroup, assetInfoController.selected.assetCode68)}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.functionGrade}</label>
-                        <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoController.selected.functionGrade)}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.brand}</label>
-                        <p:inputText id="brand" value="#{assetInfoController.selected.brand.name}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.manufacture}</label>
-                        <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.maitanance}</label>
-                        <p:inputText id="maitanance" value="#{assetInfoController.selected.maitanance}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.maitananceTel}</label>
-                        <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.nationalStandardCode}</label>
-                        <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" readonly="true"/>
-                    </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">主设备</label>
                         <p:inputText id="parentAssetId" value="#{assetInfoController.getParentAssetName()}"/>
@@ -138,6 +139,10 @@
                     <h:panelGroup>
                         <label class="label">#{msg.systemId}</label>
                         <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.departNum}</label>
+                        <p:inputText value="#{assetInfoController.selected.departNum}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.financingNum}</label>
@@ -156,6 +161,33 @@
                         <p:inputText id="modalityId" value="#{assetInfoController.selected.modalityId}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                        <!-- bar code -->
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">#{msg.functionType}</label>
+                        <p:inputText id="functionType" value="#{assetInfoController.selected.functionType}" readonly="true"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
+                        <label class="label">医疗器械分类</label>
+                        <p:inputText id="functionGroup" value="#{fieldMsg.fieldValue('assetFunctionType', assetInfoController.selected.functionGroup)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">医疗器械子分类</label>
+                        <p:inputText id="assetCode68" value="#{fieldMsg.fieldValue(assetInfoController.selected.functionGroup, assetInfoController.selected.assetCode68)}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.functionGrade}</label>
+                        <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoController.selected.functionGrade)}" readonly="true"/>
+                    </h:panelGroup>
+
+
+
+
+
+
+                    <h:panelGroup>
                         <label class="label">#{msg.locationCode}</label>
                         <p:inputText id="locationCode" value="#{assetInfoController.selected.locationCode}" readonly="true"/>
                     </h:panelGroup>
@@ -164,45 +196,28 @@
                         <p:inputText id="locationName" value="#{assetInfoController.selected.locationName}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.hospitalId}</label>
-                        <p:inputText id="hospitalId" value="#{assetInfoController.getHospitalName(assetInfoController.selected.siteUID)}" readonly="true"/>
+                        <label class="label">#{msg.status}</label>
+                        <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoController.selected.status}" disabled="true">
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneRadio>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.functionType}</label>
-                        <p:inputText id="functionType" value="#{assetInfoController.selected.functionType}" readonly="true"/>
+                        <label class="label">#{msg.deviceStatus}</label>
+                        <p:selectOneRadio id="deviceStatus"  label="#{msg.status}" value="#{assetInfoController.selected.deviceStatus}" disabled="true">
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneRadio>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.assetOwnerName}</label>
-                        <p:inputText id="assetOwnerName" value="#{assetInfoController.selected.assetOwnerName}" readonly="true"/>
+                        <label class="label">#{msg.comments}</label>
+                        <p:inputText  value="#{assetInfoController.selected.comments}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.assetOwnerTel}</label>
-                        <p:inputText id="assetOwnerTel" value="#{assetInfoController.selected.assetOwnerTel}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.assetOwnerName2}</label>
-                        <p:inputText id="assetOwnerName2" value="#{assetInfoController.selected.assetOwnerName2}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.assetOwnerTel2}</label>
-                        <p:inputText id="assetOwnerTel2" value="#{assetInfoController.selected.assetOwnerTel2}" readonly="true"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.assetOwnerName3}</label>
-                        <p:inputText id="assetOwnerName3" value="#{assetInfoController.selected.assetOwnerName3}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.assetOwnerTel3}</label>
-                        <p:inputText id="assetOwnerTel3" value="#{assetInfoController.selected.assetOwnerTel3}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.clinicalOwnerName}</label>
-                        <p:inputText id="clinicalOwnerName" value="#{assetInfoController.selected.clinicalOwnerName}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.clinicalOwnerTel}</label>
-                        <p:inputText id="clinicalOwnerTel" value="#{assetInfoController.selected.clinicalOwnerTel}" readonly="true"/>
-                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.assetCategory}</label>
                         <p:inputText id="assetCategory" value="#{fieldMsg.fieldValue('assetCategory', assetInfoController.selected.assetCategory)}" readonly="true"/>
@@ -244,11 +259,20 @@
                         <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoController.selected.accountingCategory)}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                    </h:panelGroup>
+
+                    <h:panelGroup>
                         <label class="label">#{msg.manufactDate}</label>
                         <p:inputText id="manufactDate" value="#{assetInfoController.selected.manufactDate}" readonly="true">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                         </p:inputText>
                         <!--<p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.manufactDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.purchaseDate}</label>
+                        <p:inputText value="#{assetInfoController.selected.purchaseDate}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.arriveDate}</label>
@@ -271,12 +295,37 @@
                         <!--<p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.factoryWarrantyDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
                     </h:panelGroup>
                     <h:panelGroup>
+                        <label class="label">#{msg.warrantyDate}</label>
+                        <p:inputText value="#{assetInfoController.selected.warrantyDate}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.terminateDate}</label>
                         <p:inputText id="terminateDate" value="#{assetInfoController.selected.terminateDate}" readonly="true">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                         </p:inputText>
                         <!--<p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.terminateDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
                     </h:panelGroup>
+                    <h:panelGroup></h:panelGroup>
+
+
+
+                    <h:panelGroup >
+                        <label class="label">#{msg.purchasePrice}</label>
+                        <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.salvageValue}</label>
+                        <p:inputText id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.lifecycle}</label>
+                        <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.depreciationMethod}</label>
+                        <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
+                    </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.lastPmDate}</label>
                         <p:inputText id="lastPmDate" value="#{assetInfoController.selected.lastPmDate}" readonly="true">
@@ -298,24 +347,10 @@
                         </p:inputText>
                     </h:panelGroup>
 
-                    <h:panelGroup>
-                        <label class="label">#{msg.salvageValue}</label>
-                        <p:inputText id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.lifecycle}</label>
-                        <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.depreciationMethod}</label>
-                        <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.comments}</label>
-                        <p:inputText  value="#{assetInfoController.selected.comments}" readonly="true"/>
-                    </h:panelGroup>
 
                 </p:panelGrid>
+                </div>
+                </div>
             </p:tab>
         </p:accordionPanel>
 
