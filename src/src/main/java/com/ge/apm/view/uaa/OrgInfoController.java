@@ -11,6 +11,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
@@ -25,6 +26,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.QrCodeLib;
 import java.util.UUID;
 import webapp.framework.dao.SearchFilter;
 
@@ -243,17 +245,38 @@ UserAccountRepository userDao;
     }
 
     private Boolean canDelete(){
-        List<UserAccount> userList = userDao.getByOrgInfoUID(selected.getUid());
+        List<SearchFilter> checkFilters = new ArrayList<>();
+        checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        List<UserAccount> userList = userDao.findBySearchFilter(checkFilters);
         if(userList!=null && !userList.isEmpty()){
             WebUtil.addErrorMessage("该组织下有用户存在,不能删除.");
             return false;
         }
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selected.getUid()));
-        List<AssetInfo> assetList = assetDao.findBySearchFilter(assetFilters);
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
         if(assetList!=null && !assetList.isEmpty()){
             WebUtil.addErrorMessage("该组织下有资产存在,不能删除.");
+            return false;
+        }
+        QrCodeLibRepository qrcodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
+        if(qrcodeList!=null && !qrcodeList.isEmpty()){
+            WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
             return false;
         }
         return true;

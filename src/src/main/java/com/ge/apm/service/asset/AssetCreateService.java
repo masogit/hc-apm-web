@@ -85,7 +85,7 @@ public class AssetCreateService {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, hospitalId));
         OrgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return  orgDao.findBySearchFilter(OrgInfoFilters);
+        return orgDao.findBySearchFilter(OrgInfoFilters);
     }
 
     public Boolean CreateAeest(AssetInfo assetInfo) {
@@ -120,7 +120,7 @@ public class AssetCreateService {
         attachDao.save(attachList);
     }
 
-    public List<V2_BlobObject> getQrCodePictureList(String  qrCodeLibUid) {
+    public List<V2_BlobObject> getQrCodePictureList(String qrCodeLibUid) {
         List<SearchFilter> qrCodeFilters = new ArrayList<>();
         qrCodeFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, qrCodeLibUid));
         qrCodeFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "1"));
@@ -134,7 +134,7 @@ public class AssetCreateService {
         qrLibDao.save(qrLibItem);
     }
 
-    public List<V2_BlobObject> getQrCodeAudioList(String  qrCodeLibUid) {
+    public List<V2_BlobObject> getQrCodeAudioList(String qrCodeLibUid) {
         List<SearchFilter> qrCodeFilters = new ArrayList<>();
         qrCodeFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, qrCodeLibUid));
         qrCodeFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "2"));
@@ -183,10 +183,16 @@ public class AssetCreateService {
         return userDao.getById(userId);
     }
 
-    public List<UserAccount> getClinicalOwnerList(Integer clinicalDeptId) {
-        List<SearchFilter> usersFilters = new ArrayList<>();
-        if (null != clinicalDeptId) {
-            usersFilters.add(new SearchFilter("orgInfoId", SearchFilter.Operator.EQ, clinicalDeptId));
+    public List<UserAccount> getAssetOwnerList(String deptUid) {
+        OrgInfo dept = orgDao.getByUid(deptUid);
+        List<String> deptUids = Arrays.asList(deptUid, dept.getTenantUID(), dept.getInstitutionUID(), dept.getHospitalUID(), dept.getSiteUID());
+        return userDao.findByAssetAccess(deptUids);
+    }
+
+    public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {
+       List<SearchFilter> usersFilters = new ArrayList<>();
+        if (null != clinicalDeptUid) {
+            usersFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, clinicalDeptUid));
             return userDao.findBySearchFilter(usersFilters);
         } else {
             return new ArrayList<UserAccount>();
@@ -243,15 +249,15 @@ public class AssetCreateService {
     public String getOrgName(String orgUid) {
         if (orgUid != null) {
             OrgInfo org = orgDao.getByUid(orgUid);
-            return org==null?null:org.getName();
+            return org == null ? null : org.getName();
         }
         return null;
     }
-    
+
     public String getOrgName(Integer orgId) {
         if (orgId != null) {
             OrgInfo org = orgDao.findById(orgId);
-            return org==null?null:org.getName();
+            return org == null ? null : org.getName();
         }
         return null;
     }
