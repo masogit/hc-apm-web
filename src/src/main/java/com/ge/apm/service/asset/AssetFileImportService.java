@@ -229,7 +229,7 @@ public class AssetFileImportService {
             String measureGrade = ExcelDocument.getCellStringValue(rowMap.get("计量等级"));
             asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade));
             String measuringItemCategory = ExcelDocument.getCellStringValue(rowMap.get("计量项目类别"));
-            asset.setAccountingCategory(getI18nMsgKey(measuringItemCategoryList, measuringItemCategory));
+            asset.setMeasuringItemCategory(getI18nMsgKey(measuringItemCategoryList, measuringItemCategory));
             String emergencyEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否急救设备"));
             asset.setEmergencyEquipment(getI18nMsgKey(emergencyEquipmentList, emergencyEquipment));
             String importEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否进口设备"));
