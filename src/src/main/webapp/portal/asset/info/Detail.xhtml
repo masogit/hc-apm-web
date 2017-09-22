@@ -112,11 +112,6 @@
                                 <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" readonly="true"/>
                             </h:panelGroup>
 
-
-
-
-
-
                         </p:panelGrid>
                     </div>
                     <div class="ui-g-4">
@@ -161,14 +156,14 @@
                         <p:inputText id="modalityId" value="#{assetInfoController.selected.modalityId}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <!-- bar code -->
+                        <label class="label">#{msg.qrCode}</label>
+                        <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="true"/>
                     </h:panelGroup>
 
                     <h:panelGroup>
                         <label class="label">#{msg.functionType}</label>
                         <p:inputText id="functionType" value="#{assetInfoController.selected.functionType}" readonly="true"/>
                     </h:panelGroup>
-
                     <h:panelGroup>
                         <label class="label">医疗器械分类</label>
                         <p:inputText id="functionGroup" value="#{fieldMsg.fieldValue('assetFunctionType', assetInfoController.selected.functionGroup)}" readonly="true"/>
@@ -181,11 +176,6 @@
                         <label class="label">#{msg.functionGrade}</label>
                         <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoController.selected.functionGrade)}" readonly="true"/>
                     </h:panelGroup>
-
-
-
-
-
 
                     <h:panelGroup>
                         <label class="label">#{msg.locationCode}</label>
@@ -207,6 +197,7 @@
                             <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneRadio>
                     </h:panelGroup>
+
                     <h:panelGroup>
                         <label class="label">#{msg.comments}</label>
                         <p:inputText  value="#{assetInfoController.selected.comments}" readonly="true"/>
@@ -306,8 +297,6 @@
                         <!--<p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.terminateDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
                     </h:panelGroup>
                     <h:panelGroup></h:panelGroup>
-
-
 
                     <h:panelGroup >
                         <label class="label">#{msg.purchasePrice}</label>
