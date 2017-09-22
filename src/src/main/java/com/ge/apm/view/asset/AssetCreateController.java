@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  *
@@ -129,6 +130,7 @@ public class AssetCreateController {
         if (null != assetInfo.getClinicalDeptId()) {
             OrgInfo clinicalDept = acServie.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
+            assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
         Boolean res = acServie.CreateAeest(assetInfo);
         if (res) {
@@ -155,11 +157,17 @@ public class AssetCreateController {
     }
 
     public List<UserAccount> getOwnerList() {
-        List<UserAccount> res = acServie.getAssetOnwers(assetInfo.getSiteId(), assetInfo.getHospitalId());
-        return res;
+        List<UserAccount> list =  acServie.getAssetOwnerList(Optional.ofNullable(assetInfo.getClinicalDeptUID()).orElse(assetInfo.getSiteUID()));
+        return list;
     }
 
     public void onClinicalDeptChange() {
+        if(null!=assetInfo.getClinicalDeptId()){
+            OrgInfo clinicalDept = acServie.getOrgInfo(assetInfo.getClinicalDeptId());
+            assetInfo.setClinicalDeptName(clinicalDept.getName());
+            assetInfo.setClinicalDeptUID(clinicalDept.getUid());
+        }
+        this.owner = null;
         this.clinicalOwner = null;
         assetInfo.setClinicalOwnerId(null);
         assetInfo.setClinicalOwnerName(null);
@@ -176,7 +184,7 @@ public class AssetCreateController {
 
     public List<UserAccount> getClinicalOwnerList() {
 
-        return acServie.getClinicalOwnerList(assetInfo.getClinicalDeptId());
+        return acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID());
 
     }
 
