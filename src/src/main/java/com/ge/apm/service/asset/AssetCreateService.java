@@ -99,25 +99,16 @@ public class AssetCreateService {
     }
 
     public void createAttachments(AssetInfo assetInfo, String[] selectedPictures) {
-        List<AssetFileAttachment> attachList = new ArrayList();
+        List<V2_BlobObject> attachList = new ArrayList();
         for (String item : selectedPictures) {
-            AssetFileAttachment attach = new AssetFileAttachment();
-            attach.setAssetId(assetInfo.getId());
-            attach.setFileUrl(item);
-            attach.setFileType("1");
-            attach.setHospitalId(assetInfo.getHospitalId());
-            attach.setSiteId(assetInfo.getSiteId());
-
-            V2_BlobObject blobObject = blobService.getBlobObjectByStorageId(item);
+            V2_BlobObject blobObject = blobDao.findByObjectStorageId(item);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             blobObject.setBoSubType("1");
             blobObject.setBoUuid(assetInfo.getUid());
             blobObject.setBoId(assetInfo.getId());
-            blobDao.save(blobObject);
-            attach.setName(blobObject.getObjectName());
-            attachList.add(attach);
+            attachList.add(blobObject);
         }
-        attachDao.save(attachList);
+        blobDao.save(attachList);
     }
 
     public List<V2_BlobObject> getQrCodePictureList(String qrCodeLibUid) {
@@ -190,7 +181,7 @@ public class AssetCreateService {
     }
 
     public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {
-       List<SearchFilter> usersFilters = new ArrayList<>();
+        List<SearchFilter> usersFilters = new ArrayList<>();
         if (null != clinicalDeptUid) {
             usersFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, clinicalDeptUid));
             return userDao.findBySearchFilter(usersFilters);
