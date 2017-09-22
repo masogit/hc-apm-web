@@ -95,7 +95,7 @@ public class WorkOrderDispatchController extends GenericCRUDUUIDController<V2_Wo
             searchFilters = new ArrayList();
         }
         if(!this.hasFilterOnField("siteUID")){
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList,"1*2+"));
         }
     }
