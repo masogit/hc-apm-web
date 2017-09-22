@@ -150,6 +150,7 @@ public class AssetFileImportService {
             if (assetName == null || assetName.isEmpty()) {
                 break;
             }
+            Map<String, Object> map = new LinkedHashMap();
             String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
             asset.setDepartNum(departNum);
             asset.setName(assetName);
@@ -175,16 +176,16 @@ public class AssetFileImportService {
             asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
             String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("功能分组"));
-            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup));
+            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup,map,"功能分组"));
             if (functionGroup != null && functionGroup.length() > 4) {
                 String assetCode68 = ExcelDocument.getCellStringValue(rowMap.get("医疗器械子分类"));
                 String str = functionGroup.substring(0, 3);
                 List<I18nMessage> list = FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId);
-                Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68);
-                asset.setAssetCode68(msgKey==null? null:msgKey.toString());
+                Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68,map,"医疗器械子分类");
+                asset.setAssetCode68(msgKey == null ? null : msgKey.toString());
             }
             String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
-            asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName));
+            asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName,map,"设备分类"));
             asset.setFunctionGrade(ExcelDocument.getCellIntegerValue(rowMap.get("功能等级")));
             asset.setFunctionType(ExcelDocument.getCellStringValue(rowMap.get("设备型号")));
             asset.setSerialNum(ExcelDocument.getCellStringValue(rowMap.get("制造商序列号")));
@@ -197,16 +198,16 @@ public class AssetFileImportService {
             asset.setSalvageValue(ExcelDocument.getCellDoubleValue(rowMap.get("最终残值")));
             asset.setLifecycleInYear(ExcelDocument.getCellDoubleValue(rowMap.get("使用年限")));
             String depreciationMethodNmae = ExcelDocument.getCellStringValue(rowMap.get("折旧算法"));
-            asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae));
-            asset.setManufactDate(getDateField(rowMap.get("生产日期"),"生产日期"));
-            asset.setPurchaseDate(getDateField(rowMap.get("采购日期"),"采购日期"));
-            asset.setArriveDate(getDateField(rowMap.get("到货日期"),"到货日期"));
-            asset.setInstallDate(getDateField(rowMap.get("启用日期"),"启用日期"));
-            asset.setWarrantyDate(getDateField(rowMap.get("维保截止日期"),"维保截止日期"));
-            asset.setTerminateDate(getDateField( rowMap.get("报废日期"),"报废日期"));
-            asset.setLastPmDate(getDateField(rowMap.get("上次维护日期"),"上次维护日期"));
-            asset.setLastMeteringDate(getDateField(rowMap.get("上次计量日期"),"上次计量日期"));
-            asset.setLastQaDate(getDateField(rowMap.get("上次质检日期"),"上次质检日期"));
+            asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae,map,"折旧算法"));
+            asset.setManufactDate(getDateField(rowMap.get("生产日期"), "生产日期"));
+            asset.setPurchaseDate(getDateField(rowMap.get("采购日期"), "采购日期"));
+            asset.setArriveDate(getDateField(rowMap.get("到货日期"), "到货日期"));
+            asset.setInstallDate(getDateField(rowMap.get("启用日期"), "启用日期"));
+            asset.setWarrantyDate(getDateField(rowMap.get("维保截止日期"), "维保截止日期"));
+            asset.setTerminateDate(getDateField(rowMap.get("报废日期"), "报废日期"));
+            asset.setLastPmDate(getDateField(rowMap.get("上次维护日期"), "上次维护日期"));
+            asset.setLastMeteringDate(getDateField(rowMap.get("上次计量日期"), "上次计量日期"));
+            asset.setLastQaDate(getDateField(rowMap.get("上次质检日期"), "上次质检日期"));
             asset.setMaitanance(ExcelDocument.getCellStringValue(rowMap.get("维护商")));
             Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
@@ -219,70 +220,76 @@ public class AssetFileImportService {
             asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
             asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
             String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
-            asset.setAssetCategory(getI18nMsgKey(assetTypeList, assetType));
+            asset.setAssetCategory(getI18nMsgKey(assetTypeList, assetType,map,"设备类型"));
             String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
-            asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage));
+            asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage,map,"用途分类"));
             String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
-            asset.setCapitalSource(getI18nMsgKey(capitalSourceList, capitalSource));
+            asset.setCapitalSource(getI18nMsgKey(capitalSourceList, capitalSource,map,"资金来源"));
             String riskGrade = ExcelDocument.getCellStringValue(rowMap.get("风险等级"));
-            asset.setRiskGrade(getI18nMsgKey(riskGradeList, riskGrade));
+            asset.setRiskGrade(getI18nMsgKey(riskGradeList, riskGrade,map,"风险等级"));
             String measureGrade = ExcelDocument.getCellStringValue(rowMap.get("计量等级"));
-            asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade));
+            asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade,map,"计量等级"));
             String measuringItemCategory = ExcelDocument.getCellStringValue(rowMap.get("计量项目类别"));
-            asset.setMeasuringItemCategory(getI18nMsgKey(measuringItemCategoryList, measuringItemCategory));
+            asset.setMeasuringItemCategory(getI18nMsgKey(measuringItemCategoryList, measuringItemCategory,map,"计量项目类别"));
             String emergencyEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否急救设备"));
-            asset.setEmergencyEquipment(getI18nMsgKey(emergencyEquipmentList, emergencyEquipment));
+            asset.setEmergencyEquipment(getI18nMsgKey(emergencyEquipmentList, emergencyEquipment,map,"是否急救设备"));
             String importEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否进口设备"));
-            asset.setImportEquipment(getI18nMsgKey(importEquipmentList, importEquipment));
+            asset.setImportEquipment(getI18nMsgKey(importEquipmentList, importEquipment,map,"是否进口设备"));
             String usageStatus = ExcelDocument.getCellStringValue(rowMap.get("使用状态"));
-            asset.setUsageStatus(getI18nMsgKey(usageStatusList, usageStatus));
+            asset.setUsageStatus(getI18nMsgKey(usageStatusList, usageStatus,map,"使用状态"));
             String accountingCategory = ExcelDocument.getCellStringValue(rowMap.get("核算类别"));
-            asset.setAccountingCategory(getI18nMsgKey(accountingCategoryList, accountingCategory));
+            asset.setAccountingCategory(getI18nMsgKey(accountingCategoryList, accountingCategory,map,"核算类别"));
 
-            Map<String, Object> map = new LinkedHashMap();
             map.put("asset", asset);
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
 
-            if(departNum==null){
-                departNum="";
+            if (departNum == null) {
+                departNum = "";
             }
             result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
         }
 
         return result;
     }
-    
-    private Date getDateField(Object object,String filedSrcName) throws Exception{
-        if(object ==null){
+
+    private Date getDateField(Object object, String filedSrcName) throws Exception {
+        if (object == null) {
             return null;
         }
-        if(object instanceof Date){
+        if (object instanceof Date) {
             return (Date) object;
         }
-        if(object instanceof String){
-            Date res = TimeUtils.getDateFromStr((String)object, "dd/MM/yy");
-            if(res != null && res instanceof Date){
+        if (object instanceof String) {
+            Date res = TimeUtils.getDateFromStr((String) object, "dd/MM/yy");
+            if (res != null && res instanceof Date) {
                 return res;
             }
-            res = TimeUtils.getDateFromStr((String)object, "dd/MM/yyyy");
-            if(res != null && res instanceof Date){
+            res = TimeUtils.getDateFromStr((String) object, "dd/MM/yyyy");
+            if (res != null && res instanceof Date) {
                 return res;
             }
-            res = TimeUtils.getDateFromStr((String)object, "yyyy-MM-dd");
-            if(res != null && res instanceof Date){
+            res = TimeUtils.getDateFromStr((String) object, "yyyy-MM-dd");
+            if (res != null && res instanceof Date) {
                 return res;
             }
-            throw new Exception(filedSrcName + "[" + (String)object + "]无效的日期格式");
-        }
-        else{
+            throw new Exception(filedSrcName + "[" + (String) object + "]无效的日期格式");
+        } else {
             throw new Exception(filedSrcName + "无效的日期格式");
         }
     }
 
-    private Integer getI18nMsgKey(List<I18nMessage> msgList, String value) {
+    private Integer getI18nMsgKey(List<I18nMessage> msgList, String value, Map map, String fieldName) {
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
         I18nMessage msg = msgList.stream().filter(t -> t.getValueZh().equals(value)).findAny().orElse(null);
-        return msg == null ? null : Integer.parseInt(msg.getMsgKey());
+        if (msg == null) {
+            addErrMessage(map, "警告:无效值" + fieldName + "[" + value + "]");
+            return null;
+        } else {
+            return Integer.parseInt(msg.getMsgKey());
+        }
     }
 
     private void addErrMessage(Map<String, Object> item, String comments) {
@@ -304,7 +311,7 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Created);
             } else if (orgs.size() > 1) {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo")+":" + ((OrgInfo) item.get("org")).getName());
+                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
             } else {
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
@@ -326,7 +333,7 @@ public class AssetFileImportService {
                     newAsset.setClinicalDeptId(clinicalDept.getId());
                     newAsset.setClinicalDeptUID(clinicalDept.getUid());
                 }
-            }else{
+            } else {
                 item.put("status", ImportStatus.Failure);
                 addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "不在列表页中");
                 newAsset.setClinicalDeptName(null);
@@ -360,7 +367,7 @@ public class AssetFileImportService {
                 }
                 newAsset.setAssetOwnerName2(null);
             }
-            
+
             //for AssetOwner3
             userList = getUserInfosByName(newAsset.getAssetOwnerName3());
             if (userList != null && userList.size() == 1) {
@@ -375,7 +382,7 @@ public class AssetFileImportService {
                 }
                 newAsset.setAssetOwnerName3(null);
             }
-            
+
             //for ClinicalOwner
             userList = getUserInfosByName(newAsset.getClinicalOwnerName());
             if (userList != null && userList.size() == 1) {
@@ -390,7 +397,6 @@ public class AssetFileImportService {
                 }
                 newAsset.setClinicalOwnerName(null);
             }
-            
 
             if (newAsset.getVendor() != null && !newAsset.getVendor().isEmpty()) {
                 List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
