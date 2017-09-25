@@ -16,6 +16,7 @@
   .layout-menu {
     top: 0 !important;
     width: $menu-width;
+    overflow: hidden;
     .brand {
       padding: 1em 0 .5em;
       h1 {

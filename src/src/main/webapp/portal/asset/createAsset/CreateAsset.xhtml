@@ -179,7 +179,6 @@
                                     <h:panelGroup id="assetOwnerName">
                                         <label class="label">#{msg.assetOwnerName}</label>
                                         <p:selectOneMenu id="assetOwnerName1" value="#{assetCreateController.owner}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
-                                            <f:selectItem itemLabel="请选择" />
                                             <f:selectItems value="#{assetCreateController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                             <p:column>
                                                 <h:outputText value="#{t.name}"/>
