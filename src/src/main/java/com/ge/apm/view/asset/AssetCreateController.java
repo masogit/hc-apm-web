@@ -96,7 +96,11 @@ public class AssetCreateController {
         newAsset.setIsDeleted(Boolean.FALSE);
         newAsset.setName(createRequest.getAssetName());
         newAsset.setAssetGroup(createRequest.getAssetGroup());
-        newAsset.setClinicalDeptId(createRequest.getOrgId());
+        if(null!=createRequest.getOrgId()){
+            OrgInfo org = acServie.getOrgInfo(createRequest.getOrgId());
+            newAsset.setClinicalDeptId(createRequest.getOrgId());
+            newAsset.setClinicalDeptUID(org.getUid());
+        }
         newAsset.setClinicalOwnerId(createRequest.getUserId());
 
         newAsset.setTenantUID(createRequest.getTenantUID());
