@@ -309,9 +309,9 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
         return acService.getAssetOnwers(assetInfo.getSiteId(), assetInfo.getHospitalId());
     }
 
-    public List<UserAccount> getClinicalOwnerList() {
-        return acService.getClinicalOwnerList(assetInfo.getClinicalDeptId());
-    }
+//    public List<UserAccount> getClinicalOwnerList() {
+//        return acService.getClinicalOwnerList(assetInfo.getClinicalDeptId());
+//    }
 
     @Override
     protected GenericRepository<AssetInfo> getDAO() {
