@@ -65,6 +65,15 @@
                             </f:facet>
                             <h:outputText value="#{item.requestorName}"/>
                         </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{serviceRequestByAssetIdController.srClinicalDeptNameList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column><!--

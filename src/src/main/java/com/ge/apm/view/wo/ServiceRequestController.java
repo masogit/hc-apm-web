@@ -111,6 +111,15 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
+    public List<V2_ServiceRequest> searchByClinicalDeptName(String clinicalDeptName) {
+        Integer hospitalId = UserContextService.getCurrentUserAccount().getHospitalId();
+        Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
+        List<Integer> assetIds = dao.getAssetInfoByClinicalDeptName(clinicalDeptName, hospitalId, siteId);
+        setSearchFilter();
+        searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, assetIds));
+        return dao.findBySearchFilter(this.searchFilters);
+    }
+
     @Override
     public void setSearchFilter() {
          if(this.searchFilters==null){
@@ -137,6 +146,10 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
     public List<UserAccount> getUsersInHospital() {
         UaaService uaaService = WebUtil.getBean(UaaService.class);
         return uaaService.getUserList(UserContextService.getCurrentUserAccount().getHospitalId());
+    }
+
+    public List<String> getSrClinicalDeptNameList() {
+        return dao.getSrClinicalDeptNameList();
     }
 
     public void onSelectServiceRequest() {
