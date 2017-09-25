@@ -25,8 +25,8 @@
                                 <p:inputText id="name" value="#{profileController.myAccount.name}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.email}*</label>
-                                <p:inputText id="email" value="#{profileController.myAccount.email}"  required="true" requiredMessage="#{msg.email} #{msg.ValidationRequire}" validatorMessage="#{msg.InvalidEmail}"/>
+                                <label class="label">#{msg.email}</label>
+                                <p:inputText id="email" value="#{profileController.myAccount.email}"  required="false" requiredMessage="#{msg.email} #{msg.ValidationRequire}" validatorMessage="#{msg.InvalidEmail}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.telephone}</label>

@@ -16,7 +16,7 @@
                             outcome="/portal/asset/fileAttachment/List"/>
                 <p:menuitem id="um06" value="#{msg.AssetValueAnalysis}" rendered="false" outcome="/empty"/>
                 <!--asset browser-->
-                <p:menuitem value="#{msg.AssetBrowser}" url="/portal/analysis/reports.xhtml#/AssetBrowser"/>
+                <p:menuitem id="um1001" value="#{msg.AssetBrowser}" url="/portal/analysis/reports.xhtml#/AssetBrowser"/>
                 <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/List"/>
                 <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml"/>
 
@@ -30,7 +30,7 @@
                        rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ClinicalStaff')}">
                 <p:menuitem id="um89" value="维修工单" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
                 <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" />
-                <p:menuitem  value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/> 
+                <p:menuitem  id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/> 
 
                <!-- <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="#{userContextService.isDispatcher()}"/>-->
                 <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
@@ -93,7 +93,7 @@
                 <p:menuitem id="um491" value="#{msg.SupplierMgmt}"  rendered="false" outcome="/portal/supplier/List.xhtml"/>
                 <p:menuitem id="um493" value="#{msg.SysCodeConfig}" rendered="false" outcome="/portal/config/FieldCodeTypeConfig.xhtml"/>
                <!--  <p:menuitem id="um494" value="#{msg.WorkFlowConfig}" outcome="/portal/config/workFlowConfig/Edit.xhtml"/> -->
-                <p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('ITAdmin')}"/>
+                <p:menuitem id="um495" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/qrCodeLibList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
                 <p:menuitem id="um488" value="#{msg.QRCodeTemplateMgmt}" outcome="/portal/asset/qrCode/qrCodeTemplate.xhtml"  rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('ITAdmin')}"/>
                 <p:menuitem id="um496" value="#{msg.AssetOwnerSetting}" outcome="/portal/asset/ownerSetting/SetOwners.xhtml"/>
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml"/>
