@@ -19,7 +19,7 @@
     <ui:define name="content">
         <div class="ui-g-12 card ">
             <h:form id ="TagSubscriberForm">
-<p:dataTable  id="dataList" value="#{tagSubscriberController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{tagSubscriberController.selected}" lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+<p:dataTable  id="dataList" value="#{tagSubscriberController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{tagSubscriberController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
               rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
               paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
               currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
