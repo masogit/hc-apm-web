@@ -983,20 +983,34 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
-//        selected = null;
         TreeNode node = event.getTreeNode();
-        //node.setExpanded(!node.isExpanded());
-        selectedOrg = (OrgInfo) node.getData();
-        selected.setSiteUID(selectedOrg.getUid());
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        if (orgInfo.getId() == -1) {
+            selectedOrg = null;
+            selected.setSiteUID(null);
+        } else {
+            selectedOrg = (OrgInfo) node.getData();
+
+            selected.setSiteUID(selectedOrg.getUid());
+        }
+
     }
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+//        orgTree = new DefaultTreeNode("root",null,null);
+//        orgTree.getChildren().add(treeNode);
+//        orgTree.setExpanded(true);
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root",null,null);
-        orgTree.getChildren().add(treeNode);
-        orgTree.setExpanded(true);
+        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        rootNode.getChildren().add(treeNode);
+        rootNode.setExpanded(true);
 
     }
 
