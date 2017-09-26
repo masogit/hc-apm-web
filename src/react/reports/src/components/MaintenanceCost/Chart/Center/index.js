@@ -29,7 +29,8 @@ class Center extends React.PureComponent<*, Props, *> {
     const { cursor, target } = filters
     return (
       <div className={styles['center']}>
-        <h1><Ellipsus>{cursor[1] ? (overview.data.name || '') : cursor[0] ? '汇总' : '全部选中设备'}</Ellipsus></h1>
+        <h4 className={styles['center-title']}><Ellipsus>{cursor[1] ? (overview.data.name || '') : cursor[0] ? '汇总' : '全部选中设备'}</Ellipsus></h4>
+        <span className={styles['center-subtitle']}>单位: 元</span>
         <table className={styles['cost']} onClick={this.toggleTarget('acyman')} data-active={target === 'acyman'}>
           <thead>
             <tr>

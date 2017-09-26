@@ -24,6 +24,10 @@
                             <p:outputLabel value="#{serviceRequestByAssetIdController.selected.requestorName}" />
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">#{msg.clinicalDeptName}</label>
+                            <p:outputLabel value="#{serviceRequestByAssetIdController.selected.clinicalDeptName}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.requestTime}</label>
                             <p:outputLabel value="#{serviceRequestByAssetIdController.selected.requestTime}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
