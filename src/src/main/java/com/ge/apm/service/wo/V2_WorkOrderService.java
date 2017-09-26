@@ -57,7 +57,8 @@ public class V2_WorkOrderService {
     AssetInfoRepository assetInfoRepository;
     @Autowired
     UserAccountRepository userAccountRepository;
-
+    @Autowired
+    private WorkOrderCoworkerRepository workOrderCoworkerRepository;
     public V2_WorkOrder getWorkOrderById(String woId) {
         return woDao.findById(woId);
     }
@@ -399,7 +400,9 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
 
     return woDao.findBySearchFilter(searchFilters, pr);
 }
-
+    public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
+        return workOrderCoworkerRepository.findByWoId(woId);
+    }
    /* public Page<V2_WorkOrder> getWorkOrderListToPickup_backup(int type,PageRequest pr, UserAccount ua) {
         Page<V2_WorkOrder> pages = null;
         //base on the orgLevel
