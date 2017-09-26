@@ -7,8 +7,6 @@ package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
@@ -17,7 +15,6 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -43,8 +40,6 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
     private V2_WorkOrderService woService;
 
     //status：0-待派工/1-待接单/2-维修中/3-已完成/4-已派工/5-已取消
-
-
     private V2_WorkOrder selectedWorkOrder;
 
     private String comments;
@@ -55,7 +50,6 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         srDao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
-        this.filterBySite = true;
 
     }
 
@@ -67,19 +61,27 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.selected = null;
-        this.setSiteFilter();
-        removeFilterOnField("status");
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
-        List<String> srList = getUnfinishedSRList();
-        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+        if (searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("status")) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        }
+        if (!this.hasFilterOnField("currentStepId")) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+        }
+        if (!this.hasFilterOnField("srId")) {
+            List<String> srList = getUnfinishedSRList();
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
-    
+
     private List<String> getUnfinishedSRList() {
         List<SearchFilter> srSearchFilters = new ArrayList();
         srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+        srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
@@ -106,12 +108,11 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void rateWorkOrder() {
-        woService.rateWorkOrder(selectedWorkOrder,rating,comments);
+        woService.rateWorkOrder(selectedWorkOrder, rating, comments);
         cancel();
     }
 
     //getter and setter
-
     public V2_WorkOrder getSelectedWorkOrder() {
         return selectedWorkOrder;
     }
