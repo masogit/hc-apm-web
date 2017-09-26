@@ -50,7 +50,7 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </h:panelGrid>
-                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 30%" rendered="#{orgInfoController.selected ne null}">
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 60%" rendered="#{orgInfoController.selected ne null}">
                                     <h:panelGroup>
                                         <label class="label">#{msg.parentId}</label>
                                         <p:outputLabel value="#{orgInfoController.selected.parentOrg}" rendered="#{orgInfoController.selected.parentOrg ne null}"/>
@@ -60,16 +60,37 @@
                                         <label class="label">类型</label>
                                         <p:outputLabel value="#{orgInfoController.selected.orgTypeName}"/>
                                     </h:panelGroup>
+
+                                    <h:panelGroup rendered="#{orgInfoController.acShow}">
+                                        <label class="label">设备负责人A</label>
+                                        <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>d
+                                        </p:selectOneMenu>
+
+
+                                    </h:panelGroup>
+                                    <h:panelGroup rendered="#{orgInfoController.acShow}">
+                                        <label class="label">设备负责人B</label>
+                                        <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                        </p:selectOneMenu>
+
+                                    </h:panelGroup>
+
                                     <h:panelGroup>
                                         <label class="label">#{msg.name}*</label>
                                         <p:inputText id="name" value="#{orgInfoController.selected.name}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                                     </h:panelGroup>
+                                    <br/>
                                     <h:panelGroup>
                                         <label class="label">#{msg.nameEn}</label>
                                         <p:inputText id="nameEn" value="#{orgInfoController.selected.nameEn}" />
                                     </h:panelGroup>
+                                    <p:spacer></p:spacer>
+                                    <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
 
-                                    <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}" update="orgTree editPanel :growl"/>
                                 </p:panelGrid>
 
                             </h:panelGroup>
