@@ -50,7 +50,7 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         srDao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
-
+        this.filterBySite = false;
     }
 
     @Override
@@ -71,18 +71,9 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
         }
         if (!this.hasFilterOnField("srId")) {
-            List<String> srList = getUnfinishedSRList();
-            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getUnfinishedSRList()));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
-    }
-
-    private List<String> getUnfinishedSRList() {
-        List<SearchFilter> srSearchFilters = new ArrayList();
-        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-        srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
-        return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
     public void cancel() {
