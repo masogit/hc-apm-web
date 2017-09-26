@@ -86,6 +86,7 @@
     -ms-overflow-style: none;
 
     &:hover {
+      overflow-y: auto; /*for IE*/
       overflow-y: overlay;
     }
 
