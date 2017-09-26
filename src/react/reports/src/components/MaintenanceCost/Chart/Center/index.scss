@@ -28,9 +28,17 @@
   top: 55%;
   left: 50%;
   transform: translate(-50%, -50%);
-  h1 {
+  .center-title {
     position: absolute;
     top: 8%;
+    left: 50%;
+    max-width: 50%;
+    transform: translate(-50%);
+  }
+  .center-subtitle {
+    position: absolute;
+    font-size: .85em;
+    top: 18%;
     left: 50%;
     max-width: 50%;
     transform: translate(-50%);

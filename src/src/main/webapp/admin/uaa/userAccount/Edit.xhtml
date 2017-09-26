@@ -43,8 +43,8 @@
                             <p:inputText id="name" value="#{userAccountController.selected.name}"  required="true" requiredMessage="#{msg.userName} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.email}*</label>
-                            <p:inputText id="email" label="#{msg.email}" value="#{userAccountController.selected.email}" required="true" requiredMessage="#{msg.email} #{msg.ValidationRequire}"/>
+                            <label class="label">#{msg.email}</label>
+                            <p:inputText id="email" label="#{msg.email}" value="#{userAccountController.selected.email}" required="false" requiredMessage="#{msg.email} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.telephone}</label>

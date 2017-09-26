@@ -1,29 +1,16 @@
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.GenericGenerator;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "v2_service_request")
@@ -174,6 +161,9 @@ public class V2_ServiceRequest  implements Serializable {
 
     @Column(name = "sr_num")
     private String srNum;
+
+    @Transient
+    private String clinicalDeptName;
 
     public String getTenantUID() {
         return tenantUID;
@@ -430,7 +420,14 @@ public class V2_ServiceRequest  implements Serializable {
     public void setFromDeptUID(String fromDeptUID) {
         this.fromDeptUID = fromDeptUID;
     }
-    
+
+    public String getClinicalDeptName() {
+        return clinicalDeptName;
+    }
+
+    public void setClinicalDeptName(String clinicalDeptName) {
+        this.clinicalDeptName = clinicalDeptName;
+    }
 
     @Override
     public int hashCode() {
