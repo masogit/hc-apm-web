@@ -70,19 +70,27 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.selected = null;
-        this.setSiteFilter();
-        removeFilterOnField("status");
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
-        List<String> srList = getUnfinishedSRList();
-        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+        if (searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("status")) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        }
+        if (!this.hasFilterOnField("currentStepId")) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
+        }
+        if (!this.hasFilterOnField("srId")) {
+            List<String> srList = getUnfinishedSRList();
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     private List<String> getUnfinishedSRList() {
         List<SearchFilter> srSearchFilters = new ArrayList();
         srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+        srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
