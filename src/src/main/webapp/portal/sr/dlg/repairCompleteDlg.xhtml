@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-    <p:dialog id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true"  width="1000"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
+    <p:dialog id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true" height="400" width="1000"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
         <h:form id="repairCompleteDialogForm" >
             <h:panelGroup id="display5" rendered="#{not empty workOrderListController.selectedWorkOrder}">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
