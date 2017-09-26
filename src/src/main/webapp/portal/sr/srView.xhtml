@@ -7,147 +7,168 @@
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
-    <ui:composition>
+<ui:composition>
 
-        <div class="ui-g-12 card">
+    <div class="ui-g-12 card">
 
-            <h:form id="WorkOrderEditForm">
-                <p:fieldset legend="报修单" rendered="#{not empty serviceRequestController.workOrders}">
+        <h:form id="WorkOrderEditForm">
+            <p:fieldset legend="报修单" rendered="#{not empty serviceRequestController.workOrders}">
 
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                        <h:panelGroup>
-                            <label class="label">#{msg.srNum}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.srNum}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.assetName}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.assetName}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestorName}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.requestorName}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestTime}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.requestTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.requestReason}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.requestReason}" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.equipmentTaker}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.equipmentTaker}" />
-                        </h:panelGroup>
-                        <h:panelGroup id="assetstatus" class="updateDownTime">
-                            <label class="label">#{msg.status}</label>
-                            <p:selectOneRadio id="status" value="#{serviceRequestController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{serviceRequestController.currentStatus ne 3}">
-                                <p:ajax  listener="#{serviceRequestController.onStatusChange()}"  update="assetstatus" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                
-                            </p:selectOneRadio>
-                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{serviceRequestController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{serviceRequestController.selected.confirmedDownTime}" showOn="button" 
-                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
-                            <p:commandButton value="更新停机时间" rendered="#{serviceRequestController.needConfirmTime}" actionListener="#{serviceRequestController.updateDownTime}" process="@(.updateDownTime)" update="@(.updateDownTime)"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.confirmedDownTime}</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.confirmedDownTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">开机时间</label>
-                            <p:outputLabel value="#{serviceRequestController.selected.confirmedUpTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                            </p:outputLabel>
-                        </h:panelGroup>
-                    </p:panelGrid>
-                    <c:forEach items="#{serviceRequestController.workOrders}" var="woItem" varStatus="rowIndex" >
-                        <p:fieldset legend="#{msg.WorkOrder}#{rowIndex.index+1}" toggleable="false" >
-                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">#{msg.srNum}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.srNum}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.assetName}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.assetName}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestorName}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.requestorName}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestTime}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.requestTime}" >
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.requestReason}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.requestReason}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.equipmentTaker}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.equipmentTaker}" />
+                    </h:panelGroup>
+                    <h:panelGroup id="assetstatus" class="updateDownTime">
+                        <label class="label">#{msg.status}</label>
+                        <p:selectOneRadio id="status" value="#{serviceRequestController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{serviceRequestController.currentStatus ne 3}">
+                            <p:ajax  listener="#{serviceRequestController.onStatusChange()}"  update="assetstatus" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
 
-                                <h:panelGroup>
-                                    <label class="label">#{msg.status}</label>
-                                    <p:outputLabel value="#{woItem.currentStepName}" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.caseType}</label>
-                                    <p:outputLabel value="#{woItem.caseType}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.totalManHour}</label>
-                                    <p:outputLabel value="#{woItem.totalManHour}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.totalPrice}</label>
-                                    <p:outputLabel value="#{woItem.totalPrice}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.currentPersonName}</label>
-                                    <p:outputLabel value="#{woItem.currentPersonName}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.feedbackRating}</label>
-                                    <p:outputLabel value="#{woItem.feedbackRating}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.feedbackComment}</label>
-                                    <p:outputLabel value="#{woItem.feedbackComment}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.endTime}</label>
-                                    <p:outputLabel value="#{woItem.closeTime}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                    </p:outputLabel>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.patProblems}</label>
-                                    <p:outputLabel value="#{woItem.patProblems}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.patActions}</label>
-                                    <p:outputLabel value="#{woItem.patActions}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.patTests}</label>
-                                    <p:outputLabel value="#{woItem.patTests}"/>
-                                </h:panelGroup>
+                        </p:selectOneRadio>
+                        <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{serviceRequestController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{serviceRequestController.selected.confirmedDownTime}" showOn="button"
+                                    readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+                        <p:commandButton value="更新停机时间" rendered="#{serviceRequestController.needConfirmTime}" actionListener="#{serviceRequestController.updateDownTime}" process="@(.updateDownTime)" update="@(.updateDownTime)"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.confirmedDownTime}</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.confirmedDownTime}" >
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">开机时间</label>
+                        <p:outputLabel value="#{serviceRequestController.selected.confirmedUpTime}" >
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        </p:outputLabel>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <c:forEach items="#{serviceRequestController.workOrders}" var="woItem" varStatus="rowIndex" >
+                    <p:fieldset legend="#{msg.WorkOrder}#{rowIndex.index+1}" toggleable="false" >
+                        <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
-                            </p:panelGrid>
+                            <h:panelGroup>
+                                <label class="label">#{msg.status}</label>
+                                <p:outputLabel value="#{woItem.currentStepName}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.caseType}</label>
+                                <p:outputLabel value="#{woItem.caseType}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.totalManHour}</label>
+                                <p:outputLabel value="#{woItem.totalManHour}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.totalPrice}</label>
+                                <p:outputLabel value="#{woItem.totalPrice}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.currentPersonName}</label>
+                                <p:outputLabel value="#{woItem.currentPersonName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.feedbackRating}</label>
+                                <p:outputLabel value="#{woItem.feedbackRating}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.feedbackComment}</label>
+                                <p:outputLabel value="#{woItem.feedbackComment}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.endTime}</label>
+                                <p:outputLabel value="#{woItem.closeTime}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </p:outputLabel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.patProblems}</label>
+                                <p:outputLabel value="#{woItem.patProblems}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.patActions}</label>
+                                <p:outputLabel value="#{woItem.patActions}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.patTests}</label>
+                                <p:outputLabel value="#{woItem.patTests}"/>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
 
 
-                            <p:dataTable value="#{serviceRequestController.getWOrkOrderStep(woItem.id)}" var="stepItem">
-                                <p:column headerText="#{msg.stepName}">
-                                    <h:outputText value="#{stepItem.stepName}" />
-                                </p:column>
-                                <p:column headerText="#{msg.ownerName}">
-                                    <h:outputText value="#{stepItem.ownerName}" />
-                                </p:column>
-                                <p:column headerText="#{msg.startTime}">
-                                    <h:outputText value="#{stepItem.startTime}" >
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="#{msg.endTime}">
-                                    <h:outputText value="#{stepItem.endTime}" >
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                    </h:outputText>
-                                </p:column>
-                                <p:column headerText="#{msg.description}">
-                                    <h:outputText value="#{stepItem.comments}" />
-                                </p:column>
+                        <p:dataTable value="#{serviceRequestController.getWOrkOrderStep(woItem.id)}" var="stepItem">
+                            <p:column headerText="#{msg.stepName}">
+                                <h:outputText value="#{stepItem.stepName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.ownerName}">
+                                <h:outputText value="#{stepItem.ownerName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.startTime}">
+                                <h:outputText value="#{stepItem.startTime}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.endTime}">
+                                <h:outputText value="#{stepItem.endTime}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.description}">
+                                <h:outputText value="#{stepItem.comments}" />
+                            </p:column>
 
-                            </p:dataTable>
+                        </p:dataTable>
 
-                            <br/>
+                        <br/>
 
-                            <p:dataTable value="#{serviceRequestController.getWOrkOrderDetail(woItem.id)}" var="detailItem"  rendered="#{not empty serviceRequestController.getWOrkOrderDetail(woItem.id)}">
-                                <p:column headerText="#{msg.manHours}">
-                                    <h:outputText value="#{detailItem.manHours}" />
-                                </p:column>
+                        <p:dataTable value="#{serviceRequestController.getWOrkOrderDetail(woItem.id)}" var="detailItem"  rendered="#{not empty serviceRequestController.getWOrkOrderDetail(woItem.id)}">
+                            <p:column headerText="#{msg.manHours}">
+                                <h:outputText value="#{detailItem.manHours}" />
+                            </p:column>
+                            <p:column headerText="#{msg.accessory}">
+                                <h:outputText value="#{detailItem.parts}" />
+                            </p:column>
+                            <p:column headerText="#{msg.accessoryQuantity}">
+                                <h:outputText value="#{detailItem.apartsQuantity}" />
+                            </p:column>
+                            <p:column headerText="#{msg.accessoryPrice}">
+                                <h:outputText value="#{detailItem.partsPrice}" />
+                            </p:column>
+                            <p:column headerText="#{msg.otherExpense}">
+                                <h:outputText value="#{detailItem.otherExpense}" />
+                            </p:column>
+                            <p:column headerText="#{msg.cowokerUserName}">
+                                <h:outputText value="#{detailItem.cowokerUserName}" />
+                            </p:column>
+
+                        </p:dataTable>
+                        <br/>
+                        <h:panelGroup rendered="#{not empty workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}">
+                            <label class="label" >增加的备件</label>
+                            <p:dataTable value="#{workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}" var="detailItem"  >
                                 <p:column headerText="#{msg.accessory}">
                                     <h:outputText value="#{detailItem.parts}" />
                                 </p:column>
@@ -157,33 +178,40 @@
                                 <p:column headerText="#{msg.accessoryPrice}">
                                     <h:outputText value="#{detailItem.partsPrice}" />
                                 </p:column>
-                                <p:column headerText="#{msg.otherExpense}">
-                                    <h:outputText value="#{detailItem.otherExpense}" />
-                                </p:column>
-                                <p:column headerText="#{msg.cowokerUserName}">
-                                    <h:outputText value="#{detailItem.cowokerUserName}" />
-                                </p:column>
 
                             </p:dataTable>
-                        </p:fieldset>
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{woItem.currentStepId le 3 and woItem.status ne 3}">
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty workOrderListController.getCoworkerDetail(workOrderListController.selected.id)}">
+                            <label class="label">增加的协作人</label>
+                            <p:dataTable value="#{workOrderListController.getCoworkerDetail(workOrderListController.selected.id)}" var="detailItem"  >
+                                <p:column headerText="#{msg.manHours}">
+                                    <h:outputText value="#{detailItem.manHours}" />
+                                </p:column>
+                                <p:column headerText="#{msg.coworker}">
+                                    <h:outputText value="#{detailItem.cowokerUserName}" />
+                                </p:column>
+                            </p:dataTable>
+                        </h:panelGroup>
+
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{woItem.currentStepId le 3}">
                             <h:panelGroup >
                                 <label class="label">#{msg.cancelWorkOrderReason}</label>
                                 <p:inputTextarea value="#{serviceRequestController.cancelReason}" maxlength="256"  required="true" requiredMessage="#{msg.cancelWorkOrderReason}#{msg.ValidationRequire}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                         <h:panelGroup >
-                            <p:commandButton value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{serviceRequestController.cancelWorkOrder(woItem.id)}" validateClient="true"  update="tabview:SRListForm tabview:WorkOrderEditForm :growl" style="float:left" 
-                                             rendered="#{woItem.currentStepId le 3 and woItem.status ne 3}">
+                            <p:commandButton value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{serviceRequestController.cancelWorkOrder(woItem.id)}" validateClient="true"  update="tabview:SRListForm tabview:WorkOrderEditForm :growl" style="float:left"
+                                             rendered="#{woItem.currentStepId le 3}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.CancelWorkOrderConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </h:panelGroup>
+                    </p:fieldset>
 
 
-                    </c:forEach>
-                </p:fieldset>
-            </h:form>
+                </c:forEach>
+            </p:fieldset>
+        </h:form>
 
-        </div>
-    </ui:composition>
+    </div>
+</ui:composition>
 </html>
