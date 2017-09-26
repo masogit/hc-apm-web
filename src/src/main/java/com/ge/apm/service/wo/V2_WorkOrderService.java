@@ -78,6 +78,14 @@ public class V2_WorkOrderService {
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
     }
+    
+    public List<String> getUnfinishedSRList() {
+        List<SearchFilter> srSearchFilters = new ArrayList();
+        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+        srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
+        return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
+    }
 
     public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset) {
         String token = UserContextService.getAccessToken();

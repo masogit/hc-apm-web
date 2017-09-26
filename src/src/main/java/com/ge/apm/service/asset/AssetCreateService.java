@@ -180,13 +180,17 @@ public class AssetCreateService {
         return userDao.findByAssetAccess(deptUids);
     }
 
-    public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {
+    public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid, UserAccount clinicalOwner) {
         List<SearchFilter> usersFilters = new ArrayList<>();
         if (null != clinicalDeptUid) {
             usersFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, clinicalDeptUid));
             return userDao.findBySearchFilter(usersFilters);
         } else {
-            return new ArrayList<UserAccount>();
+            List<UserAccount> ownerList = new ArrayList();
+            if(clinicalOwner != null) {
+                ownerList.add(clinicalOwner);
+            }
+            return ownerList;
         }
     }
 
