@@ -188,7 +188,7 @@ public class AssetCreateController {
 
     public List<UserAccount> getClinicalOwnerList() {
 
-        return acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID());
+        return acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner);
 
     }
 
