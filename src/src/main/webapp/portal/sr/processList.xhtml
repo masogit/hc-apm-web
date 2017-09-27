@@ -53,6 +53,9 @@
                         <p:column headerText="#{msg.assetName}">
                             <h:outputText value="#{assetInfoService.getAssetInfoName(item.assetId)}"/>
                         </p:column>
+                        <p:column headerText="#{msg.departNum}">
+                            <h:outputText value="#{assetInfoService.getAssetInfo(item.assetId).departNum}"/>
+                        </p:column>
                         <p:column headerText="#{msg.financingNum}">
                             <h:outputText value="#{assetInfoService.getAssetInfo(item.assetId).financingNum}"/>
                         </p:column>
