@@ -8,21 +8,16 @@ package com.ge.apm.service.wo;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -62,6 +57,12 @@ public class V2_WorkOrderService {
     AssetInfoRepository assetInfoRepository;
     @Autowired
     UserAccountRepository userAccountRepository;
+    @Autowired
+    private WorkOrderCoworkerRepository workOrderCoworkerRepository;
+    public V2_WorkOrder getWorkOrderById(String woId) {
+        return woDao.findById(woId);
+    }
+
     public List<V2_WorkOrder> getWorkOrdersBySR(String serviceRequest) {
         return woDao.findBySrId(serviceRequest);
     }
@@ -76,6 +77,14 @@ public class V2_WorkOrderService {
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
+    }
+    
+    public List<String> getUnfinishedSRList() {
+        List<SearchFilter> srSearchFilters = new ArrayList();
+        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+        srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
+        return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
     public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset) {
@@ -95,8 +104,12 @@ public class V2_WorkOrderService {
         }
     }
 
-    public List<UserAccount> getWorkerList() {
-        return userDao.getUsersWithAssetStaffRole(UserContextService.getCurrentUserAccount().getHospitalId());
+    public List<UserAccount> getWorkerList(Integer assetId) {
+        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId);
+        if(null!=res){
+            return (List<UserAccount>)res.get("data");
+        }
+        return null;
     }
     
     public AssetInfo getAssetInfo(Integer assetId){
@@ -395,7 +408,9 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
 
     return woDao.findBySearchFilter(searchFilters, pr);
 }
-
+    public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
+        return workOrderCoworkerRepository.findByWoId(woId);
+    }
    /* public Page<V2_WorkOrder> getWorkOrderListToPickup_backup(int type,PageRequest pr, UserAccount ua) {
         Page<V2_WorkOrder> pages = null;
         //base on the orgLevel

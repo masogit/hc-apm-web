@@ -44,6 +44,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     Page<UserAccount> getBySiteId(Pageable pageRequest, int siteId);
     Page<UserAccount> getByOrgInfoId(Pageable pageRequest, int orgInfoId);
+    @Query("select u from UserAccount u where u.tenantUID=?1 or u.institutionUID=?1 or u.hospitalUID=?1 or u.siteUID=?1 or u.orgInfoUID=?1")
+    Page<UserAccount> getByOrgInfoUID(Pageable pageRequest, String getByOrgInfoUID);
     UserAccount getByWeChatId(String weChatId);
     List<UserAccount> getByOrgInfoId(int orgInfoId);
 
@@ -60,17 +62,25 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 	List<UserInfo> findByInstitutionUID(String institutionUID);
 
     /* sysrole.id=2*/
+    @Query(value= "select * from user_account where id > 0 and site_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
     public List<UserAccount> getBySiteUID(String siteUID);
+    
+    @Query(value= "select * from user_account where id > 0 and hospital_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
     public List<UserAccount> getByHospitalUID(String hospitalUID);
+    
+    @Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     public List<UserAccount> getByInstitutionUID(String InsitiUID);
+    
+    @Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     public List<UserAccount> getByTenantUID(String tenantUID);
+    
     public List<UserAccount> getByOrgInfoUID(String orgUID);
 
     public Page<UserAccount> getByTenantUID(Pageable pageRequest,String tenantUID);
     public List<UserAccount> findBySiteUID(String id);
 
 
-    @Query(value="select u from UserAccount u, UserOrgInfo o where u.uid=o.userUid and o.orgUid in ?1")
+    @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=3 and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);
 
 

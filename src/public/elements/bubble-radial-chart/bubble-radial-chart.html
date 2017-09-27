@@ -1181,7 +1181,7 @@
                 return res.json().then(function(data) {
                   // As Jianbin's requested, remove '停机中', substract count from the sum
                   try {
-                    var hideItemIndex = data.items.findIndex(i => i.category === 2);
+                    var hideItemIndex = data.items.findIndex(function(i) { return i.category === 2; });
                     if (hideItemIndex > -1) {
                       data.root.count -= data.items[hideItemIndex].count;
                       data.items.splice(hideItemIndex, 1);

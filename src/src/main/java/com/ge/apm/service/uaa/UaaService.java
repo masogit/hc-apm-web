@@ -591,6 +591,13 @@ public class UaaService {
         List<OrgInfo> orgInfoFullList = orgInfoDao.getOrgInfosByParentId(parentOrgId);
         List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteList(userUid);
 
+        TreeNode rootNode = buildOrgTreeByParentIdWithSelectedChildren(orgInfoFullList, orgInfoSelectableList);
+
+        return rootNode;
+    }
+
+    public TreeNode buildOrgTreeByParentIdWithSelectedChildren(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
+
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
 
         for(OrgInfo org: orgInfoFullList){
@@ -636,6 +643,13 @@ public class UaaService {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
         List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
+
+        TreeNode rootNode = buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList);
+
+        return rootNode;
+    }
+
+    public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
 
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
 

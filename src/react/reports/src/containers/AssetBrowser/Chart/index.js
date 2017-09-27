@@ -129,46 +129,31 @@ class ChartHeader extends ImmutableComponent {
               filterOption={(input, option) => option.props.value.toLowerCase().indexOf(input.toLowerCase()) >= 0}
             >
               {
-                column.get('clusters').map(cluster => (
+                column.get('clusters').sort(index === 3 ? sortFilter : () => -1).map(cluster => (
                   <Option key={cluster.get('key')} value={JSON.stringify([cluster.get('key'), cluster.get('displayName')])}>{cluster.get('displayName')}</Option>
                 ))
               }
             </Select>
           ))
         }
-        {/* {
-          columns.map((column, index) => (
-            <Motion
-              key={column.get('dimension')}
-              defaultStyle={{
-                scale: 1
-              }}
-              style={{
-                scale: spring(filters.find(filter => filter.get('dimension') === column.get('dimension')) ? 1.3 : 1)
-              }}>
-              {
-                style => (
-                  <div
-                    onClick={this.removeFilter(column.get('dimension'))}
-                    style={{
-                      transform: `translate(-50%, -50%) scale(${style.scale})`,
-                      position: 'absolute',
-                      left: column.get('left'),
-                      bottom: 0,
-                      color: COLORS[index],
-                      cursor: 'pointer'
-                    }}
-                    >
-                      {translation[column.get('dimension')]}
-                    </div>
-                )
-              }
-            </Motion>
-          ))
-        } */}
       </div>
     )
   }
+}
+
+function sortFilter(a, b) {
+  // sort options for the last column
+  // it ain't pretty, i know.
+  const magicWord = '未知年份'
+  let _a = a.get('key')
+  let _b = b.get('key')
+  if (_a === magicWord) {
+    return 1
+  }
+  if (_b === magicWord) {
+    return -1
+  }
+  return _a > _b ? -1 : 1;
 }
 
 @connect()
@@ -192,13 +177,10 @@ class Asset extends ImmutableComponent {
       pointerEvents: 'none',
       position: 'fixed',
       minWidth: 100,
-      // top: clientRect.top,
-      // left: clientRect.left,
       background: '#d8d8d8',
       border: '1px solid #5d87d4',
       borderRadius: 3,
       padding: '12px 7px',
-      // transform: `translate(${clientRect.width + 10}px, ${clientRect.height / 2}px)`
     }
 
     if (clientRect.top > window.innerHeight * 0.6) {

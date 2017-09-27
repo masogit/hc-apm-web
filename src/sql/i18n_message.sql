@@ -233,7 +233,6 @@ INSERT INTO "public"."i18n_message" VALUES ('435', 'label', 'WorkOrderAssignee',
 INSERT INTO "public"."i18n_message" VALUES ('436', 'label', 'AckPass', '验收通过', 'Acknowledge pass', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('437', 'label', 'AckNoPass', '验收不通过', 'Acknowledge does not pass', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('438', 'label', 'Acknowledge', '验收', 'Acknowledge', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('439', 'label', 'startUsingDate', '启用时间', 'Start Using Date', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('440', 'label', 'FaultyDesc', '故障文字描述', 'Faulty Desc', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('441', 'label', 'newWorkOrder', '新建工单', 'New Work Order', null, '-1');
@@ -304,7 +303,7 @@ INSERT INTO "public"."i18n_message" VALUES ('648', 'field_name', 'functionGroup'
 INSERT INTO "public"."i18n_message" VALUES ('649', 'field_name', 'assetGroup', '设备分类', 'Asset Group', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('650', 'field_name', 'hospitalId', '所属院区', 'Hospital Id', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('651', 'field_name', 'injectCount', '注射量', 'Inject Count', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('652', 'field_name', 'installDate', '安装日期', 'Install Date', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('652', 'field_name', 'installDate', '启用日期', 'Install Date', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('653', 'field_name', 'isClosed', '已关单？', 'Is Closed', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('654', 'field_name', 'isFinished', '完成？', 'Is Finished', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('655', 'field_name', 'intExtType', '工单类型', 'Int Ext Type', null, '-1');
@@ -438,7 +437,7 @@ INSERT INTO "public"."i18n_message" VALUES ('788', 'field_name', 'srNum', '报�
 INSERT INTO "public"."i18n_message" VALUES ('789', 'field_name', 'assetCategory', '设备类型', 'Asset Category', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('790', 'field_name', 'assetUsage', '用途', 'Asset Usage', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('791', 'field_name', 'capitalSource', '资金来源', 'Capital Source', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('792', 'field_name', 'riskGrade', '分险等级', 'Risk Grade', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('792', 'field_name', 'riskGrade', '风险等级', 'Risk Grade', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('793', 'field_name', 'measureGrade', '计量', 'Measure Grade', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('794', 'field_name', 'emergencyEquipment', '是否急救设备', 'Emergency Equipment', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('795', 'field_name', 'importEquipment', '是否进口设备', 'Import Equipment', null, '-1');
