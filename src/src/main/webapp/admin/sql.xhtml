@@ -11,14 +11,13 @@
         <h:form id="searchForm">
             <h:panelGrid id="searchPanel" columns="10">
                 <p:inputTextarea id="sql" placeholder="SQL here" cols="100" rows="3" value="#{sqlDynaColumnController.sql}"/>
-                <p:commandButton value="Query" update="listForm"/>
-                <p:commandButton value="Execute" rendered="false" actionListener="#{sqlDynaColumnController.executeSql}"/>
+                <p:commandButton value="Query" update=":listForm" actionListener="#{sqlDynaColumnController.setErrorMsg(null)}"/>
+                <p:commandButton value="Execute" rendered="false" update=":listForm :growl" actionListener="#{sqlDynaColumnController.executeSql}"/>
             </h:panelGrid>
 
         </h:form>
 
         <h:form id="listForm">
-
             <p:dataTable id="datalist" value="#{sqlDynaColumnController.lazyModel}" var="item" widgetVar="varDataList"
                          selectionMode="single" selection="#{sqlDynaColumnController.selected}"
                          lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
@@ -31,7 +30,6 @@
                 <p:ajax event="rowSelect" update=":listForm:deltailInfo"/>
 
                 <f:facet name="header">
-                    SQL Result
                     <p:commandButton rendered="true" id="toggler" value="Columns" style="float:right;top: -5px;height: 25px;" icon="ui-icon-calculator"/>
                     <p:columnToggler datasource="datalist" trigger="toggler" rendered="true">
                         <p:ajax event="toggle" listener="#{sqlDynaColumnController.onToggleColumn}" />
@@ -49,8 +47,11 @@
                         <p:dataExporter type="xls" target="datalist" fileName="xls_export"/>
                     </p:commandButton>
                 </f:facet>
+                <f:facet name="footer">
+                    <p:outputLabel id="errorMsg" style="color: red" value="#{sqlDynaColumnController.errorMsg}" rendered="#{sqlDynaColumnController.errorMsg ne null}"/>
+                </f:facet>
             </p:dataTable>
-            <p:panel id="deltailInfo">
+            <p:panel id="deltailInfo" rendered="#{sqlDynaColumnController.selected ne null}">
                 <p:inputTextarea  cols="50" autoResize="true" value="#{sqlDynaColumnController.selectedRowData}" rendered="#{sqlDynaColumnController.selected ne null}"/>
             </p:panel>
         </h:form>

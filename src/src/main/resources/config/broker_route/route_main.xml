@@ -51,7 +51,17 @@
         <route>
             <from uri="cxf:bean:clinicalDataServiceEndpoint"/>
             <setHeader headerName="CamelBeanMethodName"><simple>${headers.SOAPAction}</simple></setHeader>
-            <bean ref="clinicalDataServiceImpl"/>
+            <doTry>
+                <bean ref="clinicalDataServiceImpl"/>
+                <doCatch>
+                    <exception>java.lang.Exception</exception>
+                    <handled><constant>true</constant></handled>
+                    <setBody>
+                        <simple>EdgeServer DataUpload Exception: soap:Fault, ${exception.message}</simple>
+                    </setBody>
+                    <log message="${body}" loggingLevel="ERROR"/>
+                </doCatch>
+            </doTry>
         </route>
 
         <route>
