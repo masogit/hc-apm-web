@@ -522,6 +522,12 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         return assetResponser;
     }
 
+    public List<UserAccount> findMaintenanceStaff(){
+        List<UserAccount> assetResponser = woService.findMaintenanceStaff(this.selectedWorkOrder.getAssetId());
+
+        return assetResponser;
+    }
+
     public Date getEsTime() {
         return esTime;
     }
