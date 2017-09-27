@@ -36,7 +36,7 @@ public class OrgApi {
   public ResponseEntity<? extends Map<String, Object>> requestOne(HttpServletRequest request,
                                                                   @Min(1) @PathVariable Integer id) {
     return Try.of(UserContext::getCurrentLoginUser).filter(UserAccount::getIsSuperAdmin).map(u ->
-      ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))
+      ResponseEntity.ok()/*.cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))*/
         .body(new ImmutableMap.Builder<String, Object>()
           .put("orgInfo", Try.of(() -> orgService.find(id)).map(t -> new ImmutableMap.Builder<String, Object>().
             put("id", t._1)
@@ -55,7 +55,7 @@ public class OrgApi {
                                                                   @Min(1) @Max(Integer.MAX_VALUE) @RequestParam(value = "limit", required = false, defaultValue = "3000") Integer limit,
                                                                   @Min(0) @RequestParam(value = "start", required = false, defaultValue = "0") Integer start) {
     return Try.of(UserContext::getCurrentLoginUser).map(u ->
-      ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))
+      ResponseEntity.ok()/*.cacheControl(CacheControl.maxAge(1, TimeUnit.HOURS))*/
         .body(new ImmutableMap.Builder<String, Object>()
           .put("orgInfos", StreamSupport.stream(orgService.find(u.getSiteId(), u.getHospitalId(), start, limit).spliterator(), false)
             .map(t -> new ImmutableMap.Builder<String, Object>().
