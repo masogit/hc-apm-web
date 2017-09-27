@@ -684,4 +684,12 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     public void setCheckInDate(String checkInDate) {
         this.checkInDate = checkInDate;
     }
+
+    public String getFaultNameBySelectedWorkOrder() {
+        if (selected == null) {
+            return "";
+        } else {
+            return this.assetFaultTypeService.getFaultName(selected.getCaseType());
+        }
+    }
 }

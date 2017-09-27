@@ -28,4 +28,12 @@ public class AssetFaultTypeService {
         }
         return byAssetGroupId;
     }
+
+    public String getFaultName(Integer id) {
+        if (id == null) {
+            return "";
+        }
+
+        return assetFaultTypeRepository.getCaseTypeName(id);
+    }
 }
