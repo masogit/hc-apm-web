@@ -55,11 +55,11 @@
                     <h:panelGroup colum="2" >
                         <h:panelGroup>
                             <label class="label">工时(小时)</label>
-                            <h:inputText value="#{workOrderListController.manHours}" />
+                            <p:inputText value="#{workOrderListController.manHours}" required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">其它费用</label>
-                            <h:inputText value="#{workOrderListController.otherExpense}" />
+                            <p:inputText value="#{workOrderListController.otherExpense}" />
                         </h:panelGroup>
                     </h:panelGroup>
 
