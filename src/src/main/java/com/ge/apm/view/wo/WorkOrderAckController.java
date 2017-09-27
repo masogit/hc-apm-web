@@ -58,7 +58,7 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         srDao = WebUtil.getBean(ServiceRequestRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
-        this.filterBySite = true;
+        this.filterBySite = false;
 
     }
 
@@ -70,20 +70,19 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.selected = null;
-        this.setSiteFilter();
-        removeFilterOnField("status");
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
-        List<String> srList = getUnfinishedSRList();
-        searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, srList));
+        if (searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("status")) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        }
+        if (!this.hasFilterOnField("currentStepId")) {
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
+        }
+        if (!this.hasFilterOnField("srId")) {
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getUnfinishedSRList()));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
-    }
-
-    private List<String> getUnfinishedSRList() {
-        List<SearchFilter> srSearchFilters = new ArrayList();
-        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-        return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
     public void cancel() {

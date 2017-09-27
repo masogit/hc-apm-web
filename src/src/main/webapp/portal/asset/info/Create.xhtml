@@ -40,7 +40,7 @@
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
-                                    <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel"/>
+                                    <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
                                     <f:selectItem itemLabel="" />
                                     <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
@@ -50,6 +50,7 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+                                <p:commandButton id="btnRemoveAssetOwner" actionListener="#{assetInfoController.clearOwner()}" icon="ui-icon-close" class="btn btn-sm" update="assetOwnerName assetOwnerTel"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel}</label>
@@ -69,6 +70,7 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+                                <p:commandButton id="btnRemoveAssetOwner2" actionListener="#{assetInfoController.clearOwner2()}" icon="ui-icon-close" class="btn btn-sm" update="assetOwnerName2 assetOwnerTel2"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel2}</label>
@@ -88,6 +90,7 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+                                <p:commandButton id="btnRemoveAssetOwner3" actionListener="#{assetInfoController.clearOwner3()}" icon="ui-icon-close" class="btn btn-sm" update="assetOwnerName3 assetOwnerTel3"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel3}</label>
@@ -380,10 +383,6 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.installDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.installDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.startUsingDate}</label>
-                                <p:calendar timeZone="GMT+8"  id="startUsingDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.startUsingDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="false" requiredMessage="#{msg.startUsingDate} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.factoryWarrantyDate}</label>

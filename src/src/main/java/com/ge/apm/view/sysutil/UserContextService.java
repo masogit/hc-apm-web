@@ -229,10 +229,6 @@ public class UserContextService implements Serializable {
 
     public Boolean isDispatcher() {
         if (isDispatcher == null) {
-            if(hasRole("AssetHead")){
-                isDispatcher = true;
-                return true;
-            }
             UaaService uuaService = WebUtil.getBean(UaaService.class);
             List<String> orgList= uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item->item.getUid()).collect(Collectors.toList());
             orgList.add("");

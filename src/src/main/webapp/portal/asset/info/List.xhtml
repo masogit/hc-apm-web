@@ -35,7 +35,7 @@
                 <h:form id="AssetInfoListForm">
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetInfoController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
@@ -90,15 +90,12 @@
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" >
-<!--                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
-                            </f:facet>-->
+<!--                         <p:column headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" >
                             <h:outputText value="#{item.assetOwnerName}"/>
-                        </p:column>
+                        </p:column> -->
+                        <p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.assetOwnerTel}"/>
+	                    </p:column>
 						<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.brand.name}"/>
 						</p:column>
@@ -128,15 +125,68 @@
                         
                         
                         <!-- import to xml begin-->
+                        
+                     	<p:column headerText="#{msg.aliasName}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.aliasName}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.assetOwnerName2}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.assetOwnerName2}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.assetOwnerTel2}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.assetOwnerTel2}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.assetOwnerName3}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.assetOwnerName3}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.assetOwnerTel3}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.assetOwnerTel3}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.clinicalOwnerName}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.clinicalOwnerName}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.clinicalOwnerTel}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.clinicalOwnerTel}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.assetCategory}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('assetCategory', item.assetCategory)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.assetUsage}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.capitalSource}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.measureGrade}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.riskGrade}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.emergencyEquipment}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.importEquipment}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.measuringItemCategory}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.usageStatus}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.accountingCategory}" visible="false" exportable="true">
+	                        <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
+	                    </p:column>
+	                    
                         <p:column headerText="#{msg.hospitalId}" visible="false" exportable="true">
 	                        <h:outputText value="#{assetInfoController.getOrgName(item.hospitalId)}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.functionGroup}" visible="false" exportable="true">
 	                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.functionType}"  visible="false" exportable="true">
+<!-- 	                    <p:column headerText="#{msg.functionType}"  visible="false" exportable="true">
 	                        <h:outputText value="#{item.functionType}"/>
-	                    </p:column>
+	                    </p:column> -->
 	                    <p:column headerText="#{msg.functionGrade}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.functionGrade}"/>
 	                    </p:column>
@@ -149,9 +199,9 @@
 	                    <p:column headerText="#{msg.serialNum}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.serialNum}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.departNum}" visible="false" exportable="true">
+<!-- 	                    <p:column headerText="#{msg.departNum}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.departNum}"/>
-	                    </p:column>
+	                    </p:column> -->
 	                    <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
 	                        <h:outputText value="#{item.financingNum}"/>
 	                    </p:column>
@@ -167,18 +217,16 @@
 	                    <p:column headerText="#{msg.locationName}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.locationName}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.clinicalDeptId}" visible="false" exportable="true">
+<!-- 	                    <p:column headerText="#{msg.clinicalDeptId}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.clinicalDeptName}"/>
-	                    </p:column>
+	                    </p:column> -->
 	                    <p:column headerText="#{msg.assetDeptId}" visible="false" exportable="true">
 	                    	<h:outputText value="#{assetInfoController.getOrgName(item.assetDeptId)}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
+<!-- 	                    <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.assetOwnerName}"/>
-	                    </p:column>
-	                    <p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.assetOwnerTel}"/>
-	                    </p:column>
+	                    </p:column> -->
+
 	                    <p:column headerText="#{msg.isValid}" visible="false" exportable="true">
 	                        <f:facet name="filter">
 	                            <p:selectOneMenu onchange="PF('varDataList').filter()">

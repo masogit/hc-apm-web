@@ -204,6 +204,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.removeFilterOnField("name");
@@ -793,6 +794,27 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOwner3(UserAccount owner3) {
         this.owner3 = owner3;
+    }
+
+    public void clearOwner() {
+        this.owner = null;
+        this.selected.setAssetOwnerId(null);
+        this.selected.setAssetOwnerName(null);
+        this.selected.setAssetOwnerTel(null);
+    }
+
+    public void clearOwner2() {
+        this.owner2 = null;
+        this.selected.setAssetOwnerId2(null);
+        this.selected.setAssetOwnerName2(null);
+        this.selected.setAssetOwnerTel2(null);
+    }
+
+    public void clearOwner3() {
+        this.owner3 = null;
+        this.selected.setAssetOwnerId3(null);
+        this.selected.setAssetOwnerName3(null);
+        this.selected.setAssetOwnerTel3(null);
     }
 
     public String getQrCode() {

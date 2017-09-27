@@ -104,7 +104,8 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         coWorkerDetail.setId(woCoworkUid);
         coWorkerDetail.setManHours(0);
         coWorkerList.add(coWorkerDetail);
-
+        //clear sign date;
+        checkInDate=null;
         // workOrderDetailsList.add(itemDetail);
 
     }
@@ -236,7 +237,9 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     public void checkIn(){
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         checkInDate = sdf.format(new Date());
-        if(this.selectedWorkOrder!=null)
+        // if()  this.selectedWorkOrder.getCheckinTime()==null)
+
+        if(this.selectedWorkOrder!=null && this.selectedWorkOrder.getCheckinTime()==null)
             woService.checkIn(this.selectedWorkOrder);
 
     }
@@ -463,7 +466,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
         }
         if ( queryIndex ==  7) {//已关单
-           // searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, ua.getId()));
+            // searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, ua.getId()));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
             removeFilterOnField("currentStepId");
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, queryIndex));
@@ -510,11 +513,11 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         List<UserAccount> assetResponser=new ArrayList<UserAccount>();
         if(this.selectedWorkOrder!=null) {
             assetResponser = woService.getAssetResponser(this.selectedWorkOrder.getAssetId());
-           if(!CollectionUtils.isEmpty(assetResponser)){
+            if(!CollectionUtils.isEmpty(assetResponser)){
                 return assetResponser;
-           }else{
-               return  woService.getAssetResponser2(this.selectedWorkOrder.getAssetId());
-           }
+            }else{
+                return  woService.getAssetResponser2(this.selectedWorkOrder.getAssetId());
+            }
         }
         return assetResponser;
     }
@@ -572,14 +575,21 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     public List<V2_WorkOrder_Detail> getWOrkOrderDetail(String woId) {
         return woService.getWorkOrderDetails(woId);
     }
+    public List<V2_WorkOrderCoworker> getCoworkerDetail(String woId)
+    {
+        return woService.getWorkOrderCoworker(woId);
+    }
 
     public List<UserAccount> getWorkerList(){
-        return woService.getWorkerList();
+        return woService.getWorkerList(this.selectedWorkOrder.getAssetId());
     }
 
     public List<AssetFaultType> getAssetFaultType(){
         AssetInfo assetinfo = assetInfoRepository.findById(this.selectedWorkOrder.getAssetId());
-        return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
+        if(assetinfo!=null)
+            return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
+        else
+            return  new ArrayList<AssetFaultType>();
     }
 
     public void closeWorkOrder(){

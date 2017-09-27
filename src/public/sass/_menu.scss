@@ -4,6 +4,11 @@
   $brand-color: #d1d0d8;
   $menu-width: 190px;
 
+  h1 {
+    margin: .67em 0;
+    line-height: 1.1em;
+  }
+
   .layout-main {
     margin-left: $menu-width;
   }
@@ -11,6 +16,7 @@
   .layout-menu {
     top: 0 !important;
     width: $menu-width;
+    overflow: hidden;
     .brand {
       padding: 1em 0 .5em;
       h1 {
@@ -80,6 +86,7 @@
     -ms-overflow-style: none;
 
     &:hover {
+      overflow-y: auto; /*for IE*/
       overflow-y: overlay;
     }
 
