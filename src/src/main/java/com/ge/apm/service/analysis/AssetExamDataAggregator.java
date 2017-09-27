@@ -39,18 +39,33 @@ public class AssetExamDataAggregator {
 
     /*该方法会由route id=aggregationAssetSummit来调用*/
     public String aggregateAssetSummit() throws Exception{
-        logger.info("start to aggregateExamData");
+        ///
+        SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM-dd");
         Date currentDate = new Date();
+        logger.info("start to aggregateExamData");
         aggregateForAssetSumit(currentDate);
+        //calculate yesterday
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.set(Calendar.DATE,calendar.get(Calendar.DATE)-1);
+        Date yesterday = dft.parse(dft.format(calendar.getTime()));
+        aggregateForAssetSumit(yesterday);
         return "success";
     }
 
     public String aggregateExamSummit() throws Exception{
-        logger.info("start to aggregateForAssetSumit");
+        logger.info("start to aggregateForExamSumit");
+        ///
+        SimpleDateFormat dft = new SimpleDateFormat("yyyy-MM-dd");
         Date currentDate = new Date();
-        /*SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        currentDate= sdf.parse("2017-02-18");*/
+        logger.info("start to aggregateExamData");
         aggregateForExamSumit(currentDate);
+        //calculate yesterday
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(currentDate);
+        calendar.set(Calendar.DATE,calendar.get(Calendar.DATE)-1);
+        Date yesterday = dft.parse(dft.format(calendar.getTime()));
+        aggregateForExamSumit(yesterday);
         return "success";
     }
 
