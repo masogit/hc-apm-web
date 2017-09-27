@@ -162,10 +162,9 @@
                                         </p:selectOneMenu>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.clinicalOwnerName}*</label>
+                                        <label class="label">#{msg.clinicalOwnerName}</label>
                                         <p:selectOneMenu id="clinicalOwnerName" value="#{assetCreateController.clinicalOwner}" converter="userAccountConverter" var="t" filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
                                             <p:ajax  listener="#{assetCreateController.onClinicalOwnerChange()}" update="clinicalOwnerTel" />
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetCreateController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                             <p:column>
                                                 <h:outputText value="#{t.name}"/>
