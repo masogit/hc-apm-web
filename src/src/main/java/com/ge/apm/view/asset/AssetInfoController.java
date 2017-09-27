@@ -589,17 +589,28 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if(selected.getTenantUID()!=null && !selected.getTenantUID().isEmpty()){
             orgList.add(selected.getTenantUID());
         }
-       return userDao.findByAssetAccess(orgList);
+        
+       List<UserAccount> accountList = getEmptyAccountList();
+       accountList.addAll(userDao.findByAssetAccess(orgList));
+       return accountList;
+    }
+    
+    private List<UserAccount> getEmptyAccountList(){
+        List<UserAccount> accountList = new ArrayList();
+        UserAccount emptyValue = new UserAccount();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        accountList.add(emptyValue);
+        return accountList;
     }
 
     public List<UserAccount> getClinicalOwnerList() {
+        List<UserAccount> accountList = getEmptyAccountList();
         List<SearchFilter> usersFilters = new ArrayList<>();
         if (null != selected.getClinicalDeptId()) {
             usersFilters.add(new SearchFilter("orgInfoId", SearchFilter.Operator.EQ, selected.getClinicalDeptId()));
-            return userDao.findBySearchFilter(usersFilters);
-        } else {
-            return new ArrayList<UserAccount>();
-        }
+            accountList.addAll(userDao.findBySearchFilter(usersFilters));
+        } 
+        return accountList;
     }
 
     public String getQrCodeImageBase64() {
@@ -794,27 +805,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOwner3(UserAccount owner3) {
         this.owner3 = owner3;
-    }
-
-    public void clearOwner() {
-        this.owner = null;
-        this.selected.setAssetOwnerId(null);
-        this.selected.setAssetOwnerName(null);
-        this.selected.setAssetOwnerTel(null);
-    }
-
-    public void clearOwner2() {
-        this.owner2 = null;
-        this.selected.setAssetOwnerId2(null);
-        this.selected.setAssetOwnerName2(null);
-        this.selected.setAssetOwnerTel2(null);
-    }
-
-    public void clearOwner3() {
-        this.owner3 = null;
-        this.selected.setAssetOwnerId3(null);
-        this.selected.setAssetOwnerName3(null);
-        this.selected.setAssetOwnerTel3(null);
     }
 
     public String getQrCode() {
