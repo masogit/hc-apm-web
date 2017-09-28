@@ -41,7 +41,7 @@
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
-                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{assetInfoService.getWorkerList(assetInfoController.selected.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -59,7 +59,7 @@
                                 <label class="label">#{msg.assetOwnerName2}</label>
                                 <p:selectOneMenu id="assetOwnerName2" value="#{assetInfoController.owner2}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel2"/>
-                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{assetInfoService.getWorkerList(assetInfoController.selected.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -77,7 +77,7 @@
                                 <label class="label">#{msg.assetOwnerName3}</label>
                                 <p:selectOneMenu id="assetOwnerName3" value="#{assetInfoController.owner3}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel3"/>
-                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{assetInfoService.getWorkerList(assetInfoController.selected.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
