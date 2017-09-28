@@ -230,7 +230,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             coWorkerList=null;
         }
         //gl:1表示是正常
-        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense);
+        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense, this.comments);
 
     }
     private String checkInDate;
