@@ -59,7 +59,6 @@ public class AssetExamDataAggregator {
     }
     public String aggregateExamSummit() throws Exception{
         logger.info("start to aggregateForExamSumit");
-        ///
         Date currentDate = new Date();
         logger.info("start to aggregateExamData");
         aggregateForExamSumit(currentDate);
