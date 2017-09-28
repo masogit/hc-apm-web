@@ -250,8 +250,8 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Integer myhours, Double otherExpense,String comments) {
 
+    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Integer myhours, Double otherExpense,String comments) {
         selectedWorkOrder.setCurrentStepId(4);
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
@@ -267,7 +267,7 @@ public class V2_WorkOrderService {
         formData.setAssetStatus(assetStatus.toString());
         formData.setStepDetail(accDetails);
         formData.setStepCoworker(coDetails);
-       formData.setManHours(myhours);
+        formData.setManHours(myhours);
         formData.setOtherExpense(otherExpense);
         String res = srApi.invokeWorkOrderAction(token,formData,"repair",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
@@ -444,6 +444,54 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
 
         return woDao.findBySearchFilter(searchFilters, pr);
     }*/
+
+    public List<UserAccount> findMaintenanceStaff(int assetId) {
+        List<UserAccount> userListTag = null;
+        AssetInfo assetInfo = assetInfoRepository.getById(assetId);
+
+        //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
+        userListTag = userAccountRepository.getResponserByAssetId(assetId);
+
+        //获取和资产绑定的owner
+        List<UserAccount> assetOwnerList=  userAccountRepository.getResponserWithAsset(assetId);
+        List<UserAccount> defaultUserList=new ArrayList<UserAccount>();
+
+        // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID
+        if(CollectionUtils.isEmpty(userListTag) &  CollectionUtils.isEmpty(assetOwnerList)){
+            OrgInfo orgInfo = orgInfoRepository.getByUid( assetInfo.getClinicalDeptUID());
+            if(orgInfo!=null) {
+                if(orgInfo.getAssetOwnerId()!=null) {
+                    UserAccount user1 = userAccountRepository.findById(orgInfo.getAssetOwnerId());
+                    defaultUserList.add(user1);
+                }
+                if(orgInfo.getAssetOwnerId2()!=null) {
+                    UserAccount user2 = userAccountRepository.findById(orgInfo.getAssetOwnerId2());
+                    defaultUserList.add(user2);
+                }
+            }
+            return defaultUserList;
+
+        }
+        if(CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)){
+            userListTag.addAll(assetOwnerList);
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            return userListTag;
+        }else if(CollectionUtils.isEmpty(assetOwnerList)){
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            return userListTag;
+        }else if(CollectionUtils.isEmpty(userListTag)){
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(assetOwnerList));
+            defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
+            userListTag.addAll(defaultUserList);
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            return userListTag;
+        }
+
+        return userListTag;
+    }
 
 }
 

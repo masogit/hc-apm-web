@@ -223,8 +223,8 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             coWorkerList=null;
         }
         //gl:1表示是正常
-        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense,comments);
 
+        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense,comments);
     }
     private String checkInDate;
     public void checkIn(){
@@ -508,15 +508,18 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public List<UserAccount> findRepairPerson(){
-        List<UserAccount> assetResponser=new ArrayList<UserAccount>();
+
         if(this.selectedWorkOrder!=null) {
-            assetResponser = woService.getAssetResponser(this.selectedWorkOrder.getAssetId());
-            if(!CollectionUtils.isEmpty(assetResponser)){
-                return assetResponser;
-            }else{
-                return  woService.getAssetResponser2(this.selectedWorkOrder.getAssetId());
-            }
+            return  woService.getWorkerList(this.selectedWorkOrder.getAssetId());
+        } else {
+            return Collections.emptyList();
         }
+
+    }
+
+    public List<UserAccount> findMaintenanceStaff(){
+        List<UserAccount> assetResponser = woService.findMaintenanceStaff(this.selectedWorkOrder.getAssetId());
+
         return assetResponser;
     }
 
@@ -681,5 +684,13 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void setCheckInDate(String checkInDate) {
         this.checkInDate = checkInDate;
+    }
+
+    public String getFaultNameBySelectedWorkOrder() {
+        if (selected == null) {
+            return "";
+        } else {
+            return this.assetFaultTypeService.getFaultName(selected.getCaseType());
+        }
     }
 }
