@@ -171,7 +171,7 @@ public class AssetFileImportService {
             asset.setAssetOwnerName2(ExcelDocument.getCellStringValue(rowMap.get("维修负责人2")));
             asset.setAssetOwnerName3(ExcelDocument.getCellStringValue(rowMap.get("维修负责人3")));
 
-            asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用部门")));
+            asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用科室")));
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
             asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
