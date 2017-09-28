@@ -271,8 +271,8 @@ INSERT INTO "public"."i18n_message" VALUES ('616', 'field_name', 'casePriority',
 INSERT INTO "public"."i18n_message" VALUES ('617', 'field_name', 'caseSubType', '故障子类别', 'Case Sub Type', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('618', 'field_name', 'caseType', '故障类别', 'Case Type', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('619', 'field_name', 'city', '城市', 'City', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('620', 'field_name', 'clinicalDeptId', '使用部门', 'Clinical Dept Id', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('621', 'field_name', 'clinicalDeptName', '使用部门', 'Clinical Dept Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('620', 'field_name', 'clinicalDeptId', '使用科室', 'Clinical Dept Id', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('621', 'field_name', 'clinicalDeptName', '使用科室', 'Clinical Dept Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('622', 'field_name', 'closeReason', '关单原因', 'Close Reason', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('623', 'field_name', 'comments', '备注', 'Comments', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('624', 'field_name', 'confirmedEndTime', '确认的恢复可用时间', 'Confirmed End Time', null, '-1');
