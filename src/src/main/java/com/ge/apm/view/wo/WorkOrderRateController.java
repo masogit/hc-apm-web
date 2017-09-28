@@ -12,11 +12,9 @@ import com.ge.apm.domain.V2_WorkOrder;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.wo.V2_WorkOrderService;
-import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
@@ -63,6 +61,9 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
         this.selected = null;
         if (searchFilters == null) {
             searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("feedbackRating")) {
+            searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.LTE, 0));
         }
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
