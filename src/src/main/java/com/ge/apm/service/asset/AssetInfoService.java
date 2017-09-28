@@ -13,6 +13,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,6 +41,7 @@ public class AssetInfoService {
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
+    V2_WorkOrderService woService = WebUtil.getBean(V2_WorkOrderService.class);
 
     public String getAssetInfoName(Integer id) {
         if (null == id || id == 0) {
@@ -47,6 +49,13 @@ public class AssetInfoService {
         } else {
             return Optional.ofNullable(assetInfoDao.findById(id)).map(t -> t.getName()).orElse("");
         }
+    }
+
+    public List<UserAccount> getWorkerList(Integer assetId) {
+        if (null == assetId) {
+            assetId = 0;
+        }
+        return woService.getWorkerList(assetId);
     }
 
     public AssetInfo getAssetInfo(int id) {
@@ -72,25 +81,25 @@ public class AssetInfoService {
 
     public List<OrgInfo> getOrgDeptList(String siteUid) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        return uaaService.getOrgDeptList(siteUid,user.getUid());
+        return uaaService.getOrgDeptList(siteUid, user.getUid());
     }
-    
-    public List<SelectItem> getAllAccessibleOrgDeptList(){
+
+    public List<SelectItem> getAllAccessibleOrgDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<OrgInfo> sitesList = uaaService.getUserAccessibleSiteList(user.getUid());
         List<SelectItem> dropdownList = new ArrayList<SelectItem>();
-        for(OrgInfo item : sitesList){
+        for (OrgInfo item : sitesList) {
             SelectItemGroup group = new SelectItemGroup(item.getName());
-            List<SelectItem> itemList = uaaService.getOrgDeptList(item.getUid(),user.getUid()).stream()
-                    .map(itemDept -> new SelectItem(itemDept.getUid(),itemDept.getName())).collect(Collectors.toList());
-            
+            List<SelectItem> itemList = uaaService.getOrgDeptList(item.getUid(), user.getUid()).stream()
+                    .map(itemDept -> new SelectItem(itemDept.getUid(), itemDept.getName())).collect(Collectors.toList());
+
             group.setSelectItems(itemList.toArray(new SelectItem[itemList.size()]));
             dropdownList.add(group);
         }
         return dropdownList;
     }
 
-    public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel(){
+    public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
 
@@ -104,14 +113,14 @@ public class AssetInfoService {
 
     private void traverse(TreeNode node, List<SelectItem> itemList) {
 
-        OrgInfo orgInfo = (OrgInfo)node.getData();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
 
 //        String name = padLeft(orgInfo.getName(), orgInfo.getOrgType());
         SelectItem selectItem = new SelectItem(orgInfo.getUid(), orgInfo.getName(), "", orgInfo.getOrgType() != 4);
         itemList.add(selectItem);
 
         if (!node.isLeaf()) {
-            for (TreeNode nodeItem: node.getChildren()) {
+            for (TreeNode nodeItem : node.getChildren()) {
                 traverse(nodeItem, itemList);
             }
         }

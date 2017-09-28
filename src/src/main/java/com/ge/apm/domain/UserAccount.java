@@ -74,7 +74,7 @@ public class UserAccount implements Serializable {
     private String password;
     @Pattern(regexp="^$|^[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-zA-Z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?\\.)+[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?", message = "{javax.validation.constraints.Pattern.email.message}")//if the field contains email address consider using this annotation to enforce field validation
     @Column(name = "email")
-    @Size(max = 32)
+    @Size(min = 0,max = 32)
     private String email;
     @Size(max = 16)
     @Column(name = "telephone")
@@ -95,6 +95,10 @@ public class UserAccount implements Serializable {
     @NotNull
     @Column(name = "is_active")
     private boolean isActive;
+    
+    @Column(name = "org_level")
+    private Integer orgLevel;
+    
     @Column(name = "is_online")
     private Boolean isOnline;
     @Column(name = "site_id")
@@ -130,6 +134,9 @@ public class UserAccount implements Serializable {
     @Column(name = "lock_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date lockTime;
+    
+    @Column(name = "wechat_nickname")
+    private String wechatNickname;
     
     @Transient
     private String plainPassword;
@@ -168,9 +175,6 @@ public class UserAccount implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
     
-    @Column(name = "org_level")
-    private Integer orgLevel;
-
     @PrePersist
     public void initializeUid() {
         if(uid==null)
@@ -450,6 +454,14 @@ public class UserAccount implements Serializable {
 
     public void setPlainPassword(String plainPassword) {
         this.plainPassword = plainPassword;
+    }
+    
+     public String getWechatNickname() {
+        return wechatNickname;
+    }
+
+    public void setWechatNickname(String wechatNickname) {
+        this.wechatNickname = wechatNickname;
     }
 
     public void entryptPassword() throws NoSuchAlgorithmException {
