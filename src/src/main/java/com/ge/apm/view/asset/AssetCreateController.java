@@ -96,13 +96,11 @@ public class AssetCreateController {
         newAsset.setIsDeleted(Boolean.FALSE);
         newAsset.setName(createRequest.getAssetName());
         newAsset.setAssetGroup(createRequest.getAssetGroup());
-        if(null!=createRequest.getOrgId()){
+        if(null!=createRequest.getOrgId() && createRequest.getOrgId()>0){
             OrgInfo org = acServie.getOrgInfo(createRequest.getOrgId());
             newAsset.setClinicalDeptId(createRequest.getOrgId());
             newAsset.setClinicalDeptUID(org.getUid());
         }
-        newAsset.setClinicalOwnerId(createRequest.getUserId());
-
         newAsset.setTenantUID(createRequest.getTenantUID());
         newAsset.setHospitalUID(createRequest.getHospitalUID());
         newAsset.setInstitutionUID(createRequest.getInstitutionUID());
@@ -122,7 +120,7 @@ public class AssetCreateController {
     }
 
     public String getHospitalName() {
-        return acServie.getHospitalName(assetInfo.getHospitalId());
+        return acServie.getSiteName(assetInfo.getSiteUID());
     }
 
     @Transactional
@@ -163,7 +161,8 @@ public class AssetCreateController {
 
     public List<UserAccount> getOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(acServie.getAssetOwnerList(Optional.ofNullable(assetInfo.getClinicalDeptUID()).orElse(assetInfo.getSiteUID())));
+        accountList.addAll(acServie.getWorkerList());
+//        accountList.addAll(acServie.getAssetOwnerList(Optional.ofNullable(assetInfo.getClinicalDeptUID()).orElse(assetInfo.getSiteUID())));
         return accountList;
     }
 

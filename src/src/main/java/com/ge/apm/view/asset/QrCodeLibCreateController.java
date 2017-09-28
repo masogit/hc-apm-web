@@ -18,36 +18,41 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.service.uaa.UaaService;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
 public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
 
-	private static final long serialVersionUID = -1;
-	QrCodeLibRepository dao = null;
+    private static final long serialVersionUID = -1;
+    QrCodeLibRepository dao = null;
     TenantInfoRepository tenantdao = null;
     OrgInfoRepository orgDao = null;
 
     private AssetCreateService acService;
+    private UaaService uaaService;
     UserContextService userContextService;
 
     private SearchFilter statusFilter = new SearchFilter("status", SearchFilter.Operator.EQ, 2);
 
     @Override
     protected void init() {
-    	orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         dao = WebUtil.getBean(QrCodeLibRepository.class);
         tenantdao = WebUtil.getBean(TenantInfoRepository.class);
         acService = WebUtil.getBean(AssetCreateService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         userContextService = WebUtil.getBean(UserContextService.class);
 
-        if (userContextService.hasRole("SuperAdmin")) {
-            this.filterByHospital = false;
-            this.filterBySite = false;
-        } else {
-            this.filterBySite = true;
-        }
+        this.filterBySite = false;
+//        if (userContextService.hasRole("SuperAdmin")) {
+//            this.filterByHospital = false;
+//            this.filterBySite = false;
+//        } else {
+//            this.filterBySite = true;
+//        }
 //        searchFilters.add(statusFilter);
 
     }
@@ -59,15 +64,26 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
 
     @Override
     protected Page<QrCodeLib> loadData(PageRequest pageRequest) {
+        setSearchFilter();
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+
+    @Override
+    public void setSearchFilter() {
         if (this.searchFilters == null) {
-            searchFilters = new ArrayList<>();
-            searchFilters.add(statusFilter);
-            return dao.findBySearchFilter(searchFilters, pageRequest);
-        } else {
-            if (!searchFilters.contains(statusFilter)) {
-                searchFilters.add(statusFilter);
+            searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("siteUID") && !userContextService.hasRole("SuperAdmin")) {
+            if (userContextService.hasRole("AssetHead")) {
+                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            } else {
+                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             }
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        }
+        if (!this.hasFilterOnField("status")) {
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         }
     }
 
@@ -95,23 +111,23 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
     public String getSiteName(Integer siteId) {
         return acService.getTenantName(siteId);
     }
-    
+
     public String getOrgName(Integer orgid) {
         return acService.getOrgName(orgid);
     }
-    
+
     public List<OrgInfo> getHospitalList() {
-    	List<OrgInfo> res = new ArrayList<OrgInfo>();
-    	 if (userContextService.hasRole("SuperAdmin")) {
-             res.addAll(orgDao.find());
-         } else {
-             res.add(orgDao.findById(UserContextService.getCurrentUserAccount().getHospitalId()));
-         }
-    	return  res;
+        List<OrgInfo> res = new ArrayList<OrgInfo>();
+        if (userContextService.hasRole("SuperAdmin")) {
+            res.addAll(orgDao.find());
+        } else {
+            res.add(orgDao.findById(UserContextService.getCurrentUserAccount().getHospitalId()));
+        }
+        return res;
     }
-    
+
     public List<OrgInfo> getOrgList() {
-    	return  acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getHospitalId());
+        return acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getHospitalId());
     }
 
 }
