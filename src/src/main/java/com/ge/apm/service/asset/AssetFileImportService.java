@@ -203,6 +203,7 @@ public class AssetFileImportService {
             asset.setPurchaseDate(getDateField(rowMap.get("采购日期"), "采购日期"));
             asset.setArriveDate(getDateField(rowMap.get("到货日期"), "到货日期"));
             asset.setInstallDate(getDateField(rowMap.get("启用日期"), "启用日期"));
+            asset.setFactoryWarrantyDate(getDateField(rowMap.get("质保日期"), "质保日期"));
             asset.setWarrantyDate(getDateField(rowMap.get("维保截止日期"), "维保截止日期"));
             asset.setTerminateDate(getDateField(rowMap.get("报废日期"), "报废日期"));
             asset.setLastPmDate(getDateField(rowMap.get("上次维护日期"), "上次维护日期"));
@@ -261,7 +262,15 @@ public class AssetFileImportService {
             return (Date) object;
         }
         if (object instanceof String) {
-            Date res = TimeUtils.getDateFromStr((String) object, "dd/MM/yy");
+            Date res = TimeUtils.getDateFromStr((String) object, "MM/dd/yyyy");
+            if (res != null && res instanceof Date) {
+                return res;
+            }
+            res = TimeUtils.getDateFromStr((String) object, "MM/dd/yy");
+            if (res != null && res instanceof Date) {
+                return res;
+            }
+            res = TimeUtils.getDateFromStr((String) object, "dd/MM/yy");
             if (res != null && res instanceof Date) {
                 return res;
             }
