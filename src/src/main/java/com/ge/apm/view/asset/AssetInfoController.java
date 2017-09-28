@@ -473,16 +473,30 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setAssetOwnerId(owner.getId());
             selected.setAssetOwnerName(owner.getName());
             selected.setAssetOwnerTel(owner.getTelephone());
+        } else {
+            selected.setAssetOwnerId(null);
+            selected.setAssetOwnerName(null);
+            selected.setAssetOwnerTel(null);
         }
+
         if (null != owner2) {
             selected.setAssetOwnerId2(owner2.getId());
             selected.setAssetOwnerName2(owner2.getName());
             selected.setAssetOwnerTel2(owner2.getTelephone());
+        } else {
+            selected.setAssetOwnerId2(null);
+            selected.setAssetOwnerName2(null);
+            selected.setAssetOwnerTel2(null);
         }
+
         if (null != owner3) {
             selected.setAssetOwnerId3(owner3.getId());
             selected.setAssetOwnerName3(owner3.getName());
             selected.setAssetOwnerTel3(owner3.getTelephone());
+        } else {
+            selected.setAssetOwnerId3(null);
+            selected.setAssetOwnerName3(null);
+            selected.setAssetOwnerTel3(null);
         }
 
     }
