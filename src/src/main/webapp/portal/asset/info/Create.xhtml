@@ -41,7 +41,6 @@
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
-                                    <f:selectItem itemLabel="" />
                                     <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
@@ -51,6 +50,7 @@
                                     </p:column>
                                 </p:selectOneMenu>
                                 <p:commandButton id="btnRemoveAssetOwner" process="@this" actionListener="#{assetInfoController.clearOwner()}" icon="ui-icon-close" class="btn btn-sm popupIconButton" update="assetOwnerName assetOwnerTel"/>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel}</label>
@@ -61,7 +61,6 @@
                                 <label class="label">#{msg.assetOwnerName2}</label>
                                 <p:selectOneMenu id="assetOwnerName2" value="#{assetInfoController.owner2}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel2"/>
-                                    <f:selectItem itemLabel="" />
                                     <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
@@ -71,6 +70,7 @@
                                     </p:column>
                                 </p:selectOneMenu>
                                 <p:commandButton id="btnRemoveAssetOwner2" process="@this" actionListener="#{assetInfoController.clearOwner2()}" icon="ui-icon-close" class="btn btn-sm popupIconButton" update="assetOwnerName2 assetOwnerTel2"/>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel2}</label>
@@ -81,7 +81,6 @@
                                 <label class="label">#{msg.assetOwnerName3}</label>
                                 <p:selectOneMenu id="assetOwnerName3" value="#{assetInfoController.owner3}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel3"/>
-                                    <f:selectItem itemLabel="" />
                                     <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
@@ -90,7 +89,9 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+
                                 <p:commandButton id="btnRemoveAssetOwner3" process="@this" actionListener="#{assetInfoController.clearOwner3()}" icon="ui-icon-close" class="btn btn-sm popupIconButton" update="assetOwnerName3 assetOwnerTel3"/>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel3}</label>
@@ -127,10 +128,12 @@
                                 <label class="label">#{msg.clinicalOwnerName}</label>
                                 <p:selectOneMenu id="clinicalOwnerName" value="#{assetInfoController.clinicalOwner}" converter="userAccountConverter" var="t" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
                                     <p:ajax  listener="#{assetInfoController.onClinicalOwnerChange()}" update="clinicalOwnerTel" />
-                                    <f:selectItem itemLabel=""/>
                                     <f:selectItems value="#{assetInfoController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
                             </h:panelGroup>
@@ -220,7 +223,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
                                 <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" />
-                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" id="iconOnly" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -431,7 +434,7 @@
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
 
                                     #{fileitem.objectName}
-                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" id="iconOnly" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
@@ -442,7 +445,7 @@
                                 <p:dataList id="contractList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                         #{fileitem.objectName}
-                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" id="iconOnly" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
@@ -453,7 +456,7 @@
                                 <p:dataList id="manualList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                     #{fileitem.objectName},
-                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" id="iconOnly" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>

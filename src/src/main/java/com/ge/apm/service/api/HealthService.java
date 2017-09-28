@@ -30,7 +30,7 @@ public class HealthService {
 			+ " FROM v2_work_order "
 			+ " LEFT JOIN asset_info "
 			+ " ON v2_work_order.asset_id = asset_info.id "
-			+ " WHERE v2_work_order.status = 1 AND asset_info.site_id=:site_id AND asset_info.hospital_id=:hospital_id ";
+			+ " WHERE v2_work_order.status = 1 AND v2_work_order.site_id=:site_id AND v2_work_order.hospital_id=:hospital_id ";
 
 
     private static final String asset_maintain
@@ -38,7 +38,7 @@ public class HealthService {
     	+ " FROM v2_work_order "
     	+ " LEFT JOIN asset_info "
     	+ " ON v2_work_order.asset_id = asset_info.id "
-    	+ " WHERE v2_work_order.status = 1 AND asset_info.site_id=:site_id AND asset_info.hospital_id=:hospital_id ";
+    	+ " WHERE v2_work_order.status = 1 AND v2_work_order.site_id=:site_id AND v2_work_order.hospital_id=:hospital_id ";
 
 	public Observable<Tuple6<Integer, String, Integer, String, String, Integer>> queryForMaintain(Integer site_id, Integer hospital_id) {
 

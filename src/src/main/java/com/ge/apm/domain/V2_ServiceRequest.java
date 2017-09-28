@@ -429,6 +429,22 @@ public class V2_ServiceRequest  implements Serializable {
         this.clinicalDeptName = clinicalDeptName;
     }
 
+    public String getCancelPerson() {
+        return cancelPerson;
+    }
+
+    public void setCancelPerson(String cancelPerson) {
+        this.cancelPerson = cancelPerson;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+    
     @Override
     public int hashCode() {
         Integer hash = 0;

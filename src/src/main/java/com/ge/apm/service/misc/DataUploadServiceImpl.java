@@ -31,7 +31,7 @@ public class DataUploadServiceImpl implements DataUploadService{
             throw new Exception("invalid modalityId");
 
         AssetInfoRepository dao = WebUtil.getBean(AssetInfoRepository.class);
-        List<AssetInfo> assets = dao.getByModalityId(assetClinicalRecord.getModalityId());
+        List<AssetInfo> assets = dao.getBySiteIdAndModalityId(assetClinicalRecord.getSiteId(), assetClinicalRecord.getModalityId());
 
         if(assets.size()>0)
             return assets.get(0).getId();
@@ -79,7 +79,7 @@ public class DataUploadServiceImpl implements DataUploadService{
             AssetClinicalRecordRepository dao = WebUtil.getBean(AssetClinicalRecordRepository.class);
             dao.save(assetClinicalRecord);
             return "dataUploadedOK";
-        } 
+        }
         catch(Exception ex){
             AssetClinicalRecordErrlog assetClinicalRecordErrlog = new AssetClinicalRecordErrlog();
             BeanUtils.copyProperties(assetClinicalRecord, assetClinicalRecordErrlog);
