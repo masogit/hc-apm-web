@@ -510,16 +510,13 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public List<UserAccount> findRepairPerson(){
-        List<UserAccount> assetResponser=new ArrayList<UserAccount>();
+
         if(this.selectedWorkOrder!=null) {
-            assetResponser = woService.getAssetResponser(this.selectedWorkOrder.getAssetId());
-            if(!CollectionUtils.isEmpty(assetResponser)){
-                return assetResponser;
-            }else{
-                return  woService.getAssetResponser2(this.selectedWorkOrder.getAssetId());
-            }
+            return  woService.getWorkerList(this.selectedWorkOrder.getAssetId());
+        } else {
+            return Collections.emptyList();
         }
-        return assetResponser;
+
     }
 
     public List<UserAccount> findMaintenanceStaff(){
