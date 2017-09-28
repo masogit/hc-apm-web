@@ -145,9 +145,9 @@
                         <br/>
 
                         <p:dataTable value="#{serviceRequestController.getWOrkOrderDetail(woItem.id)}" var="detailItem"  rendered="#{not empty serviceRequestController.getWOrkOrderDetail(woItem.id)}">
-                            <p:column headerText="#{msg.manHours}">
+                            <!--<p:column headerText="#{msg.manHours}">
                                 <h:outputText value="#{detailItem.manHours}" />
-                            </p:column>
+                            </p:column>-->
                             <p:column headerText="#{msg.accessory}">
                                 <h:outputText value="#{detailItem.parts}" />
                             </p:column>
@@ -166,7 +166,7 @@
 
                         </p:dataTable>
                         <br/>
-                        <h:panelGroup rendered="#{not empty workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}">
+                        <h:panelGroup rendered="true">
                             <label class="label" >增加的备件</label>
                             <p:dataTable value="#{workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}" var="detailItem"  >
                                 <p:column headerText="#{msg.accessory}">
