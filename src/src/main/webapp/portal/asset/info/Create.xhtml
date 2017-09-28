@@ -41,7 +41,7 @@
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
-                                    <f:selectItems value="#{assetInfoService.getWorkerList(assetInfoController.selected.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -60,7 +60,7 @@
                                 <label class="label">#{msg.assetOwnerName2}</label>
                                 <p:selectOneMenu id="assetOwnerName2" value="#{assetInfoController.owner2}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel2"/>
-                                    <f:selectItems value="#{assetInfoService.getWorkerList(assetInfoController.selected.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -79,7 +79,7 @@
                                 <label class="label">#{msg.assetOwnerName3}</label>
                                 <p:selectOneMenu id="assetOwnerName3" value="#{assetInfoController.owner3}" converter="userAccountConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}" >
                                     <p:ajax listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel3"/>
-                                    <f:selectItems value="#{assetInfoService.getWorkerList(assetInfoController.selected.id)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{assetInfoController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -97,7 +97,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
                                 <p:inputText id="selectedUserOrgName" value="#{assetInfoController.selectedOrg==null?'':assetInfoController.selectedOrg.name}" readonly="true" />
-                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoController.selected.id}"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.orgTree}" selection="#{assetInfoController.selectedNode}" var="node" selectionMode="single">

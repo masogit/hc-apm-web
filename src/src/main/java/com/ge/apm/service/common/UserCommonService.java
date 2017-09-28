@@ -20,7 +20,7 @@ public class UserCommonService {
     private ServiceRequestApiService srApi;
     
      public List<UserAccount> getWorkerList(Integer assetId) {
-        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId);
+        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId==null?0:assetId);
         if(null!=res){
             return (List<UserAccount>)res.get("data");
         }

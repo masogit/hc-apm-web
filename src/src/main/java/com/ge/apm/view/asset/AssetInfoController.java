@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetDepreciationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -84,6 +85,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private AssetDepreciationService assetDepreciationService;
 
     private QrCodeService qrCodeService;
+    private UserCommonService ucService;
 
     private String oneSearchStr;
     private String qrCode;
@@ -131,6 +133,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        ucService = WebUtil.getBean(UserCommonService.class);
         this.filterBySite = true;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -586,26 +589,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<UserAccount> getOwnerList() {
-
-        List<String> orgList = new ArrayList();
-        if(selected.getClinicalDeptUID()!=null && !selected.getClinicalDeptUID().isEmpty()){
-            orgList.add(selected.getClinicalDeptUID());
-        }
-        if(selected.getSiteUID()!=null && !selected.getSiteUID().isEmpty()){
-            orgList.add(selected.getSiteUID());
-        }
-        if(selected.getHospitalUID()!=null && !selected.getHospitalUID().isEmpty()){
-            orgList.add(selected.getHospitalUID());
-        }
-        if(selected.getInstitutionUID()!=null && !selected.getInstitutionUID().isEmpty()){
-            orgList.add(selected.getInstitutionUID());
-        }
-        if(selected.getTenantUID()!=null && !selected.getTenantUID().isEmpty()){
-            orgList.add(selected.getTenantUID());
-        }
-        
        List<UserAccount> accountList = getEmptyAccountList();
-       accountList.addAll(userDao.findByAssetAccess(orgList));
+       accountList.addAll(ucService.getWorkerList(selected.getId()));
        return accountList;
     }
     
