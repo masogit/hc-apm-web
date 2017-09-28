@@ -122,31 +122,25 @@
             <from uri="direct:aggregateExamSummitData"/>
             <bean ref="assetExamDataAggregator" method="aggregateExamSummit"/>
         </route>
-<!--
-	<route>
-            <from uri="quartz://quartzWorkflowService?cron=20+*+*+*+*+?"/>
-            <bean ref="workflowService"  method="execute"/>
-        </route>
-
-        <route>
-            <from uri="quartz://quartzAssetCostDataAggregation?cron=0+0+*/3+*+*+?"/>
-            <to uri="direct:aggregateAssetCostData"/>
-        </route>-->
 
         <route>
             <from uri="quartz://quartzAssetExamDataAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateAssetExamData"/>
+        </route>
+        <!--gl aggregate for yesterday -->
+        <route>
+            <from uri="direct:aggregationAssetSummitForYesterday"/>
+            <bean ref="assetExamDataAggregator" method="aggregateAssetSummitForYesterday"/>
+        </route>
+        <route>
+            <from uri="quartz://quartzAssetExamDataAggregationForYesterday?cron=0+30/5+2+*+*+?"/>
+            <to uri="direct:aggregationAssetSummitForYesterday"/>
         </route>
 <!--gl working-->
         <route>
             <from uri="quartz://quartzExamSummitAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateExamSummitData"/>
         </route>
-
-<!--         <route>
-            <from uri="servlet:///aggregateAssetCostData?servletName=MyServlet"/>
-            <to uri="direct:aggregateAssetCostData"/>
-        </route> -->
         
         <route>
             <from uri="servlet:///aggregateAssetExamData?servletName=MyServlet"/>

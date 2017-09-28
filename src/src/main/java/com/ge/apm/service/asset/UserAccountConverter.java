@@ -9,6 +9,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.UserAccount;
 import com.google.common.base.Strings;
+import java.util.LinkedHashMap;
 import javax.faces.application.FacesMessage;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
@@ -44,11 +45,21 @@ public class UserAccountConverter implements Converter {
 
     @Override
     public String getAsString(FacesContext fc, UIComponent uic, Object object) {
-        if (object != null) {
-            if (Strings.isNullOrEmpty(((UserAccount) object).getUid())) {
+        if (object == null) {
+            return null;
+        }
+        if(object instanceof UserAccount){
+            UserAccount user = (UserAccount) object;
+            if (Strings.isNullOrEmpty(user.getUid())) {
                 return null;
             }
-            return String.valueOf(((UserAccount) object).getId());
+            return String.valueOf(user.getId());
+        }
+        if (object instanceof LinkedHashMap) {
+            if (Strings.isNullOrEmpty(((LinkedHashMap) object).get("uid").toString())) {
+                return null;
+            }
+            return String.valueOf(((LinkedHashMap) object).get("id"));
         } else {
             return null;
         }

@@ -68,6 +68,24 @@ public class AssetCreateService {
         }
     }
 
+    public String getSiteName(String siteUid){
+        OrgInfo org = orgDao.findByUid(siteUid);
+        return getOrgFullName(org);
+    }
+    
+    private String getOrgFullName(OrgInfo org) {
+        if(null==org || org.getId()==-1){
+            return null;
+        }
+        String name = org.getName();
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + "/" + name;
+        }
+
+        return name;
+    }
+            
     public String getHospitalName(Integer hospitalId) {
         OrgInfo org = orgDao.findById(hospitalId);
         if (org != null) {
