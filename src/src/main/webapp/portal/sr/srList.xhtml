@@ -109,7 +109,13 @@
 
                                 <p:column headerText="#{msg.assetName}">
                                     <h:outputText value="#{assetInfoService.getAssetInfoName(item.assetId)}"/>
-                                </p:column>  
+                                </p:column>
+
+
+                                <p:column headerText="#{msg.srNum}">
+                                    <h:outputText value="#{workOrderAckController.getSrNum(item.srId)}"/>
+                                </p:column>
+
                                 <p:column headerText="#{msg.requestorName}">
                                     <h:outputText value="#{workOrderAckController.getServiceRequest(item.srId).requestorName}"/>
                                 </p:column>  

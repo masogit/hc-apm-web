@@ -111,13 +111,6 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
 
-  /*  public boolean isManHours(){
-        if(itemDetail!=null)
-            return  itemDetail.getManHours()==null?false:true;
-        else
-            return false;
-    }*/
-
     public void saveDetail(){
         /*String username=null;
         removeWoUid(workOrderDetailsList);
@@ -230,7 +223,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             coWorkerList=null;
         }
         //gl:1表示是正常
-        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense);
+        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense,comments);
 
     }
     private String checkInDate;
@@ -274,6 +267,9 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void prepareDispatch(String woid){
         selectedWorkOrder = dao.findById(woid);
+         testMethod=null;
+          solution=null;
+          problemDes=null;
         initWorkOrderDetailList();
 
     }
@@ -281,15 +277,17 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void clickCloseOrder(String woid){
         selectedWorkOrder = dao.findById(woid);
+/*selectedWorkOrder.getPatProblems()
+
+        selectedWorkOrder.getPatTests();
+        selectedWorkOrder.getPatActions();*/
+
 
         coWorkerList = coWorkerDao.getByWoIdOrderByCreatedDateAsc(woid);
         accessList = woDetailDao.getByWoIdOrderByCreatedDateAsc(woid);
-
-
-
         manHours=selectedWorkOrder.getManHours();
         otherExpense=selectedWorkOrder.getOtherExpense();
-        System.out.println();
+
 
     }
     public void prepareEditDetail(V2_WorkOrder_Detail workOrderDetail){
@@ -593,7 +591,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void closeWorkOrder(){
-        woService.closeWorkOrder(selectedWorkOrder);
+        woService.closeWorkOrder(selectedWorkOrder,comments);
         cancel();
     }
 
