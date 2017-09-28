@@ -109,9 +109,10 @@ public class AssetCreateController {
         newAsset.setSiteUID(createRequest.getSiteUID());
 
         if (null != createRequest.getUserId()) {
-            clinicalOwner = acServie.getUserInfo(createRequest.getUserId());
-            newAsset.setClinicalOwnerName(clinicalOwner.getName());
-            newAsset.setClinicalOwnerTel(clinicalOwner.getTelephone());
+            owner = acServie.getUserInfo(createRequest.getUserId());
+            newAsset.setAssetOwnerId(owner.getId());
+            newAsset.setAssetOwnerName(owner.getName());
+            newAsset.setAssetOwnerTel(owner.getTelephone());
         }
         return newAsset;
     }
@@ -161,8 +162,9 @@ public class AssetCreateController {
     }
 
     public List<UserAccount> getOwnerList() {
-        List<UserAccount> list =  acServie.getAssetOwnerList(Optional.ofNullable(assetInfo.getClinicalDeptUID()).orElse(assetInfo.getSiteUID()));
-        return list;
+        List<UserAccount> accountList = getEmptyAccountList();
+        accountList.addAll(acServie.getAssetOwnerList(Optional.ofNullable(assetInfo.getClinicalDeptUID()).orElse(assetInfo.getSiteUID())));
+        return accountList;
     }
 
     public void onClinicalDeptChange() {
@@ -187,11 +189,19 @@ public class AssetCreateController {
     }
 
     public List<UserAccount> getClinicalOwnerList() {
-
-        return acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner);
-
+        List<UserAccount> accountList = getEmptyAccountList();
+        accountList.addAll(acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner));
+        return accountList;
     }
-
+    
+    private List<UserAccount> getEmptyAccountList(){
+        List<UserAccount> accountList = new ArrayList();
+        UserAccount emptyValue = new UserAccount();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        accountList.add(emptyValue);
+        return accountList;
+    }
+    
     public List<Brand> getBrandList() {
         return acServie.getBrandList();
     }

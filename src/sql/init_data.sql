@@ -1124,6 +1124,12 @@ INSERT INTO public.proc_map (id, asset_group, part_id, subpart_id, step_id) VALU
 INSERT INTO public.proc_map (id, asset_group, part_id, subpart_id, step_id) VALUES (9899, 22, 9, null, 44);
 INSERT INTO public.proc_map (id, asset_group, part_id, subpart_id, step_id) VALUES (9900, 22, 9, null, 45);
 
+update proc_part set name='头部' where id=1;
+update proc_part set name='胸部' where id=2;
+update proc_part set name='腹部' where id=3;
+update proc_part set name='四肢' where id=4;
+update proc_part set name='其他' where id=5;
+
 delete from brand;
 INSERT INTO brand (name) (SELECT DISTINCT manufacture as name from asset_info where manufacture IS NOT NULL and trim(manufacture) != '') ;
 

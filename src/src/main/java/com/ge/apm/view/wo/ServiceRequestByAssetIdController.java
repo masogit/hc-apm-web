@@ -32,6 +32,7 @@ public class ServiceRequestByAssetIdController extends ServiceRequestController 
     @Override
     protected void init() {
         super.init();
+        this.filterBySite = true;
         try {
             assetId = Integer.valueOf(WebUtil.getRequestParameter("assetId"));
             woId = WebUtil.getRequestParameter("woId");
@@ -46,8 +47,7 @@ public class ServiceRequestByAssetIdController extends ServiceRequestController 
 //            V2_WorkOrder workOrder = woService.getWorkOrderById(woId);
 //            return dao.findById(workOrder.getSrId(), pageRequest);
 //        }
-
-        this.setSiteFilter();
+        
         if (searchFilters == null) {
             searchFilters = new ArrayList();
         }

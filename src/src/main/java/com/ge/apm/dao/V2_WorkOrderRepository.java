@@ -1,15 +1,13 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_WorkOrder;
-
-import java.util.Collection;
-import java.util.List;
-
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.Collection;
+import java.util.List;
 
 public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrder> {
 
@@ -43,4 +41,7 @@ public interface V2_WorkOrderRepository extends GenericRepositoryUUID<V2_WorkOrd
             + " join AssetTagBiomedGroup tbg on tbg.biomedGroupId=bgu.groupId join AssetTagRule tr on tbg.tagId=tr.tagId  where  bgu.userId=?1)"
             + " and wo.currentPersonId='-1' and wo.currentStepId=3 and wo.status=1 or wo.currentPersonId=?1 and wo.currentStepId=3 and wo.status=1")
     Page<V2_WorkOrder> fetchAvailableWorkOrderByUser(Integer userId,Pageable pageable);*/
+
+    @Query(nativeQuery = true, value = "SELECT DISTINCT clinical_dept_name FROM asset_info ai WHERE hospital_id=?1 and site_id=?2 and EXISTS (SELECT * FROM v2_service_request sr WHERE sr.asset_id=ai.id and sr.status=1) ORDER BY clinical_dept_name")
+    List<String> getClinicalDeptNameList(Integer hospitalId, Integer siteId);
 }

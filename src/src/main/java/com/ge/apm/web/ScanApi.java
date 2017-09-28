@@ -88,7 +88,8 @@ public class ScanApi {
     Map<Integer, String> parts = commonService.findParts();
     Map<Integer, Tuple3<Integer, Integer, String>> steps = commonService.findSteps();
     if ("asset".equals(groupBy)) {
-      return serializeAsset(request, assets, types, parts, scanService.assetDetail(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), type, dept, asset, part), start, limit);
+      //return serializeAsset(request, assets, types, parts, scanService.assetDetail(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), type, dept, asset, part), start, limit);
+      return serializeAsset(request, assets, types, parts, scanService.assetDetail(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), type, dept, asset, part), start, Integer.MAX_VALUE);
     } else if ("step".equals(groupBy)) {
       return serializeStep(request, types, parts, steps, scanService.stepDetail(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), type, dept, asset, part, step), start, Option.of(limit).getOrElse(Integer.MAX_VALUE));
     } else {
