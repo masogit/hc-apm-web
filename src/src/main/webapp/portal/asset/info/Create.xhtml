@@ -49,6 +49,7 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel}</label>
@@ -67,6 +68,7 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel2}</label>
@@ -85,6 +87,7 @@
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
                                 </p:selectOneMenu>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.assetOwnerTel3}</label>
@@ -216,7 +219,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
                                 <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" />
-                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" id="iconOnly" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -427,7 +430,7 @@
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
 
                                     #{fileitem.objectName}
-                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" id="iconOnly" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
@@ -438,7 +441,7 @@
                                 <p:dataList id="contractList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
                                         #{fileitem.objectName}
-                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" id="iconOnly" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
@@ -449,7 +452,7 @@
                                 <p:dataList id="manualList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
                                     #{fileitem.objectName},
-                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" id="iconOnly" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
