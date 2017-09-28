@@ -67,6 +67,11 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao;
     }
 
+    public  String getSrNum(String srId){
+    V2_ServiceRequest sr = srDao.findById(srId);
+    return sr.getSrNum();
+
+}
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.selected = null;
