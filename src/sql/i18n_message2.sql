@@ -677,6 +677,10 @@ INSERT INTO "public"."i18n_message" VALUES ('5080', 'importStatus', 'Created', '
 INSERT INTO "public"."i18n_message" VALUES ('5081', 'importStatus', 'Failure', '添加失败', 'Fail to add', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5082', 'label', 'InvalidParameter', '错误的参数', 'Fail to add', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5083', 'label', 'ParsingImportFileError', '文件不能解析,请检查模版/数据后重新上传', 'Fail to parse file,please check the tamplate or data!', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('5086', 'generateMethod', '1', '国标码+设备数', '前7位为分类代码（即国标码）+后五位（该类设备的累计数量）', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('5087', 'generateMethod', '0', '其他', '其他计算方式', null, '-1');
+
+
 INSERT INTO "public"."i18n_message" VALUES ('5401', 'label', 'assetHead_status', '设备状态', 'Device Status', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5402', 'label', 'assetHead_tile_maintenance', '维修中', 'In Repairing', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5403', 'label', 'assetHead_tile_off', '停机中', 'Down(Out of Service)', null, '-1');
@@ -769,6 +773,8 @@ INSERT INTO "public"."i18n_message" VALUES ('5624', 'label', 'StaffPerformance',
 INSERT INTO "public"."i18n_message" VALUES ('5625', 'label', 'FailureAnalysis', '设备故障分析', 'Failure Analysis', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5626', 'label', 'ProcessAnalysis', '维修流程分析', 'Process Analysis', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5627', 'label', 'MaintenanceCost', '维修成本分析', 'Maintenance Cost', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('5628', 'label', 'AssetSeriaNumConfig', '基本信息配置', 'basic config', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('5629', 'label', 'generateMethod', '资产编码生成规则', 'basic config', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('9001', 'month', '1', '一月', 'January', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('9002', 'month', '2', '二月', 'Feburary', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('9003', 'month', '3', '三月', 'March', null, '-1');
