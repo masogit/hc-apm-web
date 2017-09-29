@@ -555,8 +555,8 @@ INSERT INTO "public"."i18n_message" VALUES ('1756', 'assetCategory', '7', '除�
 INSERT INTO "public"."i18n_message" VALUES ('1757', 'assetCategory', '8', '康复类', 'assetType08', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1758', 'assetCategory', '9', '血液透析类', 'assetType09', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1759', 'assetCategory', '10', '实验类（检验/病理）', 'assetType10', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1760', 'assetCategory', '11', '内窥类', 'assetType11', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1761', 'assetCategory', '12', '生命体征支持类', 'assetType12', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1760', 'assetCategory', '11', '内窥镜类', 'assetType11', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1761', 'assetCategory', '12', '生命体征监护类', 'assetType12', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1762', 'assetCategory', '13', '其他类', 'assetType13', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1770', 'assetUsage', '1', '诊断类', 'assetUsage1', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1771', 'assetUsage', '2', '治疗类', 'assetUsage2', null, '-1');
