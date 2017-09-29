@@ -25,7 +25,7 @@
 
     <ui:define name="content">
         <div class="ui-g-12 card ">
-            <h:form id ="ApplicationForm">
+            <h:form id ="ApplicationForm" style="margin-top: 20px;">
                 <p:dataTable  id="dataList" value="#{applicationController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{applicationController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                               rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                               paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
