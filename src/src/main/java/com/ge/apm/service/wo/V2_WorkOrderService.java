@@ -7,6 +7,7 @@ package com.ge.apm.service.wo;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,8 @@ public class V2_WorkOrderService {
     UserAccountRepository userAccountRepository;
     @Autowired
     private WorkOrderCoworkerRepository workOrderCoworkerRepository;
+    @Autowired
+    private UserCommonService ucService;
     public V2_WorkOrder getWorkOrderById(String woId) {
         return woDao.findById(woId);
     }
@@ -105,11 +108,7 @@ public class V2_WorkOrderService {
     }
 
     public List<UserAccount> getWorkerList(Integer assetId) {
-        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId);
-        if(null!=res){
-            return (List<UserAccount>)res.get("data");
-        }
-        return null;
+        return ucService.getWorkerList(assetId);
     }
     
     public AssetInfo getAssetInfo(Integer assetId){
