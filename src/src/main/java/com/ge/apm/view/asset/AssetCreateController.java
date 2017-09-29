@@ -6,6 +6,7 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.BrandRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AttachmentFileService;
@@ -20,7 +21,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 /**
  *
@@ -34,6 +34,7 @@ public class AssetCreateController {
     private QrCodeLib createRequest;
     private AssetCreateService acServie;
     private AttachmentFileService attachFileService;
+    private UserAccountRepository userDao;
     private BrandRepository brandDao;
 
     private String[] selectedPictures;
@@ -55,8 +56,10 @@ public class AssetCreateController {
         acServie = WebUtil.getBean(AssetCreateService.class);
         attachFileService = WebUtil.getBean(AttachmentFileService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
-        createRequest = acServie.getCreateRequest(qrCode);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
 
+        createRequest = acServie.getCreateRequest(qrCode);
+        clinicalOwner = createRequest.getUserId() == null ? null : userDao.getById(createRequest.getUserId());
         assetInfo = createAssetInfo();
 
         pictureList = acServie.getQrCodePictureList(createRequest.getUid());
