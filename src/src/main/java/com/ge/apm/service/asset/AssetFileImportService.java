@@ -20,14 +20,14 @@ import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.text.DateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -57,7 +57,7 @@ public class AssetFileImportService {
     private List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
     private List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
     private List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
-    private List<I18nMessage> assetTypeList = FieldValueMessageController.getFieldValueList("assetType", siteId);
+    private List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
     private List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
     private List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
     private List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
@@ -171,7 +171,7 @@ public class AssetFileImportService {
             asset.setAssetOwnerName2(ExcelDocument.getCellStringValue(rowMap.get("维修负责人2")));
             asset.setAssetOwnerName3(ExcelDocument.getCellStringValue(rowMap.get("维修负责人3")));
 
-            asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用部门")));
+            asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用科室")));
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
             asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
@@ -221,7 +221,7 @@ public class AssetFileImportService {
             asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
             asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
             String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
-            asset.setAssetCategory(getI18nMsgKey(assetTypeList, assetType,map,"设备类型"));
+            asset.setAssetCategory(getI18nMsgKey(assetCategoryList, assetType,map,"设备类型"));
             String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
             asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage,map,"用途分类"));
             String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
