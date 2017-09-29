@@ -549,12 +549,12 @@ INSERT INTO "public"."i18n_message" VALUES ('1750', 'assetCategory', '1', '放�
 INSERT INTO "public"."i18n_message" VALUES ('1751', 'assetCategory', '2', '超声类', 'assetType02', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1752', 'assetCategory', '3', '呼吸麻醉类', 'assetType03', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1753', 'assetCategory', '4', '手术室类', 'assetType04', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1754', 'assetCategory', '5', '供应消杀类', 'assetType05', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1755', 'assetCategory', '6', '输注泵类', 'assetType06', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1756', 'assetCategory', '7', '除颤仪', 'assetType07', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1754', 'assetCategory', '5', '消毒杀菌类', 'assetType05', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1755', 'assetCategory', '6', '输液注射类', 'assetType06', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1756', 'assetCategory', '7', '除颤起搏类', 'assetType07', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1757', 'assetCategory', '8', '康复类', 'assetType08', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1758', 'assetCategory', '9', '血液透析类', 'assetType09', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1759', 'assetCategory', '10', '实验室类', 'assetType10', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1759', 'assetCategory', '10', '实验类（检验/病理）', 'assetType10', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1760', 'assetCategory', '11', '内窥类', 'assetType11', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1761', 'assetCategory', '12', '生命体征支持类', 'assetType12', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1762', 'assetCategory', '13', '其他类', 'assetType13', null, '-1');
@@ -609,6 +609,8 @@ INSERT INTO "public"."i18n_message" VALUES ('1838', 'measuringItemCategory', '28
 INSERT INTO "public"."i18n_message" VALUES ('1839', 'measuringItemCategory', '29', '活度计', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1840', 'measuringItemCategory', '30', '标准器', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1841', 'measuringItemCategory', '31', '测试仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1842', 'measuringItemCategory', '32', '移液器', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1843', 'measuringItemCategory', '33', '婴儿培养箱', '', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1851', 'measuringStatus', '1', '已检', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1852', 'measuringStatus', '2', '待检', '', null, '-1');
