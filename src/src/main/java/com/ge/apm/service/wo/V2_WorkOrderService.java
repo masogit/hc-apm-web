@@ -250,7 +250,7 @@ public class V2_WorkOrderService {
     }
 
 
-    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Integer myhours, Double otherExpense,String comments) {
+    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Double myhours, Double otherExpense,String comments) {
         selectedWorkOrder.setCurrentStepId(4);
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
