@@ -8,8 +8,11 @@ package com.ge.apm.view.wo;
 import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -39,6 +42,7 @@ public class WorkOrderFromReportController extends GenericCRUDUUIDController<V2_
     private List<V2_WorkOrder> workOrders;
     private List<String> clinicalDeptNameList;
     private UaaService uaaService;
+    private V2_WorkOrderService woService;
     private List<UserAccount> usersInHospital;
 
     @Override
@@ -47,6 +51,7 @@ public class WorkOrderFromReportController extends GenericCRUDUUIDController<V2_
         this.currentUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        woService = WebUtil.getBean(V2_WorkOrderService.class);
     }
 
 
@@ -57,6 +62,9 @@ public class WorkOrderFromReportController extends GenericCRUDUUIDController<V2_
 
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
+        String woId = WebUtil.getRequestParameter("woId");
+        this.selected = Strings.isNullOrEmpty(woId) ? null : dao.findById(woId);
+        this.loadSrDetails();
         this.usersInHospital = uaaService.getUserList(this.currentUser.getHospitalId());
         this.clinicalDeptNameList = dao.getClinicalDeptNameList(this.currentUser.getHospitalId(), this.currentUser.getSiteId());
         this.setSearchFilter();
@@ -80,11 +88,19 @@ public class WorkOrderFromReportController extends GenericCRUDUUIDController<V2_
     }
 
     public void onSelectServiceRequest() {
-        workOrders = new ArrayList<>();
-        workOrders.add(dao.findById(selected.getId()));
+        this.loadSrDetails();
     }
 
-    public List<V2_WorkOrder> getWorkOrders() {
+    public void loadSrDetails() {
+        this.workOrders = new ArrayList<>();
+        this.workOrders.add(dao.findById(selected.getId()));
+    }
+
+    public List<V2_WorkOrder_Detail> getWOrkOrderDetail(String woId) {
+        return woService.getWorkOrderDetails(woId);
+    }
+
+    public List<V2_WorkOrder>   getWorkOrders() {
         return workOrders;
     }
 
