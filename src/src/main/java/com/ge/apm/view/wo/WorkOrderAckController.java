@@ -16,6 +16,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,7 +86,7 @@ public class WorkOrderAckController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
         }
         if (!this.hasFilterOnField("srId")) {
-            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getUnfinishedSRList()));
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
