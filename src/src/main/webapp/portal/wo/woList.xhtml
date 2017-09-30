@@ -77,8 +77,8 @@
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column><!--
--->                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.patProblems}" filterBy="#{item.patProblems}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.patProblems}" title="#{item.patProblems}"/>
+-->                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.patProblems}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serviceRequest.requestReason}" title="#{item.serviceRequest.requestReason}"/>
                         </p:column><!--
 -->                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                             <f:facet name="filter">
