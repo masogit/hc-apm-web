@@ -65,14 +65,14 @@
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
+                        <p:column headerText="报修科室" sortBy="#{item.serviceRequest.fromDeptUID}">
+                            <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
+                        </p:column>
                         <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.serviceRequest.srNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}">
                             <h:outputText value="#{item.serviceRequest.requestorName}"/>
-                        </p:column>
-                        <p:column headerText="报修科室" sortBy="#{item.serviceRequest.fromDeptUID}">
-                            <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                         </p:column>
                         <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}">
                             <h:outputText value="#{item.serviceRequest.requestTime}">
@@ -111,7 +111,7 @@
                             <p:commandButton value="签到" actionListener="#{workOrderMgrController.checkIn(item.id)}" update=":woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
                             <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                             <p:commandButton value="完成" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update=":repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()"/>
-                            <p:commandButton  value="#{msg.newWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":newWorkorderDlgForm :growl"  oncomplete="PF('newWorkorderDlg').show()"/>
+                            <p:commandButton  value="新建" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()"/>
                         </p:column>
                         <p:column headerText="#{msg.Acknowledge}" rendered="#{workOrderMgrController.queryIndex==5}">
                             <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":ackDialogForm" oncomplete="PF('ackDialog').show()"/>

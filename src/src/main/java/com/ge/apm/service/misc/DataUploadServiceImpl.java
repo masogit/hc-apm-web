@@ -27,7 +27,7 @@ public class DataUploadServiceImpl implements DataUploadService{
     }
     
     public Integer getAssetIdByModalityId(AssetClinicalRecord assetClinicalRecord) throws Exception{
-        if(assetClinicalRecord==null || assetClinicalRecord.getModalityId()==null) 
+        if(assetClinicalRecord==null || assetClinicalRecord.getModalityId()==null || "".equals(assetClinicalRecord.getModalityId())) 
             throw new Exception("invalid modalityId");
 
         AssetInfoRepository dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -51,7 +51,7 @@ public class DataUploadServiceImpl implements DataUploadService{
         else {
             //throw new Exception("procedure name not mapped.");
             // mapped to "Else"
-            assetClinicalRecord.setProcedureId(0);
+            assetClinicalRecord.setProcedureId(5);
             assetClinicalRecord.setProcedureName("其他");
         }
     }
@@ -97,6 +97,9 @@ public class DataUploadServiceImpl implements DataUploadService{
             AssetClinicalRecordErrlogRepository dao = WebUtil.getBean(AssetClinicalRecordErrlogRepository.class);
             dao.save(assetClinicalRecordErrlog);
             
+            if(errMsg.contains("ConstraintViolationException"))
+                return "dataUploadedOK";
+
             throw ex;
         }
     }

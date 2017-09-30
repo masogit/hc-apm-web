@@ -266,6 +266,7 @@ public class AssetFileImportService {
             return (Date) object;
         }
         if (object instanceof String) {
+            object = ((String) object).trim();
             Date res = TimeUtils.getDateFromStr((String) object, "MM/dd/yyyy");
             if (res != null && res instanceof Date) {
                 return res;

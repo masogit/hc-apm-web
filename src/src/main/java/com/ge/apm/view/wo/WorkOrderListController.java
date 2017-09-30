@@ -33,7 +33,7 @@ import org.apache.commons.collections.CollectionUtils;
 @ManagedBean
 @ViewScoped
 public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOrder> implements Serializable {
-    private Integer manHours;
+    private Double manHours;
     private Double otherExpense;
     private Date esTime;
     private Date confirmedUpDate;
@@ -102,7 +102,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         coWorkerDetail = new V2_WorkOrderCoworker();
         woCoworkUid=UUID.randomUUID().toString().replace("-", "");
         coWorkerDetail.setId(woCoworkUid);
-        coWorkerDetail.setManHours(0);
+        coWorkerDetail.setManHours(0.0);
         coWorkerList.add(coWorkerDetail);
         //clear sign date;
         checkInDate=null;
@@ -390,7 +390,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
                 coWorkerList = new ArrayList<V2_WorkOrderCoworker>();
                 woCoworkUid=UUID.randomUUID().toString().replace("-", "");
                 v.setId(woCoworkUid);
-                v.setManHours(0);
+                v.setManHours(0.0);
                 coWorkerList.add(v);
             }
             else {
@@ -635,11 +635,11 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
 
-    public Integer getManHours() {
+    public Double getManHours() {
         return manHours;
     }
 
-    public void setManHours(Integer manHours) {
+    public void setManHours(Double manHours) {
         this.manHours = manHours;
     }
 
