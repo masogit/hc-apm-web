@@ -99,6 +99,7 @@ public class AssetExamDataAggregator {
                //     }
 
             }else {
+
                 ExamSummit newAsm = new ExamSummit();
                 extractorExamSummit(date, newAsmList, accrp, newAsm);
             }
