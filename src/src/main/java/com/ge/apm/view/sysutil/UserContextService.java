@@ -17,224 +17,247 @@ import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.util.List;
 import javax.servlet.http.HttpServletRequest;
+
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.WorkflowConfig;
+
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
-  private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-  private UserAccount userAccount = null;
+    private UserAccount userAccount = null;
 
-  public void processAfterLogin() {
-    getLoginUser();
-  }
-
-  public boolean isLoggedIn() {
-    return !isAnonymousUser();
-  }
-
-  public String getUserLoginName() {
-    return UserContext.getUsername();
-  }
-
-  public String getUserName() {
-    if (userAccount == null)
-      return "";
-    else
-      return userAccount.getName();
-  }
-
-  public boolean isAnonymousUser() {
-    return UserContext.ANONYMOUS_USER.equalsIgnoreCase(getUserLoginName());
-  }
-
-  private boolean isFirstRequestAfterLogin = true;
-
-  public boolean isIsFirstRequestAfterLogin() {
-    return isFirstRequestAfterLogin;
-  }
-
-  public void checkIsSuperAdminAndFirstRequest() {
-    if (!getLoginUser().getIsSuperAdmin()) return;
-
-    if (!isFirstRequestAfterLogin) return;
-    isFirstRequestAfterLogin = false;
-
-    //navigate to super admin's home page
-    FacesContext context = FacesContext.getCurrentInstance();
-    ConfigurableNavigationHandler handler = (ConfigurableNavigationHandler) context.getApplication().getNavigationHandler();
-    handler.performNavigation("admin/adminHome.xhtml?faces-redirect=true");
-  }
-
-  public static List<String> getRoles() {
-    return UserContext.getRoles();
-  }
-
-  public boolean hasRole(String role) {
-    return UserContextService.checkRole(role);
-  }
-
-  public static boolean checkRole(String role) {
-    if (UserContextService.isSuperAdmin()) return true;
-    else if ("SuperAdmin".equals(role)) return false;
-
-    if (UserContextService.isSiteAdmin()) return true;
-    else if ("SiteAdmin".equals(role)) return false;
-
-    if (UserContextService.isLocalAdmin()) return true;
-    else if ("LocalAdmin".equals(role)) return false;
-    return UserContext.getRoles().contains(role);
-  }
-
-  public UserAccount getLoginUser() {
-    if (userAccount == null) {
-      String userName = getUserLoginName();
-      if (userName == null) return null; // user is not logined
-
-      UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
-      userAccount = dao.getByLoginName(getUserLoginName());
+    public void processAfterLogin() {
+        getLoginUser();
     }
-    else{
-        // check if user has switch account by WeChat Client
-        HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String userName = UserContext.getUsername(request);
-        
-        if(!userAccount.getLoginName().equals(userName)){
-            userAccount = WebUtil.getUserAccountFromRequest();
+
+    public boolean isLoggedIn() {
+        return !isAnonymousUser();
+    }
+
+    public String getUserLoginName() {
+        return UserContext.getUsername();
+    }
+
+    public String getUserName() {
+        if (userAccount == null)
+            return "";
+        else
+            return userAccount.getName();
+    }
+
+    public boolean isAnonymousUser() {
+        return UserContext.ANONYMOUS_USER.equalsIgnoreCase(getUserLoginName());
+    }
+
+    private boolean isFirstRequestAfterLogin = true;
+
+    public boolean isIsFirstRequestAfterLogin() {
+        return isFirstRequestAfterLogin;
+    }
+
+    public void checkIsSuperAdminAndFirstRequest() {
+        if (!getLoginUser().getIsSuperAdmin()) return;
+
+        if (!isFirstRequestAfterLogin) return;
+        isFirstRequestAfterLogin = false;
+
+        //navigate to super admin's home page
+        FacesContext context = FacesContext.getCurrentInstance();
+        ConfigurableNavigationHandler handler = (ConfigurableNavigationHandler) context.getApplication().getNavigationHandler();
+        handler.performNavigation("admin/adminHome.xhtml?faces-redirect=true");
+    }
+
+    public static List<String> getRoles() {
+        return UserContext.getRoles();
+    }
+
+    public boolean hasRole(String role) {
+        return UserContextService.checkRole(role);
+    }
+
+    public boolean hasAnyRole(String roleList) {
+        String[] roles = roleList.split(",");
+        for (String role : roles) {
+            role = role.trim();
+            boolean roleAllowed = UserContextService.checkRole(role);
+            if (roleAllowed) return true;
+        }
+
+        return false;
+    }
+
+    public boolean hasNotAnyRole(String roleList) {
+        String[] roles = roleList.split(",");
+        for (String role : roles) {
+            role = role.trim();
+            boolean roleAllowed = UserContext.getRoles().contains(role);
+            if (roleAllowed) return false;
+        }
+
+        return true;
+    }
+
+    public static boolean checkRole(String role) {
+        if (UserContextService.isSuperAdmin()) return true;
+        else if ("SuperAdmin".equals(role)) return false;
+
+        if (UserContextService.isSiteAdmin()) return true;
+        else if ("SiteAdmin".equals(role)) return false;
+
+        if (UserContextService.isLocalAdmin()) return true;
+        else if ("LocalAdmin".equals(role)) return false;
+        return UserContext.getRoles().contains(role);
+    }
+
+    public UserAccount getLoginUser() {
+        if (userAccount == null) {
+            String userName = getUserLoginName();
+            if (userName == null) return null; // user is not logined
+
+            UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
+            userAccount = dao.getByLoginName(getUserLoginName());
+        } else {
+            // check if user has switch account by WeChat Client
+            HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            String userName = UserContext.getUsername(request);
+
+            if (!userAccount.getLoginName().equals(userName)) {
+                userAccount = WebUtil.getUserAccountFromRequest();
+            }
+        }
+
+        return userAccount;
+    }
+
+    public int getLoginUserId() {
+        return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
+    }
+
+    public String getLoginUserName() {
+        return Option.of(getLoginUser()).map(UserAccount::getLoginName).getOrElse("");
+    }
+
+    public int getLoginUserSiteId() {
+        return Option.of(getLoginUser()).map(UserAccount::getSiteId).getOrElse(-1);
+    }
+
+    public String getLoginUserSiteName() {
+        return Option.of(getLoginUser()).map(u -> WebUtil.getBean(TenantInfoRepository.class).findById(getLoginUser().getSiteId()).getName()).getOrElse("");
+    }
+
+    public int getLoginUserHospitalId() {
+        return Option.of(getLoginUser()).map(UserAccount::getHospitalId).getOrElse(-1);
+    }
+
+    public int getLoginUserOrgInfoId() {
+        return Option.of(getLoginUser()).map(UserAccount::getOrgInfoId).getOrElse(-1);
+    }
+
+    public OrgInfo getLoginUserOrgInfo() {
+        return Option.of(getLoginUser()).map(u -> WebUtil.getBean(OrgInfoRepository.class).findById(u.getOrgInfoId())).getOrElseThrow(() -> new IllegalStateException(String.format("unable to get orgInfo for user.orgInfoId = %s", userAccount.getOrgInfoId())));
+    }
+
+    public boolean getIsSuperAdmin() {
+        return UserContextService.isSuperAdmin();
+    }
+
+    public boolean getIsTenantAdmin() {
+        return UserContextService.isSiteAdmin();
+    }
+
+    public boolean getIsLocalAdmin() {
+        return UserContextService.isLocalAdmin();
+    }
+
+    public static UserAccount getCurrentUserAccount() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        return userContextService.getLoginUser();
+    }
+
+    public static boolean isSuperAdmin() {
+        UserAccount userAccount = getCurrentUserAccount();
+        return userAccount.getIsSuperAdmin();
+    }
+
+    public static boolean isSiteAdmin() {
+        UserAccount userAccount = getCurrentUserAccount();
+        return userAccount.getIsSiteAdmin();
+    }
+
+    public static boolean isLocalAdmin() {
+        UserAccount userAccount = getCurrentUserAccount();
+        return userAccount.getIsLocalAdmin();
+    }
+
+    public static int getUserID() {
+        UserAccount userAccount = getCurrentUserAccount();
+        if (userAccount != null) return userAccount.getId();
+
+        return -1;
+    }
+
+    public static int getSiteId() {
+        UserAccount userAccount = getCurrentUserAccount();
+        if (userAccount != null) return userAccount.getSiteId();
+
+        return -1;
+    }
+
+    public static void setSiteFilter(List<SearchFilter> filters) {
+        filters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getSiteId()));
+    }
+
+    public static void setHospitalFilter(List<SearchFilter> filters) {
+        filters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getHospitalId()));
+    }
+
+    public String getUserDefaultHomePage() {
+        this.getLoginUser();
+
+        if (userAccount == null)
+            return "/login.xhtml";
+        else {
+            UaaService uaaService = WebUtil.getBean(UaaService.class);
+            return uaaService.getUserDefaultHomePage(userAccount);
         }
     }
 
-    return userAccount;
-  }
 
-  public int getLoginUserId() {
-    return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
-  }
-
-  public String getLoginUserName() {
-    return Option.of(getLoginUser()).map(UserAccount::getLoginName).getOrElse("");
-  }
-
-  public int getLoginUserSiteId() {
-    return Option.of(getLoginUser()).map(UserAccount::getSiteId).getOrElse(-1);
-  }
-
-  public String getLoginUserSiteName() {
-    return Option.of(getLoginUser()).map(u -> WebUtil.getBean(TenantInfoRepository.class).findById(getLoginUser().getSiteId()).getName()).getOrElse("");
-  }
-
-  public int getLoginUserHospitalId() {
-    return Option.of(getLoginUser()).map(UserAccount::getHospitalId).getOrElse(-1);
-  }
-
-  public int getLoginUserOrgInfoId() {
-    return Option.of(getLoginUser()).map(UserAccount::getOrgInfoId).getOrElse(-1);
-  }
-
-  public OrgInfo getLoginUserOrgInfo() {
-    return Option.of(getLoginUser()).map(u -> WebUtil.getBean(OrgInfoRepository.class).findById(u.getOrgInfoId())).getOrElseThrow(() -> new IllegalStateException(String.format("unable to get orgInfo for user.orgInfoId = %s", userAccount.getOrgInfoId())));
-  }
-
-  public boolean getIsSuperAdmin() {
-    return UserContextService.isSuperAdmin();
-  }
-
-  public boolean getIsTenantAdmin() {
-    return UserContextService.isSiteAdmin();
-  }
-
-  public boolean getIsLocalAdmin() {
-    return UserContextService.isLocalAdmin();
-  }
-
-  public static UserAccount getCurrentUserAccount() {
-    UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-    return userContextService.getLoginUser();
-  }
-
-  public static boolean isSuperAdmin() {
-    UserAccount userAccount = getCurrentUserAccount();
-    return userAccount.getIsSuperAdmin();
-  }
-
-  public static boolean isSiteAdmin() {
-    UserAccount userAccount = getCurrentUserAccount();
-    return userAccount.getIsSiteAdmin();
-  }
-
-  public static boolean isLocalAdmin() {
-    UserAccount userAccount = getCurrentUserAccount();
-    return userAccount.getIsLocalAdmin();
-  }
-
-  public static int getUserID() {
-    UserAccount userAccount = getCurrentUserAccount();
-    if (userAccount != null) return userAccount.getId();
-
-    return -1;
-  }
-
-  public static int getSiteId() {
-    UserAccount userAccount = getCurrentUserAccount();
-    if (userAccount != null) return userAccount.getSiteId();
-
-    return -1;
-  }
-
-  public static void setSiteFilter(List<SearchFilter> filters) {
-    filters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getSiteId()));
-  }
-
-  public static void setHospitalFilter(List<SearchFilter> filters) {
-    filters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getHospitalId()));
-  }
-
-  public String getUserDefaultHomePage() {
-    this.getLoginUser();
-
-    if (userAccount == null)
-      return "/login.xhtml";
-    else {
-      UaaService uaaService = WebUtil.getBean(UaaService.class);
-      return uaaService.getUserDefaultHomePage(userAccount);
-    }
-  }
-  
-  
-    public static String getAccessToken(){
+    public static String getAccessToken() {
         return getAccessToken(null);
     }
-    public static String getAccessToken(HttpServletRequest request){
-        
+
+    public static String getAccessToken(HttpServletRequest request) {
+
         String token = null;
-        if(request==null){
-                try{
-                    request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
-                }
-                catch(Exception ex){
-                }
+        if (request == null) {
+            try {
+                request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+            } catch (Exception ex) {
             }
-        if(request!=null){
-           token = (String) request.getSession().getAttribute("ACCESS_TOKEN");
+        }
+        if (request != null) {
+            token = (String) request.getSession().getAttribute("ACCESS_TOKEN");
         }
         return token;
     }
-    
+
     private Boolean isDispatcher = null;
 
     public Boolean isDispatcher() {
         if (isDispatcher == null) {
             UaaService uuaService = WebUtil.getBean(UaaService.class);
-            List<String> orgList= uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item->item.getUid()).collect(Collectors.toList());
+            List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             orgList.add("");
             WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
             List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList);
-            isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId()) 
+            isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
                     || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
         }
         return isDispatcher;
