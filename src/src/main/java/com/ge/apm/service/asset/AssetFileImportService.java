@@ -145,6 +145,7 @@ public class AssetFileImportService {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, ++dataRow)) {
+            try{
             AssetInfo asset = new AssetInfo();
             String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
             if (assetName == null || assetName.isEmpty()) {
@@ -249,6 +250,9 @@ public class AssetFileImportService {
                 departNum = "";
             }
             result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
+            }catch(Exception e){
+                throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
+            }
         }
 
         return result;
