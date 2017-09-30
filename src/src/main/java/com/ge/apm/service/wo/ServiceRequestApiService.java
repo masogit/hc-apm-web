@@ -218,7 +218,7 @@ class WorkOrderActionForm{
     String intExtType;
     Object stepDetail;
     Object stepCoworker;
-    Integer manHours;
+    Double manHours;
     Double otherExpense;
     Integer currentStepId;
     String equipmentTaker;
@@ -394,11 +394,11 @@ class WorkOrderActionForm{
         this.stepCoworker = stepCoworker;
     }
 
-    public Integer getManHours() {
+    public Double getManHours() {
         return manHours;
     }
 
-    public void setManHours(Integer manHours) {
+    public void setManHours(Double manHours) {
         this.manHours = manHours;
     }
 

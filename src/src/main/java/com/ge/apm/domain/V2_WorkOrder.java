@@ -159,7 +159,7 @@ public class V2_WorkOrder implements Serializable {
     private Double otherExpense;
 
     @Column(name = "man_hours")
-    private Integer manHours;
+    private Double manHours;
 
     /**
      * 1: auto dispatch 2: grab and manual 3: grab 4: manual
@@ -455,11 +455,11 @@ public class V2_WorkOrder implements Serializable {
         this.otherExpense = otherExpense;
     }
 
-    public Integer getManHours() {
+    public Double getManHours() {
         return manHours;
     }
 
-    public void setManHours(Integer manHours) {
+    public void setManHours(Double manHours) {
         this.manHours = manHours;
     }
 

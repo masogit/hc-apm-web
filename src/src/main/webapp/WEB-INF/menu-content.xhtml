@@ -27,12 +27,11 @@
             </p:submenu>
             <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
                 <p:menuitem id="um89" value="维修工单" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
-                <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" />
-                <p:menuitem  id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/> 
+                <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" rendered="false"/>
+                <p:menuitem  id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="false"/> 
 
-               <!-- <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="#{userContextService.isDispatcher()}"/>-->
                 <p:menuitem  value="维修工作台" outcome="/portal/woMgr/woMgrList.xhtml"/>
-                <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="false"/>
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
                 <p:menuitem id="um085" value="#{msg.AssetTagMsgSubscriber}" outcome="/portal/asset/assetTag/TagSubscribeList.xhtml"/>
                 <p:menuitem id="um200" value="维修工单报表导出" outcome="/portal/wo/woExport/woReportExport.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
