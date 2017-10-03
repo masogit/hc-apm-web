@@ -733,6 +733,7 @@ INSERT INTO "public"."i18n_message" VALUES ('3052', 'message', 'patProblems', '�
 INSERT INTO "public"."i18n_message" VALUES ('3053', 'message', 'patActions', '解决方案', '解决方案', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('3054', 'message', 'patTests', '测试方法', '方法', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('3055', 'message', 'equipmentTaker', '取物人', '取物人', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('3056', 'message', 'cancelWorkOrder', '取消报修', 'Cancel Work Order', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('5000', 'label', 'deviceScanhd', '设备扫描量（次）', 'Scan #', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5001', 'label', 'deviceScanlg', '扫描次数', 'Scan', null, '-1');

@@ -9,7 +9,7 @@
 
     <ui:composition>
 
-        <div class="ui-g-12 card">
+        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" appendTo="@(body)"  header="新增报修" >
 
             <h:form id="ServiceRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" rendered="#{not empty workOrderMgrController.newServiceRequest}">
@@ -19,7 +19,7 @@
                         <h:panelGroup >
                             <label class="label">#{msg.assetName}*</label>
                             <p:inputText id="assetName" readonly="true" value="#{workOrderMgrController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
-                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(workOrderMgrController, ':ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg assetstatus" oncomplete="PF('varSelectAssetDlg').show()"/>
+                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(workOrderMgrController, ':ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg assetstatus" oncomplete="PF('varSelectAssetDlg').show();"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -59,13 +59,13 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :ServiceRequestCreateForm :growl" style="float:left"/>
-                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update=":ServiceRequestCreateForm :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update=":ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>
 
-        </div>
         <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
+        </p:dialog>
     </ui:composition>
 </html>
