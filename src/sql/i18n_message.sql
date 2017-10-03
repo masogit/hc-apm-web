@@ -255,14 +255,14 @@ INSERT INTO "public"."i18n_message" VALUES ('600', 'field_name', 'accessory', '�
 INSERT INTO "public"."i18n_message" VALUES ('601', 'field_name', 'accessoryPrice', '单价(元)', 'Accessory Price', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('602', 'field_name', 'accessoryQuantity', '数量', 'Accessory Quantity', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('603', 'field_name', 'address', '地址', 'Address', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('604', 'field_name', 'aliasName', '别名', 'Alias Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('604', 'field_name', 'aliasName', '设备别名', 'Alias Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('605', 'field_name', 'arriveDate', '到货日期', 'Arrive Date', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('606', 'field_name', 'assetDeptId', '所属设备科', 'Asset Dept Id', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('607', 'field_name', 'functionType', '设备型号', 'Function Type', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('608', 'field_name', 'assetId', '设备ID', 'Asset Id', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('609', 'field_name', 'assetOwnerId', '维修责任人', 'Asset Owner Id', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('610', 'field_name', 'assetOwnerName', '维修责任人', 'Asset Owner Name', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('611', 'field_name', 'assetOwnerTel', '维修责任人电话', 'Asset Owner Tel', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('609', 'field_name', 'assetOwnerId', '维修负责人', 'Asset Owner Id', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('610', 'field_name', 'assetOwnerName', '维修负责人', 'Asset Owner Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('611', 'field_name', 'assetOwnerTel', '维修负责人电话', 'Asset Owner Tel', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('612', 'field_name', 'attachmentUrl', '上传附件', 'Attachment Url', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('613', 'field_name', 'barcode', '条码', 'Barcode', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('614', 'field_name', 'caseOwnerId', '负责人', 'Case Owner Id', null, '-1');
@@ -323,7 +323,7 @@ INSERT INTO "public"."i18n_message" VALUES ('668', 'field_name', 'manufacture', 
 INSERT INTO "public"."i18n_message" VALUES ('669', 'field_name', 'modalityId', '院内IT系统编号', 'Modality Id', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('670', 'field_name', 'modalityType', '设备类型', 'Modality Type', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('671', 'field_name', 'modalityTypeId', '设备类型', 'Modality Type Id', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('672', 'field_name', 'name', '名称', 'Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('672', 'field_name', 'name', '设备名称', 'Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('673', 'field_name', 'nextTime', '下次计划时间', 'Next Time', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('674', 'field_name', 'ownerId', '执行人', 'Owner Id', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('675', 'field_name', 'ownerName', '责任人', 'Owner Name', null, '-1');
@@ -342,7 +342,7 @@ INSERT INTO "public"."i18n_message" VALUES ('687', 'field_name', 'procedureId', 
 INSERT INTO "public"."i18n_message" VALUES ('688', 'field_name', 'procedureName', '检查部位', 'Procedure Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('689', 'field_name', 'procedureStepId', '检查步骤', 'Procedure Step Id', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('690', 'field_name', 'procedureStepName', '检查步骤', 'Procedure Step Name', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('691', 'field_name', 'purchaseDate', '购买日期', 'Purchase Date', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('691', 'field_name', 'purchaseDate', '采购日期', 'Purchase Date', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('692', 'field_name', 'purchasePrice', '采购价格(元)', 'Purchase Price', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('693', 'field_name', 'reportUrl', '维护报告', 'Report Url', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('694', 'field_name', 'requestReason', '故障现象', 'Request Reason', null, '-1');
@@ -350,7 +350,7 @@ INSERT INTO "public"."i18n_message" VALUES ('695', 'field_name', 'requestTime', 
 INSERT INTO "public"."i18n_message" VALUES ('696', 'field_name', 'requestorId', '报修人', 'Requestor Id', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('697', 'field_name', 'requestorName', '报修人', 'Requestor Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('698', 'field_name', 'salvageValue', '最终残值(元)', 'Salvage Value', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('699', 'field_name', 'serialNum', '序列号(厂商SN)', 'Serial Num', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('699', 'field_name', 'serialNum', '制造商序列号', 'Serial Num', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('700', 'field_name', 'startTime', '开始时间', 'Start Time', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('701', 'field_name', 'status', '当前状态', 'Status', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('702', 'field_name', 'stepName', '步骤名称', 'Step Name', null, '-1');
@@ -363,7 +363,7 @@ INSERT INTO "public"."i18n_message" VALUES ('708', 'field_name', 'updatePersonId
 INSERT INTO "public"."i18n_message" VALUES ('709', 'field_name', 'updatePersonName', '变更人', 'Update Person Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('710', 'field_name', 'updateTime', '处理时间', 'Update Time', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('711', 'field_name', 'vendor', '供应商', 'Vendor', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('712', 'field_name', 'warrantyDate', '保修截止日期', 'Warranty Date', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('712', 'field_name', 'warrantyDate', '维保截止日期', 'Warranty Date', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('713', 'field_name', 'zipcode', '邮编', 'Zipcode', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('714', 'field_name', 'contactEmail', 'Email', 'Contact Email', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('715', 'field_name', 'contactPerson', '联系人', 'Contact Person', null, '-1');
@@ -390,9 +390,9 @@ INSERT INTO "public"."i18n_message" VALUES ('735', 'field_name', 'timeZone', '�
 INSERT INTO "public"."i18n_message" VALUES ('736', 'field_name', 'siteDescription', '详细描述', 'Description', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('737', 'field_name', 'userName', '姓名', 'Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('738', 'field_name', 'workOrderName', '工单名称', 'work Order Name', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('739', 'field_name', 'lastPmDate', '上次维护时间', 'Last Maintainance Date', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('740', 'field_name', 'lastQaDate', '上次质控时间', 'Last Quality Control Date', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('741', 'field_name', 'lastMeteringDate', '上次计量时间', 'Last Metering Date', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('739', 'field_name', 'lastPmDate', '上次维护日期', 'Last Maintainance Date', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('740', 'field_name', 'lastQaDate', '上次质检日期', 'Last Quality Control Date', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('741', 'field_name', 'lastMeteringDate', '上次计量日期', 'Last Metering Date', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('742', 'field_name', 'assetName', '资产名称', 'Asset Name', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('743', 'field_name', 'period', '循环周期', 'Period', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('744', 'field_name', 'wfAutoStep2', '自动审核', 'Auto Approve', null, '-1');
@@ -418,11 +418,11 @@ INSERT INTO "public"."i18n_message" VALUES ('763', 'field_name', 'clinicalOwnerT
 INSERT INTO "public"."i18n_message" VALUES ('764', 'field_name', 'registrationNo', '注册证号', 'Registration No', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('765', 'field_name', 'factoryWarrantyDate', '质保日期', 'Manhour Price(RMB)', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('766', 'field_name', 'contractType', '合同类型', 'Contract Type', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('767', 'field_name', 'assetOwnerId2', '维修责任人2', '2nd Asset Owner Id', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('768', 'field_name', 'assetOwnerName2', '维修责任人2', '2nd Asset Owner Name', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('769', 'field_name', 'assetOwnerTel2', '维修责任人2电话', '2nd Asset Owner Tel', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('767', 'field_name', 'assetOwnerId2', '维修负责人2', '2nd Asset Owner Id', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('768', 'field_name', 'assetOwnerName2', '维修负责人2', '2nd Asset Owner Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('769', 'field_name', 'assetOwnerTel2', '维修负责人2电话', '2nd Asset Owner Tel', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('770', 'field_name', 'eamId', 'EAM系统编号', 'EAM ID', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('771', 'field_name', 'systemId', '厂商System Id', 'System ID', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('771', 'field_name', 'systemId', 'SystemID/厂商报修ID', 'System ID', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('772', 'field_name', 'isTakeOrderEnabled', '允许抢单?', 'Compte For Order Enabled', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('773', 'label', 'TerminateAssetInfo', '报废资产信息', 'terminate Asset Info', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('774', 'label', 'ActiveAsset', '重新启用', 'active asset', null, '-1');
@@ -435,7 +435,7 @@ INSERT INTO "public"."i18n_message" VALUES ('786', 'field_name', 'brand', '品�
 INSERT INTO "public"."i18n_message" VALUES ('787', 'field_name', 'nationalStandardCode', '2010国家编码', 'National Standard Code', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('788', 'field_name', 'srNum', '报修单号', 'Service Request Number', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('789', 'field_name', 'assetCategory', '设备类型', 'Asset Category', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('790', 'field_name', 'assetUsage', '用途', 'Asset Usage', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('790', 'field_name', 'assetUsage', '用途分类', 'Asset Usage', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('791', 'field_name', 'capitalSource', '资金来源', 'Capital Source', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('792', 'field_name', 'riskGrade', '风险等级', 'Risk Grade', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('793', 'field_name', 'measureGrade', '计量', 'Measure Grade', null, '-1');
@@ -549,14 +549,14 @@ INSERT INTO "public"."i18n_message" VALUES ('1750', 'assetCategory', '1', '放�
 INSERT INTO "public"."i18n_message" VALUES ('1751', 'assetCategory', '2', '超声类', 'assetType02', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1752', 'assetCategory', '3', '呼吸麻醉类', 'assetType03', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1753', 'assetCategory', '4', '手术室类', 'assetType04', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1754', 'assetCategory', '5', '供应消杀类', 'assetType05', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1755', 'assetCategory', '6', '输注泵类', 'assetType06', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1756', 'assetCategory', '7', '除颤仪', 'assetType07', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1754', 'assetCategory', '5', '消毒杀菌类', 'assetType05', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1755', 'assetCategory', '6', '输液注射类', 'assetType06', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1756', 'assetCategory', '7', '除颤起搏类', 'assetType07', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1757', 'assetCategory', '8', '康复类', 'assetType08', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1758', 'assetCategory', '9', '血液透析类', 'assetType09', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1759', 'assetCategory', '10', '实验室类', 'assetType10', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1760', 'assetCategory', '11', '内窥类', 'assetType11', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1761', 'assetCategory', '12', '生命体征支持类', 'assetType12', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1759', 'assetCategory', '10', '实验类（检验/病理）', 'assetType10', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1760', 'assetCategory', '11', '内窥镜类', 'assetType11', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1761', 'assetCategory', '12', '生命体征监护类', 'assetType12', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1762', 'assetCategory', '13', '其他类', 'assetType13', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1770', 'assetUsage', '1', '诊断类', 'assetUsage1', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1771', 'assetUsage', '2', '治疗类', 'assetUsage2', null, '-1');
@@ -609,6 +609,8 @@ INSERT INTO "public"."i18n_message" VALUES ('1838', 'measuringItemCategory', '28
 INSERT INTO "public"."i18n_message" VALUES ('1839', 'measuringItemCategory', '29', '活度计', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1840', 'measuringItemCategory', '30', '标准器', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1841', 'measuringItemCategory', '31', '测试仪', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1842', 'measuringItemCategory', '32', '移液器', '', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1843', 'measuringItemCategory', '33', '婴儿培养箱', '', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1851', 'measuringStatus', '1', '已检', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1852', 'measuringStatus', '2', '待检', '', null, '-1');
@@ -626,8 +628,8 @@ INSERT INTO "public"."i18n_message" VALUES ('1872', 'usageStatus', '2', '停用'
 INSERT INTO "public"."i18n_message" VALUES ('1873', 'usageStatus', '3', '待报废', '', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1874', 'usageStatus', '4', '报废', '', null, '-1');
 
-INSERT INTO "public"."i18n_message" VALUES ('1881', 'field_name', 'assetOwnerName3', '维修责任人3', '3rd Asset Owner Name', null, '-1');
-INSERT INTO "public"."i18n_message" VALUES ('1882', 'field_name', 'assetOwnerTel3', '维修责任人3电话', '3rd Asset Owner Tel', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1881', 'field_name', 'assetOwnerName3', '维修负责人3', '3rd Asset Owner Name', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('1882', 'field_name', 'assetOwnerTel3', '维修负责人3电话', '3rd Asset Owner Tel', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('1901', 'arrivalListStatus', '1', '未完成', 'New List', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('1902', 'arrivalListStatus', '2', '部分完成', 'Partial Finished', null, '-1');
@@ -731,6 +733,7 @@ INSERT INTO "public"."i18n_message" VALUES ('3052', 'message', 'patProblems', '�
 INSERT INTO "public"."i18n_message" VALUES ('3053', 'message', 'patActions', '解决方案', '解决方案', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('3054', 'message', 'patTests', '测试方法', '方法', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('3055', 'message', 'equipmentTaker', '取物人', '取物人', null, '-1');
+INSERT INTO "public"."i18n_message" VALUES ('3056', 'message', 'cancelWorkOrder', '取消报修', 'Cancel Work Order', null, '-1');
 
 INSERT INTO "public"."i18n_message" VALUES ('5000', 'label', 'deviceScanhd', '设备扫描量（次）', 'Scan #', null, '-1');
 INSERT INTO "public"."i18n_message" VALUES ('5001', 'label', 'deviceScanlg', '扫描次数', 'Scan', null, '-1');

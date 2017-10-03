@@ -7,6 +7,7 @@ package com.ge.apm.service.wo;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -59,6 +60,8 @@ public class V2_WorkOrderService {
     UserAccountRepository userAccountRepository;
     @Autowired
     private WorkOrderCoworkerRepository workOrderCoworkerRepository;
+    @Autowired
+    private UserCommonService ucService;
     public V2_WorkOrder getWorkOrderById(String woId) {
         return woDao.findById(woId);
     }
@@ -79,9 +82,9 @@ public class V2_WorkOrderService {
         return detailDao.findByWoId(woId);
     }
     
-    public List<String> getUnfinishedSRList() {
+    public List<String> getSRListByStatus(List<Integer> status) {
         List<SearchFilter> srSearchFilters = new ArrayList();
-        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+        srSearchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, status));
         srSearchFilters.add(new SearchFilter("requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
@@ -105,11 +108,7 @@ public class V2_WorkOrderService {
     }
 
     public List<UserAccount> getWorkerList(Integer assetId) {
-        Map<String, Object> res = srApi.getReponserByAsset(UserContextService.getAccessToken(), assetId);
-        if(null!=res){
-            return (List<UserAccount>)res.get("data");
-        }
-        return null;
+        return ucService.getWorkerList(assetId);
     }
     
     public AssetInfo getAssetInfo(Integer assetId){
@@ -250,15 +249,14 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Integer myhours, Double otherExpense) {
 
-        // V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
+    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Double myhours, Double otherExpense,String comments) {
         selectedWorkOrder.setCurrentStepId(4);
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(4);
         selectedWorkOrder.setCurrentStepName("维修中");
-        formData.setDesc(selectedWorkOrder.getComment());
+        formData.setDesc(comments);
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
@@ -268,7 +266,7 @@ public class V2_WorkOrderService {
         formData.setAssetStatus(assetStatus.toString());
         formData.setStepDetail(accDetails);
         formData.setStepCoworker(coDetails);
-       formData.setManHours(myhours);
+        formData.setManHours(myhours);
         formData.setOtherExpense(otherExpense);
         String res = srApi.invokeWorkOrderAction(token,formData,"repair",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
@@ -277,18 +275,20 @@ public class V2_WorkOrderService {
     }
 
 
-    public void closeWorkOrder(V2_WorkOrder selectedWorkOrder) {
+    public void closeWorkOrder(V2_WorkOrder selectedWorkOrder,String comments) {
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         selectedWorkOrder.setCurrentStepId(6);
         selectedWorkOrder.setCurrentStepName("待关单");
         formData.setCurrentStepId(6);
-        formData.setDesc(selectedWorkOrder.getComment());
+        formData.setDesc(comments);
         formData.setIntExtType(selectedWorkOrder.getIntExtType().toString());
         formData.setPatActions(selectedWorkOrder.getPatActions());
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setCaseType(selectedWorkOrder.getCaseType().toString());
+
+
         String res = srApi.invokeWorkOrderAction(token,formData,"close",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"关单");
@@ -443,6 +443,54 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
 
         return woDao.findBySearchFilter(searchFilters, pr);
     }*/
+
+    public List<UserAccount> findMaintenanceStaff(int assetId) {
+        List<UserAccount> userListTag = null;
+        AssetInfo assetInfo = assetInfoRepository.getById(assetId);
+
+        //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
+        userListTag = userAccountRepository.getResponserByAssetId(assetId);
+
+        //获取和资产绑定的owner
+        List<UserAccount> assetOwnerList=  userAccountRepository.getResponserWithAsset(assetId);
+        List<UserAccount> defaultUserList=new ArrayList<UserAccount>();
+
+        // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID
+        if(CollectionUtils.isEmpty(userListTag) &  CollectionUtils.isEmpty(assetOwnerList)){
+            OrgInfo orgInfo = orgInfoRepository.getByUid( assetInfo.getClinicalDeptUID());
+            if(orgInfo!=null) {
+                if(orgInfo.getAssetOwnerId()!=null) {
+                    UserAccount user1 = userAccountRepository.findById(orgInfo.getAssetOwnerId());
+                    defaultUserList.add(user1);
+                }
+                if(orgInfo.getAssetOwnerId2()!=null) {
+                    UserAccount user2 = userAccountRepository.findById(orgInfo.getAssetOwnerId2());
+                    defaultUserList.add(user2);
+                }
+            }
+            return defaultUserList;
+
+        }
+        if(CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)){
+            userListTag.addAll(assetOwnerList);
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            return userListTag;
+        }else if(CollectionUtils.isEmpty(assetOwnerList)){
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            return userListTag;
+        }else if(CollectionUtils.isEmpty(userListTag)){
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(assetOwnerList));
+            defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
+            userListTag.addAll(defaultUserList);
+            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
+            return userListTag;
+        }
+
+        return userListTag;
+    }
 
 }
 

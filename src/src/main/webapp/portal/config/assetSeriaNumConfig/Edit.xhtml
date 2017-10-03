@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="AssetSeriaNumConfigEditDlg" widgetVar="AssetSeriaNumConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSeriaNumConfigController.CRUDActionName} #{msg.AssetSeriaNumConfig}">
+            <h:form id="AssetSeriaNumConfigEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetSeriaNumConfigController.selected != null}">
+						<h:panelGroup >
+                       		<label class="label">集团</label>
+                               <p:selectOneMenu id="group" value="#{assetSeriaNumConfigController.selected.institutionUID}" >
+                             		<p:ajax update="display" /> 
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <f:selectItems value="#{assetSeriaNumConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                               </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                       		<label class="label">医院</label>
+                               <p:selectOneMenu id="hospital" value="#{assetSeriaNumConfigController.selected.hospitalUID}" >
+                             		<p:ajax update="display" />
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(assetSeriaNumConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                               </p:selectOneMenu>
+                        </h:panelGroup>
+                        
+                       <h:panelGroup >
+                       		<label class="label">院区</label>
+                               <p:selectOneMenu id="site" value="#{assetSeriaNumConfigController.selected.siteUID}" >
+                               		<p:ajax update="display" /> 
+                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                   <f:selectItems value="#{assetSeriaNumConfigController.getIncludeOrgInfo(assetSeriaNumConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                               </p:selectOneMenu>
+                        </h:panelGroup>  
+                        
+                        <h:panelGroup>
+                            <label class ="label">#{msg.generateMethod}</label>
+                            <p:selectOneMenu value="#{assetSeriaNumConfigController.selected.generateMethod}" disabled="false">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{assetSeriaNumConfigController.applyChange()}" value="#{msg.Save}" update="display,:AssetSeriaNumConfigEditDlg, :AssetSeriaNumConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetSeriaNumConfigEditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetSeriaNumConfigEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

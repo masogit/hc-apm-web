@@ -33,7 +33,7 @@ import org.apache.commons.collections.CollectionUtils;
 @ManagedBean
 @ViewScoped
 public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOrder> implements Serializable {
-    private Integer manHours;
+    private Double manHours;
     private Double otherExpense;
     private Date esTime;
     private Date confirmedUpDate;
@@ -102,7 +102,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         coWorkerDetail = new V2_WorkOrderCoworker();
         woCoworkUid=UUID.randomUUID().toString().replace("-", "");
         coWorkerDetail.setId(woCoworkUid);
-        coWorkerDetail.setManHours(0);
+        coWorkerDetail.setManHours(0.0);
         coWorkerList.add(coWorkerDetail);
         //clear sign date;
         checkInDate=null;
@@ -110,13 +110,6 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     }
 
-
-  /*  public boolean isManHours(){
-        if(itemDetail!=null)
-            return  itemDetail.getManHours()==null?false:true;
-        else
-            return false;
-    }*/
 
     public void saveDetail(){
         /*String username=null;
@@ -230,8 +223,8 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
             coWorkerList=null;
         }
         //gl:1表示是正常
-        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense);
 
+        woService.repairWorkOrder(selectedWorkOrder,confirmedUpDate,1,accessList,coWorkerList,manHours,otherExpense,comments);
     }
     private String checkInDate;
     public void checkIn(){
@@ -274,6 +267,9 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void prepareDispatch(String woid){
         selectedWorkOrder = dao.findById(woid);
+         testMethod=null;
+          solution=null;
+          problemDes=null;
         initWorkOrderDetailList();
 
     }
@@ -281,15 +277,17 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void clickCloseOrder(String woid){
         selectedWorkOrder = dao.findById(woid);
+/*selectedWorkOrder.getPatProblems()
+
+        selectedWorkOrder.getPatTests();
+        selectedWorkOrder.getPatActions();*/
+
 
         coWorkerList = coWorkerDao.getByWoIdOrderByCreatedDateAsc(woid);
         accessList = woDetailDao.getByWoIdOrderByCreatedDateAsc(woid);
-
-
-
         manHours=selectedWorkOrder.getManHours();
         otherExpense=selectedWorkOrder.getOtherExpense();
-        System.out.println();
+
 
     }
     public void prepareEditDetail(V2_WorkOrder_Detail workOrderDetail){
@@ -392,7 +390,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
                 coWorkerList = new ArrayList<V2_WorkOrderCoworker>();
                 woCoworkUid=UUID.randomUUID().toString().replace("-", "");
                 v.setId(woCoworkUid);
-                v.setManHours(0);
+                v.setManHours(0.0);
                 coWorkerList.add(v);
             }
             else {
@@ -510,15 +508,18 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public List<UserAccount> findRepairPerson(){
-        List<UserAccount> assetResponser=new ArrayList<UserAccount>();
+
         if(this.selectedWorkOrder!=null) {
-            assetResponser = woService.getAssetResponser(this.selectedWorkOrder.getAssetId());
-            if(!CollectionUtils.isEmpty(assetResponser)){
-                return assetResponser;
-            }else{
-                return  woService.getAssetResponser2(this.selectedWorkOrder.getAssetId());
-            }
+            return  woService.getWorkerList(this.selectedWorkOrder.getAssetId());
+        } else {
+            return Collections.emptyList();
         }
+
+    }
+
+    public List<UserAccount> findMaintenanceStaff(){
+        List<UserAccount> assetResponser = woService.findMaintenanceStaff(this.selectedWorkOrder.getAssetId());
+
         return assetResponser;
     }
 
@@ -593,7 +594,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void closeWorkOrder(){
-        woService.closeWorkOrder(selectedWorkOrder);
+        woService.closeWorkOrder(selectedWorkOrder,comments);
         cancel();
     }
 
@@ -634,11 +635,11 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
 
-    public Integer getManHours() {
+    public Double getManHours() {
         return manHours;
     }
 
-    public void setManHours(Integer manHours) {
+    public void setManHours(Double manHours) {
         this.manHours = manHours;
     }
 
@@ -683,5 +684,13 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
 
     public void setCheckInDate(String checkInDate) {
         this.checkInDate = checkInDate;
+    }
+
+    public String getFaultNameBySelectedWorkOrder() {
+        if (selected == null) {
+            return "";
+        } else {
+            return this.assetFaultTypeService.getFaultName(selected.getCaseType());
+        }
     }
 }

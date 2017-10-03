@@ -9,9 +9,11 @@ import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.service.utils.ExcelDocument;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -102,6 +104,15 @@ public class AssetFileImportController {
             return 0;
         }
     }
+    
+    public List<String> getAssetErrorList(){
+        if(null == importAssetMap)
+            return null;
+        List<String> errors = importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
+                .map(item -> item.getValue().get("errmsg").toString()).collect(Collectors.toList());
+        return errors;
+    }
+    
     public Integer getOrgErrorCounts(){
         if(null!=importOrgMap &&!importOrgMap.isEmpty()){
            return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));

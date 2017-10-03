@@ -1,27 +1,16 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
-
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
-import org.hibernate.annotations.*;
 
 @Entity
 @Table(name = "v2_work_order")
@@ -41,9 +30,9 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "sr_id")
     private String srId;
 
-//	    @JoinColumn(name = "sr_id", referencedColumnName = "id", insertable = false, updatable = false)
-//	    @ManyToOne(fetch = FetchType.EAGER)
-//	    private V2_ServiceRequest serviceRequest;
+    @JoinColumn(name = "sr_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private V2_ServiceRequest serviceRequest;
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
@@ -58,6 +47,10 @@ public class V2_WorkOrder implements Serializable {
     @Basic(optional = false)
     @NotNull
     private Integer assetId;
+
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
 
     @Basic(optional = false)
     @NotNull
@@ -129,10 +122,10 @@ public class V2_WorkOrder implements Serializable {
     @JoinColumn(name = "wo_id")
     private List<V2_WorkOrder_Detail> v2_workOrder_detail_list;
 
-    @OneToMany(cascade=CascadeType.ALL,fetch=FetchType.LAZY)
-    @JoinColumn(name="wo_id")
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinColumn(name = "wo_id")
     @Fetch(FetchMode.SUBSELECT)
-    private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list ;
+    private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list;
 
     @Column(name = "comment")
     private String comment;
@@ -166,7 +159,7 @@ public class V2_WorkOrder implements Serializable {
     private Double otherExpense;
 
     @Column(name = "man_hours")
-    private Integer manHours;
+    private Double manHours;
 
     /**
      * 1: auto dispatch 2: grab and manual 3: grab 4: manual
@@ -213,7 +206,7 @@ public class V2_WorkOrder implements Serializable {
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
     }
-	    
+
     public Date getCheckinTime() {
         return checkinTime;
     }
@@ -268,6 +261,14 @@ public class V2_WorkOrder implements Serializable {
 
     public void setV2_workOrder_detail_list(List<V2_WorkOrder_Detail> v2_workOrder_detail_list) {
         this.v2_workOrder_detail_list = v2_workOrder_detail_list;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
     }
 
     public String getSrId() {
@@ -454,21 +455,22 @@ public class V2_WorkOrder implements Serializable {
         this.otherExpense = otherExpense;
     }
 
-    public Integer getManHours() {
+    public Double getManHours() {
         return manHours;
     }
 
-    public void setManHours(Integer manHours) {
+    public void setManHours(Double manHours) {
         this.manHours = manHours;
     }
 
-    //		public V2_ServiceRequest getServiceRequest() {
-//			return serviceRequest;
-//		}
-//
-//		public void setServiceRequest(V2_ServiceRequest serviceRequest) {
-//			this.serviceRequest = serviceRequest;
-//		}
+    public V2_ServiceRequest getServiceRequest() {
+        return serviceRequest;
+    }
+
+    public void setServiceRequest(V2_ServiceRequest serviceRequest) {
+        this.serviceRequest = serviceRequest;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

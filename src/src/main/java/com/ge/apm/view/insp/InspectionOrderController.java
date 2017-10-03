@@ -1,43 +1,33 @@
 package com.ge.apm.view.insp;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.NodeUnselectEvent;
-import org.primefaces.model.TreeNode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import com.ge.apm.dao.InspectionOrderRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.InspectionChecklist;
-import com.ge.apm.domain.InspectionOrder;
-import com.ge.apm.domain.InspectionOrderDetail;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.insp.InspectionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.HashSet;
-import java.util.Set;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.NodeUnselectEvent;
+import org.primefaces.model.TreeNode;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.text.MessageFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ManagedBean
 @ViewScoped
@@ -149,11 +139,13 @@ public class InspectionOrderController extends JpaCRUDController<InspectionOrder
     protected Page<InspectionOrder> loadData(PageRequest pageRequest) {
         this.selected = null;
         if (this.searchFilters == null) {
-            return dao.findAll(pageRequest);
+            this.searchFilters = new ArrayList<>();
         } else {
             searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, 1));
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
+        searchFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getHospitalId()));
+        searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getSiteId()));
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     @Override

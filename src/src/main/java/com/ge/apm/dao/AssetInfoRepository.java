@@ -13,8 +13,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o where o.hospitalId = ?1 and o.isValid = true")
     public List<AssetInfo> getByHospitalId(int hospitalId);
 
-    @Query("select o from AssetInfo o where o.modalityId = ?1 and o.isValid = true")
-    public List<AssetInfo> getByModalityId(String modalityId);
+    @Query("select o from AssetInfo o where o.siteId=?1 and o.modalityId = ?2 and o.isValid = true")
+    public List<AssetInfo> getBySiteIdAndModalityId(int siteId, String modalityId);
 
     @Query("select o from AssetInfo o where o.siteId = ?1 and o.isValid = true")
     public List<AssetInfo> getBySiteId(int siteId);
@@ -36,4 +36,18 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select a from AssetInfo a where a.uid is null or  a.uid='' ")
     public List<AssetInfo> getNeedUpdateUidAssets();
 
+    @Query(value = "select max(a.financingNum) from AssetInfo a where a.siteUID = ?1 and  a.nationalStandardCode=?2"
+    		+ " and a.financingNum like concat('%',?2,'%')")
+	public String fetchMaxAssetFinacingNumWithSiteUID(String uid, String nationalStardCode);
+
+    @Query("select max(a.financingNum) from AssetInfo a where a.hospitalUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like '%?2%' ")
+	public String fetchMaxAssetFinacingNumWithHospitalUID(String uid, String nationalStardCode);
+
+    @Query("select max(a.financingNum) from AssetInfo a where a.institutionUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like '%?2%' ")
+	public String fetchMaxAssetFinacingNumWithInstitutionUID(String uid, String nationalStardCode);
+
+    @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like '%?2%' ")
+	public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
+
+    
 }
