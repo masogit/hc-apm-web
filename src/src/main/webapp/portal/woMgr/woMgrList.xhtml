@@ -104,7 +104,7 @@
                             <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
                         <p:column headerText="#{msg.takeOrtrans}" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
-                            <p:commandButton value="#{item.currentPersonId==-1?'抢单': msg.takeorder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                             <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                         </p:column>
                         <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">

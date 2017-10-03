@@ -201,10 +201,10 @@ public class V2_WorkOrderService {
 
     public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, String extType,String comments) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
-        selectedWorkOrder.setCurrentStepId(3);
+        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(3);
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setEstimatedCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(estimatedCloseTime));
         formData.setIntExtType(extType);
         formData.setDesc(comments);
@@ -230,17 +230,11 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void reassignWorkOrder(int step, V2_WorkOrder selectedWorkOrder, Integer assigneeId,String comments) {
-       // V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
-        selectedWorkOrder.setCurrentStepId(step);
-        if(step==3){
-            selectedWorkOrder.setCurrentStepName("待接单");
-        }else{
-            selectedWorkOrder.setCurrentStepName("维修中");
-        }
+    public void reassignWorkOrder(V2_WorkOrder selectedWorkOrder, Integer assigneeId,String comments) {
+        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(step);
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setAssigneeId(String.valueOf(assigneeId));
         formData.setDesc(comments);
         String res = srApi.invokeWorkOrderAction(token,formData,"reassign",selectedWorkOrder.getId());
