@@ -14,4 +14,6 @@ public interface AssetSeriaNumConfigRepository extends GenericRepository<AssetSe
 	 @Transactional
 	public void deleteBySiteUID(String siteUID);
 
+	public AssetSeriaNumConfig findBySiteUID(String siteUID);
+
 }
