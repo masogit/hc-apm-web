@@ -53,6 +53,8 @@ public class AssetTagService {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
+        assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
         //assetFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
         if (null != queryAsset.getHospitalId() && queryAsset.getHospitalId() != 0) {
             assetFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
