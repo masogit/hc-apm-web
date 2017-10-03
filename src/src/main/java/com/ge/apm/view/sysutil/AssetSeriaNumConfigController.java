@@ -6,6 +6,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,27 +88,51 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	public void onBeforeSave(AssetSeriaNumConfig config) {
 		selected.setTenantUID(user.getTenantUID());
 		if(selected.getInstitutionUID() == null){//租户级别
-			selected.setInstitutionUID(selected.getTenantUID());
-			selected.setHospitalUID(selected.getTenantUID());
-			selected.setSiteUID(selected.getTenantUID());
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedInstitution"));
+   		 	return;
 		}
 		if(selected.getHospitalUID() == null){//集团级别
-			selected.setHospitalUID(selected.getInstitutionUID());
-			selected.setSiteUID(selected.getInstitutionUID());
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedHospital"));
+   		 	return;
 		}
 		if(selected.getSiteUID() == null){//医院级别
-			selected.setSiteUID(selected.getHospitalUID());
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
+   		 	return;
 		}
 		dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
 	@Override
 	public void save(){
-		onBeforeSave(selected);
 		selected.setTenantUID(user.getTenantUID());
 		selected.setCreatedBy(user.getName());
 		selected.setLastModifiedBy(user.getName());
 		super.save();
+	}
+	
+	@Transactional
+	public void applyChange(){
+		selected.setTenantUID(user.getTenantUID());
+		if(selected.getInstitutionUID() == null){//租户级别
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedInstitution"));
+   		 	return;
+		}
+		if(selected.getHospitalUID() == null){//集团级别
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedHospital"));
+   		 	return;
+		}
+		if(selected.getSiteUID() == null){//医院级别
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
+   		 	return;
+		}
+		dao.deleteBySiteUID(selected.getSiteUID());
+		save();
 	}
 	
 	
