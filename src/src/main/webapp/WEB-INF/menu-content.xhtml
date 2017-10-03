@@ -79,7 +79,7 @@
                 <p:menuitem id="um40" value="#{msg.FinancialPerformanceAndForecast}" url="/portal/analysis/reports.xhtml#/AssetPerf"/>
                 <p:menuitem id="um41" value="#{msg.UsageAndClinicalPerformance}" outcome="/portal/analysis/assetOperationalPerf"/>
                 <p:menuitem id="um42" value="#{msg.DeviceCostAnalysis}" rendered="false" outcome="/empty"/>
-                <p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>
+                <!--<p:menuitem id="um43" value="#{msg.DevicePurchaseDecisionSupport}" url="/portal/analysis/reports.xhtml#/DecisionMaking"/>-->
             </p:submenu>
             <p:submenu id="um44" label="#{msg.SysAdmin}" icon="settings" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('ITAdmin')}">
                 <p:menuitem id="um45" value="#{msg.SiteAdmin}" outcome="/admin/uaa/siteInfo/List.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
