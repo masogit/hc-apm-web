@@ -136,6 +136,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*4+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, -1,"1*4+"));
         } else if (queryIndex == 4) { //维修中
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
@@ -368,6 +370,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void acceptWorkOrder() {
         String repairType = selectedWorkOrder.getRepairType().toString();
         woService.acceptWorkOrder(selectedWorkOrder, esTime, repairType, comments);
+        cancel();
+    }
+    
+    public void reassignWorkOrder(){
+        woService.reassignWorkOrder(selectedWorkOrder.getCurrentStepId(),selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
 
