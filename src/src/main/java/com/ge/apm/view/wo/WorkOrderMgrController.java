@@ -118,6 +118,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("currentPersonId");
         removeFilterOnField("dispatchMode");
         removeFilterOnField("srId");
+        removeFilterOnField("feedbackRating");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -150,14 +151,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else if (queryIndex == 6) { //待评价
             if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1,2)), "1*2+"));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
-            } else {
-                searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-                searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
-            }
-        } else if (queryIndex == 7) { //已关单
+            } 
+            searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+        } else if (queryIndex == 7) { //待关单
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+        } else if (queryIndex == 8) { //已关单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
-        } else if (queryIndex == 8) { //已取消
+        } else if (queryIndex == 9) { //已取消
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         }else{//全部
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -263,6 +265,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void updateDownTime() {
         woService.updateDownTime(selected, confirmedDownTime);
         needConfirmTime = false;
+        this.selected.getServiceRequest().setConfirmedDownTime(confirmedDownTime);
     }
 
     public void rejectWorkOrder() {
@@ -352,10 +355,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void onStatusChange() {
-        if (selectedAsset != null && currentStatus == 2 && selectedAsset.getStatus() != 2) {
-            needConfirmTime = true;
-        } else {
-            needConfirmTime = false;
+        if(selectedAsset==null && selected==null){
+            return;
+        }
+        if(null!=selectedAsset){//new sr
+            needConfirmTime =  currentStatus == 2 && selectedAsset.getStatus() != 2;
+        }else{//update sr
+            needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
         }
     }
 
