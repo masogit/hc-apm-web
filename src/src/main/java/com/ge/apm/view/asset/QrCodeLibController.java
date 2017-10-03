@@ -52,6 +52,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     private String siteUIDFilter;
     private Integer siteIdFilter;
     private Integer hospitalIdFilter;
+    private UserContextService userContextService;
 
     private List<OrgInfo> hospitalFileterList = new ArrayList();
 
@@ -64,7 +65,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         acService = WebUtil.getBean(AssetCreateService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
 
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
 
         if (userContextService.hasRole("SuperAdmin")) {
             this.filterByHospital = false;
@@ -128,7 +129,10 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     }
 
     public void createQrCode() {
-
+    	if(userContextService.hasRole("ITAdmin")){
+    		tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+    		siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+    	}
         qrCodeService.createManyQrCode(tenantUID, siteUID, qrCodeNum);
 
     }
