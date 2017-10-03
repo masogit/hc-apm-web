@@ -140,7 +140,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3),"1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(),"1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*3+"));
             if(!getTagGroupAssets().isEmpty()){
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
             }
@@ -391,7 +393,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
     
     public void reassignWorkOrder(){
-        woService.reassignWorkOrder(selectedWorkOrder.getCurrentStepId(),selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
+        woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
 

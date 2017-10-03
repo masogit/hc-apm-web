@@ -57,6 +57,8 @@
                             <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.newServiceRequest.confirmedDownTime}" showOn="button" 
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
+                        
+                        
                     </p:panelGrid>
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>

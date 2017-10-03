@@ -37,7 +37,7 @@
 
                     <h:panelGroup  id="equipmentTaker" >
                         <label class="label">取物人</label>
-                        <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker}"/>
+                        <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker}" required="true" requiredMessage="取物人#{msg.ValidationRequire}"/>
                         <p:commandButton title="取物" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update=":toCloseDialogForm:equipmentTaker" disabled="#{not empty workOrderMgrController.equipmentTaker}"/>
                     </h:panelGroup>
 
