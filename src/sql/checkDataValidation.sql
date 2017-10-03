@@ -19,3 +19,6 @@ select * from user_account u, org_info o where u.org_uid=o.uid and u.org_id!=o.i
 
 -- 资产的使用科室不存在
 SELECT * FROM "public".asset_info where clinical_dept_uid not in (select uid from org_info)
+
+-- 组织被删除,但是模版还在
+select * from qr_code_template where site_uid not in (select uid from org_info);

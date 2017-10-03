@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="AssetSeriaNumConfigViewDlg" widgetVar="AssetSeriaNumConfigViewDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSeriaNumConfigController.CRUDActionName} #{msg.AssetSeriaNumConfig}">
+            <h:form id="AssetSeriaNumConfigViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{assetSeriaNumConfigController.selected != null}">
+                        <h:outputLabel value="#{msg.id}" for="id" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.id}"/>
+                        <h:outputLabel value="#{msg.generateMethod}" for="generateMethod" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.generateMethod}"/>
+                        <h:outputLabel value="#{msg.createdBy}" for="createdBy" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.createdBy}"/>
+                        <h:outputLabel value="#{msg.createdDate}" for="createdDate" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.createdDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        <h:outputLabel value="#{msg.lastModifiedBy}" for="lastModifiedBy" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.lastModifiedBy}"/>
+                        <h:outputLabel value="#{msg.lastModifiedDate}" for="lastModifiedDate" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.lastModifiedDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        <h:outputLabel value="#{msg.tenantUID}" for="tenantUID" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.tenantUID}"/>
+                        <h:outputLabel value="#{msg.institutionUID}" for="institutionUID" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.institutionUID}"/>
+                        <h:outputLabel value="#{msg.hospitalUID}" for="hospitalUID" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.hospitalUID}"/>
+                        <h:outputLabel value="#{msg.siteUID}" for="siteUID" />
+                        <h:outputText value="#{assetSeriaNumConfigController.selected.siteUID}"/>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton rendered="#{assetSeriaNumConfigController.deleteAction}" icon="ui-icon-trash" actionListener="#{assetSeriaNumConfigController.delete}" value="#{msg.Delete}" update="display,:AssetSeriaNumConfigViewDlg, :AssetSeriaNumConfigListForm:datalist, :growl" oncomplete="handleSubmit(args, 'AssetSeriaNumConfigViewDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Close}" icon="glyphicon-off" onclick="PF('AssetSeriaNumConfigViewDialog').hide()"/>
+                    
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

@@ -20,6 +20,14 @@
                         <p:outputLabel value="#{workOrderListController.selectedServiceRequest.assetName}" />
                     </h:panelGroup>
                     <h:panelGroup>
+                        <label class="label">#{msg.departNum}</label>
+                        <p:outputLabel value="#{assetInfoService.getAssetInfo(workOrderListController.selectedServiceRequest.assetId).departNum}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.financingNum}</label>
+                        <p:outputLabel value="#{assetInfoService.getAssetInfo(workOrderListController.selectedServiceRequest.assetId).financingNum}" />
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.srNum}</label>
                         <p:outputLabel value="#{workOrderListController.selectedServiceRequest.srNum}" />
                     </h:panelGroup>
@@ -55,7 +63,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}</label>
-                            <p:outputLabel value="#{workOrderListController.selected.caseType}"/>
+                            <p:outputLabel value="#{workOrderListController.getFaultNameBySelectedWorkOrder()}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.totalManHour}</label>

@@ -16,7 +16,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
@@ -64,14 +63,20 @@ public class WorkOrderRateController extends GenericCRUDUUIDController<V2_WorkOr
         if (searchFilters == null) {
             searchFilters = new ArrayList();
         }
+        this.removeFilterOnField("serviceRequest.requestorId");
+        this.removeFilterOnField("serviceRequest.fromDeptUID");
+        if (!this.hasFilterOnField("feedbackRating")) {
+            searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.LTE, 0));
+        }
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
         if (!this.hasFilterOnField("currentStepId")) {
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
         }
-        if (!this.hasFilterOnField("srId")) {
-            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getUnfinishedSRList()));
+        if (!this.hasFilterOnField("serviceRequest.requestorId")) {
+            searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*2+"));
+            searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(),"1*2+"));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }

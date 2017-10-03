@@ -37,10 +37,6 @@
                         <label class="label">#{msg.requestReason}</label>
                         <p:outputLabel value="#{serviceRequestController.selected.requestReason}" />
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.equipmentTaker}</label>
-                        <p:outputLabel value="#{serviceRequestController.selected.equipmentTaker}" />
-                    </h:panelGroup>
                     <h:panelGroup id="assetstatus" class="updateDownTime">
                         <label class="label">#{msg.status}</label>
                         <p:selectOneRadio id="status" value="#{serviceRequestController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{serviceRequestController.currentStatus ne 3}">
@@ -64,6 +60,24 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                         </p:outputLabel>
                     </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.equipmentTaker}</label>
+                            <p:outputLabel value="#{serviceRequestController.selected.equipmentTaker}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">取件时间</label>
+                            <p:outputLabel value="#{serviceRequestController.selected.takeTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{serviceRequestController.selected.status eq 3}">
+                            <label class="label">取消人</label>
+                            <p:outputLabel value="#{serviceRequestController.selected.cancelPerson}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{serviceRequestController.selected.status eq 3}">
+                            <label class="label">取消原因</label>
+                            <p:outputLabel value="#{serviceRequestController.selected.cancelReason}" />
+                        </h:panelGroup>
                 </p:panelGrid>
                 <c:forEach items="#{serviceRequestController.workOrders}" var="woItem" varStatus="rowIndex" >
                     <p:fieldset legend="#{msg.WorkOrder}#{rowIndex.index+1}" toggleable="false" >
@@ -74,6 +88,10 @@
                                 <p:outputLabel value="#{woItem.currentStepName}" />
                             </h:panelGroup>
                             <h:panelGroup>
+                                    <label class="label">签到时间</label>
+                                    <p:outputLabel value="#{woItem.checkinTime}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
                                 <label class="label">#{msg.caseType}</label>
                                 <p:outputLabel value="#{woItem.caseType}"/>
                             </h:panelGroup>
@@ -86,6 +104,10 @@
                                 <p:outputLabel value="#{woItem.totalPrice}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                    <label class="label">#{msg.intExtType}</label>
+                                    <p:outputLabel value="#{fieldMsg.fieldValue('intExtType', woItem.intExtType)}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
                                 <label class="label">#{msg.currentPersonName}</label>
                                 <p:outputLabel value="#{woItem.currentPersonName}"/>
                             </h:panelGroup>
@@ -115,6 +137,14 @@
                                 <label class="label">#{msg.patTests}</label>
                                 <p:outputLabel value="#{woItem.patTests}"/>
                             </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.manHours}</label>
+                                    <p:outputLabel value="#{woItem.manHours}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.otherExpense}</label>
+                                    <p:outputLabel value="#{woItem.otherExpense}"/>
+                                </h:panelGroup>
 
                         </p:panelGrid>
 
@@ -143,11 +173,10 @@
                         </p:dataTable>
 
                         <br/>
+                        <h:panelGroup rendered="true">
+                            <label class="label" >增加的备件</label>
 
                         <p:dataTable value="#{serviceRequestController.getWOrkOrderDetail(woItem.id)}" var="detailItem"  rendered="#{not empty serviceRequestController.getWOrkOrderDetail(woItem.id)}">
-                            <p:column headerText="#{msg.manHours}">
-                                <h:outputText value="#{detailItem.manHours}" />
-                            </p:column>
                             <p:column headerText="#{msg.accessory}">
                                 <h:outputText value="#{detailItem.parts}" />
                             </p:column>
@@ -157,38 +186,17 @@
                             <p:column headerText="#{msg.accessoryPrice}">
                                 <h:outputText value="#{detailItem.partsPrice}" />
                             </p:column>
-                            <p:column headerText="#{msg.otherExpense}">
-                                <h:outputText value="#{detailItem.otherExpense}" />
-                            </p:column>
-                            <p:column headerText="#{msg.cowokerUserName}">
-                                <h:outputText value="#{detailItem.cowokerUserName}" />
-                            </p:column>
 
                         </p:dataTable>
-                        <br/>
-                        <h:panelGroup rendered="#{not empty workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}">
-                            <label class="label" >增加的备件</label>
-                            <p:dataTable value="#{workOrderListController.getWOrkOrderDetail(workOrderListController.selected.id)}" var="detailItem"  >
-                                <p:column headerText="#{msg.accessory}">
-                                    <h:outputText value="#{detailItem.parts}" />
-                                </p:column>
-                                <p:column headerText="#{msg.accessoryQuantity}">
-                                    <h:outputText value="#{detailItem.apartsQuantity}" />
-                                </p:column>
-                                <p:column headerText="#{msg.accessoryPrice}">
-                                    <h:outputText value="#{detailItem.partsPrice}" />
-                                </p:column>
-
-                            </p:dataTable>
-                        </h:panelGroup>
+                            </h:panelGroup>
                         <h:panelGroup rendered="#{not empty workOrderListController.getCoworkerDetail(workOrderListController.selected.id)}">
                             <label class="label">增加的协作人</label>
-                            <p:dataTable value="#{workOrderListController.getCoworkerDetail(workOrderListController.selected.id)}" var="detailItem"  >
+                            <p:dataTable value="#{workOrderListController.getCoworkerDetail(workOrderListController.selected.id)}" var="coWorkerItem"  >
                                 <p:column headerText="#{msg.manHours}">
-                                    <h:outputText value="#{detailItem.manHours}" />
+                                    <h:outputText value="#{coWorkerItem.manHours}" />
                                 </p:column>
                                 <p:column headerText="#{msg.coworker}">
-                                    <h:outputText value="#{detailItem.cowokerUserName}" />
+                                    <h:outputText value="#{coWorkerItem.cowokerUserName}" />
                                 </p:column>
                             </p:dataTable>
                         </h:panelGroup>

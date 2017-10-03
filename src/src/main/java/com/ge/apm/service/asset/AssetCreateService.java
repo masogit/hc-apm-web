@@ -7,6 +7,7 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
@@ -54,6 +55,8 @@ public class AssetCreateService {
     CoreService coreService;
     @Autowired
     ConfigUtils configUtils;
+    @Autowired
+    UserCommonService ucService;
 
     @Autowired
     BlobObjectRepository blobDao;
@@ -68,6 +71,24 @@ public class AssetCreateService {
         }
     }
 
+    public String getSiteName(String siteUid){
+        OrgInfo org = orgDao.getByUid(siteUid);
+        return getOrgFullName(org);
+    }
+    
+    private String getOrgFullName(OrgInfo org) {
+        if(null==org || org.getId()==-1){
+            return null;
+        }
+        String name = org.getName();
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + "/" + name;
+        }
+
+        return name;
+    }
+            
     public String getHospitalName(Integer hospitalId) {
         OrgInfo org = orgDao.findById(hospitalId);
         if (org != null) {
@@ -172,6 +193,10 @@ public class AssetCreateService {
 //    }
     public UserAccount getUserInfo(Integer userId) {
         return userDao.getById(userId);
+    }
+    
+    public List<UserAccount> getWorkerList(){
+        return ucService.getWorkerList(0);
     }
 
     public List<UserAccount> getAssetOwnerList(String deptUid) {

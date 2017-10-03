@@ -5,6 +5,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetDepreciationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -84,6 +85,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private AssetDepreciationService assetDepreciationService;
 
     private QrCodeService qrCodeService;
+    private UserCommonService ucService;
 
     private String oneSearchStr;
     private String qrCode;
@@ -131,6 +133,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+        ucService = WebUtil.getBean(UserCommonService.class);
         this.filterBySite = true;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -473,16 +476,30 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setAssetOwnerId(owner.getId());
             selected.setAssetOwnerName(owner.getName());
             selected.setAssetOwnerTel(owner.getTelephone());
+        } else {
+            selected.setAssetOwnerId(null);
+            selected.setAssetOwnerName(null);
+            selected.setAssetOwnerTel(null);
         }
+
         if (null != owner2) {
             selected.setAssetOwnerId2(owner2.getId());
             selected.setAssetOwnerName2(owner2.getName());
             selected.setAssetOwnerTel2(owner2.getTelephone());
+        } else {
+            selected.setAssetOwnerId2(null);
+            selected.setAssetOwnerName2(null);
+            selected.setAssetOwnerTel2(null);
         }
+
         if (null != owner3) {
             selected.setAssetOwnerId3(owner3.getId());
             selected.setAssetOwnerName3(owner3.getName());
             selected.setAssetOwnerTel3(owner3.getTelephone());
+        } else {
+            selected.setAssetOwnerId3(null);
+            selected.setAssetOwnerName3(null);
+            selected.setAssetOwnerTel3(null);
         }
 
     }
@@ -572,34 +589,27 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<UserAccount> getOwnerList() {
-
-        List<String> orgList = new ArrayList();
-        if(selected.getClinicalDeptUID()!=null && !selected.getClinicalDeptUID().isEmpty()){
-            orgList.add(selected.getClinicalDeptUID());
-        }
-        if(selected.getSiteUID()!=null && !selected.getSiteUID().isEmpty()){
-            orgList.add(selected.getSiteUID());
-        }
-        if(selected.getHospitalUID()!=null && !selected.getHospitalUID().isEmpty()){
-            orgList.add(selected.getHospitalUID());
-        }
-        if(selected.getInstitutionUID()!=null && !selected.getInstitutionUID().isEmpty()){
-            orgList.add(selected.getInstitutionUID());
-        }
-        if(selected.getTenantUID()!=null && !selected.getTenantUID().isEmpty()){
-            orgList.add(selected.getTenantUID());
-        }
-       return userDao.findByAssetAccess(orgList);
+       List<UserAccount> accountList = getEmptyAccountList();
+       accountList.addAll(ucService.getWorkerList(selected.getId()));
+       return accountList;
+    }
+    
+    private List<UserAccount> getEmptyAccountList(){
+        List<UserAccount> accountList = new ArrayList();
+        UserAccount emptyValue = new UserAccount();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        accountList.add(emptyValue);
+        return accountList;
     }
 
     public List<UserAccount> getClinicalOwnerList() {
+        List<UserAccount> accountList = getEmptyAccountList();
         List<SearchFilter> usersFilters = new ArrayList<>();
         if (null != selected.getClinicalDeptId()) {
             usersFilters.add(new SearchFilter("orgInfoId", SearchFilter.Operator.EQ, selected.getClinicalDeptId()));
-            return userDao.findBySearchFilter(usersFilters);
-        } else {
-            return new ArrayList<UserAccount>();
-        }
+            accountList.addAll(userDao.findBySearchFilter(usersFilters));
+        } 
+        return accountList;
     }
 
     public String getQrCodeImageBase64() {
@@ -796,27 +806,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.owner3 = owner3;
     }
 
-    public void clearOwner() {
-        this.owner = null;
-        this.selected.setAssetOwnerId(null);
-        this.selected.setAssetOwnerName(null);
-        this.selected.setAssetOwnerTel(null);
-    }
-
-    public void clearOwner2() {
-        this.owner2 = null;
-        this.selected.setAssetOwnerId2(null);
-        this.selected.setAssetOwnerName2(null);
-        this.selected.setAssetOwnerTel2(null);
-    }
-
-    public void clearOwner3() {
-        this.owner3 = null;
-        this.selected.setAssetOwnerId3(null);
-        this.selected.setAssetOwnerName3(null);
-        this.selected.setAssetOwnerTel3(null);
-    }
-
     public String getQrCode() {
         return qrCode;
     }
@@ -983,20 +972,34 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
-//        selected = null;
         TreeNode node = event.getTreeNode();
-        //node.setExpanded(!node.isExpanded());
-        selectedOrg = (OrgInfo) node.getData();
-        selected.setSiteUID(selectedOrg.getUid());
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        if (orgInfo.getId() == -1) {
+            selectedOrg = null;
+            selected.setSiteUID(null);
+        } else {
+            selectedOrg = (OrgInfo) node.getData();
+
+            selected.setSiteUID(selectedOrg.getUid());
+        }
+
     }
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+//        orgTree = new DefaultTreeNode("root",null,null);
+//        orgTree.getChildren().add(treeNode);
+//        orgTree.setExpanded(true);
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root",null,null);
-        orgTree.getChildren().add(treeNode);
-        orgTree.setExpanded(true);
+        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        rootNode.getChildren().add(treeNode);
+        rootNode.setExpanded(true);
 
     }
 

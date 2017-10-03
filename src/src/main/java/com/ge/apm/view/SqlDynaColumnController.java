@@ -7,6 +7,7 @@ import javax.faces.bean.ViewScoped;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.NativeSqlUtil;
+import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.SqlDataController;
 
 @ManagedBean
@@ -33,6 +34,16 @@ public class SqlDynaColumnController extends SqlDataController {
         updateTableColumns();
         selected = null;
     }
+
+    private String errorMsg = null;
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
+    }
     
     @Override
     protected Page<Map<String, Object>> loadData(PageRequest pageRequest, String searchFilterSQL, String orderBySQL, Map<String, Object> params) {
@@ -41,12 +52,13 @@ public class SqlDynaColumnController extends SqlDataController {
         if(sql==null) return emptyPage;
         sql = sql.trim();
         if("".equals(sql)) return emptyPage;
-        if(!sql.toLowerCase().startsWith("select ")){
-            NativeSqlUtil.execute(sql, null);
-            return emptyPage;
-        }
         
         try{
+            if(!sql.toLowerCase().startsWith("select ")){
+                NativeSqlUtil.execute(sql, null);
+                return emptyPage;
+            }
+
             this.countSql = "select count(*) from ("+sql+ ") tmp";
 
             Page<Map<String, Object>> data = super.loadData(pageRequest, searchFilterSQL, orderBySQL, params);
@@ -67,6 +79,8 @@ public class SqlDynaColumnController extends SqlDataController {
             return data;
         }
         catch(Exception ex){
+            errorMsg = ex.getCause().getMessage();
+            WebUtil.addErrorMessage("SQL Error: "+errorMsg);
             return emptyPage;
         }
    }
