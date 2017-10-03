@@ -90,6 +90,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private String failReason;
     private String equipmentTaker;
     private String takeTime;
+    
+    
+    private List<Integer> tagGroupAssets;
 
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -119,6 +122,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("dispatchMode");
         removeFilterOnField("srId");
         removeFilterOnField("feedbackRating");
+        removeFilterOnField("assetId");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -135,9 +139,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
         } else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*4+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, -1,"1*4+"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            if(!getTagGroupAssets().isEmpty()){
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
+            }
+            
         } else if (queryIndex == 4) { //维修中
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
@@ -192,6 +199,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else {
             return uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         }
+    }
+    
+    private List<Integer> getTagGroupAssets(){
+        if(tagGroupAssets == null){
+            tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
+        }
+        return tagGroupAssets;
     }
 
     public void searchList(Integer buttonIndex) {
