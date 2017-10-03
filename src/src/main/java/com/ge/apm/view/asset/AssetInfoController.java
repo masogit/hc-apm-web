@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetDepreciationService;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.common.UserCommonService;
@@ -96,6 +97,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
 
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -134,6 +137,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         ucService = WebUtil.getBean(UserCommonService.class);
+        assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
+
         this.filterBySite = true;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -1001,6 +1006,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         rootNode.getChildren().add(treeNode);
         rootNode.setExpanded(true);
 
+    }
+
+    public void updateFinancingNumByNationalStandardCode() {
+        String financingNum = assetFinacingNumGenerateService.generateFinacingNum(this.selected.getId(),
+                this.selected.getNationalStandardCode(), this.selected.getClinicalDeptId(),
+                UserContextService.getCurrentUserAccount());
+        if (financingNum != null && this.selected.getFinancingNum() == null) {
+            this.selected.setFinancingNum(financingNum);
+        }
     }
 
 }

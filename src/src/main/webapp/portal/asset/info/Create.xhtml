@@ -176,7 +176,9 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.nationalStandardCode}</label>
-                                <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64"/>
+                                <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64">
+                                    <p:ajax process="@this" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
+                                </p:inputText>
                             </h:panelGroup>
 
                         </p:panelGrid>
@@ -202,7 +204,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
-                                <p:inputText id="financingNum2" value="#{assetInfoController.selected.financingNum}"/>
+                                <p:inputText id="financingNum" value="#{assetInfoController.selected.financingNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.barcode}</label>
