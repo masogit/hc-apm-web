@@ -10,7 +10,8 @@
     <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码生成">
     <h:form id="qrCodeLibCreateForm">
         <h:panelGroup id="display">
-            <h:outputLabel for="siteIdSelect" value="租户 ： " />
+        	<h:panelGroup id ="tenant" rendered="#{userContextService.hasRole('SuperAdmin')}" >
+            <h:outputLabel for="siteIdSelect" value="租户 ： "  />
             <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="租户院区不能为空">
                 <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="hospitalIdSelect" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -19,12 +20,13 @@
             <br/>
             <br/>
             <h:outputLabel for="hospitalIdSelect" value="医院 ： " />
-            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="医院不能为空">
+            <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="医院不能为空" >
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
             </p:selectOneMenu>
             <br/>
             <br/>
+            </h:panelGroup>
             <h:outputLabel for="hospitalIdSelect" value="二维码数量 ： " />
             <p:inputNumber id="qrCodeNum" decimalPlaces="0" minValue="1" maxValue="9999" value="#{qrCodeLibController.qrCodeNum}" required="true" requiredMessage="数量不能为空"/>
             <br/>

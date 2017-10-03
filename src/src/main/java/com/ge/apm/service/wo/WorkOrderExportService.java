@@ -8,6 +8,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 
@@ -32,6 +33,7 @@ public class WorkOrderExportService {
     private static final String SHEET_WORKORDER = "WorkOrder List";
     private static final String I18N_INT_EXT_TYPE="intExtType";
     private static final String I18N_REPAIR_TYPE="repairType";
+    private static final String I18N_CURRENT_STEP_="woSteps";
 
     @Autowired
     ServiceRequestRepository serviceRequestDao;
@@ -49,7 +51,7 @@ public class WorkOrderExportService {
     I18nMessageRepository i18nMessageDao;
 
 
-    public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime){
+    public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
 
         List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String,Object> workOrderMap;
@@ -79,6 +81,9 @@ public class WorkOrderExportService {
         if(endTime != null){
             searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
         }
+        if(statusList != null && !statusList.isEmpty()){
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
+        }
 
         List<V2_WorkOrder> tempWorkOrderList = v2WorkOrderDao.findBySearchFilter(searchFilters);
 
@@ -100,7 +105,9 @@ public class WorkOrderExportService {
             workOrderMap.put("资产编号", assetInfo.getFinancingNum());
             workOrderMap.put("设备名称", serviceRequest.getAssetName());
             workOrderMap.put("院区", serviceRequest.getHospitalName());
-            workOrderMap.put("科室", serviceRequest.getFromDeptName());
+            workOrderMap.put("科室", assetInfo.getClinicalDeptName());
+            workOrderMap.put("当前责任人", workOrder.getCurrentPersonName());
+            workOrderMap.put("当前步骤", workOrder.getCurrentStepId() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_CURRENT_STEP_, workOrder.getCurrentStepId().toString()).getValueZh() : "");
             workOrderMap.put("报修人", serviceRequest.getRequestorName());
             workOrderMap.put("报修时间", serviceRequest.getRequestTime() != null ? sdf.format(serviceRequest.getRequestTime()) : "");
             workOrderMap.put("故障描述", serviceRequest.getRequestReason());
@@ -117,15 +124,19 @@ public class WorkOrderExportService {
             workOrderMap.put("签到时间", workOrder.getCheckinTime() != null ? sdf.format(workOrder.getCheckinTime()) : "");
             workOrderMap.put("维修工时",workOrder.getTotalManHour());
             String info = "";
+            double infoTotalPrice = 0;
             for (V2_WorkOrder_Detail workOrderDetail:workOrderDetailList) {
                 Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
                 Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
                 info += workOrderDetail.getParts()+",数量："+ tempQuantity +",单价:"+ tempPrice +";";
+                infoTotalPrice += tempQuantity * tempPrice;
             }
 
             workOrderMap.put("维修备件", info);
-            workOrderMap.put("价格", workOrder.getTotalPrice());
-            if(evaluateStep != null){
+            workOrderMap.put("备件总费用", infoTotalPrice);
+            workOrderMap.put("其他费用", workOrder.getOtherExpense());
+            workOrderMap.put("维修总费用", workOrder.getTotalPrice());
+            if(evaluateStep != null && workOrder.getCurrentStepId() >= 6){
                 workOrderMap.put("验收人", evaluateStep.getOwnerName());
                 workOrderMap.put("验收时间", evaluateStep.getEndTime() != null ? sdf.format(evaluateStep.getEndTime()) : "");
             }
@@ -139,6 +150,10 @@ public class WorkOrderExportService {
                 workOrderMap.put("故障类型", assetFaultTypeDao.findById(workOrder.getCaseType()) != null ? assetFaultTypeDao.findById(workOrder.getCaseType()).getFaultName() : "");
             }
 
+            workOrderMap.put("问题描述", workOrder.getPatProblems());
+            workOrderMap.put("解决方案", workOrder.getPatActions());
+            workOrderMap.put("测试方法", workOrder.getPatTests());
+            workOrderMap.put("备注", workOrder.getComment());
 
             resultList.add(workOrderMap);
         }
