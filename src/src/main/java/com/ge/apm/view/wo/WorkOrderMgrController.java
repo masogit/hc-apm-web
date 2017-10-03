@@ -432,6 +432,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
     
+    public String getFaultTypeName(Integer id){
+        return assetFaultTypeService.getFaultName(id);
+    }
+    
     public OrgInfo getOrgInfoByUid(String orgUid){
         return orgDao.getByUid(orgUid);
     }
