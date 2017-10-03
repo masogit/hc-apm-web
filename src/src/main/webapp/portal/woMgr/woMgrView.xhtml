@@ -97,7 +97,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.caseType}</label>
-                                    <p:outputLabel value="#{woItem.caseType}"/>
+                                    <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.totalManHour}</label>
