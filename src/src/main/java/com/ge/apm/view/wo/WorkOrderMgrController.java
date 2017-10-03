@@ -250,6 +250,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return woService.getWorkOrderDetails(woId);
     }
 
+
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return woService.getWorkOrderCoworker(woId);
     }
@@ -265,6 +266,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+        selectedWorkOrder.setManHours(null);
+        selectedWorkOrder.setOtherExpense(null);
         accessoryList = new ArrayList<V2_WorkOrder_Detail>();
         coWorkerList = new ArrayList<V2_WorkOrderCoworker>();
     }

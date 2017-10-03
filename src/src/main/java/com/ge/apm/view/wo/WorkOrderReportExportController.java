@@ -8,6 +8,7 @@ import com.ge.apm.service.wo.WorkOrderExportService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
+import org.springframework.data.domain.Page;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -16,8 +17,10 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -44,8 +47,14 @@ public class WorkOrderReportExportController {
     private String currentHospitalUID;
     private String currentSiteUID;
 
+    private Boolean isStatusOpen;
+    private Boolean isStatusClose;
+    private Boolean isStatusCancel;
+
     private Date startTime;
     private Date endTime;
+
+    private List<Map<String, Object>> workOrderList;
 
     @PostConstruct
     protected void init() {
@@ -61,6 +70,10 @@ public class WorkOrderReportExportController {
         institutionList = orgDao.findByTenantUIDAndOrgType(currentUser.getTenantUID(), 1);
         hospitalList = orgDao.findByParentUIDAndOrgType(currentUser.getInstitutionUID(), 2);
         siteList = orgDao.findByParentUIDAndOrgType(currentUser.getHospitalUID(), 3);
+
+        isStatusOpen = Boolean.TRUE;
+        isStatusClose = Boolean.TRUE;
+        isStatusCancel = Boolean.TRUE;
     }
 
     public void exportData(){
@@ -68,13 +81,37 @@ public class WorkOrderReportExportController {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/APM_WorkOrder_Template.xlsx");
 //          InputStream stream = this.file.getInputstream();
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = workOrderExportService.exportData(doc, workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime));
+            Boolean exportFlag = workOrderExportService.exportData(doc, workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList()));
             if(exportFlag){
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "WorkOrderData.xlsx");
             }
         } catch (IOException ex) {
             Logger.getLogger(WorkOrderReportExportController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    public void previewData(){
+        workOrderList = workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList());
+    }
+
+    private List<Integer> getStatusList(){
+        List<Integer> statusList = new ArrayList<>();
+        if(isStatusOpen){
+            statusList.add(1);
+        }
+        if(isStatusClose){
+            statusList.add(2);
+        }
+        if(isStatusCancel){
+            statusList.add(3);
+        }
+
+        if(statusList.isEmpty()){
+            //当工单状态没有选择时
+            statusList.add(-999);
+        }
+
+        return statusList;
     }
 
     public void filterSiteByHospital(){
@@ -151,5 +188,37 @@ public class WorkOrderReportExportController {
 
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
+    }
+
+    public Boolean getStatusOpen() {
+        return isStatusOpen;
+    }
+
+    public void setStatusOpen(Boolean statusOpen) {
+        isStatusOpen = statusOpen;
+    }
+
+    public Boolean getStatusClose() {
+        return isStatusClose;
+    }
+
+    public void setStatusClose(Boolean statusClose) {
+        isStatusClose = statusClose;
+    }
+
+    public Boolean getStatusCancel() {
+        return isStatusCancel;
+    }
+
+    public void setStatusCancel(Boolean statusCancel) {
+        isStatusCancel = statusCancel;
+    }
+
+    public List<Map<String, Object>> getWorkOrderList() {
+        return workOrderList;
+    }
+
+    public void setWorkOrderList(List<Map<String, Object>> workOrderList) {
+        this.workOrderList = workOrderList;
     }
 }
