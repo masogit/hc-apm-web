@@ -604,7 +604,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
         cancel();
     }
     public void reassignWorkOrder(int step){
-        woService.reassignWorkOrder(step,selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
+        woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
 

@@ -204,7 +204,7 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
 
     public void saveServiceRequest() {
         selectedAsset.setStatus(currentStatus);
-        woService.createServiceRequest(newServiceRequest, selectedAsset);
+        woService.createServiceRequest(newServiceRequest, selectedAsset,null);
         cancel();
     }
 
