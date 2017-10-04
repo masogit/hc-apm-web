@@ -17,6 +17,11 @@ public interface AssetTagMsgSubscriberRepository extends GenericRepository<Asset
     @Query("select o from AssetTagMsgSubscriber o where o.subscribeUserId = ?1")
     public List<AssetTagMsgSubscriber> getAssetTagMsgSubscriber(Integer userId);
 
+    public AssetTagMsgSubscriber getByTagId(Integer tagId);
+
+    @Query(value = "select * from Asset_Tag_Msg_Subscriber",nativeQuery = true)
+    public List<AssetTagMsgSubscriber> getAssetTagMsgSubscriberAll();
+
 
 
 }

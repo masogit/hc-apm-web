@@ -160,7 +160,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
         } else if (queryIndex == 5) { //待验收
             if (userContextService.hasRole("AssetStaff")) {
-                searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1)), "1*2+"));
+                searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
                 searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 5));
             } else {
                 searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -168,13 +168,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             }
         } else if (queryIndex == 6) { //待评价
             if (userContextService.hasRole("AssetStaff")) {
-                searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1,2)), "1*2+"));
+                searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1,2))));
             } 
             searchFilters.add(new SearchFilter("feedbackRating", SearchFilter.Operator.EQ, 0));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
         } else if (queryIndex == 7) { //待关单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
         } else if (queryIndex == 8) { //已关单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
@@ -236,6 +237,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         selectedWorkOrderList = null;
         equipmentTaker = null;
         takeTime = null;
+        picList=null;
     }
 
 //    public V2_ServiceRequest getServiceRequest(String srId) {
@@ -287,6 +289,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         selectedWorkOrder.setOtherExpense(null);
         accessoryList = new ArrayList<V2_WorkOrder_Detail>();
         coWorkerList = new ArrayList<V2_WorkOrderCoworker>();
+        picList = new ArrayList<V2_BlobObject>();
     }
 
     public List<UserAccount> getWorkerList() {
@@ -334,7 +337,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, selectedWorkOrder.getManHours(), selectedWorkOrder.getOtherExpense(), comments);
+        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, comments,picList);
         cancel();
     }
 
