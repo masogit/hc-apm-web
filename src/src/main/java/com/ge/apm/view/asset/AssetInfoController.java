@@ -25,7 +25,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
+import javax.faces.bean.SessionScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -40,7 +40,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @ManagedBean
-@ViewScoped
+@SessionScoped
 public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private static final long serialVersionUID = -1L;
