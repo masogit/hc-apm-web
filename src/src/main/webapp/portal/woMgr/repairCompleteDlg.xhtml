@@ -7,7 +7,8 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true"  width="1000"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}" height="500">
+
+        <p:dialog id="repairCompleteDialog" widgetVar="repairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
             <h:form id="repairCompleteDialogForm" >
                 <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -28,16 +29,16 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.patProblems}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="3"  cols="40"  queryDelay="750" minQueryLength="4" scrollHeight="40" />
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patProblems}" rows="3"  cols="40"  queryDelay="750" maxlength="100" minQueryLength="4" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.patActions}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="3"  cols="40"  queryDelay="750" minQueryLength="4"/>
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patActions}" rows="3"  cols="40"  queryDelay="750" maxlength="100" minQueryLength="4"/>
                         </h:panelGroup>
                         <h:panelGroup>
 
                             <label class="label">#{msg.patTests}</label>
-                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" minQueryLength="4"/>
+                            <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750"  maxlength="100" minQueryLength="4"/>
                         </h:panelGroup>
 
                     </p:panelGrid>
