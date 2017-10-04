@@ -76,19 +76,6 @@
                     <p:fileUpload id="type1" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-                    <!--                    <h:panelGroup >
-                                                <p:dataList id="pictureList" value="#{workOrderMgrController.picList}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
-                                                    <f:facet name="header">图片</f:facet>
-                                                    <div class="ui-grid-col-2" style="text-align:center">
-                                                        <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"  height="60"  width="80" />
-                                                        <p:commandButton actionListener="#{workOrderMgrController.removeAttachment(fileitem.objectStorageId)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                                        </p:commandButton>    
-                                                    </div>
-                                                </p:dataList>
-                                                <p:fileUpload id="type1" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                                              multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-                                            </h:panelGroup>-->
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update=":ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>

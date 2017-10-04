@@ -96,6 +96,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private String takeTime;
     
     private List<V2_BlobObject> picList;
+    private List<V2_BlobObject> audioList;
     
     private List<Integer> tagGroupAssets;
 
@@ -247,11 +248,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         currentStatus = selected.getAssetInfo().getStatus();
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
+        audioList = getServiceRequestPicList(selected.getSrId(),2);
+        picList = getServiceRequestPicList(selected.getSrId(),1);
     }
     
-    public List<V2_BlobObject> getServiceRequestPicList(String srId){
-        return woService.getServiceRequestPicList(srId);
+    private List<V2_BlobObject> getServiceRequestPicList(String srId,Integer type){ //type 1:picture 2:audio
+        return woService.getServiceRequestPicList(srId).stream().filter(item -> type==1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
     }
+    
+    
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
@@ -695,5 +700,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.picList = picList;
     }
 
-    
+    public List<V2_BlobObject> getAudioList() {
+        return audioList;
+    }
+
+    public void setAudioList(List<V2_BlobObject> audioList) {
+        this.audioList = audioList;
+    }
+
 }

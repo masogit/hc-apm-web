@@ -51,7 +51,7 @@
                     <p:outputLabel id="errorMsg" style="color: red" value="#{sqlDynaColumnController.errorMsg}" rendered="#{sqlDynaColumnController.errorMsg ne null}"/>
                 </f:facet>
             </p:dataTable>
-            <p:panel id="deltailInfo" rendered="#{sqlDynaColumnController.selected ne null}">
+            <p:panel id="deltailInfo" style="border: none; background: transparent;">
                 <p:inputTextarea  cols="50" autoResize="true" value="#{sqlDynaColumnController.selectedRowData}" rendered="#{sqlDynaColumnController.selected ne null}"/>
             </p:panel>
         </h:form>
