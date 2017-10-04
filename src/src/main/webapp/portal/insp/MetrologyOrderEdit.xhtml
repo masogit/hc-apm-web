@@ -49,12 +49,12 @@
                                 <p:inputText id="ownerOrgId" value="#{metrologyOrderController.selected.ownerOrgName}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.startTime}</label>
-                                <p:calendar timeZone="GMT+8"  id="startTime" pattern="yyyy/MM/dd" value="#{metrologyOrderController.selected.startTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                <label class="label">#{msg.startTime}*</label>
+                                <p:calendar timeZone="GMT+8"  id="startTime" pattern="yyyy/MM/dd" value="#{metrologyOrderController.selected.startTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="开始时间 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.endTime}</label>
-                                <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{metrologyOrderController.selected.endTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                                <label class="label">#{msg.endTime}*</label>
+                                <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{metrologyOrderController.selected.endTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
@@ -63,7 +63,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <p:selectBooleanCheckbox id="isFinished" itemLabel="#{msg.isFinished}" value="#{metrologyOrderController.selected.isFinished}"  disabled="true"/>
+                                <p:selectBooleanCheckbox id="isFinished" itemLabel="#{msg.isFinished}" value="#{metrologyOrderController.selected.isFinished}"  disabled="false"/>
                             </h:panelGroup>
 
                             <h:panelGroup>
@@ -91,9 +91,9 @@
                             <p:column headerText="#{msg.checkListItem}">
                                 <h:outputText value="#{item.itemName}" />
                             </p:column>
-                            <p:column headerText="#{msg.isPassed}" style="align-content: center; width: 10%">
+                            <!--<p:column headerText="#{msg.isPassed}" style="align-content: center; width: 10%">
                                 <p:selectBooleanCheckbox value="#{item.isPassed}"   disabled="true" />
-                            </p:column>
+                            </p:column>-->
                         </p:dataTable>
                     </p:fieldset>
 
