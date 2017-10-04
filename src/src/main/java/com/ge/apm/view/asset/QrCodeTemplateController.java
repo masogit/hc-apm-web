@@ -8,6 +8,7 @@ import com.ge.apm.domain.OrgInfo;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.orginfo.OrgInfoService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import com.ge.apm.domain.QrCodeTemplate;
@@ -21,6 +22,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,6 +41,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     UaaService uaaService;
     TenantInfoRepository tenantInfoDao ;
     UserContextService userContextService;
+    OrgInfoService orgInfoService;
     
     String selectedTenantUid; 
 
@@ -51,6 +55,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         uaaService = WebUtil.getBean(UaaService.class);
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        orgInfoService = WebUtil.getBean(OrgInfoService.class);
         
     }
 
@@ -119,12 +124,20 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
     
     public List<OrgInfo> getHospitalFileterList(){
+        List<OrgInfo> orgInfoList = null;
         if (null != selectedTenantUid) {
-            return orgDao.getByTenantUID(selectedTenantUid).stream().filter(item-> item.getOrgType()<4).collect(Collectors.toList());
+            orgInfoList = orgDao.getByTenantUID(selectedTenantUid).stream().filter(item-> item.getOrgType()<4).collect(Collectors.toList());
         } else {
             UserAccount user = UserContextService.getCurrentUserAccount();
-            return uaaService.getUserAccessibleSiteList(user.getUid());
+            orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
         }
+        if (orgInfoList == null) {
+            return Collections.emptyList();
+        } else {
+            orgInfoList = orgInfoService.flattenOrgTree(orgInfoList);
+            return orgInfoList;
+        }
+
     }
     
     public String getHospitalName(String orgUid) {
