@@ -1,7 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.AssetClinicalRecord;
-import com.ge.apm.pojo.AssetClinicalRecordPojo;
+import com.ge.apm.service.analysis.AssetClinicalRecordPojo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
