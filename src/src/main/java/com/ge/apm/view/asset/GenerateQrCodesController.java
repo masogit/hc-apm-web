@@ -102,7 +102,7 @@ public class GenerateQrCodesController extends JpaCRUDController<QrCodeLib>{
     }
     
     public List<OrgInfo> getOrgList() {
-    	return  acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getHospitalId());
+    	return  acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getSiteUID());
     }
     
     public void onSiteChange(){

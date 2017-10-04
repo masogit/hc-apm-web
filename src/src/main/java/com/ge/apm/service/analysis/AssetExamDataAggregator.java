@@ -1,5 +1,6 @@
 package com.ge.apm.service.analysis;
 
+import com.ge.apm.domain.AssetClinicalRecordPojo;
 import com.ge.apm.dao.AssetClinicalRecordRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetSummitRepository;
@@ -7,7 +8,6 @@ import com.ge.apm.dao.ExamSummitRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetSummit;
 import com.ge.apm.domain.ExamSummit;
-import com.ge.apm.pojo.AssetClinicalRecordPojo;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -127,7 +127,7 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
     }
 
     public List<OrgInfo> getOrgList() {
-        return acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getHospitalId());
+        return acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
 }

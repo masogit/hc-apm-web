@@ -1,4 +1,4 @@
-package com.ge.apm.pojo;
+package com.ge.apm.domain;
 
 import java.util.Date;
 
