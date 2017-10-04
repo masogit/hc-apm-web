@@ -81,7 +81,8 @@ public class WorkOrderReportExportController {
             InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExport/APM_WorkOrder_Template.xlsx");
 //          InputStream stream = this.file.getInputstream();
             ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-            Boolean exportFlag = workOrderExportService.exportData(doc, workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList()));
+            //Boolean exportFlag = workOrderExportService.exportData(doc, workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList()));
+            Boolean exportFlag = workOrderExportService.exportData(doc, workOrderList);
             if(exportFlag){
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "WorkOrderData.xlsx");
             }
@@ -221,4 +222,5 @@ public class WorkOrderReportExportController {
     public void setWorkOrderList(List<Map<String, Object>> workOrderList) {
         this.workOrderList = workOrderList;
     }
+
 }
