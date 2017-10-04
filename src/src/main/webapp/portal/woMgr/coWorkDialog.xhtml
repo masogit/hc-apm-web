@@ -26,7 +26,7 @@
                 </p:panelGrid>
                 <br/>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addCoWokerItem}" value="#{msg.Save}" update=":repairCompleteDialogForm:scrolltables :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'coworkerDlg');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.addCoWokerItem}" value="#{msg.Save}" update=":repairCompleteDialogForm:coworkerList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'coworkerDlg');"/>
                     <p:commandButton immediate="true" actionListener="#{workOrderMgrController.cancelWorkdetail}" value="#{msg.Cancel}" update=":repairCompleteDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'coworkerDlg');"/>
                 </h:panelGroup>
             </h:panelGroup>
