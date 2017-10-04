@@ -29,6 +29,7 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
 import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 
 @ManagedBean
@@ -57,6 +58,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     @Override
     protected void init() {
+        this.searchFilters = new ArrayList<SearchFilter>();
         filterBySite = false;
 
         uaaService = WebUtil.getBean(UaaService.class);
@@ -66,6 +68,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
         setTenantUid(loginUser.getTenantUID());
+        
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -81,6 +84,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void setTenantUid(String tenantUid) {
+        searchFilters.clear();
         this.tenantUid = tenantUid;
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         selectedTenant = tenantDao.findByuid(tenantUid);
@@ -125,14 +129,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
         //this.selected = null;
         if (selectedOrg == null) {
-            return dao.getByTenantUID(pageRequest, this.tenantUid);
+            searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, this.tenantUid));
         } else {
             if (selectedOrg.getId() == -1) {
-                return dao.getByTenantUID(pageRequest, this.tenantUid);
+                searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, this.tenantUid));
             } else {
-                return dao.getByOrgInfoUID(pageRequest, selectedOrg.getUid());
+                searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("institutionUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("orgInfoUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
             }
         }
+        
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
     @Override
@@ -210,6 +220,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void onSelectTreeNode(NodeSelectEvent event) {
+        this.searchFilters.clear();
         selected = null;
         TreeNode node = event.getTreeNode();
         //node.setExpanded(!node.isExpanded());
