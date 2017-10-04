@@ -279,7 +279,7 @@ public class V2_WorkOrderService {
     }
 
 
-    public void closeWorkOrder(V2_WorkOrder selectedWorkOrder,String comments) {
+    public void closeWorkOrder(V2_WorkOrder selectedWorkOrder,String comments,List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         selectedWorkOrder.setCurrentStepId(6);
@@ -291,6 +291,7 @@ public class V2_WorkOrderService {
         formData.setPatProblems(selectedWorkOrder.getPatProblems());
         formData.setPatTests(selectedWorkOrder.getPatTests());
         formData.setCaseType(selectedWorkOrder.getCaseType().toString());
+        formData.setAttachments(picList);
 
 
         String res = srApi.invokeWorkOrderAction(token,formData,"close",selectedWorkOrder.getId());
