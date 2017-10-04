@@ -137,7 +137,7 @@
                                 <label class="label">#{msg.clinicalOwnerTel}</label>
                                 <p:inputText id="clinicalOwnerTel" value="#{assetInfoController.selected.clinicalOwnerTel}" readonly="true"/>
                             </h:panelGroup>
-                            <h:panelGroup rendered="false">
+                            <h:panelGroup>
                                 <label class="label">#{msg.brand}</label>
                                 <p:selectOneMenu id="brand" value="#{assetInfoController.selected.brand}" converter="brandConverter" var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.brand} #{msg.ValidationRequire}" >
                                     <p:ajax  listener="#{assetInfoController.onBrandChange()}"  process="@parent" />
