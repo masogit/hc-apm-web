@@ -54,22 +54,25 @@
                         <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
                             <h:outputText value="#{userAccountController.getOrgFullNameByUid(item.orgInfoUID)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.login_name}" sortBy="#{item.loginName}">
+                        <p:column headerText="#{msg.login_name}" sortBy="#{item.loginName}" filterBy="#{item.loginName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.loginName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.userName}" sortBy="#{item.name}">
+                        <p:column headerText="#{msg.userName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.email}" sortBy="#{item.email}">
                             <h:outputText value="#{item.email}"/>
                         </p:column>
-                        <p:column headerText="#{msg.telephone}" sortBy="#{item.telephone}">
+                        <p:column headerText="#{msg.telephone}" sortBy="#{item.telephone}" filterBy="#{item.telephone}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.telephone}"/>
                         </p:column>
                         <p:column rendered="false" headerText="#{msg.isSiteAdmin}" sortBy="#{item.isSiteAdmin}">
                             <h:outputText value="#{item.isSiteAdmin? msg.True2Yes : msg.False2No }"/>
                         </p:column>
-                        <p:column headerText="#{msg.isLocked}" sortBy="#{item.isLocked}">
+                        <p:column headerText="#{msg.isActive}" sortBy="#{item.isActive}">
+                            <h:outputText value="#{item.isActive? msg.True2Yes : msg.False2No }"/>
+                        </p:column>
+                        <p:column headerText="#{msg.Locked}?" sortBy="#{item.isLocked}">
                             <h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }"/>
                         </p:column>
                         <p:column headerText="#{msg.roleId}">
@@ -86,10 +89,10 @@
                             <p:commandButton id="resetPassButton" icon="ui-icon-repeat" process="@this" title="#{msg.resetPassword}" actionListener="#{userAccountController.resetPassword}" update="datalist" disabled="#{empty userAccountController.selected}">
                                 <p:confirm header="#{msg.ResetConformation}" message="#{msg.ResetConformationMsg}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton id="lockButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.lockAccount}" actionListener="#{userAccountController.lockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
+                            <p:commandButton rendered="false" id="lockButton" icon="ui-icon-lock-outline" process="@this" title="#{msg.lockAccount}" actionListener="#{userAccountController.lockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
                                 <p:confirm header="#{msg.lockAccount}" message="#{msg.lockAccountConfirm}" icon="ui-icon-alert"/>
                             </p:commandButton>
-                            <p:commandButton id="unlockButton" icon="ui-icon-lock-open" process="@this" title="#{msg.unlockAccount}" actionListener="#{userAccountController.unlockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
+                            <p:commandButton rendered="false" id="unlockButton" icon="ui-icon-lock-open" process="@this" title="#{msg.unlockAccount}" actionListener="#{userAccountController.unlockAccount}" update="datalist" disabled="#{empty userAccountController.selected}">
                                 <p:confirm header="#{msg.unlockAccount}" message="#{msg.unlockAccountConfirm}" icon="ui-icon-alert"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">

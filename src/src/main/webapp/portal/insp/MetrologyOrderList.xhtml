@@ -34,8 +34,9 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton :InspectionOrderListForm:excuteButton"/>
-                        <p:ajax event="filter" listener="#{metrologyOrderController.onFilter}" update=":InspectionOrderListForm:excuteButton" oncomplete="rc();"/>
+                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <!--<p:ajax event="filter" listener="#{metrologyOrderController.onFilter}" update=":InspectionOrderListForm:excuteButton" oncomplete="rc();"/>-->
+                        <p:ajax event="filter" listener="#{metrologyOrderController.onFilter}" oncomplete="rc();"/>
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
@@ -97,7 +98,7 @@
                                 <p:inputText id="filterEndTime" widgetVar="varFilterEndTime"/>
                             </f:facet>
                             <h:outputText value="#{item.endTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.isFinished}" sortBy="#{item.isFinished}" filterBy="#{item.isFinished}" filterMatchMode="EQ">
@@ -122,7 +123,7 @@
                         <f:facet name="{Toolbar}">
                             
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}"  action="#{urlEncryptController.encodeUrlParam('MetrologyOrderCreate?actionName=Create')}"/>
-                            <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" title="#{msg.View}"  actionListener="#{metrologyOrderController.getViewPage('MetrologyOrderDetail','View')}"  action="#{urlEncryptController.encodeUrlParam(metrologyOrderController.operation)}" disabled="#{empty metrologyOrderController.selected}"/>
+                            <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" title="#{msg.View}"  actionListener="#{metrologyOrderController.getViewPage('MetrologyOrderDetail','View')}"  action="#{urlEncryptController.encodeUrlParam(metrologyOrderController.operation)}" disabled="#{empty metrologyOrderController.selected}"/>-->
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}"  actionListener="#{metrologyOrderController.getViewPage('MetrologyOrderEdit','Edit')}" action="#{urlEncryptController.encodeUrlParam(metrologyOrderController.operation)}" disabled="#{empty metrologyOrderController.selected or metrologyOrderController.selected.isFinished}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" title="#{msg.Delete}"  actionListener="#{metrologyOrderController.getViewPage('MetrologyOrderDetail','Delete')}"  action="#{urlEncryptController.encodeUrlParam(metrologyOrderController.operation)}"  disabled="#{empty metrologyOrderController.selected or metrologyOrderController.selected.isFinished}"/>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
@@ -131,8 +132,8 @@
                         </f:facet>
                     </p:dataTable>
                     <br/>
-                    <p:remoteCommand name="rc" update="datalist:createButton datalist:viewButton datalist:deleteButton" immediate="true"/>
-                    <p:commandButton id="excuteButton" icon="ui-icon-playlist-add-check" value="#{msg.Execute}"  actionListener="#{metrologyOrderController.getViewPage('MetrologyOrderExcute','Excute')}"  action="#{urlEncryptController.encodeUrlParam(metrologyOrderController.operation)}"  disabled="#{!metrologyOrderController.isExcuteable()}"/>
+                    <p:remoteCommand name="rc" update="datalist:createButton datalist:deleteButton" immediate="true"/>
+                    <!--<p:commandButton id="excuteButton" icon="ui-icon-playlist-add-check" value="#{msg.Execute}"  actionListener="#{metrologyOrderController.getViewPage('MetrologyOrderExcute','Excute')}"  action="#{urlEncryptController.encodeUrlParam(metrologyOrderController.operation)}"  disabled="#{!metrologyOrderController.isExcuteable()}"/>-->
                 </h:form>
 
 
