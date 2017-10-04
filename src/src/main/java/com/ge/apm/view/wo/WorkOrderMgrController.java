@@ -10,6 +10,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.domain.AssetFaultType;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -19,6 +20,7 @@ import com.ge.apm.domain.V2_WorkOrderCoworker;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.AssetFaultTypeService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -34,6 +36,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -56,6 +59,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
+    private BlobFileService blobService;
 
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
@@ -91,6 +95,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private String equipmentTaker;
     private String takeTime;
     
+    private List<V2_BlobObject> picList;
     
     private List<Integer> tagGroupAssets;
 
@@ -100,6 +105,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         queryIndex = 0;
@@ -242,6 +248,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
     }
+    
+    public List<V2_BlobObject> getServiceRequestPicList(String srId){
+        return woService.getServiceRequestPicList(srId);
+    }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
@@ -344,6 +354,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         cancel();
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
+        picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
@@ -352,7 +363,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void saveServiceRequest() {
         selectedAsset.setStatus(currentStatus);
-        woService.createServiceRequest(newServiceRequest, selectedAsset);
+        woService.createServiceRequest(newServiceRequest, selectedAsset,picList);
         cancel();
     }
 
@@ -468,6 +479,25 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else {
             return reason.substring(0, 19) + "...";
         }
+    }
+    
+    public void removeAttachment(String storageId){
+        blobService.deleteBlobFileByStorageId(storageId);
+        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    }
+    
+    public void handleFileUpload(FileUploadEvent event) {
+
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+
     }
 
     //getter and setter
@@ -657,4 +687,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.stepFileter = stepFileter;
     }
 
+    public List<V2_BlobObject> getPicList() {
+        return picList;
+    }
+
+    public void setPicList(List<V2_BlobObject> picList) {
+        this.picList = picList;
+    }
+
+    
 }
