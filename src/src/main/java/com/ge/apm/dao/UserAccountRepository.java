@@ -83,5 +83,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Query(value="select distinct u from UserAccount u, UserOrgInfo o, UserRole ur where u.uid=o.userUid and u.id=ur.userId and ur.roleId=3 and o.orgUid in ?1")
     public List<UserAccount> findByAssetAccess(List<String> uid);
 
-
+    @Query("select distinct u from UserAccount u, UserRole r where u.orgInfoId=?1 and u.id=r.userId and r.roleId <> 9")
+    List<UserAccount> findUsersByOrgIdExceptTemporaryAccount(int orgId);
 }
