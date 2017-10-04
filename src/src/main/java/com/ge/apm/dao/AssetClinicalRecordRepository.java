@@ -1,7 +1,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.AssetClinicalRecord;
-import com.ge.apm.service.analysis.AssetClinicalRecordPojo;
+import com.ge.apm.domain.AssetClinicalRecordPojo;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepository;
@@ -12,7 +12,7 @@ import java.util.List;
 public interface AssetClinicalRecordRepository extends GenericRepository<AssetClinicalRecord> {
 
     //全量聚合
-    @Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(" +
+    @Query("select new com.ge.apm.domain.AssetClinicalRecordPojo(" +
             "siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate, " +
             "count(examDuration) as examCount, " +
             "sum(examDuration) as examDurations ," +
@@ -25,13 +25,13 @@ public interface AssetClinicalRecordRepository extends GenericRepository<AssetCl
     public List<AssetClinicalRecordPojo> getAssetExamDataAggregator();
 
     //按指定日期聚合
-    @Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate,count(examDuration) as examCount,sum(examDuration) as examDurations ,sum(priceAmount) as priceAmounts ,sum(injectCount) as injectsCounts ,sum(exposeCount) as exposeCounts,sum(filmCount) as filmCounts  ) from AssetClinicalRecord  acr GROUP BY acr.examDate,acr.siteId,acr.hospitalId,acr.assetId having exam_date >= :from and exam_date <= :to"
+    @Query("select new com.ge.apm.domain.AssetClinicalRecordPojo(siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate,count(examDuration) as examCount,sum(examDuration) as examDurations ,sum(priceAmount) as priceAmounts ,sum(injectCount) as injectsCounts ,sum(exposeCount) as exposeCounts,sum(filmCount) as filmCounts  ) from AssetClinicalRecord  acr GROUP BY acr.examDate,acr.siteId,acr.hospitalId,acr.assetId having exam_date >= :from and exam_date <= :to"
     )
     public List<AssetClinicalRecordPojo> aggreateAssetByRange(@Param("from") Date date1, @Param("to") Date date2);
 
 
     //按当天聚合
-    @Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(" +
+    @Query("select new com.ge.apm.domain.AssetClinicalRecordPojo(" +
             "siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate, " +
             "count(examDuration) as examCount," +
             "sum(examDuration) as examDurations ," +
@@ -46,7 +46,7 @@ public interface AssetClinicalRecordRepository extends GenericRepository<AssetCl
     public List<AssetClinicalRecordPojo> getAssetExamDataAggregatorByDate(@Param("date") Date date);
 
 //test2
-@Query("select new com.ge.apm.pojo.AssetClinicalRecordPojo(siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate, procedureId as procedureId,count(examDuration) as examCount) from AssetClinicalRecord group by examDate,siteId,hospitalId,assetId, procedureId having exam_date = :date")
+@Query("select new com.ge.apm.domain.AssetClinicalRecordPojo(siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate, procedureId as procedureId,count(examDuration) as examCount) from AssetClinicalRecord group by examDate,siteId,hospitalId,assetId, procedureId having exam_date = :date")
 public List<AssetClinicalRecordPojo> aggregateForExamSummitByDate(@Param("date") Date date);
 
 
