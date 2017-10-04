@@ -52,7 +52,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
-    public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset) {
+    public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset,List<V2_BlobObject> picList) {
         ServiceRequestForm formData = new ServiceRequestForm();
         formData.setAssetId(asset.getId());
         formData.setAssetStatus(String.valueOf(asset.getStatus()));
@@ -61,6 +61,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
         formData.setPriority(newServiceRequest.getCasePriority());
         formData.setRequestReason(newServiceRequest.getRequestReason());
+        formData.setAttachments(picList);
 
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_serviceRequestCreate, requestEntity, LinkedHashMap.class);

@@ -49,6 +49,9 @@ public class V2_WorkOrderService {
 
     @Autowired
     private UserAccountRepository userDao;
+    
+    @Autowired
+    private BlobObjectRepository blobDao;
 
     @Autowired
     private ServiceRequestApiService srApi;
@@ -90,9 +93,15 @@ public class V2_WorkOrderService {
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
-    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset) {
+    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset,List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
-        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset);
+        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset,picList);
+    }
+    
+    public List<V2_BlobObject> getServiceRequestPicList(String srUid){
+        List<SearchFilter> blobSearchFilters = new ArrayList();
+        blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
+        return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
     public void cancelWorkOrder(String workOrderId, String reason) {
@@ -201,10 +210,10 @@ public class V2_WorkOrderService {
 
     public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, String extType,String comments) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
-        selectedWorkOrder.setCurrentStepId(3);
+        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(3);
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setEstimatedCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(estimatedCloseTime));
         formData.setIntExtType(extType);
         formData.setDesc(comments);
@@ -230,17 +239,11 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void reassignWorkOrder(int step, V2_WorkOrder selectedWorkOrder, Integer assigneeId,String comments) {
-       // V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
-        selectedWorkOrder.setCurrentStepId(step);
-        if(step==3){
-            selectedWorkOrder.setCurrentStepName("待接单");
-        }else{
-            selectedWorkOrder.setCurrentStepName("维修中");
-        }
+    public void reassignWorkOrder(V2_WorkOrder selectedWorkOrder, Integer assigneeId,String comments) {
+        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
-        formData.setCurrentStepId(step);
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setAssigneeId(String.valueOf(assigneeId));
         formData.setDesc(comments);
         String res = srApi.invokeWorkOrderAction(token,formData,"reassign",selectedWorkOrder.getId());
