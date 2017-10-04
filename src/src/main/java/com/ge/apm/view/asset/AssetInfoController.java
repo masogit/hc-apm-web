@@ -609,10 +609,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getClinicalOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        List<SearchFilter> usersFilters = new ArrayList<>();
         if (null != selected.getClinicalDeptId()) {
-            usersFilters.add(new SearchFilter("orgInfoId", SearchFilter.Operator.EQ, selected.getClinicalDeptId()));
-            accountList.addAll(userDao.findBySearchFilter(usersFilters));
+            accountList.addAll(userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId()));
         } 
         return accountList;
     }
