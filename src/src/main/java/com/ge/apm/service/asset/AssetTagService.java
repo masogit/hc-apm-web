@@ -50,7 +50,6 @@ public class AssetTagService {
     }
 
     public List<AssetInfo> getAssetList(AssetInfo queryAsset) {
-
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
         assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));

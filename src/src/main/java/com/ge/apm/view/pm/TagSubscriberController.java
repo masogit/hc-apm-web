@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
+
 @ManagedBean
 @ViewScoped
 public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> {
@@ -27,24 +28,33 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
     private AssetTagRepository assetTagRepository;
     private I18nMessageRepository i18nMessageRepository;
     private UserAccount currentUser;
+    private UserAccountRepository userAccountRepository;
+    private List<UserAccount> tenantUserList;
 
     private List<I18nMessage>   msgModeList;
     private List<AssetTag> assetTags;
-
+    UserContextService userContextService;
     List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
     HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
     private Integer receiveMsgMode;
 
     @Override
     protected void init() {
+        userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
         this.filterBySite =false;
         dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
         assetTagRepository =WebUtil.getBean(AssetTagRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
-        assetTagMsgSubscribers = dao.getAssetTagMsgSubscriber(currentUser.getId());
+
+
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
         msgModeList = fieldMsg.getFieldValueList("focusOption");
+        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+        //获取当前租户下的所有用户
+        tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
+
+
         for (I18nMessage local1 : msgModeList) {
             hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
         }
@@ -53,6 +63,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
     public String getTagName(Integer tagId){
         return assetTagRepository.findById(tagId).getName();
     }
+    public String getSubscriberName(Integer userId){
+       return userAccountRepository.findById(userId).getName();
+    }
+
+
 
 
     public String getMsgMode(int msgmode){
@@ -74,9 +89,13 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
         selected = null;
 
         List<SearchFilter> searchFilters =  new ArrayList<>();
-        SearchFilter subscribeUserIdFilter = new SearchFilter("subscribeUserId", SearchFilter.Operator.EQ, currentUser.getId());
-        searchFilters.add(subscribeUserIdFilter);
-
+        //当前租户下的标签
+        //IT管理员可以看到所有关注标签的用户,
+        if(!userContextService.hasRole("ITAdmin")) {
+            searchFilters.add(new SearchFilter("subscribeUserId", SearchFilter.Operator.EQ, currentUser.getId()));
+        }else{
+            searchFilters.add(new SearchFilter("subscriberUser.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+        }
         if(searchFilters.size() <= 0){
             return dao.findAll(pageRequest);
         }else{
@@ -94,7 +113,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-        assetTags = assetTagRepository.find();
+       // assetTags = assetTagRepository.find();
     }
 
     @Override
@@ -131,10 +150,18 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
     public Integer getReceiveMsgMode() {
         if(this.selected!=null)
         {
-            return  this.selected .getReceiveMsgMode();
+            return  this.selected.getReceiveMsgMode();
         }else
 
             return receiveMsgMode;
+    }
+
+    public List<UserAccount> getTenantUserList() {
+        return tenantUserList;
+    }
+
+    public void setTenantUserList(List<UserAccount> tenantUserList) {
+        this.tenantUserList = tenantUserList;
     }
 
     public void setReceiveMsgMode(Integer receiveMsgMode) {
