@@ -80,7 +80,7 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('woSteps').subList(0,6)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{item.currentStepName}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
                         </p:column>
                         <p:column headerText="#{msg.intExtType}">
                             <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
