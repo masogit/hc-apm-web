@@ -77,7 +77,7 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update=":ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
                 </p:fieldset>
