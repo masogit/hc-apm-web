@@ -22,149 +22,153 @@ import java.util.List;
 @ViewScoped
 public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> {
 
-    private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
-    private AssetTagMsgSubscriberRepository dao = null;
-    private AssetTagRepository assetTagRepository;
-    private I18nMessageRepository i18nMessageRepository;
-    private UserAccount currentUser;
-    private UserAccountRepository userAccountRepository;
-    private List<UserAccount> tenantUserList;
+	private AssetTagMsgSubscriberRepository dao = null;
+	private AssetTagRepository assetTagRepository;
+	private I18nMessageRepository i18nMessageRepository;
+	private UserAccount currentUser;
+	private UserAccountRepository userAccountRepository;
+	private List<UserAccount> tenantUserList;
 
-    private List<I18nMessage>   msgModeList;
-    private List<AssetTag> assetTags;
-    UserContextService userContextService;
-    List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
-    HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
-    private Integer receiveMsgMode;
+	private List<I18nMessage>   msgModeList;
+	private List<AssetTag> assetTags;
+	UserContextService userContextService;
+	List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
+	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
+	private Integer receiveMsgMode;
 
-    @Override
-    protected void init() {
-        userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
-        this.filterBySite =false;
-        dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
-        assetTagRepository =WebUtil.getBean(AssetTagRepository.class);
-        currentUser = UserContextService.getCurrentUserAccount();
-
-
-        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
-        FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
-        msgModeList = fieldMsg.getFieldValueList("focusOption");
-        userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
-        //获取当前租户下的所有用户
-        tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
+	@Override
+	protected void init() {
+		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
+		this.filterBySite =false;
+		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
+		assetTagRepository =WebUtil.getBean(AssetTagRepository.class);
+		currentUser = UserContextService.getCurrentUserAccount();
 
 
-        for (I18nMessage local1 : msgModeList) {
-            hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
-        }
-
-    }
-    public String getTagName(Integer tagId){
-        return assetTagRepository.findById(tagId).getName();
-    }
-    public String getSubscriberName(Integer userId){
-       return userAccountRepository.findById(userId).getName();
-    }
+		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+		FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
+		msgModeList = fieldMsg.getFieldValueList("focusOption");
+		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		//获取当前租户下的所有用户
+		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 
 
+		for (I18nMessage local1 : msgModeList) {
+			hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
+		}
+
+	}
+	public String getTagName(Integer tagId){
+		return assetTagRepository.findById(tagId).getName();
+	}
+	public String getSubscriberName(Integer userId){
+		return userAccountRepository.findById(userId).getName();
+	}
 
 
-    public String getMsgMode(int msgmode){
-        return hmMsgMode.get(msgmode);
-    }
 
-    @Override
-    protected String getActionMessage(String actionName) {
-        return WebUtil.getMessage("标签"+this.getTagName(this.selected.getTagId())+"  "+WebUtil.getMessage(actionName));
-    }
 
-    @Override
-    protected AssetTagMsgSubscriberRepository getDAO() {
-        return dao;
-    }
+	public String getMsgMode(int msgmode){
+		return hmMsgMode.get(msgmode);
+	}
 
-    @Override
-    protected Page<AssetTagMsgSubscriber> loadData(PageRequest pageRequest) {
-        selected = null;
+	@Override
+	protected String getActionMessage(String actionName) {
+		return WebUtil.getMessage("标签"+this.getTagName(this.selected.getTagId())+"  "+WebUtil.getMessage(actionName));
+	}
 
-        List<SearchFilter> searchFilters =  new ArrayList<>();
-        //当前租户下的标签
-        //IT管理员可以看到所有关注标签的用户,
-        if(!userContextService.hasRole("ITAdmin")) {
-            searchFilters.add(new SearchFilter("subscribeUserId", SearchFilter.Operator.EQ, currentUser.getId()));
-        }else{
-            searchFilters.add(new SearchFilter("subscriberUser.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-        }
-        if(searchFilters.size() <= 0){
-            return dao.findAll(pageRequest);
-        }else{
-            return dao.findBySearchFilter(searchFilters, pageRequest);
-        }
-    }
+	@Override
+	protected AssetTagMsgSubscriberRepository getDAO() {
+		return dao;
+	}
 
-    @Override
-    public void prepareCreate() throws InstantiationException, IllegalAccessException {
-        super.prepareCreate();
-        this.selected.setReceiveMsgMode(null);
-        assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), currentUser.getId());
-    }
+	@Override
+	protected Page<AssetTagMsgSubscriber> loadData(PageRequest pageRequest) {
+		selected = null;
+		if(this.searchFilters ==null){
+			searchFilters =  new ArrayList<>();
+		}else{
+			this.removeFilterOnField("subscribeUserId");
+			this.removeFilterOnField("subscriberUser.tenantUID");
+		}
+		//当前租户下的标签
+		//IT管理员可以看到所有关注标签的用户,
+		if(!userContextService.hasRole("ITAdmin")) {
+			searchFilters.add(new SearchFilter("subscribeUserId", SearchFilter.Operator.EQ, currentUser.getId()));
+		}else{
+			searchFilters.add(new SearchFilter("subscriberUser.tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+		}
+		if(searchFilters.size() <= 0){
+			return dao.findAll(pageRequest);
+		}else{
+			return dao.findBySearchFilter(searchFilters, pageRequest);
+		}
+	}
 
-    @Override
-    public void prepareEdit() {
-        super.prepareEdit();
-       // assetTags = assetTagRepository.find();
-    }
+	@Override
+	public void prepareCreate() throws InstantiationException, IllegalAccessException {
+		super.prepareCreate();
+		this.selected.setReceiveMsgMode(null);
+		assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), currentUser.getId());
+	}
 
-    @Override
-    public void onBeforeNewObject(AssetTagMsgSubscriber object) {
-        super.onBeforeNewObject(object);
-        object.setSubscribeUserId(currentUser.getId());
-        object.setIsReceiveChatMsg(true);
-    }
+	@Override
+	public void prepareEdit() {
+		super.prepareEdit();
+		// assetTags = assetTagRepository.find();
+	}
 
-    public HashMap<Integer, String> getHmMsgMode() {
-        return hmMsgMode;
-    }
+	@Override
+	public void onBeforeNewObject(AssetTagMsgSubscriber object) {
+		super.onBeforeNewObject(object);
+		object.setSubscribeUserId(currentUser.getId());
+		object.setIsReceiveChatMsg(true);
+	}
 
-    public void setHmMsgMode(HashMap<Integer, String> hmMsgMode) {
-        this.hmMsgMode = hmMsgMode;
-    }
+	public HashMap<Integer, String> getHmMsgMode() {
+		return hmMsgMode;
+	}
 
-    public List<I18nMessage> getMsgModeList() {
-        return msgModeList;
-    }
+	public void setHmMsgMode(HashMap<Integer, String> hmMsgMode) {
+		this.hmMsgMode = hmMsgMode;
+	}
 
-    public void setMsgModeList(List<I18nMessage> msgModeList) {
-        this.msgModeList = msgModeList;
-    }
+	public List<I18nMessage> getMsgModeList() {
+		return msgModeList;
+	}
 
-    public List<AssetTag> getAssetTags() {
-        return assetTags;
-    }
+	public void setMsgModeList(List<I18nMessage> msgModeList) {
+		this.msgModeList = msgModeList;
+	}
 
-    public void setAssetTags(List<AssetTag> assetTags) {
-        this.assetTags = assetTags;
-    }
+	public List<AssetTag> getAssetTags() {
+		return assetTags;
+	}
 
-    public Integer getReceiveMsgMode() {
-        if(this.selected!=null)
-        {
-            return  this.selected.getReceiveMsgMode();
-        }else
+	public void setAssetTags(List<AssetTag> assetTags) {
+		this.assetTags = assetTags;
+	}
 
-            return receiveMsgMode;
-    }
+	public Integer getReceiveMsgMode() {
+		if(this.selected!=null)
+		{
+			return  this.selected.getReceiveMsgMode();
+		}else
 
-    public List<UserAccount> getTenantUserList() {
-        return tenantUserList;
-    }
+			return receiveMsgMode;
+	}
 
-    public void setTenantUserList(List<UserAccount> tenantUserList) {
-        this.tenantUserList = tenantUserList;
-    }
+	public List<UserAccount> getTenantUserList() {
+		return tenantUserList;
+	}
 
-    public void setReceiveMsgMode(Integer receiveMsgMode) {
-        this.receiveMsgMode = receiveMsgMode;
-    }
+	public void setTenantUserList(List<UserAccount> tenantUserList) {
+		this.tenantUserList = tenantUserList;
+	}
+
+	public void setReceiveMsgMode(Integer receiveMsgMode) {
+		this.receiveMsgMode = receiveMsgMode;
+	}
 }
