@@ -5,12 +5,6 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="preRenderView">
-    </ui:define>
-
-    <ui:define name="head">
-        <h:outputStylesheet name="css/wo_steps.css" />
-    </ui:define>
 
     <ui:define name="content">
         <div class="ui-g clearfix">
@@ -19,7 +13,7 @@
             </div>
 
             <div class="ui-g-12 card">
-                <p:messages autoUpdate="true" closable="true" showDetail="false"/>
+                <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
                 <h:form id="woMgrListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
