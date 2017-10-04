@@ -1133,6 +1133,9 @@ update proc_part set name='其他' where id=5;
 delete from brand;
 INSERT INTO brand (name) (SELECT DISTINCT manufacture as name from asset_info where manufacture IS NOT NULL and trim(manufacture) != '') ;
 
+insert into asset_tag (id, name) values (-999, '院区所有设备');
+
+
 /*insert into supplier(site_id,name) values (1, '通用电气');
 insert into supplier(site_id,name) values (1, '西门子');
 insert into supplier(site_id,name) values (1, '飞利浦');
