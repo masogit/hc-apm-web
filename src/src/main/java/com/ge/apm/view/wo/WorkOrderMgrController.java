@@ -10,6 +10,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.domain.AssetFaultType;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -19,6 +20,7 @@ import com.ge.apm.domain.V2_WorkOrderCoworker;
 import com.ge.apm.domain.V2_WorkOrder_Detail;
 import com.ge.apm.domain.V2_WorkOrder_Step;
 import com.ge.apm.service.asset.AssetFaultTypeService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -34,6 +36,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -56,6 +59,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
+    private BlobFileService blobService;
 
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
@@ -90,6 +94,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private String failReason;
     private String equipmentTaker;
     private String takeTime;
+    
+    private List<V2_BlobObject> picList;
+    private List<V2_BlobObject> audioList;
+    
+    private List<Integer> tagGroupAssets;
 
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -97,6 +106,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         queryIndex = 0;
@@ -119,6 +129,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("dispatchMode");
         removeFilterOnField("srId");
         removeFilterOnField("feedbackRating");
+        removeFilterOnField("assetId");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -135,9 +146,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
         } else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*4+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, -1,"1*4+"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3),"1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(),"1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*3+"));
+            if(!getTagGroupAssets().isEmpty()){
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
+            }
+            
         } else if (queryIndex == 4) { //维修中
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
@@ -193,6 +209,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             return uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         }
     }
+    
+    private List<Integer> getTagGroupAssets(){
+        if(tagGroupAssets == null){
+            tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
+        }
+        return tagGroupAssets;
+    }
 
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
@@ -225,7 +248,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         currentStatus = selected.getAssetInfo().getStatus();
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
+        audioList = getServiceRequestPicList(selected.getSrId(),2);
+        picList = getServiceRequestPicList(selected.getSrId(),1);
     }
+    
+    private List<V2_BlobObject> getServiceRequestPicList(String srId,Integer type){ //type 1:picture 2:audio
+        return woService.getServiceRequestPicList(srId).stream().filter(item -> type==1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
+    }
+    
+    
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
@@ -328,6 +359,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         cancel();
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
+        picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
@@ -336,7 +368,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void saveServiceRequest() {
         selectedAsset.setStatus(currentStatus);
-        woService.createServiceRequest(newServiceRequest, selectedAsset);
+        woService.createServiceRequest(newServiceRequest, selectedAsset,picList);
         cancel();
     }
 
@@ -377,7 +409,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
     
     public void reassignWorkOrder(){
-        woService.reassignWorkOrder(selectedWorkOrder.getCurrentStepId(),selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
+        woService.reassignWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), comments);
         cancel();
     }
 
@@ -452,6 +484,25 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else {
             return reason.substring(0, 19) + "...";
         }
+    }
+    
+    public void removeAttachment(String storageId){
+        blobService.deleteBlobFileByStorageId(storageId);
+        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    }
+    
+    public void handleFileUpload(FileUploadEvent event) {
+
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+
     }
 
     //getter and setter
@@ -639,6 +690,22 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void setStepFileter(String stepFileter) {
         this.stepFileter = stepFileter;
+    }
+
+    public List<V2_BlobObject> getPicList() {
+        return picList;
+    }
+
+    public void setPicList(List<V2_BlobObject> picList) {
+        this.picList = picList;
+    }
+
+    public List<V2_BlobObject> getAudioList() {
+        return audioList;
+    }
+
+    public void setAudioList(List<V2_BlobObject> audioList) {
+        this.audioList = audioList;
     }
 
 }

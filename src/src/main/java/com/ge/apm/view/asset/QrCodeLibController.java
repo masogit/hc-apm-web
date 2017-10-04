@@ -131,7 +131,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     public void createQrCode() {
     	if(userContextService.hasRole("ITAdmin")){
     		tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-    		siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+    		//siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
     	}
         qrCodeService.createManyQrCode(tenantUID, siteUID, qrCodeNum);
 

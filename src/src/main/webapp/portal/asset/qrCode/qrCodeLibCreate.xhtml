@@ -10,7 +10,7 @@
     <p:dialog id="qrCodeLibCreateDlg" widgetVar="qrCodeLibCreateDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码生成">
     <h:form id="qrCodeLibCreateForm">
         <h:panelGroup id="display">
-        	<h:panelGroup id ="tenant" rendered="#{userContextService.hasRole('SuperAdmin')}" >
+        	<h:panelGroup id ="tenant" >
             <h:outputLabel for="siteIdSelect" value="租户 ： "  />
             <p:selectOneMenu id="siteIdSelect" value="#{qrCodeLibController.tenantUID}" required="true" requiredMessage="租户院区不能为空">
                 <p:ajax  listener="#{qrCodeLibController.onSiteChange}" update="hospitalIdSelect" />
