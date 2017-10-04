@@ -594,7 +594,7 @@ public class WorkOrderListController extends GenericCRUDUUIDController<V2_WorkOr
     }
 
     public void closeWorkOrder(){
-        woService.closeWorkOrder(selectedWorkOrder,comments);
+        woService.closeWorkOrder(selectedWorkOrder,comments,null);
         cancel();
     }
 
