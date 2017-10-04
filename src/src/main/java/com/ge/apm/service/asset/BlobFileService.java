@@ -138,5 +138,9 @@ public class BlobFileService {
             return false;
         }
     }
+    
+    public void saveBlobObject(V2_BlobObject blobObject){
+        blobDao.save(blobObject);
+    }
 
 }
