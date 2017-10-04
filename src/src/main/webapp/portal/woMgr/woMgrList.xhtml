@@ -5,12 +5,6 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="preRenderView">
-    </ui:define>
-
-    <ui:define name="head">
-        <h:outputStylesheet name="css/wo_steps.css" />
-    </ui:define>
 
     <ui:define name="content">
         <div class="ui-g clearfix">
@@ -19,7 +13,7 @@
             </div>
 
             <div class="ui-g-12 card">
-                <p:messages autoUpdate="true" closable="true" showDetail="false"/>
+                <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
                 <h:form id="woMgrListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
@@ -86,7 +80,7 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('woSteps').subList(0,6)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{item.currentStepName}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
                         </p:column>
                         <p:column headerText="#{msg.intExtType}">
                             <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>

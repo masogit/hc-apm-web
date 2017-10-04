@@ -12,6 +12,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.asset.AssetFileAttachmentController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.File;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -113,11 +114,29 @@ public class BlobFileService {
         return blobDao.findByObjectStorageId(storagedId);
     }
 
+    public List<V2_BlobObject> getBlobObjectsByStorageId(String storagedId) {
+        return blobDao.findAllByObjectStorageId(storagedId);
+    }
+
     public Boolean deleteBlobFileByStorageId(String objectId) {
         V2_BlobObject object = getBlobObjectByStorageId(objectId);
         return deleteBlobFile(object);
     }
-    
+
+    /**
+     * Need to investigate why the same object storage id occurs more than once
+     * @param objectId
+     * @return
+     */
+    public Boolean deleteBlobFilesByStorageId(String objectId) {
+        List<V2_BlobObject> objects = getBlobObjectsByStorageId(objectId);
+        for (V2_BlobObject object: objects) {
+            deleteBlobFile(object);
+        }
+
+        return true;
+    }
+
     public Boolean deleteBlobFileByStorageId(String openId, String objectId) {
         String token = microService.getAuthenticateByOpenId(null, openId);
         if (token == null || token.isEmpty()) {

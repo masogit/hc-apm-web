@@ -53,7 +53,7 @@
         <intercept-url pattern="/portal/asset/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff', 'ClinicalStaff')"/>
 
         <!-- 维修管理 -->
-        <intercept-url pattern="/portal/wo/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 维修管理 -->
+        <intercept-url pattern="/portal/wo/**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','AssetStaff')"/> <!-- 维修管理 -->
 
         <!-- 设备监控 -->
         <intercept-url pattern="/portal/analysis/assetStatus**" access="hasAnyRole('SuperAdmin','HospitalHead','AssetHead','DeptHead','AssetStaff')"/> <!-- 状态监控 -->

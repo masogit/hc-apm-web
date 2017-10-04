@@ -276,7 +276,7 @@ public class WxAssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<OrgInfo> getClinicalDeptList() {
-        return acService.getClinicalDeptList(assetInfo.getHospitalId());
+        return acService.getClinicalDeptList(assetInfo.getSiteUID());
     }
 
     public void onClinicalDeptChange() {

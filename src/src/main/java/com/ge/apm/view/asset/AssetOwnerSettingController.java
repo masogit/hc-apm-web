@@ -80,7 +80,7 @@ public class AssetOwnerSettingController {
     }
 
     public List<OrgInfo> getClinicalDeptList() {
-        return acServie.getClinicalDeptList(queryAsset.getHospitalId());
+        return acServie.getClinicalDeptList(queryAsset.getSiteUID());
     }
 
     public List<UserAccount> getOwnerList() {

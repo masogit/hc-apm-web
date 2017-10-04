@@ -93,7 +93,8 @@ public class WorkOrderFromReportController extends GenericCRUDUUIDController<V2_
 
     public void loadSrDetails() {
         this.workOrders = new ArrayList<>();
-        this.workOrders.add(dao.findById(selected.getId()));
+        //this.workOrders.add(dao.findById(selected.getId()));
+        if(selected!=null) this.workOrders.add(selected);
     }
 
     public List<V2_WorkOrder_Detail> getWOrkOrderDetail(String woId) {

@@ -204,7 +204,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     public List<OrgInfo> getClinicalDeptList() {
         List<OrgInfo> tempDeptList = new ArrayList<>();
         if(queryAsset.getHospitalId() != null && queryAsset.getHospitalId() != 0){
-            tempDeptList = acService.getClinicalDeptList(queryAsset.getHospitalId());
+            tempDeptList = acService.getClinicalDeptList(queryAsset.getSiteUID());
         }
         return tempDeptList;
     }

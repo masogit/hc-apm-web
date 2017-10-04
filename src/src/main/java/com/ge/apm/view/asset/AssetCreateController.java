@@ -119,7 +119,7 @@ public class AssetCreateController {
     }
 
     public List<OrgInfo> getClinicalDeptList() {
-        return acServie.getClinicalDeptList(assetInfo.getHospitalId());
+        return acServie.getClinicalDeptList(assetInfo.getSiteUID());
     }
 
     public String getHospitalName() {
