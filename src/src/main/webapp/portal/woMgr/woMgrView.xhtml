@@ -8,7 +8,6 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
-
         <div class="ui-g-12 card">
 
             <h:form id="woMgrDetailForm">
@@ -83,14 +82,23 @@
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.cancelReason}" />
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:dataGrid var="fileitem" value="#{workOrderMgrController.getServiceRequestPicList(workOrderMgrController.selected.serviceRequest.id)}" columns="3" layout="grid">
+                    <p:dataGrid var="picItem" value="#{workOrderMgrController.picList}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.picList}">
                         <f:facet name="header">报修图片</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"/> 
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"/> 
                             </h:panelGrid>
                         </p:panel>
-
+                    </p:dataGrid>
+                    <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
+                        <f:facet name="header">报修语音</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <audio controls="controls">  
+                                    <source src="#{fileDownloadService.getFileUrl(audioItem.objectStorageId)}" /> 
+                                </audio> 
+                            </h:panelGrid>
+                        </p:panel>
                     </p:dataGrid>
                     <c:forEach items="#{workOrderMgrController.selectedWorkOrderList}" var="woItem" varStatus="rowIndex" >
                         <p:fieldset legend="#{woItem.id==workOrderMgrController.selected.id? '当前工单':msg.WorkOrder}" toggleable="false" >
