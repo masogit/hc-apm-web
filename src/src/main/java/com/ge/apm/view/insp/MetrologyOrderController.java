@@ -213,6 +213,25 @@ public class MetrologyOrderController extends JpaCRUDController<InspectionOrder>
     }
 
     public String updateOrder(){
+        Calendar calender = Calendar.getInstance();
+        calender.setTime(new Date());
+        calender.add(Calendar.DAY_OF_MONTH, -1);
+
+        if(selected.getEndTime() != null && selected.getStartTime() == null ){
+            WebUtil.addErrorMessage("开始时间不能为空");
+            return "";
+        }
+
+        if (selected.getStartTime().before(selected.getPlanTime())) {
+            WebUtil.addErrorMessage("开始时间不能小于计划时间");
+            return "";
+        }
+
+        if (selected.getEndTime().before(selected.getStartTime())) {
+            WebUtil.addErrorMessage("结束时间不能小于开始时间");
+            return "";
+        }
+
         inspectionService.updateOrder(this.selected, new ArrayList<>());
         return "MetrologyOrderList?faces-redirect=true";
     }
