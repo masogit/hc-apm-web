@@ -1,0 +1,116 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.QRCodeMgmt}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form >
+                    <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
+                    &#160;
+                    <!--                    <p:commandButton id="generateQrCodesButton" icon="ui-icon-arrowthick-1-s" value="生成并导出二维码" 
+                                                         title="生成并导出二维码" actionListener="#{generateQrCodesController.createQrCode}" update=":generateQrCodesDlg" 
+                                                         oncomplete="PF('generateQrCodesDialog').show()"/>-->
+                </h:form>
+
+                <h:form id="qrCodeLibListForm">
+                    <p:dataTable id="datalist" value="#{qrCodeLibController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{qrCodeLibController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,40,60,90">
+
+                        <p:ajax event="rowSelect" update="viewButton"/>
+                        <p:ajax event="filter" listener="#{qrCodeLibController.onFilter}" />
+
+<!--                         <p:column headerText="租户" sortBy="#{item.siteId}" filterBy="#{item.tenantUID}" filterMatchMode="EQ" rendered="#{userContextService.hasRole('SuperAdmin')}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu value="#{qrCodeLibController.tenantUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" disabled="#{qrCodeLibController.isChooseTenant()}">
+                                    <p:ajax  listener="#{qrCodeLibController.onTenantFilterChange}" update="hospitalIdSelect_list" />
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{qrCodeLibController.getSiteName(item.siteId)}"/>
+                        </p:column> -->
+                        <p:column headerText="医院" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeLibController.siteUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+                                   	<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                					<f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
+                                   <!--  <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/> -->
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
+                        </p:column>
+                        <p:column headerText="二维码" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+                        <p:column headerText="当前状态" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('qrCodeLibStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('qrCodeLibStatus', item.status)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.issueDate}" sortBy="#{item.issueDate}" >
+                            <h:outputText value="#{item.issueDate}">
+                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.submitDate}" sortBy="#{item.submitDate}" >
+                            <h:outputText value="#{item.submitDate}">
+                                <f:convertDateTime pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="qrCodeInfo_export"/>
+                            </p:commandButton>
+                            <p:commandButton id="viewButton" icon="ui-icon-search" title="#{msg.View}" actionListener="#{qrCodeLibController.showQrCode}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty qrCodeLibController.selected}"/>
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{qrCodeLibController.exportQrCode}" update=":growl" 
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                <p:fileDownload value="#{qrCodeLibController.zipFile}" />
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+
+                </h:form>
+
+
+                <ui:include src="qrCodeLibCreate.xhtml"/>
+                <ui:include src="qrCodeLibShow.xhtml"/>
+                <!--<ui:include src="generateQrCodes.xhtml"/>-->
+            </div>
+            <p:dialog modal="true" id="statusDialog" widgetVar="statusDialog" draggable="false" closable="false" resizable="false">
+                <p:graphicImage name="img/ajaxloader.gif" />
+            </p:dialog>
+        </div>
+
+        <script type="text/javascript">
+            function start() {
+                PF('statusDialog').show();
+            }
+
+            function stop() {
+                PF('statusDialog').hide();
+            }
+        </script>
+    </ui:define>
+</ui:composition>
