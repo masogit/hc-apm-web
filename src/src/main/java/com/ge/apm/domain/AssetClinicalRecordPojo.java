@@ -1,4 +1,4 @@
-package com.ge.apm.service.analysis;
+package com.ge.apm.domain;
 
 import java.util.Date;
 

@@ -30,19 +30,31 @@
                         <label class="label">测试方法</label>
                         <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"  queryDelay="750" minQueryLength="4"/>
                     </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">备注</label>
-                        <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.comment}" rows="3"  cols="40"  queryDelay="750" minQueryLength="4"/>
-                    </h:panelGroup>
-
                     <h:panelGroup  id="equipmentTaker" >
                         <label class="label">取物人</label>
-                        <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker}" required="true" requiredMessage="取物人#{msg.ValidationRequire}"/>
+                        <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker}"/>
                         <p:commandButton title="取物" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update=":toCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrController.equipmentTaker}"/>
                     </h:panelGroup>
 
 
                 </p:panelGrid>
+                <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="7" layout="grid">
+                        <f:facet name="header">增加图片</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+                                <p:commandButton actionListener="#{workOrderMgrController.removeAttachment(fileitem.objectStorageId)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>   
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </p:dataGrid>
+                    <p:fileUpload id="type1" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+
+
                 <p:fieldset legend="费用明细" >
 
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">

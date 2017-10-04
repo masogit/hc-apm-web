@@ -1,5 +1,6 @@
 package com.ge.apm.service.analysis;
 
+import com.ge.apm.domain.AssetClinicalRecordPojo;
 import com.ge.apm.dao.AssetClinicalRecordRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetSummitRepository;
