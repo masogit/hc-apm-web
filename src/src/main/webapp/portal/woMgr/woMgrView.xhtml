@@ -106,7 +106,7 @@
 
                                 <h:panelGroup>
                                     <label class="label">#{msg.status}</label>
-                                    <p:outputLabel value="#{woItem.currentStepName}" />
+                                    <p:outputLabel value="#{fieldMsg.fieldValue('woSteps', woItem.currentStepId)}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">签到时间</label>
