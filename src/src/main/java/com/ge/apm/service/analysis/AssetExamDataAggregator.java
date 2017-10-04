@@ -7,7 +7,6 @@ import com.ge.apm.dao.ExamSummitRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetSummit;
 import com.ge.apm.domain.ExamSummit;
-import com.ge.apm.pojo.AssetClinicalRecordPojo;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
