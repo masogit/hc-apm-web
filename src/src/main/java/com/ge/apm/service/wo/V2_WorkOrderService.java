@@ -49,6 +49,9 @@ public class V2_WorkOrderService {
 
     @Autowired
     private UserAccountRepository userDao;
+    
+    @Autowired
+    private BlobObjectRepository blobDao;
 
     @Autowired
     private ServiceRequestApiService srApi;
@@ -90,9 +93,15 @@ public class V2_WorkOrderService {
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
 
-    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset) {
+    public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset,List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
-        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset);
+        Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset,picList);
+    }
+    
+    public List<V2_BlobObject> getServiceRequestPicList(String srUid){
+        List<SearchFilter> blobSearchFilters = new ArrayList();
+        blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
+        return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
     public void cancelWorkOrder(String workOrderId, String reason) {
