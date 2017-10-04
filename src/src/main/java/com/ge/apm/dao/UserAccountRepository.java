@@ -70,7 +70,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     @Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     public List<UserAccount> getByInstitutionUID(String InsitiUID);
-    
+
+    //当前租户下的肥临时报修人
     @Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
     public List<UserAccount> getByTenantUID(String tenantUID);
     

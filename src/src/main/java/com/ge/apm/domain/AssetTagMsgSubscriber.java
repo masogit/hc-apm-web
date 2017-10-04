@@ -41,11 +41,23 @@ public class AssetTagMsgSubscriber  implements Serializable {
     @Column(name = "subscribe_user_id")
     private Integer subscribeUserId;
 
+    @JoinColumn(name = "subscribe_user_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserAccount subscriberUser;
+
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "tag_id")
     private Integer tagId;
 
+    public UserAccount getSubscriberUser() {
+        return subscriberUser;
+    }
+
+    public void setSubscriberUser(UserAccount subscriberUser) {
+        this.subscriberUser = subscriberUser;
+    }
 
     public Integer getId() {
         return id;
