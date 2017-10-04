@@ -28,8 +28,9 @@
     <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
-    <p:column headerText="关注人" filterMatchMode="LIKE">
-        <h:outputText value="#{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />
+    <p:column headerText="关注人" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+      <!--  <h:outputText value="  #{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />-->
+        <h:outputText value="#{item.subscriberUser.name}" />
     </p:column>
 
     <p:column headerText="设备标签" filterMatchMode="LIKE">
@@ -40,12 +41,6 @@
         <h:outputText value="#{tagSubscriberController.getMsgMode(item.receiveMsgMode)}" />
     </p:column>
    <p:column headerText="工单超时推送选项" ><h:outputText value="#{item.isReceiveTimeoutMsg?'推送':'不推送'}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'} "/></p:column>
-   <!-- <p:column headerText="关注工单超时消息xxx" >
-       <h:outputText value="#{item.isReceiveChatMsg?'已选':'未选'}" style="color:#{item.isReceiveChatMsg?'blue':'red'} "/></p:column>
-    <p:column headerText="关注工单对话消息" >
-        <h:outputText  value="#{item.isReceiveTimeoutMsg?'已选':'未选'}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'}" />
-    </p:column>-->
-
 
     <f:facet name="{Toolbar}">
       <!--  <p:commandButton id="createButton" actionListener="#{tagSubscriberController.prepareCreate}" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" />-->
