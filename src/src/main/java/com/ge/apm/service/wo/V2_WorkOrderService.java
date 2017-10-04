@@ -253,7 +253,7 @@ public class V2_WorkOrderService {
     }
 
 
-    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails, Double myhours, Double otherExpense,String comments) {
+    public void repairWorkOrder(V2_WorkOrder selectedWorkOrder, Date confirmedUpTime, Integer assetStatus, List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,String comments,List<V2_BlobObject> attachments) {
         selectedWorkOrder.setCurrentStepId(4);
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
@@ -269,8 +269,9 @@ public class V2_WorkOrderService {
         formData.setAssetStatus(assetStatus.toString());
         formData.setStepDetail(accDetails);
         formData.setStepCoworker(coDetails);
-        formData.setManHours(myhours);
-        formData.setOtherExpense(otherExpense);
+        formData.setManHours(selectedWorkOrder.getManHours());
+        formData.setOtherExpense(selectedWorkOrder.getOtherExpense());
+        formData.setAttachments(attachments);
         String res = srApi.invokeWorkOrderAction(token,formData,"repair",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
