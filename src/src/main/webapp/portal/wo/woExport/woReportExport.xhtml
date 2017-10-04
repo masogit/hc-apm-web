@@ -78,17 +78,16 @@
                             <p:remoteCommand name="test" ajax="true" validateClient="true" update=":growl">
                                 <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
                             </p:remoteCommand>-->
-                            <p:commandButton ajax="false" value="导出" actionListener="#{workOrderReportExportController.exportData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                <p:fileDownload value="#{workOrderReportExportController.exportFile}" update=":growl" />
-                            </p:commandButton>
 
-                            <p:commandButton value="导出结果预览" actionListener="#{workOrderReportExportController.previewData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl datalist">
+                            <p:commandButton value="预览结果" actionListener="#{workOrderReportExportController.previewData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :dataListForm :dataListForm:datalist">
                             </p:commandButton>
                         </h:panelGroup>
                     </p:panelGrid>
+                </h:form>
 
-                    <p:dataTable id="datalist" value="#{workOrderReportExportController.workOrderList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                <h:form id="dataListForm">
+                    <p:dataTable id="datalist" rendered="#{not empty workOrderReportExportController.workOrderList}" value="#{workOrderReportExportController.workOrderList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,50">
                         <p:column headerText="报修单号">
@@ -124,6 +123,12 @@
                         <p:column headerText="工单状态">
                             <h:outputText value="#{item.工单状态}" />
                         </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton ajax="false" value="导出" actionListener="#{workOrderReportExportController.exportData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                <p:fileDownload value="#{workOrderReportExportController.exportFile}" update=":growl" />
+                            </p:commandButton>
+                        </f:facet>
                     </p:dataTable>
                 </h:form>
             </div>

@@ -107,7 +107,7 @@ public class WorkOrderExportService {
             workOrderMap.put("院区", serviceRequest.getHospitalName());
             workOrderMap.put("科室", assetInfo.getClinicalDeptName());
             workOrderMap.put("当前责任人", workOrder.getCurrentPersonName());
-            workOrderMap.put("当前步骤", workOrder.getCurrentStepId() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_CURRENT_STEP_, workOrder.getCurrentStepId().toString()).getValueZh() : "");
+            workOrderMap.put("当前步骤", workOrder.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrder.getCurrentStepId().toString()) : "");
             workOrderMap.put("报修人", serviceRequest.getRequestorName());
             workOrderMap.put("报修时间", serviceRequest.getRequestTime() != null ? sdf.format(serviceRequest.getRequestTime()) : "");
             workOrderMap.put("故障描述", serviceRequest.getRequestReason());
@@ -115,8 +115,8 @@ public class WorkOrderExportService {
                 workOrderMap.put("派工人", sendStep.getOwnerName());
                 workOrderMap.put("派工时间", sendStep.getEndTime() != null ? sdf.format(sendStep.getEndTime()) : "");
             }
-            workOrderMap.put("工单类型", workOrder.getIntExtType() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_INT_EXT_TYPE, workOrder.getIntExtType().toString()).getValueZh() : "");
-            workOrderMap.put("上门维修/送修", workOrder.getRepairType() != null ? i18nMessageDao.getByMsgTypeAndMsgKey(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()).getValueZh() : "");
+            workOrderMap.put("工单类型", workOrder.getIntExtType() != null ? FieldValueMessageController.fieldValue(I18N_INT_EXT_TYPE, workOrder.getIntExtType().toString()) : "");
+            workOrderMap.put("上门维修/送修", workOrder.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()) : "");
             if(acceptStep != null){
                 workOrderMap.put("接单人", acceptStep.getOwnerName());
                 workOrderMap.put("接单时间", acceptStep.getStartTime() != null ? sdf.format(acceptStep.getStartTime()) : "");
