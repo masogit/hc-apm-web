@@ -9,7 +9,7 @@
 
     <p:dialog id="coworkerDlg" widgetVar="coworkerDlg" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="协作者">
         <h:form id="coworkerDlgForm" >
-            <h:panelGroup  rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
+            <h:panelGroup  rendered="#{not empty workOrderMgrController.coWorkerDetail}">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
                     <h:panelGroup>
