@@ -195,7 +195,7 @@
                                 <p:ajax  listener="#{workOrderMgrController.onStatusChange()}"  update="assetstatus" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneRadio>
-                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderAckController.confirmedDownTime}" showOn="button" 
+                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{workOrderMgrController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.confirmedDownTime}" showOn="button" 
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                     </p:panelGrid>
