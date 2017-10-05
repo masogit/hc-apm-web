@@ -53,7 +53,7 @@
                             <h:outputText value="#{item.siteId}"/>
                         </p:column>
                         -->
-                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?86:43}">
+                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?86:53}">
                             <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
                             <h:panelGroup>
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasNotAnyRole('DeptHead,ClinicalStaff')}">
@@ -80,7 +80,7 @@
                         <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()"  >
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
