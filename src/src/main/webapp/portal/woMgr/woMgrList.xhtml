@@ -173,8 +173,8 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup >
-                        <p:commandButton value="确定" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancelWorkOrder()}" validateClient="true"  update=":woMgrListForm :woMgrDetailForm :growl" style="float:left" oncomplete="handleSubmit(args, 'cancelDialog');" >
-                            <p:confirm header="确认取消" message="#{msg.CancelWorkOrderConformationMsg}" icon="ui-icon-warning"/>
+                        <p:commandButton value=#{msg.selectSearchInterval_2} icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancelWorkOrder()}" validateClient="true"  update=":woMgrListForm :woMgrDetailForm :growl" style="float:left" oncomplete="handleSubmit(args, 'cancelDialog');" >
+                            <p:confirm header="#{msg.confirmcancel}" message="#{msg.CancelWorkOrderConformationMsg}" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('cancelDialog').hide()"/>
                     </h:panelGroup>

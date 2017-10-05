@@ -43,7 +43,7 @@
 
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="7" layout="grid">
-                        <f:facet name="header">增加图片</f:facet>
+                        <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
@@ -59,22 +59,24 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
 
-                    <p:fieldset legend="费用明细" >
+                    <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">工时(小时)*</label>
-                                <p:inputNumber decimalPlaces="2" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}" required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}"/>
+
+                                <label class="label">#{msg.manhours}</label>
+                                <p:inputText value="#{workOrderListController.selectedWorkOrder.manHours}" required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">其它费用</label>
-                                <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}"/>
+                                <label class="label">#{msg.otherExpense}</label><!--其它费用-->
+                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" required="true" requiredMessage="其它费用 #{msg.ValidationRequire}"/>
+
                             </h:panelGroup>
                         </p:panelGrid>
 
                         
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">增加备件</label>
+                                <label class="label">#{msg.addAcce}</label><!--增加备件-->
                                 <p:dataTable id="accessList" class="uiTransparent" value="#{workOrderMgrController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">
                                         <h:outputText value="#{item.parts}"/>
@@ -115,7 +117,7 @@
                                 </p:dataTable>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">增加协作人</label>
+                                <label class="label">#{msg.addworker}</label>
                                 <p:dataTable id="coworkerList" class="uiTransparent" value="#{workOrderMgrController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                              rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.coworker}">

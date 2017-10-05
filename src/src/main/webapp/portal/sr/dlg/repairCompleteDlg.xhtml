@@ -88,7 +88,7 @@
                             </p:dataTable>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">增加协作人</label>
+                            <label class="label">#{msg.addworker}"</label>
                             <p:dataTable id="coworkerList" class="uiTransparent" value="#{workOrderListController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                          rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                 <p:column headerText="#{msg.manHours}">
