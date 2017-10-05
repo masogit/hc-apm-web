@@ -341,9 +341,10 @@ public class V2_WorkOrderService {
         }
     }
     public List<UserAccount> getAssetResponser2(int assetId) {
-
+        List<UserAccount> userList999 = new ArrayList<UserAccount>();
         AssetInfo assetInfo = assetInfoRepository.getById(assetId);
-
+        if(assetInfo!=null)
+            userList999= userAccountRepository.getResponserwithTag999(assetInfo.getSiteUID());
         //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
         List<UserAccount> userListTag =  userAccountRepository.getResponserByAssetId(assetId);
         //获取和资产绑定的owner
@@ -351,7 +352,6 @@ public class V2_WorkOrderService {
 
         // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID-->tenanent
         if(CollectionUtils.isEmpty(userListTag)){
-
             if(!StringUtils.isEmpty(assetInfo.getSiteUID()) )
                 return userAccountRepository.getBySiteUID(assetInfo.getSiteUID());
             if(!StringUtils.isEmpty(assetInfo.getHospitalUID()) )
@@ -366,8 +366,11 @@ public class V2_WorkOrderService {
             return userListTag;
     }
     public List<UserAccount> getAssetResponser(int assetId) {
-        List<UserAccount> userListTag = null;
+        List<UserAccount> userList999 = new ArrayList<UserAccount>();
         AssetInfo assetInfo = assetInfoRepository.getById(assetId);
+        if(assetInfo!=null)
+            userList999= userAccountRepository.getResponserwithTag999(assetInfo.getSiteUID());
+        List<UserAccount> userListTag = null;
 
         //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
         userListTag = userAccountRepository.getResponserByAssetId(assetId);
@@ -388,30 +391,43 @@ public class V2_WorkOrderService {
                     defaultUserList.add(user2);
                 }
             }
+            defaultUserList.addAll(userList999);
+            defaultUserList=removeDuAccounts(defaultUserList);
             return defaultUserList;
 
         }
         if(CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)){
             userListTag.addAll(assetOwnerList);
-            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag.addAll(userList999);
+            userListTag = removeDuAccounts(assetOwnerList);
             userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
             return userListTag;
         }else if(CollectionUtils.isEmpty(assetOwnerList)){
+            userListTag.addAll(userList999);
+            userListTag = removeDuAccounts(userListTag);
             userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
             return userListTag;
         }else if(CollectionUtils.isEmpty(userListTag)){
-            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(assetOwnerList));
+            assetOwnerList.addAll(userList999);
             defaultUserList=  userAccountRepository.getDefaultUsers(assetId);
             userListTag.addAll(defaultUserList);
-            userListTag = new ArrayList<UserAccount>(new HashSet<UserAccount>(userListTag));
+            userListTag = removeDuAccounts(assetOwnerList);
             userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
             return userListTag;
         }
 
         return userListTag;
     }
-
+    private List<UserAccount> removeDuAccounts(List<UserAccount> assetOwnerList) {
+        List<UserAccount> ulist= new ArrayList<UserAccount>();
+        Set<UserAccount> useSet = new HashSet<UserAccount>();
+        for(UserAccount ua:assetOwnerList){
+            if(useSet.add(ua)){
+                ulist.add(ua);
+            }
+        }
+        return ulist;
+    }
 
 //Type：0-我的/1-同一group的/2-同院区的/3-其它院区的
 public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, UserAccount ua) {
@@ -442,38 +458,7 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return workOrderCoworkerRepository.findByWoId(woId);
     }
-   /* public Page<V2_WorkOrder> getWorkOrderListToPickup_backup(int type,PageRequest pr, UserAccount ua) {
-        Page<V2_WorkOrder> pages = null;
-        //base on the orgLevel
-        Integer orgLevel = ua.getOrgLevel();
-        if (orgLevel == null || orgLevel == 0)
-            orgLevel = 3;
-        Integer groupCount = 0;
-        List<SearchFilter> searchFilters = new ArrayList<>();
-        switch (orgLevel) {
-            case 1: searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, ua.getInstitutionUID()));
-                groupCount = groupDao.getCountByUserOrgLevel1(ua.getInstitutionUID());break;
-            case 2: searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, ua.getHospitalUID()));
-                groupCount = groupDao.getCountByUserOrgLevel2(ua.getHospitalUID());break;
-            case 3: searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, ua.getSiteUID()));
-                groupCount = groupDao.getCountByUserOrgLevel3(ua.getSiteUID());
-        }
-        if (groupCount > 0 && (type == 0 || type == 1)) {
-            switch(type) {
-                case 0: pages = woDao.fetchAvailableWorkOrderByUser(ua.getId(), pr);break;
-                case 1: pages = woDao.fetchAvailableSameGroupWorkOrderByUser(ua.getId(),pr);
-            }
-            return pages;
-        }
 
-        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-        searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
-        if(type == 0) {
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.IN, Arrays.asList(-1,ua.getId())));
-        }
-
-        return woDao.findBySearchFilter(searchFilters, pr);
-    }*/
 
     public List<UserAccount> findMaintenanceStaff(int assetId) {
         List<UserAccount> userListTag = null;

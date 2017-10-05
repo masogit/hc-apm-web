@@ -86,4 +86,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query("select u from UserAccount u where u.orgInfoId=?1 and u.id not in (select r.userId from UserRole r where r.roleId=9)")
     List<UserAccount> findUsersByOrgIdExceptTemporaryAccount(int orgId);
+
+    //subscirber with tag=-999 under  this assetInfo.site_UID
+    @Query(value="select ua.* from asset_tag at,asset_tag_biomed_group atbg,biomed_group bg,biomed_group_user bgu,user_account ua where at.id=-999  and at.id=atbg.tag_id and atbg.biomed_group_id=bg.id and bgu.group_id=bg.id and bgu.user_id=ua.id and ua.site_uid=?1",nativeQuery=true)
+    List<UserAccount> getResponserwithTag999(String siteUID);
 }
