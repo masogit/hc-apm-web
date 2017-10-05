@@ -122,6 +122,7 @@
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl :woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
+                        <p:commandButton validateClient="false" immediate="true" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl :woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
