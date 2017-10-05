@@ -61,7 +61,7 @@
                                         <p:outputLabel value="#{orgInfoController.selected.orgTypeName}"/>
                                     </h:panelGroup>
 
-                                    <h:panelGroup rendered="#{orgInfoController.acShow}">
+                                    <h:panelGroup rendered="#{orgInfoController.acShow and false}">
                                         <label class="label">设备负责人A</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -70,7 +70,7 @@
 
 
                                     </h:panelGroup>
-                                    <h:panelGroup rendered="#{orgInfoController.acShow}">
+                                    <h:panelGroup rendered="#{orgInfoController.acShow and false}">
                                         <label class="label">设备负责人B</label>
                                         <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
