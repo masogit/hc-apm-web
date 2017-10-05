@@ -25,14 +25,13 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
-import javax.faces.bean.SessionScoped;
+import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
@@ -40,7 +39,7 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @ManagedBean
-@SessionScoped
+@ViewScoped
 public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private static final long serialVersionUID = -1L;
