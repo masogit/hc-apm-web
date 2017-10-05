@@ -286,4 +286,16 @@ public class OrgInfo implements Serializable {
     public void setAssetOwnerId2(Integer assetOwnerId2) {
         this.assetOwnerId2 = assetOwnerId2;
     }
+    
+    public String getOrgFullName(){
+        String name = this.name;
+
+        OrgInfo org = this;
+        while (org.getParentOrg() != null) {
+            org = org.getParentOrg();
+            name = org.getName() + " " + name;
+        }
+
+        return name;
+    }
 }
