@@ -42,6 +42,7 @@ import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.ServerEventInterface;
 
@@ -96,7 +97,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private Integer rating;
     private String failReason;
     private String equipmentTaker;
-    private String takeTime;
+    private Date takeTime;
 
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
@@ -142,19 +143,19 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
-            } 
+            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
         } else if (queryIndex == 2) { //待派工
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
-            List<String> sitelist= uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist,"1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist,"1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist,"1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist,"1*2+"));
-            
+            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+
         } else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
@@ -169,6 +170,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 5) { //待验收
             if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
@@ -285,6 +287,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         selectedWorkOrder = dao.findById(woid);
         picList = new ArrayList<V2_BlobObject>();
         equipmentTaker = selectedWorkOrder.getServiceRequest().getEquipmentTaker();
+        takeTime = selectedWorkOrder.getServiceRequest().getTakeTime();
     }
 
     public void prepareCompleteOrder(String woid) {
@@ -355,10 +358,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
         if (Strings.isNullOrEmpty(equipmentTaker)) {
             WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
+        } else if(takeTime!=null && takeTime.after(new Date())){
+            WebUtil.addErrorMessage("取物时间大于当前时间");
+            takeTime = null;
         } else {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-            takeTime = sdf.format(new Date());
-            woService.takeEquip(selectedWorkOrder, equipmentTaker, takeTime);
+            if (null == takeTime) {
+                takeTime = new Date();
+            }
+            woService.takeEquip(selectedWorkOrder, equipmentTaker, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(takeTime));
         }
     }
 
@@ -518,15 +525,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
 
     }
-    
-    public void submitWorkOrder(){
+
+    public void submitWorkOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        woService.submitWorkOrder(selectedWorkOrder,accessoryList);
+        woService.submitWorkOrder(selectedWorkOrder, accessoryList);
         cancel();
     }
-    
-    public void approveWorkOrder(Boolean isAgree){
-        woService.approveAction(selectedWorkOrder,isAgree,comments);
+
+    public void approveWorkOrder(Boolean isAgree) {
+        woService.approveAction(selectedWorkOrder, isAgree, comments);
         cancel();
     }
 
@@ -701,11 +708,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.equipmentTaker = equipmentTaker;
     }
 
-    public String getTakeTime() {
+    public Date getTakeTime() {
         return takeTime;
     }
 
-    public void setTakeTime(String takeTime) {
+    public void setTakeTime(Date takeTime) {
         this.takeTime = takeTime;
     }
 
