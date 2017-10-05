@@ -53,7 +53,7 @@
                             <h:outputText value="#{item.siteId}"/>
                         </p:column>
                         -->
-                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?86:43}">
+                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?86:53}">
                             <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
                             <h:panelGroup>
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasNotAnyRole('DeptHead,ClinicalStaff')}">
@@ -379,7 +379,7 @@
             
             var newWin;
             function prepareAssetViewWindow() {
-                newWin = window.open('about:blank', '_new');
+                newWin = window.open('about:blank', '_blank');
                 newWin.document.body.innerHTML = '加载中...';
             }
             
