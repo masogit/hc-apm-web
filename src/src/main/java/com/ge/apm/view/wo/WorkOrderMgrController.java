@@ -348,6 +348,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.forEach(item -> item.setCreatedDate(null));
         woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
