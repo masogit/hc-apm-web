@@ -61,7 +61,12 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	}
 	public String getTagName(Integer tagId){
+            try{
 		return assetTagRepository.findById(tagId).getName();
+            }
+            catch(Exception ex){
+                return "";
+            }
 	}
 	public String getSubscriberName(Integer userId){
 		return userAccountRepository.findById(userId).getName();
