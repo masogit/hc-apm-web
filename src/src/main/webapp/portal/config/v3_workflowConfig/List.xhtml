@@ -8,10 +8,9 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12">
-
-                <p align="center">
-                    <b>#{msg.V3_WorkFlowConfig}</b>
-                </p>
+				<div class="ui-g-12 card cardTitle">
+                	<p:outputLabel class="pageTitle" value="#{msg.V3_WorkFlowConfig}"/>
+            	</div>
             <h:form id="V2_WorkflowConfigListForm">
                 <p:dataTable id="datalist" value="#{v2_WorkflowConfigController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{v2_WorkflowConfigController.selected}"
