@@ -21,7 +21,7 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">内部工时(小时)</label>
-                        <p:inputText id="manHours" value="#{workOrderMgrController.coWorkerDetail.manHours}" required="true"/>
+                        <p:inputNumber decimalPlaces="2" maxValue="999" id="manHours" value="#{workOrderMgrController.coWorkerDetail.manHours}" required="true"/>
                     </h:panelGroup>
                 </p:panelGrid>
                 <br/>
