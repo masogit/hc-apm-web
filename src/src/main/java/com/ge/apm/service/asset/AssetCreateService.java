@@ -110,12 +110,12 @@ public class AssetCreateService {
     }
     
     
-//    public List<OrgInfo> getClinicalDeptList(Integer hospitalId) {
-//        List<SearchFilter> OrgInfoFilters = new ArrayList<>();
-//        OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, hospitalId));
-//        OrgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-//        return orgDao.findBySearchFilter(OrgInfoFilters);
-//    }
+    public List<OrgInfo> getClinicalDeptList(Integer hospitalId) {
+        List<SearchFilter> OrgInfoFilters = new ArrayList<>();
+        OrgInfoFilters.add(new SearchFilter("parentOrg.id", SearchFilter.Operator.EQ, hospitalId));
+        OrgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
+        return orgDao.findBySearchFilter(OrgInfoFilters);
+    }
 
     public Boolean CreateAeest(AssetInfo assetInfo) {
         return (null != assetDao.save(assetInfo));

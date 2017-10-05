@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetTagService;
+import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
@@ -53,6 +54,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
     private UserAccount currentUser;
 
+    private OrgInfoService orgInfoService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetTagRepository.class);
@@ -61,6 +64,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         assetTagService = WebUtil.getBean(AssetTagService.class);
+        orgInfoService = WebUtil.getBean(OrgInfoService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -139,7 +143,9 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         List<OrgInfo> hospitalList = null;
         if (siteIdFilter != null) {
 
-            hospitalList = orgInfoDao.getHospitalBySiteId(Integer.valueOf(siteIdFilter));
+            UserAccount userAccount = UserContextService.getCurrentUserAccount();
+            hospitalList = orgInfoDao.getOrgInfosByParentId(userAccount.getSiteUID());
+            hospitalList = orgInfoService.flattenOrgTree(hospitalList);
         }
 
         return hospitalList;
@@ -204,7 +210,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     public List<OrgInfo> getClinicalDeptList() {
         List<OrgInfo> tempDeptList = new ArrayList<>();
         if(queryAsset.getHospitalId() != null && queryAsset.getHospitalId() != 0){
-            tempDeptList = acService.getClinicalDeptList(queryAsset.getSiteUID());
+            tempDeptList = acService.getClinicalDeptList(queryAsset.getHospitalId());
         }
         return tempDeptList;
     }
