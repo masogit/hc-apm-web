@@ -102,11 +102,11 @@
                                 <label class="label">增加协作人</label>
                                 <p:dataTable id="coworkerList" class="uiTransparent" value="#{workOrderMgrController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                              rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                    <p:column headerText="#{msg.manHours}">
-                                        <h:outputText value="#{item.manHours}" />
-                                    </p:column>
                                     <p:column headerText="#{msg.coworker}">
                                         <h:outputText value="#{item.cowokerUserName}"/>
+                                    </p:column>
+                                    <p:column headerText="#{msg.manHours}">
+                                        <h:outputText value="#{item.manHours}" />
                                     </p:column>
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditCoWorkerDetail('new')}" update=":coworkerDlg :coworkerDlgForm" oncomplete="PF('coworkerDlg').show()" rendered="#{item.id eq '000'}"/>
