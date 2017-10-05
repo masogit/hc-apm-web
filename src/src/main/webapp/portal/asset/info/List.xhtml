@@ -53,12 +53,17 @@
                             <h:outputText value="#{item.siteId}"/>
                         </p:column>
                         -->
-                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?96:43}">
+                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?86:43}">
                             <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
-                            <p:commandButton icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  action="#{assetInfoController.getEditPage(item.id,item.name)}" style="width:26px;height: 26px" rendered="#{userContextService.hasNotAnyRole('DeptHead,ClinicalStaff')}"/>
-                            <p:commandButton rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm" style="width:26px;height: 26px" title="#{msg.Delete}"  actionListener="#{assetInfoController.deleteAsset(item)}" update="datalist">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
-                            </p:commandButton>
+                            <h:panelGroup>
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasNotAnyRole('DeptHead,ClinicalStaff')}">
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                </p:link>
+                                <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoController.deleteAsset(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
                         </p:column>
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
