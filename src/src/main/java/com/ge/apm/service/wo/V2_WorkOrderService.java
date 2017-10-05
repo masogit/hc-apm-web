@@ -239,6 +239,31 @@ public class V2_WorkOrderService {
         }
     }
 
+    public void submitWorkOrder(V2_WorkOrder selectedWorkOrder,List<V2_WorkOrder_Detail> accessoryList) {
+        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setStepDetail(accessoryList);
+        String res = srApi.invokeWorkOrderAction(token,formData,"approval",selectedWorkOrder.getId());
+        if (res==null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }
+    }
+    
+    public void approveAction(V2_WorkOrder selectedWorkOrder, Boolean agree,String comments) {
+        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        String token = UserContextService.getAccessToken();
+        WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setDesc(comments);
+        
+        String res = srApi.invokeWorkOrderAction(token,formData,agree?"approvalPass":"approvalReject",selectedWorkOrder.getId());
+        if (res==null || !res.contains("success")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }
+    }
+    
     public void reassignWorkOrder(V2_WorkOrder selectedWorkOrder, Integer assigneeId,String comments) {
         selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();

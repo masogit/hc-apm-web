@@ -140,8 +140,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.tenantUID");
 
         if (queryIndex == 1) {//已报修 可取消
-            if (userContextService.hasRole("AssetStaff") || userContextService.isDispatcher()) {
-                searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1)), "1*2+"));
+            if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
             } 
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -192,6 +191,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
+        } else if (queryIndex == 10) { //审批
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 8));
+            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
         } else {//全部
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
@@ -515,6 +517,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             WebUtil.addErrorMessage("fail to upload file");
         }
 
+    }
+    
+    public void submitWorkOrder(){
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        woService.submitWorkOrder(selectedWorkOrder,accessoryList);
+        cancel();
+    }
+    
+    public void approveWorkOrder(Boolean isAgree){
+        woService.approveAction(selectedWorkOrder,isAgree,comments);
+        cancel();
     }
 
     //getter and setter
