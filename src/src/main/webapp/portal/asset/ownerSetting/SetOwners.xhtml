@@ -29,10 +29,10 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}</label>
-                                <p:selectOneMenu id="clinicalDeptName" value="#{assetOwnerSettingController.queryAsset.clinicalDeptId}">
+                                <p:selectOneMenu id="clinicalDeptName" value="#{assetOwnerSettingController.queryAsset.clinicalDeptUID}">
                                     <p:ajax  listener="#{assetOwnerSettingController.getQueryAssetsList()}" update="AssetsPickList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetOwnerSettingController.getClinicalDeptList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
