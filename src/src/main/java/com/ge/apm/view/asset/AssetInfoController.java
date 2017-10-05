@@ -523,6 +523,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setClinicalOwnerId(clinicalOwner.getId());
             selected.setClinicalOwnerName(clinicalOwner.getName());
             selected.setClinicalOwnerTel(clinicalOwner.getTelephone());
+        } else {
+            selected.setClinicalOwnerId(null);
+            selected.setClinicalOwnerName(null);
+            selected.setClinicalOwnerTel(null);
         }
     }
 
