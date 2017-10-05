@@ -282,6 +282,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void prepareAct(String woid) {
         selectedWorkOrder = dao.findById(woid);
+        currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
+        confirmedUpDate = null;
+        confirmedDownTime = null;
     }
 
     public void prepareCloseOrder(String woid) {
@@ -293,8 +296,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
-        selectedWorkOrder.setManHours(null);
-        selectedWorkOrder.setOtherExpense(null);
+        confirmedUpDate = null;
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = new ArrayList<V2_BlobObject>();
@@ -412,7 +414,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void onStatusChange() {
-        if (selectedAsset == null && selected == null) {
+        if(selectedWorkOrder !=null){
+            selectedAsset = selectedWorkOrder.getAssetInfo();
+        }
+        
+        if (selectedAsset == null && selected == null ) {
             return;
         }
         if (null != selectedAsset) {//new sr
