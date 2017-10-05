@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="关单--" height="500">
+    <p:dialog id="toCloseDialog" widgetVar="toCloseDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="关单" height="500">
         <h:form id="toCloseDialogForm" >
             <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -32,8 +32,11 @@
                     </h:panelGroup>
                     <h:panelGroup  id="equipmentTaker" >
                         <label class="label">取物人</label>
-                        <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker}"/>
-                        <p:commandButton title="取物" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update=":toCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrController.equipmentTaker}"/>
+                        <p:inputText id="taker" value="#{workOrderMgrController.equipmentTaker}"  maxlength="40" readonly="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
+                        <label class="label">取物时间</label>
+                        <p:calendar timeZone="GMT+8" label="取物时间" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button" 
+                                    readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
+                        <p:commandButton title="取物" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update=":toCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
                     </h:panelGroup>
 
 
