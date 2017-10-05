@@ -285,6 +285,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
         confirmedUpDate = null;
         confirmedDownTime = null;
+        needConfirmTime = false;
     }
 
     public void prepareCloseOrder(String woid) {
