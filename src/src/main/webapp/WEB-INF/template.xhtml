@@ -38,7 +38,10 @@
         </div>
         <div class="layout-profile">
             <div class="profile-name">
-                #{userContextService.userName}，#{userContextService.loginUserSiteName} #{userContextService.loginUserOrgInfo.name}
+                #{userContextService.loginUserOrgInfo.orgFullName}
+            </div>
+            <div class="profile-name">
+                #{userContextService.userName}
             </div>
         </div>
 

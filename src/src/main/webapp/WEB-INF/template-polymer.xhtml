@@ -49,7 +49,10 @@
         </div>
         <div class="layout-profile">
             <div class="profile-name">
-                #{userContextService.userName}，#{userContextService.loginUserSiteName} #{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') ? '' : userContextService.loginUserOrgInfo.name}
+                #{userContextService.loginUserOrgInfo.orgFullName}
+            </div>
+            <div class="profile-name">
+                #{userContextService.userName}
             </div>
         </div>
     </div>

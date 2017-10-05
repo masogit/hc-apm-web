@@ -323,14 +323,18 @@ UserAccountRepository userDao;
         this.acShow = acShow;
     }
 
+    public boolean getIsCreateInstitutionDisabled(){
+        return selected.getId()==null;
+    }
+    
     public boolean getIsCreateHospitalDisabled(){
-        return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()!=1);
+        return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()!=1) || selected.getId()==null;
     }
     public boolean getIsCreateSiteDisabled(){
-        return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()!=2);
+        return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()!=2) || selected.getId()==null;
     }
     public boolean getIsCreateDepartmentDisabled(){
-        return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()==4);
+        return (selected==null) || (selected.getOrgType()==null) || (selected.getOrgType()==4) || selected.getId()==null;
     }
 
     public UserAccount getUserAccount() {
