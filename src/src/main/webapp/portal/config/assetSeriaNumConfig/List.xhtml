@@ -8,10 +8,9 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12">
-
-                <p align="center">
-                    <b>#{msg.AssetSeriaNumConfig}</b>
-                </p>
+				<div class="ui-g-12 card cardTitle">
+                	<p:outputLabel class="pageTitle" value="#{msg.AssetSeriaNumConfig}"/>
+            	</div>
             <h:form id="AssetSeriaNumConfigListForm">
                 <p:dataTable id="datalist" value="#{assetSeriaNumConfigController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{assetSeriaNumConfigController.selected}"
