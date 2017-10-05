@@ -5,24 +5,12 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
-    <ui:define name="head">
-        <h:outputStylesheet name="css/inspection.css" />
-
-        <style type="text/css">
-            .ui-datalist-content{
-                border: 0!important;
-            }
-        </style>
-
-    </ui:define>
-
     <ui:define name="content">
         <div class="ui-g clearfix">
-        <div class="ui-g-12 card cardTitle">
-            <p:outputLabel class="pageTitle" value="维修事件消息订阅"/>
-        </div>
-
-        <div class="ui-g-12 card ">
+            <div class="ui-g-12 card cardTitle">
+              <p:outputLabel class="pageTitle" value="维修事件消息订阅"/>
+            </div>
+            <div class="ui-g-12 card">
             <h:form id ="TagSubscriberForm" style="margin-top: 20px;">
 <p:dataTable  id="dataList" value="#{tagSubscriberController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{tagSubscriberController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
               rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
@@ -59,11 +47,9 @@
         </p:commandButton>        
     </f:facet>
 </p:dataTable>
-
             </h:form>
             <ui:include src="EditSub.xhtml"/>
         </div>
-
         </div>
     </ui:define>
 
