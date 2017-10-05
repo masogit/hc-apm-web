@@ -50,6 +50,27 @@ public class AssetOwnerService {
         return assetDao.findBySearchFilter(OrgInfoFilters);
     }
 
+    public List<AssetInfo> getAssetListEx(AssetInfo queryAsset) {
+
+        List<SearchFilter> OrgInfoFilters = new ArrayList<>();
+        OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
+        OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
+        if (null != queryAsset.getAssetGroup()) {
+            OrgInfoFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+        }
+        if (null != queryAsset.getClinicalDeptId()) {
+            OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptUID()));
+        }
+        if (null != queryAsset.getAssetOwnerId()) {
+            OrgInfoFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, queryAsset.getAssetOwnerId()));
+        }
+        if (null != queryAsset.getAssetOwnerId2()) {
+            OrgInfoFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, queryAsset.getAssetOwnerId2()));
+        }
+
+        return assetDao.findBySearchFilter(OrgInfoFilters);
+    }
+
     public UserAccount getOwnerAccount(Integer userId) {
         return userDao.getById(userId);
     }
