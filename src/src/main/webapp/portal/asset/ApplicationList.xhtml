@@ -24,6 +24,11 @@
     </ui:define>
 
     <ui:define name="content">
+        <div class="ui-g clearfix">
+        <div class="ui-g-12 card cardTitle">
+            <p:outputLabel class="pageTitle" value="采购申请"/>
+        </div>
+
         <div class="ui-g-12 card ">
             <h:form id ="ApplicationForm" style="margin-top: 20px;">
                 <p:dataTable  id="dataList" value="#{applicationController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{applicationController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -63,6 +68,7 @@
                     </f:facet>
                 </p:dataTable>
             </h:form>
+        </div>
         </div>
     </ui:define>
 </ui:composition>
