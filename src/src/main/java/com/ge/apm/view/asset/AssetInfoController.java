@@ -37,6 +37,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.primefaces.context.RequestContext;
 
 @ManagedBean
 @ViewScoped
@@ -257,7 +258,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 + "&terminate=" + this.terminate;
         url = "Detail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
-        FacesContext.getCurrentInstance().getExternalContext().redirect(url);
+        //FacesContext.getCurrentInstance().getExternalContext().redirect(url);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public String getViewPage(String pageName, String actionName) {
