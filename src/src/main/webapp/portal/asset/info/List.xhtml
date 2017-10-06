@@ -65,7 +65,7 @@
                                 </p:commandLink>
                             </h:panelGroup>
                         </p:column>
-                        <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
@@ -95,9 +95,9 @@
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
-<!--                         <p:column headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" >
-                            <h:outputText value="#{item.assetOwnerName}"/>
-                        </p:column> -->
+                         <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.assetOwnerName}"/>
+	                    </p:column>
                         <p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.assetOwnerTel}"/>
 	                    </p:column>
@@ -183,9 +183,14 @@
 	                        <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
 	                    </p:column>
 	                    
-                        <p:column headerText="#{msg.hospitalId}" visible="false" exportable="true">
+                        <!-- <p:column headerText="#{msg.hospitalId}" visible="false" exportable="true">
 	                        <h:outputText value="#{assetInfoController.getOrgName(item.hospitalId)}"/>
+	                    </p:column> -->
+	                    <p:column headerText="#{msg.hospitalId}" visible="false" exportable="true">
+	                        <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
 	                    </p:column>
+	                    
+	                    
 	                    <p:column headerText="#{msg.functionGroup}" visible="false" exportable="true">
 	                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
 	                    </p:column>
@@ -228,9 +233,7 @@
 	                    <p:column headerText="#{msg.assetDeptId}" visible="false" exportable="true">
 	                    	<h:outputText value="#{assetInfoController.getOrgName(item.assetDeptId)}"/>
 	                    </p:column>
-<!-- 	                    <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.assetOwnerName}"/>
-	                    </p:column> -->
+
 
 	                    <p:column headerText="#{msg.isValid}" visible="false" exportable="true">
 	                        <f:facet name="filter">
