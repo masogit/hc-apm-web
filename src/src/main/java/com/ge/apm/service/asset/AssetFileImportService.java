@@ -261,9 +261,7 @@ public class AssetFileImportService {
     }
 
     private Date getDateField(Object object, String filedSrcName) throws Exception {
-        if (object == null) {
-            return null;
-        }
+
 
         ExcelDocument.ValueWrapper valueWrapper = null;
         Cell cell = null;
@@ -271,6 +269,10 @@ public class AssetFileImportService {
             valueWrapper = (ExcelDocument.ValueWrapper) object;
             object = valueWrapper.value;
             cell = valueWrapper.cell;
+        }
+
+        if (object == null) {
+            return null;
         }
 
         if (object instanceof Date) {
