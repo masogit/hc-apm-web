@@ -43,7 +43,7 @@
                                     <f:selectItems value="#{qrCodeLibCreateController.getHospitalList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <!--<h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>-->
+                            <h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.orgId}" filterBy="#{item.orgId}" filterMatchMode="EQ" >
 	                        <f:facet name="filter">
