@@ -21,6 +21,7 @@ import webapp.framework.web.WebUtil;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -520,6 +521,13 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
         }
 
         return userListTag;
+    }
+
+    @Transactional
+    public void arrivedParts(String detailId) {
+        V2_WorkOrder_Detail detail = detailDao.findById(detailId);
+        detail.setArrived(Boolean.TRUE);
+        detailDao.save(detail);
     }
 
 }

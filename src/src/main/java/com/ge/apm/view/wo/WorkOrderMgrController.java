@@ -9,7 +9,9 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.WorkOrderDetailRepository;
 import com.ge.apm.domain.AssetFaultType;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.AssetInfo;
@@ -64,6 +66,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private AssetFaultTypeService assetFaultTypeService;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
+    private WorkOrderDetailRepository detailDao;
+    private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
@@ -114,6 +118,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         blobService = WebUtil.getBean(BlobFileService.class);
         assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
+        coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         queryIndex = 0;
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -363,7 +369,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
         if (Strings.isNullOrEmpty(equipmentTaker)) {
             WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
-        } else if(takeTime!=null && takeTime.after(new Date())){
+        } else if (equipmentTaker.trim().isEmpty()) {
+            WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
+        } else if (takeTime != null && takeTime.after(new Date())) {
             WebUtil.addErrorMessage("取物时间大于当前时间");
             takeTime = null;
         } else {
@@ -416,11 +424,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void onStatusChange() {
-        if(selectedWorkOrder !=null){
+        if (selectedWorkOrder != null) {
             selectedAsset = selectedWorkOrder.getAssetInfo();
         }
-        
-        if (selectedAsset == null && selected == null ) {
+
+        if (selectedAsset == null && selected == null) {
             return;
         }
         if (null != selectedAsset) {//new sr
@@ -467,6 +475,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
+        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
 
@@ -476,14 +485,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
+        coWorkerDao.save(coWorkerDetail);
         cancelWorkdetail();
     }
 
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
+            detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
+            coWorkerDao.delete(itemId);
         }
     }
 
