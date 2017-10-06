@@ -28,6 +28,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -92,7 +93,8 @@ public class AssetFileImportService {
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, ++dataRow)) {
             OrgInfo org = new OrgInfo();
-            String orgName = (String) rowMap.get("部门名称");
+            ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper)rowMap.get("部门名称");
+            String orgName = (String) valueWrapper.value;
             if (orgName == null || orgName.isEmpty()) {
                 break;
             }
@@ -213,7 +215,7 @@ public class AssetFileImportService {
             asset.setMaitanance(ExcelDocument.getCellStringValue(rowMap.get("维护商")));
             Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
             asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
-            String inputQrcode = (String) rowMap.get("二维码");
+            String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
             if (inputQrcode != null) {
                 asset.setQrCode(inputQrcode.replace("-", ""));
             }
@@ -262,6 +264,15 @@ public class AssetFileImportService {
         if (object == null) {
             return null;
         }
+
+        ExcelDocument.ValueWrapper valueWrapper = null;
+        Cell cell = null;
+        if (object instanceof ExcelDocument.ValueWrapper) {
+            valueWrapper = (ExcelDocument.ValueWrapper) object;
+            object = valueWrapper.value;
+            cell = valueWrapper.cell;
+        }
+
         if (object instanceof Date) {
             return (Date) object;
         }

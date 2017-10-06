@@ -15,6 +15,8 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,6 +24,7 @@ import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 /**
@@ -92,7 +95,8 @@ public class ExcelDocument {
                 break;
             }
             Object v = getCellValue(cell);
-            dataMap.put(rowKey[cellIndex], v);
+            ValueWrapper wrapper = new ValueWrapper(v, cell);
+            dataMap.put(rowKey[cellIndex], wrapper);
         }
         return dataMap;
     }
@@ -137,6 +141,15 @@ public class ExcelDocument {
     }
 
     static public String getCellStringValue(Object value) {
+        ValueWrapper valueWrapper = null;
+        Cell cell = null;
+        if (value instanceof ValueWrapper) {
+            valueWrapper = (ValueWrapper) value;
+            value = valueWrapper.value;
+            cell = valueWrapper.cell;
+
+        }
+
         if (value == null) {
             return null;
         }
@@ -144,15 +157,26 @@ public class ExcelDocument {
             return (String) value;
         }
         if (value instanceof Integer) {
-            return ((Integer) value).toString();
+            return ((XSSFCell)cell).getRawValue();
+//            return ((Integer) value).toString();
         }
         if (value instanceof Double) {
-            return ((Double) value).toString();
+            return ((XSSFCell)cell).getRawValue();
+//            return ((Double) value).toString();
         }
         return value.toString();
     }
 
     static public Integer getCellIntegerValue(Object value) {
+
+        ValueWrapper valueWrapper = null;
+        Cell cell = null;
+        if (value instanceof ValueWrapper) {
+            valueWrapper = (ValueWrapper) value;
+            value = valueWrapper.value;
+            cell = valueWrapper.cell;
+        }
+
         if (value == null) {
             return null;
         }
@@ -169,6 +193,15 @@ public class ExcelDocument {
     }
 
     static public Double getCellDoubleValue(Object value) {
+
+        ValueWrapper valueWrapper = null;
+        Cell cell = null;
+        if (value instanceof ValueWrapper) {
+            valueWrapper = (ValueWrapper) value;
+            value = valueWrapper.value;
+            cell = valueWrapper.cell;
+        }
+
         if (value == null) {
             return null;
         }
@@ -249,6 +282,16 @@ public class ExcelDocument {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         this.workBook.write(out);
         return new ByteArrayInputStream(out.toByteArray());
+    }
+
+    public static class ValueWrapper {
+        public Object value;
+        public Cell cell;
+
+        public ValueWrapper(Object value, Cell cell) {
+            this.value = value;
+            this.cell = cell;
+        }
     }
 
 }
