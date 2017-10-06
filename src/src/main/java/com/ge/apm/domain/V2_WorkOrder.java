@@ -76,7 +76,7 @@ public class V2_WorkOrder implements Serializable {
     private String currentStepName;
 
     @Column(name = "total_man_hour")
-    private Integer totalManHour;
+    private Double totalManHour;
 
     @Column(name = "total_price")
     private Double totalPrice;
@@ -335,11 +335,11 @@ public class V2_WorkOrder implements Serializable {
         this.currentStepName = currentStepName;
     }
 
-    public Integer getTotalManHour() {
+    public Double getTotalManHour() {
         return totalManHour;
     }
 
-    public void setTotalManHour(Integer totalManHour) {
+    public void setTotalManHour(Double totalManHour) {
         this.totalManHour = totalManHour;
     }
 
