@@ -563,7 +563,7 @@ public class AssetFileImportService {
 
     private List<UserAccount> getUserInfosByName(String userName) {
         List<SearchFilter> userFilters = new ArrayList<>();
-        userFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+//        userFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
         userFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         userFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, userName));
         return userDao.findBySearchFilter(userFilters);
