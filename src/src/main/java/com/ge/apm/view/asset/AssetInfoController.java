@@ -830,6 +830,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         return null;
     }
+    
+    public String getSiteOrgName(String siteUID) {
+        OrgInfo org = orgDao.getByUid(siteUID);
+        if (org != null) {
+            return org.getName();
+        }
+        return null;
+    }
 
     public String getAssetDetailTitle() {
         return terminate ? WebUtil.getMessage("TerminateAssetInfoDetail") : WebUtil.getMessage("AssetInfoDetail");
