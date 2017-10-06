@@ -26,7 +26,7 @@
 
                         <!--<p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>-->
                         <p:ajax event="filter" listener="#{qrCodeLibCreateController.onFilter}" />
-                        <p:column headerText="#{msg.SiteInfo}" sortBy="#{item.siteId}" filterBy="#{item.siteId}" filterMatchMode="EQ">
+<!--                        <p:column headerText="#{msg.SiteInfo}" sortBy="#{item.siteId}" filterBy="#{item.siteId}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -34,19 +34,20 @@
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{qrCodeLibCreateController.getSiteName(item.siteId)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.hospitalId}" filterBy="#{item.hospitalId}" filterMatchMode="EQ">
+                        </p:column>-->
+                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
                              <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                 <p:selectOneMenu value="#{qrCodeLibCreateController.selectedSiteUid}" >
+                                     <p:ajax listener="#{qrCodeLibCreateController.onSiteChange}"  update="datalist clinicalDeptName"/>
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{qrCodeLibCreateController.getHospitalList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{qrCodeLibCreateController.getHospitalList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.hospitalId)}"/>
+                            <!--<h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>-->
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.orgId}" filterBy="#{item.orgId}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.orgId}" filterBy="#{item.orgId}" filterMatchMode="EQ" >
 	                        <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  id="clinicalDeptName">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{qrCodeLibCreateController.getOrgList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>

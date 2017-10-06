@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
@@ -57,6 +58,8 @@ public class AssetCreateService {
     ConfigUtils configUtils;
     @Autowired
     UserCommonService ucService;
+//    @Autowired
+//    WechatSendMsgService wsService;
 
     @Autowired
     BlobObjectRepository blobDao;
@@ -71,13 +74,13 @@ public class AssetCreateService {
         }
     }
 
-    public String getSiteName(String siteUid){
+    public String getSiteName(String siteUid) {
         OrgInfo org = orgDao.getByUid(siteUid);
         return getOrgFullName(org);
     }
-    
+
     private String getOrgFullName(OrgInfo org) {
-        if(null==org || org.getId()==-1){
+        if (null == org || org.getId() == -1) {
             return null;
         }
         String name = org.getName();
@@ -88,7 +91,7 @@ public class AssetCreateService {
 
         return name;
     }
-            
+
     public String getHospitalName(Integer hospitalId) {
         OrgInfo org = orgDao.findById(hospitalId);
         if (org != null) {
@@ -108,8 +111,7 @@ public class AssetCreateService {
         OrgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
         return orgDao.findBySearchFilter(OrgInfoFilters);
     }
-    
-    
+
     public List<OrgInfo> getClinicalDeptList(Integer hospitalId) {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         OrgInfoFilters.add(new SearchFilter("parentOrg.id", SearchFilter.Operator.EQ, hospitalId));
@@ -163,26 +165,43 @@ public class AssetCreateService {
     }
 
     public boolean rejectReturn(QrCodeLib request, String rejectText) {
-        String _openId = request.getSubmitWechatId();
-        String _templateId = configUtils.fetchProperties("asset_build_template_id");
-        Map<String, Object> map = new HashMap();
-        map.put("first", "建档失败");
-//        map.put("_qrCode", request.getQrCode());
-//        map.put("_requestTime", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
-//        map.put("_detail", rejectText);
-        map.put("keyword1", rejectText);
-        map.put("keyword2", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
-        map.put("linkUrl", "wechat/asset/createInfoDetail.xhtml?qrCode=".concat(request.getQrCode()));
 
-        coreService.sendWxTemplateMessage(_openId, _templateId, map);
-
-        rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
-
-        request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
-        qrLibDao.save(request);
+//        String openId = request.getSubmitWechatId();
+//        Map<String, Object> map = new HashMap();
+//        map.put("_openId", openId);
+//        map.put("first", "建档失败");
+//        map.put("keyword1", rejectText);
+//        map.put("keyword2", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
+//        map.put("linkUrl", "wechat/asset/createInfoDetail.xhtml?qrCode=".concat(request.getQrCode()));
+//
+//        wsService.sendCreateAssetRejectMsg(map);
+//
+//        rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
+//        request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
+//        qrLibDao.save(request);
         return true;
     }
 
+//    public boolean rejectReturn(QrCodeLib request, String rejectText) {
+//        String _openId = request.getSubmitWechatId();
+//        String _templateId = configUtils.fetchProperties("asset_build_template_id");
+//        Map<String, Object> map = new HashMap();
+//        map.put("first", "建档失败");
+////        map.put("_qrCode", request.getQrCode());
+////        map.put("_requestTime", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
+////        map.put("_detail", rejectText);
+//        map.put("keyword1", rejectText);
+//        map.put("keyword2", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
+//        map.put("linkUrl", "wechat/asset/createInfoDetail.xhtml?qrCode=".concat(request.getQrCode()));
+//
+//        coreService.sendWxTemplateMessage(_openId, _templateId, map);
+//
+//        rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
+//
+//        request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
+//        qrLibDao.save(request);
+//        return true;
+//    }
     public OrgInfo getOrgInfo(Integer clinicalDeptId) {
         return orgDao.findById(clinicalDeptId);
     }
@@ -202,8 +221,8 @@ public class AssetCreateService {
     public UserAccount getUserInfo(Integer userId) {
         return userDao.getById(userId);
     }
-    
-    public List<UserAccount> getWorkerList(){
+
+    public List<UserAccount> getWorkerList() {
         return ucService.getWorkerList(0);
     }
 
@@ -220,7 +239,7 @@ public class AssetCreateService {
             return userDao.findBySearchFilter(usersFilters);
         } else {
             List<UserAccount> ownerList = new ArrayList();
-            if(clinicalOwner != null) {
+            if (clinicalOwner != null) {
                 ownerList.add(clinicalOwner);
             }
             return ownerList;

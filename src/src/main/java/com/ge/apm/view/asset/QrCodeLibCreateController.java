@@ -19,6 +19,7 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.service.uaa.UaaService;
+import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -33,6 +34,8 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
     private AssetCreateService acService;
     private UaaService uaaService;
     UserContextService userContextService;
+    
+    String selectedSiteUid;
 
     private SearchFilter statusFilter = new SearchFilter("status", SearchFilter.Operator.EQ, 2);
 
@@ -58,6 +61,12 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
     @Override
     protected Page<QrCodeLib> loadData(PageRequest pageRequest) {
         setSearchFilter();
+        
+//        if(!Strings.isNullOrEmpty(selectedSiteUid)){
+//            this.removeFilterOnField("siteUID");
+//            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,  selectedSiteUid));
+//            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ,  selectedSiteUid,"1*2+"));
+//        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -67,18 +76,25 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
             searchFilters = new ArrayList();
         }
 
-        if (!this.hasFilterOnField("siteUID") && !userContextService.hasRole("SuperAdmin")) {
+            
+            this.removeFilterOnField("siteUID");
+            this.removeFilterOnField("hospitalUID");
+            this.removeFilterOnField("institutionUID");
+            this.removeFilterOnField("tenantUID");
             List<String> orgUidList;
             if (userContextService.hasRole("AssetHead")) {
                 orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
             } else {
                 orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             }
+            
+            if(!Strings.isNullOrEmpty(selectedSiteUid)){
+                orgUidList = Arrays.asList(selectedSiteUid);
+            }
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
 
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
@@ -102,30 +118,36 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         return res;
     }
 
-    public String getHospitalName(Integer hospitalId) {
-        return acService.getHospitalName(hospitalId);
+    public String getHospitalName(String siteUid) {
+        return acService.getSiteName(siteUid);
     }
 
-    public String getSiteName(Integer siteId) {
-        return acService.getTenantName(siteId);
-    }
+//    public String getSiteName(Integer siteId) {
+//        return acService.getTenantName(siteId);
+//    }
 
     public String getOrgName(Integer orgid) {
         return acService.getOrgName(orgid);
     }
 
+    public void onSiteChange(){
+        
+    }
+    
     public List<OrgInfo> getHospitalList() {
-        List<OrgInfo> res = new ArrayList<OrgInfo>();
-        if (userContextService.hasRole("SuperAdmin")) {
-            res.addAll(orgDao.find());
-        } else {
-            res.add(orgDao.findById(UserContextService.getCurrentUserAccount().getHospitalId()));
-        }
-        return res;
+        return uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
     }
 
     public List<OrgInfo> getOrgList() {
-        return acService.getClinicalDeptList(UserContextService.getCurrentUserAccount().getSiteUID());
+        return Strings.isNullOrEmpty(selectedSiteUid)? null: acService.getClinicalDeptList(selectedSiteUid);
     }
 
+    public String getSelectedSiteUid() {
+        return selectedSiteUid;
+    }
+
+    public void setSelectedSiteUid(String selectedSiteUid) {
+        this.selectedSiteUid = selectedSiteUid;
+    }
+    
 }
