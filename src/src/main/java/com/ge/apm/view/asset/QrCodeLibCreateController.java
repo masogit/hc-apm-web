@@ -47,13 +47,6 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         userContextService = WebUtil.getBean(UserContextService.class);
 
         this.filterBySite = false;
-//        if (userContextService.hasRole("SuperAdmin")) {
-//            this.filterByHospital = false;
-//            this.filterBySite = false;
-//        } else {
-//            this.filterBySite = true;
-//        }
-//        searchFilters.add(statusFilter);
 
     }
 
@@ -73,14 +66,12 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        if (!this.hasFilterOnField("siteUID") && !userContextService.hasRole("SuperAdmin")) {
-            if (userContextService.hasRole("AssetHead")) {
-                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            } else {
-                List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            }
+        if(!this.hasFilterOnField("siteUID") && !userContextService.hasRole("SuperAdmin")){
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
