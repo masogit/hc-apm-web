@@ -18,7 +18,6 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -55,6 +54,23 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdDate;
+
+    @Size(max = 64)
+    @Column(name = "serial_num")
+    private String serialNum;
+
+    @Column(name = "warranty_date")
+    @Temporal(TemporalType.DATE)
+    private Date warrantyDate;
+
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "estimated_arrive_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date estimatedArriveTime;
+
+    @Column(name = "arrived")
+    private Boolean arrived;
+
     public String getId() {
         return id;
     }
@@ -111,8 +127,6 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.woId = woId;
     }
 
-
-
     public String getParts() {
         return parts;
     }
@@ -137,7 +151,37 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.partsPrice = partsPrice;
     }
 
+    public String getSerialNum() {
+        return serialNum;
+    }
 
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
+    }
+
+    public Date getWarrantyDate() {
+        return warrantyDate;
+    }
+
+    public void setWarrantyDate(Date warrantyDate) {
+        this.warrantyDate = warrantyDate;
+    }
+
+    public Date getEstimatedArriveTime() {
+        return estimatedArriveTime;
+    }
+
+    public void setEstimatedArriveTime(Date estimatedArriveTime) {
+        this.estimatedArriveTime = estimatedArriveTime;
+    }
+
+    public Boolean getArrived() {
+        return arrived;
+    }
+
+    public void setArrived(Boolean arrived) {
+        this.arrived = arrived;
+    }
 
     @Override
     public int hashCode() {
