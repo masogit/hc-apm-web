@@ -8,7 +8,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
-import com.ge.apm.service.common.WechatSendMsgService;
+//import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
