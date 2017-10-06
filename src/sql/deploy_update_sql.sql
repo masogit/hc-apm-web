@@ -8,6 +8,11 @@
  * Created: Aug 23, 2017
  */
 
+ALTER TABLE public.v2_work_order ALTER COLUMN total_man_hour TYPE float8 USING total_man_hour::float8 ;
+ALTER TABLE public.v2_work_order ALTER COLUMN man_hours TYPE float8 USING man_hours::float8 ;
+ALTER TABLE public.v2_work_order_coworker ALTER COLUMN man_hours TYPE float8 USING man_hours::float8 ;
+ALTER TABLE public.v2_work_order_step ALTER COLUMN owner_name TYPE varchar(64) USING owner_name::varchar ;
+
 update user_account set uid = replace('' || uuid_generate_v4(),'-','') where uid is null;
 
 -- set user default access scope
