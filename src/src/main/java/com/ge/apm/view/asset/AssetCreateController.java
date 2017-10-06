@@ -59,7 +59,6 @@ public class AssetCreateController {
         userDao = WebUtil.getBean(UserAccountRepository.class);
 
         createRequest = acServie.getCreateRequest(qrCode);
-        clinicalOwner = createRequest.getUserId() == null ? null : userDao.getById(createRequest.getUserId());
         assetInfo = createAssetInfo();
 
         pictureList = acServie.getQrCodePictureList(createRequest.getUid());
