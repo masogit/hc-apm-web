@@ -52,7 +52,7 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     @Column(name = "created_date")
     @Temporal(TemporalType.TIMESTAMP)
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date createdDate;
 
     @Size(max = 64)
@@ -61,9 +61,10 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     @Column(name = "warranty_date")
     @Temporal(TemporalType.DATE)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date warrantyDate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @Column(name = "estimated_arrive_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedArriveTime;
