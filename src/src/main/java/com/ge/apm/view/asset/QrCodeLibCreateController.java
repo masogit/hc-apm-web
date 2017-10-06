@@ -66,13 +66,20 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        if(!this.hasFilterOnField("siteUID") && !userContextService.hasRole("SuperAdmin")){
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
+
+        if (!this.hasFilterOnField("siteUID") && !userContextService.hasRole("SuperAdmin")) {
+            List<String> orgUidList;
+            if (userContextService.hasRole("AssetHead")) {
+                orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+            } else {
+                orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            }
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+
         if (!this.hasFilterOnField("status")) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         }
