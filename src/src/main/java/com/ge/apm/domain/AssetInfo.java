@@ -53,210 +53,210 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "alias_name")
-    private String aliasName;
+    private String aliasName;//资产别名
 
     @Column(name = "function_group")
-    private Integer functionGroup;
+    private Integer functionGroup;//功能分组   医疗器械分类
 
     @Column(name = "function_type")
-    private String functionType;
+    private String functionType;//设备型号
 
     @Column(name = "function_grade")
-    private Integer functionGrade;
+    private Integer functionGrade;//功能等级
 
     @Size(max = 64)
     @Column(name = "manufacture")
-    private String manufacture;
+    private String manufacture;//制造商
 
     @Size(max = 64)
     @Column(name = "vendor")
-    private String vendor;
+    private String vendor;//供应商
 
     @Column(name = "supplier_id")
     private Integer supplierId;
 
     @Size(max = 64)
     @Column(name = "maitanance")
-    private String maitanance;
+    private String maitanance;//维修商
 
     @Size(max = 32)
     @Column(name = "maitanance_tel")
-    private String maitananceTel;
+    private String maitananceTel;//维修电话
 
     @Size(max = 64)
     @Column(name = "national_standard_code")
-    private String nationalStandardCode;
+    private String nationalStandardCode;//2010国家编码
 
     @Size(max = 64)
     @Column(name = "serial_num")
-    private String serialNum;
+    private String serialNum;//制造商序列号
 
     @Size(max = 64)
     @Column(name = "depart_num")
-    private String departNum;
+    private String departNum;//设备编号
 
     @Size(max = 64)
     @Column(name = "financing_num")
-    private String financingNum;
+    private String financingNum;//资产编号
 
     @Size(max = 64)
     @Column(name = "barcode")
-    private String barcode;
+    private String barcode;//条码
 
     @Size(max = 64)
     @Column(name = "modality_id")
-    private String modalityId;
+    private String modalityId;//院内IT系统编号
 
     @Size(max = 64)
     @Column(name = "location_code")
-    private String locationCode;
+    private String locationCode;//安装位置编码
 
     @Size(max = 64)
     @Column(name = "location_name")
-    private String locationName;
+    private String locationName;//安装位置
 
     @Column(name = "clinical_dept_id")
-    private Integer clinicalDeptId;//设备使用科室
+    private Integer clinicalDeptId;//使用科室
 
     @Column(name = "clinical_dept_uid" , columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
 
     @Size(max = 64)
     @Column(name = "clinical_dept_name")
-    private String clinicalDeptName;
+    private String clinicalDeptName;//使用科室
 
     @Column(name = "asset_group")
-    private Integer assetGroup;
+    private Integer assetGroup;//设备分类
 
     @Column(name = "asset_dept_id")
-    private int assetDeptId;//设备所属科室
+    private int assetDeptId;//所属设备科
 
     @Column(name = "asset_owner_id")
-    private Integer assetOwnerId;
+    private Integer assetOwnerId;//维修负责人
 
     @Size(min = 1, max = 32)
     @Column(name = "asset_owner_name")
-    private String assetOwnerName;
+    private String assetOwnerName;//维修负责人
 
     @Size(max = 16)
     @Column(name = "asset_owner_tel")
-    private String assetOwnerTel;
+    private String assetOwnerTel;//维修负责人电话
 
     @Basic(optional = false)
     @NotNull
     @Column(name = "is_valid")
-    private boolean isValid;
+    private boolean isValid;//在用？
 
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
-    private int status;
+    private int status;//当前状态
 
     @Column(name = "manufact_date")
     @Temporal(TemporalType.DATE)
-    private Date manufactDate;
+    private Date manufactDate;//出厂日期
 
     @Column(name = "purchase_date")
     @Temporal(TemporalType.DATE)
-    private Date purchaseDate;
+    private Date purchaseDate;//采购日期
 
     @Column(name = "arrive_date")
     @Temporal(TemporalType.DATE)
-    private Date arriveDate;
+    private Date arriveDate;//到货日期
 
     @Column(name = "install_date")
     @Temporal(TemporalType.DATE)
-    private Date installDate;
+    private Date installDate;//启用日期
 
     @Column(name = "warranty_date")
     @Temporal(TemporalType.DATE)
-    private Date warrantyDate;
+    private Date warrantyDate;//维保截止日期
 
     @Column(name = "terminate_date")
     @Temporal(TemporalType.DATE)
-    private Date terminateDate;
+    private Date terminateDate;//报废日期
 
     @Column(name = "last_pm_date")
     @Temporal(TemporalType.DATE)
-    private Date lastPmDate;
+    private Date lastPmDate;//上次维护日期
 
     @Column(name = "last_metering_date")
     @Temporal(TemporalType.DATE)
-    private Date lastMeteringDate;
+    private Date lastMeteringDate;//上次计量日期
 
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
-    private Date lastQaDate;
+    private Date lastQaDate;//上次质检日期
 
     @Column(name = "last_stocktake_date")
     @Temporal(TemporalType.DATE)
-    private Date lastStockTakeDate;
+    private Date lastStockTakeDate;//
 
     @Column(name = "clinical_owner_id")
-    private Integer clinicalOwnerId;
+    private Integer clinicalOwnerId;//使用责任人
 
     @Size(max = 32)
     @Column(name = "clinical_owner_name")
-    private String clinicalOwnerName;
+    private String clinicalOwnerName;//使用责任人
 
     @Size(max = 16)
     @Column(name = "clinical_owner_tel")
-    private String clinicalOwnerTel;
+    private String clinicalOwnerTel;//使用责任人电话
 
     @Size(max = 64)
     @Column(name = "registration_no")
-    private String registrationNo;
+    private String registrationNo;//注册证号
 
     @Column(name = "factory_warranty_date")
     @Temporal(TemporalType.DATE)
-    private Date factoryWarrantyDate;
+    private Date factoryWarrantyDate;//质保日期
 
     @Size(max = 256)
     @Column(name = "qr_code")
-    private String qrCode;
+    private String qrCode;//二维码
     
     @Column(name = "asset_owner_id2")
-    private Integer assetOwnerId2;
+    private Integer assetOwnerId2;//维修负责人2
 
     @Column(name = "asset_owner_name2")
-    private String assetOwnerName2;
+    private String assetOwnerName2;//维修负责人2
 
     @Column(name = "asset_owner_tel2")
-    private String assetOwnerTel2;
+    private String assetOwnerTel2;//维修负责人2电话
 
     @Column(name = "asset_owner_id3")
-    private Integer assetOwnerId3;
+    private Integer assetOwnerId3;//维修负责人3
 
     @Column(name = "asset_owner_name3")
-    private String assetOwnerName3;
+    private String assetOwnerName3;//维修负责人3
 
     @Column(name = "asset_owner_tel3")
-    private String assetOwnerTel3;
+    private String assetOwnerTel3;//维修负责人3电话
 
     @Column(name = "fe_user_id")
     private Integer feUserId;
 
     @Column(name = "dispatch_mode")
-    private Integer dispatchMode;
+    private Integer dispatchMode;//派工模式
     
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "purchase_price")
-    private Double purchasePrice;
+    private Double purchasePrice;//采购价格(元)
 
     @Column(name = "salvage_value")
-    private Double salvageValue;
+    private Double salvageValue;//最终残值(元)
 
     @Column(name = "lifecycle")
-    private Integer lifecycle;
+    private Integer lifecycle;//使用年限
 
     @Column(name = "depreciation_method")
-    private Integer depreciationMethod;
+    private Integer depreciationMethod;//折旧算法
 
     @Column(name = "eam_id")
-    private String eamId;
+    private String eamId;//EAM系统编号
 
     @Column(name = "system_id")
-    private String systemId;
+    private String systemId;//SystemID/厂商报修ID
 
     @Column(name = "system_num1")
     private String systemNum1;
@@ -274,11 +274,11 @@ public class AssetInfo implements Serializable {
     private String systemNum5;
 
     @Column(name = "is_deleted")
-    private Boolean isDeleted;
+    private Boolean isDeleted;//是否删除
 
     // 0-normal 1-standby
     @Column(name = "device_status")
-    private Integer deviceStatus;
+    private Integer deviceStatus;//资产状态
 
     @Column(name = "parent_asset_id")
     private Integer parentAssetId;
@@ -299,11 +299,11 @@ public class AssetInfo implements Serializable {
     
     @Column(name = "comments")
     @Size(min = 0, max = 256)
-    private String comments;
+    private String comments;//备注
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "brand_id")
-    private Brand brand;
+    private Brand brand;//品牌
 
     @Column(name = "hospital_id")
     @Basic(optional = false)

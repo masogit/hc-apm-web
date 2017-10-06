@@ -77,6 +77,7 @@
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
+
                         <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                             <f:facet name="filter">
@@ -94,6 +95,9 @@
                                 </p:selectOneMenu>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                         <p:column headerText="#{msg.nationalStandardCode}"  visible="false" exportable="true">
+                            <h:outputText value="#{item.nationalStandardCode}"/>
                         </p:column>
                          <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.assetOwnerName}"/>
@@ -190,10 +194,14 @@
 	                        <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
 	                    </p:column>
 	                    
-	                    
-	                    <p:column headerText="#{msg.functionGroup}" visible="false" exportable="true">
+	                    <!-- #{msg.functionGroup} -->
+	                    <p:column headerText="医疗器械分类" visible="false" exportable="true">
 	                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
 	                    </p:column>
+	                    <!-- #{msg.assetCode68} -->
+                        <p:column headerText="医疗器械子分类"  visible="false" exportable="true">
+                            <h:outputText value="#{item.assetCode68}"/>
+                        </p:column>
 <!-- 	                    <p:column headerText="#{msg.functionType}"  visible="false" exportable="true">
 	                        <h:outputText value="#{item.functionType}"/>
 	                    </p:column> -->
@@ -227,15 +235,18 @@
 	                    <p:column headerText="#{msg.locationName}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.locationName}"/>
 	                    </p:column>
-<!-- 	                    <p:column headerText="#{msg.clinicalDeptId}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.clinicalDeptName}"/>
-	                    </p:column> -->
-	                    <p:column headerText="#{msg.assetDeptId}" visible="false" exportable="true">
-	                    	<h:outputText value="#{assetInfoController.getOrgName(item.assetDeptId)}"/>
+                    	<p:column headerText="#{msg.registrationNo}" visible="false" exportable="true">
+	                        <h:outputText value="#{item.registrationNo}"/>
 	                    </p:column>
+	                    <p:column headerText="#{msg.deviceStatus}" visible="false" exportable="true">
+	                    	<h:outputText value=" #{fieldMsg.fieldValue('deviceStatus',item.deviceStatus)}"/>
+	                    </p:column>
+<!-- 	                    <p:column headerText="#{msg.assetDeptId}" visible="false" exportable="true">
+	                    	<h:outputText value="#{assetInfoController.getOrgName(item.assetDeptId)}"/>
+	                    </p:column> -->
 
-
-	                    <p:column headerText="#{msg.isValid}" visible="false" exportable="true">
+						<!-- #{msg.isValid} -->
+	                    <p:column headerText="是否可用" visible="false" exportable="true">
 	                        <f:facet name="filter">
 	                            <p:selectOneMenu onchange="PF('varDataList').filter()">
 	                                <f:converter converterId="javax.faces.Boolean" />
@@ -318,6 +329,15 @@
 	                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
 	                        </h:outputText>
 	                    </p:column>
+	                    <!-- #{msg.factoryWarrantyDate} -->
+	                    <p:column headerText="质保日期" visible="false" exportable="false">
+	                        <f:facet name="filter">
+	                            <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate"/>
+	                        </f:facet>
+	                        <h:outputText value="#{item.factoryWarrantyDate}">
+	                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+	                        </h:outputText>
+	                    </p:column>
 	                    <p:column headerText="#{msg.purchasePrice}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.purchasePrice}"/>
 	                    </p:column>
@@ -333,6 +353,9 @@
 	                    <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
 	                     	<h:outputText value="#{item.qrCode}"/>
 	                    </p:column>
+	                     <p:column headerText="#{msg.comments}"  visible="false" exportable="true">
+                            <h:outputText value="#{item.comments}"/>
+                        </p:column>
 
                         <!-- import to xml end -->
                         <f:facet name="{Toolbar}">
