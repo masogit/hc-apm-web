@@ -99,6 +99,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
+    private String selectedSiteUID;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -118,6 +120,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         qrCode = selected.getQrCode();
 
         selectedOrg = orgInfoRepository.getByUid(selected.getSiteUID());
+
+        setSelectedSiteUID(selected.getSiteUID());
     }
 
     @Override
@@ -994,10 +998,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (orgInfo.getId() == -1) {
             selectedOrg = null;
             selected.setSiteUID(null);
+            setSelectedSiteUID(null);
         } else {
             selectedOrg = (OrgInfo) node.getData();
 
             selected.setSiteUID(selectedOrg.getUid());
+            setSelectedSiteUID(selectedOrg.getUid());
         }
 
     }
@@ -1029,4 +1035,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public String getSelectedSiteUID() {
+        return selectedSiteUID;
+    }
+
+    public void setSelectedSiteUID(String selectedSiteUID) {
+        this.selectedSiteUID = selectedSiteUID;
+    }
 }
