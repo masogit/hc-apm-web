@@ -355,6 +355,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> item.setCreatedDate(null));
         woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
@@ -549,6 +550,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void submitWorkOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        accessoryList.forEach(item -> item.setCreatedDate(null));
         woService.submitWorkOrder(selectedWorkOrder, accessoryList);
         cancel();
     }
