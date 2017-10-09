@@ -129,11 +129,11 @@
                 <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
                     <h:panelGroup>
                         <label class="label">主设备</label>
-                        <p:inputText id="parentAssetId" value="#{assetInfoController.getParentAssetName()}"/>
+                        <p:inputText id="parentAssetId" value="#{assetInfoController.getParentAssetName()}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.systemId}</label>
-                        <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}"/>
+                        <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.departNum}</label>
