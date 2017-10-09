@@ -91,7 +91,7 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,50">
                         <p:column headerText="报修单号">
-                            <h:outputText value="#{item.报修单号}" />
+                            <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank"><h:outputText value="#{item.报修单号}" /></a>
                         </p:column>
                         <p:column headerText="设备编号">
                             <h:outputText value="#{item.设备编号}" />
@@ -119,6 +119,9 @@
                         </p:column>
                         <p:column headerText="故障描述">
                             <h:outputText value="#{item.故障描述}" />
+                        </p:column>
+                        <p:column headerText="当前步骤">
+                            <h:outputText value="#{item.当前步骤}" />
                         </p:column>
                         <p:column headerText="工单状态">
                             <h:outputText value="#{item.工单状态}" />
