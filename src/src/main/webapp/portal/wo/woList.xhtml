@@ -6,11 +6,11 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="preRenderView">
-<!--        <f:metadata>
-            <f:viewParam name="isClosed" value="#{workOrderController.filterIsClosed}"/>
-            <f:viewParam name="aid" value="#{workOrderController.filterAssetId}"/>
-        </f:metadata>
-        <f:event type="preRenderView" listener="#{workOrderController.setViewFilter()}"/>-->
+        <!--        <f:metadata>
+                    <f:viewParam name="isClosed" value="#{workOrderController.filterIsClosed}"/>
+                    <f:viewParam name="aid" value="#{workOrderController.filterAssetId}"/>
+                </f:metadata>
+                <f:event type="preRenderView" listener="#{workOrderController.setViewFilter()}"/>-->
     </ui:define>
 
     <ui:define name="head">
@@ -26,61 +26,61 @@
             <div class="ui-g-12 card">
                 <p:messages autoUpdate="true" closable="true" showDetail="false"/>
 
-                <h:form id="SRListForm">
-                    <p:dataTable id="datalist" value="#{serviceRequestByAssetIdController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{serviceRequestByAssetIdController.selected}"
+                <h:form id="woListForm">
+                    <p:dataTable id="datalist" value="#{workOrderFromReportController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{workOrderFromReportController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" listener="#{serviceRequestByAssetIdController.onSelectServiceRequest}" update=":WorkOrderEditForm"/>
-                        <p:ajax event="filter" listener="#{serviceRequestByAssetIdController.onFilter}" update="datalist :WorkOrderEditForm"/>
+                        <p:ajax event="rowSelect" listener="#{workOrderFromReportController.onSelectServiceRequest}" update=":WorkOrderEditForm"/>
+                        <p:ajax event="filter" listener="#{workOrderFromReportController.onFilter}" update="datalist :WorkOrderEditForm"/>
 
-                        <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.casePriority}" filterBy="#{item.casePriority}" filterMatchMode="EQ">
+                        <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
+                            <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
                         </p:column>
-                        <p:column headerText="#{msg.requestTime}" sortBy="#{item.requestTime}" filterBy="#{item.requestTime}" filterMatchMode="GTE">
+                        <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}" filterBy="#{item.serviceRequest.requestTime}" filterMatchMode="GTE">
                             <f:facet name="filter">
                                 <p:inputText id="filterRequestTime" widgetVar="varFilterRequestTime"/>
                             </f:facet>
-                            <h:outputText value="#{item.requestTime}">
+                            <h:outputText value="#{item.serviceRequest.requestTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.requestorName}" filterBy="#{item.requestorId}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}" filterBy="#{item.requestorId}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{serviceRequestByAssetIdController.usersInHospital}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{workOrderFromReportController.usersInHospital}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{item.requestorName}"/>
+                            <h:outputText value="#{item.serviceRequest.requestorName}"/>
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}" >
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{serviceRequestByAssetIdController.srClinicalDeptNameList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
+                                    <f:selectItems value="#{workOrderFromReportController.clinicalDeptNameList}" var="item" itemLabel="#{item}" itemValue="#{item}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{item.clinicalDeptName}"/>
+                            <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetName}"/>
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column><!--
--->                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.requestReason}" filterBy="#{item.requestReason}" filterMatchMode="LIKE">
-                            <h:outputText value="#{serviceRequestByAssetIdController.getRequestReasonInShort(item)}" title="#{item.requestReason}"/>
+-->                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.patProblems}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.serviceRequest.requestReason}" title="#{item.serviceRequest.requestReason}"/>
                         </p:column><!--
--->                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+    -->                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -89,11 +89,7 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('status', item.status)}"/>
                         </p:column>
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
-                            </p:commandButton>
-                        </f:facet>
+
                     </p:dataTable>
                 </h:form>
 

@@ -68,9 +68,10 @@ public class WorkOrderFromReportController extends GenericCRUDUUIDController<V2_
         this.usersInHospital = uaaService.getUserList(this.currentUser.getHospitalId());
         this.clinicalDeptNameList = dao.getClinicalDeptNameList(this.currentUser.getHospitalId(), this.currentUser.getSiteId());
         this.setSearchFilter();
-        this.searchFilters.add(new SearchFilter("status", EQ, 1));
+        /*this.searchFilters.add(new SearchFilter("status", EQ, 1));
         this.searchFilters.add(new SearchFilter("hospitalId", EQ, this.currentUser.getHospitalId()));
-        this.searchFilters.add(new SearchFilter("siteId", EQ, this.currentUser.getSiteId()));
+        this.searchFilters.add(new SearchFilter("siteId", EQ, this.currentUser.getSiteId()));*/
+        this.searchFilters.add(new SearchFilter("id", EQ, woId));
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
