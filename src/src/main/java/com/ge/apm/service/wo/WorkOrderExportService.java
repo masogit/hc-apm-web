@@ -99,6 +99,7 @@ public class WorkOrderExportService {
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
             workOrderMap = new HashedMap();
+            workOrderMap.put("woId", workOrder.getId());
             workOrderMap.put("报修单号", serviceRequest.getSrNum() != null ? serviceRequest.getSrNum() : "");
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
             workOrderMap.put("工单状态", workOrder.getStatus() != null ? FieldValueMessageController.fieldValue("status",workOrder.getStatus().toString()) : "");
