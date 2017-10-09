@@ -6,6 +6,8 @@
 package com.ge.apm.view.wo;
 
 import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.google.common.base.Strings;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -15,7 +17,6 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Optional;
 
 /**
  * @author 212579464
@@ -32,7 +33,6 @@ public class ServiceRequestByAssetIdController extends ServiceRequestController 
     @Override
     protected void init() {
         super.init();
-        this.filterBySite = true;
         try {
             assetId = Integer.valueOf(WebUtil.getRequestParameter("assetId"));
             woId = WebUtil.getRequestParameter("woId");
@@ -43,34 +43,27 @@ public class ServiceRequestByAssetIdController extends ServiceRequestController 
 
     @Override
     protected Page<V2_ServiceRequest> loadData(PageRequest pageRequest) {
-//        if (!Strings.isNullOrEmpty(woId)) {
-//            V2_WorkOrder workOrder = woService.getWorkOrderById(woId);
-//            return dao.findById(workOrder.getSrId(), pageRequest);
-//        }
-        
+        if (!Strings.isNullOrEmpty(woId)) {
+            V2_WorkOrder workOrder = woService.getWorkOrderById(woId);
+            return dao.findById(workOrder.getSrId(), pageRequest);
+        }
+
+        this.setSiteFilter();
         if (searchFilters == null) {
             searchFilters = new ArrayList();
         }
         if (assetId != -1) {
-//            searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetId));
+            searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, assetId));
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1)); //query Closed service request
         }
 
         this.selected = null;
         this.workOrders = null;
-        Page<V2_ServiceRequest> results;
-
         if (this.searchFilters.isEmpty()) {
-            results = dao.findAll(pageRequest);
+            return dao.findAll(pageRequest);
         } else {
-            results = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
-
-        Optional.ofNullable(results)
-                .map(Page::getContent)
-                .get()
-                .forEach(sr -> sr.setClinicalDeptName(dao.getSrClinicalDeptName(sr.getAssetId())));
-        return results;
     }
 
 }
