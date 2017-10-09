@@ -38,6 +38,23 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
 	private Integer receiveMsgMode;
 
+	/*public boolean subscriberShow(){
+		//xiugai   if(xiu gai and fei admin) return true
+		if(!userContextService.hasRole("ITAdmin")&  WebUtil.getMessage(crudActionName)=="修改")
+			return true;
+		else
+			 return false;
+	}*/
+	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
+	/*public void takeAssetTags(){
+		assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
+	}*/
+// 关注人tentant下的tag
+	public void takeAssetTags(){
+		//assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
+		assetTags =  assetTagRepository.getTagUnderTanent(userAccountRepository.getById(this.selected.getSubscribeUserId()).getTenantUID());
+
+	}
 	@Override
 	protected void init() {
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
@@ -45,8 +62,6 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
 		assetTagRepository =WebUtil.getBean(AssetTagRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-
-
 		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 		FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
 		msgModeList = fieldMsg.getFieldValueList("focusOption");
@@ -116,13 +131,14 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
 		this.selected.setReceiveMsgMode(null);
-		assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), currentUser.getId());
+		assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
 	}
 
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-		// assetTags = assetTagRepository.find();
+		assetTags= assetTagRepository.getTagUnderTanent(currentUser.getTenantUID());
+		//assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), this.selected.getSubscribeUserId());
 	}
 
 	@Override
