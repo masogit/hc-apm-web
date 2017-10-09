@@ -8,7 +8,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
-//import com.ge.apm.service.common.WechatSendMsgService;
+import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
@@ -24,6 +24,7 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -58,13 +59,12 @@ public class AssetCreateService {
     ConfigUtils configUtils;
     @Autowired
     UserCommonService ucService;
-//    @Autowired
-//    WechatSendMsgService wsService;
+    @Autowired
+    WechatSendMsgService wsService;
 
     @Autowired
     BlobObjectRepository blobDao;
-
-//    AttachmentFileService fileService = WebUtil.getBean(AttachmentFileService.class);
+    
     public String getTenantName(Integer siteId) {
         TenantInfo si = tenantDao.findById(siteId);
         if (si != null) {
@@ -166,42 +166,17 @@ public class AssetCreateService {
 
     public boolean rejectReturn(QrCodeLib request, String rejectText) {
 
-//        String openId = request.getSubmitWechatId();
-//        Map<String, Object> map = new HashMap();
-//        map.put("_openId", openId);
-//        map.put("first", "建档失败");
-//        map.put("keyword1", rejectText);
-//        map.put("keyword2", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
-//        map.put("linkUrl", "wechat/asset/createInfoDetail.xhtml?qrCode=".concat(request.getQrCode()));
-//
-//        wsService.sendCreateAssetRejectMsg(map);
-//
-//        rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
-//        request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
-//        qrLibDao.save(request);
-        return true;
+        String openId = request.getSubmitWechatId();
+        Map<String, Object> map = new HashMap();
+        map.put("_openId", openId);
+        map.put("first", "建档失败");
+        map.put("keyword1", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss") + "提交建档".concat(request.getQrCode()));
+        map.put("keyword2", rejectText);
+        map.put("linkUrl", "/wx/scanQrCode?qrCode=".concat(request.getQrCode()));
+//        map.put("remark", "/wx/scanQrCode?qrCode=".concat(request.getQrCode()));
+        return wsService.sendCreateAssetRejectMsg(map);
     }
 
-//    public boolean rejectReturn(QrCodeLib request, String rejectText) {
-//        String _openId = request.getSubmitWechatId();
-//        String _templateId = configUtils.fetchProperties("asset_build_template_id");
-//        Map<String, Object> map = new HashMap();
-//        map.put("first", "建档失败");
-////        map.put("_qrCode", request.getQrCode());
-////        map.put("_requestTime", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
-////        map.put("_detail", rejectText);
-//        map.put("keyword1", rejectText);
-//        map.put("keyword2", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss"));
-//        map.put("linkUrl", "wechat/asset/createInfoDetail.xhtml?qrCode=".concat(request.getQrCode()));
-//
-//        coreService.sendWxTemplateMessage(_openId, _templateId, map);
-//
-//        rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
-//
-//        request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
-//        qrLibDao.save(request);
-//        return true;
-//    }
     public OrgInfo getOrgInfo(Integer clinicalDeptId) {
         return orgDao.findById(clinicalDeptId);
     }
@@ -210,14 +185,6 @@ public class AssetCreateService {
         return orgDao.getByHospitalId(hospitalId);
     }
 
-//    public String pushVoiceToWechat(Integer fileId) throws Exception {
-//        StreamedContent sc = fileService.getFile(fileId);
-//        return coreService.uploadMediaToWechat(sc.getStream());
-//    }
-//    public String pushImageToWechat(Integer fileId) throws Exception {
-//        StreamedContent sc = fileService.getFile(fileId);
-//        return coreService.uploadImageToWechat(sc.getStream());
-//    }
     public UserAccount getUserInfo(Integer userId) {
         return userDao.getById(userId);
     }

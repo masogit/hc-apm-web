@@ -6,11 +6,11 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="preRenderView">
-<!--        <f:metadata>
-            <f:viewParam name="isClosed" value="#{workOrderController.filterIsClosed}"/>
-            <f:viewParam name="aid" value="#{workOrderController.filterAssetId}"/>
-        </f:metadata>
-        <f:event type="preRenderView" listener="#{workOrderController.setViewFilter()}"/>-->
+        <!--        <f:metadata>
+                    <f:viewParam name="isClosed" value="#{workOrderController.filterIsClosed}"/>
+                    <f:viewParam name="aid" value="#{workOrderController.filterAssetId}"/>
+                </f:metadata>
+                <f:event type="preRenderView" listener="#{workOrderController.setViewFilter()}"/>-->
     </ui:define>
 
     <ui:define name="head">
@@ -31,7 +31,7 @@
                                  selectionMode="single" selection="#{workOrderFromReportController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
@@ -78,9 +78,9 @@
                             <h:outputText value="#{item.assetInfo.name}"/>
                         </p:column><!--
 -->                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.patProblems}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.serviceRequest.requestReason}" title="#{item.serviceRequest.requestReason}"/>
+                        <h:outputText value="#{item.serviceRequest.requestReason}" title="#{item.serviceRequest.requestReason}"/>
                         </p:column><!--
--->                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+    -->                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -89,11 +89,7 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('status', item.status)}"/>
                         </p:column>
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
-                            </p:commandButton>
-                        </f:facet>
+
                     </p:dataTable>
                 </h:form>
 

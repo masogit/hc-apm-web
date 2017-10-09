@@ -1,5 +1,6 @@
 package com.ge.apm.view.uaa;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -9,6 +10,9 @@ import org.springframework.data.domain.PageRequest;
 
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.dao.BiomedGroupUserRepository;
+import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
@@ -27,6 +31,10 @@ import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.BiomedGroupUser;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.WorkflowConfig;
 import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -268,7 +276,55 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             
         }
     }
+    
+    public void deleteSelectedUser() {
+        if (canDelete()) {
+            super.delete();
+        } 
+    }
 
+    private Boolean canDelete(){
+        List<SearchFilter> checkFilters = new ArrayList<>();
+        checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        checkFilters.add(new SearchFilter("dispatchUserId2", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        List<WorkflowConfig> cfgList =  wfDao.findBySearchFilter(checkFilters);
+        if(cfgList!=null && !cfgList.isEmpty()){
+            WebUtil.addErrorMessage("该用户是派工人,不能删除.");
+            return false;
+        }
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
+        if(assetList!=null && !assetList.isEmpty()){
+            WebUtil.addErrorMessage("该用户是设备责任人,不能删除.");
+            return false;
+        }
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("userId", SearchFilter.Operator.EQ, selected.getId()));
+        BiomedGroupUserRepository groupDao = WebUtil.getBean(BiomedGroupUserRepository.class);
+        List<BiomedGroupUser> groupList = groupDao.findBySearchFilter(checkFilters);
+        if(groupList!=null && !groupList.isEmpty()){
+            WebUtil.addErrorMessage("该用户在维修工程师群组中,不能删除.");
+            return false;
+        }
+        
+        checkFilters.clear();
+        checkFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, selected.getId()));
+        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
+        V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
+        List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
+        if(woList!=null && !woList.isEmpty()){
+            WebUtil.addErrorMessage("该用户有在修工单,不能删除.");
+            return false;
+        }
+        
+        return true;
+    }
     
     @Override
     public void onBeforeSave(UserAccount user) {
