@@ -2,22 +2,13 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.util.Date;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
- *
  * @author 212547631
  */
 @Entity
@@ -95,7 +86,7 @@ public class InspectionOrder implements Serializable {
     @Size(max = 128)
     @Column(name = "paper_url")
     private String paperUrl;
-    
+
     @Column(name = "hospital_id")
     @Basic(optional = false)
     @NotNull
@@ -108,7 +99,52 @@ public class InspectionOrder implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date planTime;  //计划时间
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    @Size(max = 32)
+    private String tenantUID;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
+
     public InspectionOrder() {
+    }
+
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
     }
 
     public Integer getId() {
@@ -287,5 +323,5 @@ public class InspectionOrder implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.InspectionOrder[ id=" + id + " ]";
     }
-    
+
 }
