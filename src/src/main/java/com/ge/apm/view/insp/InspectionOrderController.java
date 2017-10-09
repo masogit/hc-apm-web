@@ -144,7 +144,6 @@ public class InspectionOrderController extends JpaCRUDController<InspectionOrder
             searchFilters.add(new SearchFilter("orderType", SearchFilter.Operator.EQ, 1));
         }
         searchFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getHospitalId()));
-        searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getSiteId()));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
