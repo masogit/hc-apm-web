@@ -512,7 +512,48 @@ public class UserAccount implements Serializable {
 	public void setIsUnbunding(boolean isUnbunding) {
 		this.isUnbunding = isUnbunding;
 	}
-    
-    
+
+    public String loadOrgTableColumn() {
+        switch (this.getOrgLevel() == null ? 3 : this.getOrgLevel()) {
+            case 1:
+                return "INSTITUTION_UID";
+            case 2:
+                return "HOSPITAL_UID";
+            case 3:
+                return "SITE_UID";
+            default:
+                return "SITE_UID";
+        }
+    }
+
+    public String loadOrgColumnName() {
+        switch (this.getOrgLevel() == null ? 3 : this.getOrgLevel()) {
+            case 0:
+                return "tenantUID";
+            case 1:
+                return "institutionUID";
+            case 2:
+                return "hospitalUID";
+            case 3:
+                return "siteUID";
+            default:
+                return "siteUID";
+        }
+    }
+
+    public String loadOrgUid() {
+        switch (this.getOrgLevel() == null ? 3 : this.getOrgLevel()) {
+            case 0:
+                return this.getTenantUID();
+            case 1:
+                return this.getInstitutionUID();
+            case 2:
+                return this.getHospitalUID();
+            case 3:
+                return this.getSiteUID();
+            default:
+                return this.getSiteUID();
+        }
+    }
 
 }
