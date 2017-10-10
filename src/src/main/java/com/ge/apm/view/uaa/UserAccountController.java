@@ -320,7 +320,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         
         checkFilters.clear();
         checkFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, selected.getId()));
-        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
+        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
         List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
         if(woList!=null && !woList.isEmpty()){
