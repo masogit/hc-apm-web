@@ -5,9 +5,11 @@ import com.ge.apm.dao.OrgInfoRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.component.selectmanycheckbox.SelectManyCheckbox;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -487,6 +489,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void roleChangeListener(ValueChangeEvent e) {
+        if (e.getPhaseId() != PhaseId.INVOKE_APPLICATION) {
+            e.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            e.queue();
+            return;
+        }
+
         List<String> newValues = (List<String>)e.getNewValue();
         List<String> oldValues = (List<String>)e.getOldValue();
         List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
@@ -495,13 +503,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             //new role checked
             String checkedRole = newlyCheckedRoles.get(0);
             if (uaaService.isTemporaryAccount(checkedRole)) {
-                this.assignedRoles.clear();
-                this.assignedRoles.add(checkedRole);
+                if (newValues.size() > 1) {
+                    //not only guest account checked
+                    this.assignedRoles.clear();
+                    this.assignedRoles.add(checkedRole);
+                    WebUtil.addSuccessMessage(WebUtil.getMessage("GuestAccountCheckedWarning"));
+                }
+
             } else {
                 String tempRoleName = uaaService.getTemporaryAccountIfAlreadyChecked((oldValues));
 
-                if (tempRoleName != null) {
+                if (tempRoleName != null && this.assignedRoles.contains(tempRoleName)) {
                     this.assignedRoles.remove(tempRoleName);
+                    WebUtil.addSuccessMessage(WebUtil.getMessage("GuestAccountCheckedWarning"));
                 }
             }
 
