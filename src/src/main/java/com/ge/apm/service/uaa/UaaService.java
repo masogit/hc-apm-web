@@ -689,4 +689,26 @@ public class UaaService {
         return rootNode;
     }
 
+    public boolean isTemporaryAccount(String role) {
+        Optional<SysRole> optionalSysRole = sysRoles.values().stream().filter(sysRole -> sysRole.getRoleDesc().equals(role) && sysRole.getId() == 9).findFirst();
+
+        if (optionalSysRole.isPresent()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
+    public String getTemporaryAccountIfAlreadyChecked(List<String> roles) {
+
+        for (String role: roles) {
+            if (isTemporaryAccount(role)) {
+                return role;
+            }
+        }
+
+        return null;
+    }
+
 }

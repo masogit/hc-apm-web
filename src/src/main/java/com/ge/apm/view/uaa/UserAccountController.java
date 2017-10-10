@@ -5,6 +5,9 @@ import com.ge.apm.dao.OrgInfoRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.ValueChangeEvent;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -481,6 +484,29 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
         this.selectedAccessOrgNodes = selectedAccessOrgNodes;
+    }
+
+    public void roleChangeListener(ValueChangeEvent e) {
+        List<String> newValues = (List<String>)e.getNewValue();
+        List<String> oldValues = (List<String>)e.getOldValue();
+        List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
+
+        if (newlyCheckedRoles.size() > 0) {
+            //new role checked
+            String checkedRole = newlyCheckedRoles.get(0);
+            if (uaaService.isTemporaryAccount(checkedRole)) {
+                this.assignedRoles.clear();
+                this.assignedRoles.add(checkedRole);
+            } else {
+                String tempRoleName = uaaService.getTemporaryAccountIfAlreadyChecked((oldValues));
+
+                if (tempRoleName != null) {
+                    this.assignedRoles.remove(tempRoleName);
+                }
+            }
+
+        }
+
     }
 
 }
