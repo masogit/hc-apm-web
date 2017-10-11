@@ -336,15 +336,27 @@ public class UaaService {
     
     @Transactional
     public void setDefaultScope(UserAccount user) {
-        OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
-        if (org != null) {
+        OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
+        if (ownnedOrg.getOrgType() == 4) {
+            //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
             UserOrgInfo userOrg = new UserOrgInfo();
             userOrg.setUserUid(user.getUid());
-            userOrg.setOrgUid(org.getUid());
-            userOrg.setOrgType(org.getOrgType());
+            userOrg.setOrgUid(ownnedOrg.getUid());
+            userOrg.setOrgType(ownnedOrg.getOrgType());
             UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
             userOrgDao.save(userOrg);
+        } else {
+            OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
+            if (org != null) {
+                UserOrgInfo userOrg = new UserOrgInfo();
+                userOrg.setUserUid(user.getUid());
+                userOrg.setOrgUid(org.getUid());
+                userOrg.setOrgType(org.getOrgType());
+                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
+                userOrgDao.save(userOrg);
+            }
         }
+
     }
     
     public DefaultTreeNode getOrgTree(int hospitalId){
