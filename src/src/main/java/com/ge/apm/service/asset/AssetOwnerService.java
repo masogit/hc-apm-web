@@ -58,7 +58,7 @@ public class AssetOwnerService {
         if (null != queryAsset.getAssetGroup()) {
             OrgInfoFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }
-        if (null != queryAsset.getClinicalDeptId()) {
+        if (null != queryAsset.getClinicalDeptUID()) {
             OrgInfoFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptUID()));
         }
         if (null != queryAsset.getAssetOwnerId()) {
