@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-              <p:outputLabel class="pageTitle" value="维修事件消息订阅"/>
+              <p:outputLabel class="pageTitle" value="#{msg.msgsubscribe}"/>
             </div>
             <div class="ui-g-12 card">
             <h:form id ="TagSubscriberForm" style="margin-top: 20px;">
@@ -21,19 +21,19 @@
     <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
-    <p:column headerText="关注人" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+    <p:column headerText="#{msg.subscriber}" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
       <!--  <h:outputText value="  #{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />-->
         <h:outputText value="#{item.subscriberUser.name}" />
     </p:column>
 
-    <p:column headerText="设备标签" filterMatchMode="LIKE">
+    <p:column headerText="#{msg.AssetTag}" filterMatchMode="LIKE">
         <h:outputText value="#{tagSubscriberController.getTagName(item.tagId)}" />
     </p:column>
 
-    <p:column headerText="工单消息推送选项" >
+    <p:column headerText="#{msg.messagepushoption}" >
         <h:outputText value="#{tagSubscriberController.getMsgMode(item.receiveMsgMode)}" />
     </p:column>
-   <p:column headerText="工单超时推送选项" ><h:outputText value="#{item.isReceiveTimeoutMsg?'推送':'不推送'}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'} "/></p:column>
+   <p:column headerText="#{msg.overtimenotification}" ><h:outputText value="#{item.isReceiveTimeoutMsg?'推送':'不推送'}" style="color:#{item.isReceiveTimeoutMsg?'blue':'red'} "/></p:column>
 
     <f:facet name="{Toolbar}">
       <!--  <p:commandButton id="createButton" actionListener="#{tagSubscriberController.prepareCreate}" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" />-->
