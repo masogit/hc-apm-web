@@ -1232,7 +1232,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('6877', '2', '导丝和管鞘', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('6877', '3', '栓塞器材', NULL, NULL, '-1');
 
----tmp gl
+
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'all', '全部', 'All', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'newrepair', '新增报修', 'New repair', NULL, '-1');
 
@@ -1254,4 +1254,19 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'canceled', '已取消', 'canceled', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'tobeReview', '待审批', 'tobeReview', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'messagepushoption', '工单消息推送选项', 'work order message push option', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'overtimenotification', '工单超时推送选项', 'work order over time notification', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'suscriber', '关注人', 'suscriber', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'msgsubscribe', '维修事件消息订阅', 'message subscriber', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'signon', '签到', 'sign on', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'new', '新建', 'New', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'repair', '维修', 'repair', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'audit', '审批', 'audit', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'clinicaldepart', '使用科室', 'clinical depart', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'equiptaketime', '取物时间', 'equip take time', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'equiptake', '取物', 'equip take', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'qualityexpirdate', '质保期', 'quality expire date', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'expectarrivaldate', '预期到达时间', 'expeted arrival date', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'arrival', '到货', 'arrival', NULL, '-1');
 --- above already in db
