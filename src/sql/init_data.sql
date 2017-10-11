@@ -1135,6 +1135,12 @@ INSERT INTO brand (name) (SELECT DISTINCT manufacture as name from asset_info wh
 
 insert into asset_tag (id, name) values (-999, '院区所有设备');
 
+-- 设备盘点问题清单
+INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '二维码标签缺失');
+INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '计量合格标识缺失');
+INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '资产标签缺失');
+INSERT INTO inventory_check_list (id, item) VALUES (replace(uuid_generate_v4() || '', '-', ''), '台帐二维码记录缺失');
+
 
 /*insert into supplier(site_id,name) values (1, '通用电气');
 insert into supplier(site_id,name) values (1, '西门子');
