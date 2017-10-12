@@ -5,6 +5,11 @@ import com.ge.apm.dao.OrgInfoRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.event.PhaseId;
+import javax.faces.event.ValueChangeEvent;
+
+import org.apache.commons.collections.CollectionUtils;
+import org.primefaces.component.selectmanycheckbox.SelectManyCheckbox;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -315,7 +320,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         
         checkFilters.clear();
         checkFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, selected.getId()));
-        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
+        checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
         List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
         if(woList!=null && !woList.isEmpty()){
@@ -481,6 +486,41 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     public void setSelectedAccessOrgNodes(TreeNode[] selectedAccessOrgNodes) {
         this.selectedAccessOrgNodes = selectedAccessOrgNodes;
+    }
+
+    public void roleChangeListener(ValueChangeEvent e) {
+        if (e.getPhaseId() != PhaseId.INVOKE_APPLICATION) {
+            e.setPhaseId(PhaseId.INVOKE_APPLICATION);
+            e.queue();
+            return;
+        }
+
+        List<String> newValues = (List<String>)e.getNewValue();
+        List<String> oldValues = (List<String>)e.getOldValue();
+        List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
+
+        if (newlyCheckedRoles.size() > 0) {
+            //new role checked
+            String checkedRole = newlyCheckedRoles.get(0);
+            if (uaaService.isTemporaryAccount(checkedRole)) {
+                if (newValues.size() > 1) {
+                    //not only guest account checked
+                    this.assignedRoles.clear();
+                    this.assignedRoles.add(checkedRole);
+                    WebUtil.addSuccessMessage(WebUtil.getMessage("GuestAccountCheckedWarning"));
+                }
+
+            } else {
+                String tempRoleName = uaaService.getTemporaryAccountIfAlreadyChecked((oldValues));
+
+                if (tempRoleName != null && this.assignedRoles.contains(tempRoleName)) {
+                    this.assignedRoles.remove(tempRoleName);
+                    WebUtil.addSuccessMessage(WebUtil.getMessage("GuestAccountCheckedWarning"));
+                }
+            }
+
+        }
+
     }
 
 }

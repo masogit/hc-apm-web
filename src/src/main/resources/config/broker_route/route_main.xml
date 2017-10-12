@@ -123,24 +123,24 @@
             <bean ref="assetExamDataAggregator" method="aggregateExamSummit"/>
         </route>
 
-        <route>
+      <!--  <route>
             <from uri="quartz://quartzAssetExamDataAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateAssetExamData"/>
-        </route>
+        </route>-->
         <!--gl aggregate for yesterday -->
         <route>
             <from uri="direct:aggregationAssetSummitForYesterday"/>
             <bean ref="assetExamDataAggregator" method="aggregateAssetSummitForYesterday"/>
         </route>
-        <route>
+        <!--<route>
             <from uri="quartz://quartzAssetExamDataAggregationForYesterday?cron=0+30/5+2+*+*+?"/>
             <to uri="direct:aggregationAssetSummitForYesterday"/>
-        </route>
+        </route>-->
 <!--gl working-->
-        <route>
+     <!--   <route>
             <from uri="quartz://quartzExamSummitAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateExamSummitData"/>
-        </route>
+        </route>-->
         
         <route>
             <from uri="servlet:///aggregateAssetExamData?servletName=MyServlet"/>
