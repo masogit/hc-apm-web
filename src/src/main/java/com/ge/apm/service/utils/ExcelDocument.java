@@ -62,6 +62,7 @@ public class ExcelDocument {
         } else if (type.equals(ExcelType.XLSX)) {
             workBook = new XSSFWorkbook(input);
         }
+
         input.close();
     }
 
@@ -95,7 +96,8 @@ public class ExcelDocument {
                 break;
             }
             Object v = getCellValue(cell);
-            ValueWrapper wrapper = new ValueWrapper(v, cell);
+            String rawValue = getRawValue(cell);
+            ValueWrapper wrapper = new ValueWrapper(v, rawValue);
             dataMap.put(rowKey[cellIndex], wrapper);
         }
         return dataMap;
@@ -140,14 +142,29 @@ public class ExcelDocument {
         }
     }
 
+    private String getRawValue(Cell cell) {
+        CellType type = cell.getCellTypeEnum();
+        switch (type) {
+            case BLANK:
+                return null;
+            case BOOLEAN:
+                return null;
+            case NUMERIC:
+                return HSSFDateUtil.isCellDateFormatted(cell) ? null : ((XSSFCell)cell).getRawValue();
+            case STRING:
+                return null;
+            case FORMULA:
+                return null;
+            default:
+                return null;
+        }
+    }
+
     static public String getCellStringValue(Object value) {
         ValueWrapper valueWrapper = null;
-        Cell cell = null;
         if (value instanceof ValueWrapper) {
             valueWrapper = (ValueWrapper) value;
             value = valueWrapper.value;
-            cell = valueWrapper.cell;
-
         }
 
         if (value == null) {
@@ -157,12 +174,10 @@ public class ExcelDocument {
             return (String) value;
         }
         if (value instanceof Integer) {
-            return ((XSSFCell)cell).getRawValue();
-//            return ((Integer) value).toString();
+            return valueWrapper.rawValue;
         }
         if (value instanceof Double) {
-            return ((XSSFCell)cell).getRawValue();
-//            return ((Double) value).toString();
+            return valueWrapper.rawValue;
         }
         return value.toString();
     }
@@ -170,11 +185,9 @@ public class ExcelDocument {
     static public Integer getCellIntegerValue(Object value) {
 
         ValueWrapper valueWrapper = null;
-        Cell cell = null;
         if (value instanceof ValueWrapper) {
             valueWrapper = (ValueWrapper) value;
             value = valueWrapper.value;
-            cell = valueWrapper.cell;
         }
 
         if (value == null) {
@@ -195,11 +208,9 @@ public class ExcelDocument {
     static public Double getCellDoubleValue(Object value) {
 
         ValueWrapper valueWrapper = null;
-        Cell cell = null;
         if (value instanceof ValueWrapper) {
             valueWrapper = (ValueWrapper) value;
             value = valueWrapper.value;
-            cell = valueWrapper.cell;
         }
 
         if (value == null) {
@@ -286,11 +297,22 @@ public class ExcelDocument {
 
     public static class ValueWrapper {
         public Object value;
-        public Cell cell;
+        public String rawValue;
 
-        public ValueWrapper(Object value, Cell cell) {
+        public ValueWrapper(Object value, String rawValue) {
             this.value = value;
-            this.cell = cell;
+            this.rawValue = rawValue;
+        }
+    }
+
+    public void release() {
+        if (workBook != null) {
+            try {
+                workBook.close();
+            } catch (IOException e) {
+                //nothing
+            }
+            workBook = null;
         }
     }
 
