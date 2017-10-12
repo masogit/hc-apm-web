@@ -16,25 +16,25 @@
 
                 <h:form id="woMgrListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="全部"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(0)}" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true"/>
-                        <p:commandButton value="新增报修"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
-                        <p:commandButton value="已报修"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(1)}" disabled="#{workOrderMgrController.queryIndex==1}" rendered="true"/>
-                        <p:commandButton value="待审批"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(10)}" disabled="#{workOrderMgrController.queryIndex==10}" rendered="true"/>
-                        <p:commandButton value="待派工"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(2)}" disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/>
-                        <p:commandButton value="待接单"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(3)}" disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                        <p:commandButton value="维修中"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                        <p:commandButton value="待验收"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}" rendered="true"/>
-                        <p:commandButton value="待评价"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(6)}" disabled="#{workOrderMgrController.queryIndex==6}" rendered="true"/>
-                        <p:commandButton value="待关单"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(7)}" disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                        <p:commandButton value="已关单"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(8)}" disabled="#{workOrderMgrController.queryIndex==8}" rendered="true"/>
-                        <p:commandButton value="已取消"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(9)}" disabled="#{workOrderMgrController.queryIndex==9}" rendered="true"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(0)}" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true"/>
+                        <p:commandButton value="#{msg.createrepair}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
+                        <p:commandButton value="#{msg.repaired}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(1)}" disabled="#{workOrderMgrController.queryIndex==1}" rendered="true"/>
+                        <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(10)}" disabled="#{workOrderMgrController.queryIndex==10}" rendered="true"/>
+                        <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(2)}" disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/>
+                        <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(3)}" disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                        <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                        <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}" rendered="true"/>
+                        <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(6)}" disabled="#{workOrderMgrController.queryIndex==6}" rendered="true"/>
+                        <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(7)}" disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                        <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(8)}" disabled="#{workOrderMgrController.queryIndex==8}" rendered="true"/>
+                        <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(9)}" disabled="#{workOrderMgrController.queryIndex==9}" rendered="true"/>
 <!--                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet :woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(3)}"  disabled="#{workOrderMgrController.queryIndex==3}" />
                         <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet :woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
                         <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet :woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{workOrderMgrController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
@@ -59,7 +59,7 @@
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
-                        <p:column headerText="使用科室" sortBy="#{item.serviceRequest.fromDeptUID}">
+                        <p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
                             <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
                         </p:column>
                         <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
@@ -102,13 +102,13 @@
                             <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
                         </p:column>
                         <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
-                            <p:commandButton value="签到" actionListener="#{workOrderMgrController.checkIn(item.id)}" update=":woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
+                            <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update=":woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
                             <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
-                            <p:commandButton value="维修" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update=":repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()"/>
-                            <p:commandButton  value="新建" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()"/>
+                            <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update=":repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()"/>
+                            <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()"/>
                         </p:column>
                         <p:column headerText="审批" rendered="#{workOrderMgrController.queryIndex==10}">
-                            <p:commandButton value="审批" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                            <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                         </p:column>
                         <p:column headerText="#{msg.Acknowledge}" rendered="#{workOrderMgrController.queryIndex==5}">
                             <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":ackDialogForm" oncomplete="PF('ackDialog').show()"/>

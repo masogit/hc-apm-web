@@ -64,7 +64,7 @@ public class AssetCreateService {
 
     @Autowired
     BlobObjectRepository blobDao;
-    
+
     public String getTenantName(Integer siteId) {
         TenantInfo si = tenantDao.findById(siteId);
         if (si != null) {
@@ -174,7 +174,14 @@ public class AssetCreateService {
         map.put("keyword2", rejectText);
         map.put("linkUrl", "/wx/scanQrCode?qrCode=".concat(request.getQrCode()));
 //        map.put("remark", "/wx/scanQrCode?qrCode=".concat(request.getQrCode()));
-        return wsService.sendCreateAssetRejectMsg(map);
+        if (wsService.sendCreateAssetRejectMsg(map)) {
+            rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
+            request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
+            qrLibDao.save(request);
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public OrgInfo getOrgInfo(Integer clinicalDeptId) {

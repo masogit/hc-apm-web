@@ -6,6 +6,12 @@
                 template="/WEB-INF/template.xhtml">
 
     <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell>label+div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="#{assetInfoController.CRUDActionName} #{assetInfoController.getAssetEditTitle()}"/>
