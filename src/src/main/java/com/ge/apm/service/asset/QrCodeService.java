@@ -22,7 +22,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -148,7 +147,8 @@ public class QrCodeService {
 
     public Map<String, String> getFieldsMap() {
         if (null == FieldsMap) {
-            FieldsMap = new HashMap<>();
+            FieldsMap = new java.util.LinkedHashMap<>();
+            FieldsMap.put("blank", "无");                                        //空白
             FieldsMap.put("name", WebUtil.getMessage("name"));                   //设备名称  AssetInfo.name
             FieldsMap.put("assetGroup", WebUtil.getMessage("assetGroup"));       //设备类型  AssetInfo.assetGroup
             FieldsMap.put("hospital", WebUtil.getMessage("hospitalId"));         //所属院区  AssetInfo.siteUID -> OrgInfo.name
@@ -186,6 +186,9 @@ public class QrCodeService {
                     item.setTextValue("");
                 }
                 switch (item.getFieldKey()) {
+                    case "blank" : 
+                        item.setTextShowValue(item.getTextValue());
+                        break;
                     case "name":
                         item.setTextShowValue(item.getTextValue().concat(asset.getName() == null ? "" : asset.getName()));
                         break;
