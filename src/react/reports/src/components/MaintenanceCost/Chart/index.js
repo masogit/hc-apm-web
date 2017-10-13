@@ -70,6 +70,11 @@ class Chart extends React.PureComponent {
     //   })
     // }
     let filterOptions = []
+    filterOptions.push({
+      type: 'range',
+      key: 'range',
+      value: filters.range
+    })
     if (depts) {
       filterOptions.push({
         type: 'select',
