@@ -195,7 +195,7 @@
 	                    </p:column>
 	                    
 	                     <p:column headerText="主设备" visible="false" exportable="true">
-	                        <h:outputText value="#{assetInfoController.getParentAssetName(item.id)}"/>
+	                        <h:outputText value="#{assetInfoController.getParentAssetNameByAssetId(item.id)}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
 	                        <h:outputText value="#{assetInfoController.selected.systemId}"/>
