@@ -25,6 +25,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -84,7 +85,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
     
     public String getTenantName(String tenantUid){
-        return tenantInfoDao.findByuid(tenantUid).getName();
+        return Optional.ofNullable(tenantInfoDao.findByuid(tenantUid)).orElse(new TenantInfo()).getName();
     }
 
     public String getEditLink() {
@@ -141,7 +142,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
     
     public String getHospitalName(String orgUid) {
-        return orgDao.getByUid(orgUid).getName();
+        return Optional.ofNullable(orgDao.getByUid(orgUid)).orElse(new OrgInfo()).getName();
     }
     
     public List<TenantInfo> getTenantList() {
