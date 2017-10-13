@@ -41,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 @RestController
 @RequestMapping("/dmv2")
 @Validated
-public class DmApiV2 {/*
+public class DmApiV2 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(DmApiV2.class);
   private final String SUGGESTION_BUY = "建议购买";
   private final String SUGGESTION_ADJUST = "建议合理安排使用";
@@ -535,7 +535,7 @@ public class DmApiV2 {/*
   }
 
 
-  *//**
+  /**
    * This function combines data form CalculateHistoryData and predictFutureData to form all information needed for one asset
    * THis function may change if user requires another time slots on his/her page.
    *
@@ -544,7 +544,7 @@ public class DmApiV2 {/*
    * @param tsY     AssetBsc + HisData at the time slot of this year from 1, Jan. up to now.
    * @param pdtData AssetBsc + PdtData for 2017 or 2018
    * @return All information needed for single Asset
-   *//*
+   */
   private Seq<Asset> itemsDataCalculation(Seq<Tuple2<AssetBsc, HisData>> lstSnd,
                                           Seq<Tuple2<AssetBsc, HisData>> lstFst,
                                           Seq<Tuple2<AssetBsc, HisData>> tsY,
@@ -564,7 +564,7 @@ public class DmApiV2 {/*
       .values();
   }
 
-  *//**
+  /**
    * This function returns a set of Basic information + calculated data for a specific historical time slot
    * THis function may change if user requires another field of data on his/her page
    *
@@ -574,7 +574,7 @@ public class DmApiV2 {/*
    * @param start      start of the time slot
    * @param end        end of the time slot
    * @return AssetBsc + HisData for all single Assets
-   *//*
+   */
   private List<Tuple2<AssetBsc, HisData>> CalculateHistoryData(Integer siteId, Integer hospitalId,
                                                                Integer dept, LocalDate start, LocalDate end) {
     return List.ofAll(dmService.findAssets(siteId, hospitalId, dept, start, end)
@@ -582,7 +582,7 @@ public class DmApiV2 {/*
         new HisData(start, v._6, v._5))).toBlocking().toIterable());
   }
 
-  *//**
+  /**
    * This function returns a set of generate Basic information + calculated data for a specific historical time slot
    * This function may change if the predict algorithm changes
    *
@@ -592,7 +592,7 @@ public class DmApiV2 {/*
    * @param userInputThreshold user predicted max/min threshold
    * @param year               year required to show
    * @return AssetBsc + PdtData for all single Assets
-   *//*
+   */
   private Seq<Tuple2<AssetBsc, PdtData>> predictFutureData(Seq<Tuple2<AssetBsc, HisData>> thisY,
                                                            Seq<Tuple2<AssetBsc, HisData>> lstFst,
                                                            java.util.Map<Integer, java.util.Map<Integer, Double>> systemPredictedUsage,
@@ -673,7 +673,7 @@ public class DmApiV2 {/*
       / (double) LocalDate.ofYearDay(year, 1).until(LocalDate.ofYearDay(year, 1).plusYears(1), ChronoUnit.DAYS);
   }
 
-  *//**
+  /**
    * This function is used to deal with the suggestion logic of single asset, using predicted usage and some other values to generate PdtData
    * This function may change if the user want something else about future data on his/her screen
    *
@@ -683,7 +683,7 @@ public class DmApiV2 {/*
    * @param date         beginning of the required time slot
    * @param usageHistory usage of last year
    * @return PdtData for one single asset
-   *//*
+   */
   private PdtData calculatePdtData(Double depre, Double usage, java.util.List<Double> thre, LocalDate date, Double usageHistory) {
     return new PdtData(date, depre,
       new ImmutableList.Builder<Integer>().add(Option.when(usage <= thre.get(0), 1).getOrElse(0), Option.when(usage > thre.get(1), 1).getOrElse(0)).build(),
@@ -693,14 +693,14 @@ public class DmApiV2 {/*
     );
   }
 
-  *//**
+  /**
    * This function is used to calculate information for a type of assets.
    * This function should not change over time
    *
    * @param items  All assets data
    * @param groups a map of asset_group with their ids as keys and names as value
    * @return information for a type of asset
-   *//*
+   */
   private TypeInfo calculateTypeInfo(Seq<Asset> items, java.util.Map<Integer, String> groups) {
     int typeId = items.get(0).getAssetBsc().getType();
     return new TypeInfo(
@@ -713,7 +713,7 @@ public class DmApiV2 {/*
     );
   }
 
-  *//**
+  /**
    * This function is used by calculateTypeInfo() to return predicted values about a type of assets.
    * This function may change when the number of time slots the user wants to see changes.
    *
@@ -721,7 +721,7 @@ public class DmApiV2 {/*
    * @param count         number of assets in this type
    * @param lastYearUsage average usage for this type last year
    * @return predicted data of this type
-   *//*
+   */
   private Tuple1<TypePdtData> calculateTypePdtData(Seq<Tuple1<PdtData>> items, int count, Double lastYearUsage) {
     //for first item of Tuple
     Seq<PdtData> subItems = items.map(v -> v._1);
@@ -737,39 +737,39 @@ public class DmApiV2 {/*
     )));
   }
 
-  *//**
+  /**
    * This function is used by calculateTypeInfo(),calculateDeptInfo() to return historical values about a type of assets.
    * This function may change when the number of time slots the user wants to see changes.
    *
    * @param items HstData for single assets in this type
    * @return HisData of this type
-   *//*
+   */
   private Tuple3<HisData, HisData, HisData> calculateHistoricalData(Seq<Tuple3<HisData, HisData, HisData>> items) {
     return Tuple.of(dealWithHisdata(items.map(v -> v._1), LocalDate.now().minusYears(2)), dealWithHisdata(items.map(v -> v._2), LocalDate.now().minusYears(1)), dealWithHisdata(items.map(v -> v._3), LocalDate.now()));
   }
 
-  *//**
+  /**
    * This function is used by calculateHistoricalData() to return historical values about a type of assets in a single time slots.
    * This function may change when the historical data user wants on his/her screen changes
    *
    * @param hisDatas    HisData for all single assets in a certain time slot
    * @param defaultDate default date when items is null
    * @return HisData for all current type of assets in the same time slot
-   *//*
+   */
   private HisData dealWithHisdata(Seq<HisData> hisDatas, LocalDate defaultDate) {
     return new HisData(Try.of(() -> hisDatas.get(0).getDate()).getOrElse(defaultDate),
       hisDatas.map(HisData::getDepre).sum().doubleValue(),
       hisDatas.map(HisData::getUsage).average().getOrElse(0D));
   }
 
-  *//**
+  /**
    * This function is used to calculate suggestions for a type of assets
    *
    * @param NumGreaterThan1 number of assets with usage greater than upper limit
    * @param averageUsage    average predicted usage of current set of assets
    * @param buyIn           number of assets that should be bought in
    * @return A list of suggestions
-   *//*
+   */
   private List<Map<String, String>> calculateBottomLevelSuggestions(Integer NumGreaterThan1, Double averageUsage, Integer buyIn, java.util.List<Double> usageThreshold) {
     if (averageUsage > usageThreshold.get(1)) {
       return List.of(HashMap.of("title", SUGGESTION_BUY, "addition", String.format("%s台设备", buyIn)));
@@ -782,7 +782,7 @@ public class DmApiV2 {/*
     }
   }
 
-  *//**
+  /**
    * This function is used to calculate information for a type of assets.
    * This function should not change overtime
    *
@@ -790,7 +790,7 @@ public class DmApiV2 {/*
    * @param depts  depts map
    * @param deptId current dept Id
    * @return information of current dept
-   *//*
+   */
   private DeptInfo calculateDeptInfo(Seq<TypeInfo> items, java.util.Map<Integer, String> depts, int deptId) {
     return new DeptInfo(new DeptBsc(deptId, depts.get(deptId), items.map(v -> v.getTypeBsc().getCount()).sum().intValue()),
       calculateDeptPdtData(items,
@@ -799,7 +799,7 @@ public class DmApiV2 {/*
       calculateHistoricalData(items.map(TypeInfo::getHisDatas)));
   }
 
-  *//**
+  /**
    * Calculate predicted data for a dept
    * This function may change when the number of time slots the user wants to see changes.
    *
@@ -807,7 +807,7 @@ public class DmApiV2 {/*
    * @param count         number of assets in current dept
    * @param lastYearUsage usage of last year in current dept
    * @return DeptPdtData
-   *//*
+   */
   private Tuple1<DeptPdtData> calculateDeptPdtData(Seq<TypeInfo> items, int count, Double lastYearUsage) {
     Seq<TypePdtData> subItems = items.map(v -> v.getTypePdtDatas()._1);
     int buyIn = subItems.map(TypePdtData::getBuyIn).sum().intValue();
@@ -826,14 +826,14 @@ public class DmApiV2 {/*
   }
 
 
-  *//**
+  /**
    * Calculate High level suggestions using low level suggestions
    * THis function may change when suggestion logic changes
    *
    * @param lowerLevel a list of low level suggestions and the corresponding dept or type name, and the number of buyIn asset
    * @param groupBy    dept|type
    * @return High level suggestions
-   *//*
+   */
   private List<Map<String, String>> calculateHighLevelSuggestions(Seq<Tuple3<String, Seq<Map<String, String>>, Integer>> lowerLevel, String groupBy) {
     Seq<Tuple3<String, Seq<Map<String, String>>, Integer>> sugBuy = lowerLevel.filter(v -> v._2.exists(sub -> sub.get("title").getOrElse("").contains(SUGGESTION_BUY)));
     Seq<Tuple3<String, Seq<Map<String, String>>, Integer>> sugAjst = lowerLevel.filter(v -> v._2.exists(sub -> sub.get("title").getOrElse("").contains(SUGGESTION_ADJUST)));
@@ -1048,4 +1048,4 @@ public class DmApiV2 {/*
       .put("suggestions", item.getAllAssetPdtDatas()._1.getSuggestions().map(Map::toJavaMap).toJavaList())
       .build();
   }
-*/}
+}
