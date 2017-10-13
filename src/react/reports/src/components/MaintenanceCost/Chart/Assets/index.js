@@ -87,7 +87,7 @@ class Assets extends React.PureComponent<*, Props, *> {
                         text={{
                           content: item.data.name,
                           offset: (outerRadius - innerRadius) / 10,
-                          fontSize: (outerRadius - innerRadius) / 6,
+                          fontSize: (outerRadius - innerRadius) / 5,
                           fill: '#8c8c8c'
                         }}
                         sectors={keys.map(key => ({
