@@ -8,6 +8,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -893,8 +894,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void prepareEdit() {
         super.prepareEdit();
 
-        List<SearchFilter> assetFilters = new ArrayList<>();
+
         if (this.selected.getAssetGroup() != null) {
+            List<SearchFilter> assetFilters = new ArrayList<>();
+            assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getSiteId()));
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
             parentAssetList = dao.findBySearchFilter(assetFilters);
