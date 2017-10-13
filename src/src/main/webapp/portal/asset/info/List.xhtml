@@ -66,16 +66,16 @@
                             </h:panelGroup>
                         </p:column>
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.name}" title="#{item.name}"/>
+                            <h:outputText value="#{item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.functionType}" title="#{item.functionType}"/>
+                            <h:outputText value="#{item.functionType}"/>
                         </p:column>
                         <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.serialNum}" title="#{item.serialNum}"/>
+                            <h:outputText value="#{item.serialNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.departNum}" title="#{item.departNum}" />
+                            <h:outputText value="#{item.departNum}"/>
                         </p:column>
 
                         <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
@@ -194,6 +194,13 @@
 	                        <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
 	                    </p:column>
 	                    
+	                     <p:column headerText="主设备" visible="false" exportable="true">
+	                        <h:outputText value="#{assetInfoController.getParentAssetName(item.id)}"/>
+	                    </p:column>
+	                    <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
+	                        <h:outputText value="#{assetInfoController.selected.systemId}"/>
+	                    </p:column>
+	                    
 	                    <!-- #{msg.functionGroup} -->
 	                    <p:column headerText="医疗器械分类" visible="false" exportable="true">
 	                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
@@ -221,7 +228,7 @@
 	                        <h:outputText value="#{item.departNum}"/>
 	                    </p:column> -->
 	                    <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-	                        <h:outputText value="#{item.financingNum}" title="#{item.financingNum}"/>
+	                        <h:outputText value="#{item.financingNum}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.barcode}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.barcode}"/>
@@ -330,7 +337,7 @@
 	                        </h:outputText>
 	                    </p:column>
 	                    <!-- #{msg.factoryWarrantyDate} -->
-	                    <p:column headerText="质保日期" visible="false" exportable="false">
+	                    <p:column headerText="质保日期" visible="false" exportable="true">
 	                        <f:facet name="filter">
 	                            <p:inputText id="filterFactoryWarrantyDate" widgetVar="varFilterFactoryWarrantyDate"/>
 	                        </f:facet>
@@ -351,7 +358,7 @@
 	                     	<h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList',item.depreciationMethod)}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
-	                     	<h:outputText value="#{item.qrCode}" title="#{item.qrCode}"/>
+	                     	<h:outputText value="#{item.qrCode}"/>
 	                    </p:column>
 	                     <p:column headerText="#{msg.comments}"  visible="false" exportable="true">
                             <h:outputText value="#{item.comments}"/>
