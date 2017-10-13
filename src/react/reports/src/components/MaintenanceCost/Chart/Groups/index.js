@@ -110,7 +110,7 @@ class Groups extends React.PureComponent<*, Props, *> {
                           text={{
                             content: item.data.name,
                             offset: (outerRadius - innerRadius) / 10,
-                            fontSize: (outerRadius - innerRadius) / 5,
+                            fontSize: (outerRadius - innerRadius) / 4,
                             fill: '#8c8c8c'
                           }}
                           sectors={keys.map(key => ({
