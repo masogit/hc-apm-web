@@ -67,6 +67,9 @@ public class AssetOwnerService {
         if (null != queryAsset.getAssetOwnerId2()) {
             OrgInfoFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, queryAsset.getAssetOwnerId2()));
         }
+        if (null != queryAsset.getAssetOwnerId3()) {
+            OrgInfoFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, queryAsset.getAssetOwnerId3()));
+        }
 
         return assetDao.findBySearchFilter(OrgInfoFilters);
     }
@@ -76,17 +79,23 @@ public class AssetOwnerService {
     }
 
     @Transactional
-    public void updateAssetOwner(List<AssetInfo> targetAssets, Boolean chanegeOwner, Integer ownerId, Boolean chanegeOwner2, Integer ownerId2) {
+    public void updateAssetOwner(List<AssetInfo> targetAssets,
+                                 Boolean chanegeOwner, Integer ownerId,
+                                 Boolean chanegeOwner2, Integer ownerId2,
+                                 Boolean chanegeOwner3, Integer ownerId3) {
 
         UserAccount owner = null;
         UserAccount owner2 = null;
+        UserAccount owner3 = null;
         if (null != ownerId && chanegeOwner) {
             owner = getOwnerAccount(ownerId);
         }
         if (null != ownerId2 && chanegeOwner2) {
             owner2 = getOwnerAccount(ownerId2);
         }
-
+        if (null != ownerId3 && chanegeOwner3) {
+            owner3 = getOwnerAccount(ownerId3);
+        }
         for (AssetInfo item : targetAssets) {
             if (chanegeOwner) {
                 item.setAssetOwnerId(null == owner ? null : owner.getId());
@@ -97,6 +106,11 @@ public class AssetOwnerService {
                 item.setAssetOwnerId2(null == owner2 ? null : owner2.getId());
                 item.setAssetOwnerName2(null == owner2 ? null : owner2.getName());
                 item.setAssetOwnerTel2(null == owner2 ? null : owner2.getTelephone());
+            }
+            if (chanegeOwner3) {
+                item.setAssetOwnerId3(null == owner3 ? null : owner3.getId());
+                item.setAssetOwnerName3(null == owner3 ? null : owner3.getName());
+                item.setAssetOwnerTel3(null == owner3 ? null : owner3.getTelephone());
             }
         }
 
