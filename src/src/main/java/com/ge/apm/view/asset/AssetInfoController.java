@@ -863,6 +863,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
         if (this.selected.getAssetGroup() != null) {
+            assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
             parentAssetList = dao.findBySearchFilter(assetFilters);
@@ -893,16 +894,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void prepareEdit() {
         super.prepareEdit();
 
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        if (this.selected.getAssetGroup() != null) {
-            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
+        onAssetGroupChange();
 
-            parentAssetList = dao.findBySearchFilter(assetFilters);
-        } else {
-            parentAssetList = new ArrayList<>();
-        }
-
-        this.changeFunctionGroup();
+        changeFunctionGroup();
     }
 
     public List<AssetInfo> getParentAssetList() {
