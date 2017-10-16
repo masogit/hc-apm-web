@@ -1001,12 +1001,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         OrgInfo orgInfo = (OrgInfo) node.getData();
         if (orgInfo.getId() == -1) {
             selectedOrg = null;
+
+            selected.setTenantUID(null);
+            selected.setInstitutionUID(null);
+            selected.setHospitalUID(null);
             selected.setSiteUID(null);
+
             setSelectedSiteUID(null);
         } else {
             selectedOrg = (OrgInfo) node.getData();
 
-            selected.setSiteUID(selectedOrg.getUid());
+            selected.setTenantUID(selectedOrg.getTenantUID());
+            selected.setInstitutionUID(selectedOrg.getInstitutionUID());
+            selected.setHospitalUID(selectedOrg.getHospitalUID());
+            selected.setSiteUID(selectedOrg.getSiteUID());
+
             setSelectedSiteUID(selectedOrg.getUid());
         }
 
