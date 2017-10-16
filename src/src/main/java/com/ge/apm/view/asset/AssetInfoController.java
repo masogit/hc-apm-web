@@ -863,6 +863,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
         if (this.selected.getAssetGroup() != null) {
+            assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
             parentAssetList = dao.findBySearchFilter(assetFilters);
@@ -893,16 +894,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void prepareEdit() {
         super.prepareEdit();
 
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        if (this.selected.getAssetGroup() != null) {
-            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
+        onAssetGroupChange();
 
-            parentAssetList = dao.findBySearchFilter(assetFilters);
-        } else {
-            parentAssetList = new ArrayList<>();
-        }
-
-        this.changeFunctionGroup();
+        changeFunctionGroup();
     }
 
     public List<AssetInfo> getParentAssetList() {
@@ -1007,12 +1001,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         OrgInfo orgInfo = (OrgInfo) node.getData();
         if (orgInfo.getId() == -1) {
             selectedOrg = null;
+
+            selected.setTenantUID(null);
+            selected.setInstitutionUID(null);
+            selected.setHospitalUID(null);
             selected.setSiteUID(null);
+
             setSelectedSiteUID(null);
         } else {
             selectedOrg = (OrgInfo) node.getData();
 
-            selected.setSiteUID(selectedOrg.getUid());
+            selected.setTenantUID(selectedOrg.getTenantUID());
+            selected.setInstitutionUID(selectedOrg.getInstitutionUID());
+            selected.setHospitalUID(selectedOrg.getHospitalUID());
+            selected.setSiteUID(selectedOrg.getSiteUID());
+
             setSelectedSiteUID(selectedOrg.getUid());
         }
 
