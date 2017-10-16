@@ -1,6 +1,7 @@
 package com.ge.apm.web.chart;
 
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.wechat.CoreService;
@@ -43,6 +44,9 @@ public class TestController {
 
 	@Autowired
 	CoreService coreService;
+	
+	@Autowired
+	private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
 	private Logger logger = LoggerFactory.getLogger(getClass());
     @RequestMapping(value = "/get/{id}", method = RequestMethod.GET )
@@ -105,17 +109,9 @@ public class TestController {
     		return "success";
     }
     
-    @RequestMapping(value = "/createUser", method = RequestMethod.POST )
+    @RequestMapping(value = "/{assetId}", method = RequestMethod.POST )
     @ResponseBody
-	public UserAccount createUser() {
-    	return null;
-//		int i = new Random().nextInt(10000);
-//		String name = "name" + i;
-//		String mobile = "mobile" + i;
-//		int assetId = 1;
-//		String wechatId = "wechatId" + i;
-//		String telephone = "telephone" + i;
-//		String nickName = "nickName" + i;
-//		return userAccountService.createUser(name, mobile, assetId, wechatId, telephone, nickName);
+	public String createUser(@PathVariable("assetId") Integer assetId) {
+    	return assetFinacingNumGenerateService.generateFinacingNum(assetId, null, null, null);
 	}
 }
