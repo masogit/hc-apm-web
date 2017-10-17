@@ -57,8 +57,9 @@ public class AssetFinacingNumGenerateService {
 				LOGGER.error("can't find asset by {}", assetId);
 				return null;
 			}
-			if(StringUtils.isEmpty(asset.getNationalStandardCode())){
-				LOGGER.warn("can't find nationStandardCode !");
+			if(StringUtils.isEmpty(nationalStardCode)){
+				//LOGGER.warn("can't find nationStandardCode !");
+				LOGGER.warn("nationalStardCode shouldn't be null !");
 				return null;
 			}
 			OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(),asset.getTenantUID());
