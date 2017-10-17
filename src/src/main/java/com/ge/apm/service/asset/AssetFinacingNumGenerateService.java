@@ -66,7 +66,7 @@ public class AssetFinacingNumGenerateService {
 			if (level == null) {
 				return null;
 			} else {
-				return getFinacingNum(asset.getNationalStandardCode(), level);
+				return getFinacingNum(nationalStardCode, level);
 			}
 		} else if (clinicalId != null) {
 			OrgInfo orgInfo = orgInfoRepository.findById(clinicalId);
