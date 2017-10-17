@@ -580,7 +580,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, assetuid));
             attachements = blobDao.findBySearchFilter(sfs);
         }
-        return attachements.stream().filter(item -> item.getBoSubType().equals(type)).collect(Collectors.toList());
+        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
 
