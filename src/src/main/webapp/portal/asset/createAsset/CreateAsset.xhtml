@@ -51,7 +51,7 @@
                 <p:fieldset legend="基本资料" id="accordion" >
                     <div class="ui-g-7">
                         <p:galleria value="#{assetCreateController.pictureList}" var="attach" panelWidth="500" panelHeight="313" showCaption="false"  autoPlay="false">
-                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" /> 
+                            <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;"  onclick="javascript:showthis(this);"/> 
                         </p:galleria>
                     </div>
                     <div class="ui-g-5">
@@ -296,15 +296,15 @@
         <div >
 
         </div>
-        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container">
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
             <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
                 <span id="shwoPicDialog_title" class="ui-dialog-title">图片</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
                     <span class="ui-icon ui-icon-closethick"></span></a>
                 <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
             </div>
-            <div class="ui-dialog-content ui-widget-content">
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
 
-                <image id="shwoPicDialogImg" src=""></image>
+                <image id="shwoPicDialogImg" src="" ></image>
             </div>
         </div>
         <script id="shwoPicDialog_s" type="text/javascript">$(function () {
