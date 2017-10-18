@@ -53,7 +53,6 @@ public class PmOrderController extends JpaCRUDController<PmOrder> {
     private AttachmentFileService fileService;
     
     private UserAccount owner;
-    
     private List<UserAccount> ownerList;
     
     private UserAccountRepository userDao ;

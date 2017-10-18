@@ -101,7 +101,7 @@ public class PmOrder implements Serializable {
 
     @Column(name = "file_id")
     private Integer fileId;
-    
+
     @Column(name = "plan_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date planTime;  //计划时间
@@ -110,25 +110,25 @@ public class PmOrder implements Serializable {
     private Integer nearestSrDays;//此次保养后，最近的报修距此保养天数
     @Column(name = "nearest_sr_id", columnDefinition = "CHAR(32)")
     private String nearestSrId;//此次保养后，最近的报修SR ID
-    
+
 
     public Integer getNearestSrDays() {
-		return nearestSrDays;
-	}
+        return nearestSrDays;
+    }
 
-	public void setNearestSrDays(Integer nearestSrDays) {
-		this.nearestSrDays = nearestSrDays;
-	}
+    public void setNearestSrDays(Integer nearestSrDays) {
+        this.nearestSrDays = nearestSrDays;
+    }
 
-	public String getNearestSrId() {
-		return nearestSrId;
-	}
+    public String getNearestSrId() {
+        return nearestSrId;
+    }
 
-	public void setNearestSrId(String nearestSrId) {
-		this.nearestSrId = nearestSrId;
-	}
+    public void setNearestSrId(String nearestSrId) {
+        this.nearestSrId = nearestSrId;
+    }
 
-	public PmOrder() {
+    public PmOrder() {
     }
 
     public int getHospitalId() {
@@ -300,23 +300,23 @@ public class PmOrder implements Serializable {
     public void setFileId(Integer fileId) {
         this.fileId = fileId;
     }
-    
+
     public String getReportUrlInShort(){
         if(this.reportUrl == null){
-        	return "";
+            return "";
         }
         if(this.reportUrl.length() < LENGTH){
-        	return this.reportUrl;
+            return this.reportUrl;
         }
         return   this.reportUrl.substring(0,LENGTH)+"...";
     }
-    
+
     public String getCommentsInShort(){
         if(this.comments == null){
-        	return "";
+            return "";
         }
         if(this.comments.length() < LENGTH){
-        	return this.comments;
+            return this.comments;
         }
         return   this.comments.substring(0,LENGTH)+"...";
     }
@@ -353,5 +353,5 @@ public class PmOrder implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.PmOrder[ id=" + id + " ]";
     }
-    
+
 }
