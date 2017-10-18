@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -191,7 +192,9 @@ public class AssetCreateController {
 
     public List<UserAccount> getClinicalOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner));
+        accountList.addAll(acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner)
+                .stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
+                        .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList()));
         return accountList;
     }
     
