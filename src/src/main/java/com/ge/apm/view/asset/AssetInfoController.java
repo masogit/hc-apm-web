@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -1043,7 +1044,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         String financingNum = assetFinacingNumGenerateService.generateFinacingNum(this.selected.getId(),
                 this.selected.getNationalStandardCode(), this.selected.getClinicalDeptId(),
                 UserContextService.getCurrentUserAccount());
-        if (financingNum != null && this.selected.getFinancingNum() == null) {
+        if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
             this.selected.setFinancingNum(financingNum);
         }
     }
