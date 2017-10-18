@@ -183,7 +183,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.nationalStandardCode}</label>
                                 <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64">
-                                    <p:ajax process="@this" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
+                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:inputText>
                             </h:panelGroup>
 
