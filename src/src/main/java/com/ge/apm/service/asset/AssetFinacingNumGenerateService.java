@@ -58,7 +58,6 @@ public class AssetFinacingNumGenerateService {
 				return null;
 			}
 			if(StringUtils.isEmpty(nationalStardCode)){
-				//LOGGER.warn("can't find nationStandardCode !");
 				LOGGER.warn("nationalStardCode shouldn't be null !");
 				return null;
 			}
@@ -131,36 +130,37 @@ public class AssetFinacingNumGenerateService {
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
 			return nationalStardCode + df.format(finacingNum);
 		} else if (level.getLevel() == 2) {
-			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithHospitalUID(nationalStardCode,
-					level.getUid());
+			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithHospitalUID(level.getUid(),nationalStardCode);
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
-			return nationalStardCode + finacingNum;
+			return nationalStardCode + df.format(finacingNum);
 		} else if (level.getLevel() == 3) {
-			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithInstitutionUID(nationalStardCode,
-					level.getUid());
+			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithInstitutionUID(level.getUid(),nationalStardCode);
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
-			return nationalStardCode + finacingNum;
+			return nationalStardCode + df.format(finacingNum);
 		} else if (level.getLevel() == 4) {
-			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithTenantUID(nationalStardCode,
-					level.getUid());
+			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithTenantUID(level.getUid(),nationalStardCode);
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
-			return nationalStardCode + finacingNum;
+			return nationalStardCode + df.format(finacingNum);
 		}
 		return null;
 	}
