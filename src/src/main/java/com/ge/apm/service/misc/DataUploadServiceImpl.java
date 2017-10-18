@@ -81,27 +81,46 @@ public class DataUploadServiceImpl implements DataUploadService{
             return "dataUploadedOK";
         }
         catch(Exception ex){
-            AssetClinicalRecordErrlog assetClinicalRecordErrlog = new AssetClinicalRecordErrlog();
-            BeanUtils.copyProperties(assetClinicalRecord, assetClinicalRecordErrlog);
-
-            assetClinicalRecordErrlog.setEdgeServerKey(edgeServerKey);
-            assetClinicalRecordErrlog.setUploadTime(TimeUtil.now());
-
             String errMsg = ex.getMessage();
             if(errMsg==null) errMsg = ex.getClass().getSimpleName();
 
-            int len = errMsg.length();
-            if(len>255) len = 255;
-            assetClinicalRecordErrlog.setErrMsg(errMsg.substring(0, len));
-            
-            AssetClinicalRecordErrlogRepository dao = WebUtil.getBean(AssetClinicalRecordErrlogRepository.class);
-            dao.save(assetClinicalRecordErrlog);
+            logToAssetClinicalRecordErrLog(edgeServerKey, assetClinicalRecord, errMsg);
             
             if(errMsg.contains("ConstraintViolationException"))
-                return "dataUploadedOK";
+                return updateAssetClinicalRecord(assetClinicalRecord);
 
             throw ex;
         }
+    }
+
+    public void logToAssetClinicalRecordErrLog(String edgeServerKey, AssetClinicalRecord assetClinicalRecord, String errMsg){
+        AssetClinicalRecordErrlog assetClinicalRecordErrlog = new AssetClinicalRecordErrlog();
+        BeanUtils.copyProperties(assetClinicalRecord, assetClinicalRecordErrlog);
+
+        assetClinicalRecordErrlog.setEdgeServerKey(edgeServerKey);
+        assetClinicalRecordErrlog.setUploadTime(TimeUtil.now());
+
+        int len = errMsg.length();
+        if(len>255) len = 255;
+        assetClinicalRecordErrlog.setErrMsg(errMsg.substring(0, len));
+
+        AssetClinicalRecordErrlogRepository dao = WebUtil.getBean(AssetClinicalRecordErrlogRepository.class);
+        dao.save(assetClinicalRecordErrlog);
+    }
+    
+    public String updateAssetClinicalRecord(AssetClinicalRecord assetClinicalRecord) throws Exception{
+        AssetClinicalRecordRepository dao = WebUtil.getBean(AssetClinicalRecordRepository.class);
+        List<AssetClinicalRecord> result = dao.getBySiteIdAndHospitalIdAndModalityIdAndSourceRecordIdOrderByExamDateDesc(assetClinicalRecord.getSiteId(), assetClinicalRecord.getHospitalId(), assetClinicalRecord.getModalityId(), assetClinicalRecord.getSourceRecordId());
+        if(result.size()<1) return "dataUploadedOK";
+        
+        AssetClinicalRecord existingRecord = result.get(0);
+        int id = existingRecord.getId();
+        BeanUtils.copyProperties(assetClinicalRecord, existingRecord);
+        existingRecord.setId(id);
+
+        dao.save(existingRecord);
+
+        return "dataUploadedOK";
     }
     
 }

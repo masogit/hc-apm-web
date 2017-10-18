@@ -131,7 +131,12 @@
                                         <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetCreateController.assetInfo.manufactDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
                                     </h:panelGroup>
 
-                                    <h:panelGroup >
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.manufacture}</label>
+                                        <p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>
+                                    </h:panelGroup>
+
+                                    <h:panelGroup rendered="false">
                                         <label class="label">#{msg.brand}</label>
                                         <p:selectOneMenu id="brand" value="#{assetCreateController.assetInfo.brand}" converter="brandConverter"  var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.brand} #{msg.ValidationRequire}" >
                                             <f:selectItem itemLabel="" />
