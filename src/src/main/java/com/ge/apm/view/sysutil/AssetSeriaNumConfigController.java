@@ -91,6 +91,7 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 			selected.setInstitutionUID(user.getTenantUID());
 			selected.setHospitalUID(user.getTenantUID());
 			selected.setSiteUID(user.getTenantUID());
+			selected.setLevel(4);
 //			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 //   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedInstitution"));
 //   		 	return;
@@ -99,6 +100,7 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 			selected.setInstitutionUID(selected.getInstitutionUID());
 			selected.setHospitalUID(selected.getInstitutionUID());
 			selected.setSiteUID(selected.getInstitutionUID());
+			selected.setLevel(3);
 //			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 //   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedHospital"));
 //   		 	return;
@@ -106,6 +108,7 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 		if(selected.getSiteUID() == null){//医院级别
 			selected.setHospitalUID(selected.getHospitalUID());
 			selected.setSiteUID(selected.getHospitalUID());
+			selected.setLevel(2);
 //			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 //   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
 //   		 	return;

@@ -1,7 +1,11 @@
 package com.ge.apm.service.asset;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -146,14 +150,14 @@ public class AssetFinacingNumGenerateService {
 
 	private OrgInfoLevel fetchConfig(String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
 		AssetSeriaNumConfig config = null;
-		config = assetSeriaNumConfigRepository.findBySiteUID(siteUID);
+		config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(siteUID,1);
 		if (config != null) {
 			if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
 				return new OrgInfoLevel(1, siteUID);// 院区配置
 			}
 			return null;
 		}
-		config = assetSeriaNumConfigRepository.findBySiteUID(hospitalUID);
+		config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(hospitalUID,2);
 		if (config != null) {
 			if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
 				return new OrgInfoLevel(2, hospitalUID);// 医院配置
@@ -161,14 +165,14 @@ public class AssetFinacingNumGenerateService {
 				return null;
 			}
 		} else {
-			config = assetSeriaNumConfigRepository.findBySiteUID(institutionUID);
+			config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(institutionUID,3);
 			if (config != null) {
 				if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
 					return new OrgInfoLevel(3, institutionUID);// 集团配置
 				}
 				return null;
 			} else {
-				config = assetSeriaNumConfigRepository.findBySiteUID(tenantUID);
+				config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(tenantUID,4);
 				if (config != null) {
 					if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
 						return new OrgInfoLevel(4, tenantUID);// 租户配置
