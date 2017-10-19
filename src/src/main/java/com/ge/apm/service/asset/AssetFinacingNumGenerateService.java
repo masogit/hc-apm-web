@@ -39,7 +39,7 @@ public class AssetFinacingNumGenerateService {
 	 * 该方法是新增资产或更新资产(必须是更新该字段)时调用，1是更新，2是新增
 	 * 
 	 * @param 1、assetId
-	 *            如果有assetId，后面的三个字段可以为null
+	 *            如果有assetId，后面的三个字段可以为null,nationalStardCode
 	 * @param 2、nationalStardCode
 	 *            国标码
 	 * @param clinicalId
@@ -98,24 +98,82 @@ public class AssetFinacingNumGenerateService {
 		}
 		return null;
 	}
+	
+	/***
+	 *  1、
+	 * @param assetId
+	 * @param nationalStardCode
+	 * @param uid
+	 * @return
+	 */
+	public String generateFinancingNum(Integer assetId, String nationalStardCode,String uid){
+		LOGGER.info("generate finacing num begin ,assetId is {},code is {},uid is {}", assetId,nationalStardCode,uid);
+		if (assetId != null) {
+			if(StringUtils.isEmpty(nationalStardCode)){
+				LOGGER.warn("nationalStardCode shouldn't be null !");
+				return null;
+			}
+			AssetInfo asset = assetInfoRepository.findById(assetId);
+			if (asset == null) {
+				LOGGER.error("can't find asset by {}", assetId);
+				return null;
+			}
+			OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(),asset.getTenantUID());
+			if (level == null) {
+				return null;
+			} else {
+				return getFinacingNum(nationalStardCode, level);
+			}
+		} else if (uid != null) {
+			if(StringUtils.isEmpty(nationalStardCode)){
+				LOGGER.warn("can't find nationStandardCode !");
+				return null;
+			}
+			OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
+			if (orgInfo == null) {
+				return null;
+			}
+			OrgInfoLevel level = fetchConfig(orgInfo.getSiteUID(), orgInfo.getHospitalUID(),orgInfo.getInstitutionUID(), orgInfo.getTenantUID());
+			if (level == null) {
+				return null;
+			} else {
+				return getFinacingNum(nationalStardCode, level);
+			}
+		}
+		return null;
+	
+	}
 
 	private OrgInfoLevel fetchConfig(String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
 		AssetSeriaNumConfig config = null;
 		config = assetSeriaNumConfigRepository.findBySiteUID(siteUID);
-		if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-			return new OrgInfoLevel(1, siteUID);// 院区配置
+		if (config != null) {
+			if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+				return new OrgInfoLevel(1, siteUID);// 院区配置
+			}
+			return null;
 		}
 		config = assetSeriaNumConfigRepository.findBySiteUID(hospitalUID);
-		if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-			return new OrgInfoLevel(2, hospitalUID);// 医院配置
+		if (config != null) {
+			if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+				return new OrgInfoLevel(2, hospitalUID);// 医院配置
+			}else{
+				return null;
+			}
 		} else {
 			config = assetSeriaNumConfigRepository.findBySiteUID(institutionUID);
-			if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-				return new OrgInfoLevel(3, institutionUID);// 集团配置
+			if (config != null) {
+				if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+					return new OrgInfoLevel(3, institutionUID);// 集团配置
+				}
+				return null;
 			} else {
 				config = assetSeriaNumConfigRepository.findBySiteUID(tenantUID);
-				if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-					return new OrgInfoLevel(4, tenantUID);// 租户配置
+				if (config != null) {
+					if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+						return new OrgInfoLevel(4, tenantUID);// 租户配置
+					}
+					return null;
 				} else {
 					return null;// 未配置
 				}
