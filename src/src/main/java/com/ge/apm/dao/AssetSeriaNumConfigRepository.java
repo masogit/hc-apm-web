@@ -16,4 +16,8 @@ public interface AssetSeriaNumConfigRepository extends GenericRepository<AssetSe
 
 	public AssetSeriaNumConfig findBySiteUID(String siteUID);
 
+	public AssetSeriaNumConfig findByHospitalUID(String hospitalUID);
+
+	public AssetSeriaNumConfig findBySiteUIDAndLevel(String siteUID, int level);
+
 }
