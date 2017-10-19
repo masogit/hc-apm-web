@@ -107,7 +107,7 @@
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.orgTree}" selection="#{assetInfoController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2 :AssetInfoEditForm:parentAssetList" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -121,7 +121,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}</label>
                                 <p:selectOneMenu id="clinicalDeptName" value="#{assetInfoController.selected.clinicalDeptId}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
-                                    <p:ajax  listener="#{assetInfoController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel" />
+                                    <p:ajax  listener="#{assetInfoController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInfoService.getOrgDeptList(assetInfoController.selectedSiteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
