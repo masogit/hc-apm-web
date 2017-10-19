@@ -1041,9 +1041,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        String financingNum = assetFinacingNumGenerateService.generateFinacingNum(this.selected.getId(),
-                this.selected.getNationalStandardCode(), this.selected.getClinicalDeptId(),
-                UserContextService.getCurrentUserAccount());
+        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                this.selected.getId(),
+                this.selected.getNationalStandardCode(),
+                this.selected.getSiteUID()
+        );
         if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
             this.selected.setFinancingNum(financingNum);
         }
