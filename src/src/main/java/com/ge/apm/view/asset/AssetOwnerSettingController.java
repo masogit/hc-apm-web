@@ -10,6 +10,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetOwnerService;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,19 +35,23 @@ public class AssetOwnerSettingController {
     private AssetCreateService acServie;
 
     private AssetOwnerService aoService;
+    private UserCommonService userCommonService;
 
     private AssetInfo queryAsset;
 
     private Integer ownerId;
     private Integer ownerId2;
+    private Integer ownerId3;
     private Boolean isChanegeOwner;
     private Boolean isChanegeOwner2;
+    private Boolean isChanegeOwner3;
 
     @PostConstruct
     protected void init() {
 
         acServie = WebUtil.getBean(AssetCreateService.class);
         aoService = WebUtil.getBean(AssetOwnerService.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
         queryAsset = new AssetInfo();
         queryAsset.setSiteId(currentUser.getSiteId());
@@ -84,7 +89,8 @@ public class AssetOwnerSettingController {
     }
 
     public List<UserAccount> getOwnerList() {
-        List<UserAccount> res = acServie.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
+//        List<UserAccount> res = acServie.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
+        List<UserAccount> res = userCommonService.getWorkerList(null);
         return res;
     }
 
@@ -94,7 +100,7 @@ public class AssetOwnerSettingController {
         } else if (!(isChanegeOwner || isChanegeOwner2)) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssetsOwner"));
         } else {
-            aoService.updateAssetOwner(targetAssets, isChanegeOwner, ownerId, isChanegeOwner2, ownerId2);
+            aoService.updateAssetOwner(targetAssets, isChanegeOwner, ownerId, isChanegeOwner2, ownerId2, isChanegeOwner3, ownerId3);
             availableAssets.setTarget(targetAssets);
         }
     }
@@ -135,6 +141,14 @@ public class AssetOwnerSettingController {
         this.ownerId2 = ownerId2;
     }
 
+    public Integer getOwnerId3() {
+        return ownerId3;
+    }
+
+    public void setOwnerId3(Integer ownerId3) {
+        this.ownerId3 = ownerId3;
+    }
+
     public Boolean getIsChanegeOwner() {
         return isChanegeOwner;
     }
@@ -149,6 +163,14 @@ public class AssetOwnerSettingController {
 
     public void setIsChanegeOwner2(Boolean isChanegeOwner2) {
         this.isChanegeOwner2 = isChanegeOwner2;
+    }
+
+    public Boolean getIsChanegeOwner3() {
+        return isChanegeOwner3;
+    }
+
+    public void setIsChanegeOwner3(Boolean chanegeOwner3) {
+        isChanegeOwner3 = chanegeOwner3;
     }
 
 }
