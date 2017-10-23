@@ -264,11 +264,10 @@ public class AssetFileImportService {
 
 
         ExcelDocument.ValueWrapper valueWrapper = null;
-        Cell cell = null;
+
         if (object instanceof ExcelDocument.ValueWrapper) {
             valueWrapper = (ExcelDocument.ValueWrapper) object;
             object = valueWrapper.value;
-            cell = valueWrapper.cell;
         }
 
         if (object == null) {
