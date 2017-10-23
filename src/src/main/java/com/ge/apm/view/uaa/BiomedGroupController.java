@@ -4,9 +4,13 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.uaa.BiomedGroupService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.DualListModel;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -29,6 +33,7 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
     private I18nMessageRepository i18nDao = null;
     private TenantInfoRepository siteInfoDao = null;
     private OrgInfoRepository orgInfoDao = null;
+    private TenantInfoRepository tenantInfoDao = null;
 
     private DualListModel<UserAccount> availableUserAccount;
     private List<UserAccount> sourceUserAccount;
@@ -47,7 +52,12 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
 
     private UserAccount currentUser;
 
-    private BiomedGroup tempBiomedGroup;
+    private UaaService uaaService;
+
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private OrgInfo selectedOrg;
+
 
     @Override
     protected void init() {
@@ -57,6 +67,8 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         biomedGroupService = WebUtil.getBean(BiomedGroupService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
 
         targetUserAccount = new ArrayList<UserAccount>();
 
@@ -66,8 +78,18 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
 
         queryUserAccount = new UserAccount();
         queryUserAccount.setSiteId(currentUser.getSiteId());
-        //queryUserAccount.setHospitalId(currentUser.getHospitalId());
+        queryUserAccount.setTenantUID(currentUser.getTenantUID());
+
+        if(currentUser.getOrgLevel() == 1){
+            queryUserAccount.setInstitutionUID(currentUser.getInstitutionUID());
+        }else if(currentUser.getOrgLevel() == 2){
+            queryUserAccount.setHospitalUID(currentUser.getHospitalUID());
+        }else{
+            queryUserAccount.setSiteUID(currentUser.getSiteUID());
+        }
+
         this.getQueryUserAccountList();
+        this.initOrgTree();
     }
 
     @Override
@@ -81,10 +103,15 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         selected = null;
 
         List<SearchFilter> searchFilters = this.searchFilters;
-        SearchFilter siteIdFilter = new SearchFilter("siteId", SearchFilter.Operator.EQ, currentUser.getSiteId());
-        SearchFilter hospitalIdFilter = new SearchFilter("hospitalId", SearchFilter.Operator.EQ, currentUser.getHospitalId());
-        searchFilters.add(siteIdFilter);
-        searchFilters.add(hospitalIdFilter);
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+
+        if(currentUser.getOrgLevel() == 1){
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+        }else if(currentUser.getOrgLevel() == 2){
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+        }else{
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+        }
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -99,12 +126,11 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         return dao.find();
     }
 
-    public String getHospitalName(Integer hospitalId) {
-        return acService.getHospitalName(hospitalId);
+    public String getTenantName(String tenantUid) {
+        return tenantInfoDao.findByuid(tenantUid).getName();
     }
-
-    public String getSiteName(Integer siteId) {
-        return acService.getTenantName(siteId);
+    public String getSiteName(String siteUid) {
+        return orgInfoDao.getByUid(siteUid).getName();
     }
 
     public List<TenantInfo> getSiteList() {
@@ -179,6 +205,10 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
     public void onBeforeNewObject(BiomedGroup object) {
         object.setSiteId(currentUser.getSiteId());
         object.setHospitalId(currentUser.getHospitalId());
+        object.setTenantUID(currentUser.getTenantUID());
+        object.setInstitutionUID(currentUser.getInstitutionUID());
+        object.setHospitalUID(currentUser.getHospitalUID());
+        object.setSiteUID(currentUser.getSiteUID());
 
         targetUserAccount = new ArrayList<UserAccount>();
         this.getQueryUserAccountList();
@@ -196,31 +226,48 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
         biomedGroupService.deleteBiomedGroup(this.getSelected());
     }
 
-    /*
-    @Override
-    public void onAfterNewObject(BiomedGroup object, boolean isOK) {
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        queryUserAccount.setInstitutionUID(null);
+        queryUserAccount.setHospitalUID(null);
+        queryUserAccount.setSiteUID(null);
+
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        if (orgInfo.getId() == -1) {
+            selectedOrg = null;
+        } else {
+            selectedOrg = (OrgInfo) node.getData();
+        }
+
+        if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
+            if(selectedOrg.getOrgLevel() == 1){
+                queryUserAccount.setInstitutionUID(selectedOrg.getInstitutionUID());
+            }else if(selectedOrg.getOrgLevel() == 2){
+                queryUserAccount.setHospitalUID(selectedOrg.getHospitalUID());
+            }else if(selectedOrg.getOrgLevel() == 3){
+                queryUserAccount.setSiteUID(selectedOrg.getSiteUID());
+            }
+        }
+
+       this.getQueryUserAccountList();
+
     }
 
-    @Override
-    public void onAfterUpdateObject(BiomedGroup object, boolean isOK) {
-    }
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
-    @Override
-    public void onBeforeDeleteObject(BiomedGroup object) {
-    }
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
-    @Override
-    public void onAfterDeleteObject(BiomedGroup object, boolean isOK) {
-    }
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root",null,null);
+        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        rootNode.getChildren().add(treeNode);
+        //rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
+        rootNode.setExpanded(true);
 
-    @Override
-    public void onBeforeSave(BiomedGroup object) {
     }
-
-    @Override
-    public void onAfterDataChanged(){
-    };
-     */
 
     public Integer getSiteId() {
         return siteId;
@@ -284,5 +331,29 @@ public class BiomedGroupController extends JpaCRUDController<BiomedGroup> {
 
     public void setQueryUserAccount(UserAccount queryUserAccount) {
         this.queryUserAccount = queryUserAccount;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
     }
 }
