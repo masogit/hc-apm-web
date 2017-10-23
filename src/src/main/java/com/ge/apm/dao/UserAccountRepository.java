@@ -90,4 +90,18 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     //subscirber with tag=-999 under  this assetInfo.site_UID
     @Query(value="select ua.* from asset_tag at,asset_tag_biomed_group atbg,biomed_group bg,biomed_group_user bgu,user_account ua where at.id=-999  and at.id=atbg.tag_id and atbg.biomed_group_id=bg.id and bgu.group_id=bg.id and bgu.user_id=ua.id and ua.site_uid=?1",nativeQuery=true)
     List<UserAccount> getResponserwithTag999(String siteUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.tenantUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findByTenantUIDAndStaffRole(String tenantUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.institutionUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findByInstitutionUIDAndStaffRole(String institutionUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.hospitalUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findByHospitalUIDAndStaffRole(String hospitalUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.siteUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findBySiteUIDAndStaffRole(String siteUID);
+
+
 }
