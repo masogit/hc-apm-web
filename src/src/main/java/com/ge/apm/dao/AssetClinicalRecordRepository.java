@@ -11,6 +11,8 @@ import java.util.List;
 
 public interface AssetClinicalRecordRepository extends GenericRepository<AssetClinicalRecord> {
 
+    public List<AssetClinicalRecord> getBySiteIdAndHospitalIdAndModalityIdAndSourceRecordIdOrderByExamDateDesc(int siteId, int hospitalId, String modalityId, String sourceRecordId);
+    
     //全量聚合
     @Query("select new com.ge.apm.domain.AssetClinicalRecordPojo(" +
             "siteId as siteIds,hospitalId as hospitalIds,assetId as assetIds, examDate as examDate, " +

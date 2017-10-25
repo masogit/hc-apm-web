@@ -20,7 +20,7 @@
                                    <f:selectItems value="#{assetSeriaNumConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{assetSeriaNumConfigController.selected.institutionUID != null}">
+                        <h:panelGroup >
                        		<label class="label">医院</label>
                                <p:selectOneMenu id="hospital" value="#{assetSeriaNumConfigController.selected.hospitalUID}" >
                              		<p:ajax update="display" />
@@ -29,7 +29,7 @@
                                </p:selectOneMenu>
                         </h:panelGroup>
                         
-                       <h:panelGroup rendered="#{assetSeriaNumConfigController.selected.hospitalUID != null}">
+                       <h:panelGroup >
                        		<label class="label">院区</label>
                                <p:selectOneMenu id="site" value="#{assetSeriaNumConfigController.selected.siteUID}" >
                                		<p:ajax update="display" /> 
@@ -47,7 +47,7 @@
                         
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{assetSeriaNumConfigController.save}" value="#{msg.Save}" update="display,:AssetSeriaNumConfigEditDlg, :AssetSeriaNumConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetSeriaNumConfigEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{assetSeriaNumConfigController.applyChange()}" value="#{msg.Save}" update="display,:AssetSeriaNumConfigEditDlg, :AssetSeriaNumConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetSeriaNumConfigEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetSeriaNumConfigEditDialog').hide()"/>
                 </h:panelGroup>

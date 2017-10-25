@@ -10,6 +10,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetOwnerService;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class AssetOwnerSettingController {
     private AssetCreateService acServie;
 
     private AssetOwnerService aoService;
+    private UserCommonService userCommonService;
 
     private AssetInfo queryAsset;
 
@@ -49,6 +51,7 @@ public class AssetOwnerSettingController {
 
         acServie = WebUtil.getBean(AssetCreateService.class);
         aoService = WebUtil.getBean(AssetOwnerService.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
         UserAccount currentUser = UserContextService.getCurrentUserAccount();
         queryAsset = new AssetInfo();
         queryAsset.setSiteId(currentUser.getSiteId());
@@ -86,7 +89,8 @@ public class AssetOwnerSettingController {
     }
 
     public List<UserAccount> getOwnerList() {
-        List<UserAccount> res = acServie.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
+//        List<UserAccount> res = acServie.getAssetOnwers(queryAsset.getSiteId(), queryAsset.getHospitalId());
+        List<UserAccount> res = userCommonService.getWorkerList(null);
         return res;
     }
 
