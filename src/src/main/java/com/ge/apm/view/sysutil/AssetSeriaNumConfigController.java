@@ -88,19 +88,27 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	public void onBeforeSave(AssetSeriaNumConfig config) {
 		selected.setTenantUID(user.getTenantUID());
 		if(selected.getInstitutionUID() == null){//租户级别
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedInstitution"));
-   		 	return;
+			selected.setInstitutionUID(user.getTenantUID());
+			selected.setHospitalUID(user.getTenantUID());
+			selected.setSiteUID(user.getTenantUID());
+//			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedInstitution"));
+//   		 	return;
 		}
 		if(selected.getHospitalUID() == null){//集团级别
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedHospital"));
-   		 	return;
+			selected.setInstitutionUID(selected.getInstitutionUID());
+			selected.setHospitalUID(selected.getInstitutionUID());
+			selected.setSiteUID(selected.getInstitutionUID());
+//			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedHospital"));
+//   		 	return;
 		}
 		if(selected.getSiteUID() == null){//医院级别
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
-   		 	return;
+			selected.setHospitalUID(selected.getHospitalUID());
+			selected.setSiteUID(selected.getHospitalUID());
+//			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
+//   		 	return;
 		}
 		dao.deleteBySiteUID(selected.getSiteUID());
 	}
@@ -115,23 +123,7 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	
 	@Transactional
 	public void applyChange(){
-		selected.setTenantUID(user.getTenantUID());
-		if(selected.getInstitutionUID() == null){//租户级别
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedInstitution"));
-   		 	return;
-		}
-		if(selected.getHospitalUID() == null){//集团级别
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedHospital"));
-   		 	return;
-		}
-		if(selected.getSiteUID() == null){//医院级别
-			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
-   		 	return;
-		}
-		dao.deleteBySiteUID(selected.getSiteUID());
+		onBeforeSave(selected);
 		save();
 	}
 	

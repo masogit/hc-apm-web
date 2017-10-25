@@ -32,11 +32,27 @@ public class BiomedGroupService {
 
     public List<UserAccount> getSourceUserAccountList(UserAccount queryUserAccount) {
 
-        if(queryUserAccount.getHospitalId() != null && !queryUserAccount.getHospitalId().equals("")){
+        List<UserAccount> userAccountList = new ArrayList<>();
+        if(queryUserAccount.getTenantUID() != null){
+            userAccountList = userDao.findByTenantUIDAndStaffRole(queryUserAccount.getTenantUID());
+        }
+        if(queryUserAccount.getInstitutionUID() != null){
+            userAccountList = userDao.findByInstitutionUIDAndStaffRole(queryUserAccount.getInstitutionUID());
+        }
+        if(queryUserAccount.getHospitalUID() != null){
+            userAccountList = userDao.findByHospitalUIDAndStaffRole(queryUserAccount.getHospitalUID());
+        }
+        if(queryUserAccount.getSiteUID() != null){
+            userAccountList = userDao.findBySiteUIDAndStaffRole(queryUserAccount.getSiteUID());
+        }
+
+        return userAccountList;
+
+        /*if(queryUserAccount.getHospitalId() != null && !queryUserAccount.getHospitalId().equals("")){
             return userDao.getUsersWithAssetStaffRole(queryUserAccount.getHospitalId());
         }else{
             return userDao.getUsersWithAssetStaffRoleBySiteId(queryUserAccount.getSiteId());
-        }
+        }*/
 
     }
 
