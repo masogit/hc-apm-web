@@ -23,16 +23,16 @@
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="2">
                         <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}" maxlength="100" style="width: 420px">
-                            <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
+                            <p:ajax event="keyup" update=":xxxForm searchButtons" />
                         </p:inputText>
 
                         <h:panelGroup id='searchButtons'>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetInfoController.oneSearchStr}"/>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":xxxForm :searchForm"  rendered="#{empty assetInfoController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":xxxForm :searchForm" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
-                <h:form id="AssetInfoListForm">
+                <h:form id="xxxForm">
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -45,32 +45,20 @@
                         <!--<p:ajax  event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton editButton viewButton deleteButton "/>-->
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
 
-
-                        <p:column headerText="#{msg.id}" sortBy="#{item.id}" filterBy="#{item.id}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.id}" sortBy="#{item.id}" filterBy="#{item.id}" filterMatchMode="EQ" visible="false">
                             <h:outputText value="#{item.id}"/>
                         </p:column>
-                        <p:column headerText="#{msg.siteId}" sortBy="#{item.siteId}" filterBy="#{item.siteId}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.siteId}" sortBy="#{item.siteId}" filterBy="#{item.siteId}" filterMatchMode="EQ" visible="false">
                             <h:outputText value="#{item.siteId}"/>
                         </p:column>
-                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?86:53}">
-                            <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
-                            <!--<h:panelGroup>-->
-                                <!--<p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">-->
-                                    <!--<p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>-->
-                                <!--</p:link>-->
-                                <!--<p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoController.deleteAsset(item)}" update="datalist">-->
-                                    <!--<p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>-->
-                                    <!--<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>-->
-                                <!--</p:commandLink>-->
-                            <!--</h:panelGroup>-->
-                        </p:column>
-                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE" visible="false">
                             <h:outputText value="#{item.name}" title="#{item.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.functionType}" title="#{item.functionType}"/>
                         </p:column>
-                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE" visible="false">
                             <h:outputText value="#{item.serialNum}" title="#{item.serialNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE">
@@ -97,72 +85,79 @@
                         </p:column>
 
 
-                        <p:column headerText="#{msg.assetCategory}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.assetCategory}"  exportable="true" visible="false">
                             <h:outputText value="#{fieldMsg.fieldValue('assetCategory', item.assetCategory)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.assetUsage}" visible="false" exportable="true">
-                            <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
+                        <p:column headerText="#{msg.assetUsage}"  exportable="true" visible="false">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>7
                         </p:column>
-                        <p:column headerText="#{msg.capitalSource}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.capitalSource}"  exportable="true" visible="false">
                             <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.measureGrade}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.measureGrade}"  exportable="true" visible="true">
                             <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.riskGrade}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.riskGrade}"  exportable="true" visible="false">
                             <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.emergencyEquipment}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.emergencyEquipment}"  exportable="true" visible="false">
                             <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.importEquipment}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.importEquipment}"  exportable="true" visible="false">
                             <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.measuringItemCategory}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.measuringItemCategory}"  exportable="true" visible="true">
                             <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.usageStatus}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.usageStatus}"  exportable="true" visible="true">
                             <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.accountingCategory}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.accountingCategory}"  exportable="true" visible="true">
                             <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
                         </p:column>
+                        <p:column headerText="#{msg.lastMeteringDate}"  exportable="true" visible="true">
+                            <h:outputText value=" #{fieldMsg.fieldValue('lastMeteringDate',item.lastMeteringDate)}"/>
+                        </p:column>
 
 
-                        <p:column headerText="#{msg.functionGrade}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.functionGrade}"  exportable="true" visible="false">
                             <h:outputText value="#{item.functionGrade}"/>
                         </p:column>
-                        <p:column headerText="#{msg.maitanance}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.maitanance}"  exportable="true" visible="false">
                             <h:outputText value="#{item.maitanance}"/>
                         </p:column>
-                        <p:column headerText="#{msg.maitananceTel}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.maitananceTel}"  exportable="true" visible="false">
                             <h:outputText value="#{item.maitananceTel}"/>
                         </p:column>
-                        <p:column headerText="#{msg.serialNum}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.serialNum}"  exportable="true" visible="false">
                             <h:outputText value="#{item.serialNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.financingNum}"  exportable="true" visible="false" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.financingNum}" title="#{item.financingNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.barcode}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.barcode}"  exportable="true" visible="false">
                             <h:outputText value="#{item.barcode}"/>
                         </p:column>
-                        <p:column headerText="#{msg.modalityId}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.modalityId}"  exportable="true" visible="false">
                             <h:outputText value="#{item.modalityId}"/>
                         </p:column>
-                        <p:column headerText="#{msg.locationCode}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.locationCode}"  exportable="true" visible="false">
                             <h:outputText value="#{item.locationCode}"/>
                         </p:column>
-                        <p:column headerText="#{msg.locationName}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.locationName}"  exportable="true" visible="false">
                             <h:outputText value="#{item.locationName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.registrationNo}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.registrationNo}"  exportable="true" visible="false">
                             <h:outputText value="#{item.registrationNo}"/>
                         </p:column>
-                        <p:column headerText="#{msg.deviceStatus}" visible="false" exportable="true">
+                        <p:column headerText="#{msg.deviceStatus}"  exportable="true" visible="false">
                             <h:outputText value=" #{fieldMsg.fieldValue('deviceStatus',item.deviceStatus)}"/>
                         </p:column>
+
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="discardButton" class="btn btn-sm btn-gray" title="报废" actionListener="#{assetInfoController.discard(assetInfoController.selected)}"  />
+                            <p:commandButton id="readyForDiscardButton" class="btn btn-sm btn-gray" title="待报废" actionListener="#{assetInfoController.readyForDiscard(assetInfoController.selected)}" />
+
                             <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
                             <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  actionListener="#{assetInfoController.getViewPage('Create','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
 
@@ -180,7 +175,7 @@
             </div>
         </div>
 
-        <!--<p:overlayPanel widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false">-->
+        <!--<p:overlayPanel widgetVar="panelFilterWarrantyDate" for=":xxxForm:datalist:filterWarrantyDate" dismissable="false">-->
             <!--<h:panelGrid columns="2">-->
                 <!--<p:outputLabel value="#{msg.From}"/>-->
                 <!--<p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>-->
@@ -191,25 +186,25 @@
             <!--<p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>-->
         <!--</p:overlayPanel>-->
 
-        <!--<script>-->
-            <!--window.onload = function(){-->
-                <!--$("#searchForm\\:searchText").keypress(function(e){-->
-                    <!--if(e.keyCode==13){-->
-                        <!--e.preventDefault();-->
-                    <!--}-->
-                <!--});-->
-            <!--}-->
+        <script>
+            window.onload = function(){
+                $("#searchForm\\:searchText").keypress(function(e){
+                    if(e.keyCode==13){
+                        e.preventDefault();
+                    }
+                });
+            }
 
-            <!--var newWin;-->
-            <!--function prepareAssetViewWindow() {-->
-                <!--newWin = window.open('about:blank', '_blank');-->
-                <!--newWin.document.body.innerHTML = '加载中...';-->
-            <!--}-->
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
 
-            <!--function openAssetViewWindow(xhr, status, args) {-->
-                <!--newWin.location.href = args.url;-->
-            <!--}-->
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
 
-        <!--</script>-->
+        </script>
     </ui:define>
 </ui:composition>
