@@ -11,11 +11,11 @@
         <div class="ui-g">
 
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="安装信息"/>
+                <p:outputLabel class="pageTitle" value="#{msg.AssetArrivalListInstallInfo}"/>
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="ItemEditDlgForm">
-                    <p:fieldset  legend="到货单信息">
+                    <p:fieldset  legend="#{msg.AssetArrivalListInfo}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.name}</label>
@@ -80,14 +80,14 @@
 
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset  legend="设备信息">
+                    <p:fieldset  legend="#{msg.AssetArrivalListAssetInfo}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.itemNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.itemNum}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">使用科室</label>
+                                <label class="label">#{msg.clinicalDeptName}</label>
                                 <p:inputText id="selectedOrgName" value="#{assetInstallationController.selectedOrg.orgFullName}" readonly="true" />
                                 <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                                 <p:overlayPanel id="panelOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
@@ -122,7 +122,7 @@
                         
                     </p:fieldset>
                     
-                    <p:fieldset  legend="设备档案预录">
+                    <p:fieldset  legend="#{msg.AssetArrivalListAssetInfoInput}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.aliasName}</label>
@@ -173,7 +173,7 @@
                             </h:panelGroup>
                             
                             <h:panelGroup>
-                                <label class="label">主设备</label>
+                                <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInstallationController.arrivalListItem.parentAssetId}" >
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInstallationController.parentAssetList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -209,7 +209,7 @@
                             </h:panelGroup>
                             
                             <h:panelGroup >
-                                <label class="label">医疗器械分类</label>
+                                <label class="label">#{msg.medicalInstrumentClassification}</label>
                                 <p:selectOneMenu id="functionGroup" value="#{assetInstallationController.arrivalListItem.functionGroup}" style="width: 100%">
                                     <p:ajax  listener="#{assetInstallationController.onFunctionGroupChange()}" update="assetCode68" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -217,7 +217,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">医疗器械子分类</label>
+                                <label class="label">#{msg.medicalInstrumentSubclassification}</label>
                                 <p:selectOneMenu id="assetCode68" value="#{assetInstallationController.arrivalListItem.assetCode68}" style="width: 100%">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInstallationController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -377,15 +377,15 @@
 
                         </p:panelGrid>
                     </p:fieldset>
-                    <p:fieldset legend="验收信息">
+                    <p:fieldset legend="#{msg.AssetArrivalListAckInfo}">
                         <label class="label">#{msg.businessAckStatus}</label>
                         <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.businessAckStatus}">
-                            <f:selectItem itemLabel="待验收" itemValue="none" />
-                            <f:selectItem itemLabel="验收通过" itemValue="pass" />
-                            <f:selectItem itemLabel="验收不合格" itemValue="reject" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckNone}" itemValue="none" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckPass}" itemValue="pass" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckReject}" itemValue="reject" />
                         </p:selectOneRadio>
                         <p:dataGrid id="pictureList1" var="fileitem" value="#{assetInstallationController.getAckPicList('business')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                            <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
+                            <f:facet name="header">#{msg.addPic}</f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
                                     <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
@@ -402,9 +402,9 @@
 
                         <label class="label">#{msg.businessAckStatus}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.clinicalAckStatus}">
-                            <f:selectItem itemLabel="待验收" itemValue="none" />
-                            <f:selectItem itemLabel="验收通过" itemValue="pass" />
-                            <f:selectItem itemLabel="验收不合格" itemValue="reject" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckNone}" itemValue="none" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckPass}" itemValue="pass" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckReject}" itemValue="reject" />
                         </p:selectOneRadio>
                         <p:dataGrid id="pictureList2" var="fileitem" value="#{assetInstallationController.getAckPicList('clinical')}" emptyMessage="#{msg.noRecordFound}" columns="5" layout="grid">
                             <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
@@ -424,9 +424,9 @@
 
                         <label class="label">#{msg.businessAckStatus}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
-                            <f:selectItem itemLabel="待验收" itemValue="none" />
-                            <f:selectItem itemLabel="验收通过" itemValue="pass" />
-                            <f:selectItem itemLabel="验收不合格" itemValue="reject" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckNone}" itemValue="none" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckPass}" itemValue="pass" />
+                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckReject}" itemValue="reject" />
                         </p:selectOneRadio>
                         <p:dataGrid id="pictureList3" var="fileitem" value="#{assetInstallationController.getAckPicList('technical')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
