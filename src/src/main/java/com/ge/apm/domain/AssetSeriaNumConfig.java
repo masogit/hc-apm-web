@@ -61,6 +61,16 @@ public class AssetSeriaNumConfig implements Serializable{
     
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
+    
+    private Integer level = 1;//1、租户 2、集团 3、医院 4、院区
+
+	public Integer getLevel() {
+		return level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
 
 	public Integer getId() {
 		return id;

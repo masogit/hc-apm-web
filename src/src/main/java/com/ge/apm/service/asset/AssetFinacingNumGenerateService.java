@@ -1,7 +1,11 @@
 package com.ge.apm.service.asset;
 
 import java.text.DecimalFormat;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +43,7 @@ public class AssetFinacingNumGenerateService {
 	 * 该方法是新增资产或更新资产(必须是更新该字段)时调用，1是更新，2是新增
 	 * 
 	 * @param 1、assetId
-	 *            如果有assetId，后面的三个字段可以为null
+	 *            如果有assetId，后面的三个字段可以为null,nationalStardCode
 	 * @param 2、nationalStardCode
 	 *            国标码
 	 * @param clinicalId
@@ -57,15 +61,15 @@ public class AssetFinacingNumGenerateService {
 				LOGGER.error("can't find asset by {}", assetId);
 				return null;
 			}
-			if(StringUtils.isEmpty(asset.getNationalStandardCode())){
-				LOGGER.warn("can't find nationStandardCode !");
+			if(StringUtils.isEmpty(nationalStardCode)){
+				LOGGER.warn("nationalStardCode shouldn't be null !");
 				return null;
 			}
 			OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(),asset.getTenantUID());
 			if (level == null) {
 				return null;
 			} else {
-				return getFinacingNum(asset.getNationalStandardCode(), level);
+				return getFinacingNum(nationalStardCode, level);
 			}
 		} else if (clinicalId != null) {
 			OrgInfo orgInfo = orgInfoRepository.findById(clinicalId);
@@ -98,24 +102,82 @@ public class AssetFinacingNumGenerateService {
 		}
 		return null;
 	}
+	
+	/***
+	 *  1、
+	 * @param assetId
+	 * @param nationalStardCode
+	 * @param uid
+	 * @return
+	 */
+	public String generateFinancingNum(Integer assetId, String nationalStardCode,String uid){
+		LOGGER.info("generate finacing num begin ,assetId is {},code is {},uid is {}", assetId,nationalStardCode,uid);
+		if (assetId != null) {
+			if(StringUtils.isEmpty(nationalStardCode)){
+				LOGGER.warn("nationalStardCode shouldn't be null !");
+				return null;
+			}
+			AssetInfo asset = assetInfoRepository.findById(assetId);
+			if (asset == null) {
+				LOGGER.error("can't find asset by {}", assetId);
+				return null;
+			}
+			OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(),asset.getTenantUID());
+			if (level == null) {
+				return null;
+			} else {
+				return getFinacingNum(nationalStardCode, level);
+			}
+		} else if (uid != null) {
+			if(StringUtils.isEmpty(nationalStardCode)){
+				LOGGER.warn("can't find nationStandardCode !");
+				return null;
+			}
+			OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
+			if (orgInfo == null) {
+				return null;
+			}
+			OrgInfoLevel level = fetchConfig(orgInfo.getSiteUID(), orgInfo.getHospitalUID(),orgInfo.getInstitutionUID(), orgInfo.getTenantUID());
+			if (level == null) {
+				return null;
+			} else {
+				return getFinacingNum(nationalStardCode, level);
+			}
+		}
+		return null;
+	
+	}
 
 	private OrgInfoLevel fetchConfig(String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
 		AssetSeriaNumConfig config = null;
-		config = assetSeriaNumConfigRepository.findBySiteUID(siteUID);
-		if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-			return new OrgInfoLevel(1, siteUID);// 院区配置
+		config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(siteUID,1);
+		if (config != null) {
+			if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+				return new OrgInfoLevel(1, siteUID);// 院区配置
+			}
+			return null;
 		}
-		config = assetSeriaNumConfigRepository.findBySiteUID(hospitalUID);
-		if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-			return new OrgInfoLevel(2, hospitalUID);// 医院配置
+		config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(hospitalUID,2);
+		if (config != null) {
+			if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+				return new OrgInfoLevel(2, hospitalUID);// 医院配置
+			}else{
+				return null;
+			}
 		} else {
-			config = assetSeriaNumConfigRepository.findBySiteUID(institutionUID);
-			if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-				return new OrgInfoLevel(3, institutionUID);// 集团配置
+			config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(institutionUID,3);
+			if (config != null) {
+				if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+					return new OrgInfoLevel(3, institutionUID);// 集团配置
+				}
+				return null;
 			} else {
-				config = assetSeriaNumConfigRepository.findBySiteUID(tenantUID);
-				if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-					return new OrgInfoLevel(4, tenantUID);// 租户配置
+				config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(tenantUID,4);
+				if (config != null) {
+					if(config.getGenerateMethod() != null && config.getGenerateMethod() == 1){
+						return new OrgInfoLevel(4, tenantUID);// 租户配置
+					}
+					return null;
 				} else {
 					return null;// 未配置
 				}
@@ -130,36 +192,37 @@ public class AssetFinacingNumGenerateService {
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
 			return nationalStardCode + df.format(finacingNum);
 		} else if (level.getLevel() == 2) {
-			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithHospitalUID(nationalStardCode,
-					level.getUid());
+			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithHospitalUID(level.getUid(),nationalStardCode);
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
-			return nationalStardCode + finacingNum;
+			return nationalStardCode + df.format(finacingNum);
 		} else if (level.getLevel() == 3) {
-			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithInstitutionUID(nationalStardCode,
-					level.getUid());
+			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithInstitutionUID(level.getUid(),nationalStardCode);
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
-			return nationalStardCode + finacingNum;
+			return nationalStardCode + df.format(finacingNum);
 		} else if (level.getLevel() == 4) {
-			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithTenantUID(nationalStardCode,
-					level.getUid());
+			String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithTenantUID(level.getUid(),nationalStardCode);
 			if (StringUtils.isEmpty(maxFinacingNum)) {
 				return nationalStardCode + "00001";
 			}
-			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(7, 12));
+			int lenth = maxFinacingNum.length();
+			Integer finacingNum = Integer.parseInt(maxFinacingNum.substring(lenth-5, lenth));
 			finacingNum++;
-			return nationalStardCode + finacingNum;
+			return nationalStardCode + df.format(finacingNum);
 		}
 		return null;
 	}
