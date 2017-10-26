@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetInstallationService;
@@ -101,6 +102,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         selectedItem = null;
     }
 
+    public OrgInfo getOrgInfoByUid(String orgUid){
+        return aiService.getOrgInfoByUid(orgUid);
+    }
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }

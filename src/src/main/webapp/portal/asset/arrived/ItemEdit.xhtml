@@ -30,7 +30,7 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.brand}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.orderType}</label>
+                                <label class="label">#{msg.arrivalListOrderType}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.orderType}" />
                             </h:panelGroup>
                             <h:panelGroup>
@@ -42,19 +42,19 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.quantity}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.origin}</label>
+                                <label class="label">#{msg.arrivalListOrigin}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.origin}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.invoiceNum}</label>
+                                <label class="label">#{msg.arrivalListInvoiceNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.invoiceNum}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.contractPrice}</label>
+                                <label class="label">#{msg.arrivalListContractPrice}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.contractPrice}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.contractNum}</label>
+                                <label class="label">#{msg.arrivalListContractNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.contractNum}" />
                             </h:panelGroup>
                             <h:panelGroup>
@@ -62,11 +62,11 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.vendor}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.agent}</label>
+                                <label class="label">#{msg.arrivalListAgent}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.agent}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.classCode}</label>
+                                <label class="label">#{msg.arrivalListClassCode}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.classCode}" />
                             </h:panelGroup>
                             <h:panelGroup>
@@ -83,7 +83,7 @@
                     <p:fieldset  legend="#{msg.AssetArrivalListAssetInfo}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">#{msg.itemNum}</label>
+                                <label class="label">#{msg.arrivalListItemNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.itemNum}" />
                             </h:panelGroup>
                             <h:panelGroup>
@@ -378,11 +378,9 @@
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset legend="#{msg.AssetArrivalListAckInfo}">
-                        <label class="label">#{msg.businessAckStatus}</label>
+                        <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
                         <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.businessAckStatus}">
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckNone}" itemValue="none" />
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckPass}" itemValue="pass" />
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckReject}" itemValue="reject" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneRadio>
                         <p:dataGrid id="pictureList1" var="fileitem" value="#{assetInstallationController.getAckPicList('business')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.addPic}</f:facet>
@@ -400,11 +398,9 @@
                         <p:fileUpload id="business" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="false"  sizeLimit="10000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-                        <label class="label">#{msg.businessAckStatus}</label>
+                        <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.clinicalAckStatus}">
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckNone}" itemValue="none" />
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckPass}" itemValue="pass" />
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckReject}" itemValue="reject" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneRadio>
                         <p:dataGrid id="pictureList2" var="fileitem" value="#{assetInstallationController.getAckPicList('clinical')}" emptyMessage="#{msg.noRecordFound}" columns="5" layout="grid">
                             <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
@@ -422,11 +418,9 @@
                         <p:fileUpload id="clinical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="false"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
-                        <label class="label">#{msg.businessAckStatus}</label>
+                        <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckNone}" itemValue="none" />
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckPass}" itemValue="pass" />
-                            <f:selectItem itemLabel="#{msg.AssetArrivalListInstallAckReject}" itemValue="reject" />
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneRadio>
                         <p:dataGrid id="pictureList3" var="fileitem" value="#{assetInstallationController.getAckPicList('technical')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->

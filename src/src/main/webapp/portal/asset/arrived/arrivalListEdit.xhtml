@@ -61,7 +61,7 @@
                             <p:inputText value="#{assetArrivedListController.selected.brand}"  readonly="#{assetArrivedListController.selected.status ne '1'}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{arrivalListOrigin}</label>
+                            <label class="label">#{msg.arrivalListOrigin}</label>
                             <p:inputText value="#{assetArrivedListController.selected.origin}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
                         </h:panelGroup>
                         <h:panelGroup>
@@ -93,20 +93,23 @@
 
                     </p:panelGrid>
                     <p:dataTable rendered="#{not empty assetArrivedListController.arrivalItemList}"  sortBy="#{item.itemNum}" value="#{assetArrivedListController.arrivalItemList}" var="item">
-                        <p:column headerText="#{msg.itemNum}" >
+                        <p:column headerText="#{msg.arrivalListItemNum}" >
                             <h:outputText value="#{item.itemNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.serialNum}">
                             <h:outputText value="#{item.serialNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.businessAckStatus}">
-                            <h:outputText value="#{item.businessAckStatus}"/>
+                        <p:column headerText="#{msg.AssetArrivalListBusinessAck}">
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',item.businessAckStatus)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.technicalAckStatus}">
-                            <h:outputText value="#{item.technicalAckStatus}"/>
+                        <p:column headerText="#{msg.AssetArrivalListClinicalAck}">
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',item.clinicalAckStatus)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.technicalAckStatus}">
-                            <h:outputText value="#{item.technicalAckStatus}"/>
+                        <p:column headerText="#{msg.AssetArrivalListTechnicalAck}">
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',item.technicalAckStatus)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.status}">
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                         </p:column>
                             
                      </p:dataTable>
