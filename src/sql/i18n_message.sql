@@ -1322,7 +1322,10 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PmOrderRuleCheckList', '保养检查项', 'pm order rule check list', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'approveSuccess', '审核成功！', 'approve success!', NULL, '-1');
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('srRepairType', '1', '主动维修', 'Active maintenance', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('srRepairType', '2', '被动维修', 'Passive maintenance', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('qualityChecking', '1', '合格', 'Qualified', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('qualityChecking', '2', '不合格', 'Unqualified', NULL, '-1');
 
 
 
