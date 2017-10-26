@@ -1,0 +1,280 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ge.apm.view.asset;
+
+import com.ge.apm.dao.ArrivalListItemRepository;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeLib;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.uaa.UaaService;
+import com.google.common.base.Strings;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.TreeNode;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+
+/**
+ *
+ * @author 212579464
+ */
+@ManagedBean
+@ViewScoped
+public class AssetInstallationController {
+
+    private ArrivalListItem arrivalListItem;
+    private ArrivalListItemRepository itemDao;
+    private AssetInstallationService aiService;
+    private AssetInfoRepository assetDao;
+    private UserAccountRepository userDao;
+    private UaaService uaaService;
+    private BlobFileService blobService;
+    private QrCodeService qrCodeService;
+
+    private OrgInfo selectedOrg;
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private List<V2_BlobObject> picList;
+
+    private List<I18nMessage> code68List;
+    private I18nMessageRepository i18nDao;
+
+    @PostConstruct
+    protected void init() {
+        aiService = WebUtil.getBean(AssetInstallationService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        qrCodeService = WebUtil.getBean(QrCodeService.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
+        assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
+        String itemId = WebUtil.getRequestParameter("itemId");
+        arrivalListItem = itemDao.findById(itemId);
+        changeFunctionGroup();
+
+        orgTree = uaaService.getOrgTreeBySite(arrivalListItem.getArrivalList().getSiteUID());
+        setTreeNodeUnselectable(orgTree);
+        orgTree.setExpanded(true);
+        if (arrivalListItem.getClinicalDeptUID() != null) {
+            selectedOrg = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());
+        } else {
+            selectedOrg = null;
+        }
+
+        picList = aiService.getPicList(arrivalListItem.getId());
+    }
+
+    private void setTreeNodeUnselectable(TreeNode node) {
+        OrgInfo data = (OrgInfo) node.getData();
+        if (data != null && data.getOrgType() != 4) {
+            node.setSelectable(false);
+        }
+        if (node.getChildren() != null) {
+            node.getChildren().forEach(item -> setTreeNodeUnselectable(item));
+        }
+    }
+
+    public String rejectInstall() {
+        if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+            itemDao.save(arrivalListItem);
+            if (aiService.submitInstallItem(arrivalListItem.getId(), false)) {
+                WebUtil.addSuccessMessage("提交成功");
+                return "arrivalItemsList?faces-redirect=true";
+            } else {
+                WebUtil.addErrorMessage("提交失败");
+            }
+
+        }
+        return "";
+    }
+
+    public String finishInstall() {
+        if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
+            WebUtil.addErrorMessage("商务验收未通过");
+        }
+        if (!arrivalListItem.getClinicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
+            WebUtil.addErrorMessage("临床验收未通过");
+        }
+        if (!arrivalListItem.getTechnicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
+            WebUtil.addErrorMessage("技术验收未通过");
+        }
+        if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+            itemDao.save(arrivalListItem);
+            if (aiService.submitInstallItem(arrivalListItem.getId(), true)) {
+                WebUtil.addSuccessMessage("提交成功");
+            } else {
+                WebUtil.addErrorMessage("提交失败");
+            }
+
+        }
+        return "arrivalItemsList?faces-redirect=true";
+    }
+
+    public void removeAttachment(String storageId) {
+        blobService.deleteBlobFileByStorageId(storageId);
+        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    }
+
+    public List<V2_BlobObject> getAckPicList(String type) {
+        return picList == null ? null : picList.stream().filter(item -> type.equals(item.getBoSubType())).collect(Collectors.toList());
+    }
+
+    public void onSelectOrgFromTree(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        selectedOrg = (OrgInfo) node.getData();
+        if (selectedOrg.getOrgType() != 4) {
+            WebUtil.addErrorMessage("选择的部门不是科室");
+        }
+        arrivalListItem.setClinicalDeptUID(selectedOrg.getUid());
+    }
+
+    public void updateItem() {
+        if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+            itemDao.save(arrivalListItem);
+            WebUtil.addSuccessMessage("修改成功");
+        } else {
+            WebUtil.addErrorMessage("不可修改");
+        }
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        String typeName = event.getComponent().getClientId();
+        typeName = typeName.contains("business") ? "business" : typeName;
+        typeName = typeName.contains("clinical") ? "clinical" : typeName;
+        typeName = typeName.contains("technical") ? "technical" : typeName;
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
+            blobObject.setBoUuid(arrivalListItem.getId());
+            blobObject.setBoSubType(typeName);
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
+    public void onFunctionGroupChange() {
+        code68List = new ArrayList<>();
+        this.arrivalListItem.setAssetCode68(null);
+
+        this.changeFunctionGroup();
+    }
+
+    public void changeFunctionGroup() {
+        Integer functionGroupId = this.arrivalListItem.getFunctionGroup();
+        if (functionGroupId != null) {
+            I18nMessage functionGroup = i18nDao.getByMsgTypeAndMsgKey("assetFunctionType", functionGroupId.toString());
+            if (functionGroup != null) {
+                code68List = i18nDao.getByMsgType(functionGroup.getMsgKey());
+            }
+        }
+    }
+
+    public List<UserAccount> getClinicalOwnerList() {
+        List<UserAccount> accountList = new ArrayList<>();
+        if (null != arrivalListItem.getClinicalDeptUID()) {
+            List<SearchFilter> assetFilters = new ArrayList<>();
+            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
+            accountList = userDao.findBySearchFilter(assetFilters);
+        }
+        return accountList.stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
+                        .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
+    }
+
+    public List<AssetInfo> getParentAssetList() {
+        List<SearchFilter> assetFilters = new ArrayList<>();
+        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
+        if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
+            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
+        }
+        if (this.arrivalListItem.getAssetGroup() != null) {
+            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.arrivalListItem.getAssetGroup()));
+        }
+        return assetDao.findBySearchFilter(assetFilters);
+    }
+
+    public void renewQrcode() {
+        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 1);
+        arrivalListItem.setQrCode(qrcodeLib.getQrCode());
+    }
+
+    public List<UserAccount> getOwnerList() {
+        return null; //aiService.getWorkerList();
+    }
+
+    public UserAccount getUserAccountByUid(String uid) {
+        return aiService.getUserAccountByUid(uid);
+    }
+
+    public ArrivalListItem getArrivalListItem() {
+        return arrivalListItem;
+    }
+
+    public void setArrivalListItem(ArrivalListItem arrivalListItem) {
+        this.arrivalListItem = arrivalListItem;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public List<V2_BlobObject> getPicList() {
+        return picList;
+    }
+
+    public void setPicList(List<V2_BlobObject> picList) {
+        this.picList = picList;
+    }
+
+    public List<I18nMessage> getCode68List() {
+        return code68List;
+    }
+
+    public void setCode68List(List<I18nMessage> code68List) {
+        this.code68List = code68List;
+    }
+
+}
