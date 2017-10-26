@@ -53,7 +53,7 @@ public class ArrivalList implements Serializable{
     
     //规格型号
     @Column(name = "function_type")
-    private String functionType;//设备型号
+    private String functionType;
     
     //数量
     @Column(name = "quantity")
