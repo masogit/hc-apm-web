@@ -1260,4 +1260,24 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'qualityexpirdate', '质保期', 'quality expire date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'expectarrivaldate', '预期到达时间', 'expeted arrival date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'arrival', '到货', 'arrival', NULL, '-1');
+
 --- above already in db
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PmOrderRule', '保养规则', 'pm order rule', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'approveUserId', '审核人', 'approveUserId', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmRuleStatus', '0', '待审核', 'waiting approve', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmRuleStatus', '1', '已通过', 'approved', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PmOrderRuleItem', '保养检查项配置', 'pm order rule item', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'PmOrderRuleCheckList', '保养检查项', 'pm order rule check list', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'approveSuccess', '审核成功！', 'approve success!', NULL, '-1');
+
+
+
+
+
+
+
+
+
+
+
+
