@@ -13,6 +13,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.primefaces.context.RequestContext;
 
 @ManagedBean
 @ViewScoped
@@ -1069,6 +1069,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         );
         if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
             this.selected.setFinancingNum(financingNum);
+        }
+    }
+
+    public void discard(AssetInfo asset) {
+        if(asset != null && asset.getUsageStatus() == 3) {
+            asset.setUsageStatus(4);
+            this.selected = dao.save(asset);
+        }
+    }
+
+    public void readyForDiscard(AssetInfo asset) {
+        if(asset != null && asset.getUsageStatus() == 2) {
+            asset.setUsageStatus(3);
+            this.selected = dao.save(asset);
         }
     }
 
