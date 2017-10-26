@@ -109,14 +109,21 @@ public class AssetInstallationController {
     }
 
     public String finishInstall() {
+        Boolean isAckFinished = true;
         if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
             WebUtil.addErrorMessage("商务验收未通过");
+            isAckFinished = false;
         }
         if (!arrivalListItem.getClinicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
             WebUtil.addErrorMessage("临床验收未通过");
+            isAckFinished = false;
         }
         if (!arrivalListItem.getTechnicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
             WebUtil.addErrorMessage("技术验收未通过");
+            isAckFinished = false;
+        }
+        if(!isAckFinished){
+            return "";
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             itemDao.save(arrivalListItem);
@@ -222,7 +229,7 @@ public class AssetInstallationController {
     }
 
     public List<UserAccount> getOwnerList() {
-        return null; //aiService.getWorkerList();
+        return aiService.getWorkerList();
     }
 
     public UserAccount getUserAccountByUid(String uid) {

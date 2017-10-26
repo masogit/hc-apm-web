@@ -43,7 +43,10 @@
                             <h:outputText value="#{item.arrivalList.functionType}"/>
                         </p:column>
                         <p:column width="90" >
-                            <p:commandLink actionListener="#{assetArrivedItemsController.prepareTransOrder(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"  rendered="#{item.installStatus eq 'new'}" style="padding-right: 10px">转单</p:commandLink>
+                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
+                          <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
+                            </p:commandLink>
+                            <!--<p:commandLink actionListener="#{assetArrivedItemsController.prepareTransOrder(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"  rendered="#{item.installStatus eq 'new'}" style="padding-right: 10px">转单</p:commandLink>-->
                             
                             <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{item.installStatus=='new'?'安装':item.installStatus=='instorage'?'已入库':'已退货'}
                                 <f:param name="itemId" value="#{item.id}" />

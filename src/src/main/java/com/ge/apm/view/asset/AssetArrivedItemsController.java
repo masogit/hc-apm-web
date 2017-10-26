@@ -88,6 +88,13 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         cancel();
     }
     
+    public void takeWorkOrder(String itemId){
+        ArrivalListItem item = dao.findById(itemId);
+        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+        aiService.reAssignWorkOrder(item);
+        cancel();
+    }
+    
     public Boolean isAssignToMe(String currentPersonUID){
         return UserContextService.getCurrentUserAccount().getUid().equals(currentPersonUID);
     }
