@@ -28,7 +28,7 @@
                         <p:column headerText="#{msg.name}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.assetName}"/>
                         </p:column>
-                        <p:column headerText="#{msg.itemNum}" sortBy="#{item.itemNum}" filterBy="#{item.itemNum}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.arrivalListItemNum}" sortBy="#{item.itemNum}" >
                             <h:outputText value="#{item.itemNum}"/>
                         </p:column>
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creatorUID}" filterMatchMode="LIKE">
