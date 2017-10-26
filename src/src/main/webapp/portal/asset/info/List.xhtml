@@ -198,7 +198,7 @@
 	                        <h:outputText value="#{assetInfoController.getParentAssetNameByAssetId(item.id)}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
-	                        <h:outputText value="#{assetInfoController.selected.systemId}"/>
+	                        <h:outputText value="#{item.systemId}"/>
 	                    </p:column>
 	                    
 	                    <!-- #{msg.functionGroup} -->
@@ -221,12 +221,6 @@
 	                    <p:column headerText="#{msg.maitananceTel}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.maitananceTel}"/>
 	                    </p:column>
-	                    <p:column headerText="#{msg.serialNum}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.serialNum}"/>
-	                    </p:column>
-<!-- 	                    <p:column headerText="#{msg.departNum}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.departNum}"/>
-	                    </p:column> -->
 	                    <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
 	                        <h:outputText value="#{item.financingNum}"/>
 	                    </p:column>

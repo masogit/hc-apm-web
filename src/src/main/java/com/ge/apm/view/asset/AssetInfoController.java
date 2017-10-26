@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -520,6 +521,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         selected.setClinicalOwnerId(null);
         selected.setClinicalOwnerName(null);
         selected.setClinicalOwnerTel(null);
+
+        if (null != selected.getClinicalDeptId()) {
+            OrgInfo org = orgDao.findById(selected.getClinicalDeptId());
+            selected.setClinicalDeptName(org.getName());
+            selected.setClinicalDeptUID(org.getUid());
+        } else {
+            selected.setClinicalDeptName(null);
+            selected.setClinicalDeptUID(null);
+        }
+
+        onAssetGroupChange();
     }
 
     public void onClinicalOwnerChange() {
@@ -580,7 +592,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             sfs.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, assetuid));
             attachements = blobDao.findBySearchFilter(sfs);
         }
-        return attachements.stream().filter(item -> item.getBoSubType().equals(type)).collect(Collectors.toList());
+        return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
 
@@ -866,6 +878,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
+            if (this.selected.getClinicalDeptUID() != null) {
+                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, this.selected.getClinicalDeptUID()));
+            }
+
+            if (this.selected.getSiteUID() != null) {
+                assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, this.selected.getSiteUID()));
+            }
+
             parentAssetList = dao.findBySearchFilter(assetFilters);
         } else {
             parentAssetList = new ArrayList<>();
@@ -1019,6 +1039,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             setSelectedSiteUID(selectedOrg.getUid());
         }
 
+        onAssetGroupChange();
+
     }
 
     public void initOrgTree() {
@@ -1040,10 +1062,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        String financingNum = assetFinacingNumGenerateService.generateFinacingNum(this.selected.getId(),
-                this.selected.getNationalStandardCode(), this.selected.getClinicalDeptId(),
-                UserContextService.getCurrentUserAccount());
-        if (financingNum != null && this.selected.getFinancingNum() == null) {
+        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                this.selected.getId(),
+                this.selected.getNationalStandardCode(),
+                this.selected.getSiteUID()
+        );
+        if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
             this.selected.setFinancingNum(financingNum);
         }
     }

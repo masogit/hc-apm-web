@@ -107,7 +107,7 @@
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.orgTree}" selection="#{assetInfoController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2 :AssetInfoEditForm:parentAssetList" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -121,9 +121,9 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}</label>
                                 <p:selectOneMenu id="clinicalDeptName" value="#{assetInfoController.selected.clinicalDeptId}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
-                                    <p:ajax  listener="#{assetInfoController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel" />
+                                    <p:ajax  listener="#{assetInfoController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInfoService.getOrgDeptList(assetInfoController.selectedSiteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{assetInfoService.getClinicalDeptList(assetInfoController.selectedSiteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -183,7 +183,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.nationalStandardCode}</label>
                                 <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64">
-                                    <p:ajax process="@this" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
+                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:inputText>
                             </h:panelGroup>
 
@@ -193,7 +193,7 @@
                     <p:fieldset  style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
-                                <label class="label">主设备</label>
+                                <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInfoController.selected.parentAssetId}" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInfoController.parentAssetList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -226,8 +226,8 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
-                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" />
-                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="true"/>
+                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this" disabled="#{not empty assetInfoController.qrCode}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -242,7 +242,7 @@
                                 </p:selectOneMenu>-->
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">医疗器械分类</label>
+                                <label class="label">#{msg.medicalInstrumentClassification}</label>
                                 <p:selectOneMenu id="functionGroup" value="#{assetInfoController.selected.functionGroup}" style="width: 100%">
                                     <p:ajax  listener="#{assetInfoController.onFunctionGroupChange()}" update="assetCode68" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -250,7 +250,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">医疗器械子分类</label>
+                                <label class="label">#{msg.medicalInstrumentSubclassification}</label>
                                 <p:selectOneMenu id="assetCode68" value="#{assetInfoController.selected.assetCode68}" style="width: 100%">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInfoController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

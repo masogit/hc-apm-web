@@ -22,6 +22,23 @@
     <h:outputScript name="js/ripple.js" library="ultima-layout"/>
     <h:outputScript name="js/swipe.js" library="ultima-layout"/>
     <h:outputScript name="js/primefaces-locale_zh.js"/>
+    <script type="text/javascript">
+        if(PrimeFaces.widget.SelectOneMenu.prototype.bindFilterEvents)
+        {
+            var oldEvent = PrimeFaces.widget.SelectOneMenu.prototype.bindFilterEvents;
+            PrimeFaces.widget.SelectOneMenu.prototype.bindFilterEvents = function() {
+                var widgetInstance = this;
+                oldEvent.call(widgetInstance);
+                if (widgetInstance.filterInput) {
+                    widgetInstance.filterInput.on('input', function(e) {
+                        widgetInstance.filter($(this).val());
+                    });
+
+                }
+            };
+
+        }
+    </script>
     <h:outputStylesheet name="css/main.css"/>
     <h:outputScript name="js/main.js"/>
     <ui:insert name="head"/>
