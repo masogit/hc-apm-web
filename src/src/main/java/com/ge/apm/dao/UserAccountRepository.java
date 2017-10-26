@@ -17,6 +17,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getById(int userId);
+    
+    UserAccount getByUid(String userUid);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     List<UserAccount> getByHospitalId(int hospitalId);
