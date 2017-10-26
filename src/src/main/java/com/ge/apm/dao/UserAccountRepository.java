@@ -104,6 +104,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Query("select u from UserAccount u, UserRole r where u.siteUID=?1 and u.id=r.userId and r.roleId=3")
     List<UserAccount> findBySiteUIDAndStaffRole(String siteUID);
-
-
+    
+    @Query(value = "select u from UserAccount u where u.tenantUID = ?1 and u.id in (select r.userId from UserRole r where r.roleId=2)")
+    List<UserAccount> getAssetHeadList(String tenantUID);
 }
