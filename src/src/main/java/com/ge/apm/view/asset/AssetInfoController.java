@@ -33,9 +33,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -102,6 +100,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String selectedSiteUID;
 
+    private String measuring;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -148,6 +148,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
+        this.measuring  = request.getParameter("measuring");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         // String actionName = WebUtil.getRequestParameter("actionName");
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -232,6 +233,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             searchFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+
+        if ("true".equals(this.measuring)) {
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(new Date());
+            calendar.add(calendar.YEAR, -1);
+            calendar.add(calendar.DATE, 60);
+            Date remindDate = calendar.getTime();
+            searchFilters.add(new SearchFilter("lastMeteringDate", SearchFilter.Operator.NE, null));
+            searchFilters.add(new SearchFilter("lastMeteringDate", SearchFilter.Operator.GTE, remindDate));
         }
 
     }
@@ -1076,6 +1087,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if(asset != null && asset.getUsageStatus() == 3) {
             asset.setUsageStatus(4);
             this.selected = dao.save(asset);
+            WebUtil.addSuccessMessage("报废成功！");
+        } else {
+            WebUtil.addSuccessMessage("只能报废待报废状态的资产！");
         }
     }
 
@@ -1083,6 +1097,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if(asset != null && asset.getUsageStatus() == 2) {
             asset.setUsageStatus(3);
             this.selected = dao.save(asset);
+            WebUtil.addSuccessMessage("已将状态修改为待报废！");
+        } else {
+            WebUtil.addSuccessMessage("只能待报废停用状态的资产！");
         }
     }
 
