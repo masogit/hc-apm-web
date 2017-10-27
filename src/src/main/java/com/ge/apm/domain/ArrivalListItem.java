@@ -520,14 +520,6 @@ public class ArrivalListItem implements Serializable {
         this.locationName = locationName;
     }
 
-    public Integer getAssetGroup() {
-        return assetGroup;
-    }
-
-    public void setAssetGroup(Integer assetGroup) {
-        this.assetGroup = assetGroup;
-    }
-
     public Date getManufactDate() {
         return manufactDate;
     }
@@ -839,7 +831,14 @@ public class ArrivalListItem implements Serializable {
     public void setAccountingCategory(Integer accountingCategory) {
         this.accountingCategory = accountingCategory;
     }
-    
+
+    public Integer getFunctionGroup() {
+        return functionGroup;
+    }
+
+    public void setFunctionGroup(Integer functionGroup) {
+        this.functionGroup = functionGroup;
+    }
     
 
     @Override
