@@ -159,9 +159,6 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "location_name")
     private String locationName;//安装位置
 
-    @Column(name = "asset_group")
-    private Integer assetGroup;//设备分类
-
     @Column(name = "asset_owner_uid")
     private String assetOwnerUID;//维修负责人
 
@@ -441,14 +438,6 @@ public class ArrivalListItem implements Serializable {
 
     public void setAliasName(String aliasName) {
         this.aliasName = aliasName;
-    }
-
-    public Integer getFunctionGroup() {
-        return functionGroup;
-    }
-
-    public void setFunctionGroup(Integer functionGroup) {
-        this.functionGroup = functionGroup;
     }
 
     public Integer getFunctionGrade() {
