@@ -23,7 +23,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.assetGroup}</label>
-                            <p:inputText value="#{fieldMsg.fieldValue('assetGroup', assetArrivedItemsController.selected.arrivalList.assetGroup)}" readonly="true"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup', assetArrivedItemsController.selected.arrivalList.assetGroup)}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.brand}</label>
@@ -31,7 +31,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.arrivalListOrderType}</label>
-                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.orderType}" />
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListOrderType', assetArrivedItemsController.selected.arrivalList.orderType)}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.functionType}</label>

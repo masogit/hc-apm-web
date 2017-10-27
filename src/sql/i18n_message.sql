@@ -709,6 +709,11 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListItemStatus', 'new', '安装中', 'New', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListItemStatus', 'instorage', '已入库', 'Instorage', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListItemStatus', 'rejected', '退货', 'Rejected', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListOrderType', '1', '医院购买', 'OrderType1', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListOrderType', '2', '赠送', 'OrderType2', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListOrderType', '3', '投放', 'OrderType3', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListOrderType', '4', '试用', 'OrderType4', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('arrivalListOrderType', '5', '借用', 'OrderType5', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6801', '6801基础外科手术器械', NULL, NULL, '-1');

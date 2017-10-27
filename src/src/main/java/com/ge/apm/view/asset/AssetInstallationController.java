@@ -217,9 +217,6 @@ public class AssetInstallationController {
         if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
-        if (this.arrivalListItem.getAssetGroup() != null) {
-            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.arrivalListItem.getAssetGroup()));
-        }
         return assetDao.findBySearchFilter(assetFilters);
     }
 
