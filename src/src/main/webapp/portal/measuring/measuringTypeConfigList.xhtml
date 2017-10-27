@@ -5,5 +5,52 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
 
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="计量类型设置"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="measuringTypeConfigListForm">
+                    <p:dataTable id="datalist" value="#{measuringTypeConfigController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{measuringTypeConfigController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,40,60,90">
+
+                        <p:ajax event="rowSelect" update="editButton deleteButton"/>
+                        <p:ajax event="filter" listener="#{measuringTypeConfigController.onFilter}" />
+
+                        <p:column headerText="计量类别" >
+                            <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
+                        </p:column>
+                        <p:column headerText="计量等级" >
+                            <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
+                        </p:column>
+                        <p:column headerText="计量周期(月)" >
+                            <h:outputText value="#{item.measureCycle}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{measuringTypeConfigController.prepareCreate}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" />
+                            <p:commandButton id="editButton" actionListener="#{measuringTypeConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}" update=":measuringTypeConfigEditDlg" oncomplete="PF('measuringTypeConfigEditDialog').show()" disabled="#{empty measuringTypeConfigController.selected}"/>
+                            <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{measuringTypeConfigController.delete}" update=":measuringTypeConfigListForm:datalist" disabled="#{empty measuringTypeConfigController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </f:facet>
+
+                    </p:dataTable>
+
+                </h:form>
+
+                <ui:include src="measuringTypeConfigEdit.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
 
 </ui:composition>
