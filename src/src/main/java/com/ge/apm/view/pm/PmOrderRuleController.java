@@ -36,9 +36,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private PmOrderRuleItemRepository pmOrderRuleItemRepository;
 	private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
 	private List<Integer> ids = new ArrayList<Integer>();
+	private String filterPmRuleStatus;
 
 	@Override
 	protected void init() {
+		filterBySite = false;
 		dao = WebUtil.getBean(PmOrderRuleRepository.class);
 		user = UserContextService.getCurrentUserAccount();
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
@@ -53,9 +55,15 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Override
 	protected Page<PmOrderRule> loadData(PageRequest pageRequest) {
-		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-		return dao.findAll(pageRequest);
+//		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+		if(searchFilters == null){
+			searchFilters = new ArrayList<SearchFilter>();
+		}
+		if(!this.hasFilterOnField("tenantUID")){
+			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		}
+		return dao.findBySearchFilter(searchFilters, pageRequest);
+		//return dao.findAll(pageRequest);
 	}
 	
 	public List<Integer> getSelectedIds(){
@@ -117,6 +125,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Override
 	public void onBeforeNewObject(PmOrderRule por) {
+		Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID());
+		period =  period == null ? 1 : period;
+		por.setPeriod(period);
 		por.setTenantUID(user.getTenantUID());
 		por.setStatus(0);
 		por.setCreatedDate(new Date());
@@ -136,10 +147,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Transactional
 	public void applyChange() {
-		if (selected.getId() != null) {// 新增
+		if (selected.getId() != null) {//更新
 			onBeforeSave(selected);
 		}
-		//TODO 周期最小、科长审核
 		dao.save(selected);
 		Integer pmOrderRuleId = selected.getId();
 		List<PmOrderRuleCheckList> checkLists = new ArrayList<PmOrderRuleCheckList>();
@@ -166,8 +176,29 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	
 	public void approve(){
 		selected.setStatus(1);
+		selected.setApproveUserId(user.getId());
 		dao.save(selected);
 		WebUtil.addSuccessMessage(WebUtil.getMessage("approveSuccess"));
+	}
+	
+	 public void setAssetStatusFilter() {
+	        if (filterPmRuleStatus == null) {
+	            return;
+	        }
+	        if (searchFilters == null) {
+	            searchFilters = new ArrayList<SearchFilter>();
+	        }
+	        if (filterPmRuleStatus != null) {
+	            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, Integer.parseInt(filterPmRuleStatus)));
+	        }
+	    }
+
+	public String getFilterPmRuleStatus() {
+		return filterPmRuleStatus;
+	}
+
+	public void setFilterPmRuleStatus(String filterPmRuleStatus) {
+		this.filterPmRuleStatus = filterPmRuleStatus;
 	}
 
 	public List<Integer> getIds() {

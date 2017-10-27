@@ -1,11 +1,14 @@
 package com.ge.apm.domain;
 
+import java.util.UUID;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
@@ -26,6 +29,29 @@ public class PmOrderRuleItem {
     
     @Column(name = "name")
 	private String name;//检查项名称
+    
+    @Column(name = "remark")
+	private String remark;//备注
+    
+    @Column(name="uid",columnDefinition = "CHAR(32)")
+    private String uid;
+
+    @PrePersist
+    public void initializeUid() {
+        if(uid==null)
+            uid = UUID.randomUUID().toString().replace("-", "");
+    }
+    
+	public String getUid() {
+		return uid;
+	}
+    
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
 	public Integer getId() {
 		return id;
 	}

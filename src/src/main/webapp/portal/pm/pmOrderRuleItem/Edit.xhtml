@@ -14,11 +14,15 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleItemController.selected != null}">
                         <h:panelGroup>
                             <label>#{msg.name} ：</label>
-                            <p:inputText id="name" value="#{pmOrderRuleItemController.selected.name}" />
+                            <p:inputText id="name" value="#{pmOrderRuleItemController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label>#{msg.period} ：</label>
-                            <p:inputText id="period" value="#{pmOrderRuleItemController.selected.period}" />
+                            <p:inputText id="period" value="#{pmOrderRuleItemController.selected.period}" required="true" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label>备注 ：</label>
+                            <p:inputText id="remark" value="#{pmOrderRuleItemController.selected.remark}" />
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleItemController.save}" value="#{msg.Save}" update="display,:PmOrderRuleItemEditDlg, :PmOrderRuleItemListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleItemEditDialog');"/>

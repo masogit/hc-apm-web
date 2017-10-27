@@ -28,7 +28,9 @@
                     <p:column headerText="#{msg.period}（单位：月）" sortBy="#{item.period}" >
                         <h:outputText value="#{item.period}"/>
                     </p:column>
-
+					<p:column headerText="备注" sortBy="#{item.remark}" >
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{pmOrderRuleItemController.prepareCreate}" update=":PmOrderRuleItemEditDlg" oncomplete="PF('PmOrderRuleItemEditDialog').show()"/>
                         <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{pmOrderRuleItemController.prepareEdit}" update=":PmOrderRuleItemEditDlg" oncomplete="PF('PmOrderRuleItemEditDialog').show()" disabled="#{empty pmOrderRuleItemController.selected}"/>

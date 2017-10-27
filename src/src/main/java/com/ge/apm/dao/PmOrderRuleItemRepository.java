@@ -2,6 +2,8 @@ package com.ge.apm.dao;
 
 import java.util.List;
 
+import org.springframework.data.jpa.repository.Query;
+
 import com.ge.apm.domain.PmOrderRuleItem;
 import webapp.framework.dao.GenericRepository;
 
@@ -10,5 +12,8 @@ public interface PmOrderRuleItemRepository extends GenericRepository<PmOrderRule
 	List<PmOrderRuleItem> findByTenantUID(String tenantUID);
 
 	List<PmOrderRuleItem> findByIdIn(List<Integer> ids);
+
+	@Query(value = "select min(period) from pm_order_rule_item where tenant_uid = ?1",nativeQuery = true)
+	Integer fetchMinPeriod(String tenantUID);
 
 }
