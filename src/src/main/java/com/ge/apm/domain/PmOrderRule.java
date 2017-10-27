@@ -1,12 +1,15 @@
 package com.ge.apm.domain;
 
 import java.util.Date;
+import java.util.UUID;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 @Entity
@@ -49,7 +52,21 @@ public class PmOrderRule {
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
     
+    @Column(name = "status")
     private Integer status;//0、待审核 1、已审核
+    
+    @Column(name="uid",columnDefinition = "CHAR(32)")
+    private String uid;
+
+    @PrePersist
+    public void initializeUid() {
+        if(uid==null)
+            uid = UUID.randomUUID().toString().replace("-", "");
+    }
+    
+	public String getUid() {
+		return uid;
+	}
     
 	public Integer getStatus() {
 		return status;
@@ -63,7 +80,6 @@ public class PmOrderRule {
 	public void setTenantUID(String tenantUID) {
 		this.tenantUID = tenantUID;
 	}
-	//private String reportUID;//报告uid
 	public Integer getId() {
 		return id;
 	}

@@ -14,43 +14,43 @@
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
                         <h:panelGroup >
                             <label class ="label">#{msg.name}</label>
-                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" />
+                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
-                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false">
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                              </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" />
+                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="true" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                              <label class ="label">#{msg.functionType}</label>
-                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" />
+                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="true" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-                        <h:panelGroup >
+<!--                         <h:panelGroup >
                                <label class="label">审核人</label>
                                <p:selectOneMenu id="group" value="#{pmOrderRuleController.selected.approveUserId}" >
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{pmOrderRuleController.getApproveUserList(pmOrderRuleController.selected.tenantUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup> -->
                         <h:panelGroup >
                             <label>#{msg.period}</label>
-                            <p:inputText id="period" value="#{pmOrderRuleController.selected.period}" />
+                            <p:inputText id="period" value="#{pmOrderRuleController.selected.period}" required="true" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                      <br/>
                      <br/>
-                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.getAllItems().size() >0}">
+<!--                      <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.getAllItems().size() >0}">
 		                  <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="responsive" columns="5" rendered="#{pmOrderRuleController.getSelectedIds() != null}">
 		                  	<f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i" itemLabel="#{i.name}(#{i.period}月)" itemValue="#{i.id}" />
 					     </p:selectManyCheckbox>	
                      </p:panelGrid>
-					<br/>
-                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
+					<br/> -->
+                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.save()}" value="#{msg.Save}" update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleEditDialog').hide()"/>
                       &nbsp;&nbsp;
