@@ -51,6 +51,9 @@ public class ArrivalList implements Serializable{
     @Column(name = "asset_name")
     private String assetName;
     
+    @Column(name = "asset_group")
+    private Integer assetGroup;//设备分类
+    
     //规格型号
     @Column(name = "function_type")
     private String functionType;
@@ -306,8 +309,14 @@ public class ArrivalList implements Serializable{
         this.siteUID = siteUID;
     }
 
-    
-    
+    public Integer getAssetGroup() {
+        return assetGroup;
+    }
+
+    public void setAssetGroup(Integer assetGroup) {
+        this.assetGroup = assetGroup;
+    }
+
     
     @Override
     public int hashCode() {

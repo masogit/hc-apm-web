@@ -26,6 +26,10 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.assetName}" />
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">#{msg.assetGroup}</label>
+                                <h:outputText  value="#{fieldMsg.fieldValue('assetGroup', assetInstallationController.arrivalListItem.arrivalList.assetGroup)}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.brand}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.brand}" />
                             </h:panelGroup>
@@ -128,14 +132,14 @@
                                 <label class="label">#{msg.aliasName}</label>
                                 <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.assetGroup}</label>
                                 <p:selectOneMenu id="assetGroup" value="#{assetInstallationController.arrivalListItem.assetGroup}" >
                                     <p:ajax listener="#{assetInstallationController.onAssetGroupChange}" process="@this" update="parentAssetList"/>
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInstallationController.arrivalListItem.assetOwnerUID}" >

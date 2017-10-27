@@ -22,6 +22,10 @@
                             <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.assetName}" />
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">#{msg.assetGroup}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('assetGroup', assetArrivedItemsController.selected.arrivalList.assetGroup)}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">#{msg.brand}</label>
                             <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.brand}" />
                         </h:panelGroup>
@@ -114,10 +118,6 @@
                         <h:panelGroup>
                             <label class="label">#{msg.aliasName}</label>
                             <p:inputText id="aliasName" value="#{assetArrivedItemsController.selected.aliasName}" readonly="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.assetGroup}</label>
-                            <p:inputText value="#{fieldMsg.fieldValue('assetGroup', assetArrivedItemsController.selected.assetGroup)}" readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class="label">#{msg.assetOwnerName}</label>
