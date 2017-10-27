@@ -45,7 +45,7 @@
                         <p:selectOneMenu id="clinicalDeptName" value="#{assetTagController.queryAsset.clinicalDeptId}">
                             <p:ajax  listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{assetTagController.getClinicalDeptList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            <f:selectItems value="#{assetTagController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                     <h:panelGroup >
