@@ -5,6 +5,7 @@ package com.ge.apm.domain;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -758,7 +759,7 @@ public class AssetInfo implements Serializable {
     }
 
     public void setAssetDeptId(Integer assetDeptId) {
-        this.assetDeptId = assetDeptId;
+        this.assetDeptId = Optional.ofNullable(assetDeptId).orElse(0);
     }
 
     public Integer getAssetOwnerId() {
