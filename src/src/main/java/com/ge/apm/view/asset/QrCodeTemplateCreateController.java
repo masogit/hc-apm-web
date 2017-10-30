@@ -115,6 +115,9 @@ public class QrCodeTemplateCreateController {
             fontNameMap.put("TimesRoman", "TimesRoman");
             fontNameMap.put("Courier", "Courier");
             fontNameMap.put("Arial", "Arial");
+            fontNameMap.put("Microsoft YaHei", "Microsoft YaHei");
+            fontNameMap.put("SimHei", "SimHei");
+            fontNameMap.put("SimSun", "SimSun");
         }
         return fontNameMap;
     }
