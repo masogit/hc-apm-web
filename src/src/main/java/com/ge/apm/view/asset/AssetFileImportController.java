@@ -5,12 +5,14 @@
  */
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.AssetSeriaNumConfigRepository;
 import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.service.utils.ExcelDocument;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -18,6 +20,8 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+
+import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
@@ -38,18 +42,26 @@ public class AssetFileImportController {
     private Map<String, Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
+    private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
 
     private Boolean isImported = false;
     private Boolean hasExportData = false;
     
     private Boolean canbeImported = false;
     private Boolean autoGenerateQrcode = true;
+    private Boolean autoGenerateFinancingNum;
 
     private StreamedContent exportFile;
 
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetFileImportService.class);
+        assetSeriaNumConfigRepository = WebUtil.getBean(AssetSeriaNumConfigRepository.class);
+
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
+
+        autoGenerateFinancingNum = configuredCount > 0L;
 
     }
 
@@ -77,7 +89,7 @@ public class AssetFileImportController {
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap,autoGenerateQrcode);
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, autoGenerateFinancingNum);
             isImported = true;
 
             try {
@@ -106,8 +118,9 @@ public class AssetFileImportController {
     }
     
     public List<String> getAssetErrorList(){
-        if(null == importAssetMap)
+        if(null == importAssetMap) {
             return null;
+        }
         List<String> errors = importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
                 .map(item -> item.getValue().get("errmsg").toString()).collect(Collectors.toList());
         return errors;
@@ -161,5 +174,12 @@ public class AssetFileImportController {
     public void setAutoGenerateQrcode(Boolean autoGenerateQrcode) {
         this.autoGenerateQrcode = autoGenerateQrcode;
     }
-    
+
+    public Boolean getAutoGenerateFinancingNum() {
+        return autoGenerateFinancingNum;
+    }
+
+    public void setAutoGenerateFinancingNum(Boolean autoGenerateFinancingNum) {
+        this.autoGenerateFinancingNum = autoGenerateFinancingNum;
+    }
 }
