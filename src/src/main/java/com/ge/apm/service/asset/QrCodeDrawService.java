@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -53,7 +54,7 @@ public class QrCodeDrawService {
     // LOGO路径
 //    private static final String LOGO_PATH = "/logo.jpg";
 //    private static final String BACKGROUND_PATH = "/background.png";
-    
+
     @Value("#{wxProperties.suscribeLink}")
     private String suscribeLink;
 
@@ -83,8 +84,7 @@ public class QrCodeDrawService {
 //        if (imgPath == null || "".equals(imgPath)) {
 //            return image;
 //        }
-        // 插入Logo图片
-
+    // 插入Logo图片
 //        InputStream is = this.getClass().getResourceAsStream(LOGO_PATH);
 //        if (null != is) {
 //            Image logoSrc = ImageIO.read(is);
@@ -112,10 +112,8 @@ public class QrCodeDrawService {
 //            graph.setStroke(new BasicStroke(3f));
 //            graph.dispose();
 //        }
-
 //        return image;
 //    }
-
     public String getImageBase64(BufferedImage src) {
         Base64 encoder = new Base64();
         String res = "data:image/jpeg;base64,";
@@ -151,30 +149,32 @@ public class QrCodeDrawService {
         return image;
     }
 
-    public BufferedImage drawQrcodeWithText(String prifix, String code) throws Exception {
+    public BufferedImage drawQrcodeWithText(String prifix, QrCodeTemplateElement element) throws Exception {
 
+        String code = element.getTextValue();
         BufferedImage image = new BufferedImage(QRCODE_SIZE, QRCODE_SIZE * 11 / 10, BufferedImage.TYPE_INT_RGB);
         Graphics g = image.createGraphics();
         g.setColor(Color.WHITE);
         g.fillRect(0, 0, image.getWidth(), image.getHeight());
         g.drawImage(createBitMatrixImage(prifix.concat("?").concat(code), QRCODE_SIZE), 0, 0, null);
 
+        StringBuffer textSB = new StringBuffer(code);
         if (code != null && code.length() == 16) {
-            StringBuffer textSB = new StringBuffer(code);
             textSB.insert(4, "-");
             textSB.insert(9, "-");
             textSB.insert(14, "-");
-
-            String os = System.getProperty("os.name").toLowerCase();
-            int textX = os.indexOf("windows") != -1 ? 23 : 0;
-            int textY = 310;
-            int fontSize = 26;
-            Font font = new Font("TimesRoman", Font.BOLD, fontSize);
-            g.setFont(font);
-            g.setColor(Color.BLACK);
-            g.drawChars(textSB.toString().toCharArray(), 0, textSB.length(), textX, textY);
-
         }
+        String os = System.getProperty("os.name").toLowerCase();
+        int textX = os.indexOf("windows") != -1 ? 23 : 0;
+        int textY = 310;
+        int fontSize = element.getFontSize();
+        textX = element.getFontType();
+//        textX = 0 ;
+        Font font = new Font(Optional.ofNullable(element.getFontName()).orElse("TimesRoman"), Font.BOLD, fontSize);
+        
+        g.setFont(font);
+        g.setColor(Color.BLACK);
+        g.drawChars(textSB.toString().toCharArray(), 0, textSB.length(), textX, textY);
         g.dispose();
         return image;
     }
@@ -189,7 +189,7 @@ public class QrCodeDrawService {
     }
 
     public void drawQrcodeElement(Graphics graphics, String prifix, QrCodeTemplateElement element) throws Exception {
-        BufferedImage image = drawQrcodeWithText(prifix, element.getTextValue());
+        BufferedImage image = drawQrcodeWithText(prifix, element);
         graphics.drawImage(
                 image.getScaledInstance(element.getSize(), image.getHeight() * element.getSize() / QRCODE_SIZE, Image.SCALE_SMOOTH),
                 element.getPositionX(),
