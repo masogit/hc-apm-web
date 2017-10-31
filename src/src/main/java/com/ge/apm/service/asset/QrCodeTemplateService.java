@@ -68,6 +68,8 @@ public class QrCodeTemplateService {
         qrcodeElement.setSize(300);
         qrcodeElement.setPositionX(10);
         qrcodeElement.setPositionY(20);
+        qrcodeElement.setFontType(9);
+        qrcodeElement.setFontSize(24);
         elementList.add(qrcodeElement);
 
         elementList.add(createTextElement("", "hospital", 320, 40, 40, 1, "TimesRoman", "000000"));

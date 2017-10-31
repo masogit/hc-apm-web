@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
@@ -83,6 +84,8 @@ public class AssetFileImportService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private QrCodeService qrCodeService;
+    @Autowired
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -194,6 +197,8 @@ public class AssetFileImportService {
             asset.setSerialNum(ExcelDocument.getCellStringValue(rowMap.get("制造商序列号")));
             asset.setSystemId(ExcelDocument.getCellStringValue(rowMap.get("SystemID/厂商报修ID")));
             asset.setBarcode(ExcelDocument.getCellStringValue(rowMap.get("条码")));
+            String nationalStandardCode = ExcelDocument.getCellStringValue(rowMap.get("2010国家编码"));
+            asset.setNationalStandardCode(nationalStandardCode);
             String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
             asset.setFinancingNum(financingNum);
             asset.setModalityId(ExcelDocument.getCellStringValue(rowMap.get("IT系统编号")));
@@ -328,7 +333,8 @@ public class AssetFileImportService {
         }
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap, Boolean autoGenerateQrcode) {
+    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
+                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum) {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -445,6 +451,19 @@ public class AssetFileImportService {
                 }
             }
 
+            //auto generate financing num
+            String financingNum = newAsset.getFinancingNum();
+            String nationalStandardCode = newAsset.getNationalStandardCode();
+
+            if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
+                financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                        null,
+                        nationalStandardCode,
+                        newAsset.getSiteUID()
+                );
+                newAsset.setFinancingNum(financingNum);
+            }
+
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
                 String qrCode = newAsset.getQrCode();
@@ -528,7 +547,7 @@ public class AssetFileImportService {
     }
 
     @Transactional
-    private void createAsset(AssetInfo asset) {
+    void createAsset(AssetInfo asset) {
         assetDao.save(asset);
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
             QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode());

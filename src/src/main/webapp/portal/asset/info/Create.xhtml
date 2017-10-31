@@ -160,6 +160,10 @@
                                 <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">品牌/制造商简称</label>
+                                <p:inputText id="makerShortName" value="#{assetInfoController.selected.makerShortName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.vendor}</label>
                                 <p:selectOneMenu id="vendor" value="#{assetInfoController.supplier}" converter="supplierConverter" var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" >
                                     <p:ajax  listener="#{assetInfoController.onSupplierChange()}" process="@parent"/>
@@ -192,6 +196,10 @@
 
                     <p:fieldset  style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">设备标准名称</label>
+                                <p:inputText id="deviceName" value="#{assetInfoController.selected.deviceName}"/>
+                            </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInfoController.selected.parentAssetId}" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
@@ -250,7 +258,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">#{msg.medicalInstrumentSubclassification}</label>
+                                <label class="label">#{msg.assetCode68}</label>
                                 <p:selectOneMenu id="assetCode68" value="#{assetInfoController.selected.assetCode68}" style="width: 100%">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInfoController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
