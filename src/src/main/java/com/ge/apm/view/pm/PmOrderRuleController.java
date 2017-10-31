@@ -2,6 +2,7 @@ package com.ge.apm.view.pm;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
@@ -66,13 +67,22 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		//return dao.findAll(pageRequest);
 	}
 	
+	/***
+	 * 获取勾选项
+	 * @return
+	 */
 	public List<Integer> getSelectedIds(){
 		if(selected != null){
-			ids = pmOrderRuleCheckListRepository.findItemIds(user.getTenantUID(),selected.getId());
+			ids = pmOrderRuleCheckListRepository.findByRuleUID(selected.getUid());
+			//pmOrderRuleCheckListRepository.findItemIds(user.getTenantUID(),selected.getId());
 		}
 		return ids;
 	}
 	
+	/***
+	 * 获取租户下面所有Items
+	 * @return
+	 */
 	public List<PmOrderRuleItem> getAllItems(){
 		List<PmOrderRuleItem> items = pmOrderRuleItemRepository.findByTenantUID(user.getTenantUID());
 		if(CollectionUtils.isEmpty(items)){
@@ -81,34 +91,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		return items;
 	}
 
-	public List<PmOrderRuleCheckList> getRuleItemList() {
-		List<PmOrderRuleCheckList> itemFromDB = pmOrderRuleCheckListRepository.findByTenantUID(user.getTenantUID());
-		if (CollectionUtils.isEmpty(itemFromDB)) {
-			itemFromDB = changeItem2CheckList();
-		}
-		return itemFromDB;
-	}
-	
-	public List<PmOrderRuleCheckList> changeItem2CheckList(){
-		List<PmOrderRuleItem> allItems = pmOrderRuleItemRepository.findByTenantUID(user.getTenantUID());
-		List<PmOrderRuleCheckList> checkLists = new ArrayList<PmOrderRuleCheckList>();
-		for (PmOrderRuleItem item : allItems) {
-			PmOrderRuleCheckList cl = new PmOrderRuleCheckList();
-			cl.setName(item.getName());
-			cl.setPeriod(item.getPeriod());
-			cl.setItemId(item.getId());
-			cl.setTenantUID(item.getTenantUID());
-			cl.setPmOrderRuleId(item.getId());
-			cl.setStatus(0);
-			checkLists.add(cl);
-		}
-		return checkLists;
-	}
-
 	@Override
 	@Transactional
 	public void onBeforeSave(PmOrderRule por) {
-		pmOrderRuleCheckListRepository.deleteExistsRecord(por.getId());
+		pmOrderRuleCheckListRepository.deleteExistsRecord(por.getUid());
 	}
 
 	public List<UserAccount> getApproveUserList(String tenantUID) {
@@ -125,9 +111,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Override
 	public void onBeforeNewObject(PmOrderRule por) {
-		Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID());
-		period =  period == null ? 1 : period;
-		por.setPeriod(period);
 		por.setTenantUID(user.getTenantUID());
 		por.setStatus(0);
 		por.setCreatedDate(new Date());
@@ -147,34 +130,52 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Transactional
 	public void applyChange() {
+		if(selected.getPeriod() == null){
+			List<Integer> itemIds = new ArrayList<Integer>();
+			
+			if(!ids.isEmpty()){
+				Iterator it = ids.iterator();
+				if(it.hasNext()){
+					Object o = it.next();
+					itemIds.add(Integer.parseInt((String)o));
+				}
+			}
+			Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
+			period =  period == null ? 1 : period;
+			selected.setPeriod(period);
+		}
+		
+		//TODO valid json
+		
 		if (selected.getId() != null) {//更新
 			onBeforeSave(selected);
 		}
 		dao.save(selected);
-		Integer pmOrderRuleId = selected.getId();
-		List<PmOrderRuleCheckList> checkLists = new ArrayList<PmOrderRuleCheckList>();
-		List<PmOrderRuleItem> allItems = pmOrderRuleItemRepository.findByTenantUID(user.getTenantUID());
-		if(CollectionUtils.isNotEmpty(allItems)){
-			for (PmOrderRuleItem item : allItems) {
-				PmOrderRuleCheckList cl = new PmOrderRuleCheckList();
-				cl.setName(item.getName());
-				cl.setPeriod(item.getPeriod());
-				cl.setItemId(item.getId());
-				cl.setTenantUID(item.getTenantUID());
-				cl.setPmOrderRuleId(pmOrderRuleId);
-				if (ids.contains(item.getId().toString())) {
-					cl.setStatus(1);
-				} else {
-					cl.setStatus(0);
+		String ruleUID = selected.getUid();
+		if(!ids.isEmpty()){
+			List<PmOrderRuleCheckList> checkLists = new ArrayList<PmOrderRuleCheckList>();
+			List<PmOrderRuleItem> allItems = pmOrderRuleItemRepository.findByTenantUID(user.getTenantUID());
+			if(CollectionUtils.isNotEmpty(allItems)){
+				for (PmOrderRuleItem item : allItems) {
+					if(ids.contains(item.getId().toString())){
+						PmOrderRuleCheckList cl = new PmOrderRuleCheckList();
+						cl.setName(item.getName());
+						cl.setPeriod(item.getPeriod());
+						cl.setRemark(cl.getRemark());
+						cl.setRuleUID(ruleUID);
+						cl.setItemId(item.getId());
+						checkLists.add(cl);
+					}
 				}
-				checkLists.add(cl);
+				pmOrderRuleCheckListRepository.save(checkLists);
 			}
-			pmOrderRuleCheckListRepository.save(checkLists);
 		}
 		ids.clear();
 	}
 	
+	@Transactional
 	public void approve(){
+		applyChange();
 		selected.setStatus(1);
 		selected.setApproveUserId(user.getId());
 		dao.save(selected);
@@ -207,6 +208,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	public void setIds(List<Integer> ids) {
 		this.ids = ids;
+	}
+	
+	@Override
+	@Transactional
+	public void delete(){
+		pmOrderRuleCheckListRepository.deleteExistsRecord(selected.getUid());
+		super.delete();
 	}
 	
 

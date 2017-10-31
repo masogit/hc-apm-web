@@ -18,23 +18,20 @@ public class PmOrderRuleCheckList {
     @Column(name = "id")
 	private Integer id;
     
-    @Column(name = "tenant_uid")
-	private String tenantUID;//租户uid
-    
     @Column(name = "period")
 	private Integer period;//周期，以‘月’为单位
     
     @Column(name = "name")
 	private String name;//检查项名称
     
-    @Column(name = "status")
-	private Integer status = 0;//0、未选中 1、已选中
+    @Column(name = "rule_uid")
+    private String ruleUID;//pm_order_rule.uid
     
-    @Column(name = "item_id")//pm_order_rule_item.id
+    @Column(name = "remark")
+	private String remark;//备注
+    
+    @Column(name = "item_id")
     private Integer itemId;
-    
-    @Column(name = "pm_order_rule_id")
-    private Integer pmOrderRuleId;//pm_order_rule.id
     
 	public Integer getItemId() {
 		return itemId;
@@ -42,23 +39,23 @@ public class PmOrderRuleCheckList {
 	public void setItemId(Integer itemId) {
 		this.itemId = itemId;
 	}
-	public Integer getPmOrderRuleId() {
-		return pmOrderRuleId;
+	public String getRuleUID() {
+		return ruleUID;
 	}
-	public void setPmOrderRuleId(Integer pmOrderRuleId) {
-		this.pmOrderRuleId = pmOrderRuleId;
+	public void setRuleUID(String ruleUID) {
+		this.ruleUID = ruleUID;
+	}
+	public String getRemark() {
+		return remark;
+	}
+	public void setRemark(String remark) {
+		this.remark = remark;
 	}
 	public Integer getId() {
 		return id;
 	}
 	public void setId(Integer id) {
 		this.id = id;
-	}
-	public String getTenantUID() {
-		return tenantUID;
-	}
-	public void setTenantUID(String tenantUID) {
-		this.tenantUID = tenantUID;
 	}
 	public Integer getPeriod() {
 		return period;
@@ -72,12 +69,7 @@ public class PmOrderRuleCheckList {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public Integer getStatus() {
-		return status;
-	}
-	public void setStatus(Integer status) {
-		this.status = status;
-	}
+
 	
     @Override
     public int hashCode() {
