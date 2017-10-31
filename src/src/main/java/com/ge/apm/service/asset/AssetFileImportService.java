@@ -228,8 +228,8 @@ public class AssetFileImportService {
             asset.setLocationName(ExcelDocument.getCellStringValue(rowMap.get("安装位置")));
             asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
             asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
-            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
-            asset.setAssetCategory(getI18nMsgKey(assetCategoryList, assetType,map,"设备类型"));
+//            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
+//            asset.setAssetCategory(getI18nMsgKey(assetCategoryList, assetType,map,"设备类型"));
             String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
             asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage,map,"用途分类"));
             String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
