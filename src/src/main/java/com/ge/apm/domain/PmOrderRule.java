@@ -57,6 +57,12 @@ public class PmOrderRule {
     
     @Column(name="uid",columnDefinition = "CHAR(32)")
     private String uid;
+    
+    @Column(name = "safety_report")
+	private String safetyReport;//安全报告
+    
+    @Column(name = "performance_report")
+	private String performanceReport;//性能报告
 
     @PrePersist
     public void initializeUid() {
@@ -64,6 +70,26 @@ public class PmOrderRule {
             uid = UUID.randomUUID().toString().replace("-", "");
     }
     
+	public String getSafetyReport() {
+		return safetyReport;
+	}
+
+	public void setSafetyReport(String safetyReport) {
+		this.safetyReport = safetyReport;
+	}
+
+	public String getPerformanceReport() {
+		return performanceReport;
+	}
+
+	public void setPerformanceReport(String performanceReport) {
+		this.performanceReport = performanceReport;
+	}
+
+	public void setUid(String uid) {
+		this.uid = uid;
+	}
+
 	public String getUid() {
 		return uid;
 	}
