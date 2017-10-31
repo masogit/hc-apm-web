@@ -181,8 +181,8 @@ public class AssetFileImportService {
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
             asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
-            String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("功能分组"));
-            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup,map,"功能分组"));
+            String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("医疗器械分类"));
+            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup,map,"医疗器械分类"));
             if (functionGroup != null && functionGroup.length() > 4) {
                 String assetCode68 = ExcelDocument.getCellStringValue(rowMap.get("医疗器械子分类"));
                 String str = functionGroup.substring(0, 3);
