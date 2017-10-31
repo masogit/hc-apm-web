@@ -64,6 +64,26 @@
                                     <p:ajax  update="qrCodeEditForm:preView"/>
                                 </p:spinner>
                             </h:panelGroup>
+                            <p:spacer/>
+                            <h:panelGroup>
+                                <label class="label">#{msg.font}#{msg.name}</label>
+                                <p:selectOneMenu value="#{qrCodeTemplateCreateController.qrcodeElement.fontName}" >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                    <f:selectItems value="#{qrCodeTemplateCreateController.fontNameMap.entrySet()}" var="fontName" itemLabel="#{fontName.key}"  itemValue="#{fontName.value}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.font}#{msg.Size}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.fontSize}"  >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.font}#{msg.positionX}</label>
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.fontType}"  >
+                                    <p:ajax  update="qrCodeEditForm:preView"/>
+                                </p:spinner>
+                            </h:panelGroup>
                         </p:panelGrid>
 
 

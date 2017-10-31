@@ -264,7 +264,7 @@ public class QrCodeService {
 
     List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements) {
 
-        return getElementsValue(template, elements, "0000000000000000");
+        return getElementsValue(template, elements, "0123456789123456");
     }
 
     public String getPreViewBase64(QrCodeTemplate template, List<QrCodeTemplateElement> elementList) {
