@@ -179,6 +179,8 @@ public class AssetFileImportService {
 
             asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用科室")));
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
+            asset.setMakerShortName(ExcelDocument.getCellStringValue(rowMap.get("品牌/制造商简称")));
+            asset.setDeviceName(ExcelDocument.getCellStringValue(rowMap.get("设备标准名称")));
             asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
             String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("医疗器械分类"));
