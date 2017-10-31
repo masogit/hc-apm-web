@@ -368,6 +368,16 @@ public class AssetInfo implements Serializable {
     @Column(name = "accounting_category")
     private Integer accountingCategory;
 
+    //设备标准名称
+    @Size(max = 64)
+    @Column(name = "device_name")
+    private String deviceName;
+
+    //品牌/制造商简称
+    @Size(max = 64)
+    @Column(name = "make_short_name")
+    private String makerShortName;
+
     public Integer getAssetCategory() {
         return assetCategory;
     }
@@ -1134,6 +1144,22 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptUID(String clinicalDeptUID) {
         this.clinicalDeptUID = clinicalDeptUID;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getMakerShortName() {
+        return makerShortName;
+    }
+
+    public void setMakerShortName(String makerShortName) {
+        this.makerShortName = makerShortName;
     }
 
     @Override
