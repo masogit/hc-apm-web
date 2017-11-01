@@ -154,6 +154,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
+                selectedOrg = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
