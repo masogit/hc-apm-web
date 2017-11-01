@@ -171,7 +171,7 @@ public class ExcelDocument {
             return null;
         }
         if (value instanceof String) {
-            return (String) value;
+            return ((String) value).trim();
         }
         if (value instanceof Integer) {
             return valueWrapper.rawValue;
