@@ -13,7 +13,7 @@ public interface PmOrderRuleItemRepository extends GenericRepository<PmOrderRule
 
 	List<PmOrderRuleItem> findByIdIn(List<Integer> ids);
 
-	@Query(value = "select min(period) from pm_order_rule_item where tenant_uid = ?1",nativeQuery = true)
-	Integer fetchMinPeriod(String tenantUID);
+	@Query(value = "select min(period) from pm_order_rule_item where tenant_uid = ?1 and id in ?2",nativeQuery = true)
+	Integer fetchMinPeriod(String tenantUID, List<Integer> ids);
 
 }
