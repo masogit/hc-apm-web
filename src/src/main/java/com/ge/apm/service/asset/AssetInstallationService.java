@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.UserCommonService;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -39,6 +40,7 @@ public class AssetInstallationService {
     
     @Autowired
     private UserCommonService ucService;
+    
     
     public Boolean submitArrivalList(String srrivalListId){
         String token = UserContextService.getAccessToken();
@@ -72,6 +74,15 @@ public class AssetInstallationService {
 
     public List<UserAccount> getWorkerList() {
         return ucService.getWorkerList(0);
+    }
+
+    public List<UserAccount> getClinicalOwnerList(OrgInfo clinicalDept) {
+        if (clinicalDept == null){
+            return null;
+        }
+        List<UserAccount> userlist = ucService.getClinicalDeptOwnerList(clinicalDept);
+        return userlist.stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
+                        .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
     }
 
 }

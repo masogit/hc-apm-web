@@ -200,14 +200,7 @@ public class AssetInstallationController {
     }
 
     public List<UserAccount> getClinicalOwnerList() {
-        List<UserAccount> accountList = new ArrayList<>();
-        if (null != arrivalListItem.getClinicalDeptUID()) {
-            List<SearchFilter> assetFilters = new ArrayList<>();
-            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
-            accountList = userDao.findBySearchFilter(assetFilters);
-        }
-        return accountList.stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
-                        .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
+        return aiService.getClinicalOwnerList(selectedOrg);
     }
 
     public List<AssetInfo> getParentAssetList() {

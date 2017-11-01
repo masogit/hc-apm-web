@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserInfo;
+import java.util.Collection;
 
 import java.util.List;
 import javax.persistence.QueryHint;
@@ -107,4 +108,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     @Query(value = "select u from UserAccount u where u.tenantUID = ?1 and u.id in (select r.userId from UserRole r where r.roleId=2)")
     List<UserAccount> getAssetHeadList(String tenantUID);
+    
+    @Query(value = "select u from UserAccount u, UserOrgInfo o where  u.uid=o.userUid and o.orgUid in ?1")
+    List<UserAccount> getByClinicalDept(Collection<String> orgList);
 }

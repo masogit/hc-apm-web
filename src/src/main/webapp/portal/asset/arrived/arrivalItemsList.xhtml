@@ -23,15 +23,19 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update="editButton :ItemViewForm"/>
-                        <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="" />
+                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm"/>
+                        <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
                         </p:column>
-                        <p:column headerText="#{msg.arrivalListItemNum}" sortBy="#{item.itemNum}" >
+<!--                        <p:column headerText="#{msg.arrivalListItemNum}" sortBy="#{item.itemNum}" >
                             <h:outputText value="#{item.itemNum}"/>
+                        </p:column>-->
+                        
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.arrivalList.clinicalDeptUID}">
+                            <h:outputText value="#{assetArrivedItemsController.getOrgInfoByUid(item.clinicalDeptUID)}" />
                         </p:column>
-                        <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creatorUID}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" >
                             <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(item.arrivalList.creatorUID).name}"/>
                         </p:column>
                         <p:column headerText="#{msg.createDate}" sortBy="#{item.arrivalList.createDate}" >
@@ -55,7 +59,7 @@
 
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" update=":ItemViewDlgForm" oncomplete="PF('ItemViewDlg').show()" disabled="#{empty assetArrivedItemsController.selected}"/>-->
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>
+                            <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetArrivedItemsController.prepareEdit}" disabled="#{empty assetArrivedItemsController.selected}"/>-->
 
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
