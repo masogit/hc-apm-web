@@ -96,6 +96,22 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
     }
 
+    public void applyChange() {
+        if (checkName()) {
+            this.save();
+        } else {
+            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
+        }
+    }
+
+    private Boolean checkName() {
+        List<SearchFilter> nameSearchFilterList = new ArrayList();
+        nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
+        nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
+        List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
+        return (null == res || res.isEmpty());
+    }
+
     @Override
     public void onBeforeSave(ArrivalList object) {
         object.setTenantUID(selectedOrg.getTenantUID());
@@ -131,14 +147,18 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public void submitArrivalList() {
-        this.save();
-        if (aiService.submitArrivalList(selected.getId())) {
-            WebUtil.addSuccessMessage("到货清单已经提交");
-        } else {
-            WebUtil.addErrorMessage("到货清单提交失败");
-        };
-        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-        selected = dao.findById(selected.getId());
+        if (checkName()) {
+            dao.save(selected);
+            if (aiService.submitArrivalList(selected.getId())) {
+                WebUtil.addSuccessMessage("到货清单已经提交");
+            } else {
+                WebUtil.addErrorMessage("到货清单提交失败");
+            };
+            arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+            selected = dao.findById(selected.getId());
+        }else {
+            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
+        }
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {
