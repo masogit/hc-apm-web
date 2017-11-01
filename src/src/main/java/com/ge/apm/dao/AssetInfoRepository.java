@@ -4,6 +4,7 @@ import com.ge.apm.domain.AssetFileAttachment;
 import com.ge.apm.domain.AssetInfo;
 import java.util.List;
 
+import org.primefaces.model.DualListModel;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
@@ -48,6 +49,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
+
+	public List<AssetInfo> findByTenantUID(String tenantUID);
 
     
 }

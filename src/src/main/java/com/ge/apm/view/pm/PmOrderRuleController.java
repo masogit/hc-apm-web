@@ -9,10 +9,12 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
-
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.PmOrderRuleCheckListRepository;
 import com.ge.apm.dao.PmOrderRuleItemRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
@@ -21,8 +23,8 @@ import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.PmOrderRuleCheckList;
 import com.ge.apm.domain.PmOrderRuleItem;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.Report;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -130,6 +132,39 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Transactional
 	public void applyChange() {
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+		if(!StringUtils.isEmpty(selected.getSafetyReport())){
+			try{
+				if(!selected.getSafetyReport().contains("title")){
+					WebUtil.addErrorMessage("安全检测报告必须包含title元素！");
+					return;
+				}else if(!selected.getSafetyReport().contains("groups")){
+					WebUtil.addErrorMessage("安全检测报告必须包含groups元素！");
+					return;
+				}
+				JSON.parseObject(selected.getSafetyReport(),Report.class);
+			}catch(Exception e){
+				WebUtil.addErrorMessage("安全检测报告JSON不合法！");
+				return;
+			}
+		}
+		if(!StringUtils.isEmpty(selected.getPerformanceReport())){
+			try{
+				if(!selected.getPerformanceReport().contains("title")){
+					WebUtil.addErrorMessage("性能检测报告必须包含title元素！");
+					return;
+				}else if(!selected.getPerformanceReport().contains("groups")){
+					WebUtil.addErrorMessage("性能检测报告必须包含groups元素！");
+					return;
+				}
+				JSON.parseObject(selected.getPerformanceReport(),Report.class);
+			}catch(Exception e){
+    			//RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage("性能检测报告JSON不合法！");
+				return;
+			}
+		}
+		
 		if(selected.getPeriod() == null){
 			List<Integer> itemIds = new ArrayList<Integer>();
 			
