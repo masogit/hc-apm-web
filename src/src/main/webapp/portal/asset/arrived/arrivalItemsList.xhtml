@@ -25,8 +25,8 @@
 
                         <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update="editButton :ItemViewForm"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="" />
-                        <p:column headerText="#{msg.name}" sortBy="#{item.arrivalList.assetName}" filterBy="#{item.arrivalList.assetName}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.arrivalList.assetName}"/>
+                        <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.arrivalList.name}"/>
                         </p:column>
                         <p:column headerText="#{msg.arrivalListItemNum}" sortBy="#{item.itemNum}" >
                             <h:outputText value="#{item.itemNum}"/>
