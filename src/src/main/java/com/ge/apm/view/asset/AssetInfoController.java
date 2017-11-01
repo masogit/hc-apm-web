@@ -11,6 +11,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
@@ -186,7 +187,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.selected != null) {
             initOrgTree();
         }
-
 
     }
 
@@ -371,9 +371,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     public void onAfterNewObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
-        if(isOK){
-            attachements.forEach(item->{
-                if(item.getBoId()==null){
+        if (isOK) {
+            attachements.forEach(item -> {
+                if (item.getBoId() == null) {
                     item.setBoId(object.getId());
                     item.setBoUuid(object.getUid());
                     blobDao.save(item);
@@ -431,13 +431,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (!isTimeValidate()) {
             return "";
         }
-        if (!qrCode.equals(selected.getQrCode()) && !qrCode.isEmpty()) {
-            if (!updateQrCode()) {
-                return "";
-            }
-        }
-        if (qrCode != null && "".equals(qrCode.trim())) {
+        if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim()) ) {
             selected.setQrCode(null);
+        }else{
+            if (!qrCode.equals(selected.getQrCode())) {
+                if (!updateQrCode()) {
+                    return "";
+                }
+            }
         }
 
         this.save();
@@ -595,7 +596,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
-
     public void removeAttachment(String objectId) {
 
         blobService.deleteBlobFileByStorageId(objectId);
@@ -616,12 +616,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<UserAccount> getOwnerList() {
-       List<UserAccount> accountList = getEmptyAccountList();
-       accountList.addAll(ucService.getWorkerList(selected.getId()));
-       return accountList;
+        List<UserAccount> accountList = getEmptyAccountList();
+        accountList.addAll(ucService.getWorkerList(selected.getId()));
+        return accountList;
     }
-    
-    private List<UserAccount> getEmptyAccountList(){
+
+    private List<UserAccount> getEmptyAccountList() {
         List<UserAccount> accountList = new ArrayList();
         UserAccount emptyValue = new UserAccount();
         emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
@@ -633,7 +633,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         List<UserAccount> accountList = getEmptyAccountList();
         if (null != selected.getClinicalDeptId()) {
             accountList.addAll(userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId()));
-        } 
+        }
         return accountList;
     }
 
@@ -846,7 +846,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         return null;
     }
-    
+
     public String getSiteOrgName(String siteUID) {
         OrgInfo org = orgDao.getByUid(siteUID);
         if (org != null) {
@@ -936,9 +936,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         return "";
     }
-    
+
     public String getParentAssetNameByAssetId(int assetId) {
-    	AssetInfo ai = dao.findById(assetId);
+        AssetInfo ai = dao.findById(assetId);
         if (ai.getParentAssetId() != null) {
             AssetInfo assetInfo = dao.getById(ai.getParentAssetId());
             if (assetInfo != null) {
@@ -970,7 +970,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setOneSearchStr(String oneSearchStr) {
         this.oneSearchStr = oneSearchStr;
-        if(oneSearchStr.isEmpty()){
+        if (oneSearchStr.isEmpty()) {
             this.removeFilterOnField("name");
             this.removeFilterOnField("departNum");
             this.removeFilterOnField("financingNum");
@@ -1054,8 +1054,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root",null,null);
-        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.getChildren().add(treeNode);
         rootNode.setExpanded(true);
 
