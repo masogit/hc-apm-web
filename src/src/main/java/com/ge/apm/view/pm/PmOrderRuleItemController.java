@@ -39,7 +39,7 @@ public class PmOrderRuleItemController extends JpaCRUDController<PmOrderRuleItem
     protected Page<PmOrderRuleItem> loadData(PageRequest pageRequest) {
     	List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
     	 searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, user.getTenantUID()));
-    	return dao.findAll(pageRequest);
+    	return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
     @Override
