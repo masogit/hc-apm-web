@@ -21,7 +21,9 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
@@ -45,7 +47,6 @@ public class AssetInstallationController {
     private ArrivalListItemRepository itemDao;
     private AssetInstallationService aiService;
     private AssetInfoRepository assetDao;
-    private UserAccountRepository userDao;
     private UaaService uaaService;
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
@@ -65,7 +66,6 @@ public class AssetInstallationController {
         blobService = WebUtil.getBean(BlobFileService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        userDao = WebUtil.getBean(UserAccountRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         String itemId = WebUtil.getRequestParameter("itemId");
@@ -96,7 +96,7 @@ public class AssetInstallationController {
 
     public String rejectInstall() {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            itemDao.save(arrivalListItem);
+            saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), false)) {
                 WebUtil.addSuccessMessage("提交成功");
                 return "arrivalItemsList?faces-redirect=true";
@@ -126,7 +126,7 @@ public class AssetInstallationController {
             return "";
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            itemDao.save(arrivalListItem);
+            saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), true)) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
@@ -155,9 +155,14 @@ public class AssetInstallationController {
         arrivalListItem.setClinicalDeptUID(selectedOrg.getUid());
     }
 
+    private void saveOrUpdateItem(ArrivalListItem arrivalListItem){
+        arrivalListItem.setLastModifiedDate(new Date());
+        itemDao.save(arrivalListItem);
+    }
     public void updateItem() {
+        
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            itemDao.save(arrivalListItem);
+            saveOrUpdateItem(arrivalListItem);
             WebUtil.addSuccessMessage("修改成功");
         } else {
             WebUtil.addErrorMessage("不可修改");
@@ -207,7 +212,8 @@ public class AssetInstallationController {
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
-        if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
+        assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getAssetGroup()));
+        if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
         return assetDao.findBySearchFilter(assetFilters);

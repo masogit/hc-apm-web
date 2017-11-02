@@ -5,7 +5,10 @@
  */
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
+import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,8 +20,10 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.data.annotation.LastModifiedDate;
 
 /**
  *
@@ -111,6 +116,10 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "current_person_uid", columnDefinition = "CHAR(32)")
     private String currentPersonUID;
     
+    @Column(name = "last_modified_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
+    private Date lastModifiedDate;
     
     
     //fields for AssetInfo
@@ -839,7 +848,14 @@ public class ArrivalListItem implements Serializable {
     public void setFunctionGroup(Integer functionGroup) {
         this.functionGroup = functionGroup;
     }
-    
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 
     @Override
     public int hashCode() {

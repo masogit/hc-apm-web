@@ -80,7 +80,7 @@ public class AssetInstallationService {
         if (clinicalDept == null){
             return null;
         }
-        List<UserAccount> userlist = ucService.getClinicalDeptOwnerList(clinicalDept);
+        List<UserAccount> userlist = userDao.findByOrgInfoUID(clinicalDept.getUid());
         return userlist.stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
                         .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
     }

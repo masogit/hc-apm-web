@@ -111,4 +111,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     
     @Query(value = "select u from UserAccount u, UserOrgInfo o where  u.uid=o.userUid and o.orgUid in ?1")
     List<UserAccount> getByClinicalDept(Collection<String> orgList);
+    
+    List<UserAccount> findByOrgInfoUID(String orgUid);
 }
