@@ -71,7 +71,12 @@ public class V2_PmOrder  implements Serializable {
     @Column(name = "asset_id")
     @Basic(optional = false)
     @NotNull
-    private String assetId;
+    private Integer assetId;
+
+    @Column(name = "asset_uid")
+    @Basic(optional = false)
+    @NotNull
+    private String assetUid;
 
     @Basic(optional = false)
     @NotNull
@@ -94,8 +99,8 @@ public class V2_PmOrder  implements Serializable {
     private Date planTime;  //计划时间
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @javax.persistence.ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
-    @Where(clause = "bo_type = 'V2_PmOrder'")
+    @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
+    @Where(clause = "bo_type = 'PmOrder'")
     private List<V2_BlobObject> attachments = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
@@ -118,11 +123,11 @@ public class V2_PmOrder  implements Serializable {
 
     @Column(name="inst_id")
     private String instId;
-    @Column(name = "feedback_rating")
-    private Integer feedbackRating;
-
-    @Column(name = "feedback_comment")
-    private String feedbackComment;
+    //    @Column(name = "feedback_rating")
+//    private Integer feedbackRating;
+//
+//    @Column(name = "feedback_comment")
+//    private String feedbackComment;
     @Column(name = "current_step_id")
     private String currentStepId;
     @Column(name = "current_step_name")
@@ -132,26 +137,39 @@ public class V2_PmOrder  implements Serializable {
     @Size(max = 64)
     @Column(name = "current_person_name")
     private String currentPersonName;
+    /**
+     * 1: auto dispatch 2: grab and manual 3: grab 4: manual
+     */
+    @Column(name="dispatch_mode")
+    private Integer dispatchMode;
+    //    @Column(name="clinical_dept_id")
+//    private String clinicalDeptId;
+    @Column(name="quality_checking")
+    private String qualityChecking;
+
+    @Column(name="approval_status")
+    private String approvalStatus;
 
     public V2_PmOrder() {
     }
-	
-	public Integer getNearestSrDays() {
-		return nearestSrDays;
-	}
 
-	public void setNearestSrDays(Integer nearestSrDays) {
-		this.nearestSrDays = nearestSrDays;
-	}
+    public Integer getNearestSrDays() {
+        return nearestSrDays;
+    }
 
-	public String getNearestSrId() {
-		return nearestSrId;
-	}
+    public void setNearestSrDays(Integer nearestSrDays) {
+        this.nearestSrDays = nearestSrDays;
+    }
 
-	public void setNearestSrId(String nearestSrId) {
-		this.nearestSrId = nearestSrId;
-	}
-	public List<V2_BlobObject> getAttachments() {
+    public String getNearestSrId() {
+        return nearestSrId;
+    }
+
+    public void setNearestSrId(String nearestSrId) {
+        this.nearestSrId = nearestSrId;
+    }
+
+    public List<V2_BlobObject> getAttachments() {
         return attachments;
     }
 
@@ -251,11 +269,11 @@ public class V2_PmOrder  implements Serializable {
         this.comments = comments;
     }
 
-    public String getAssetId() {
+    public Integer getAssetId() {
         return assetId;
     }
 
-    public void setAssetId(String assetId) {
+    public void setAssetId(Integer assetId) {
         this.assetId = assetId;
     }
 
@@ -315,21 +333,21 @@ public class V2_PmOrder  implements Serializable {
         this.instId = instId;
     }
 
-    public Integer getFeedbackRating() {
-        return feedbackRating;
-    }
+//    public Integer getFeedbackRating() {
+//        return feedbackRating;
+//    }
 
-    public void setFeedbackRating(Integer feedbackRating) {
-        this.feedbackRating = feedbackRating;
-    }
+//    public void setFeedbackRating(Integer feedbackRating) {
+//        this.feedbackRating = feedbackRating;
+//    }
 
-    public String getFeedbackComment() {
-        return feedbackComment;
-    }
+//    public String getFeedbackComment() {
+//        return feedbackComment;
+//    }
 
-    public void setFeedbackComment(String feedbackComment) {
-        this.feedbackComment = feedbackComment;
-    }
+//    public void setFeedbackComment(String feedbackComment) {
+//        this.feedbackComment = feedbackComment;
+//    }
 
     public String getCurrentStepId() {
         return currentStepId;
@@ -377,6 +395,46 @@ public class V2_PmOrder  implements Serializable {
 
     public void setCurrentPersonName(String currentPersonName) {
         this.currentPersonName = currentPersonName;
+    }
+
+    public Integer getDispatchMode() {
+        return dispatchMode;
+    }
+
+    public void setDispatchMode(Integer dispatchMode) {
+        this.dispatchMode = dispatchMode;
+    }
+
+//    public String getClinicalDeptId() {
+//        return clinicalDeptId;
+//    }
+
+//    public void setClinicalDeptId(String clinicalDeptId) {
+//        this.clinicalDeptId = clinicalDeptId;
+//    }
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
+
+    public String getQualityChecking() {
+        return qualityChecking;
+    }
+
+    public void setQualityChecking(String qualityChecking) {
+        this.qualityChecking = qualityChecking;
+    }
+
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
     }
 
     @Override

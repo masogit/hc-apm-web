@@ -21,7 +21,11 @@
     <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
+<<<<<<< Updated upstream
     <p:column headerText="#{msg.suscriber}" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+=======
+    <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+>>>>>>> Stashed changes
       <!--  <h:outputText value="  #{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />-->
         <h:outputText value="#{item.subscriberUser.name}" />
     </p:column>
