@@ -229,7 +229,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	        if (filterPmRuleStatus != null) {
 	            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, Integer.parseInt(filterPmRuleStatus)));
 	        }
-	    }
+	 }
 
 	public String getFilterPmRuleStatus() {
 		return filterPmRuleStatus;
