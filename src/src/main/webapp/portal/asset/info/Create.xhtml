@@ -160,7 +160,7 @@
                                 <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">品牌/制造商简称</label>
+                                <label class="label">#{msg.makerShortName}</label>
                                 <p:inputText id="makerShortName" value="#{assetInfoController.selected.makerShortName}"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -197,10 +197,6 @@
                     <p:fieldset  style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
-                                <label class="label">设备标准名称</label>
-                                <p:inputText id="deviceName" value="#{assetInfoController.selected.deviceName}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInfoController.selected.parentAssetId}" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -208,17 +204,20 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">#{msg.deviceName}</label>
+                                <p:inputText id="deviceName" value="#{assetInfoController.selected.deviceName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.systemId}</label>
                                 <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}"/>
-                            </h:panelGroup>
-
-                            <h:panelGroup>
-                                <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInfoController.selected.departNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText id="financingNum" value="#{assetInfoController.selected.financingNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.departNum}</label>
+                                <p:inputText id="departNum2" value="#{assetInfoController.selected.departNum}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.barcode}</label>
