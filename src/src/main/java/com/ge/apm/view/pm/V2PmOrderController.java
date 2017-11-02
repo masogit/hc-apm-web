@@ -11,6 +11,7 @@ import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
@@ -58,7 +59,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
-    private V2_ServiceRequest newServiceRequest;
 
 
     private List<V2_PmOrder> selectedPmWorkOrderList;
@@ -89,13 +89,68 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String equipmentTaker;
     private Date takeTime;
     private String approvaler;
+    private String  isActive;
 
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
 
    // private List<Integer> tagGroupAssets;
 
+    //create service request
+    private V2_WorkOrderService woService;
+    private V2_ServiceRequest newServiceRequest;
+    public void removeAttachment(String storageId) {
+        blobService.deleteBlobFileByStorageId(storageId);
+        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    }
+    public void handleFileUpload(FileUploadEvent event) {
+
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+
+    }
+
+    public void createServiceRequest() {
+        cancel();
+        selected = null;
+        newServiceRequest = new V2_ServiceRequest();
+        picList = new ArrayList();
+        newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
+        newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
+        newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
+        newServiceRequest.setRequestTime(new Date());
+    }
+
+    public void saveServiceRequest() {
+        //1表示主动报修
+        newServiceRequest.setSrRepairType("1");
+        selectedAsset.setStatus(currentStatus);
+        woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+        cancel();
+    }
+    public void cancelsr() {
+        selected = null;
+        newServiceRequest = null;
+        esTime = null;
+        comments = null;
+        failReason = null;
+        rating = null;
+        confirmedDownTime = null;
+        equipmentTaker = null;
+        takeTime = null;
+        picList = null;
+    }
+    ///
+
     protected void init() {
+        woService = WebUtil.getBean(V2_WorkOrderService.class);
         dao = WebUtil.getBean(V2_PmOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -142,6 +197,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         else
             return new ArrayList<UserAccount>();
     }
+
+    public String getIsActive() {
+        return isActive;
+    }
+
+
+
 
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
@@ -393,19 +455,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
 
 
-    public void handleFileUpload(FileUploadEvent event) {
-
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
-        }
-
-    }
 
 
 
