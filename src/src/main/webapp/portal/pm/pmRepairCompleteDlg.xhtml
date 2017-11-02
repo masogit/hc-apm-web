@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="保养完成">
+        <p:dialog id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="保养">
             <h:form id="pmrepairCompleteDialogForm" >
                 <h:panelGroup  id="display5" style="height:500px">
                     <!--<p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
@@ -100,7 +100,7 @@
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
                         <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairWorkOrder()}" value="保养完成" update=":growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
-                        <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==2}" immediate="true"  value= "#{v2PmOrderController.selectedPmOrder.approvalStatus==2?'提交审核':'审核已通过'}" icon="ui-icon-check" update=":growl :approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                        <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==2}" immediate="true"  value= "#{v2PmOrderController.selectedPmOrder.approvalStatus==2?'审核已通过':'提交审核'}" icon="ui-icon-check" update=":growl :approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>

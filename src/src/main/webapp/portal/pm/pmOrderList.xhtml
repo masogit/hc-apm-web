@@ -67,7 +67,7 @@
                         </p:column>
 
                         <p:column headerText="#{msg.takeOrtrans}" rendered="#{v2PmOrderController.queryIndex==3}">
-                            <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId? msg.takeorder:'抢单'}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId? msg.takeorder:'接单'}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">

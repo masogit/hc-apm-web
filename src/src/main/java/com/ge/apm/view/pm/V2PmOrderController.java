@@ -237,31 +237,34 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if (queryIndex == -1) {
             return dao.findAll(pageRequest);
         }
-
-        if (queryIndex == 1) {//已报修 可取消
-           /* if (userContextService.hasRole("AssetStaff")) {
-                searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, pmOrderService.getSRListByStatus(Arrays.asList(1))));
-            }*/
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
-        } else if (queryIndex == 2) { //待派工  Assign
+         if (queryIndex == 2) { //待派工  Assign
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
+            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
+
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
-        }  else if (queryIndex == 5) {//待验收
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Ack"));
-        } else if (queryIndex == 6) { //待关单
 
+          //  searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
+           /* searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));*/
+        } else if (queryIndex == 6) { //待关单
+            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }else if (queryIndex == 8) { //待审核
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
+           //1表示该pm工单已被提交等待审核
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
-
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
         else if (queryIndex == 0) { //保养中
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
-
+            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
         this.selected = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
