@@ -75,7 +75,7 @@ public class OrgInfo implements Serializable {
     @Column(name = "name_en")
     private String nameEn;
     
-    @JoinColumn(name = "parent_id", referencedColumnName = "id")
+    @JoinColumn(name = "parent_uid", referencedColumnName = "uid",insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private OrgInfo parentOrg;

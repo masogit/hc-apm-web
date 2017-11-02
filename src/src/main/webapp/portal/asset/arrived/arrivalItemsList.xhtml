@@ -17,7 +17,7 @@
                     <p:dataTable id="datalist" value="#{assetArrivedItemsController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetArrivedItemsController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortBy="#{item.arrivalListId}" 
+                                 rowKey="#{item.id}" sortMode="single" sortBy="#{item.lastModifiedDate}"   sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -28,9 +28,6 @@
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
                         </p:column>
-<!--                        <p:column headerText="#{msg.arrivalListItemNum}" sortBy="#{item.itemNum}" >
-                            <h:outputText value="#{item.itemNum}"/>
-                        </p:column>-->
                         
                         <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.arrivalList.clinicalDeptUID}">
                             <h:outputText value="#{assetArrivedItemsController.getOrgInfoByUid(item.clinicalDeptUID)}" />
@@ -46,7 +43,7 @@
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.functionType}"/>
                         </p:column>
-                        <p:column width="90" >
+                        <p:column width="90"  headerText="操作">
                             <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
                           <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                             </p:commandLink>

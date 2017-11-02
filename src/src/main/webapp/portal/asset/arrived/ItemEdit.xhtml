@@ -97,7 +97,7 @@
                                 <p:overlayPanel id="panelOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{assetInstallationController.orgTree}" selection="#{assetInstallationController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":ItemEditDlgForm:selectedOrgName :ItemEditDlgForm:parentAssetList" listener="#{assetInstallationController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="select" update=":ItemEditDlgForm:selectedOrgName :ItemEditDlgForm:parentAssetList :ItemEditDlgForm:clinicalOwnerName" listener="#{assetInstallationController.onSelectOrgFromTree}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -441,7 +441,7 @@
 
                         <p:commandButton validateClient="true" actionListener="#{assetInstallationController.updateItem}" update=":growl"  value="保存" icon="ui-icon-check" />
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" />
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.rejectInstall}" value="退货" immediate="true" />
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.rejectInstall}" value="退货" />
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalItemsList?faces-redirect=true" immediate="true" />
 
                     </h:panelGroup>
