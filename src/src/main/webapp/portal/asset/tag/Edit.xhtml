@@ -86,7 +86,7 @@
                     </p:column>
                 </p:pickList>
             </p:fieldset>
-            <p:commandButton validateClient="true" process="@(:AssetTagEditForm:name)" actionListener="#{assetTagController.save}" value="#{msg.Save}" update=":AssetTagEditDlg, :AssetTagListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagEditDialog');"/>
+            <p:commandButton validateClient="true" actionListener="#{assetTagController.save}" value="#{msg.Save}" update=":AssetTagEditDlg, :AssetTagListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagEditDialog');"/>
             &nbsp;&nbsp;
             <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('AssetTagEditDialog').hide()"/>
         </h:form>

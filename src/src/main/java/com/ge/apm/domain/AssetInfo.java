@@ -360,6 +360,10 @@ public class AssetInfo implements Serializable {
     @Column(name = "measuring_item_category")
     private Integer measuringItemCategory;
 
+    //计量周期(月)
+    @Column(name = "metering_cycle")
+    private Integer meteringCycle;
+
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
     @Column(name = "usage_status")
     private Integer usageStatus;
