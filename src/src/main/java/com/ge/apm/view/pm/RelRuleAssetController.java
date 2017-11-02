@@ -10,9 +10,11 @@ import org.primefaces.model.DualListModel;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
 import com.ge.apm.dao.RelRuleAssetRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.QueryAsset;
 import com.ge.apm.domain.RelRuleAsset;
@@ -37,6 +39,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
 	private RelRuleAssetRepository relRuleAssetRepository;
 	private String pmOrderRuleUID;
 	private PmOrderRuleRepository pmOrderRuleRepository;
+	private OrgInfoRepository orgInfoRepository;
 	
 	@Override
     protected void init() {
@@ -46,6 +49,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
         relRuleAssetRepository = WebUtil.getBean(RelRuleAssetRepository.class);
         assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         targetAssets = new ArrayList<AssetInfo>();
         queryAsset = new QueryAsset();
         queryAsset.setTenantUID(user.getTenantUID());
@@ -54,7 +58,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
 	
     
     public void getAssetsListByTenantUid() {
-        sourceAssets = assetInfoRepository.findByTenantUID(user.getTenantUID());
+        sourceAssets = assetInfoRepository.findBySearchFilter(getFilter(user.getSiteUID()));//findByTenantUID(user.getTenantUID());
         targetAssets.forEach((item)->{
             if(sourceAssets.contains(item)){
                 sourceAssets.remove(item);
@@ -64,8 +68,9 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
     }
     
     public List<AssetInfo> getAssetList() {
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+        List<SearchFilter> assetFilters = getFilter(user.getSiteUID());
+        		// new ArrayList<>();
+        //assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
         if(null != queryAsset.getFunctionType()){
         	assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
         }
@@ -80,6 +85,23 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
         }
         return assetInfoRepository.findBySearchFilter(assetFilters);
     }
+    
+    public  List<SearchFilter> getFilter(String siteUID){
+    	List<SearchFilter>filter = new ArrayList<SearchFilter>();
+    	OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
+    	if(orgInfo.getOrgType() == 3){//院区
+    		filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+    	}else if(orgInfo.getOrgType() == 2){//医院
+    		filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+    	}else if(orgInfo.getOrgType() == 1){//集团
+    		filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+    	}else{//租户
+    		filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+    	}
+    	filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+    	return filter;
+    }
+  
     
     public void addFilter(){
     	sourceAssets = getAssetList();

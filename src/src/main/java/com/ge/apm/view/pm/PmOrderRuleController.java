@@ -33,6 +33,8 @@ import webapp.framework.web.mvc.JpaCRUDController;
 @ViewScoped
 public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private static final long serialVersionUID = -1L;
+	private  String safeReport = "";
+	private String performanceReport = "";
 	private PmOrderRuleRepository dao = null;
 	private UserAccount user;
 	private UserAccountRepository userAccountRepository;
@@ -40,6 +42,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
 	private List<Integer> ids = new ArrayList<Integer>();
 	private String filterPmRuleStatus;
+	
 
 	@Override
 	protected void init() {
@@ -164,7 +167,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 				return;
 			}
 		}
-		
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
 		if(selected.getPeriod() == null){
 			List<Integer> itemIds = new ArrayList<Integer>();
 			
@@ -179,8 +182,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			period =  period == null ? 1 : period;
 			selected.setPeriod(period);
 		}
-		
-		//TODO valid json
 		
 		if (selected.getId() != null) {//更新
 			onBeforeSave(selected);
@@ -206,6 +207,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			}
 		}
 		ids.clear();
+		WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
 	}
 	
 	@Transactional
@@ -251,6 +253,24 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		pmOrderRuleCheckListRepository.deleteExistsRecord(selected.getUid());
 		super.delete();
 	}
+
+	public String getSafeReport() {
+		return safeReport;
+	}
+
+	public void setSafeReport(String safeReport) {
+		this.safeReport = safeReport;
+	}
+
+	public String getPerformanceReport() {
+		return performanceReport;
+	}
+
+	public void setPerformanceReport(String performanceReport) {
+		this.performanceReport = performanceReport;
+	}
+	
+	
 	
 
 	/*
