@@ -22,7 +22,7 @@
                         <p:commandButton value="待接单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}" rendered="true"/>
                         <!--<p:commandButton value="待验收"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(5)}" disabled="#{v2PmOrderController.queryIndex==5}" rendered="true"/>-->
                         <p:commandButton value="待关单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(6)}" disabled="#{v2PmOrderController.queryIndex==6}" rendered="true"/>
-                        <!--<p:commandButton value="待评价"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}" rendered="true"/>-->
+
                         <p:commandButton value="待审核"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="true"/>
                         <p:commandButton value="保养中"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}" rendered="true"/>
                     </h:panelGrid>
@@ -97,19 +97,14 @@
                 </h:form>
               <ui:include src="pmOrderView.xhtml"/>
                 <ui:include src="pmRepairCompleteDlg.xhtml"/>
-                <!--     <ui:include src="srCreate.xhtml"/>
-                   <ui:include src="takeOrderDialog.xhtml"/>
-                   <ui:include src="transferDialog.xhtml"/>
 
-                   <ui:include src="newOrderDialog.xhtml"/>
-                   <ui:include src="toCloseDlg.xhtml"/>
-                   <ui:include src="approveDlg.xhtml"/>-->
             </div>
         </div>
         <p:dialog id="closePmDialog" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="关单">
             <h:form id="closePmDialogForm" >
                 <h:panelGroup id="display3" >
-                    <p:selectOneRadio id="console" value="#{v2PmOrderController.selectedPmOrder.qualityChecking}">
+                    <p:selectOneRadio id="console"  value="#{v2PmOrderController.selectedPmOrder.qualityChecking}">
+                      <!--  <p:ajax  listener="#{v2PmOrderController.d1(v2PmOrderController.selectedPmOrder.qualityChecking)}" event="change"></p:ajax>-->
                         <f:selectItem itemLabel="合格" itemValue="1" />
                         <f:selectItem itemLabel="不合格" itemValue="2" />
                     </p:selectOneRadio>
@@ -117,11 +112,12 @@
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update=":takeOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 
-                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.cancel()}"  onclick="PF('closePmDialog').hide()"/>
+                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest()}" update=":ServiceRequestCreateForm"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+            <ui:include src="srCreatePM.xhtml"/>
         </p:dialog>
 
 
