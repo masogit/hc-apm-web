@@ -1274,11 +1274,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'qualityexpirdate', '质保期', 'quality expire date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'expectarrivaldate', '预期到达时间', 'expeted arrival date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'arrival', '到货', 'arrival', NULL, '-1');
-<<<<<<< HEAD
-=======
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'createrepair', '新增报修', 'create repair', NULL, '-1');
->>>>>>> internationalize bug fix
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'createrepair', '新增报修', 'create repair', NULL, '-1');
 
 --- above already in db
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'medicalInstrumentClassification', '医疗器械分类', 'Medical Instrument Classification', NULL, '-1');
