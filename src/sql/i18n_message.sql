@@ -1297,7 +1297,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'safetyReport', '安全监测报告', 'safety report', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'performanceReport', '性能监测报告', 'performance report', NULL, '-1');
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceName', '设备标准名称', 'Device Name', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'makerShortName', '品牌/制造商简称', 'Maker Short Name', NULL, '-1');
 
 
 
