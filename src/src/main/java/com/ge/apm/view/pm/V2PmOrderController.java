@@ -59,8 +59,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
-
-
     private List<V2_PmOrder> selectedPmWorkOrderList;
 
     private AssetInfo selectedAsset;
@@ -115,6 +113,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             WebUtil.addErrorMessage("fail to upload file");
         }
 
+    }
+    private V2_PmOrder v2PmOrder;
+    public void createPM(){
+        pmOrderService.createPMrequest(selectedAsset.getUid());
     }
 
     public void createServiceRequest() {
@@ -239,7 +241,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
          if (queryIndex == 2) { //待派工  Assign
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
-            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+           // searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
 
@@ -377,9 +379,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
             return;
         }
 
-        if (this.newServiceRequest == null) {
-            return;
-        }
 
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
@@ -700,4 +699,5 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void setApprovaler(String approvaler) {
         this.approvaler = approvaler;
     }
+
 }

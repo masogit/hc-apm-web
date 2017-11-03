@@ -17,6 +17,9 @@
                 <h:form id="pmOrderListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="true"/>
+
+                        <p:commandButton value="创建保养"  process="@this" update="datalist buttonSet :pmOrderDetailForm"  oncomplete="PF('createPMDialog').show()" />
+
                         <p:commandButton value="待派工"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/>
 
                         <p:commandButton value="待接单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}" rendered="true"/>
@@ -87,7 +90,6 @@
 
                         </p:column>
 
-
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="PmOrder_export"/>
@@ -100,6 +102,29 @@
 
             </div>
         </div>
+
+        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养" >
+
+            <h:form id="PmRequestCreateForm">
+                <p:fieldset legend="#{msg.Create}保养">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetName}*</label>
+                            <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
+                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM" oncomplete="PF('varSelectAssetDlgPM').show();"/>
+                        </h:panelGroup>
+
+                    <h:panelGroup >
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.createPM()}" validateClient="true" update="pmOrderListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                    </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+            </h:form>
+            <ui:include src="/portal/asset/selectAssetDialogPM.xhtml"/>
+        </p:dialog>
+
+
         <p:dialog id="closePmDialog" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="关单">
             <h:form id="closePmDialogForm" >
                 <h:panelGroup id="display3" >
@@ -184,6 +209,7 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+
         </p:dialog>
 
 

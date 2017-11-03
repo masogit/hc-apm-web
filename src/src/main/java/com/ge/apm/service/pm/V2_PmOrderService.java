@@ -16,8 +16,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
@@ -33,7 +36,8 @@ import java.util.stream.Collectors;
  */
 @Component
 public class V2_PmOrderService {
-
+    @Autowired
+    protected RestTemplate template;
     @Autowired
     private BiomedGroupRepository groupDao;
 
@@ -103,6 +107,10 @@ formData.setAssignee(approvaler);
         }
     }
 
+    public void createPMrequest(String assetUID){
+        String token = UserContextService.getAccessToken();
+        srApi.createPmRequest(token,assetUID);
+    }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
@@ -267,6 +275,17 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
 
 }
 
+class PmOrderCreateForm{
+    String assetUid;
+
+    public String getAssetUid() {
+        return assetUid;
+    }
+
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
+}
 
 class PmOrderActionForm{
 String actionType;

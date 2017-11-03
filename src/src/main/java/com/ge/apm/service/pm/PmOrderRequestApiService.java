@@ -10,6 +10,7 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -33,8 +34,8 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     private String url_serviceRequestCreate;*/
     @Value("#{urlProperties.url_PmOrderAction}")
     private String url_pmOrderAction;
-    /*@Value("#{urlProperties.url_createPmOrder}")
-    private String url_createPmOrder;*/
+    @Value("#{urlProperties.url_pmRequestCreate}")
+    private String url_pmRequestCreate;
 
 
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
@@ -51,6 +52,21 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         }
     }
 
+
+    public Map<String, Object> createPmRequest(String token, String assetUid){
+        PmOrderCreateForm formData = new PmOrderCreateForm();
+        HttpEntity<String> requestEntity = new HttpEntity<>(assetUid, createHttpHeaders(token));
+       /* ResponseEntity<LinkedHashMap> response = template.exchange(url_pmRequestCreate,HttpMethod.POST,requestEntity,LinkedHashMap.class);*/
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_pmRequestCreate, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap.get("data");
+        } else {
+            return null;
+        }
+
+
+    }
 
 //http://apm-dev.hcdigital.com.cn:8090/hcapmworkflowservice/api/apm/pmOrders/ff8080815f525e84015f5764de610000/action?type=accept
 }
