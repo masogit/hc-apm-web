@@ -16,6 +16,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.stream.Collectors;
@@ -105,11 +106,15 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     private Boolean checkName() {
-        List<SearchFilter> nameSearchFilterList = new ArrayList();
-        nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
-        nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
-        List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
-        return (null == res || res.isEmpty());
+        if (Strings.isNullOrEmpty(selected.getId())) {
+            List<SearchFilter> nameSearchFilterList = new ArrayList();
+            nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
+            nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
+            List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
+            return (null == res || res.isEmpty());
+        } else {
+            return true;
+        }
     }
 
     @Override
@@ -156,7 +161,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             };
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
             selected = dao.findById(selected.getId());
-        }else {
+        } else {
             WebUtil.addErrorMessage("到货单名称/编号 已经存在");
         }
     }
