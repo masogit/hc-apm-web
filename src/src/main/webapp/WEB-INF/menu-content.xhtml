@@ -8,9 +8,7 @@
         <pu:menu widgetVar="me">
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;"
                         outcome="#{userContextService.userDefaultHomePage}"/>
-            <p:submenu id="um100" label="保养流程" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
-                <p:menuitem id="um101" value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
-            </p:submenu>
+
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
                 <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>
                 <p:menuitem id="um04" value="#{msg.AssetInventory}" rendered="false" outcome="/portal/asset/AssetInventory.xhtml" />
@@ -60,6 +58,8 @@
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o"
                        rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}">
+
+                <p:menuitem id="um306" value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
                 <p:menuitem id="um25" value="#{msg.Inspection}" outcome="/portal/insp/InspOrderList.xhtml"/>
                 <p:menuitem id="um26" value="#{msg.PmRecord}" outcome="/portal/pm/List"/>
                 <!--<p:menuitem id="um261" value="#{msg.PreventiveMaintaincePlanning}" url="/portal/analysis/reports.xhtml#/MaintenanceStats"/>-->
