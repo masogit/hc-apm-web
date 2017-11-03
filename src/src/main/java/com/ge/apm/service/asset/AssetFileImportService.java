@@ -285,28 +285,34 @@ public class AssetFileImportService {
             return (Date) object;
         }
         if (object instanceof String) {
-            object = ((String) object).trim();
-            Date res = TimeUtils.getDateFromStr((String) object, "MM/dd/yyyy");
-            if (res != null && res instanceof Date) {
-                return res;
+            String strDate = (String) object;
+            strDate = strDate.trim();
+            Date res = null;
+            if (strDate.length() == 10) {
+                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
+                if (res != null && res instanceof Date) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
+                if (res != null && res instanceof Date) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
+                if (res != null && res instanceof Date) {
+                    return res;
+                }
+            } else if (strDate.length() == 8) {
+                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
+                if (res != null && res instanceof Date) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
+                if (res != null && res instanceof Date) {
+                    return res;
+                }
             }
-            res = TimeUtils.getDateFromStr((String) object, "MM/dd/yy");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            res = TimeUtils.getDateFromStr((String) object, "dd/MM/yy");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            res = TimeUtils.getDateFromStr((String) object, "dd/MM/yyyy");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            res = TimeUtils.getDateFromStr((String) object, "yyyy-MM-dd");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            throw new Exception(filedSrcName + "[" + (String) object + "]无效的日期格式");
+
+            throw new Exception(filedSrcName + "[" + strDate + "]无效的日期格式");
         } else {
             throw new Exception(filedSrcName + "无效的日期格式");
         }
