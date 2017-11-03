@@ -93,7 +93,7 @@ public class ExcelDocument {
         for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
             Cell cell = dataRow.getCell(cellIndex);
             if (cell == null) {
-                break;
+                continue;
             }
             Object v = getCellValue(cell);
             String rawValue = getRawValue(cell);
