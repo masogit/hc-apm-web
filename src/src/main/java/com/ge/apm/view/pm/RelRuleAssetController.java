@@ -67,6 +67,14 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
     }
     
+    public String getOrgName(String uid){
+    	OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
+    	if(orgInfo == null){
+    		return null;
+    	}
+    	return orgInfo.getName();		
+    }
+    
     public List<AssetInfo> getAssetList() {
         List<SearchFilter> assetFilters = getFilter(user.getSiteUID());
         		// new ArrayList<>();

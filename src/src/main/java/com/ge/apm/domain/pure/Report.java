@@ -18,4 +18,15 @@ public class Report {
 	public void setGroups(List<Object> groups) {
 		this.groups = groups;
 	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Report [title=");
+		builder.append(title);
+		builder.append(", groups=");
+		builder.append(groups);
+		builder.append("]");
+		return builder.toString();
+	}
+	
 }
