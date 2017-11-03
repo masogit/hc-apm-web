@@ -8,8 +8,8 @@
         <pu:menu widgetVar="me">
             <p:menuitem style=" font-size: 30" id="um01" value="#{msg.HomePage}" icon="&#xE871;"
                         outcome="#{userContextService.userDefaultHomePage}"/>
-            <p:submenu id="um100" label="pm流程" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
-                <p:menuitem id="um101" value="Pm流程" outcome="/portal/pm/pmOrderList.xhtml"/>
+            <p:submenu id="um100" label="保养流程" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
+                <p:menuitem id="um101" value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
             </p:submenu>
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
                 <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>
