@@ -2,8 +2,10 @@ package com.ge.apm.view.pm;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -33,7 +35,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 @ViewScoped
 public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private static final long serialVersionUID = -1L;
-	private  String safeReport = "";
+	private String safeReport = "";
 	private String performanceReport = "";
 	private PmOrderRuleRepository dao = null;
 	private UserAccount user;
@@ -43,7 +45,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private List<Integer> ids = new ArrayList<Integer>();
 	private String filterPmRuleStatus;
 	
-
 	@Override
 	protected void init() {
 		filterBySite = false;
@@ -52,6 +53,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
 		pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
+		safeReport = getDefalutReport();
+		performanceReport = safeReport;
 	}
 
 	@Override
@@ -270,7 +273,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		this.performanceReport = performanceReport;
 	}
 	
+	public String getDefalutReport(){
+		return dao.getDefalutReport(1);
+	}
 	
+
 	
 
 	/*

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog"  height="600" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
+            <h:form id="PmOrderRuleApproveForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
+                        <h:panelGroup >
+                            <label class ="label">#{msg.name}</label>
+                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.assetGroup}</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.manufacture}</label>
+                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="true" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                             <label class ="label">#{msg.functionType}</label>
+                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="true" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.period}</label>
+                            <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    		<label>#{msg.safetyReport}</label>
+                            <p:inputTextarea id="safetyReport" cols="100" value="#{pmOrderRuleController.selected.safetyReport}" 
+                            placeholder="#{pmOrderRuleController.safeReport}" />
+                    </p:panelGrid>
+                    <p:panelGrid id="grid4"  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    		<label>#{msg.performanceReport}</label>
+                            <p:inputTextarea id="performanceReport" cols="100"  value="#{pmOrderRuleController.selected.performanceReport}" 
+                             placeholder="#{pmOrderRuleController.performanceReport}" />
+                    </p:panelGrid>
+                     <br/>
+                      <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+		                  <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="responsive" columns="1" rendered="#{pmOrderRuleController.getSelectedIds() != null}">
+		                  	<f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i" itemLabel="#{i.name}(#{i.period}月)" itemValue="#{i.id}" />
+					     </p:selectManyCheckbox>	
+                     </p:panelGrid>
+					<br/>
+                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()"/>
+                      &nbsp;&nbsp;
+                      <!-- and pmOrderRuleController.selected.id != null -->
+                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="审核" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" 
+                    icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');" rendered="#{userContextService.hasRole('AssetHead') and pmOrderRuleController.selected.status != 1}"/> 
+                </h:panelGroup>
+            </h:form>
+            
+        </p:dialog>
+
+    </ui:composition>
+</html>
