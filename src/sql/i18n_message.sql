@@ -1264,3 +1264,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'parentAsset', '主设备', 'Parent Asset', NULL, '-1');
 
 --- above already in db
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'needFilterFurthur', '返回记录过多，请增加过滤条件', '', NULL, '-1');
