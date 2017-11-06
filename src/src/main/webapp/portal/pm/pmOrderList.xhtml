@@ -24,12 +24,14 @@
 
                         <p:commandButton value="待接单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}" rendered="true"/>
                         <!--<p:commandButton value="待验收"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(5)}" disabled="#{v2PmOrderController.queryIndex==5}" rendered="true"/>-->
-                        <p:commandButton value="待关单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(6)}" disabled="#{v2PmOrderController.queryIndex==6}" rendered="true"/>
+                        <p:commandButton value="保养中"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}" rendered="true"/>
+
 
                         <p:commandButton value="待审核"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="true"/>
                         <p:commandButton value="保养中"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}" rendered="true"/>
 
                         <p:commandButton value="已关单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}" rendered="true"/>
+
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{v2PmOrderController.selected}"
