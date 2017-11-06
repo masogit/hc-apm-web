@@ -117,7 +117,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_PmOrder v2PmOrder;
     public void createPM(){
         pmOrderService.createPMrequest(selectedAsset.getUid());
+        selectedAsset=null;
+       // cancel();
     }
+    public void createPMRequest(){
+        selectedAsset=null;
+    }
+
+
 
     public void createServiceRequest() {
         cancel();
@@ -332,18 +339,8 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
 
     public void cancel() {
-        selected = null;
-        newServiceRequest = null;
-        esTime = null;
-        comments = null;
-        selectedPmOrder = null;
-        failReason = null;
-        rating = null;
-        confirmedDownTime = null;
-        selectedPmWorkOrderList = null;
-        equipmentTaker = null;
-        takeTime = null;
-        picList = null;
+        selectedAsset = null;
+
     }
 
 //    public V2_ServiceRequest getServiceRequest(String srId) {
