@@ -445,6 +445,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }else{
             if (!qrCode.equals(selected.getQrCode())) {
                 if (!updateQrCode()) {
+                    qrCode = "";
                     return "";
                 }
             }
