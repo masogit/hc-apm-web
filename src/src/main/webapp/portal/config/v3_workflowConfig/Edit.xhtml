@@ -13,13 +13,15 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                       <h:panelGroup >
-                       		<label class="label">集团</label>
+                      
+                       	 <label class="label">集团</label>
                                <p:selectOneMenu id="group" value="#{v2_WorkflowConfigController.selected.institutionUID}" >
                              	<p:ajax update="display" listener="#{v2_WorkflowConfigController.initDispatchUserList()}"/>
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{v2_WorkflowConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>
+                        
                         <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.institutionUID != null}">
                        		<label class="label">医院</label>
                                <p:selectOneMenu id="hospital" value="#{v2_WorkflowConfigController.selected.hospitalUID}" >
@@ -76,6 +78,10 @@
                         <h:panelGroup>
                             <label class="label">#{msg.maxMessageCount}</label>
                             <p:inputText id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" />
+                        </h:panelGroup> 
+                        <h:panelGroup>
+                            <label class="label">#{msg.pmReminderTime}</label>
+                            <p:inputText id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" />
                         </h:panelGroup> 
                         <h:panelGroup >
                             <label class = "label">工单完工不需要验收?</label>
