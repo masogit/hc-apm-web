@@ -1278,7 +1278,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'createrepair', '新增报修', 'create repair', NULL, '-1');
 
 --- above already in db
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'needFilterFurthur', '返回记录过多，请增加过滤条件', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'medicalInstrumentClassification', '医疗器械分类', 'Medical Instrument Classification', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'medicalInstrumentSubclassification', '医疗器械子分类', 'Medical Instrument Sub Classification', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'parentAsset', '主设备', 'Parent Asset', NULL, '-1');
@@ -1302,6 +1301,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceName', '设备标准名称', 'Device Name', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'makerShortName', '品牌/制造商简称', 'Maker Short Name', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'needFilterFurthur', '返回记录过多，请增加过滤条件', '', NULL, '-1');
 
 
 
