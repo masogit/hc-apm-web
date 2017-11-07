@@ -90,7 +90,6 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     @Override
     public void onBeforeNewObject(ArrivalList object) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        object.setCreateDate(new Date());
         object.setCreatorUID(user.getUid());
         object.setStatus(1);
 
@@ -153,6 +152,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public void submitArrivalList() {
         if (checkName()) {
+            onBeforeSave(selected);
             dao.save(selected);
             if (aiService.submitArrivalList(selected.getId())) {
                 WebUtil.addSuccessMessage("到货清单已经提交");

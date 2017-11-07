@@ -110,10 +110,10 @@ public class ArrivalList implements Serializable{
     @Column(name = "creator_uid", columnDefinition = "CHAR(32)")
     private String creatorUID;
     
-    //填表日期
-    @Column(name = "create_date")
+    //到货日期
+    @Column(name = "arrival_date")
     @Temporal(TemporalType.DATE)
-    private Date createDate;
+    private Date arrivalDate;
     
     // 1:new 2:partial finished 3.finished
     @Basic(optional = false)
@@ -261,12 +261,12 @@ public class ArrivalList implements Serializable{
         this.creatorUID = creatorUID;
     }
 
-    public Date getCreateDate() {
-        return createDate;
+    public Date getArrivalDate() {
+        return arrivalDate;
     }
 
-    public void setCreateDate(Date createDate) {
-        this.createDate = createDate;
+    public void setArrivalDate(Date arrivalDate) {
+        this.arrivalDate = arrivalDate;
     }
 
     public int getStatus() {
