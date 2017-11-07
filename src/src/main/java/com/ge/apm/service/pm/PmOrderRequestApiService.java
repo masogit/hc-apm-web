@@ -19,6 +19,8 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,8 +32,8 @@ import java.util.Map;
 @Component
 public class PmOrderRequestApiService extends MicroServiceInvoker {
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
-  /*  @Value("#{urlProperties.url_serviceRequestCreate}")
-    private String url_serviceRequestCreate;*/
+    /*  @Value("#{urlProperties.url_serviceRequestCreate}")
+	  private String url_serviceRequestCreate;*/
     @Value("#{urlProperties.url_PmOrderAction}")
     private String url_pmOrderAction;
     @Value("#{urlProperties.url_pmRequestCreate}")
@@ -45,18 +47,18 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-           logger.info("Invoke PmOrderAction "+actionName+" has finished "+responseMap.get("data"));
+            logger.info("Invoke PmOrderAction "+actionName+" has finished "+responseMap.get("data"));
             return (String) responseMap.get("bizStatusCode");
         } else {
             return null;
         }
     }
 
-
-    public Map<String, Object> createPmRequest(String token, String assetUid){
-        PmOrderCreateForm formData = new PmOrderCreateForm();
-        HttpEntity<String> requestEntity = new HttpEntity<>(assetUid, createHttpHeaders(token));
-       /* ResponseEntity<LinkedHashMap> response = template.exchange(url_pmRequestCreate,HttpMethod.POST,requestEntity,LinkedHashMap.class);*/
+    public Map<String, Object> createPmRequest(String token, String assetUid,Date planTime){
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setAssetUid(assetUid);
+        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+        HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_pmRequestCreate, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();

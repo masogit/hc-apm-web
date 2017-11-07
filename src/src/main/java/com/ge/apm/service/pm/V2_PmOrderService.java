@@ -107,9 +107,9 @@ formData.setAssignee(approvaler);
         }
     }
 
-    public void createPMrequest(String assetUID){
+    public void createPMrequest(String assetUID,Date planTime){
         String token = UserContextService.getAccessToken();
-        srApi.createPmRequest(token,assetUID);
+        srApi.createPmRequest(token,assetUID,planTime);
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
@@ -155,11 +155,12 @@ formData.setAssignee(approvaler);
         }
     }
 
-    public void dispatchWorkOrder(V2_PmOrder selectedPmOrder) {
+    public void dispatchWorkOrder(V2_PmOrder selectedPmOrder,Date planTime) {
         V2_PmOrder tmpwo=woDao.findById(selectedPmOrder.getId());
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("assign");
+        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         formData.setAssignee(selectedPmOrder.getCurrentPersonId());
         formData.setStepId(selectedPmOrder.getCurrentStepId());
       //   formData.setIntExtType(selectedPmOrder.getIntExtType().toString());
@@ -213,12 +214,13 @@ formData.setAssignee(approvaler);
         return srDao.findByAssetId(id);
     }
 
-    public void acceptWorkOrder(V2_PmOrder selectedPmOrder, Date estimatedCloseTime) {
+    public void acceptWorkOrder(V2_PmOrder selectedPmOrder, Date estimatedCloseTime,Date planTime) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
 
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("accept");
+        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
 formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
         String res = srApi.invokePmOrderAction(token,formData,"accept",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
@@ -275,7 +277,7 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
 
 }
 
-class PmOrderCreateForm{
+/*class PmOrderCreateForm{
     String assetUid;
 
     public String getAssetUid() {
@@ -285,25 +287,22 @@ class PmOrderCreateForm{
     public void setAssetUid(String assetUid) {
         this.assetUid = assetUid;
     }
-}
+}*/
 
 class PmOrderActionForm{
-String actionType;
-String assignee;
+    String assetUid;
+    String actionType;
+    String assignee;
     List<V2_BlobObject> attachments;
-
     String desc;
-String endTime;
-
-Double manHours;
-String startTime;
-String stepId;
-String qualityChecking;
+    String endTime;
+    Double manHours;
+    String startTime;
+    String stepId;
+    String qualityChecking;
     Object details;
     Object coworkers;
-
-
-
+    String planTime;
 //V2_WorkOrder_Coworker[] coworkes //optional
 
     public String getQualityChecking() {
@@ -341,7 +340,13 @@ String qualityChecking;
     }
 
 
+    public String getAssetUid() {
+        return assetUid;
+    }
 
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
 
     public String getDesc() {
         return desc;
@@ -399,6 +404,14 @@ String qualityChecking;
 
     public void setCoworkers(Object coworkers) {
         this.coworkers = coworkers;
+    }
+
+    public String getPlanTime() {
+        return planTime;
+    }
+
+    public void setPlanTime(String planTime) {
+        this.planTime = planTime;
     }
 }
 
