@@ -160,7 +160,7 @@
                                 <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.makerShortName}</label>
+                                <label class="label">品牌/制造商简称</label>
                                 <p:inputText id="makerShortName" value="#{assetInfoController.selected.makerShortName}"/>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -219,6 +219,7 @@
                                 <label class="label">#{msg.departNum}</label>
                                 <p:inputText id="departNum2" value="#{assetInfoController.selected.departNum}"/>
                             </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">#{msg.barcode}</label>
                                 <p:inputText id="barcode" value="#{assetInfoController.selected.barcode}"/>
@@ -249,7 +250,7 @@
                                 </p:selectOneMenu>-->
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">#{msg.medicalInstrumentClassification}</label>
+                                <label class="label">#{msg.functionGroup}</label>
                                 <p:selectOneMenu id="functionGroup" value="#{assetInfoController.selected.functionGroup}" style="width: 100%">
                                     <p:ajax  listener="#{assetInfoController.onFunctionGroupChange()}" update="assetCode68" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
