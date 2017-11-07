@@ -13,12 +13,14 @@ import com.ge.apm.service.asset.AssetOwnerService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
+import org.springframework.data.domain.Page;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -30,7 +32,7 @@ import webapp.framework.web.WebUtil;
 public class AssetOwnerSettingController {
 
     private DualListModel<AssetInfo> availableAssets;
-    private List<AssetInfo> sourceAssets;
+    private List<AssetInfo> sourceAssets = Collections.emptyList();
     private List<AssetInfo> targetAssets;
     private AssetCreateService acServie;
 
@@ -58,19 +60,28 @@ public class AssetOwnerSettingController {
         queryAsset.setHospitalId(currentUser.getHospitalId());
 
         targetAssets = new ArrayList();
-        getQueryAssetsList();
+
+        availableAssets = new DualListModel<>(Collections.emptyList(), targetAssets);
+        //not display data initially
+//        getQueryAssetsList();
 
     }
 
     public void getQueryAssetsList() {
-        sourceAssets = aoService.getAssetListEx(queryAsset);
+        Page page = aoService.getAssetListEx(queryAsset);
+        sourceAssets = page.getContent();
         targetAssets.forEach((item)->{
             if(sourceAssets.contains(item)){
                 sourceAssets.remove(item);
             }
         });
-        
+
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
+
+        boolean needFilterFurther = page.getTotalElements() > page.getSize();
+        if (needFilterFurther) {
+            WebUtil.addSuccessMessage(WebUtil.getMessage("needFilterFurthur"));
+        }
     }
 
     public void onAssetsTransfer(TransferEvent event) {

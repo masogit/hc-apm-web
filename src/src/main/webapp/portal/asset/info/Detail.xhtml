@@ -132,24 +132,24 @@
                 <div class="ui-g-12 ui-g-nopad">
                 <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
                     <h:panelGroup>
-                        <label class="label">设备标准名称</label>
-                        <p:inputText id="deviceName" value="#{assetInfoController.selected.deviceName}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
                         <label class="label">#{msg.parentAsset}</label>
                         <p:inputText id="parentAssetId" value="#{assetInfoController.getParentAssetName()}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.deviceName}</label>
+                        <p:inputText id="deviceName" value="#{assetInfoController.selected.deviceName}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.systemId}</label>
                         <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
-                        <label class="label">#{msg.departNum}</label>
-                        <p:inputText value="#{assetInfoController.selected.departNum}" readonly="true"/>
-                    </h:panelGroup>
-                    <h:panelGroup>
                         <label class="label">#{msg.financingNum}</label>
                         <p:inputText id="financingNum2" value="#{assetInfoController.selected.financingNum}" readonly="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">#{msg.departNum}</label>
+                        <p:inputText value="#{assetInfoController.selected.departNum}" readonly="true"/>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.barcode}</label>
