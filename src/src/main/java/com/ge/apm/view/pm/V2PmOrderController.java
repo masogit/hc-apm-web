@@ -47,6 +47,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     private Date startTime;
     private Date endTime;
+    private Date planTime;
 
     private UaaService uaaService;
     private UserContextService userContextService;
@@ -116,12 +117,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     private V2_PmOrder v2PmOrder;
     public void createPM(){
-        pmOrderService.createPMrequest(selectedAsset.getUid());
-        selectedAsset=null;
-       // cancel();
+        pmOrderService.createPMrequest(selectedAsset.getUid(),planTime);
+        cancel();
     }
     public void createPMRequest(){
-        selectedAsset=null;
+        cancel();
     }
 
 
@@ -197,7 +197,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }*/
     public void dispatchWorkOrder() {
-        pmOrderService.dispatchWorkOrder(selectedPmOrder);
+        Date planTime =selectedPmOrder.getPlanTime();
+        pmOrderService.dispatchWorkOrder(selectedPmOrder,planTime);
         cancel();
     }
     public List<UserAccount> getWorkerList() {
@@ -212,15 +213,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
-
-
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
         return dao;
     }
 
     public void acceptWorkOrder() {
-        pmOrderService.acceptWorkOrder(selectedPmOrder, esTime);
+        Date planTime =selectedPmOrder.getPlanTime();
+        pmOrderService.acceptWorkOrder(selectedPmOrder, esTime,planTime);
         cancel();
     }
 
@@ -272,9 +272,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         else if (queryIndex == 0) { //保养中
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
-            searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+         //   searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
+         else if (queryIndex == 7) { //已关单
+             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ,true ));
+         }
         this.selected = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
@@ -340,6 +344,8 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void cancel() {
         selectedAsset = null;
+        planTime=null;
+        selectedPmOrder=null;
 
     }
 
@@ -697,4 +703,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
         this.approvaler = approvaler;
     }
 
+    public Date getPlanTime() {
+        return planTime;
+    }
+
+    public void setPlanTime(Date planTime) {
+        this.planTime = planTime;
+    }
 }

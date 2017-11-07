@@ -139,6 +139,10 @@ public class UserContextService implements Serializable {
         return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
     }
 
+    public String getLoginUserUid() {
+        return Option.of(getLoginUser()).map(UserAccount::getUid).getOrElse("");
+    }
+
     public String getLoginUserName() {
         return Option.of(getLoginUser()).map(UserAccount::getLoginName).getOrElse("");
     }
