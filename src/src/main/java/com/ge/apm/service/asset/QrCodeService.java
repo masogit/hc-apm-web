@@ -228,7 +228,7 @@ public class QrCodeService {
                         item.setTextShowValue(item.getTextValue().concat(asset.getFinancingNum() == null ? "" : asset.getFinancingNum()));
                         break;
                     case "departNum":
-                        item.setTextShowValue(item.getTextValue().concat(asset.getDepartNum() == null ? "" : asset.getFinancingNum()));
+                        item.setTextShowValue(item.getTextValue().concat(asset.getDepartNum() == null ? "" : asset.getDepartNum()));
                         break;
                     case "modalityId":
                         item.setTextShowValue(item.getTextValue().concat(asset.getModalityId() == null ? "" : asset.getModalityId()));
