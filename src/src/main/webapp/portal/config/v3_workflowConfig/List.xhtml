@@ -57,6 +57,9 @@
                     <p:column headerText="#{msg.maxMessageCount}" sortBy="#{item.maxMessageCount}" filterBy="#{item.maxMessageCount}" filterMatchMode="EQ">
                         <h:outputText value="#{item.maxMessageCount}"/>
                     </p:column>
+                    <p:column headerText="#{msg.pmReminderTime}" sortBy="#{item.pmReminderTime}" filterBy="#{item.pmReminderTime}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.pmReminderTime}"/>
+                    </p:column>
                    
                     <p:column headerText="#{msg.autoAck}" sortBy="#{item.autoAck}" filterBy="#{item.autoAck}" filterMatchMode="EQ">
                         <f:facet name="filter">
