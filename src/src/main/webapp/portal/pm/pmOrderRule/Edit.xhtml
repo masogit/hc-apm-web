@@ -12,24 +12,23 @@
             <h:form id="PmOrderRuleEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
-                         <h:panelGroup >
+                        <h:panelGroup >
                             <label class ="label">#{msg.name}</label>
-                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}"  
-                             required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
                             <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                             </p:selectOneMenu>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="true" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                            <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="true" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
-                             <label class ="label">#{msg.functionType}</label>
-                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="true" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
+                            <label class ="label">#{msg.functionType}</label>
+                            <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="true" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}</label>
@@ -37,35 +36,59 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                    		<label class ="label">#{msg.safetyReport}</label>
-                            <p:inputTextarea id="safetyReport" cols="100" value="#{pmOrderRuleController.selected.safetyReport == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
-                           <!--  placeholder="#{pmOrderRuleController.safeReport}"  />-->
+                        <h:panelGroup >
+                            <label>#{msg.safetyReport}</label>
+                            <p:inputTextarea id="safetyReport" cols="100" value="#{pmOrderRuleController.selected.safetyReport}" 
+                                             placeholder="#{pmOrderRuleController.safeReport}" />
+                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                            <a href="HC-APM 动态表单设计说明.pdf" target="_Blank" title="download">帮助</a>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <p:panelGrid id="grid4"  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                    		<label class ="label">#{msg.performanceReport}</label>
-                            <p:inputTextarea id="performanceReport" cols="100"  value="#{pmOrderRuleController.selected.performanceReport == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}" /> 
-                            <!--  placeholder="#{pmOrderRuleController.performanceReport}"  /> -->
+                        <h:panelGroup >
+                            <label>#{msg.performanceReport}</label>
+                            <p:inputTextarea id="performanceReport" cols="100"  value="#{pmOrderRuleController.selected.performanceReport}" 
+                                             placeholder="#{pmOrderRuleController.performanceReport}" />
+                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                        <a href="HC-APM 动态表单设计说明.pdf" target="_Blank" title="download">帮助</a>
+                        </h:panelGroup>
                     </p:panelGrid>
-                     <br/>
-                      <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-		                  <p:selectManyCheckbox id="grid2"  value="#{pmOrderRuleController.ids}"  layout="responsive" columns="1" rendered="#{pmOrderRuleController.getSelectedIds() != null}">
-		                  	<f:selectItems value="#{pmOrderRuleController.getAllItems()}"  var="i"  itemLabel="#{i.name}(#{i.period}月)" itemValue="#{i.id}" />
-					     </p:selectManyCheckbox>	
-                     </p:panelGrid>
-					<br/>
-					
-                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" 
-                    update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check"
-                    rendered="#{userContextService.hasRole('AssetHead') or pmOrderRuleController.selected.status != 1}" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
+                    <br/>
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="responsive" columns="1" rendered="#{pmOrderRuleController.getSelectedIds() != null}">
+                            <f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i" itemLabel="#{i.name}(#{i.period}月)" itemValue="#{i.id}" />
+                        </p:selectManyCheckbox>	
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleEditDialog').hide()"/>
-                      &nbsp;&nbsp;
-                      <!-- and pmOrderRuleController.selected.id != null 
+                    &nbsp;&nbsp;
+                    <!-- and pmOrderRuleController.selected.id != null -->
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="审核" update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" 
-                    icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');" rendered="#{userContextService.hasRole('AssetHead') and pmOrderRuleController.selected.status != 1}"/> -->
+                                     icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');" rendered="#{userContextService.hasRole('AssetHead') and pmOrderRuleController.selected.status != 1}"/> 
                 </h:panelGroup>
+                <!--                <p:panel id="previewPanel">
+                                    <iframe src="/wx/form/preview/" />
+                
+                                </p:panel>-->
             </h:form>
-            
+            <script>
+                function preparePreview(index) {
+                    var $jasonText;
+                    if(index == '1'){
+                        $jasonText = $("#PmOrderRuleEditForm\\:safetyReport")[0];
+                    }else if(index == '2'){
+                        $jasonText = $("#PmOrderRuleEditForm\\:performanceReport")[0];
+                    }
+                    if ('localStorage' in window) {
+                        localStorage.setItem("hc-apm-form-preview", $jasonText.value || ''); // # for test/dev perpose
+                        localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
+                    }
+                  
+                }
+
+            </script>
         </p:dialog>
 
     </ui:composition>

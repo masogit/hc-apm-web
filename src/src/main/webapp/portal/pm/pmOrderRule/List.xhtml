@@ -65,7 +65,7 @@
                             <h:outputText value="#{fieldMsg.fieldValue('pmRuleStatus',item.status)}"/>
 	                 </p:column>
                     <f:facet name="{Toolbar}">
-                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditDlg" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                         <!-- <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareView}" update=":PmOrderRuleViewDlg" oncomplete="PF('PmOrderRuleViewDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/> -->
                         <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleEditDlg" oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
                         <p:commandButton id="approveButton" icon="ui-icon-check" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleApproveDlg" oncomplete="PF('PmOrderRuleApproveDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
@@ -83,6 +83,12 @@
             <ui:include src="View.xhtml"/>
             <ui:include src="Approve.xhtml"/>
 
+            <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="预览">
+            <h:form id="PmOrderPreviewForm" >
+                <iframe src="/wx/form/preview/"  width="100%"  height="100%"/>
+            </h:form>
+
+        </p:dialog>
             </div>
         </div>
         

@@ -250,6 +250,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		this.ids = ids;
 	}
 	
+        public void onPriview(){
+            
+        }
+        
 	@Override
 	@Transactional
 	public void delete(){
