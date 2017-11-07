@@ -35,15 +35,21 @@
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" >
                             <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(item.arrivalList.creatorUID).name}"/>
                         </p:column>
-                        <p:column headerText="#{msg.createDate}" sortBy="#{item.arrivalList.createDate}" >
-                            <h:outputText value="#{item.arrivalList.createDate}">
+                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalList.arrivalDate}" >
+                            <h:outputText value="#{item.arrivalList.arrivalDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.functionType}"/>
                         </p:column>
-                        <p:column width="90"  headerText="操作">
+                        <p:column width="90"  headerText="操作" filterBy="#{item.installStatus}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListItemStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
                             <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
                           <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                             </p:commandLink>

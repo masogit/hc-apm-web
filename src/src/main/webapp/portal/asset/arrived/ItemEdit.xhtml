@@ -78,8 +78,8 @@
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.arrivalList.creatorUID).name}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.createDate}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.createDate}" />
+                                <label class="label">#{msg.arrivalDate}</label>
+                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" />
                             </h:panelGroup>
 
                         </p:panelGrid>
@@ -253,15 +253,15 @@
                                 <label class="label">#{msg.purchaseDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.purchaseDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.arriveDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="arriveDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.arriveDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.installDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.factoryWarrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.factoryWarrantyDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />

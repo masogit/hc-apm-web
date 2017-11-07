@@ -78,8 +78,8 @@
                             <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.arrivalList.creatorUID).name}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.createDate}</label>
-                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.createDate}" />
+                            <label class="label">#{msg.arrivalDate}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.arrivalDate}" />
                         </h:panelGroup>
 
                     </p:panelGrid>
@@ -212,12 +212,12 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
-                        <h:panelGroup>
+<!--                        <h:panelGroup>
                             <label class="label">#{msg.arriveDate}</label>
                             <p:inputText  value="#{assetArrivedItemsController.selected.arriveDate}" readonly="true">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
 
                         <h:panelGroup>
                             <label class="label">#{msg.installDate}</label>

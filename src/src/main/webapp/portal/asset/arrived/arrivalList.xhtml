@@ -31,8 +31,8 @@
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}" filterBy="#{item.creatorUID}" filterMatchMode="LIKE">
                             <h:outputText value="#{assetArrivedListController.getUserAccountByUid(item.creatorUID).name}"/>
                         </p:column>
-                        <p:column headerText="#{msg.createDate}" sortBy="#{item.createDate}" >
-                            <h:outputText value="#{item.createDate}">
+                        <p:column headerText="#{msg.arrivalDate}" sortBy="#{item.arrivalDate}" >
+                            <h:outputText value="#{item.arrivalDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
