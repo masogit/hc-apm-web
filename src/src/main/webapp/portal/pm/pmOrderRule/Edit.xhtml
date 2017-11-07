@@ -13,33 +13,38 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
                         <h:panelGroup >
-                            <label class ="label">#{msg.name}</label>
-                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                            <label class ="label">#{msg.assetName}</label>
+                            <p:inputText id="assetName" value="#{pmOrderRuleController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
-                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                            <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="true" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                            <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.functionType}</label>
-                            <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="true" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
+                            <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="false" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
-                            <label class ="label">#{msg.period}</label>
+                            <label class ="label">#{msg.period}(月)</label>
                             <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.feedbackComment}</label>
+                            <p:inputText id="remark" value="#{pmOrderRuleController.selected.remark}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
                     </p:panelGrid>
+                    
                     <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup >
                             <label>#{msg.safetyReport}</label>
-                            <p:inputTextarea id="safetyReport" cols="100" value="#{pmOrderRuleController.selected.safetyReport}" 
-                                             placeholder="#{pmOrderRuleController.safeReport}" />
+                            <p:inputTextarea id="safetyReport" cols="100" value="#{pmOrderRuleController.selected.safetyReport == null ? safeReport : pmOrderRuleController.selected.safetyReport}" />
                             <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                             <a href="HC-APM 动态表单设计说明.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>
@@ -47,8 +52,8 @@
                     <p:panelGrid id="grid4"  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup >
                             <label>#{msg.performanceReport}</label>
-                            <p:inputTextarea id="performanceReport" cols="100"  value="#{pmOrderRuleController.selected.performanceReport}" 
-                                             placeholder="#{pmOrderRuleController.performanceReport}" />
+                            <p:inputTextarea id="performanceReport" cols="100"  
+                            value="#{pmOrderRuleController.selected.performanceReport == null ? performanceReport : pmOrderRuleController.selected.performanceReport}"   />
                             <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                         <a href="HC-APM 动态表单设计说明.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>

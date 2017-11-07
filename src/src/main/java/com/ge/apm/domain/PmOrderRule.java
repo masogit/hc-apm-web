@@ -63,8 +63,30 @@ public class PmOrderRule {
     
     @Column(name = "performance_report")
 	private String performanceReport;//性能报告
+    
+    @Column(name = "remark")
+    private String remark;//备注
+    
+    @Column(name = "asset_name")
+    private String assetName;//设备名称
+    
+    public String getRemark() {
+		return remark;
+	}
 
-    @PrePersist
+	public void setRemark(String remark) {
+		this.remark = remark;
+	}
+
+	public String getAssetName() {
+		return assetName;
+	}
+
+	public void setAssetName(String assetName) {
+		this.assetName = assetName;
+	}
+
+	@PrePersist
     public void initializeUid() {
         if(uid==null)
             uid = UUID.randomUUID().toString().replace("-", "");

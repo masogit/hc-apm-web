@@ -1,5 +1,6 @@
 package com.ge.apm.view.pm;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -64,7 +65,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Override
 	protected Page<PmOrderRule> loadData(PageRequest pageRequest) {
-//		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 		if(searchFilters == null){
 			searchFilters = new ArrayList<SearchFilter>();
 		}
@@ -72,7 +72,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		}
 		return dao.findBySearchFilter(searchFilters, pageRequest);
-		//return dao.findAll(pageRequest);
 	}
 	
 	/***
@@ -82,7 +81,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	public List<Integer> getSelectedIds(){
 		if(selected != null){
 			ids = pmOrderRuleCheckListRepository.findByRuleUID(selected.getUid());
-			//pmOrderRuleCheckListRepository.findItemIds(user.getTenantUID(),selected.getId());
 		}
 		return ids;
 	}
@@ -102,6 +100,20 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	@Override
 	@Transactional
 	public void onBeforeSave(PmOrderRule por) {
+		StringBuilder sb = new StringBuilder();
+		if(StringUtils.isNotEmpty(por.getAssetName())){
+			sb.append(por.getAssetName()+"|");
+		}
+		if(StringUtils.isNotEmpty(por.getManufacture())){
+			sb.append(por.getManufacture()+"|");
+		}
+		if(StringUtils.isNotEmpty(por.getFunctionType())){
+			sb.append(por.getFunctionType()+"|");
+		}
+		if(StringUtils.isNotEmpty(por.getRemark())){
+			sb.append(por.getRemark());
+		}
+		por.setName(sb.toString());
 		pmOrderRuleCheckListRepository.deleteExistsRecord(por.getUid());
 	}
 
@@ -165,7 +177,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 				}
 				JSON.parseObject(selected.getPerformanceReport(),Report.class);
 			}catch(Exception e){
-    			//RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 				WebUtil.addErrorMessage("性能检测报告JSON不合法！");
 				return;
 			}
@@ -281,8 +292,31 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		return dao.getDefalutReport(1);
 	}
 	
+    private Date varWarrantyDateTo = null;
+    private String warrantyFormatTime = null;
 
+    public String getWarrantyFormatTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        if (varWarrantyDateTo == null) {
+            return warrantyFormatTime;
+        } else {
+            return "~" + sdf.format(varWarrantyDateTo);
+        }
+    }
+
+	public Date getVarWarrantyDateTo() {
+		return varWarrantyDateTo;
+	}
+
+	public void setVarWarrantyDateTo(Date varWarrantyDateTo) {
+		this.varWarrantyDateTo = varWarrantyDateTo;
+	}
+
+	public void setWarrantyFormatTime(String warrantyFormatTime) {
+		this.warrantyFormatTime = warrantyFormatTime;
+	}
 	
+    
 
 	/*
 	 * @Override public void onBeforeNewObject(PmOrderRule object) { }
