@@ -2,6 +2,7 @@ package com.ge.apm.view.pm;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -19,6 +20,7 @@ import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.QueryAsset;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -58,7 +60,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
 	
     
     public void getAssetsListByTenantUid() {
-        sourceAssets = assetInfoRepository.findBySearchFilter(getFilter(user.getSiteUID()));//findByTenantUID(user.getTenantUID());
+        sourceAssets = new ArrayList<>();//assetInfoRepository.findBySearchFilter(getFilter(user.getSiteUID()));//findByTenantUID(user.getTenantUID());
         targetAssets.forEach((item)->{
             if(sourceAssets.contains(item)){
                 sourceAssets.remove(item);
@@ -154,10 +156,28 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
     }
     
     public List<PmOrderRule> getPmOrderRuleList(){
-    	return pmOrderRuleRepository.findByTenantUIDAndStatus(user.getTenantUID(),1);
+    	List<SearchFilter> assetFilters = new ArrayList<>();//getFilter(user.getSiteUID());
+		assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+		if(null != queryAsset.getFunctionType()){
+			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+		}
+		if (null != queryAsset.getName()) {
+		    assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
+		}
+		if (null != queryAsset.getManufacture()) {
+		    assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+		}
+		if (null != queryAsset.getAssetGroup()) {
+		    assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+		}
+		return pmOrderRuleRepository.findBySearchFilter(assetFilters);
+//    	return pmOrderRuleRepository.findByTenantUIDAndStatus(user.getTenantUID(),1);
     }
     
-
+    public String getStrDate(Date lastPmDate){
+    	return TimeUtils.getStrDate(lastPmDate, "yyyy-MM-dd hh:MM:ss");
+    }
+    
 	public String getPmOrderRuleUID() {
 		return pmOrderRuleUID;
 	}
