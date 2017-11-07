@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.TreeNode;
@@ -160,8 +161,9 @@ public class AssetInstallationController {
         itemDao.save(arrivalListItem);
     }
     public void updateItem() {
-        
-        if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+        if(Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())){
+            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
+        }else if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             saveOrUpdateItem(arrivalListItem);
             WebUtil.addSuccessMessage("修改成功");
         } else {
