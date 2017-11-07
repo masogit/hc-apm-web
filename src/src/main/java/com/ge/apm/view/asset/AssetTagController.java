@@ -103,7 +103,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         }
 
         this.getQueryBiomedGroupList();
-        this.getQueryAssetsList();
+        this.getQueryAssetsList(false);
 
         initOrgTree();
 
@@ -214,13 +214,18 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         }
     }
 
-    public void getQueryAssetsList() {
-        sourceAssets = assetTagService.getAssetList(queryAsset);
-        targetAssets.forEach((item)->{
-            if(sourceAssets.contains(item)){
-                sourceAssets.remove(item);
-            }
-        });
+    public void getQueryAssetsList(boolean isChoose) {
+        if(isChoose){
+            sourceAssets = assetTagService.getAssetList(queryAsset);
+            targetAssets.forEach((item)->{
+                if(sourceAssets.contains(item)){
+                    sourceAssets.remove(item);
+                }
+            });
+        }else{
+            sourceAssets = new ArrayList<AssetInfo>();
+        }
+
 
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
     }
@@ -262,7 +267,9 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         this.getQueryBiomedGroupList();
 
         targetAssets = assetTagService.getTargetAssets(this.getSelected());
-        this.getQueryAssetsList();
+        this.getQueryAssetsList(false);
+
+        selectedOrg = null;
     }
 
     @Override
@@ -279,7 +286,9 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         this.getQueryBiomedGroupList();
 
         targetAssets = assetTagService.getTargetAssets(this.getSelected());
-        this.getQueryAssetsList();
+        this.getQueryAssetsList(false);
+
+        selectedOrg = null;
     }
 
     public void delete() {
@@ -313,9 +322,9 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
                 queryAsset.setSiteUID(selectedOrg.getSiteUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getSiteUID(), 4);
             }
-        }
 
-        this.getQueryAssetsList();
+            this.getQueryAssetsList(true);
+        }
 
     }
 
