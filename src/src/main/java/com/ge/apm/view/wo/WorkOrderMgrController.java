@@ -400,9 +400,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveServiceRequest() {
-        selectedAsset.setStatus(currentStatus);
-        woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-        cancel();
+        if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+        } else {
+            selectedAsset.setStatus(currentStatus);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            cancel();
+        }
     }
 
     @Override
