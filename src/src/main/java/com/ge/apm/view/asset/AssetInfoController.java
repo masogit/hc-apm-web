@@ -336,6 +336,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             object.setInstitutionUID(org.getInstitutionUID());
             object.setSiteUID(org.getSiteUID());
             object.setClinicalDeptUID(org.getUid());
+        } else {
+            //clear uid and its name
+            object.setClinicalDeptUID(null);
+            object.setClinicalDeptName(null);
         }
         DateTime temp;
         if (null != object.getManufactDate()) {
