@@ -1058,7 +1058,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root", null, null);
         TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        rootNode.getChildren().add(treeNode);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
         rootNode.setExpanded(true);
 
     }
