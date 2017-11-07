@@ -12,6 +12,9 @@ import com.ge.apm.domain.UserAccount;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -50,7 +53,7 @@ public class AssetOwnerService {
         return assetDao.findBySearchFilter(OrgInfoFilters);
     }
 
-    public List<AssetInfo> getAssetListEx(AssetInfo queryAsset) {
+    public Page getAssetListEx(AssetInfo queryAsset) {
 
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
@@ -71,7 +74,10 @@ public class AssetOwnerService {
             OrgInfoFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, queryAsset.getAssetOwnerId3()));
         }
 
-        return assetDao.findBySearchFilter(OrgInfoFilters);
+        //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
+        Pageable pageable = new PageRequest(0, 5000);
+        Page page = assetDao.findBySearchFilter(OrgInfoFilters, pageable);
+        return page;
     }
 
     public UserAccount getOwnerAccount(Integer userId) {

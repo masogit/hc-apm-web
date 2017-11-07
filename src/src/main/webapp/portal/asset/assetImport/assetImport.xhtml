@@ -78,13 +78,6 @@
                                 </h:panelGrid>
                                 
                             </h:panelGroup>
-                            <h:panelGroup>
-                                <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
-
-                                    <h:outputText value="是否自动生成资产编号" />
-                                    <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateFinancingNum}" onLabel="是" offLabel="否" disabled="#{assetFileImportController.isImported}"/>
-                                </h:panelGrid>
-                            </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
                             <p:dataTable  value="#{assetFileImportController.importOrgMap.values()}" var="item" >
