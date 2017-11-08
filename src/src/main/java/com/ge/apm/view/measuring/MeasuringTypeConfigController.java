@@ -99,6 +99,12 @@ public class MeasuringTypeConfigController extends GenericCRUDUUIDController<Mea
         this.measuringItemCategory = measuringItemCategory;
     }
 
+    @Override
+    public void save() {
+        super.save();
+        this.selected=null;
+    }
+
     public String getMeasureGrade() {
         return measureGrade;
     }
