@@ -49,5 +49,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
 
-    
+    @Query("select distinct a.name from AssetInfo a where a.tenantUID=?1 and a.name like concat(?2,'%') ")
+    public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
 }

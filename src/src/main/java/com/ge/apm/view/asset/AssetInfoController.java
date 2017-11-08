@@ -40,6 +40,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.primefaces.context.RequestContext;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -1086,5 +1087,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectedSiteUID(String selectedSiteUID) {
         this.selectedSiteUID = selectedSiteUID;
+    }
+
+    public List<String> completeAssetName(String prefix) {
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        List<String> names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
+        return names;
+
     }
 }
