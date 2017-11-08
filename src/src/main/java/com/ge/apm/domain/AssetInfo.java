@@ -295,7 +295,7 @@ public class AssetInfo implements Serializable {
 
     //医疗器械子分类
     @Column(name = "asset_code68")
-    private String assetCode68;
+    private Integer assetCode68;
     
     @Column(name = "comments")
     @Size(min = 0, max = 256)
@@ -1130,11 +1130,11 @@ public class AssetInfo implements Serializable {
         this.inventoryTime = inventoryTime;
     }
 
-    public String getAssetCode68() {
+    public Integer getAssetCode68() {
         return assetCode68;
     }
 
-    public void setAssetCode68(String assetCode68) {
+    public void setAssetCode68(Integer assetCode68) {
         this.assetCode68 = assetCode68;
     }
 
