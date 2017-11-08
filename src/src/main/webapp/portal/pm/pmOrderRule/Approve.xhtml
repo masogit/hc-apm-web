@@ -12,9 +12,13 @@
             <h:form id="PmOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
-                        <h:panelGroup >
+<!--                         <h:panelGroup >
                             <label class ="label">#{msg.name}</label>
                             <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                        </h:panelGroup> -->
+                        <h:panelGroup >
+                            <label class ="label">#{msg.assetName} *</label>
+                            <p:inputText id="assetName" value="#{pmOrderRuleController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
@@ -52,7 +56,9 @@
 					     </p:selectManyCheckbox>	
                      </p:panelGrid>
 					<br/>
-                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" 
+                    update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
+                    oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()"/>
                       &nbsp;&nbsp;

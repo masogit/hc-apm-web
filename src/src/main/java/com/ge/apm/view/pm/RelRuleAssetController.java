@@ -158,6 +158,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
     public List<PmOrderRule> getPmOrderRuleList(){
     	List<SearchFilter> assetFilters = new ArrayList<>();//getFilter(user.getSiteUID());
 		assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+		assetFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
 		if(null != queryAsset.getFunctionType()){
 			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
 		}
