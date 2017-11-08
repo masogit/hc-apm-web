@@ -382,6 +382,10 @@ public class AssetInfo implements Serializable {
     @Column(name = "make_short_name")
     private String makerShortName;
 
+    @Column(name = "next_metering_date")
+    @Temporal(TemporalType.DATE)
+    private Date nextMeteringDate;//下次计量日期
+
 //    public Integer getAssetCategory() {
 //        return assetCategory;
 //    }
@@ -1165,6 +1169,22 @@ public class AssetInfo implements Serializable {
 
     public void setMakerShortName(String makerShortName) {
         this.makerShortName = makerShortName;
+    }
+
+    public Integer getMeteringCycle() {
+        return meteringCycle;
+    }
+
+    public void setMeteringCycle(Integer meteringCycle) {
+        this.meteringCycle = meteringCycle;
+    }
+
+    public Date getNextMeteringDate() {
+        return nextMeteringDate;
+    }
+
+    public void setNextMeteringDate(Date nextMeteringDate) {
+        this.nextMeteringDate = nextMeteringDate;
     }
 
     @Override

@@ -52,5 +52,5 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
 	public List<AssetInfo> findByTenantUID(String tenantUID);
 
-    
+    public AssetInfo findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
 }
