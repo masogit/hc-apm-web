@@ -245,6 +245,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        removeFilterOnField("assetInfo.hosputalUID");
 //        removeFilterOnField("assetInfo.tenantUID");
         if (queryIndex == -1) {
+
             return dao.findBySearchFilter(searchFilters,pageRequest);
 
         }
@@ -267,9 +268,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 
-			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
-			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
-			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+
         } else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
@@ -293,6 +293,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.selected = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
+
+    public void onSelectPmOrder(){}
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         List<V2_WorkOrder_Detail> list = pmOrderService.getWorkOrderDetails(woId);
@@ -332,13 +334,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         }
     }
 
-   /* private List<Integer> getTagGroupAssets() {
-        if (tagGroupAssets == null) {
-           // tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
-        }
-        return tagGroupAssets;
-    }
-*/
+
 
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
@@ -372,7 +368,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
 
 
-    public void repairWorkOrder() {
+    public void repairPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -381,6 +377,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
         cancel();
     }
 
+    public void stagingPmOrder(){
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> item.setCreatedDate(null));
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,startTime,endTime);
+    }
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
