@@ -633,7 +633,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(ucService.getWorkerList(selected.getId()));
+        List<UserAccount> ownerList = ucService.getWorkerList(selected.getId());
+        if (null != ownerList) {
+            accountList.addAll(ownerList);
+        }
         return accountList;
     }
 
