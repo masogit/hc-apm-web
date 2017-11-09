@@ -158,20 +158,18 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="discardButton" class="btn btn-sm btn-gray" title="报废" actionListener="#{assetInfoController.discard(assetInfoController.selected)}" update=":searchForm :growl" />
                             <p:commandButton id="readyForDiscardButton" class="btn btn-sm btn-gray" title="待报废" actionListener="#{assetInfoController.readyForDiscard(assetInfoController.selected)}" />
-
-                            <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
-                            <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  actionListener="#{assetInfoController.getViewPage('Create','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
-
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="AssetInfo_export"/>
-                            </p:commandButton>
-                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl"
-                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.zipFile}" />
-                            </p:commandButton>
                         </f:facet>
                     </p:dataTable>
-                    <!--<p:remoteCommand name="rc" update="datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton" immediate="true"/>-->
+                </h:form>
+                <h:form enctype="multipart/form-data">
+                    <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
+                                  dragDropSupport="false"
+                                  fileLimitMessage="一次最多上传3个文件"
+                                  invalidFileMessage="只支持xls或xlsx格式的文件"
+                                  invalidSizeMessage="文件大小不得超过5M"
+                                  update="messages" sizeLimit="5242880" fileLimit="3" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                  label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                    <p:growl id="messages" showDetail="true"/>
                 </h:form>
             </div>
         </div>

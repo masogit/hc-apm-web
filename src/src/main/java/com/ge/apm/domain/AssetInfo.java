@@ -3,25 +3,14 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 /**
  *
@@ -329,8 +318,8 @@ public class AssetInfo implements Serializable {
     private String siteUID;
     
     //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
-//    @Column(name = "asset_category")
-//    private Integer assetCategory;
+    @Column(name = "asset_category")
+    private Integer assetCategory;
 
     //用途[1:诊断类,2:治疗类,3:辅助类]
     @Column(name = "asset_usage")
@@ -1165,6 +1154,14 @@ public class AssetInfo implements Serializable {
 
     public void setMakerShortName(String makerShortName) {
         this.makerShortName = makerShortName;
+    }
+
+    public Integer getAssetCategory() {
+        return assetCategory;
+    }
+
+    public void setAssetCategory(Integer assetCategory) {
+        this.assetCategory = assetCategory;
     }
 
     @Override
