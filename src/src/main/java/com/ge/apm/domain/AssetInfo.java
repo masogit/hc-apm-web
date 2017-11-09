@@ -11,6 +11,21 @@ import java.io.Serializable;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 /**
  *
@@ -370,6 +385,10 @@ public class AssetInfo implements Serializable {
     @Size(max = 64)
     @Column(name = "make_short_name")
     private String makerShortName;
+
+    @Column(name = "next_metering_date")
+    @Temporal(TemporalType.DATE)
+    private Date nextMeteringDate;//下次计量日期
 
 //    public Integer getAssetCategory() {
 //        return assetCategory;
@@ -1162,6 +1181,22 @@ public class AssetInfo implements Serializable {
 
     public void setAssetCategory(Integer assetCategory) {
         this.assetCategory = assetCategory;
+    }
+
+    public Integer getMeteringCycle() {
+        return meteringCycle;
+    }
+
+    public void setMeteringCycle(Integer meteringCycle) {
+        this.meteringCycle = meteringCycle;
+    }
+
+    public Date getNextMeteringDate() {
+        return nextMeteringDate;
+    }
+
+    public void setNextMeteringDate(Date nextMeteringDate) {
+        this.nextMeteringDate = nextMeteringDate;
     }
 
     @Override

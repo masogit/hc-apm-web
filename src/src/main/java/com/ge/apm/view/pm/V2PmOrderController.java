@@ -44,6 +44,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private UserAccountRepository userDao;
     private V2_PmOrderService pmOrderService;
     private V2_PmOrder selectedPmOrder;
+    private String assetName;
 
     private Date startTime;
     private Date endTime;
@@ -232,33 +233,43 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
-       /* removeFilterOnField("status");
         removeFilterOnField("currentStepId");
-        removeFilterOnField("currentPersonId");
+        removeFilterOnField("isFinished");
         removeFilterOnField("dispatchMode");
-        removeFilterOnField("srId");
-        removeFilterOnField("feedbackRating");
-        removeFilterOnField("assetId");
-        removeFilterOnField("assetInfo.institutionUID");
-        removeFilterOnField("assetInfo.siteUID");
-        removeFilterOnField("assetInfo.hosputalUID");
-        removeFilterOnField("assetInfo.tenantUID");*/
+        removeFilterOnField("ownerId");
+        removeFilterOnField("approvalStatus");
+//        removeFilterOnField("feedbackRating");
+//        removeFilterOnField("assetId");
+//        removeFilterOnField("assetInfo.institutionUID");
+//        removeFilterOnField("assetInfo.siteUID");
+//        removeFilterOnField("assetInfo.hosputalUID");
+//        removeFilterOnField("assetInfo.tenantUID");
         if (queryIndex == -1) {
-            return dao.findAll(pageRequest);
+
+            return dao.findBySearchFilter(searchFilters,pageRequest);
+
         }
          if (queryIndex == 2) { //待派工  Assign
+			 List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+
+
+
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
            // searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
 
+
+				/* List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+			 searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+			 searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+			 searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+			 searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));*/
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 
-          //  searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
-           /* searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));*/
+			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+
         } else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
@@ -283,15 +294,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
+    public void onSelectPmOrder(){}
+
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         List<V2_WorkOrder_Detail> list = pmOrderService.getWorkOrderDetails(woId);
         return pmOrderService.getWorkOrderDetails(woId);
     }
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
-    }
-    public void onSelectWorkOrder() {
-
     }
 
 public void closePM(V2_PmOrder selectedPmOrder){
@@ -315,24 +325,16 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-       /* if (!this.hasFilterOnField("siteUID")) {
+        if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }*/
+        }
     }
 
-   /* private List<Integer> getTagGroupAssets() {
-        if (tagGroupAssets == null) {
-           // tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
-        }
-        return tagGroupAssets;
-    }
-*/
+
 
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
@@ -343,9 +345,10 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
 
     public void cancel() {
-        selectedAsset = null;
+        this.selectedAsset = null;
         planTime=null;
         selectedPmOrder=null;
+        assetName=null;
 
     }
 
@@ -365,7 +368,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
 
 
-    public void repairWorkOrder() {
+    public void repairPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -374,6 +377,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
         cancel();
     }
 
+    public void stagingPmOrder(){
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> item.setCreatedDate(null));
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,startTime,endTime);
+    }
 
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
@@ -381,8 +391,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (asset == null) {
             return;
         }
-
-
+        assetName=asset.getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -709,5 +718,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void setPlanTime(Date planTime) {
         this.planTime = planTime;
+    }
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 }

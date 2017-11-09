@@ -48,7 +48,7 @@
                             <f:selectItems value="#{assetTagController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
-                    <h:panelGroup >
+                    <h:panelGroup>
                         <label class="label">#{msg.assetGroup}</label>
                         <p:selectOneMenu id="assetGroup" value="#{assetTagController.queryAsset.assetGroup}">
                             <p:ajax  listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
@@ -67,7 +67,8 @@
                         <h:outputText value="#{item.name}" />
                     </p:column>
                     <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{item.hospital.name}" />
+                        <h:outputText value="#{assetTagController.getOrgName(item.siteUID)}" />
+                        <!--<h:outputText value="#{item.hospital.name}" />-->
                     </p:column>
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.clinicalDeptName}" />

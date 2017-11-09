@@ -16,7 +16,7 @@
                       
                        	 <label class="label">集团</label>
                                <p:selectOneMenu id="group" value="#{v2_WorkflowConfigController.selected.institutionUID}" >
-                             	<p:ajax update="display" listener="#{v2_WorkflowConfigController.initDispatchUserList()}"/>
+                             	<p:ajax update="display" listener="#{v2_WorkflowConfigController.updateHospitalAndSite()}"/>
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{v2_WorkflowConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
@@ -25,7 +25,7 @@
                         <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.institutionUID != null}">
                        		<label class="label">医院</label>
                                <p:selectOneMenu id="hospital" value="#{v2_WorkflowConfigController.selected.hospitalUID}" >
-                             	<p:ajax update="display" listener="#{v2_WorkflowConfigController.initDispatchUserList()}"/>
+                             	<p:ajax update="display" listener="#{v2_WorkflowConfigController.updateSite()}"/>
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
@@ -34,7 +34,7 @@
                        <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.hospitalUID != null}">
                        		<label class="label">院区</label>
                                <p:selectOneMenu id="site" value="#{v2_WorkflowConfigController.selected.siteUID}" >
-                               		<p:ajax update="display" listener="#{v2_WorkflowConfigController.initDispatchUserList()}"/>
+                               		<p:ajax update="display" listener="#{v2_WorkflowConfigController.updateDispaters()}"/>
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
@@ -104,7 +104,7 @@
                     <br/>
                     <p:commandButton validateClient="false" actionListener="#{v2_WorkflowConfigController.applyChange()}" value="#{msg.Save}" update="display,:V2_WorkflowConfigEditDlg, :V2_WorkflowConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'V2_WorkflowConfigEditDialog');"/>
                     &nbsp;&nbsp;
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('V2_WorkflowConfigEditDialog').hide()"/>
+                    <p:commandButton immediate="true"  actionListener="#{v2_WorkflowConfigController.clearSelected()}" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('V2_WorkflowConfigEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
