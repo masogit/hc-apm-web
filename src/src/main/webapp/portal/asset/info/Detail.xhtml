@@ -267,7 +267,9 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.purchaseDate}</label>
-                        <p:inputText value="#{assetInfoController.selected.purchaseDate}" readonly="true"/>
+                        <p:inputText value="#{assetInfoController.selected.purchaseDate}" readonly="true">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.arriveDate}</label>
@@ -291,7 +293,9 @@
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.warrantyDate}</label>
-                        <p:inputText value="#{assetInfoController.selected.warrantyDate}" readonly="true"/>
+                        <p:inputText value="#{assetInfoController.selected.warrantyDate}" readonly="true">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </p:inputText>
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.terminateDate}</label>
