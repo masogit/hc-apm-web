@@ -232,19 +232,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
-       /* removeFilterOnField("status");
         removeFilterOnField("currentStepId");
-        removeFilterOnField("currentPersonId");
+        removeFilterOnField("isFinished");
         removeFilterOnField("dispatchMode");
-        removeFilterOnField("srId");
-        removeFilterOnField("feedbackRating");
-        removeFilterOnField("assetId");
-        removeFilterOnField("assetInfo.institutionUID");
-        removeFilterOnField("assetInfo.siteUID");
-        removeFilterOnField("assetInfo.hosputalUID");
-        removeFilterOnField("assetInfo.tenantUID");*/
+        removeFilterOnField("ownerId");
+        removeFilterOnField("approvalStatus");
+//        removeFilterOnField("feedbackRating");
+//        removeFilterOnField("assetId");
+//        removeFilterOnField("assetInfo.institutionUID");
+//        removeFilterOnField("assetInfo.siteUID");
+//        removeFilterOnField("assetInfo.hosputalUID");
+//        removeFilterOnField("assetInfo.tenantUID");
         if (queryIndex == -1) {
-            return dao.findAll(pageRequest);
+            return dao.findBySearchFilter(searchFilters,pageRequest);
         }
          if (queryIndex == 2) { //待派工  Assign
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
@@ -315,15 +315,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-       /* if (!this.hasFilterOnField("siteUID")) {
+        if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }*/
+        }
     }
 
    /* private List<Integer> getTagGroupAssets() {
