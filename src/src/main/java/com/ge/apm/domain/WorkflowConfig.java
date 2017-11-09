@@ -70,7 +70,7 @@ public class WorkflowConfig implements Serializable {
     private Boolean autoAck;//是否需要验收
     
     @Column(name = "pm_reminder_time")
-    private Integer pmReminderTime;//保养提醒时间
+    private Integer pmReminderTime;//保养提醒时间，单位‘天’
     
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;

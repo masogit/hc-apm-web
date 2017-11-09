@@ -44,7 +44,7 @@
                     <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup >
                             <label>#{msg.safetyReport}</label>
-                            <p:inputTextarea id="safetyReport" cols="100" scrollHeight="200" value="#{pmOrderRuleController.selected.safetyReport == null ? safeReport : pmOrderRuleController.selected.safetyReport}" />
+                            <p:inputTextarea id="safetyReport" cols="100" scrollHeight="200" value="#{pmOrderRuleController.selected.safetyReport == null and pmOrderRuleController.selected.id == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
                             <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                             <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>
@@ -53,7 +53,7 @@
                         <h:panelGroup >
                             <label>#{msg.performanceReport}</label>
                             <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="200" 
-                            value="#{pmOrderRuleController.selected.performanceReport == null ? performanceReport : pmOrderRuleController.selected.performanceReport}"   />
+                            value="#{pmOrderRuleController.selected.performanceReport == null and pmOrderRuleController.selected.id == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}"   />
                             <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                         <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>
