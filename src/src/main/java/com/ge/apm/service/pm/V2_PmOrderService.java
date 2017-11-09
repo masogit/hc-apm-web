@@ -195,7 +195,6 @@ formData.setAssignee(approvaler);
         formData.setActionType("repair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 
-
         formData.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startTime));
         formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
@@ -210,6 +209,24 @@ formData.setAssignee(approvaler);
         }
     }
 
+
+    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date startTime,Date endTime) {
+
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setActionType("tempRepair");
+        formData.setStepId(selectedPmOrder.getCurrentStepId());
+        formData.setStartTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(startTime));
+        formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
+        formData.setManHours(selectedPmOrder.getManHours());
+        selectedPmOrder.setCurrentStepName("暂时保存");
+        formData.setDetails(accDetails);
+        formData.setCoworkers(coDetails);
+        String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
+        if (res==null || !res.equalsIgnoreCase("Ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+        }
+    }
     public List<V2_ServiceRequest> getServiceRequestByAssetId(Integer id) {
         return srDao.findByAssetId(id);
     }

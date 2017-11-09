@@ -41,7 +41,7 @@
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectWorkOrder}" update=":pmOrderDetailForm"/>
+                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder}" update=":pmOrderDetailForm"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist :pmOrderDetailForm"/>
 
                         <p:column headerText="资产名" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
@@ -137,7 +137,7 @@
             <ui:include src="/portal/asset/selectAssetDialogPM.xhtml"/>
         </p:dialog>
 
-
+<!--关单对话框-->
         <p:dialog id="closePmDialog" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="关单">
             <h:form id="closePmDialogForm" >
                 <h:panelGroup id="display3" >
@@ -186,7 +186,7 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
+<!--派工对话框-->
         <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
             <h:form id="dispatchDialogForm" >
                 <h:panelGroup id="display8" >
@@ -211,7 +211,7 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
+<!--接单对话框-->
         <p:dialog id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.takeorder}">
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
