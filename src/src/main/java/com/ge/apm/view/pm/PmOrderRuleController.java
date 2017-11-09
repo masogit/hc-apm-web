@@ -184,7 +184,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
 		if(selected.getPeriod() == null){
 			List<Integer> itemIds = new ArrayList<Integer>();
-			
 			if(!ids.isEmpty()){
 				Iterator it = ids.iterator();
 				if(it.hasNext()){
@@ -192,8 +191,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 					itemIds.add(Integer.parseInt((String)o));
 				}
 			}
-			Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
-			period =  period == null ? 1 : period;
+			Integer period = 1;
+			if(itemIds.size() > 0){
+				 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
+			}
+//			Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
+//			period =  period == null ? 1 : period;
 			selected.setPeriod(period);
 		}
 		
