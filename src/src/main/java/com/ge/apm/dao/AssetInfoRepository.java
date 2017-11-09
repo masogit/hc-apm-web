@@ -40,13 +40,13 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     		+ " and a.financingNum like concat('%',?2,'%')")
 	public String fetchMaxAssetFinacingNumWithSiteUID(String uid, String nationalStardCode);
 
-    @Query("select max(a.financingNum) from AssetInfo a where a.hospitalUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
+    @Query("select max(a.financingNum) from AssetInfo a where a.hospitalUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithHospitalUID(String uid, String nationalStardCode);
 
-    @Query("select max(a.financingNum) from AssetInfo a where a.institutionUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
+    @Query("select max(a.financingNum) from AssetInfo a where a.institutionUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithInstitutionUID(String uid, String nationalStardCode);
 
-    @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
+    @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
 
 	public List<AssetInfo> findByTenantUID(String tenantUID);
