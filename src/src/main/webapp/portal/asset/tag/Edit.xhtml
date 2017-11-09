@@ -67,7 +67,8 @@
                         <h:outputText value="#{item.name}" />
                     </p:column>
                     <p:column style="float: left;width:30%;">
-                        <h:outputText value="#{item.hospital.name}" />
+                        <h:outputText value="#{assetTagController.getOrgName(item.siteUID)}" />
+                        <!--<h:outputText value="#{item.hospital.name}" />-->
                     </p:column>
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{item.clinicalDeptName}" />
