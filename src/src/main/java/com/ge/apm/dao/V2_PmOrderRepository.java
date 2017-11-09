@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> {
 
+
+	@Query("select distinct tr.assetId from BiomedGroupUser bgu,AssetTagBiomedGroup tbg, AssetTagRule tr where bgu.groupId = tbg.biomedGroupId and tbg.tagId = tr.tagId and bgu.userId = ?1")
+	public List<Integer> getAssetsByTagGroup(Integer currentPersonId);
    /* List<V2_PmOrder> findBySrId(String srId);
 
     @Query(value = "select wo.* from V2_Work_Order wo where wo.asset_Id in (select distinct tr.asset_Id from Biomed_Group_User bgu, "

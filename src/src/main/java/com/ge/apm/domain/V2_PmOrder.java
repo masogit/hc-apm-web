@@ -98,6 +98,10 @@ public class V2_PmOrder  implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date planTime;  //计划时间
 
+    @JoinColumn(name = "asset_id", referencedColumnName = "id", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
+
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @Where(clause = "bo_type = 'PmOrder'")
@@ -154,8 +158,8 @@ public class V2_PmOrder  implements Serializable {
      */
     @Column(name="dispatch_mode")
     private Integer dispatchMode;
-    //    @Column(name="clinical_dept_id")
-//    private String clinicalDeptId;
+    @Column(name="clinical_dept_id")
+    private String clinicalDeptId;
     @Column(name="quality_checking")
     private String qualityChecking;
 
@@ -417,13 +421,13 @@ public class V2_PmOrder  implements Serializable {
         this.dispatchMode = dispatchMode;
     }
 
-//    public String getClinicalDeptId() {
-//        return clinicalDeptId;
-//    }
+    public String getClinicalDeptId() {
+        return clinicalDeptId;
+    }
 
-//    public void setClinicalDeptId(String clinicalDeptId) {
-//        this.clinicalDeptId = clinicalDeptId;
-//    }
+    public void setClinicalDeptId(String clinicalDeptId) {
+        this.clinicalDeptId = clinicalDeptId;
+    }
 
     public String getAssetUid() {
         return assetUid;
@@ -501,4 +505,11 @@ public class V2_PmOrder  implements Serializable {
         return true;
     }
 
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
 }

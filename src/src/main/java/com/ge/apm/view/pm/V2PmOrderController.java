@@ -116,6 +116,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
     }
+
+    public OrgInfo getOrgInfoByUid(String orgUid) {
+        return orgDao.getByUid(orgUid);
+    }
     private V2_PmOrder v2PmOrder;
     public void createPM(){
         pmOrderService.createPMrequest(selectedAsset.getUid(),planTime);
@@ -209,6 +213,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return new ArrayList<UserAccount>();
     }
 
+    public List<UserAccount> getApproveList() {
+        if(this.selectedPmOrder!=null)
+            return pmOrderService.getApproveList(selectedPmOrder.getAssetUid());
+        else
+            return new ArrayList<UserAccount>();
+    }
+    private List<Integer> tagGroupAssets;
     public String getIsActive() {
         return isActive;
     }
@@ -225,6 +236,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }
 
+    private List<Integer> getTagGroupAssets() {
+        if (tagGroupAssets == null) {
+            tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
+        }
+        return tagGroupAssets;
+    }
 
 
 /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
@@ -238,12 +255,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("dispatchMode");
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
-//        removeFilterOnField("feedbackRating");
-//        removeFilterOnField("assetId");
-//        removeFilterOnField("assetInfo.institutionUID");
-//        removeFilterOnField("assetInfo.siteUID");
-//        removeFilterOnField("assetInfo.hosputalUID");
-//        removeFilterOnField("assetInfo.tenantUID");
         if (queryIndex == -1) {
 
             return dao.findBySearchFilter(searchFilters,pageRequest);
@@ -267,10 +278,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 			 searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));*/
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
-
 			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+        }else if(queryIndex == 31){//抢单
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
+            /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));*/
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            if (!getTagGroupAssets().isEmpty()) {
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
+            }
 
-        } else if (queryIndex == 6) { //待关单
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
+        }
+
+
+
+        else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
@@ -373,7 +398,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,startTime,endTime);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime);
         cancel();
     }
 
@@ -382,7 +407,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,startTime,endTime);
+        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime);
     }
 
     @Override
