@@ -91,9 +91,9 @@
             <ui:include src="View.xhtml"/>
             <ui:include src="Approve.xhtml"/>
 
-            <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="预览">
+            <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="false" draggable="true" appendTo="@(body)" header="预览">
             <h:form id="PmOrderPreviewForm" >
-                <iframe src="/wx/form/preview/"  width="100%"  height="100%"/>
+                <iframe src="/wx/form/preview/"  width="100%"  height="490"/>
             </h:form>
 
         </p:dialog>
