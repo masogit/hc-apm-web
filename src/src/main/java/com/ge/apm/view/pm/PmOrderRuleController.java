@@ -271,6 +271,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		pmOrderRuleCheckListRepository.deleteExistsRecord(selected.getUid());
 		super.delete();
 	}
+	
+	@Transactional
+	public void saveAs(){
+		selected.setId(null);
+		applyChange();
+	}
 
 	public String getSafeReport() {
 		return safeReport;

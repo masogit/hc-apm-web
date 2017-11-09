@@ -1,9 +1,9 @@
 export const phaseETTR = {
   "data": {
-    "phase1": 11,
-    "phase2": 16,
-    "phase3": 19,
-    "phase4": 26
+    "phase1": 31,
+    "phase2": 116,
+    "phase3": 119,
+    "phase4": 226
   }
 }
 

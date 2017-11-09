@@ -77,8 +77,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			return;
 		}else{
 			System.out.println("before change:"+JSON.toJSONString(selected));
-			selected = getLevel(selected);
-			System.out.println("after change:"+JSON.toJSONString(selected));
+			//selected = getLevel(selected);
+			//System.out.println("after change:"+JSON.toJSONString(selected));
 			uids.add(selected.getTenantUID());
 			selected.setTenantUID(tenantUID);
 			
@@ -202,6 +202,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         		}
         	}
     	}
+    }
+    
+    public void updateDispather(){
+    	selected = getLevel(selected);
+    	initDispatchUserList();
     }
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
@@ -357,12 +362,35 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     	super.save();
     }
 	
-	@Override
+/*	@Override
 	public void prepareEdit(){
 		if(selected != null){
-			initDispatchUserList();
+			selected = getLevel(selected);
 		}
 		super.prepareEdit();
+	}*/
+	
+	public void updateHospitalAndSite(){
+		selected.setHospitalUID(null);
+		selected.setSiteUID(null);
+		dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
+	}
+	
+	public void updateSite(){
+		selected.setSiteUID(null);
+		dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
+	}
+	
+	public void updateDispaters(){
+		dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
+	}
+	
+	public void clearSelected(){
+		selected = null;
+	}
+	
+	public void printf(){
+		System.out.println(JSON.toJSONString(selected));
 	}
 
 	public UserAccount getOwner() {

@@ -103,7 +103,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         }
 
         this.getQueryBiomedGroupList();
-        this.getQueryAssetsList(false);
+        this.getQueryAssetsList();
 
         initOrgTree();
 
@@ -214,8 +214,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         }
     }
 
-    public void getQueryAssetsList(boolean isChoose) {
-        if(isChoose){
+    public void getQueryAssetsList() {
+        if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
             sourceAssets = assetTagService.getAssetList(queryAsset);
             targetAssets.forEach((item)->{
                 if(sourceAssets.contains(item)){
@@ -225,8 +225,6 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         }else{
             sourceAssets = new ArrayList<AssetInfo>();
         }
-
-
         availableAssets = new DualListModel<>(sourceAssets, targetAssets);
     }
 
@@ -267,7 +265,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         this.getQueryBiomedGroupList();
 
         targetAssets = assetTagService.getTargetAssets(this.getSelected());
-        this.getQueryAssetsList(false);
+        this.getQueryAssetsList();
 
         selectedOrg = null;
     }
@@ -286,7 +284,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         this.getQueryBiomedGroupList();
 
         targetAssets = assetTagService.getTargetAssets(this.getSelected());
-        this.getQueryAssetsList(false);
+        this.getQueryAssetsList();
 
         selectedOrg = null;
     }
@@ -322,9 +320,9 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
                 queryAsset.setSiteUID(selectedOrg.getSiteUID());
                 clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getSiteUID(), 4);
             }
-
-            this.getQueryAssetsList(true);
         }
+
+        this.getQueryAssetsList();
 
     }
 
@@ -342,6 +340,15 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         //rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(loginUser.getTenantUID()).getChildren());
         rootNode.setExpanded(true);
 
+    }
+
+    public String getOrgName(String siteUID){
+        OrgInfo orgInfo = orgInfoDao.getByUid(siteUID);
+        if(orgInfo != null){
+            return orgInfo.getName();
+        }else{
+            return "";
+        }
     }
 
     public Integer getSiteId() {
