@@ -206,6 +206,8 @@ alter table pm_order add COLUMN nearest_sr_id character(32);
 alter table V2_service_request add COLUMN nearest_sr_days int;
 alter table V2_service_request add COLUMN nearest_sr_id character(32);
 
+alter table asset_info alter column asset_code68 type integer using asset_code68::integer;
+
 INSERT INTO "i18n_message" VALUES (5626, 'label', 'ProcessAnalysis', '维修流程分析','Process Analysis',null,-1);
 INSERT INTO "i18n_message" VALUES (5627, 'label', 'MaintenanceCost', '维修成本分析','Maintenance Cost',null,-1);
 
