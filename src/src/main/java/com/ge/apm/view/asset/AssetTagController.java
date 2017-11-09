@@ -342,6 +342,15 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
 
     }
 
+    public String getOrgName(String siteUID){
+        OrgInfo orgInfo = orgInfoDao.getByUid(siteUID);
+        if(orgInfo != null){
+            return orgInfo.getName();
+        }else{
+            return "";
+        }
+    }
+
     public Integer getSiteId() {
         return siteId;
     }
