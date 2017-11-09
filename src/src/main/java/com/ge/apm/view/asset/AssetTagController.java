@@ -261,13 +261,15 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         object.setHospitalUID(currentUser.getHospitalUID());
         object.setSiteUID(currentUser.getSiteUID());
 
+        selectedOrg = null;
+
         targetBiomedGroup = assetTagService.getTargetBiomedGroup(this.getSelected());
         this.getQueryBiomedGroupList();
 
         targetAssets = assetTagService.getTargetAssets(this.getSelected());
         this.getQueryAssetsList();
 
-        selectedOrg = null;
+
     }
 
     @Override
@@ -278,6 +280,8 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         queryAsset.setClinicalDeptId(null);
         queryAsset.setAssetGroup(null);
 
+        selectedOrg = null;
+
         super.prepareEdit();
 
         targetBiomedGroup = assetTagService.getTargetBiomedGroup(this.getSelected());
@@ -286,7 +290,6 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         targetAssets = assetTagService.getTargetAssets(this.getSelected());
         this.getQueryAssetsList();
 
-        selectedOrg = null;
     }
 
     public void delete() {
