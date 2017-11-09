@@ -28,7 +28,6 @@
 
 
                         <p:commandButton value="待审核"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="true"/>
-                        <p:commandButton value="保养中"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}" rendered="true"/>
 
                         <p:commandButton value="已关单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}" rendered="true"/>
 
@@ -68,7 +67,7 @@
                         </p:column>
                         <p:column headerText="计划完成时间"  sortBy="#{item.planTime}" filterMatchMode="LIKE" filterBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
-                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                        <!-- <p:column headerText="价格"  filterMatchMode="LIKE">
@@ -113,16 +112,15 @@
         </div>
 
         <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养" >
-
             <h:form id="PmRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}保养">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup >
                             <label class="label">#{msg.assetName}*</label>
-                            <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
-                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM" oncomplete="PF('varSelectAssetDlgPM').show();"/>
+                            <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.assetName}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
+                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM" oncomplete="PF('varSelectAssetDlgPM').show();"/>
                         </h:panelGroup>
-
+                        <!--<p:inputText id="assetName3" readonly="true" placeholder="#{msg.noAssetSelected}"  required="true" requiredMessage="ccc #{msg.ValidationRequire}"/>-->
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
                             <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd HH:mm:ss"  value="#{v2PmOrderController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>

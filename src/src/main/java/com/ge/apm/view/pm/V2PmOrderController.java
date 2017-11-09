@@ -44,6 +44,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private UserAccountRepository userDao;
     private V2_PmOrderService pmOrderService;
     private V2_PmOrder selectedPmOrder;
+    private String assetName;
 
     private Date startTime;
     private Date endTime;
@@ -245,20 +246,30 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 //        removeFilterOnField("assetInfo.tenantUID");
         if (queryIndex == -1) {
             return dao.findBySearchFilter(searchFilters,pageRequest);
+
         }
          if (queryIndex == 2) { //待派工  Assign
+			 List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+
+
+
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
            // searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
 
+
+				/* List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+			 searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+			 searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+			 searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+			 searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));*/
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 
-          //  searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
-           /* searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));*/
+			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
+			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
+			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
@@ -289,9 +300,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
-    }
-    public void onSelectWorkOrder() {
-
     }
 
 public void closePM(V2_PmOrder selectedPmOrder){
@@ -341,9 +349,10 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
 
     public void cancel() {
-        selectedAsset = null;
+        this.selectedAsset = null;
         planTime=null;
         selectedPmOrder=null;
+        assetName=null;
 
     }
 
@@ -379,8 +388,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (asset == null) {
             return;
         }
-
-
+        assetName=asset.getName();
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -707,5 +715,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void setPlanTime(Date planTime) {
         this.planTime = planTime;
+    }
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
     }
 }
