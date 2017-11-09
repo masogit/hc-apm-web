@@ -16,6 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.PmOrderRuleCheckListRepository;
@@ -71,6 +72,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		if(!this.hasFilterOnField("tenantUID")){
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		}
+		 Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
+		 pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 	
@@ -278,6 +281,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	@Transactional
 	public void saveAs(){
 		selected.setId(null);
+		selected.setStatus(0);
 		applyChange();
 	}
 
