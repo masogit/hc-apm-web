@@ -4,7 +4,6 @@ import com.ge.apm.domain.AssetFileAttachment;
 import com.ge.apm.domain.AssetInfo;
 import java.util.List;
 
-import org.primefaces.model.DualListModel;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
@@ -53,4 +52,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 	public List<AssetInfo> findByTenantUID(String tenantUID);
 
     public AssetInfo findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
+
+    @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and a.name like concat(?2,'%') order by a.name fetch first 20 rows only", nativeQuery = true)
+    public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
+
 }

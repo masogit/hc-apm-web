@@ -190,7 +190,7 @@ public class AssetFileImportService {
                 String str = functionGroup.substring(0, 3);
                 List<I18nMessage> list = FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId);
                 Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68,map,"医疗器械子分类");
-                asset.setAssetCode68(msgKey == null ? null : msgKey.toString());
+                asset.setAssetCode68(msgKey == null ? null : msgKey);
             }
             String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
             asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName,map,"设备分类"));

@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -252,7 +253,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         if (assetId == null) {
             setUserSearchFilters();
-        }        if (this.searchFilters == null) {
+        }
+        if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -344,6 +346,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             object.setInstitutionUID(org.getInstitutionUID());
             object.setSiteUID(org.getSiteUID());
             object.setClinicalDeptUID(org.getUid());
+        } else {
+            //clear uid and its name
+            object.setClinicalDeptUID(null);
+            object.setClinicalDeptName(null);
         }
         DateTime temp;
         if (null != object.getManufactDate()) {
@@ -1066,7 +1072,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
         orgTree = new DefaultTreeNode("root", null, null);
         TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        rootNode.getChildren().add(treeNode);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
         rootNode.setExpanded(true);
 
     }
@@ -1108,5 +1116,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectedSiteUID(String selectedSiteUID) {
         this.selectedSiteUID = selectedSiteUID;
+    }
+
+    public List<String> completeAssetName(String prefix) {
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+        List<String> names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
+        return names;
+
     }
 }

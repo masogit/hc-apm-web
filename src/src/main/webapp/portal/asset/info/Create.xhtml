@@ -29,7 +29,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.name}*</label>
-                                <p:inputText id="name" value="#{assetInfoController.selected.name}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                                <p:autoComplete id="name" dropdown="true" value="#{assetInfoController.selected.name}" completeMethod="#{assetInfoController.completeAssetName}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.aliasName}</label>
