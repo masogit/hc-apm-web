@@ -6,9 +6,7 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -20,10 +18,8 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
-import org.springframework.data.annotation.LastModifiedDate;
 
 /**
  *
@@ -115,6 +111,10 @@ public class ArrivalListItem implements Serializable {
     //当前处理人
     @Column(name = "current_person_uid", columnDefinition = "CHAR(32)")
     private String currentPersonUID;
+    
+    //安装工时
+    @Column(name = "work_hours")
+    private Double workHours;
     
     @Column(name = "last_modified_date")
     @Temporal(TemporalType.TIMESTAMP)
@@ -265,7 +265,7 @@ public class ArrivalListItem implements Serializable {
 
     //医疗器械子分类
     @Column(name = "asset_code68")
-    private String assetCode68;
+    private Integer assetCode68;
     
     @Column(name = "comments")
     @Size(min = 0, max = 256)
@@ -745,11 +745,11 @@ public class ArrivalListItem implements Serializable {
         this.inventoryTime = inventoryTime;
     }
 
-    public String getAssetCode68() {
+    public Integer getAssetCode68() {
         return assetCode68;
     }
 
-    public void setAssetCode68(String assetCode68) {
+    public void setAssetCode68(Integer assetCode68) {
         this.assetCode68 = assetCode68;
     }
 
@@ -855,6 +855,14 @@ public class ArrivalListItem implements Serializable {
 
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public Double getWorkHours() {
+        return workHours;
+    }
+
+    public void setWorkHours(Double workHours) {
+        this.workHours = workHours;
     }
 
     @Override
