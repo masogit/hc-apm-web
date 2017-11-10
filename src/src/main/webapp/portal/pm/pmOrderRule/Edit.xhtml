@@ -8,7 +8,13 @@
 
     <ui:composition>
 
-        <p:dialog id="PmOrderRuleEditDlg" widgetVar="PmOrderRuleEditDialog"  height="600" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
+		<style>
+			table.checkboxGroup tr td:nth-child(2)  {
+				text-align: left;
+			}
+		</style>
+
+        <p:dialog id="PmOrderRuleEditDlg" widgetVar="PmOrderRuleEditDialog"  height="800" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
             <h:form id="PmOrderRuleEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
@@ -41,29 +47,70 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     
-                    <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    <p:panelGrid columns="3"  styleClass="ui-panelgrid-blank form-group">
+	                   <label class ="label" >#{msg.safetyReport}</label>
+	                   <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                    <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
+                    </p:panelGrid>
+                  	<p:scrollPanel style="height:150px">
+                            <p:inputTextarea id="safetyReport" cols="100" scrollHeight="20"  rows="20" autoResize="true"
+                            value="#{pmOrderRuleController.selected.safetyReport == null or pmOrderRuleController.selected.id == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
+                   	</p:scrollPanel>
+                    <br/>
+<!--                     <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup >
-                            <label>#{msg.safetyReport}</label>
-                            <p:inputTextarea id="safetyReport" cols="100" scrollHeight="200" value="#{pmOrderRuleController.selected.safetyReport == null and pmOrderRuleController.selected.id == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
+                            <label class ="label">#{msg.safetyReport}</label>
+                            <br/>
+                            <p:inputTextarea id="safetyReport" cols="100" scrollHeight="20"  rows="20" autoResize="true"
+                            value="#{pmOrderRuleController.selected.safetyReport == null and pmOrderRuleController.selected.id == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
                             <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                             <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>
+                    </p:panelGrid> -->
+                    
+                    <p:panelGrid columns="3"  styleClass="ui-panelgrid-blank form-group">
+	                     <label class ="label">#{msg.performanceReport}</label>
+	                     <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                     <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
-                    <p:panelGrid id="grid4"  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <h:panelGroup >
-                            <label>#{msg.performanceReport}</label>
-                            <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="200" 
+                    <p:scrollPanel style="height:150px">
+                           <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50"  rows="50"
+                           value="#{pmOrderRuleController.selected.performanceReport == null or pmOrderRuleController.selected.id == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}"   />
+                   	</p:scrollPanel>
+
+                    
+<!--                     <p:panelGrid id="grid4"  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    	<p:scrollPanel >
+                    	   <label class ="label">#{msg.performanceReport}</label>
+                            <br/>
+                            <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50"  rows="50"
                             value="#{pmOrderRuleController.selected.performanceReport == null and pmOrderRuleController.selected.id == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}"   />
                             <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                         <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
-                        </h:panelGroup>
-                    </p:panelGrid>
+                    	</p:scrollPanel> -->
+                        <!-- <h:panelGroup >
+                            <label class ="label">#{msg.performanceReport}</label>
+                            <br/>
+                            <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50"  rows="50"
+                            value="#{pmOrderRuleController.selected.performanceReport == null and pmOrderRuleController.selected.id == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}"   />
+                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                        <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
+                        </h:panelGroup> 
+                    </p:panelGrid>-->
                     <br/>
-                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group"  >
+                    
+                    <p:scrollPanel  style="height:150px">
+                        <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="pageDirection" columns="1"  styleClass="checkboxGroup"
+                        rendered="#{pmOrderRuleController.getSelectedIds() != null}">
+                            <f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i"  itemLabel="#{i.name}(#{i.period}月)"  itemValue="#{i.id}" />
+                        </p:selectManyCheckbox>	
+                    </p:scrollPanel>
+                    
+<!--                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group"  >
                         <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="responsive" columns="1"  rendered="#{pmOrderRuleController.getSelectedIds() != null}">
                             <f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i" itemLabel="#{i.name}(#{i.period}月)" itemValue="#{i.id}" />
                         </p:selectManyCheckbox>	
-                    </p:panelGrid>
+                    </p:panelGrid> -->
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" 
                     rendered="#{pmOrderRuleController.selected.status != 1 or userContextService.hasRole('AssetHead')}"
