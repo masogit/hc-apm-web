@@ -103,20 +103,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	@Override
 	@Transactional
 	public void onBeforeSave(PmOrderRule por) {
-		StringBuilder sb = new StringBuilder();
-		if(StringUtils.isNotEmpty(por.getAssetName())){
-			sb.append(por.getAssetName()+"|");
-		}
-		if(StringUtils.isNotEmpty(por.getManufacture())){
-			sb.append(por.getManufacture()+"|");
-		}
-		if(StringUtils.isNotEmpty(por.getFunctionType())){
-			sb.append(por.getFunctionType()+"|");
-		}
-		if(StringUtils.isNotEmpty(por.getRemark())){
-			sb.append(por.getRemark());
-		}
-		por.setName(sb.toString());
 		pmOrderRuleCheckListRepository.deleteExistsRecord(por.getUid());
 	}
 
@@ -206,6 +192,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		if (selected.getId() != null) {//更新
 			onBeforeSave(selected);
 		}
+		getName();
 		dao.save(selected);
 		String ruleUID = selected.getUid();
 		if(!ids.isEmpty()){
@@ -228,6 +215,23 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		}
 		ids.clear();
 		WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
+	}
+	
+	public void getName(){
+		StringBuilder sb = new StringBuilder();
+		if(StringUtils.isNotEmpty(selected.getAssetName())){
+			sb.append(selected.getAssetName()+"|");
+		}
+		if(StringUtils.isNotEmpty(selected.getManufacture())){
+			sb.append(selected.getManufacture()+"|");
+		}
+		if(StringUtils.isNotEmpty(selected.getFunctionType())){
+			sb.append(selected.getFunctionType()+"|");
+		}
+		if(StringUtils.isNotEmpty(selected.getRemark())){
+			sb.append(selected.getRemark());
+		}
+		selected.setName(sb.toString());
 	}
 	
 	@Transactional
