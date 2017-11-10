@@ -50,7 +50,7 @@
                         <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder}" update=":pmOrderDetailForm"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist :pmOrderDetailForm"/>
 
-                        <p:column headerText="资产名" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                        <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
 
@@ -65,15 +65,10 @@
                         <p:column headerText="创建人" sortBy="#{item.creatorName}" filterBy="#{item.creatorName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.creatorName}"/>
                         </p:column>
-                        <!--<p:column headerText="设备编号"  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.pmNUm}"/>
-                        </p:column>-->
+
                         <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.pmNum}"/>
                         </p:column>
-                       <!-- <p:column headerText="使用科室"  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.departNum}"/>
-                        </p:column>-->
                         <p:column headerText="当前处理步骤"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.currentStepName}"/>
                         </p:column>
@@ -139,13 +134,10 @@
                             <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.assetName}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
                             <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM" oncomplete="PF('varSelectAssetDlgPM').show();"/>
                         </h:panelGroup>
-                        <!--<p:inputText id="assetName3" readonly="true" placeholder="#{msg.noAssetSelected}"  required="true" requiredMessage="ccc #{msg.ValidationRequire}"/>-->
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
                             <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd HH:mm:ss"  value="#{v2PmOrderController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
-
-
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.createPM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
@@ -156,12 +148,11 @@
             <ui:include src="/portal/asset/selectAssetDialogPM.xhtml"/>
         </p:dialog>
 
-<!--关单对话框-->
+        <!--关单对话框-->
         <p:dialog id="closePmDialog" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="关单">
             <h:form id="closePmDialogForm" >
                 <h:panelGroup id="display3" >
                     <p:selectOneRadio id="console"  value="#{v2PmOrderController.selectedPmOrder.qualityChecking}">
-                      <!--  <p:ajax  listener="#{v2PmOrderController.d1(v2PmOrderController.selectedPmOrder.qualityChecking)}" event="change"></p:ajax>-->
                         <f:selectItem itemLabel="合格" itemValue="1" />
                         <f:selectItem itemLabel="不合格" itemValue="2" />
                     </p:selectOneRadio>
@@ -205,7 +196,7 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-<!--派工对话框-->
+        <!--派工对话框-->
         <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
             <h:form id="dispatchDialogForm" >
                 <h:panelGroup id="display8" >
