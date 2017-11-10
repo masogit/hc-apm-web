@@ -209,7 +209,7 @@ public class AssetFileImportService {
             asset.setLifecycleInYear(ExcelDocument.getCellDoubleValue(rowMap.get("使用年限")));
             String depreciationMethodNmae = ExcelDocument.getCellStringValue(rowMap.get("折旧算法"));
             asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae,map,"折旧算法"));
-            asset.setManufactDate(getDateField(rowMap.get("生产日期"), "生产日期"));
+            asset.setManufactDate(getDateField(rowMap.get("出厂日期"), "出厂日期"));
             asset.setPurchaseDate(getDateField(rowMap.get("采购日期"), "采购日期"));
             asset.setArriveDate(getDateField(rowMap.get("到货日期"), "到货日期"));
             asset.setInstallDate(getDateField(rowMap.get("启用日期"), "启用日期"));
