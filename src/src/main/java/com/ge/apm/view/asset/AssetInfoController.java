@@ -1123,7 +1123,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<String> completeAssetName(String prefix) {
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-        List<String> names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
+        List<String> names = null;
+        if (StringUtils.isEmpty(prefix)) {
+            names = dao.findDistinctAssetNames(tenantUID);
+        } else {
+            names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
+        }
+
         return names;
 
     }
