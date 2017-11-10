@@ -16,7 +16,7 @@
                 <h:form id="AssetArrivalItemListForm">
                     <p:dataTable id="datalist" value="#{assetArrivedItemsController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetArrivedItemsController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortBy="#{item.lastModifiedDate}"   sortOrder="descending"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
