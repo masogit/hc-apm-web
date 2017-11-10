@@ -176,7 +176,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-        queryIndex = 0;
+        queryIndex = -1;
         this.filterBySite = false;
         this.filterByHospital = false;
 
@@ -256,13 +256,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
         if (queryIndex == -1) {
-
             return dao.findBySearchFilter(searchFilters,pageRequest);
-
         }
          if (queryIndex == 2) { //待派工  Assign
 			 List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
-
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
            // searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
@@ -270,6 +267,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+			 //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
         }else if(queryIndex == 31){//抢单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
             /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));*/
@@ -280,31 +279,31 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             if (!getTagGroupAssets().isEmpty()) {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
             }
-
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
-
-
-
         else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Close"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }else if (queryIndex == 8) { //待审核
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
            //1表示该pm工单已被提交等待审核
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }
         else if (queryIndex == 0) { //保养中
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
          //   searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }
          else if (queryIndex == 7) { //已关单
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
              searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ,true ));
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
          }
         this.selected = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -379,6 +378,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
 
     public void repairPmOrder() {
+        if(endTime==null){
+            WebUtil.addErrorMessage("结束时间"+WebUtil.getMessage("ValidationRequire"));
+        }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
