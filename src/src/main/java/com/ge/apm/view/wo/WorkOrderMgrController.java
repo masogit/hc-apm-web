@@ -40,6 +40,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -402,6 +403,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void saveServiceRequest() {
         if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
         } else {
             selectedAsset.setStatus(currentStatus);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
