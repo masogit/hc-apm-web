@@ -656,6 +656,6 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.7".equalsIgnoreCase(inputVersion);
+        return "v1.8".equalsIgnoreCase(inputVersion);
     }
 }
