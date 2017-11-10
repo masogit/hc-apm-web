@@ -27,17 +27,17 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
-                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                              </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="true" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                             <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                              <label class ="label">#{msg.functionType}</label>
-                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="true" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
+                             <p:inputText id="functionType" value="#{pmOrderRuleController.selected.functionType}" required="false" requiredMessage="#{msg.functionType} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}</label>

@@ -231,7 +231,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		if(StringUtils.isNotEmpty(selected.getRemark())){
 			sb.append(selected.getRemark());
 		}
-		selected.setName(sb.toString());
+		String name = sb.toString();
+		if(name.endsWith("|")){
+			name = name.substring(0, name.lastIndexOf("|"));
+		}
+		selected.setName(name);
 	}
 	
 	@Transactional
