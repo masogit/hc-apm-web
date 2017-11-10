@@ -282,6 +282,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	public void saveAs(){
 		selected.setId(null);
 		selected.setStatus(0);
+                selected.setCreatedDate(new Date());
 		applyChange();
 	}
 

@@ -45,7 +45,7 @@
                         <h:panelGroup >
                             <label>#{msg.safetyReport}</label>
                             <p:inputTextarea id="safetyReport" cols="100" scrollHeight="200" value="#{pmOrderRuleController.selected.safetyReport == null and pmOrderRuleController.selected.id == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
-                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();"/>
                             <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -54,7 +54,7 @@
                             <label>#{msg.performanceReport}</label>
                             <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="200" 
                             value="#{pmOrderRuleController.selected.performanceReport == null and pmOrderRuleController.selected.id == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}"   />
-                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                            <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" />
                         <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                         </h:panelGroup>
                     </p:panelGrid>
@@ -67,10 +67,10 @@
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" 
                     rendered="#{pmOrderRuleController.selected.status != 1 or userContextService.hasRole('AssetHead')}"
-                    update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
+                    update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.saveAs()}" value="另存为" 
-                    update="display,:PmOrderRuleEditDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
+                    update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
                     oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleEditDialog').hide()"/>
