@@ -121,6 +121,10 @@
                                 <label class="label">#{msg.currentPersonUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.currentPersonUID).name}" />
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">安装工时</label>
+                                <p:inputText value="#{assetInstallationController.arrivalListItem.workHours}" />
+                            </h:panelGroup>
                         </p:panelGrid>
 
                         
@@ -132,14 +136,6 @@
                                 <label class="label">#{msg.aliasName}</label>
                                 <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}"/>
                             </h:panelGroup>
-<!--                            <h:panelGroup>
-                                <label class="label">#{msg.assetGroup}</label>
-                                <p:selectOneMenu id="assetGroup" value="#{assetInstallationController.arrivalListItem.assetGroup}" >
-                                    <p:ajax listener="#{assetInstallationController.onAssetGroupChange}" process="@this" update="parentAssetList"/>
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInstallationController.arrivalListItem.assetOwnerUID}" >
