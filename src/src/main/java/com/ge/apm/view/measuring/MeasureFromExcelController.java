@@ -3,8 +3,8 @@ package com.ge.apm.view.measuring;
 import com.ge.apm.dao.MeasuringTypeConfigRepository;
 import com.ge.apm.domain.MeasuringTypeConfig;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.MeasuringService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -27,12 +27,15 @@ import java.io.Serializable;
 public class MeasureFromExcelController extends GenericCRUDUUIDController<MeasuringTypeConfig> implements Serializable, ServerEventInterface {
 
     private MeasuringTypeConfigRepository dao;
+    private MeasuringService measuringService;
     private UserAccount currentUser;
     private UploadedFile file;
 
     @Override
     protected void init() {
+        currentUser = UserContextService.getCurrentUserAccount();
         dao = WebUtil.getBean(MeasuringTypeConfigRepository.class);
+        measuringService = WebUtil.getBean(MeasuringService.class);
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
@@ -48,10 +51,9 @@ public class MeasureFromExcelController extends GenericCRUDUUIDController<Measur
     }
 
     public void handleFileUpload(FileUploadEvent event) throws IOException {
-        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " is uploaded.");
-        HSSFWorkbook workbook = new HSSFWorkbook(event.getFile().getInputstream());
+        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " 上传成功！");
+        measuringService.handleExcel(file, currentUser);
         FacesContext.getCurrentInstance().addMessage(null, message);
-
     }
 
     public UploadedFile getFile() {
