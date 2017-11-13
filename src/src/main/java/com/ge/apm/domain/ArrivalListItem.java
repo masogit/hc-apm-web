@@ -133,9 +133,6 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "function_grade")
     private Integer functionGrade;//功能等级
 
-    @Column(name = "supplier_id")
-    private Integer supplierId;
-
     @Size(max = 64)
     @Column(name = "maitanance")
     private String maitanance;//维修商
@@ -455,14 +452,6 @@ public class ArrivalListItem implements Serializable {
 
     public void setFunctionGrade(Integer functionGrade) {
         this.functionGrade = functionGrade;
-    }
-
-    public Integer getSupplierId() {
-        return supplierId;
-    }
-
-    public void setSupplierId(Integer supplierId) {
-        this.supplierId = supplierId;
     }
 
     public String getMaitanance() {
@@ -863,6 +852,20 @@ public class ArrivalListItem implements Serializable {
 
     public void setWorkHours(Double workHours) {
         this.workHours = workHours;
+    }
+    
+    public Double getLifecycleInYear() {
+    	if(lifecycle == null){
+    		return null;
+    	}
+        return new Double(lifecycle)/12.0;
+    }
+
+    public void setLifecycleInYear(Double lifecycle) {
+    	if(lifecycle == null){
+    		return;
+    	}
+       this.lifecycle = new Double(lifecycle * 12).intValue();
     }
 
     @Override

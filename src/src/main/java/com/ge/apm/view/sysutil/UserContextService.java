@@ -258,9 +258,12 @@ public class UserContextService implements Serializable {
         if (isDispatcher == null) {
             UaaService uuaService = WebUtil.getBean(UaaService.class);
             List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            orgList.add("");
+            orgList.add(userAccount.getTenantUID());
+            orgList.add(userAccount.getInstitutionUID());
+            orgList.add(userAccount.getHospitalUID());
+            orgList.add(userAccount.getSiteUID());
             WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-            List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList);
+            List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
             isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
                     || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
         }

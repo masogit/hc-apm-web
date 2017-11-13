@@ -96,6 +96,9 @@ public class ArrivalList implements Serializable{
     @Column(name = "vendor")
     private String vendor;
     
+    //供应商Id
+    @Column(name = "supplier_id")
+    private Integer supplierId; 
     //经办人
     @Size(max = 64)
     @Column(name = "agent")
@@ -315,6 +318,14 @@ public class ArrivalList implements Serializable{
 
     public void setAssetGroup(Integer assetGroup) {
         this.assetGroup = assetGroup;
+    }
+
+    public Integer getSupplierId() {
+        return supplierId;
+    }
+
+    public void setSupplierId(Integer supplierId) {
+        this.supplierId = supplierId;
     }
 
     
