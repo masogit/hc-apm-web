@@ -118,7 +118,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.submitAppvalPmOrder}" value="确认" icon="ui-icon-check" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.submitAppvalPmOrder}" value="确认" icon="ui-icon-check" update=":pmOrderListForm:datalist" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
