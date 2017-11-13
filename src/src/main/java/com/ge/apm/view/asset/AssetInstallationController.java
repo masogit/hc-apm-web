@@ -16,6 +16,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -51,6 +53,7 @@ public class AssetInstallationController {
     private UaaService uaaService;
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     private OrgInfo selectedOrg;
     private TreeNode orgTree;
@@ -66,6 +69,7 @@ public class AssetInstallationController {
         uaaService = WebUtil.getBean(UaaService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
+        assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
@@ -219,6 +223,17 @@ public class AssetInstallationController {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
         return assetDao.findBySearchFilter(assetFilters);
+    }
+    
+    public void updateFinancingNumByNationalStandardCode() {
+        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                null,
+                this.arrivalListItem.getNationalStandardCode(),
+                this.arrivalListItem.getArrivalList().getSiteUID()
+        );
+        if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
+            this.arrivalListItem.setFinancingNum(financingNum);
+        }
     }
 
     public void renewQrcode() {

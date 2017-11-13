@@ -110,8 +110,15 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
+                                <label class="label">#{msg.nationalStandardCode}</label>
+                                <p:inputText id="nationalStandardCode" value="#{assetInstallationController.arrivalListItem.nationalStandardCode}" maxlength="64">
+                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInstallationController.updateFinancingNumByNationalStandardCode()}"/>
+                                </p:inputText>
+                            </h:panelGroup>
+                            
+                            <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
-                                <p:inputText value="#{assetInstallationController.arrivalListItem.financingNum}" />
+                                <p:inputText id="financingNum" value="#{assetInstallationController.arrivalListItem.financingNum}" />
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.serialNum}</label>
@@ -236,7 +243,6 @@
                                 <label class="label">#{msg.comments}</label>
                                 <p:inputTextarea value="#{assetInstallationController.arrivalListItem.comments}"  maxlength="256"/>
                             </h:panelGroup>
-                            
                             
                             
                         </p:panelGrid>
