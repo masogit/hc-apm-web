@@ -77,7 +77,8 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <!--<p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>-->
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.locateAsset()}" validateClient="true"  style="float:left" update=":installLocationDlgForm :growl" oncomplete="PF('installLocationDlg').show();"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update=":ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
                 </p:fieldset>
@@ -85,5 +86,21 @@
 
             <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
         </p:dialog>
+
+        <p:dialog id="installLocationDlg" widgetVar="installLocationDlg" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="确定提交报修">
+           <h:form id="installLocationDlgForm" >
+               <h:panelGroup id="display" >
+                       <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                           <label class="label">请同时确认设备当前位置</label>
+                           <p:inputText value="#{workOrderMgrController.locationName}" maxlength="256" />
+                       </p:panelGrid>
+                   <br/>
+                   <h:panelGroup>
+                       <p:commandButton immediate="false" validateClient="true" actionListener="#{workOrderMgrController.saveServiceRequest()}" value="#{msg.Confirm}"  update="woMgrListForm :growl" icon="ui-icon-check" oncomplete="PF('createSRDialog').hide();handleSubmit(args, 'installLocationDlg');"/>
+                       <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('installLocationDlg').hide()"/>
+                   </h:panelGroup>
+               </h:panelGroup>
+           </h:form>
+       </p:dialog>
     </ui:composition>
 </html>
