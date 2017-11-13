@@ -21,7 +21,7 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,40,60,90">
 
-                    <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                    <p:ajax event="rowSelect"  listener= "#{v2_WorkflowConfigController.onSelect()}" update="createButton editButton deleteButton"/>
 <!--                     <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/> -->
                     
                     <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">

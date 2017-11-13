@@ -104,7 +104,7 @@
                     <br/>
                     <p:commandButton validateClient="false" actionListener="#{v2_WorkflowConfigController.applyChange()}" value="#{msg.Save}" update="display,:V2_WorkflowConfigEditDlg, :V2_WorkflowConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'V2_WorkflowConfigEditDialog');"/>
                     &nbsp;&nbsp;
-                    <p:commandButton immediate="true"  value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('V2_WorkflowConfigEditDialog').hide()" update=":V2_WorkflowConfigListForm:datalist" />
+                    <p:commandButton immediate="true"  value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('V2_WorkflowConfigEditDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>

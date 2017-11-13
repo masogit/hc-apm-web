@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -37,8 +38,8 @@ import webapp.framework.web.mvc.JpaCRUDController;
 @ViewScoped
 public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private static final long serialVersionUID = -1L;
-	private String safeReport = "";
-	private String performanceReport = "";
+//	private String safeReport = "";
+//	private String performanceReport = "";
 	private PmOrderRuleRepository dao = null;
 	private UserAccount user;
 	private UserAccountRepository userAccountRepository;
@@ -46,6 +47,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
 	private List<Integer> ids = new ArrayList<Integer>();
 	private String filterPmRuleStatus;
+	//private Integer copyPeriod;
+	private String defaultReport;
 	
 	@Override
 	protected void init() {
@@ -55,8 +58,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
 		pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
-		safeReport = getDefalutReport();
-		performanceReport = safeReport;
+		defaultReport = getDefalutReport();
 	}
 
 	@Override
@@ -124,6 +126,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		por.setStatus(0);
 		por.setCreatedDate(new Date());
 		por.setOwnerId(user.getId());
+		por.setSafetyReport(defaultReport);
+		por.setPerformanceReport(defaultReport);
 	}
 
 	public String getUserName(Integer userId) {
@@ -171,7 +175,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			}
 		}
 		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-		if(selected.getPeriod() == null){
+		System.out.println("selected.getPeriod() is "+selected.getPeriod());
+		selected.setPeriod(getPeriod());
+/*		if(selected.getPeriod() == null){
 			List<Integer> itemIds = new ArrayList<Integer>();
 			if(!ids.isEmpty()){
 				Iterator it = ids.iterator();
@@ -187,7 +193,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 //			Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
 //			period =  period == null ? 1 : period;
 			selected.setPeriod(period);
-		}
+		}*/
 		
 		if (selected.getId() != null) {//更新
 			onBeforeSave(selected);
@@ -290,24 +296,69 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	public void saveAs(){
 		selected.setId(null);
 		selected.setStatus(0);
-                selected.setCreatedDate(new Date());
-		applyChange();
+        selected.setCreatedDate(new Date());
+        selected.setUid(UUID.randomUUID().toString().replace("-", ""));
+        selected.setOwnerId(user.getId());
+        saveOwn();
 	}
-
-	public String getSafeReport() {
-		return safeReport;
-	}
-
-	public void setSafeReport(String safeReport) {
-		this.safeReport = safeReport;
-	}
-
-	public String getPerformanceReport() {
-		return performanceReport;
-	}
-
-	public void setPerformanceReport(String performanceReport) {
-		this.performanceReport = performanceReport;
+	
+	public void saveOwn(){
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+		if(!StringUtils.isEmpty(selected.getSafetyReport())){
+			try{
+				if(!selected.getSafetyReport().contains("title")){
+					WebUtil.addErrorMessage("安全检测报告必须包含title元素！");
+					return;
+				}else if(!selected.getSafetyReport().contains("groups")){
+					WebUtil.addErrorMessage("安全检测报告必须包含groups元素！");
+					return;
+				}
+				JSON.parseObject(selected.getSafetyReport(),Report.class);
+			}catch(Exception e){
+				WebUtil.addErrorMessage("安全检测报告JSON不合法！");
+				return;
+			}
+		}
+		if(!StringUtils.isEmpty(selected.getPerformanceReport())){
+			try{
+				if(!selected.getPerformanceReport().contains("title")){
+					WebUtil.addErrorMessage("性能检测报告必须包含title元素！");
+					return;
+				}else if(!selected.getPerformanceReport().contains("groups")){
+					WebUtil.addErrorMessage("性能检测报告必须包含groups元素！");
+					return;
+				}
+				JSON.parseObject(selected.getPerformanceReport(),Report.class);
+			}catch(Exception e){
+				WebUtil.addErrorMessage("性能检测报告JSON不合法！");
+				return;
+			}
+		}
+		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+		selected.setPeriod(getPeriod());
+		getName();
+		dao.save(selected);
+		String ruleUID = selected.getUid();
+		if(!ids.isEmpty()){
+			List<PmOrderRuleCheckList> checkLists = new ArrayList<PmOrderRuleCheckList>();
+			List<PmOrderRuleItem> allItems = pmOrderRuleItemRepository.findByTenantUID(user.getTenantUID());
+			if(CollectionUtils.isNotEmpty(allItems)){
+				for (PmOrderRuleItem item : allItems) {
+					if(ids.contains(item.getId().toString())){
+						PmOrderRuleCheckList cl = new PmOrderRuleCheckList();
+						cl.setName(item.getName());
+						cl.setPeriod(item.getPeriod());
+						cl.setRemark(cl.getRemark());
+						cl.setRuleUID(ruleUID);
+						cl.setItemId(item.getId());
+						checkLists.add(cl);
+					}
+				}
+				pmOrderRuleCheckListRepository.save(checkLists);
+			}
+		}
+		ids.clear();
+		WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
 	}
 	
 	public String getDefalutReport(){
@@ -336,6 +387,30 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	public void setWarrantyFormatTime(String warrantyFormatTime) {
 		this.warrantyFormatTime = warrantyFormatTime;
+	}
+
+	public Integer getPeriod(){
+		List<Integer> itemIds = new ArrayList<Integer>();
+		if(!ids.isEmpty()){
+			Iterator it = ids.iterator();
+			if(it.hasNext()){
+				Object o = it.next();
+				itemIds.add(Integer.parseInt((String)o));
+			}
+		}
+		Integer period = 1;
+		if(itemIds.size() > 0){
+			 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
+		}
+		return period;
+	}
+
+	public String getDefaultReport() {
+		return defaultReport;
+	}
+
+	public void setDefaultReport(String defaultReport) {
+		this.defaultReport = defaultReport;
 	}
 	
     
