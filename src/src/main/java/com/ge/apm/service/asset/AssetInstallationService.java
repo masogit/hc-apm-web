@@ -7,9 +7,11 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Component;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.UserCommonService;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -31,6 +34,9 @@ public class AssetInstallationService {
     
     @Autowired
     BlobObjectRepository blobDao;
+    
+    @Autowired
+    SupplierRepository supplierDao;
     
     @Autowired
     OrgInfoRepository orgDao;
@@ -83,6 +89,10 @@ public class AssetInstallationService {
         List<UserAccount> userlist = userDao.findByOrgInfoUID(clinicalDept.getUid());
         return userlist.stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
                         .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
+    }
+
+    public Supplier getSupplierById(Integer supplierId) {
+        return Optional.ofNullable(supplierDao.findById(supplierId)).orElse(null);
     }
 
 }

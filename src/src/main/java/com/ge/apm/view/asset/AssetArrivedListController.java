@@ -12,6 +12,7 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
@@ -23,6 +24,7 @@ import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -41,6 +43,8 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private AssetInstallationService aiService;
     private UaaService uaaService;
     private TreeNode orgTree;
+    
+    private Supplier supplier;
 
     private TreeNode selectedNode;
 
@@ -51,7 +55,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        orgTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
+        TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
+        orgTree = new DefaultTreeNode("org", null, null);
+        orgTree.getChildren().add(subTree);
         this.filterBySite = false;
         this.filterByHospital = false;
     }
@@ -141,6 +147,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     public void onArrivalListSelected(SelectEvent event) {
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
+        if(selected.getSupplierId()!=null){
+            supplier = aiService.getSupplierById(selected.getSupplierId());
+        }
         this.prepareEdit();
     }
 
@@ -171,6 +180,13 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         selectedOrg = (OrgInfo) node.getData();
     }
 
+    public void onSupplierChange() {
+        if (null != supplier) {
+            selected.setSupplierId(supplier.getId());
+            selected.setVendor(supplier.getName());
+        }
+    }
+    
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }
@@ -206,6 +222,14 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(Supplier supplier) {
+        this.supplier = supplier;
     }
 
 }

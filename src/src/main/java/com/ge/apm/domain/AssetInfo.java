@@ -75,10 +75,10 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "vendor")
-    private String vendor;//供应商
+    private String vendor;//供应商名称
 
     @Column(name = "supplier_id")
-    private Integer supplierId;
+    private Integer supplierId; //供应商Id
 
     @Size(max = 64)
     @Column(name = "maitanance")
