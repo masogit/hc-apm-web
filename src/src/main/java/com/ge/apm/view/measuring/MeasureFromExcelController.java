@@ -51,7 +51,8 @@ public class MeasureFromExcelController extends GenericCRUDUUIDController<Measur
     }
 
     public void handleFileUpload(FileUploadEvent event) throws IOException {
-        FacesMessage message = new FacesMessage("Succesful", event.getFile().getFileName() + " 上传成功！");
+        FacesMessage message = new FacesMessage("Successful", event.getFile().getFileName() + " 上传成功！");
+        this.file = event.getFile();
         measuringService.handleExcel(file, currentUser);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }

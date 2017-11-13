@@ -14,6 +14,7 @@ import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -22,6 +23,7 @@ import java.util.Map;
 /**
  * Created by 212605082 on 2017/11/7.
  */
+@Component
 public class MeasuringService {
     private final String HEADER_CERTIFICATION_NO = "证书编号";
     private final String HEADER_APPLIANCE_NAME = "器具名称";
@@ -73,45 +75,53 @@ public class MeasuringService {
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             HSSFSheet sheet = workbook.getSheetAt(i);
+            if (sheet == null) {
+                continue;
+            }
             Map<String, Integer> header = findHeader(sheet);
             for (int j = header.get("HEADER_ROW") + 1; j < sheet.getLastRowNum(); j++) {
                 HSSFRow row = sheet.getRow(j);
+                if (row == null) {
+                    continue;
+                }
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
                 detail.setTenantUID(user.getTenantUID());
                 detail.setInstitutionUID(user.getInstitutionUID());
                 detail.setHospitalUID(user.getHospitalUID());
                 detail.setSiteUID(user.getSiteUID());
-                detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
-                detail.setAssetModel(row.getCell(header.get("MODEL_CELL")).getStringCellValue());
-                detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
-                detail.setAssetNo(row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
-                detail.setCertificateNo(row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
-                detail.setCheckDate(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue());
-                detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
-                detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
-                detail.setComments(row.getCell(header.get("REMARK_CELL")).getStringCellValue());
-                detail.setExpired(row.getCell(header.get("OVERDUE_CELL")).getBooleanCellValue());
-                detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
-                detail.setFinanceNo(row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
-                detail.setCheckItem(row.getCell(header.get("ITEM_CELL")).getStringCellValue());
-                detail.setPay(row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
+                detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")) == null ? null : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+                detail.setAssetModel(row.getCell(header.get("MODEL_CELL")) == null ? null : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+                detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                detail.setAssetNo(row.getCell(header.get("APPLIANCE_NO_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                detail.setCertificateNo(row.getCell(header.get("CERTIFICATION_NO_CELL")) == null ? null : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
+                detail.setCheckDate(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue());
+                detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
+                detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")) == null ? null : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
+                detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+                detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
+                detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                detail.setFinanceNo(row.getCell(header.get("ASSET_NO_CELL")) == null ? null : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 Integer status = 1;
-                switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
-                    case "A级合格":
-                        status = 1;
-                        break;
-                    case "合格":
-                        status = 1;
-                        break;
-                    case "校准不合格":
-                        status = 2;
-                        break;
-                    case "没有校准结果":
-                        status = 3;
-                        break;
-                    case "校准合格":
-                        status = 1;
-                        break;
+                if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
+                    switch (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue()) {
+                        case "A级合格":
+                            status = 1;
+                            break;
+                        case "合格":
+                            status = 1;
+                            break;
+                        case "校准不合格":
+                            status = 2;
+                            break;
+                        case "没有校准结果":
+                            status = 3;
+                            break;
+                        case "校准合格":
+                            status = 1;
+                            break;
+                    }
                 }
                 detail.setStatus(status);
                 operateMeasuringAndAssetInfo(detail);
@@ -126,6 +136,10 @@ public class MeasuringService {
     private Map<String, Integer> findHeader(HSSFSheet sheet) {
         Map<String, Integer> header = new HashMap<>();
         for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
+            HSSFRow row = sheet.getRow(i);
+            if (row == null) {
+                continue;
+            }
             boolean hasCertificationNo = false;
             boolean hasApplianceName = false;
             boolean hasManufacture = false;
@@ -144,99 +158,105 @@ public class MeasuringService {
             boolean hasRemark = false;
             boolean hasOverdue = false;
 
-            HSSFRow row = sheet.getRow(i);
+
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
                 HSSFCell cell = row.getCell(j);
-                hasCertificationNo = HEADER_CERTIFICATION_NO.equals(cell.getStringCellValue());
-                hasApplianceName = HEADER_APPLIANCE_NAME.equals(cell.getStringCellValue());
-                hasManufacture = HEADER_MANUFACTURE.equals(cell.getStringCellValue());
-                hasModel = HEADER_MODEL.equals(cell.getStringCellValue());
-                hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue());
-                hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue());
-                hasPayed = HEADER_PAYED.equals(cell.getStringCellValue());
-                hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue());
-                hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue());
-                hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue());
-                hasVerificationUnit = HEADER_VERIFICATION_UNIT.equals(cell.getStringCellValue());
-                hasVerifier = HEADER_VERIFIER.equals(cell.getStringCellValue());
-                hasItem = HEADER_ITEM.equals(cell.getStringCellValue());
-                hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue());
-                hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue());
-                hasRemark = HEADER_REMARK.equals(cell.getStringCellValue());
-                hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue());
-
-
-                switch (cell.getStringCellValue()) {
-                    case HEADER_CERTIFICATION_NO:
-                        hasCertificationNo = true;
-                        header.put("CERTIFICATION_NO_CELL", j);
-                        break;
-                    case HEADER_APPLIANCE_NAME:
-                        hasApplianceName = true;
-                        header.put("APPLIANCE_NAME_CELL", j);
-                        break;
-                    case HEADER_MANUFACTURE:
-                        hasManufacture = true;
-                        header.put("MANUFACTURE_CELL", j);
-                        break;
-                    case HEADER_MODEL:
-                        hasModel = true;
-                        header.put("MODEL_CELL", j);
-                        break;
-                    case HEADER_ASSET_NO:
-                        hasAssetNo = true;
-                        header.put("ASSET_NO_CELL", j);
-                        break;
-                    case HEADER_APPLIANCE_NO:
-                        hasApplianceNo = true;
-                        header.put("APPLIANCE_NO_CELL", j);
-                        break;
-                    case HEADER_PAYED:
-                        hasPayed = true;
-                        header.put("PAYED_CELL", j);
-                        break;
-                    case HEADER_VERIFICATION_CONCLUSION:
-                        hasVerificationConclusion = true;
-                        header.put("VERIFICATION_CONCLUSION_CELL", j);
-                        break;
-                    case HEADER_VERIFICATION_DATE:
-                        hasVerificationDate = true;
-                        header.put("VERIFICATION_DATE_CELL", j);
-                        break;
-                    case HEADER_EXPIRE_DATE:
-                        hasExpireDate = true;
-                        header.put("EXPIRE_DATE_CELL", j);
-                        break;
-                    case HEADER_VERIFICATION_UNIT:
-                        hasVerificationUnit = true;
-                        header.put("VERIFICATION_UNIT_CELL", j);
-                        break;
-                    case HEADER_VERIFIER:
-                        hasVerifier = true;
-                        header.put("VERIFIER_CELL", j);
-                        break;
-                    case HEADER_ITEM:
-                        hasItem = true;
-                        header.put("ITEM_CELL", j);
-                        break;
-                    case HEADER_CATEGORY:
-                        hasCategory = true;
-                        header.put("EXPIRE_DATE_CELL", j);
-                        break;
-                    case HEADER_CLINICAL_DEPT:
-                        hasClinicalDept = true;
-                        header.put("CLINICAL_DEPT_CELL", j);
-                        break;
-                    case HEADER_REMARK:
-                        hasRemark = true;
-                        header.put("REMARK_CELL", j);
-                        break;
-                    case HEADER_OVERDUE:
-                        hasOverdue = true;
-                        header.put("OVERDUE_CELL", j);
-                        break;
-                    default:
-                        break;
+                if (cell == null) {
+                    continue;
+                }
+                try {
+                    hasCertificationNo = HEADER_CERTIFICATION_NO.equals(cell.getStringCellValue()) ? true : hasCertificationNo;
+                    hasApplianceName = HEADER_APPLIANCE_NAME.equals(cell.getStringCellValue()) ? true : hasApplianceName;
+                    hasManufacture = HEADER_MANUFACTURE.equals(cell.getStringCellValue()) ? true : hasManufacture;
+                    hasModel = HEADER_MODEL.equals(cell.getStringCellValue()) ? true : hasModel;
+                    hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue()) ? true : hasAssetNo;
+                    hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue()) ? true : hasApplianceNo;
+                    hasPayed = HEADER_PAYED.equals(cell.getStringCellValue()) ? true : hasPayed;
+                    hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue()) ? true : hasVerificationConclusion;
+                    hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue()) ? true : hasVerificationDate;
+                    hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue()) ? true : hasExpireDate;
+                    hasVerificationUnit = HEADER_VERIFICATION_UNIT.equals(cell.getStringCellValue()) ? true : hasVerificationUnit;
+                    hasVerifier = HEADER_VERIFIER.equals(cell.getStringCellValue()) ? true : hasVerifier;
+                    hasItem = HEADER_ITEM.equals(cell.getStringCellValue()) ? true : hasItem;
+                    hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue()) ? true : hasCategory;
+                    hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue()) ? true : hasClinicalDept;
+                    hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
+                    hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
+                    switch (cell.getStringCellValue()) {
+                        case HEADER_CERTIFICATION_NO:
+                            hasCertificationNo = true;
+                            header.put("CERTIFICATION_NO_CELL", j);
+                            break;
+                        case HEADER_APPLIANCE_NAME:
+                            hasApplianceName = true;
+                            header.put("APPLIANCE_NAME_CELL", j);
+                            break;
+                        case HEADER_MANUFACTURE:
+                            hasManufacture = true;
+                            header.put("MANUFACTURE_CELL", j);
+                            break;
+                        case HEADER_MODEL:
+                            hasModel = true;
+                            header.put("MODEL_CELL", j);
+                            break;
+                        case HEADER_ASSET_NO:
+                            hasAssetNo = true;
+                            header.put("ASSET_NO_CELL", j);
+                            break;
+                        case HEADER_APPLIANCE_NO:
+                            hasApplianceNo = true;
+                            header.put("APPLIANCE_NO_CELL", j);
+                            break;
+                        case HEADER_PAYED:
+                            hasPayed = true;
+                            header.put("PAYED_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_CONCLUSION:
+                            hasVerificationConclusion = true;
+                            header.put("VERIFICATION_CONCLUSION_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_DATE:
+                            hasVerificationDate = true;
+                            header.put("VERIFICATION_DATE_CELL", j);
+                            break;
+                        case HEADER_EXPIRE_DATE:
+                            hasExpireDate = true;
+                            header.put("EXPIRE_DATE_CELL", j);
+                            break;
+                        case HEADER_VERIFICATION_UNIT:
+                            hasVerificationUnit = true;
+                            header.put("VERIFICATION_UNIT_CELL", j);
+                            break;
+                        case HEADER_VERIFIER:
+                            hasVerifier = true;
+                            header.put("VERIFIER_CELL", j);
+                            break;
+                        case HEADER_ITEM:
+                            hasItem = true;
+                            header.put("ITEM_CELL", j);
+                            break;
+                        case HEADER_CATEGORY:
+                            hasCategory = true;
+                            header.put("EXPIRE_DATE_CELL", j);
+                            break;
+                        case HEADER_CLINICAL_DEPT:
+                            hasClinicalDept = true;
+                            header.put("CLINICAL_DEPT_CELL", j);
+                            break;
+                        case HEADER_REMARK:
+                            hasRemark = true;
+                            header.put("REMARK_CELL", j);
+                            break;
+                        case HEADER_OVERDUE:
+                            hasOverdue = true;
+                            header.put("OVERDUE_CELL", j);
+                            break;
+                        default:
+                            break;
+                    }
+                } catch (Exception e) {
+                    LOGGER.debug(e.getMessage());
+                    continue;
                 }
             }
             if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetNo
