@@ -366,6 +366,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         planTime=null;
         selectedPmOrder=null;
         assetName=null;
+        endTime=null;
 
     }
 
@@ -397,6 +398,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime);
+        cancel();
     }
 
     @Override
