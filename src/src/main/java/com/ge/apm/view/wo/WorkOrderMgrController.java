@@ -69,7 +69,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
-
+    private String locationName;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
@@ -270,6 +270,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
+    public void locateAsset(){
+        System.out.println();
+        if(selectedAsset.getLocationName().isEmpty())  {
+            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+            String lName = orgDao.getByUid(orgInfoUID).getName();
+            selectedAsset.setLocationName(lName);
+            locationName=lName;
+        }
+    }
+
+
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
     }
@@ -406,6 +417,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
+            selectedAsset.setLocationName(locationName);
             selectedAsset.setStatus(currentStatus);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             cancel();
@@ -670,7 +682,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
         return accessoryList;
     }
+    public String getLocationName() {
+        return locationName;
+    }
 
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
             return null;
