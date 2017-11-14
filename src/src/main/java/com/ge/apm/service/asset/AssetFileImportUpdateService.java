@@ -76,13 +76,22 @@ public class AssetFileImportUpdateService {
 
         for (Map<String, Object> record: results) {
 
-            AssetInfo asset = new AssetInfo();
+            stringValue = ExcelDocument.getCellStringValue(record.get("ID"));
+            AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
+            if (assetInfo == null) {
+                continue;
+            }
 
             String title = DbResourcesUtil.getInstance().getAsResourceBundle().getString("preventiveMaintenanceAnalysis_deviceName");
+            if (StringUtils.isEmpty(title)) {
+                continue;
+            }
             if (record.containsKey(title)) {
                 stringValue = ExcelDocument.getCellStringValue(record.get(title));
-                asset.setName(stringValue);
+                assetInfo.setName(stringValue);
             }
+
+            assetInfoDao.save(assetInfo);
 
 
         }
