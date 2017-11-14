@@ -24,24 +24,31 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    //证书编号
     @Column(name = "certificate_no")
     private String certificateNo;
 
+    //器具名称
     @Column(name = "asset_name")
     private String assetName;
 
+    //制造厂
     @Column(name = "asset_manufacturer")
     private String assetManufacturer;
 
+    //型号
     @Column(name = "asset_model")
     private String assetModel;
 
+    //财产编号
     @Column(name = "finance_no")
     private String financeNo;
 
+    //器具编号
     @Column(name = "asset_no")
     private String assetNo;
 
+    //付款否
     @Column(name = "is_pay")
     private Boolean isPay;
 
@@ -50,34 +57,43 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "status")
     private Integer status;
 
+    //检定日期
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Column(name = "check_date")
     private Date checkDate;
 
+    //有效期至
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Column(name = "valid_date_to")
     private Date validDateTo;
 
+    //检测单位
     @Column(name = "check_company")
     private String checkCompany;
 
+    //检定人员
     @Column(name = "check_person")
     private String checkPerson;
 
+    //项别
     @Column(name = "check_item")
     private String checkItem;
 
+    //种别
     @Column(name = "type")
     private String type;
 
+    //所在科室
     @Column(name = "department")
     private String department;
 
+    //备注
     @Column(name = "comments")
     private String comments;
 
+    //过期否
     @Column(name = "is_expired")
     private Boolean isExpired;
 
