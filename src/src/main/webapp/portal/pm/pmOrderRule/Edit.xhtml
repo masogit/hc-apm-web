@@ -79,10 +79,10 @@
                     rendered="#{pmOrderRuleController.selected.status != 1 or userContextService.hasRole('AssetHead')}"
                     update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
-                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.saveAs()}" value="另存为" 
+<!--                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.saveAs()}" value="另存为" 
                     update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
                     oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
-                    &nbsp;&nbsp;
+                    &nbsp;&nbsp; -->
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleEditDialog').hide()"/>
                     &nbsp;&nbsp;
                 </h:panelGroup>
