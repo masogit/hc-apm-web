@@ -55,6 +55,9 @@ public class AssetFileImportUpdateController {
 
             List<Map<String, Object>> results = doc.getAllDataRows(0, 1, 2);
 
+            //clear data like QR code to avoid unique key excepption
+            assetFileUpdateService.clearBeforeUpdateAll(results);
+
             assetFileUpdateService.updateAll(results);
 
 
