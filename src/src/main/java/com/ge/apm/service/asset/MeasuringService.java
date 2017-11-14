@@ -9,6 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
@@ -17,7 +18,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,7 +53,8 @@ public class MeasuringService {
     private AssetInfoRepository assetInfoDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasuringService.class);
 
-    public void operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
+    public boolean operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
+        boolean flag = false;
         if (!StringHelper.isNullOrEmptyString(measuringCertificateDetail.getCertificateNo())) {
             MeasuringCertificateDetail tempData = measuringCertificateDetailDao.findByCertificateNoAndTenantUID(measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
 
@@ -59,19 +63,28 @@ public class MeasuringService {
             }
 
             measuringCertificateDetailDao.save(measuringCertificateDetail);
+        }
 
+        if(!StringHelper.isNullOrEmptyString(measuringCertificateDetail.getFinanceNo())){
             AssetInfo tempAssetInfo = assetInfoDao.findByFinancingNumAndTenantUID(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getTenantUID());
 
-            tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
-            tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
-            tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
-            if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
-                tempAssetInfo.setUsageStatus(2);//停用
+            if(tempAssetInfo != null){
+                tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
+                tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
+                tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
+                if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
+                    tempAssetInfo.setUsageStatus(2);//停用
+                }
+
+                flag = true;
             }
         }
+
+        return flag;
     }
 
-    public void handleExcel(UploadedFile file, UserAccount user) throws IOException {
+    public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException {
+        List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             HSSFSheet sheet = workbook.getSheetAt(i);
@@ -79,6 +92,9 @@ public class MeasuringService {
                 continue;
             }
             Map<String, Integer> header = findHeader(sheet);
+            if(header.isEmpty()) {
+                continue;
+            }
             for (int j = header.get("HEADER_ROW") + 1; j < sheet.getLastRowNum(); j++) {
                 HSSFRow row = sheet.getRow(j);
                 if (row == null) {
@@ -90,11 +106,20 @@ public class MeasuringService {
                 detail.setHospitalUID(user.getHospitalUID());
                 detail.setSiteUID(user.getSiteUID());
                 detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")) == null ? null : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
-                detail.setAssetModel(row.getCell(header.get("MODEL_CELL")) == null ? null : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+
+                if(row.getCell(header.get("MODEL_CELL")) != null) {
+                    detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+                }
+
                 detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
-                detail.setAssetNo(row.getCell(header.get("APPLIANCE_NO_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+
+                if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
+                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                }
+
                 detail.setCertificateNo(row.getCell(header.get("CERTIFICATION_NO_CELL")) == null ? null : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
                 detail.setCheckDate(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue());
+                detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
                 detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
                 detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")) == null ? null : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
                 detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
@@ -102,6 +127,7 @@ public class MeasuringService {
                 detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 detail.setFinanceNo(row.getCell(header.get("ASSET_NO_CELL")) == null ? null : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
                 detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
                 detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 Integer status = 1;
                 if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
@@ -124,9 +150,14 @@ public class MeasuringService {
                     }
                 }
                 detail.setStatus(status);
-                operateMeasuringAndAssetInfo(detail);
+                detail.setExcelIdex(j + 1);
+                if(!operateMeasuringAndAssetInfo(detail)){
+                    tempMCDList.add(detail);
+                }
             }
         }
+
+        return tempMCDList;
     }
 
     private HSSFSheet handleSheet(HSSFSheet sheet) {
@@ -237,7 +268,7 @@ public class MeasuringService {
                             break;
                         case HEADER_CATEGORY:
                             hasCategory = true;
-                            header.put("EXPIRE_DATE_CELL", j);
+                            header.put("CATEGORY_CELL", j);
                             break;
                         case HEADER_CLINICAL_DEPT:
                             hasClinicalDept = true;

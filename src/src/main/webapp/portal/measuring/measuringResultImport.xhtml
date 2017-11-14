@@ -1,0 +1,74 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="计量结果"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form enctype="multipart/form-data">
+                    <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
+                                  dragDropSupport="false" multiple="false" auto="true"
+                                  invalidFileMessage="只支持xls或xlsx格式的文件"
+                                  invalidSizeMessage="文件大小不得超过5M"
+                                  update=":dataListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                  label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                    <p:growl id="messages" showDetail="true"/>
+                </h:form>
+
+                <h:form id="dataListForm">
+                    <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,50">
+                        <p:column headerText="证书编号">
+                            <h:outputText value="#{item.certificateNo}" />
+                        </p:column>
+                        <p:column headerText="器具名称">
+                            <h:outputText value="#{item.assetName}" />
+                        </p:column>
+                        <p:column headerText="制造厂">
+                            <h:outputText value="#{item.assetManufacturer}" />
+                        </p:column>
+                        <p:column headerText="型号">
+                            <h:outputText value="#{item.assetModel}" />
+                        </p:column>
+                        <p:column headerText="财产编号">
+                            <h:outputText value="#{item.financeNo}" />
+                        </p:column>
+                        <p:column headerText="器具编号">
+                            <h:outputText value="#{item.assetNo}" />
+                        </p:column>
+                        <p:column headerText="检定结论">
+                            <h:outputText value="#{item.status}" />
+                        </p:column>
+                        <p:column headerText="检定日期">
+                            <h:outputText value="#{item.checkDate}" />
+                        </p:column>
+                        <p:column headerText="有效期至">
+                            <h:outputText value="#{item.validDateTo}" />
+                        </p:column>
+                        <p:column headerText="检测单位">
+                            <h:outputText value="#{item.checkCompany}" />
+                        </p:column>
+                        <p:column headerText="检定人员">
+                            <h:outputText value="#{item.checkPerson}" />
+                        </p:column>
+                        <p:column headerText="项别">
+                            <h:outputText value="#{item.checkItem}" />
+                        </p:column>
+                        <p:column headerText="种别">
+                            <h:outputText value="#{item.type}" />
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

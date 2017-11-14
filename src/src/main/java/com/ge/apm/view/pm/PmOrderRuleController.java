@@ -38,8 +38,6 @@ import webapp.framework.web.mvc.JpaCRUDController;
 @ViewScoped
 public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private static final long serialVersionUID = -1L;
-//	private String safeReport = "";
-//	private String performanceReport = "";
 	private PmOrderRuleRepository dao = null;
 	private UserAccount user;
 	private UserAccountRepository userAccountRepository;
@@ -47,9 +45,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
 	private List<Integer> ids = new ArrayList<Integer>();
 	private String filterPmRuleStatus;
-	//private Integer copyPeriod;
 	private String defaultReport;
-	
+
 	@Override
 	protected void init() {
 		filterBySite = false;
@@ -128,6 +125,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		por.setOwnerId(user.getId());
 		por.setSafetyReport(defaultReport);
 		por.setPerformanceReport(defaultReport);
+		por.setPeriod(1);//默认一个月
 	}
 
 	public String getUserName(Integer userId) {
@@ -175,25 +173,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			}
 		}
 		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
-		System.out.println("selected.getPeriod() is "+selected.getPeriod());
+		
 		selected.setPeriod(getPeriod());
-/*		if(selected.getPeriod() == null){
-			List<Integer> itemIds = new ArrayList<Integer>();
-			if(!ids.isEmpty()){
-				Iterator it = ids.iterator();
-				if(it.hasNext()){
-					Object o = it.next();
-					itemIds.add(Integer.parseInt((String)o));
-				}
-			}
-			Integer period = 1;
-			if(itemIds.size() > 0){
-				 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
-			}
-//			Integer period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
-//			period =  period == null ? 1 : period;
-			selected.setPeriod(period);
-		}*/
 		
 		if (selected.getId() != null) {//更新
 			onBeforeSave(selected);
@@ -299,10 +280,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
         selected.setOwnerId(user.getId());
-        saveOwn();
+        applyChange();
 	}
 	
-	public void saveOwn(){
+/*	public void saveOwn(){
 		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 		if(!StringUtils.isEmpty(selected.getSafetyReport())){
 			try{
@@ -335,7 +316,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			}
 		}
 		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+		
 		selected.setPeriod(getPeriod());
+		
 		getName();
 		dao.save(selected);
 		String ruleUID = selected.getUid();
@@ -359,7 +342,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		}
 		ids.clear();
 		WebUtil.addSuccessMessage(WebUtil.getMessage("保存成功！"));
-	}
+	}*/
 	
 	public String getDefalutReport(){
 		return dao.getDefalutReport(1);
@@ -390,19 +373,33 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	}
 
 	public Integer getPeriod(){
-		List<Integer> itemIds = new ArrayList<Integer>();
-		if(!ids.isEmpty()){
-			Iterator it = ids.iterator();
-			if(it.hasNext()){
-				Object o = it.next();
-				itemIds.add(Integer.parseInt((String)o));
+		if(selected.getPeriod() != null && selected.getPeriod() != 1){
+			return selected.getPeriod();
+		}else{
+			List<Integer> itemIds = new ArrayList<Integer>();
+			if(!ids.isEmpty()){
+				Iterator it = ids.iterator();
+				if(it.hasNext()){
+					Object o = it.next();
+					itemIds.add(Integer.parseInt((String)o));
+				}
 			}
+			Integer period = 1;
+			if(itemIds.size() > 0){
+				 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
+			}
+			return period;
 		}
-		Integer period = 1;
-		if(itemIds.size() > 0){
-			 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
-		}
-		return period;
+	}
+	
+	public void initSaveAs(){
+		selected.setPeriod(null);
+//		selected.setId(null);
+//		selected.setStatus(0);
+//        selected.setCreatedDate(new Date());
+//        selected.setUid(UUID.randomUUID().toString().replace("-", ""));
+//        selected.setOwnerId(user.getId());
+        super.prepareEdit();
 	}
 
 	public String getDefaultReport() {
@@ -412,8 +409,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	public void setDefaultReport(String defaultReport) {
 		this.defaultReport = defaultReport;
 	}
-	
-    
 
 	/*
 	 * @Override public void onBeforeNewObject(PmOrderRule object) { }
