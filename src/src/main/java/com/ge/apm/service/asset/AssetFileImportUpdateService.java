@@ -16,6 +16,7 @@ import org.apache.poi.ss.usermodel.ExcelStyleDateFormatter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.jsf.FacesContextUtils;
 import webapp.framework.dao.SearchFilter;
@@ -109,13 +110,51 @@ public class AssetFileImportUpdateService {
             stringValue = ExcelDocument.getCellStringValue(columnValue);
             assetInfo.setNationalStandardCode(stringValue);
 
+            columnValue = getColumnValue(record, "manufacture");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setManufacture(stringValue);
+
+            columnValue = getColumnValue(record, "vendor");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setVendor(stringValue);
+
+            columnValue = getColumnValue(record, "QRCode");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = StringUtils.isEmpty(stringValue) ? null : stringValue;
+            assetInfo.setQrCode(stringValue);
+
+
 
             ++row;
 
             assetInfoDao.save(assetInfo);
 
+        }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void clearBeforeUpdateAll(List<Map<String, Object>> results) throws Exception {
+
+        String stringValue;
+
+        int row = 1;
+        //clear QR code first, otherwise throw unique key exception
+        for (Map<String, Object> record : results) {
+
+            stringValue = ExcelDocument.getCellStringValue(record.get("ID"));
+            AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
+            if (assetInfo == null) {
+                throw new Exception(String.format("第{0}条记录没有找到", row));
+            }
+            assetInfo.setQrCode(null);
+
+
+            ++row;
+
+            assetInfoDao.save(assetInfo);
 
         }
+
     }
 
     private Object getColumnValue(Map<String, Object> record, String columnKey) throws Exception {
