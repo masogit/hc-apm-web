@@ -92,6 +92,9 @@ public class MeasuringService {
                 continue;
             }
             Map<String, Integer> header = findHeader(sheet);
+            if(header.isEmpty()) {
+                continue;
+            }
             for (int j = header.get("HEADER_ROW") + 1; j < sheet.getLastRowNum(); j++) {
                 HSSFRow row = sheet.getRow(j);
                 if (row == null) {
@@ -103,7 +106,11 @@ public class MeasuringService {
                 detail.setHospitalUID(user.getHospitalUID());
                 detail.setSiteUID(user.getSiteUID());
                 detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")) == null ? null : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
-                detail.setAssetModel(row.getCell(header.get("MODEL_CELL")) == null ? null : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+
+                if(row.getCell(header.get("MODEL_CELL")) != null) {
+                    detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
+                }
+
                 detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
 
                 if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
