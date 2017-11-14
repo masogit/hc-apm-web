@@ -55,17 +55,9 @@
 	                    <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
                   	<p:scrollPanel style="height:80px">
-                            <p:inputTextarea id="safetyReport" cols="10" scrollHeight="20"  rows="20" autoResize="true"
-                            value="#{pmOrderRuleController.selected.safetyReport == null or pmOrderRuleController.selected.id == null? pmOrderRuleController.safeReport : pmOrderRuleController.selected.safetyReport}" />
+                  		<p:inputTextarea id="safetyReport" cols="10" scrollHeight="20"  rows="20" autoResize="true" value="#{pmOrderRuleController.selected.safetyReport}"/>
                    	</p:scrollPanel>
                     <br/>
-                    
-<!--                     <p:panelGrid id="grid3" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                    		<label class ="label">#{msg.safetyReport}</label>
-                    		<br/>
-                            <p:inputTextarea id="safetyReport" cols="100" value="#{pmOrderRuleController.selected.safetyReport}" 
-                            placeholder="#{pmOrderRuleController.safeReport}" />
-                    </p:panelGrid> -->
                     
                    <p:panelGrid columns="3"  styleClass="ui-panelgrid-blank form-group">
 	                     <label class ="label">#{msg.performanceReport}</label>
@@ -73,16 +65,9 @@
 	                     <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
                     <p:scrollPanel style="height:80px">
-                           <p:inputTextarea id="performanceReport" cols="10"  scrollHeight="50"  rows="50"
-                           value="#{pmOrderRuleController.selected.performanceReport == null or pmOrderRuleController.selected.id == null ? pmOrderRuleController.performanceReport : pmOrderRuleController.selected.performanceReport}"   />
+                    	<p:inputTextarea id="performanceReport" cols="10"  scrollHeight="50"  rows="50" value="#{pmOrderRuleController.selected.performanceReport}"/>
                    	</p:scrollPanel>
-                    
-<!--                     <p:panelGrid id="grid4"  columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                    		<label class ="label">#{msg.performanceReport}</label>
-                    		<br/>
-                            <p:inputTextarea id="performanceReport" cols="100"  value="#{pmOrderRuleController.selected.performanceReport}" 
-                             placeholder="#{pmOrderRuleController.performanceReport}" />
-                    </p:panelGrid> -->
+
                       <br/>
                      <p:scrollPanel  style="height:80px">
                         <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="pageDirection" columns="1"   styleClass="checkboxGroup"
@@ -90,12 +75,6 @@
                             <f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i"  itemLabel="#{i.name}(#{i.period}月)"  itemValue="#{i.id}"  />
                         </p:selectManyCheckbox>	
                     </p:scrollPanel>
-<!--                      <br/>
-                      <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-		                  <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="responsive" columns="1" rendered="#{pmOrderRuleController.getSelectedIds() != null}">
-		                  	<f:selectItems value="#{pmOrderRuleController.getAllItems()}" var="i" itemLabel="#{i.name}(#{i.period}月)" itemValue="#{i.id}" />
-					     </p:selectManyCheckbox>	
-                     </p:panelGrid> -->
 					<br/>
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.applyChange()}" value="#{msg.Save}" 
                     update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 

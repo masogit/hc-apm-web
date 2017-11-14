@@ -45,9 +45,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private List<OrgInfo> institutionList;
 	private List<OrgInfo> hospitalList;
 	private List<OrgInfo> siteList;
-//	private String selectedHospitalId;
-//	private String selectedSiteId;
-//	private String selectedInstitutionId;
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	@Override
@@ -64,10 +61,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void initDispatchUserList() {
 		dispatchUserList.clear();
 		Set<String> uids = new HashSet<String>();
-/*		uids.add(selected.getTenantUID());
-		uids.add(selected.getInstitutionUID());
-		uids.add(selected.getHospitalUID());
-		uids.add(selected.getSiteUID());*/
 		String tenantUID = user.getTenantUID();
 		if(selected == null){
 			/**
@@ -76,9 +69,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			dispatchUserList = userDao.getByTenantUID(tenantUID);
 			return;
 		}else{
-			System.out.println("before change:"+JSON.toJSONString(selected));
-			//selected = getLevel(selected);
-			//System.out.println("after change:"+JSON.toJSONString(selected));
 			uids.add(selected.getTenantUID());
 			selected.setTenantUID(tenantUID);
 			
@@ -116,98 +106,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}
 		}
 	}
-	
-    public WorkflowConfig getLevel(WorkflowConfig originSelected){
-    	if(originSelected.getId() == null){
-    		if(originSelected.getSiteUID() != null){
-    			return originSelected;
-    		}else{
-    			 if(originSelected.getHospitalUID() != null){
-    	        		originSelected.setSiteUID(null);
-    	        		return originSelected;
-    			 }else{
-    				 if(originSelected.getInstitutionUID() != null){
-    					originSelected.setHospitalUID(null);
-    		        	originSelected.setSiteUID(null);
-    		        	return originSelected;
-    				 }else{
-    		        		originSelected.setHospitalUID(null);
-    		        		originSelected.setSiteUID(null);
-    		        		originSelected.setHospitalUID(null);
-    		        		return originSelected;
-    				 }
-    			 }
-    		}
-    	}else{
-        	OrgInfo orgInfoSite = orgInfoRepository.getByUid(originSelected.getSiteUID());
-        	if(orgInfoSite != null){
-        		if(orgInfoSite.getOrgType() != null && orgInfoSite.getOrgType() == 3){//院区
-        			return originSelected;
-        		}else if(orgInfoSite.getOrgType() != null && orgInfoSite.getOrgType() == 2){//医院
-        			originSelected.setSiteUID(null);
-        			return originSelected;
-        		}else if(orgInfoSite.getOrgType() != null && orgInfoSite.getOrgType() == 1){//集团
-        			originSelected.setHospitalUID(null);
-        			originSelected.setSiteUID(null);
-        			return originSelected;
-        		}else{//租户
-        			originSelected.setHospitalUID(null);
-        			originSelected.setSiteUID(null);
-        			originSelected.setHospitalUID(null);
-        			return originSelected;
-        		}
-        	}else{
-        		OrgInfo orgInfoHospital = orgInfoRepository.getByUid(originSelected.getHospitalUID());
-        		if(orgInfoHospital != null){
-            		if(orgInfoHospital.getOrgType() != null && orgInfoHospital.getOrgType() == 3){//院区
-            			return originSelected;
-            		}else if(orgInfoHospital.getOrgType() != null && orgInfoHospital.getOrgType() == 2){//医院
-            			originSelected.setSiteUID(null);
-            			return originSelected;
-            		}else if(orgInfoHospital.getOrgType() != null && orgInfoHospital.getOrgType() == 1){//集团
-            			originSelected.setHospitalUID(null);
-            			originSelected.setSiteUID(null);
-            			return originSelected;
-            		}else{//租户
-            			originSelected.setHospitalUID(null);
-            			originSelected.setSiteUID(null);
-            			originSelected.setHospitalUID(null);
-            			return originSelected;
-            		}
-            	
-        		}else{
-        			OrgInfo orgInfoHospitalInstitution = orgInfoRepository.getByUid(originSelected.getInstitutionUID());
-        			if(orgInfoHospitalInstitution != null){
-        				if(orgInfoHospitalInstitution.getOrgType() != null && orgInfoHospitalInstitution.getOrgType() == 3){//院区
-                			return originSelected;
-                		}else if(orgInfoHospitalInstitution.getOrgType() != null && orgInfoHospitalInstitution.getOrgType() == 2){//医院
-                			originSelected.setSiteUID(null);
-                			return originSelected;
-                		}else if(orgInfoHospitalInstitution.getOrgType() != null && orgInfoHospitalInstitution.getOrgType() == 1){//集团
-                			originSelected.setHospitalUID(null);
-                			originSelected.setSiteUID(null);
-                			return originSelected;
-                		}else{//租户
-                			originSelected.setHospitalUID(null);
-                			originSelected.setSiteUID(null);
-                			originSelected.setHospitalUID(null);
-                			return originSelected;
-                		}
-        			}else{
-        				originSelected.setHospitalUID(null);
-            			originSelected.setSiteUID(null);
-            			originSelected.setHospitalUID(null);
-            			return originSelected;
-        			}
-        		}
-        	}
-    	}
-    }
-    
-    public void updateDispather(){
-    	selected = getLevel(selected);
-    	initDispatchUserList();
-    }
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
@@ -260,9 +158,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-//        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-//        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
@@ -362,13 +257,17 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     	super.save();
     }
 	
-/*	@Override
+	@Override
 	public void prepareEdit(){
 		if(selected != null){
-			selected = getLevel(selected);
+			initDispatchUserList();
 		}
 		super.prepareEdit();
-	}*/
+	}
+	
+	public void onSelect(){
+		selected = dao.findById(selected.getId());
+	}
 	
 	public void updateHospitalAndSite(){
 		selected.setHospitalUID(null);
@@ -383,14 +282,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	
 	public void updateDispaters(){
 		dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
-	}
-	
-	public void clearSelected(){
-		selected = null;
-	}
-	
-	public void printf(){
-		System.out.println(JSON.toJSONString(selected));
 	}
 
 	public UserAccount getOwner() {
