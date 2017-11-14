@@ -9,6 +9,7 @@ import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.CellType;
 import org.hibernate.validator.internal.util.StringHelper;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
@@ -104,7 +105,11 @@ public class MeasuringService {
                 detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")) == null ? null : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
                 detail.setAssetModel(row.getCell(header.get("MODEL_CELL")) == null ? null : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
                 detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
-                detail.setAssetNo(row.getCell(header.get("APPLIANCE_NO_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+
+                if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
+                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                }
+
                 detail.setCertificateNo(row.getCell(header.get("CERTIFICATION_NO_CELL")) == null ? null : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
                 detail.setCheckDate(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue());
                 detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
