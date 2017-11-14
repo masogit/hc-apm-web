@@ -53,7 +53,7 @@
 	                    <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
                   	<p:scrollPanel style="height:80px">
-                  		<p:inputTextarea id="safetyReport" cols="10" scrollHeight="50"  rows="50" autoResize="true" value="#{pmOrderRuleController.selected.safetyReport}"/>
+                  		<p:inputTextarea id="safetyReport" cols="100" scrollHeight="50"  rows="50" autoResize="true" value="#{pmOrderRuleController.selected.safetyReport}"/>
                    	</p:scrollPanel>
 
                     <br/>
@@ -63,7 +63,7 @@
 	                     <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
                     <p:scrollPanel style="height:80px">
-                           <p:inputTextarea id="performanceReport" cols="10"  scrollHeight="50"  rows="50" value="#{pmOrderRuleController.selected.performanceReport}"/>
+                           <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50"  rows="50" value="#{pmOrderRuleController.selected.performanceReport}"/>
                    	</p:scrollPanel>
 					<br/>
                     
@@ -79,10 +79,10 @@
                     rendered="#{pmOrderRuleController.selected.status != 1 or userContextService.hasRole('AssetHead')}"
                     update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
-                    <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.saveAs()}" value="另存为" 
+<!--                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.saveAs()}" value="另存为" 
                     update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
                     oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
-                    &nbsp;&nbsp;
+                    &nbsp;&nbsp; -->
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleEditDialog').hide()"/>
                     &nbsp;&nbsp;
                 </h:panelGroup>

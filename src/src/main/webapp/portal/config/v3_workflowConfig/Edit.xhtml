@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
+        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">

@@ -21,7 +21,7 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,40,60,90">
 
-                    <p:ajax event="rowSelect" update="createButton editButton deleteButton approveButton"/>
+                    <p:ajax event="rowSelect" update="createButton editButton deleteButton approveButton saveAsButton"/>
                     <p:ajax event="filter" listener="#{pmOrderRuleController.onFilter}" update="createButton editButton deleteButton"/>
                     
                      <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -76,7 +76,8 @@
                         <p:commandButton id="createButton" title="#{msg.Create}"  icon="ui-icon-plus" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareCreate}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()"/>
                         <!-- <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareView}" update=":PmOrderRuleViewDlg" oncomplete="PF('PmOrderRuleViewDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/> -->
                         <p:commandButton id="editButton"  title="#{msg.Edit}"  icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleEditForm" oncomplete="PF('PmOrderRuleEditDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
-                        <p:commandButton id="approveButton"  title="审核"  icon="ui-icon-check" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleApproveDlg" oncomplete="PF('PmOrderRuleApproveDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
+                        <p:commandButton id="saveAsButton"  title="另存为"  icon="ui-icon-save" class="btn btn-sm btn-gray"  actionListener="#{pmOrderRuleController.initSaveAs()}" update=":PmOrderRuleSaveAsForm" oncomplete="PF('SaveAsDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
+                        <p:commandButton id="approveButton"  title="审核"  icon="ui-icon-check" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}" actionListener="#{pmOrderRuleController.prepareEdit}" update=":PmOrderRuleApproveForm" oncomplete="PF('PmOrderRuleApproveDialog').show()" disabled="#{empty pmOrderRuleController.selected}"/>
                         <p:commandButton id="deleteButton" title="#{msg.Delete}"  icon="ui-icon-close" class="btn btn-sm btn-gray" rendered="#{userContextService.hasRole('AssetHead')}"  actionListener="#{pmOrderRuleController.delete}"  update=":PmOrderRuleEditDlg,datalist"  disabled="#{empty pmOrderRuleController.selected}">
                         	<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/> 
                         </p:commandButton>
@@ -90,6 +91,7 @@
             <ui:include src="Edit.xhtml"/>
             <ui:include src="View.xhtml"/>
             <ui:include src="Approve.xhtml"/>
+            <ui:include src="SaveAs.xhtml"/>
 
             <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="false" draggable="true" appendTo="@(body)" header="预览">
                 <h:form id="PmOrderPreviewForm" >
