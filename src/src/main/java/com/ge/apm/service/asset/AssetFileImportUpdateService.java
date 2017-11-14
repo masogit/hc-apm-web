@@ -78,6 +78,7 @@ public class AssetFileImportUpdateService {
 
         String stringValue;
         Integer intValue;
+        String columnTitle = null;
 
         int row = 1;
         for (Map<String, Object> record: results) {
@@ -107,6 +108,10 @@ public class AssetFileImportUpdateService {
             columnValue = getColumnValue(record, "assetGroup");
             stringValue = ExcelDocument.getCellStringValue(columnValue);
             intValue = stringValue == null ? null : findSelectionKey(this.assetGroup, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetGroup");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
             assetInfo.setAssetGroup(intValue);
 
             columnValue = getColumnValue(record, "nationalStandardCode");
@@ -121,6 +126,14 @@ public class AssetFileImportUpdateService {
             stringValue = ExcelDocument.getCellStringValue(columnValue);
             assetInfo.setVendor(stringValue);
 
+            columnValue = getColumnValue(record, "aliasName");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setAliasName(stringValue);
+
+            columnValue = getColumnValue(record, "financingNum");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setFinancingNum(stringValue);
+
             columnValue = getColumnValue(record, "QRCode");
             stringValue = ExcelDocument.getCellStringValue(columnValue);
             stringValue = StringUtils.isEmpty(stringValue) ? null : stringValue;
@@ -128,9 +141,10 @@ public class AssetFileImportUpdateService {
 
 
 
-            ++row;
 
             assetInfoDao.save(assetInfo);
+
+            ++row;
 
         }
     }
