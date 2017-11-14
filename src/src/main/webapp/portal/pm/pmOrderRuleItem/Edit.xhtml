@@ -13,11 +13,11 @@
                 <h:panelGroup id="display">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleItemController.selected != null}">
                         <h:panelGroup>
-                            <label>#{msg.name} ：</label>
+                            <label>#{msg.name} *：</label>
                             <p:inputText id="name" value="#{pmOrderRuleItemController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label>#{msg.period} (月)：</label>
+                            <label>#{msg.period} (月) *：</label>
                             <p:inputText id="period" value="#{pmOrderRuleItemController.selected.period}" required="true" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
