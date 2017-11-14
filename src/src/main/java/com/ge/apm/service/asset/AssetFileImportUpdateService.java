@@ -79,34 +79,30 @@ public class AssetFileImportUpdateService {
         String stringValue;
         Integer intValue;
         String columnTitle = null;
+//        Object columnValue = null;
 
         int row = 1;
         for (Map<String, Object> record: results) {
 
-            stringValue = ExcelDocument.getCellStringValue(record.get("ID"));
+            stringValue = getColumnStringValue(record, "ID");
             AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
             if (assetInfo == null) {
                 throw new Exception(String.format("第{0}条记录没有找到", row));
             }
 
-            Object columnValue = getColumnValue(record, "preventiveMaintenanceAnalysis_deviceName");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "preventiveMaintenanceAnalysis_deviceName");
             assetInfo.setName(stringValue);
 
-            columnValue = getColumnValue(record, "functionType");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "functionType");
             assetInfo.setFunctionType(stringValue);
 
-            columnValue = getColumnValue(record, "serialNum");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "serialNum");
             assetInfo.setSerialNum(stringValue);
 
-            columnValue = getColumnValue(record, "departNum");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "departNum");
             assetInfo.setDepartNum(stringValue);
 
-            columnValue = getColumnValue(record, "assetGroup");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "assetGroup");
             intValue = stringValue == null ? null : findSelectionKey(this.assetGroup, stringValue);
             if (!StringUtils.isEmpty(stringValue) && null == intValue) {
                 columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetGroup");
@@ -114,29 +110,22 @@ public class AssetFileImportUpdateService {
             }
             assetInfo.setAssetGroup(intValue);
 
-            columnValue = getColumnValue(record, "nationalStandardCode");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "nationalStandardCode");
             assetInfo.setNationalStandardCode(stringValue);
 
-            columnValue = getColumnValue(record, "manufacture");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "manufacture");
             assetInfo.setManufacture(stringValue);
 
-            columnValue = getColumnValue(record, "vendor");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "vendor");
             assetInfo.setVendor(stringValue);
 
-            columnValue = getColumnValue(record, "aliasName");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "aliasName");
             assetInfo.setAliasName(stringValue);
 
-            columnValue = getColumnValue(record, "financingNum");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            stringValue = getColumnStringValue(record, "financingNum");
             assetInfo.setFinancingNum(stringValue);
 
-            columnValue = getColumnValue(record, "QRCode");
-            stringValue = ExcelDocument.getCellStringValue(columnValue);
-            stringValue = StringUtils.isEmpty(stringValue) ? null : stringValue;
+            stringValue = getColumnStringValue(record, "QRCode");
             assetInfo.setQrCode(stringValue);
 
 
@@ -158,7 +147,7 @@ public class AssetFileImportUpdateService {
         //clear QR code first, otherwise throw unique key exception
         for (Map<String, Object> record : results) {
 
-            stringValue = ExcelDocument.getCellStringValue(record.get("ID"));
+            stringValue = getColumnStringValue(record, "ID");
             AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
             if (assetInfo == null) {
                 throw new Exception(String.format("第{0}条记录没有找到", row));
@@ -187,6 +176,13 @@ public class AssetFileImportUpdateService {
         return record.get(columnTitle);
     }
 
+    private String getColumnStringValue(Map<String, Object> record, String columnKey) throws Exception {
+        Object obj = getColumnValue(record, columnKey);
+        String columnValue = ExcelDocument.getCellStringValue(obj);
+
+        return convertToNullIfEmtpy(columnValue);
+    }
+
 
     private Integer findSelectionKey(List<I18nMessage> messages, String title) {
 
@@ -198,6 +194,16 @@ public class AssetFileImportUpdateService {
 
         return null;
 
+    }
+
+    private String convertToNullIfEmtpy(String input) {
+        if (null == input) {
+            return null;
+        }
+        if (StringUtils.isEmpty(input)) {
+            return null;
+        }
+        return input.trim();
     }
 
 }

@@ -202,7 +202,18 @@ public class ExcelDocument {
             case BOOLEAN:
                 return null;
             case NUMERIC:
-                return HSSFDateUtil.isCellDateFormatted(cell) ? null : ((XSSFCell)cell).getRawValue();
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                    return null;
+                }
+
+                if (cell instanceof XSSFCell) {
+                    return ((XSSFCell)cell).getRawValue();
+                }
+                if (cell instanceof HSSFCell) {
+                    cell.setCellType(CellType.STRING);
+                    return cell.getStringCellValue();
+                }
+                return null;
             case STRING:
                 return null;
             case FORMULA:
