@@ -16,10 +16,12 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.service.asset.AssetDepreciationService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 import java.time.ZonedDateTime;
@@ -54,6 +56,8 @@ public class AssetInstallationController {
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    private AssetDepreciationService assetDepreciationService;
+    private V2_PmOrderService pmService;
 
     private OrgInfo selectedOrg;
     private TreeNode orgTree;
@@ -70,6 +74,8 @@ public class AssetInstallationController {
         blobService = WebUtil.getBean(BlobFileService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
+        assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
+        pmService = WebUtil.getBean(V2_PmOrderService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
@@ -133,6 +139,9 @@ public class AssetInstallationController {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), true)) {
+                AssetInfo newAsset = assetDao.getByUid(arrivalListItem.getAssetUID());
+                assetDepreciationService.saveAssetDerpeciation(newAsset);
+                pmService.createPMrequest(newAsset.getUid(), null);
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");

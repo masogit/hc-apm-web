@@ -81,7 +81,7 @@ public class AssetFileImportService {
     @Autowired
     private QrCodeLibRepository qrcodeDao;
     @Autowired
-    private AssetDepreciationService assetDepreciationService;
+    private AssetCreateService assetCreateService;
     @Autowired
     private QrCodeService qrCodeService;
     @Autowired
@@ -479,11 +479,17 @@ public class AssetFileImportService {
                 if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
                     QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
                     newAsset.setQrCode(newCode.getQrCode());
-                    createAsset(newAsset);
-                    item.put("status", ImportStatus.Created);
+                    if(createAsset(newAsset)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
                 } else if (isAvailableQrcode(qrCode, item)) {
-                    createAsset(newAsset);
-                    item.put("status", ImportStatus.Created);
+                    if(createAsset(newAsset)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
                 } else {
                     item.put("status", ImportStatus.Failure);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
@@ -555,8 +561,10 @@ public class AssetFileImportService {
     }
 
     @Transactional
-    void createAsset(AssetInfo asset) {
-        assetDao.save(asset);
+    Boolean createAsset(AssetInfo asset) {
+        if(!assetCreateService.CreateAeest(asset)){
+            return false;
+        }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
             QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode());
             if (qrCodeLib != null) {
@@ -564,7 +572,7 @@ public class AssetFileImportService {
                 qrcodeDao.save(qrCodeLib);
             }
         }
-        assetDepreciationService.saveAssetDerpeciation(asset);
+        return true;
     }
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
