@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
@@ -24,7 +25,6 @@ import java.io.File;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import org.springframework.beans.factory.annotation.Value;
 
 /**
  *
@@ -64,6 +64,11 @@ public class AssetCreateService {
 
     @Autowired
     BlobObjectRepository blobDao;
+    
+    @Autowired
+    private AssetDepreciationService assetDepreciationService;
+    @Autowired
+    private V2_PmOrderService pmService;
 
     public String getTenantName(Integer siteId) {
         TenantInfo si = tenantDao.findById(siteId);
@@ -120,7 +125,15 @@ public class AssetCreateService {
     }
 
     public Boolean CreateAeest(AssetInfo assetInfo) {
-        return (null != assetDao.save(assetInfo));
+        boolean isNew = assetInfo.getId()==null;
+        if(null == assetDao.save(assetInfo)){
+            return false;
+        }
+        assetDepreciationService.saveAssetDerpeciation(assetInfo);
+        if(isNew){
+            pmService.createPMrequest(assetInfo.getUid(), null);
+        }
+        return true;
     }
 
     public List<UserAccount> getAssetOnwers(int siteId, Integer hospitalId) {
