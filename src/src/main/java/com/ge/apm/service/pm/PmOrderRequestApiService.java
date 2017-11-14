@@ -73,7 +73,9 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     public Map<String, Object> createPmRequest(String token, String assetUid,Date planTime){
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setAssetUid(assetUid);
-        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+        if(null!=planTime){
+            formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+        }
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_pmRequestCreate, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {

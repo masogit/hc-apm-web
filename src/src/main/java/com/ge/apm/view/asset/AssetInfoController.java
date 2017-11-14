@@ -457,8 +457,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
         }
 
+        Boolean isNew = selected.hashCode()==0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
+        if(isNew){
+            pmService.createPMrequest(selected.getUid(), null);
+        }
         if (resultStatus) {
             return getListPageLink();
         } else {
