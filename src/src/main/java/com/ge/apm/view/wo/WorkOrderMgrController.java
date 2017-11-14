@@ -417,8 +417,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
-            selectedAsset.setLocationName(locationName);
+              //如果设备没有指定安装位置，就取当前人的设备科室
             selectedAsset.setStatus(currentStatus);
+            assetDao.save(selectedAsset);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             cancel();
         }
@@ -434,7 +435,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (this.newServiceRequest == null) {
             return;
         }
-
+        if(Strings.isNullOrEmpty(asset.getLocationName()) )  {
+            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+            String lName = orgDao.getByUid(orgInfoUID).getName();
+            asset.setLocationName(lName);
+            locationName=lName;
+        }else{
+            locationName = asset.getLocationName();
+        }
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
