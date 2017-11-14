@@ -17,7 +17,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -50,12 +52,14 @@ public class MeasuringService {
     private AssetInfoRepository assetInfoDao;
     private static final Logger LOGGER = LoggerFactory.getLogger(MeasuringService.class);
 
-    public void operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
+    public boolean operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
+        boolean flag = false;
         if (!StringHelper.isNullOrEmptyString(measuringCertificateDetail.getCertificateNo())) {
             MeasuringCertificateDetail tempData = measuringCertificateDetailDao.findByCertificateNoAndTenantUID(measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
 
             if (tempData != null) {
                 measuringCertificateDetail.setId(tempData.getId());
+                flag = true;
             }
 
             measuringCertificateDetailDao.save(measuringCertificateDetail);
@@ -69,9 +73,12 @@ public class MeasuringService {
                 tempAssetInfo.setUsageStatus(2);//停用
             }
         }
+
+        return flag;
     }
 
-    public void handleExcel(UploadedFile file, UserAccount user) throws IOException {
+    public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException {
+        List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
             HSSFSheet sheet = workbook.getSheetAt(i);
@@ -95,6 +102,7 @@ public class MeasuringService {
                 detail.setAssetNo(row.getCell(header.get("APPLIANCE_NO_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
                 detail.setCertificateNo(row.getCell(header.get("CERTIFICATION_NO_CELL")) == null ? null : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
                 detail.setCheckDate(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue());
+                detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
                 detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
                 detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")) == null ? null : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
                 detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
@@ -124,9 +132,14 @@ public class MeasuringService {
                     }
                 }
                 detail.setStatus(status);
-                operateMeasuringAndAssetInfo(detail);
+                detail.setExcelIdex(j);
+                if(!operateMeasuringAndAssetInfo(detail)){
+                    tempMCDList.add(detail);
+                }
             }
         }
+
+        return tempMCDList;
     }
 
     private HSSFSheet handleSheet(HSSFSheet sheet) {

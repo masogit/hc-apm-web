@@ -1,6 +1,7 @@
 package com.ge.apm.view.measuring;
 
 import com.ge.apm.dao.MeasuringTypeConfigRepository;
+import com.ge.apm.domain.MeasuringCertificateDetail;
 import com.ge.apm.domain.MeasuringTypeConfig;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.MeasuringService;
@@ -18,6 +19,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by 212605082 on 2017/10/11.
@@ -30,6 +32,7 @@ public class MeasureFromExcelController extends GenericCRUDUUIDController<Measur
     private MeasuringService measuringService;
     private UserAccount currentUser;
     private UploadedFile file;
+    private List<MeasuringCertificateDetail> noFoundList;
 
     @Override
     protected void init() {
@@ -53,7 +56,7 @@ public class MeasureFromExcelController extends GenericCRUDUUIDController<Measur
     public void handleFileUpload(FileUploadEvent event) throws IOException {
         FacesMessage message = new FacesMessage("Successful", event.getFile().getFileName() + " 上传成功！");
         this.file = event.getFile();
-        measuringService.handleExcel(file, currentUser);
+        noFoundList = measuringService.handleExcel(file, currentUser);
         FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
@@ -63,5 +66,13 @@ public class MeasureFromExcelController extends GenericCRUDUUIDController<Measur
 
     public void setFile(UploadedFile file) {
         this.file = file;
+    }
+
+    public List<MeasuringCertificateDetail> getNoFoundList() {
+        return noFoundList;
+    }
+
+    public void setNoFoundList(List<MeasuringCertificateDetail> noFoundList) {
+        this.noFoundList = noFoundList;
     }
 }
