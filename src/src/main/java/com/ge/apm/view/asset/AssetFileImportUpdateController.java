@@ -35,8 +35,6 @@ public class AssetFileImportUpdateController {
 
     Logger logger = LoggerFactory.getLogger(AssetFileImportUpdateController.class);
 
-    private Map<String, Map<String, Object>> importAssetMap;
-
     @Autowired
     private AssetFileImportUpdateService assetFileUpdateService;
 
@@ -55,9 +53,6 @@ public class AssetFileImportUpdateController {
 
             List<Map<String, Object>> results = doc.getAllDataRows(0, 1, 2);
 
-            //clear data like QR code to avoid unique key exception
-//            assetFileUpdateService.clearBeforeUpdateAll(results);
-
             assetFileUpdateService.updateAll(results);
 
 
@@ -65,7 +60,7 @@ public class AssetFileImportUpdateController {
             WebUtil.addErrorMessage("File can not be read!");
             logger.error(e.getMessage(), e);
         } catch (Exception e) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--" +  e.getMessage());
+            WebUtil.addErrorMessage(e.getMessage());
             logger.error(e.getMessage(), e);
         }
 
