@@ -69,27 +69,48 @@ public class AssetFileImportUpdateService {
 
     }
 
-    @Transactional
-    public void updateAll(List<Map<String, Object>> results) {
+    @Transactional(rollbackFor = Exception.class)
+    public void updateAll(List<Map<String, Object>> results) throws Exception{
 
         String stringValue;
+        Integer intValue;
 
+        int row = 1;
         for (Map<String, Object> record: results) {
 
             stringValue = ExcelDocument.getCellStringValue(record.get("ID"));
             AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
             if (assetInfo == null) {
-                continue;
+                throw new Exception(String.format("第{0}条记录没有找到", row));
             }
 
-            String title = DbResourcesUtil.getInstance().getAsResourceBundle().getString("preventiveMaintenanceAnalysis_deviceName");
-            if (StringUtils.isEmpty(title)) {
-                continue;
-            }
-            if (record.containsKey(title)) {
-                stringValue = ExcelDocument.getCellStringValue(record.get(title));
-                assetInfo.setName(stringValue);
-            }
+            Object columnValue = getColumnValue(record, "preventiveMaintenanceAnalysis_deviceName");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setName(stringValue);
+
+            columnValue = getColumnValue(record, "functionType");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setFunctionType(stringValue);
+
+            columnValue = getColumnValue(record, "serialNum");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setSerialNum(stringValue);
+
+            columnValue = getColumnValue(record, "departNum");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setDepartNum(stringValue);
+
+            columnValue = getColumnValue(record, "assetGroup");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            intValue = stringValue == null ? null : findSelectionKey(this.assetGroup, stringValue);
+            assetInfo.setAssetGroup(intValue);
+
+            columnValue = getColumnValue(record, "nationalStandardCode");
+            stringValue = ExcelDocument.getCellStringValue(columnValue);
+            assetInfo.setNationalStandardCode(stringValue);
+
+
+            ++row;
 
             assetInfoDao.save(assetInfo);
 
@@ -97,6 +118,30 @@ public class AssetFileImportUpdateService {
         }
     }
 
+    private Object getColumnValue(Map<String, Object> record, String columnKey) throws Exception {
+        String columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString(columnKey);
+        if (StringUtils.isEmpty(columnTitle)) {
+            throw new Exception(String.format("列别名{0}没有找到相应的列名", columnKey));
+        }
 
+        if (!record.containsKey(columnTitle)) {
+            throw new Exception(String.format("列名{0}不在数据中", columnTitle));
+        }
+
+        return record.get(columnTitle);
+    }
+
+
+    private Integer findSelectionKey(List<I18nMessage> messages, String title) {
+
+        for (I18nMessage message: messages) {
+            if (message.getValue().equals(title)) {
+                return Integer.valueOf(message.getMsgKey());
+            }
+        }
+
+        return null;
+
+    }
 
 }
