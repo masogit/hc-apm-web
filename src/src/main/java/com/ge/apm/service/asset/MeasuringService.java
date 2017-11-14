@@ -110,6 +110,7 @@ public class MeasuringService {
                 detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 detail.setFinanceNo(row.getCell(header.get("ASSET_NO_CELL")) == null ? null : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
                 detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
                 detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 Integer status = 1;
                 if (row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) != null) {
@@ -132,7 +133,7 @@ public class MeasuringService {
                     }
                 }
                 detail.setStatus(status);
-                detail.setExcelIdex(j);
+                detail.setExcelIdex(j + 1);
                 if(!operateMeasuringAndAssetInfo(detail)){
                     tempMCDList.add(detail);
                 }
@@ -250,7 +251,7 @@ public class MeasuringService {
                             break;
                         case HEADER_CATEGORY:
                             hasCategory = true;
-                            header.put("EXPIRE_DATE_CELL", j);
+                            header.put("CATEGORY_CELL", j);
                             break;
                         case HEADER_CLINICAL_DEPT:
                             hasClinicalDept = true;
