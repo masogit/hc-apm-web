@@ -139,7 +139,8 @@ public class AssetInstallationController {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), true)) {
-                AssetInfo newAsset = assetDao.getByUid(arrivalListItem.getAssetUID());
+                ArrivalListItem temp = itemDao.findById(arrivalListItem.getId());
+                AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 pmService.createPMrequest(newAsset.getUid(), null);
                 WebUtil.addSuccessMessage("提交成功");
