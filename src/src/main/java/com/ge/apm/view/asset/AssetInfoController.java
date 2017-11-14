@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.AssetDepreciationService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -85,6 +86,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String operation;
 
     private AssetDepreciationService assetDepreciationService;
+    private V2_PmOrderService pmService;
 
     private QrCodeService qrCodeService;
     private UserCommonService ucService;
@@ -140,6 +142,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
+        pmService = WebUtil.getBean(V2_PmOrderService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
