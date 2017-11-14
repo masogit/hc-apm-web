@@ -129,7 +129,7 @@ public class AssetInfo implements Serializable {
     private Integer assetGroup;//设备分类
 
     @Column(name = "asset_dept_id")
-    private int assetDeptId;//所属设备科
+    private Integer assetDeptId;//所属设备科
 
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
@@ -536,7 +536,7 @@ public class AssetInfo implements Serializable {
         this.id = id;
     }
 
-    public AssetInfo(Integer id, int siteId, String name, int assetDeptId, int assetOwnerId, String assetOwnerName, boolean isValid, int status) {
+    public AssetInfo(Integer id, int siteId, String name, Integer assetDeptId, int assetOwnerId, String assetOwnerName, boolean isValid, int status) {
         this.id = id;
         this.siteId = siteId;
         this.name = name;
@@ -764,11 +764,11 @@ public class AssetInfo implements Serializable {
         this.assetGroup = assetGroup;
     }
 
-    public int getAssetDeptId() {
+    public Integer getAssetDeptId() {
         return assetDeptId;
     }
 
-    public void setAssetDeptId(int assetDeptId) {
+    public void setAssetDeptId(Integer assetDeptId) {
         this.assetDeptId = assetDeptId;
     }
 
