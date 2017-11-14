@@ -73,6 +73,9 @@ public class AssetFileImportUpdateService {
     @Transactional(rollbackFor = Exception.class)
     public void updateAll(List<Map<String, Object>> results) throws Exception{
 
+        //clear data like QR code to avoid unique key exception
+        clearBeforeUpdateAll(results);
+
         String stringValue;
         Integer intValue;
 
