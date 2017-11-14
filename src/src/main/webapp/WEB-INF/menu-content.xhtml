@@ -61,7 +61,7 @@
                             url="/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o"
-                       rendered="#{   userContextService.hasRole('ClinicalStaff') or
+                       rendered="#{userContextService.hasRole('ClinicalStaff') or
                         userContextService.hasRole('DeptHead') or
                         userContextService.hasRole('SuperAdmin') or
                         userContextService.hasRole('AssetHead') or
