@@ -13,11 +13,10 @@
             <div class="ui-g-12 card">
                 <h:form enctype="multipart/form-data">
                     <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
-                                  dragDropSupport="false"
-                                  fileLimitMessage="一次最多上传3个文件"
+                                  dragDropSupport="false" multiple="false" auto="true"
                                   invalidFileMessage="只支持xls或xlsx格式的文件"
                                   invalidSizeMessage="文件大小不得超过5M"
-                                  update="messages" sizeLimit="5242880" fileLimit="3" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                  update="messages" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
                                   label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
                     <p:growl id="messages" showDetail="true"/>
                 </h:form>

@@ -110,6 +110,8 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    private Integer excelIdex;
+
     public String getId() {
         return id;
     }
@@ -284,6 +286,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
+    }
+
+    public Integer getExcelIdex() {
+        return excelIdex;
+    }
+
+    public void setExcelIdex(Integer excelIdex) {
+        this.excelIdex = excelIdex;
     }
 
     @Override
