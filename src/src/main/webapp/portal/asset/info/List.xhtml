@@ -102,12 +102,7 @@
                          <p:column headerText="#{msg.nationalStandardCode}"  visible="false" exportable="true">
                             <h:outputText value="#{item.nationalStandardCode}"/>
                         </p:column>
-                         <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.assetOwnerName}"/>
-	                    </p:column>
-                        <p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.assetOwnerTel}"/>
-	                    </p:column>
+
 						<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.brand.name}"/>
 						</p:column>
@@ -141,6 +136,13 @@
                      	<p:column headerText="#{msg.aliasName}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.aliasName}"/>
 	                    </p:column>
+
+						<p:column headerText="#{msg.assetOwnerName}" visible="false" exportable="true">
+							<h:outputText value="#{item.assetOwnerName}"/>
+						</p:column>
+						<p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
+							<h:outputText value="#{item.assetOwnerTel}"/>
+						</p:column>
 	                    <p:column headerText="#{msg.assetOwnerName2}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.assetOwnerName2}"/>
 	                    </p:column>
