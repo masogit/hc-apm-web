@@ -194,7 +194,7 @@
 	                        <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
 	                    </p:column>
 	                    
-	                     <p:column headerText="主设备" visible="false" exportable="true">
+	                     <p:column headerText="#{msg.parentAsset}" visible="false" exportable="true">
 	                        <h:outputText value="#{assetInfoController.getParentAssetNameByAssetId(item.id)}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
@@ -202,11 +202,11 @@
 	                    </p:column>
 	                    
 	                    <!-- #{msg.functionGroup} -->
-	                    <p:column headerText="医疗器械分类" visible="false" exportable="true">
+	                    <p:column headerText="#{msg.functionGroup}" visible="false" exportable="true">
 	                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
 	                    </p:column>
 	                    <!-- #{msg.assetCode68} -->
-                        <p:column headerText="医疗器械子分类"  visible="false" exportable="true">
+                        <p:column headerText="#{msg.assetCode68}"  visible="false" exportable="true">
                             <h:outputText value="#{item.assetCode68}"/>
                         </p:column>
 <!-- 	                    <p:column headerText="#{msg.functionType}"  visible="false" exportable="true">
