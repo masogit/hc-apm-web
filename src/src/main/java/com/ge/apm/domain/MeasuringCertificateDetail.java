@@ -110,6 +110,7 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    @Transient
     private Integer excelIdex;
 
     public String getId() {
