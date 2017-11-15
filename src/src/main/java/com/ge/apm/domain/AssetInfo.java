@@ -3,8 +3,13 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -70,10 +75,10 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "vendor")
-    private String vendor;//供应商
+    private String vendor;//供应商名称
 
     @Column(name = "supplier_id")
-    private Integer supplierId;
+    private Integer supplierId; //供应商Id
 
     @Size(max = 64)
     @Column(name = "maitanance")
@@ -328,8 +333,8 @@ public class AssetInfo implements Serializable {
     private String siteUID;
     
     //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
-//    @Column(name = "asset_category")
-//    private Integer assetCategory;
+    @Column(name = "asset_category")
+    private Integer assetCategory;
 
     //用途[1:诊断类,2:治疗类,3:辅助类]
     @Column(name = "asset_usage")
@@ -359,6 +364,10 @@ public class AssetInfo implements Serializable {
     @Column(name = "measuring_item_category")
     private Integer measuringItemCategory;
 
+    //计量周期(月)
+    @Column(name = "metering_cycle")
+    private Integer meteringCycle;
+
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
     @Column(name = "usage_status")
     private Integer usageStatus;
@@ -376,6 +385,10 @@ public class AssetInfo implements Serializable {
     @Size(max = 64)
     @Column(name = "make_short_name")
     private String makerShortName;
+
+    @Column(name = "next_metering_date")
+    @Temporal(TemporalType.DATE)
+    private Date nextMeteringDate;//下次计量日期
 
 //    public Integer getAssetCategory() {
 //        return assetCategory;
@@ -769,7 +782,7 @@ public class AssetInfo implements Serializable {
     }
 
     public void setAssetDeptId(Integer assetDeptId) {
-        this.assetDeptId = assetDeptId;
+        this.assetDeptId = Optional.ofNullable(assetDeptId).orElse(0);
     }
 
     public Integer getAssetOwnerId() {
@@ -1160,6 +1173,30 @@ public class AssetInfo implements Serializable {
 
     public void setMakerShortName(String makerShortName) {
         this.makerShortName = makerShortName;
+    }
+
+    public Integer getAssetCategory() {
+        return assetCategory;
+    }
+
+    public void setAssetCategory(Integer assetCategory) {
+        this.assetCategory = assetCategory;
+    }
+
+    public Integer getMeteringCycle() {
+        return meteringCycle;
+    }
+
+    public void setMeteringCycle(Integer meteringCycle) {
+        this.meteringCycle = meteringCycle;
+    }
+
+    public Date getNextMeteringDate() {
+        return nextMeteringDate;
+    }
+
+    public void setNextMeteringDate(Date nextMeteringDate) {
+        this.nextMeteringDate = nextMeteringDate;
     }
 
     @Override

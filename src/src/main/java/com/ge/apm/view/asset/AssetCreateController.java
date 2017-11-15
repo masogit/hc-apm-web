@@ -34,8 +34,6 @@ public class AssetCreateController {
     private AssetInfo assetInfo;
     private QrCodeLib createRequest;
     private AssetCreateService acServie;
-    private AttachmentFileService attachFileService;
-    private UserAccountRepository userDao;
     private BrandRepository brandDao;
 
     private String[] selectedPictures;
@@ -55,9 +53,7 @@ public class AssetCreateController {
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
         acServie = WebUtil.getBean(AssetCreateService.class);
-        attachFileService = WebUtil.getBean(AttachmentFileService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
-        userDao = WebUtil.getBean(UserAccountRepository.class);
 
         createRequest = acServie.getCreateRequest(qrCode);
         assetInfo = createAssetInfo();
@@ -148,11 +144,6 @@ public class AssetCreateController {
             WebUtil.addErrorMessage("创建失败");
             return "";
         }
-    }
-
-    public String getAudioBase64(Integer fileId) {
-        String audio = attachFileService.getBase64File(fileId);
-        return audio;
     }
 
     public void returnBack() {

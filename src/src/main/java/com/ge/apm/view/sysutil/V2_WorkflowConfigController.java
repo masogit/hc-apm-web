@@ -1,7 +1,9 @@
 package com.ge.apm.view.sysutil;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -12,6 +14,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
@@ -36,15 +39,12 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private UserAccountRepository userDao;
 	private UserAccount user;
 	private UserAccount owner;
-	private List<UserAccount> dispatchUserList;
+	private List<UserAccount> dispatchUserList = new ArrayList<UserAccount>();
 	private List<UserInfo> userList;
 	private List<V2_DeviceType> deviceTypeList;
 	private List<OrgInfo> institutionList;
 	private List<OrgInfo> hospitalList;
 	private List<OrgInfo> siteList;
-//	private String selectedHospitalId;
-//	private String selectedSiteId;
-//	private String selectedInstitutionId;
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	@Override
@@ -59,63 +59,62 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 	public void initDispatchUserList() {
+		dispatchUserList.clear();
+		Set<String> uids = new HashSet<String>();
 		String tenantUID = user.getTenantUID();
 		if(selected == null){
+			/**
+			 * 默认级别：租户
+			 */
 			dispatchUserList = userDao.getByTenantUID(tenantUID);
 			return;
 		}else{
-			if(selected.getSiteUID() != null){
-				dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
-				return;
-			}else if(selected.getHospitalUID() != null){
-				dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
-				return;
-			}else if(selected.getInstitutionUID() != null){
-				dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
-				return;
-			}else {
+			uids.add(selected.getTenantUID());
+			selected.setTenantUID(tenantUID);
+			
+			/***
+			 * 租户级别
+			 */
+			if(isNullOrBelongs(selected.getInstitutionUID(),uids) || selected.getTenantUID().equals(selected.getInstitutionUID())){
+				System.out.println("租户级别");
 				dispatchUserList = userDao.getByTenantUID(tenantUID);
 				return;
-			}
-			
-		}
-		
-/*		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-		String tenantUID = user.getTenantUID();
-		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-		if(selected != null){
-			String institutionUID =selected.getInstitutionUID();
-			String hospitalUID = selected.getHospitalUID();
-			String siteUID = selected.getSiteUID();
-			if(institutionUID != null && !institutionUID.equals(tenantUID)){
-				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, institutionUID));
-				if(hospitalUID != null && !hospitalUID.equals(institutionUID)){
-					searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID));
-					if(siteUID != null && !siteUID.equals(hospitalUID)){
-						searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID));
+			}else{
+				/***
+				 * 集团级别
+				 */
+				uids.add(selected.getInstitutionUID());
+				if(isNullOrBelongs(selected.getHospitalUID(),uids) || selected.getInstitutionUID().equals(selected.getHospitalUID())){
+					System.out.println("集团级别");
+					dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
+					return;
+				}else{
+					/***
+					 * 医院级别
+					 */
+					uids.add(selected.getHospitalUID());
+					if(isNullOrBelongs(selected.getSiteUID(),uids) || selected.getHospitalUID().equals(selected.getSiteUID())){
+						System.out.println("医院级别");
+						dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
+						return;
+					}else{
+						System.out.println("院区级别");
+						dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
+						return;
 					}
 				}
 			}
 		}
-		dispatchUserList = userDao.findBySearchFilter(searchFilters);*/
-		
-		
-/*		if(selectedSiteId != null){
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-	        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-	        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-	        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-		}else if(selectedHospitalId != null){
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-	        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-	        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-		}else if(selectedInstitutionId != null){
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-	        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-		}else{
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-		}*/
+	}
 	
+	private boolean isNullOrBelongs(String uid,Set<String> uids){
+		if(uid == null){
+			return true;
+		}
+		if(uids.contains(uid)){
+			return true;
+		}
+		return false;
 	}
 
 	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
@@ -159,9 +158,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-//        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-//        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
@@ -260,6 +256,35 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     	onBeforeSave(selected);
     	super.save();
     }
+	
+	@Override
+	public void prepareEdit(){
+		if(selected != null){
+			initDispatchUserList();
+		}
+		super.prepareEdit();
+	}
+	
+	public void onSelect(){
+		if(selected != null){
+			selected = dao.findById(selected.getId());
+		}
+	}
+	
+	public void updateHospitalAndSite(){
+		selected.setHospitalUID(null);
+		selected.setSiteUID(null);
+		dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
+	}
+	
+	public void updateSite(){
+		selected.setSiteUID(null);
+		dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
+	}
+	
+	public void updateDispaters(){
+		dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
+	}
 
 	public UserAccount getOwner() {
 		return owner;

@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.AssetDepreciationService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
@@ -14,6 +15,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -33,13 +35,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.primefaces.context.RequestContext;
 import webapp.framework.web.service.UserContext;
 
 @ManagedBean
@@ -87,6 +86,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String operation;
 
     private AssetDepreciationService assetDepreciationService;
+    private V2_PmOrderService pmService;
 
     private QrCodeService qrCodeService;
     private UserCommonService ucService;
@@ -103,6 +103,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     private String selectedSiteUID;
+
+    private String measuring;
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -140,16 +142,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
+        pmService = WebUtil.getBean(V2_PmOrderService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         ucService = WebUtil.getBean(UserCommonService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
-        this.filterBySite = true;
+        this.filterBySite = false;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
+        this.measuring  = request.getParameter("measuring");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         // String actionName = WebUtil.getRequestParameter("actionName");
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -206,34 +210,42 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private void setUserSearchFilters() {
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         if (terminate) {
-            this.searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
+            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, false));
         } else {
-            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         }
 
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        if(!this.hasFilterOnField("siteUID")){
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
-            this.removeFilterOnField("name");
-            this.removeFilterOnField("departNum");
-            this.removeFilterOnField("financingNum");
-            this.removeFilterOnField("qrCode");
-            this.removeFilterOnField("serialNum");
-            this.removeFilterOnField("manufacture");
-            searchFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            searchFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            searchFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            searchFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            searchFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            searchFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        }
+
+        if ("true".equals(this.measuring)) {
+            Calendar calendar = new GregorianCalendar();
+            calendar.setTime(new Date());
+            calendar.add(calendar.YEAR, -1);
+            calendar.add(calendar.DATE, 60);
+            Date remindDate = calendar.getTime();
+            searchFilters.add(new SearchFilter("lastMeteringDate", SearchFilter.Operator.NE, null));
+            searchFilters.add(new SearchFilter("lastMeteringDate", SearchFilter.Operator.GTE, remindDate));
+        }else{
+            this.removeFilterOnField("lastMeteringDate");
         }
 
     }
@@ -448,8 +460,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
         }
 
+        Boolean isNew = selected.hashCode()==0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
+        if(isNew){
+            pmService.createPMrequest(selected.getUid(), null);
+        }
         if (resultStatus) {
             return getListPageLink();
         } else {
@@ -624,7 +640,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(ucService.getWorkerList(selected.getId()));
+        List<UserAccount> ownerList = ucService.getWorkerList(selected.getId());
+        if (null != ownerList) {
+            accountList.addAll(ownerList);
+        }
         return accountList;
     }
 
@@ -1078,6 +1097,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         );
         if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
             this.selected.setFinancingNum(financingNum);
+        }
+    }
+
+    public void discard(AssetInfo asset) {
+        if(asset != null && asset.getUsageStatus() == 3) {
+            asset.setUsageStatus(4);
+            this.selected = dao.save(asset);
+            WebUtil.addSuccessMessage("报废成功！");
+        } else {
+            WebUtil.addSuccessMessage("只能报废待报废状态的资产！");
+        }
+    }
+
+    public void readyForDiscard(AssetInfo asset) {
+        if(asset != null && asset.getUsageStatus() == 2) {
+            asset.setUsageStatus(3);
+            this.selected = dao.save(asset);
+            WebUtil.addSuccessMessage("已将状态修改为待报废！");
+        } else {
+            WebUtil.addSuccessMessage("只能待报废停用状态的资产！");
         }
     }
 

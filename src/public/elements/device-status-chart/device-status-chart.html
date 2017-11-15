@@ -336,6 +336,11 @@
                     }
 
                     // stage
+                    // monkey patch begin: for backend quirks, unknow stage > 6
+                    if (node.data.stage > 6) {
+                      node.data.stage = 4
+                    }
+                    // monkey patch end
                     label.append('tspan')
                     .attr('x', 0)
                     .attr('dy', '1.5em')

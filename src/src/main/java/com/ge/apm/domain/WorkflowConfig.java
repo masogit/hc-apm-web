@@ -69,6 +69,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
     
+    @Column(name = "pm_reminder_time")
+    private Integer pmReminderTime;//保养提醒时间，单位‘天’
+    
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
     
@@ -81,7 +84,15 @@ public class WorkflowConfig implements Serializable {
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
     
-    public String getTenantUID() {
+    public Integer getPmReminderTime() {
+		return pmReminderTime;
+	}
+
+	public void setPmReminderTime(Integer pmReminderTime) {
+		this.pmReminderTime = pmReminderTime;
+	}
+
+	public String getTenantUID() {
 		return tenantUID;
 	}
 

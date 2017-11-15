@@ -51,23 +51,28 @@ public class WorkOrderExportService {
     I18nMessageRepository i18nMessageDao;
 
 
-    public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
+    //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
+    public List<Map<String,Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, List<Integer> statusList){
 
         List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String,Object> workOrderMap;
 
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 
-        if(institutionUID != null && !institutionUID.equals("")){
-            SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, institutionUID);
+        if(selectedOrg != null && selectedOrg.getOrgLevel() == 0){
+            SearchFilter tenantFilter = new SearchFilter("tenant_uid", SearchFilter.Operator.EQ, selectedOrg.getUid());
+            searchFilters.add(tenantFilter);
+        }
+        if(selectedOrg != null && selectedOrg.getOrgLevel() == 1){
+            SearchFilter institutionFilter = new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(institutionFilter);
         }
-        if(hospitalUID != null && !hospitalUID.equals("")){
-            SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, hospitalUID);
+        if(selectedOrg != null && selectedOrg.getOrgLevel() == 2){
+            SearchFilter hospitalFilter = new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(hospitalFilter);
         }
-        if(siteUID != null && !siteUID.equals("")){
-            SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID);
+        if(selectedOrg != null && selectedOrg.getOrgLevel() == 3){
+            SearchFilter siteFilter = new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(siteFilter);
         }
 

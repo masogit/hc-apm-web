@@ -81,7 +81,7 @@ public class AssetFileImportService {
     @Autowired
     private QrCodeLibRepository qrcodeDao;
     @Autowired
-    private AssetDepreciationService assetDepreciationService;
+    private AssetCreateService assetCreateService;
     @Autowired
     private QrCodeService qrCodeService;
     @Autowired
@@ -209,7 +209,7 @@ public class AssetFileImportService {
             asset.setLifecycleInYear(ExcelDocument.getCellDoubleValue(rowMap.get("使用年限")));
             String depreciationMethodNmae = ExcelDocument.getCellStringValue(rowMap.get("折旧算法"));
             asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae,map,"折旧算法"));
-            asset.setManufactDate(getDateField(rowMap.get("生产日期"), "生产日期"));
+            asset.setManufactDate(getDateField(rowMap.get("出厂日期"), "出厂日期"));
             asset.setPurchaseDate(getDateField(rowMap.get("采购日期"), "采购日期"));
             asset.setArriveDate(getDateField(rowMap.get("到货日期"), "到货日期"));
             asset.setInstallDate(getDateField(rowMap.get("启用日期"), "启用日期"));
@@ -479,11 +479,17 @@ public class AssetFileImportService {
                 if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
                     QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
                     newAsset.setQrCode(newCode.getQrCode());
-                    createAsset(newAsset);
-                    item.put("status", ImportStatus.Created);
+                    if(createAsset(newAsset)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
                 } else if (isAvailableQrcode(qrCode, item)) {
-                    createAsset(newAsset);
-                    item.put("status", ImportStatus.Created);
+                    if(createAsset(newAsset)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
                 } else {
                     item.put("status", ImportStatus.Failure);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
@@ -555,8 +561,10 @@ public class AssetFileImportService {
     }
 
     @Transactional
-    void createAsset(AssetInfo asset) {
-        assetDao.save(asset);
+    Boolean createAsset(AssetInfo asset) {
+        if(!assetCreateService.CreateAeest(asset)){
+            return false;
+        }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
             QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode());
             if (qrCodeLib != null) {
@@ -564,7 +572,7 @@ public class AssetFileImportService {
                 qrcodeDao.save(qrCodeLib);
             }
         }
-        assetDepreciationService.saveAssetDerpeciation(asset);
+        return true;
     }
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
@@ -656,6 +664,6 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.7".equalsIgnoreCase(inputVersion);
+        return "v1.8".equalsIgnoreCase(inputVersion);
     }
 }

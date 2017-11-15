@@ -239,7 +239,7 @@ export class App extends Component<void, Props, void> {
   }
 
   mountPhaseData = (evt, phaseData) => {
-    let phases = values(phaseData.data).sort()
+    let phases = values(phaseData.data).sort((a, b) => a - b)
     let timeNodes = phaseData.nodes
     let distri = phases.map((val, i) => {
       if (i > 0) {
@@ -443,7 +443,7 @@ export class App extends Component<void, Props, void> {
                 title={t('ettr')}
                 data={distriEttr}
                 rows={[GetDonutChartRow(t('average'), gross.ETTR), GetDonutChartRow('P75', gross.ETTR75), GetDonutChartRow('P95', gross.ETTR95)]}
-                onMouseMove={evt => this.onDonutHover(evt, distriEttr, distributionEttr)}
+                onMouseMove={evt => this.onDonutHover(evt, distriEttr)}
                 onMouseLeave={this.onDonutHover}
               />
               <Donut
@@ -454,7 +454,7 @@ export class App extends Component<void, Props, void> {
                 title={t('response_time')}
                 data={distriResponse}
                 rows={[GetDonutChartRow(t('average'), gross.respond)]}
-                onMouseMove={evt => this.onDonutHover(evt, distriResponse, distributionResponse)}
+                onMouseMove={evt => this.onDonutHover(evt, distriResponse)}
                 onMouseLeave={this.onDonutHover}
               />
 
