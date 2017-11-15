@@ -8,64 +8,82 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="计量结果"/>
+                <p:outputLabel class="pageTitle" value="计量结果导入"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form enctype="multipart/form-data">
-                    <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
-                                  dragDropSupport="false" multiple="false" auto="true"
-                                  invalidFileMessage="只支持xls或xlsx格式的文件"
-                                  invalidSizeMessage="文件大小不得超过5M"
-                                  update=":dataListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
-                                  label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
-                    <p:growl id="messages" showDetail="true"/>
+                    <p:fieldset  legend="批量导入计量数据" id="uploaderContainer">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
+                                          dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件"
+                                          invalidSizeMessage="文件大小不得超过5M"
+                                          update=":dataListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                          label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                            <p:growl id="messages" showDetail="true"/>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>1. <a href="APM_MEASURING_Template.xls" title="download">#{msg.downloadTemplateFile}</a> </p>
+                            <p>2. 文件中填入要导入的计量数据</p>
+                            <p>3. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:fieldset>
                 </h:form>
+            </div>
 
+            <div class="ui-g-12 card">
                 <h:form id="dataListForm">
-                    <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="10,20,50">
-                        <p:column headerText="证书编号">
-                            <h:outputText value="#{item.certificateNo}" />
-                        </p:column>
-                        <p:column headerText="器具名称">
-                            <h:outputText value="#{item.assetName}" />
-                        </p:column>
-                        <p:column headerText="制造厂">
-                            <h:outputText value="#{item.assetManufacturer}" />
-                        </p:column>
-                        <p:column headerText="型号">
-                            <h:outputText value="#{item.assetModel}" />
-                        </p:column>
-                        <p:column headerText="财产编号">
-                            <h:outputText value="#{item.financeNo}" />
-                        </p:column>
-                        <p:column headerText="器具编号">
-                            <h:outputText value="#{item.assetNo}" />
-                        </p:column>
-                        <p:column headerText="检定结论">
-                            <h:outputText value="#{item.status}" />
-                        </p:column>
-                        <p:column headerText="检定日期">
-                            <h:outputText value="#{item.checkDate}" />
-                        </p:column>
-                        <p:column headerText="有效期至">
-                            <h:outputText value="#{item.validDateTo}" />
-                        </p:column>
-                        <p:column headerText="检测单位">
-                            <h:outputText value="#{item.checkCompany}" />
-                        </p:column>
-                        <p:column headerText="检定人员">
-                            <h:outputText value="#{item.checkPerson}" />
-                        </p:column>
-                        <p:column headerText="项别">
-                            <h:outputText value="#{item.checkItem}" />
-                        </p:column>
-                        <p:column headerText="种别">
-                            <h:outputText value="#{item.type}" />
-                        </p:column>
-                    </p:dataTable>
+                    <p:fieldset  legend="（财产编号）没有匹配到设备的数据">
+                        <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="10,20,50">
+                            <p:column headerText="EXCEL行数">
+                                <h:outputText value="#{item.excelIdex}" />
+                            </p:column>
+                            <p:column headerText="证书编号">
+                                <h:outputText value="#{item.certificateNo}" />
+                            </p:column>
+                            <p:column headerText="器具名称">
+                                <h:outputText value="#{item.assetName}" />
+                            </p:column>
+                            <p:column headerText="制造厂">
+                                <h:outputText value="#{item.assetManufacturer}" />
+                            </p:column>
+                            <p:column headerText="型号">
+                                <h:outputText value="#{item.assetModel}" />
+                            </p:column>
+                            <p:column headerText="财产编号">
+                                <h:outputText value="#{item.financeNo}" />
+                            </p:column>
+                            <p:column headerText="器具编号">
+                                <h:outputText value="#{item.assetNo}" />
+                            </p:column>
+                            <p:column headerText="检定日期">
+                                <h:outputText value="#{item.checkDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="有效期至">
+                                <h:outputText value="#{item.validDateTo}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="检测单位">
+                                <h:outputText value="#{item.checkCompany}" />
+                            </p:column>
+                            <p:column headerText="检定人员">
+                                <h:outputText value="#{item.checkPerson}" />
+                            </p:column>
+                            <p:column headerText="项别">
+                                <h:outputText value="#{item.checkItem}" />
+                            </p:column>
+                            <p:column headerText="种别">
+                                <h:outputText value="#{item.type}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:fieldset>
                 </h:form>
             </div>
         </div>
