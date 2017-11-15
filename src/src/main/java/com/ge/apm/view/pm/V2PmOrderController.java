@@ -13,6 +13,8 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,7 +41,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //V2_WorkOrderRepository dao;
     V2_PmOrderRepository dao;
-
+private String dptName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_PmOrderService pmOrderService;
@@ -56,6 +58,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
+
     //private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     //status：2-待派工/3-已派工/4-已关单/5-已取消
@@ -122,8 +125,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     private V2_PmOrder v2PmOrder;
     public void createPM(){
-        pmOrderService.createPMrequest(selectedAsset.getUid(),planTime);
-        cancel();
+        if(Strings.isNullOrEmpty(dptName)){
+            WebUtil.addErrorMessage("吴使用科室的资产不能创建保养工单");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        }else{
+            pmOrderService.createPMrequest(selectedAsset.getUid(),planTime);
+            cancel();
+        }
+
     }
     public void createPMRequest(){
         cancel();
@@ -408,6 +418,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
             return;
         }
         assetName=asset.getName();
+        if(Strings.isNullOrEmpty(asset.getClinicalDeptName()) )  {
+           dptName=null;
+        }
+        else{
+            dptName=asset.getClinicalDeptName();
+        }
+
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -416,20 +433,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         needConfirmTime = false;
     }
 
-   /* public void onStatusChange() {
-        if (selectedPmOrder != null) {
-            selectedAsset = selectedPmOrder.getAssetInfo();
-        }
-
-        if (selectedAsset == null && selected == null) {
-            return;
-        }
-        if (null != selectedAsset) {//new sr
-            needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
-        } else {//update sr
-            needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
-        }
-    }*/
 
     public void prepareEditAccDetail(String itemId) {
         if ("new".equals(itemId)) {
@@ -742,5 +745,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void setAssetName(String assetName) {
         this.assetName = assetName;
+    }
+
+    public String getDptName() {
+        return dptName;
+    }
+
+    public void setDptName(String dptName) {
+        this.dptName = dptName;
     }
 }
