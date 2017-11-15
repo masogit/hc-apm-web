@@ -308,11 +308,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void assembleMaintainData() {
-        operation = "/portal/sr/srList?faces-redirect=true";
+        operation = "/portal/woMgr/woMgrList?faces-redirect=true&assetUID=" + selected.getUid();
     }
 
     public void assembleMaintainList() {
-        operation = "/portal/sr/srList?faces-redirect=true";
+        operation = "/portal/woMgr/woMgrList?faces-redirect=true";
     }
 
     public String getContractListLink() {
@@ -589,13 +589,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (null != blobObject) {
             String type = event.getComponent().getId();
             type = type.substring(type.indexOf("type") + 4);
-//            AssetFileAttachment attach = new AssetFileAttachment();
-//            attach.setName(blobObject.getObjectName());
-//            attach.setFileType(type);
-//            attach.setSiteId(UserContextService.getCurrentUserAccount().getSiteId());
-//            attach.setAssetId(selected.getId());
-//            attach.setHospitalId(selected.getHospitalId());
-//            attach.setFileUrl(blobObject.getObjectStorageId());
             attachements.add(blobObject);
             blobObject.setBoId(selected.getId());
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
@@ -670,7 +663,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public boolean isTimeValidate() {
         String message = WebUtil.getMessage("shouldEarly"); //"{0} must before {1}!";
         AssetInfo input = this.selected;
-//        Date todaydate = new Date();
         boolean isError = false;
 
         if (null != input.getManufactDate() && null != input.getPurchaseDate() && input.getManufactDate().after(input.getPurchaseDate())) {
@@ -708,18 +700,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("installDate"), WebUtil.getMessage("lastQaDate")));
         }
 
-//        if (null!=input.getLastPmDate() && input.getLastPmDate().after(todaydate)) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("lastPmDate"), WebUtil.getMessage("todayDate")));
-//        }
-//        if (null!=input.getLastMeteringDate() && input.getLastMeteringDate().after(todaydate)) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("lastMeteringDate"), WebUtil.getMessage("todayDate")));
-//        }
-//        if (null!=input.getLastQaDate() && input.getLastQaDate().after(todaydate)) {
-//            isError = true;
-//            WebUtil.addErrorMessage(MessageFormat.format(message, WebUtil.getMessage("lastQaDate"), WebUtil.getMessage("todayDate")));
-//        }
         return !isError;
     }
 
