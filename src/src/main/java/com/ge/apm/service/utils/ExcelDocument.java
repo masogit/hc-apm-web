@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -288,6 +289,69 @@ public class ExcelDocument {
         if (value instanceof Integer) {
             return Double.valueOf((Integer) value);
         }
+        return null;
+    }
+
+    static public Date getCellDateValue(Object value) {
+        ValueWrapper valueWrapper = null;
+        if (value instanceof ValueWrapper) {
+            valueWrapper = (ValueWrapper) value;
+            value = valueWrapper.value;
+        }
+
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof Date) {
+            return (Date) value;
+        }
+
+        if (value instanceof String) {
+            String strDate = ((String) value).trim();
+            if (StringUtils.isEmpty(strDate)) {
+                return null;
+            }
+
+            Date res;
+            if (strDate.length() == 10) {
+                String dateFormat = TimeUtils.getDateFormat(strDate);
+                if (dateFormat != null) {
+                    res = TimeUtils.getDateFromStr(strDate, dateFormat);
+                    if (res != null) {
+                        return res;
+                    }
+                }
+                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "yyyy/MM/dd");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
+                if (res != null) {
+                    return res;
+                }
+            } else if (strDate.length() == 8) {
+                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
+                if (res != null) {
+                    return res;
+                }
+            }
+
+            return null;
+        }
+
         return null;
     }
 
