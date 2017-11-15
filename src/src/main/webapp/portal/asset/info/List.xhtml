@@ -65,6 +65,9 @@
                                 </p:commandLink>
                             </h:panelGroup>
                         </p:column>
+						<p:column headerText="ID" visible="false">
+							<h:outputText value="#{item.uid}"/>
+						</p:column>
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
@@ -99,12 +102,7 @@
                          <p:column headerText="#{msg.nationalStandardCode}"  visible="false" exportable="true">
                             <h:outputText value="#{item.nationalStandardCode}"/>
                         </p:column>
-                         <p:column headerText="#{msg.assetOwnerId}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.assetOwnerName}"/>
-	                    </p:column>
-                        <p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
-	                        <h:outputText value="#{item.assetOwnerTel}"/>
-	                    </p:column>
+
 						<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.brand.name}"/>
 						</p:column>
@@ -138,6 +136,13 @@
                      	<p:column headerText="#{msg.aliasName}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.aliasName}"/>
 	                    </p:column>
+
+						<p:column headerText="#{msg.assetOwnerName}" visible="false" exportable="true">
+							<h:outputText value="#{item.assetOwnerName}"/>
+						</p:column>
+						<p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
+							<h:outputText value="#{item.assetOwnerTel}"/>
+						</p:column>
 	                    <p:column headerText="#{msg.assetOwnerName2}" visible="false" exportable="true">
 	                        <h:outputText value="#{item.assetOwnerName2}"/>
 	                    </p:column>
@@ -191,7 +196,7 @@
 	                        <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
 	                    </p:column>
 	                    
-	                     <p:column headerText="主设备" visible="false" exportable="true">
+	                     <p:column headerText="#{msg.parentAsset}" visible="false" exportable="true">
 	                        <h:outputText value="#{assetInfoController.getParentAssetNameByAssetId(item.id)}"/>
 	                    </p:column>
 	                    <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
@@ -199,11 +204,11 @@
 	                    </p:column>
 	                    
 	                    <!-- #{msg.functionGroup} -->
-	                    <p:column headerText="医疗器械分类" visible="false" exportable="true">
+	                    <p:column headerText="#{msg.functionGroup}" visible="false" exportable="true">
 	                        <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
 	                    </p:column>
 	                    <!-- #{msg.assetCode68} -->
-                        <p:column headerText="医疗器械子分类"  visible="false" exportable="true">
+                        <p:column headerText="#{msg.assetCode68}"  visible="false" exportable="true">
                             <h:outputText value="#{item.assetCode68}"/>
                         </p:column>
 <!-- 	                    <p:column headerText="#{msg.functionType}"  visible="false" exportable="true">
@@ -377,11 +382,14 @@
                         </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton" immediate="true"/>
+
+					<p:fileUpload id="type1" fileUploadListener="#{assetFileImportUpdateController.handleFileUpload}" mode="advanced" dragDropSupport="false"
+								  multiple="false"  update="datalist" sizeLimit="10000000" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                 </h:form>
             </div>
         </div>
 
-        <p:overlayPanel widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false">
+		<p:overlayPanel widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>

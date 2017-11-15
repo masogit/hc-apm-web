@@ -549,7 +549,7 @@ public class AssetInfo implements Serializable {
         this.id = id;
     }
 
-    public AssetInfo(Integer id, int siteId, String name, int assetDeptId, int assetOwnerId, String assetOwnerName, boolean isValid, int status) {
+    public AssetInfo(Integer id, int siteId, String name, Integer assetDeptId, int assetOwnerId, String assetOwnerName, boolean isValid, int status) {
         this.id = id;
         this.siteId = siteId;
         this.name = name;

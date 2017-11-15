@@ -30,6 +30,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     
     public AssetInfo getByUid(String uid);
 
+    public AssetInfo findByUid(String uid);
+
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
 
     @Query(value = "select count(1) from v2_work_order where asset_id = ?1 and status = 1", nativeQuery = true)
