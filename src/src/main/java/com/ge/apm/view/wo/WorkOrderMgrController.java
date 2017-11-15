@@ -26,6 +26,7 @@ import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.io.Serializable;
@@ -108,6 +109,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<V2_BlobObject> audioList;
 
     private List<Integer> tagGroupAssets;
+    
+    private String requestAssetUid;
 
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -124,6 +127,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         queryIndex = 0;
         this.filterBySite = false;
         this.filterByHospital = false;
+        
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        if(!Strings.isNullOrEmpty(enCodeParameters)){
+            requestAssetUid = (String)UrlEncryptController.getValueFromMap(enCodeParameters,"assetUID");
+        }
+        
 
     }
 
@@ -402,6 +411,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void createServiceRequest() {
         cancel();
+        if(!Strings.isNullOrEmpty(requestAssetUid)){
+            selectedAsset = assetDao.findByUid(requestAssetUid);
+        }
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
@@ -794,6 +806,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void setAudioList(List<V2_BlobObject> audioList) {
         this.audioList = audioList;
+    }
+
+    public String getRequestAssetUid() {
+        return requestAssetUid;
+    }
+
+    public void setRequestAssetUid(String requestAssetUid) {
+        this.requestAssetUid = requestAssetUid;
     }
 
 }

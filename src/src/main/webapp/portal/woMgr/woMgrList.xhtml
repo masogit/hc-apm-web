@@ -17,7 +17,7 @@
                 <h:form id="woMgrListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(0)}" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true"/>
-
+                        
                         <p:commandButton value="报修"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
                         <p:commandButton value="#{msg.repaired}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(1)}" disabled="#{workOrderMgrController.queryIndex==1}" rendered="true"/>
                         <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(10)}" disabled="#{workOrderMgrController.queryIndex==10}" rendered="true"/>
@@ -32,6 +32,7 @@
 <!--                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet :woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(3)}"  disabled="#{workOrderMgrController.queryIndex==3}" />
                         <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet :woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
                         <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet :woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
+                        <p:remoteCommand id="createSR" name="createSR" update=":ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{workOrderMgrController.selected}"
@@ -230,6 +231,14 @@
             </h:form>
         </p:dialog>
 
+        <script>
+            window.onload = function () {
+                var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+                if (requestAssetUid != "") {
+                    createSR();
+                }
+            }
+        </script>
     </ui:define>
 
 </ui:composition>
