@@ -16,6 +16,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -71,12 +72,23 @@ public class ExcelDocument {
         return sheet == null ? 0 : workBook.getSheet(sheetName).getLastRowNum();
     }
 
-    public String[] getKeyRow(String sheetName, Integer keyRowNum) {
+    public String[] getKeyRow(String sheetName, int keyRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
+        return getKeyRow(sheet, keyRowNum);
+    }
+
+    public String[] getKeyRow(int sheetIndex, int keyRowNum) {
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        return getKeyRow(sheet, keyRowNum);
+    }
+
+    public String[] getKeyRow(Sheet sheet, int keyRowNum) {
         Row keyRow = sheet.getRow(keyRowNum - 1);
         String[] result = new String[keyRow.getLastCellNum()];
-        for (int cellIndex = keyRow.getFirstCellNum(); cellIndex < keyRow.getLastCellNum(); cellIndex++) {
-            result[cellIndex] = keyRow.getCell(cellIndex).getStringCellValue();
+        int firstCellNum = keyRow.getFirstCellNum();
+        int lastCellNum = keyRow.getLastCellNum();
+        for (int columnIndex = firstCellNum; columnIndex < lastCellNum; columnIndex++) {
+            result[columnIndex] = keyRow.getCell(columnIndex).getStringCellValue();
         }
         return result;
     }
@@ -93,7 +105,7 @@ public class ExcelDocument {
         for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
             Cell cell = dataRow.getCell(cellIndex);
             if (cell == null) {
-                break;
+                continue;
             }
             Object v = getCellValue(cell);
             String rawValue = getRawValue(cell);
@@ -101,6 +113,47 @@ public class ExcelDocument {
             dataMap.put(rowKey[cellIndex], wrapper);
         }
         return dataMap;
+    }
+
+    public List<Map<String, Object>> getAllDataRows(int sheetIndex, int keyRowNum, int startDataRowNum) {
+
+        Sheet sheet = workBook.getSheetAt(sheetIndex);
+        return getAllDataRows(sheet, keyRowNum, startDataRowNum);
+
+    }
+
+    public List<Map<String, Object>> getAllDataRows(Sheet sheet, int keyRowNum, int startDataRowNum) {
+
+        String[] colKeys = getKeyRow(sheet, keyRowNum);
+        int lastRowNum = sheet.getLastRowNum();
+        List<Map<String, Object>> results = new ArrayList<>(lastRowNum);
+
+        while (true) {
+            Row dataRow = sheet.getRow(startDataRowNum - 1);
+            if (dataRow == null) {
+                break;
+            }
+
+            Map<String, Object> dataMap = new LinkedHashMap();
+            for (int cellIndex = 0; cellIndex < colKeys.length; cellIndex++) {
+                Cell cell = dataRow.getCell(cellIndex);
+                if (cell == null) {
+                    continue;
+                }
+                Object v = getCellValue(cell);
+                String rawValue = getRawValue(cell);
+                ValueWrapper wrapper = new ValueWrapper(v, rawValue);
+
+                dataMap.put(colKeys[cellIndex], wrapper);
+            }
+
+            results.add(dataMap);
+
+            ++startDataRowNum;
+        }
+
+        return results;
+
     }
 
     public Map<String, Object> getDataRowMap(String sheetName, Integer keyRowNum, Integer dataRowNum) {
@@ -150,7 +203,18 @@ public class ExcelDocument {
             case BOOLEAN:
                 return null;
             case NUMERIC:
-                return HSSFDateUtil.isCellDateFormatted(cell) ? null : ((XSSFCell)cell).getRawValue();
+                if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                    return null;
+                }
+
+                if (cell instanceof XSSFCell) {
+                    return ((XSSFCell)cell).getRawValue();
+                }
+                if (cell instanceof HSSFCell) {
+                    cell.setCellType(CellType.STRING);
+                    return cell.getStringCellValue();
+                }
+                return null;
             case STRING:
                 return null;
             case FORMULA:
@@ -171,7 +235,7 @@ public class ExcelDocument {
             return null;
         }
         if (value instanceof String) {
-            return (String) value;
+            return ((String) value).trim();
         }
         if (value instanceof Integer) {
             return valueWrapper.rawValue;
@@ -225,6 +289,69 @@ public class ExcelDocument {
         if (value instanceof Integer) {
             return Double.valueOf((Integer) value);
         }
+        return null;
+    }
+
+    static public Date getCellDateValue(Object value) {
+        ValueWrapper valueWrapper = null;
+        if (value instanceof ValueWrapper) {
+            valueWrapper = (ValueWrapper) value;
+            value = valueWrapper.value;
+        }
+
+        if (value == null) {
+            return null;
+        }
+
+        if (value instanceof Date) {
+            return (Date) value;
+        }
+
+        if (value instanceof String) {
+            String strDate = ((String) value).trim();
+            if (StringUtils.isEmpty(strDate)) {
+                return null;
+            }
+
+            Date res;
+            if (strDate.length() == 10) {
+                String dateFormat = TimeUtils.getDateFormat(strDate);
+                if (dateFormat != null) {
+                    res = TimeUtils.getDateFromStr(strDate, dateFormat);
+                    if (res != null) {
+                        return res;
+                    }
+                }
+                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "yyyy/MM/dd");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
+                if (res != null) {
+                    return res;
+                }
+            } else if (strDate.length() == 8) {
+                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
+                if (res != null) {
+                    return res;
+                }
+                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
+                if (res != null) {
+                    return res;
+                }
+            }
+
+            return null;
+        }
+
         return null;
     }
 

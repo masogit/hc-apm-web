@@ -17,7 +17,8 @@
                 <h:form id="woMgrListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(0)}" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true"/>
-                        <p:commandButton value="#{msg.createrepair}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
+
+                        <p:commandButton value="报修"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
                         <p:commandButton value="#{msg.repaired}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(1)}" disabled="#{workOrderMgrController.queryIndex==1}" rendered="true"/>
                         <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(10)}" disabled="#{workOrderMgrController.queryIndex==10}" rendered="true"/>
                         <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet :woMgrDetailForm :ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(2)}" disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/>

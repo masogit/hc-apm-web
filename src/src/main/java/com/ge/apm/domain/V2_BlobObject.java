@@ -20,6 +20,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_AssetContract = "AssetContract";
     public static final String BO_TYPE_QRCodeLib = "QRCodeLib";
     public static final String BO_TYPE_PmOrder = "PmOrder";
+    public static final String BO_TYPE_ArrivalListItem = "ArrivalListItem";
 
     @Id
     @GeneratedValue(generator = "uuid")

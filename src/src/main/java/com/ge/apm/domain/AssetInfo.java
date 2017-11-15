@@ -3,8 +3,13 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -70,10 +75,10 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "vendor")
-    private String vendor;//供应商
+    private String vendor;//供应商名称
 
     @Column(name = "supplier_id")
-    private Integer supplierId;
+    private Integer supplierId; //供应商Id
 
     @Size(max = 64)
     @Column(name = "maitanance")
@@ -129,7 +134,7 @@ public class AssetInfo implements Serializable {
     private Integer assetGroup;//设备分类
 
     @Column(name = "asset_dept_id")
-    private int assetDeptId;//所属设备科
+    private Integer assetDeptId;//所属设备科
 
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
@@ -295,7 +300,7 @@ public class AssetInfo implements Serializable {
 
     //医疗器械子分类
     @Column(name = "asset_code68")
-    private String assetCode68;
+    private Integer assetCode68;
     
     @Column(name = "comments")
     @Size(min = 0, max = 256)
@@ -359,6 +364,10 @@ public class AssetInfo implements Serializable {
     @Column(name = "measuring_item_category")
     private Integer measuringItemCategory;
 
+    //计量周期(月)
+    @Column(name = "metering_cycle")
+    private Integer meteringCycle;
+
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
     @Column(name = "usage_status")
     private Integer usageStatus;
@@ -367,13 +376,27 @@ public class AssetInfo implements Serializable {
     @Column(name = "accounting_category")
     private Integer accountingCategory;
 
-    public Integer getAssetCategory() {
-        return assetCategory;
-    }
+    //设备标准名称
+    @Size(max = 64)
+    @Column(name = "device_name")
+    private String deviceName;
 
-    public void setAssetCategory(Integer assetCategory) {
-        this.assetCategory = assetCategory;
-    }
+    //品牌/制造商简称
+    @Size(max = 64)
+    @Column(name = "make_short_name")
+    private String makerShortName;
+
+    @Column(name = "next_metering_date")
+    @Temporal(TemporalType.DATE)
+    private Date nextMeteringDate;//下次计量日期
+
+//    public Integer getAssetCategory() {
+//        return assetCategory;
+//    }
+//
+//    public void setAssetCategory(Integer assetCategory) {
+//        this.assetCategory = assetCategory;
+//    }
 
     public Integer getAssetUsage() {
         return assetUsage;
@@ -526,7 +549,7 @@ public class AssetInfo implements Serializable {
         this.id = id;
     }
 
-    public AssetInfo(Integer id, int siteId, String name, int assetDeptId, int assetOwnerId, String assetOwnerName, boolean isValid, int status) {
+    public AssetInfo(Integer id, int siteId, String name, Integer assetDeptId, int assetOwnerId, String assetOwnerName, boolean isValid, int status) {
         this.id = id;
         this.siteId = siteId;
         this.name = name;
@@ -539,14 +562,15 @@ public class AssetInfo implements Serializable {
 
     @PrePersist
     public void initializeUid() {
-        if(uid==null)
+        if (uid==null) {
             uid = UUID.randomUUID().toString().replace("-", "");
-        
+        }
         if(isDeleted == null){
             isDeleted = false;
         }
-        if(supplierId==null)
+        if (supplierId==null) {
             supplierId = -1;
+        }
     }
     
     public String getUid() {
@@ -753,12 +777,12 @@ public class AssetInfo implements Serializable {
         this.assetGroup = assetGroup;
     }
 
-    public int getAssetDeptId() {
+    public Integer getAssetDeptId() {
         return assetDeptId;
     }
 
-    public void setAssetDeptId(int assetDeptId) {
-        this.assetDeptId = assetDeptId;
+    public void setAssetDeptId(Integer assetDeptId) {
+        this.assetDeptId = Optional.ofNullable(assetDeptId).orElse(0);
     }
 
     public Integer getAssetOwnerId() {
@@ -1119,11 +1143,11 @@ public class AssetInfo implements Serializable {
         this.inventoryTime = inventoryTime;
     }
 
-    public String getAssetCode68() {
+    public Integer getAssetCode68() {
         return assetCode68;
     }
 
-    public void setAssetCode68(String assetCode68) {
+    public void setAssetCode68(Integer assetCode68) {
         this.assetCode68 = assetCode68;
     }
 
@@ -1133,6 +1157,46 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptUID(String clinicalDeptUID) {
         this.clinicalDeptUID = clinicalDeptUID;
+    }
+
+    public String getDeviceName() {
+        return deviceName;
+    }
+
+    public void setDeviceName(String deviceName) {
+        this.deviceName = deviceName;
+    }
+
+    public String getMakerShortName() {
+        return makerShortName;
+    }
+
+    public void setMakerShortName(String makerShortName) {
+        this.makerShortName = makerShortName;
+    }
+
+    public Integer getAssetCategory() {
+        return assetCategory;
+    }
+
+    public void setAssetCategory(Integer assetCategory) {
+        this.assetCategory = assetCategory;
+    }
+
+    public Integer getMeteringCycle() {
+        return meteringCycle;
+    }
+
+    public void setMeteringCycle(Integer meteringCycle) {
+        this.meteringCycle = meteringCycle;
+    }
+
+    public Date getNextMeteringDate() {
+        return nextMeteringDate;
+    }
+
+    public void setNextMeteringDate(Date nextMeteringDate) {
+        this.nextMeteringDate = nextMeteringDate;
     }
 
     @Override

@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+                <p align="center">
+                    <b>#{msg.PmOrderRuleCheckList}</b>
+                </p>
+            <h:form id="PmOrderRuleCheckListListForm">
+                <p:dataTable id="datalist" value="#{pmOrderRuleCheckListController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{pmOrderRuleCheckListController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{pmOrderRuleCheckListController.onFilter}" update="createButton editButton viewButton deleteButton"/>
+                    
+                    <p:column headerText="#{msg.id}" sortBy="#{item.id}" filterBy="#{item.id}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.id}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.tenantUID}" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.tenantUID}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.period}" sortBy="#{item.period}" filterBy="#{item.period}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.period}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.status}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="PmOrderRuleCheckList_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{pmOrderRuleCheckListController.prepareCreate}" update=":PmOrderRuleCheckListEditDlg" oncomplete="PF('PmOrderRuleCheckListEditDialog').show()"/>
+                        <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{pmOrderRuleCheckListController.prepareView}" update=":PmOrderRuleCheckListViewDlg" oncomplete="PF('PmOrderRuleCheckListViewDialog').show()" disabled="#{empty pmOrderRuleCheckListController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{pmOrderRuleCheckListController.prepareEdit}" update=":PmOrderRuleCheckListEditDlg" oncomplete="PF('PmOrderRuleCheckListEditDialog').show()" disabled="#{empty pmOrderRuleCheckListController.selected}"/>
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{pmOrderRuleCheckListController.prepareDelete}" update=":PmOrderRuleCheckListViewDlg" oncomplete="PF('PmOrderRuleCheckListViewDialog').show()" disabled="#{empty pmOrderRuleCheckListController.selected}"/>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>

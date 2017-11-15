@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <h:form id="ItemViewForm">
+            <p:fieldset id="display" legend="#{msg.view}" rendered="#{not empty assetArrivedItemsController.selected}">
+
+                <p:fieldset  legend="#{msg.AssetArrivalListInfo}" rendered="#{not empty assetArrivedItemsController.selected}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.name}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.name}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetName}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.assetName}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetGroup}</label>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup', assetArrivedItemsController.selected.arrivalList.assetGroup)}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.brand}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.brand}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListOrderType}</label>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListOrderType', assetArrivedItemsController.selected.arrivalList.orderType)}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.functionType}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.functionType}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.quantity}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.quantity}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.manufacture}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.manufacture}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListOrigin}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.origin}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListInvoiceNum}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.invoiceNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListContractPrice}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.contractPrice}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListContractNum}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.contractNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.vendor}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.vendor}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListAgent}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.agent}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListClassCode}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.classCode}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.creatorUID}</label>
+                            <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.arrivalList.creatorUID).name}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalDate}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.arrivalDate}" />
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+
+
+                </p:fieldset>
+                <p:fieldset  legend="#{msg.AssetArrivalListAssetInfo}" rendered="#{not empty assetArrivedItemsController.selected}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.arrivalListItemNum}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.itemNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.clinicalDeptName}</label>
+                            <h:outputText value="#{assetArrivedItemsController.getOrgInfoByUid(assetArrivedItemsController.selected.clinicalDeptUID)}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.financingNum}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.financingNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.serialNum}</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.serialNum}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.currentPersonUID}</label>
+                            <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.currentPersonUID).name}" />
+                        </h:panelGroup>
+                    </p:panelGrid>
+
+                </p:fieldset>
+                <p:fieldset  legend="#{msg.AssetArrivalListAssetInfoInput}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.aliasName}</label>
+                            <p:inputText id="aliasName" value="#{assetArrivedItemsController.selected.aliasName}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetOwnerName}</label>
+                            <p:inputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.assetOwnerUID).name}" readonly="true" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetOwnerName2}</label>
+                            <p:inputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.assetOwnerUID2).name}" readonly="true" />
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetOwnerName3}</label>
+                            <p:inputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.assetOwnerUID3).name}" readonly="true" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.clinicalOwnerName}</label>
+                            <p:inputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.clinicalOwnerUid).name}" readonly="true" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.maitanance}</label>
+                            <p:inputText id="maitanance" value="#{assetArrivedItemsController.selected.maitanance}" readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.parentAsset}</label>
+                            <p:inputText value="#{assetArrivedItemsController.selected.parentAssetId}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.systemId}</label>
+                            <p:inputText id="systemId" value="#{assetArrivedItemsController.selected.systemId}" readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.departNum}</label>
+                            <p:inputText id="departNum2" value="#{assetArrivedItemsController.selected.departNum}" readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.barcode}</label>
+                            <p:inputText id="barcode" value="#{assetArrivedItemsController.selected.barcode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.registrationNo}</label>
+                            <p:inputText id="registrationNo" value="#{assetArrivedItemsController.selected.registrationNo}" readonly="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.modalityId}</label>
+                            <p:inputText id="modalityId" value="#{assetArrivedItemsController.selected.modalityId}" readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.qrCode}</label>
+                            <p:inputText id="qrCode" value="#{assetArrivedItemsController.selected.qrCode}" readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup >
+                            <label class="label">#{msg.medicalInstrumentClassification}</label>
+                            <p:inputText  value="#{fieldMsg.fieldValue('assetFunctionType', assetArrivedItemsController.selected.functionGroup)}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class="label">#{msg.medicalInstrumentSubclassification}</label>
+                            <p:inputText  value="#{fieldMsg.fieldValue(assetArrivedItemsController.selected.functionGroup, assetArrivedItemsController.selected.assetCode68)}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.locationCode}</label>
+                            <p:inputText id="locationCode" value="#{assetArrivedItemsController.selected.locationCode}" readonly="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.locationName}</label>
+                            <p:inputText id="locationName" value="#{assetArrivedItemsController.selected.locationName}" readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup >
+                            <label class="label">#{msg.comments}</label>
+                            <p:inputTextarea value="#{assetArrivedItemsController.selected.comments}"  maxlength="256" readonly="true"/>
+                        </h:panelGroup>
+
+
+
+                    </p:panelGrid>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.manufactDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.manufactDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.purchaseDate}</label>
+                            <p:inputText value="#{assetArrivedItemsController.selected.purchaseDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+<!--                        <h:panelGroup>
+                            <label class="label">#{msg.arriveDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.arriveDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>-->
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.installDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.installDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.factoryWarrantyDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.factoryWarrantyDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.warrantyDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.warrantyDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.terminateDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.terminateDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.purchasePrice}</label>
+                            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetArrivedItemsController.selected.purchasePrice}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.salvageValue}</label>
+                            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetArrivedItemsController.selected.salvageValue}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.lifecycle}</label>
+                            <p:inputNumber minValue="0" decimalPlaces="1" value="#{assetArrivedItemsController.selected.lifecycle}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.depreciationMethod}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('depreciationMethodList',assetArrivedItemsController.selected.depreciationMethod)}"  readonly="true"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.assetUsage}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('assetUsage',assetArrivedItemsController.selected.assetUsage)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.capitalSource}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('capitalSource',assetArrivedItemsController.selected.capitalSource)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.measureGrade}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('measureGrade',assetArrivedItemsController.selected.measureGrade)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.riskGrade}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('riskGrade',assetArrivedItemsController.selected.riskGrade)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.emergencyEquipment}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('emergencyEquipment',assetArrivedItemsController.selected.emergencyEquipment)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.importEquipment}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('importEquipment',assetArrivedItemsController.selected.importEquipment)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.measuringItemCategory}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('measuringItemCategory',assetArrivedItemsController.selected.measuringItemCategory)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.usageStatus}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('usageStatus',assetArrivedItemsController.selected.usageStatus)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.accountingCategory}</label>
+                            <p:inputText value="#{fieldMsg.fieldValue('accountingCategory',assetArrivedItemsController.selected.accountingCategory)}"  readonly="true"/>
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+                </p:fieldset>
+                <p:fieldset  legend="#{msg.AssetArrivalListAckInfo}" rendered="#{not empty assetArrivedItemsController.selected}">
+                    <h:panelGroup>
+                        <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
+                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.businessAckStatus)}" />
+                    </h:panelGroup>
+                    <p:dataGrid var="businessPicItem" value="#{assetArrivedItemsController.getAckPicList('business')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.businessAckStatus ne 'none'}">
+                        <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(businessPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <h:panelGroup>
+                        <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
+                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.clinicalAckStatus)}" />
+                    </h:panelGroup>
+                    <p:dataGrid var="clinicalPicItem" value="#{assetArrivedItemsController.getAckPicList('clinical')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.clinicalAckStatus ne 'none'}">
+                        <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(clinicalPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <h:panelGroup>
+                        <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
+                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.technicalAckStatus)}" />
+                    </h:panelGroup>
+                    <p:dataGrid var="technicalPicItem" value="#{assetArrivedItemsController.getAckPicList('technical')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.technicalAckStatus ne 'none'}">
+                        <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(technicalPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+
+                </p:fieldset>
+                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+
+                </p:panelGrid>
+            </p:fieldset>
+        </h:form>
+
+    </ui:composition>
+</html>

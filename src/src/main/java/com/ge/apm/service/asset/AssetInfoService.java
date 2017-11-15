@@ -84,6 +84,10 @@ public class AssetInfoService {
         return uaaService.getOrgDeptList(siteUid, user.getUid());
     }
 
+    public List<OrgInfo> getClinicalDeptList(String siteUid) {
+        return orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
+    }
+
     public List<SelectItem> getAllAccessibleOrgDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<OrgInfo> sitesList = uaaService.getUserAccessibleSiteList(user.getUid());

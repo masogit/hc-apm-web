@@ -22,6 +22,7 @@
     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
     <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
+
       <!--  <h:outputText value="  #{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />-->
         <h:outputText value="#{item.subscriberUser.name}" />
     </p:column>

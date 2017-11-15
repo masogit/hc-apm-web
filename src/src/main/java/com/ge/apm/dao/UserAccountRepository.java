@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserInfo;
+import java.util.Collection;
 
 import java.util.List;
 import javax.persistence.QueryHint;
@@ -17,6 +18,8 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     UserAccount getById(int userId);
+    
+    UserAccount getByUid(String userUid);
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     List<UserAccount> getByHospitalId(int hospitalId);
@@ -90,4 +93,24 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     //subscirber with tag=-999 under  this assetInfo.site_UID
     @Query(value="select ua.* from asset_tag at,asset_tag_biomed_group atbg,biomed_group bg,biomed_group_user bgu,user_account ua where at.id=-999  and at.id=atbg.tag_id and atbg.biomed_group_id=bg.id and bgu.group_id=bg.id and bgu.user_id=ua.id and ua.site_uid=?1",nativeQuery=true)
     List<UserAccount> getResponserwithTag999(String siteUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.tenantUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findByTenantUIDAndStaffRole(String tenantUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.institutionUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findByInstitutionUIDAndStaffRole(String institutionUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.hospitalUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findByHospitalUIDAndStaffRole(String hospitalUID);
+
+    @Query("select u from UserAccount u, UserRole r where u.siteUID=?1 and u.id=r.userId and r.roleId=3")
+    List<UserAccount> findBySiteUIDAndStaffRole(String siteUID);
+    
+    @Query(value = "select u from UserAccount u where u.tenantUID = ?1 and u.id in (select r.userId from UserRole r where r.roleId=2)")
+    List<UserAccount> getAssetHeadList(String tenantUID);
+    
+    @Query(value = "select u from UserAccount u, UserOrgInfo o where  u.uid=o.userUid and o.orgUid in ?1")
+    List<UserAccount> getByClinicalDept(Collection<String> orgList);
+    
+    List<UserAccount> findByOrgInfoUID(String orgUid);
 }
