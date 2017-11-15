@@ -37,11 +37,13 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
     private String url_createWorkOrder;
     @Value("#{urlProperties.url_getReponserByAsset}")
     private String url_getReponserByAsset;
-    
+
+
+
     public Map<String, Object> getReponserByAsset(String token, Integer assetid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-        
+
         String url = url_getReponserByAsset.replace("{assetId}", assetid.toString());
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -51,6 +53,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+
 
     public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset,List<V2_BlobObject> picList) {
         ServiceRequestForm formData = new ServiceRequestForm();

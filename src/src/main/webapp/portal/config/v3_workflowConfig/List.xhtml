@@ -21,7 +21,7 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,40,60,90">
 
-                    <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                    <p:ajax event="rowSelect"  listener= "#{v2_WorkflowConfigController.onSelect()}" update="createButton editButton deleteButton"/>
 <!--                     <p:ajax event="filter" listener="#{v2_WorkflowConfigController.onFilter}" update="createButton editButton deleteButton"/> -->
                     
                     <p:column headerText="租户" sortBy="#{item.tenantUID}" filterBy="#{item.tenantUID}" filterMatchMode="EQ">
@@ -57,6 +57,9 @@
                     <p:column headerText="#{msg.maxMessageCount}" sortBy="#{item.maxMessageCount}" filterBy="#{item.maxMessageCount}" filterMatchMode="EQ">
                         <h:outputText value="#{item.maxMessageCount}"/>
                     </p:column>
+                    <p:column headerText="#{msg.pmReminderTime}" sortBy="#{item.pmReminderTime}" filterBy="#{item.pmReminderTime}" filterMatchMode="EQ">
+                        <h:outputText value="#{item.pmReminderTime}"/>
+                    </p:column>
                    
                     <p:column headerText="#{msg.autoAck}" sortBy="#{item.autoAck}" filterBy="#{item.autoAck}" filterMatchMode="EQ">
                         <f:facet name="filter">
@@ -73,7 +76,7 @@
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{v2_WorkflowConfigController.prepareCreate}" update=":V2_WorkflowConfigEditDlg" oncomplete="PF('V2_WorkflowConfigEditDialog').show()"/>
                        <!--  <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{v2_WorkflowConfigController.prepareView}" update=":V2_WorkflowConfigViewDlg" oncomplete="PF('V2_WorkflowConfigViewDialog').show()" disabled="#{empty v2_WorkflowConfigController.selected}"/> -->
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{v2_WorkflowConfigController.prepareEdit}" update=":V2_WorkflowConfigEditDlg" oncomplete="PF('V2_WorkflowConfigEditDialog').show()" disabled="#{empty v2_WorkflowConfigController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{v2_WorkflowConfigController.prepareEdit()}" update=":V2_WorkflowConfigEditDlg" oncomplete="PF('V2_WorkflowConfigEditDialog').show()" disabled="#{empty v2_WorkflowConfigController.selected}"/>
                         <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{v2_WorkflowConfigController.delete}" update=":V2_WorkflowConfigViewDlg,datalist" disabled="#{empty v2_WorkflowConfigController.selected}">
                        		<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/> 
                         </p:commandButton>

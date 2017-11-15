@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -33,8 +34,6 @@ public class AssetCreateController {
     private AssetInfo assetInfo;
     private QrCodeLib createRequest;
     private AssetCreateService acServie;
-    private AttachmentFileService attachFileService;
-    private UserAccountRepository userDao;
     private BrandRepository brandDao;
 
     private String[] selectedPictures;
@@ -54,9 +53,7 @@ public class AssetCreateController {
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
         acServie = WebUtil.getBean(AssetCreateService.class);
-        attachFileService = WebUtil.getBean(AttachmentFileService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
-        userDao = WebUtil.getBean(UserAccountRepository.class);
 
         createRequest = acServie.getCreateRequest(qrCode);
         assetInfo = createAssetInfo();
@@ -149,11 +146,6 @@ public class AssetCreateController {
         }
     }
 
-    public String getAudioBase64(Integer fileId) {
-        String audio = attachFileService.getBase64File(fileId);
-        return audio;
-    }
-
     public void returnBack() {
         acServie.rejectReturn(createRequest, rejectText);
         this.rejectTextHistory.add(TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText));
@@ -191,7 +183,9 @@ public class AssetCreateController {
 
     public List<UserAccount> getClinicalOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner));
+        accountList.addAll(acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner)
+                .stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
+                        .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList()));
         return accountList;
     }
     

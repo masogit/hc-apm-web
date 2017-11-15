@@ -3,6 +3,8 @@ package com.ge.apm.service.utils;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
@@ -26,6 +28,32 @@ public class TimeUtils {
 		}
 		DateTime dt = new DateTime(date);
 		return dt.toString(format);
+	}
+
+	public static String getDateFormat(String date) {
+
+		Pattern pattern = Pattern.compile("(\\d*)([-/])(\\d*)([-/])(\\d*)");
+		Matcher matcher = pattern.matcher(date);
+		if (!matcher.find()) {
+			return null;
+		}
+		if (matcher.groupCount() != 5) {
+			return null;
+		}
+
+		String separator = matcher.group(2);
+		//2017/11/12
+		if (matcher.group(1).length() == 4) {
+			return String.format("yyyy%sMM%sdd", separator, separator);
+		}
+
+		//11/12/2017
+		if (matcher.group(5).length() == 4) {
+			return String.format("MM%sdd%syyyy", separator, separator);
+		}
+
+
+		return null;
 	}
 	
 }

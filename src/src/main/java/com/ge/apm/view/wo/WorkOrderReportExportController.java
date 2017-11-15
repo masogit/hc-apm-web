@@ -3,11 +3,15 @@ package com.ge.apm.view.wo;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.WorkOrderExportService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import webapp.framework.web.WebUtil;
 
@@ -56,11 +60,18 @@ public class WorkOrderReportExportController {
 
     private List<Map<String, Object>> workOrderList;
 
+    private UaaService uaaService;
+
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private OrgInfo selectedOrg;
+
     @PostConstruct
     protected void init() {
 
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
         currentInstitutionUID = currentUser.getInstitutionUID();
@@ -74,6 +85,9 @@ public class WorkOrderReportExportController {
         isStatusOpen = Boolean.TRUE;
         isStatusClose = Boolean.TRUE;
         isStatusCancel = Boolean.TRUE;
+
+        initOrgTree();
+
     }
 
     public void exportData(){
@@ -92,7 +106,8 @@ public class WorkOrderReportExportController {
     }
 
     public void previewData(){
-        workOrderList = workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList());
+        //workOrderList = workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList());
+        workOrderList = workOrderExportService.createData(selectedOrg, startTime, endTime, getStatusList());
     }
 
     private List<Integer> getStatusList(){
@@ -113,6 +128,32 @@ public class WorkOrderReportExportController {
         }
 
         return statusList;
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+        if (orgInfo.getId() == -1) {
+            selectedOrg = null;
+        } else {
+            selectedOrg = (OrgInfo) node.getData();
+        }
+
+    }
+
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root",null,null);
+        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        rootNode.getChildren().add(treeNode);
+        rootNode.setExpanded(true);
+
     }
 
     public void filterSiteByHospital(){
@@ -223,4 +264,27 @@ public class WorkOrderReportExportController {
         this.workOrderList = workOrderList;
     }
 
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
 }

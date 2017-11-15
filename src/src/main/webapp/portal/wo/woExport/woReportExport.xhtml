@@ -16,7 +16,7 @@
                 <h:form id="exportDataForm">
                     <p:fieldset legend="#{msg.FilterCondition}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup >
+                            <!--<h:panelGroup >
                                 <label class="label">集团</label>
                                 <p:selectOneMenu id="institution" value="#{workOrderReportExportController.currentInstitutionUID}" disabled="true">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
@@ -37,6 +37,24 @@
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue=""/>
                                     <f:selectItems value="#{workOrderReportExportController.getSiteList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
+                            </h:panelGroup>-->
+                            <h:panelGroup>
+                                <label class="label">*#{msg.hospitalId}</label>
+                                <p:inputText id="selectedOrgName" value="#{workOrderReportExportController.selectedOrg==null ? '': workOrderReportExportController.selectedOrg.name}" readonly="true" required="true" requiredMessage="所属院区不能为空" />
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{workOrderReportExportController.orgTree}" selection="#{workOrderReportExportController.selectedNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":exportDataForm:selectedOrgName" listener="#{workOrderReportExportController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>

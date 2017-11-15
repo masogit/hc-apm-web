@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
@@ -80,9 +81,11 @@ public class AssetFileImportService {
     @Autowired
     private QrCodeLibRepository qrcodeDao;
     @Autowired
-    private AssetDepreciationService assetDepreciationService;
+    private AssetCreateService assetCreateService;
     @Autowired
     private QrCodeService qrCodeService;
+    @Autowired
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -176,16 +179,18 @@ public class AssetFileImportService {
 
             asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用科室")));
             asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
+            asset.setMakerShortName(ExcelDocument.getCellStringValue(rowMap.get("品牌/制造商简称")));
+            asset.setDeviceName(ExcelDocument.getCellStringValue(rowMap.get("设备标准名称")));
             asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
             asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
-            String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("功能分组"));
-            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup,map,"功能分组"));
+            String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("医疗器械分类"));
+            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup,map,"医疗器械分类"));
             if (functionGroup != null && functionGroup.length() > 4) {
                 String assetCode68 = ExcelDocument.getCellStringValue(rowMap.get("医疗器械子分类"));
                 String str = functionGroup.substring(0, 3);
                 List<I18nMessage> list = FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId);
                 Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68,map,"医疗器械子分类");
-                asset.setAssetCode68(msgKey == null ? null : msgKey.toString());
+                asset.setAssetCode68(msgKey == null ? null : msgKey);
             }
             String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
             asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName,map,"设备分类"));
@@ -194,6 +199,8 @@ public class AssetFileImportService {
             asset.setSerialNum(ExcelDocument.getCellStringValue(rowMap.get("制造商序列号")));
             asset.setSystemId(ExcelDocument.getCellStringValue(rowMap.get("SystemID/厂商报修ID")));
             asset.setBarcode(ExcelDocument.getCellStringValue(rowMap.get("条码")));
+            String nationalStandardCode = ExcelDocument.getCellStringValue(rowMap.get("2010国家编码"));
+            asset.setNationalStandardCode(nationalStandardCode);
             String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
             asset.setFinancingNum(financingNum);
             asset.setModalityId(ExcelDocument.getCellStringValue(rowMap.get("IT系统编号")));
@@ -202,7 +209,7 @@ public class AssetFileImportService {
             asset.setLifecycleInYear(ExcelDocument.getCellDoubleValue(rowMap.get("使用年限")));
             String depreciationMethodNmae = ExcelDocument.getCellStringValue(rowMap.get("折旧算法"));
             asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae,map,"折旧算法"));
-            asset.setManufactDate(getDateField(rowMap.get("生产日期"), "生产日期"));
+            asset.setManufactDate(getDateField(rowMap.get("出厂日期"), "出厂日期"));
             asset.setPurchaseDate(getDateField(rowMap.get("采购日期"), "采购日期"));
             asset.setArriveDate(getDateField(rowMap.get("到货日期"), "到货日期"));
             asset.setInstallDate(getDateField(rowMap.get("启用日期"), "启用日期"));
@@ -223,8 +230,8 @@ public class AssetFileImportService {
             asset.setLocationName(ExcelDocument.getCellStringValue(rowMap.get("安装位置")));
             asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
             asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
-            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
-            asset.setAssetCategory(getI18nMsgKey(assetCategoryList, assetType,map,"设备类型"));
+//            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
+//            asset.setAssetCategory(getI18nMsgKey(assetCategoryList, assetType,map,"设备类型"));
             String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
             asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage,map,"用途分类"));
             String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
@@ -278,28 +285,16 @@ public class AssetFileImportService {
             return (Date) object;
         }
         if (object instanceof String) {
-            object = ((String) object).trim();
-            Date res = TimeUtils.getDateFromStr((String) object, "MM/dd/yyyy");
-            if (res != null && res instanceof Date) {
+            String strDate = (String) object;
+
+            strDate = strDate.trim();
+            Date res = ExcelDocument.getCellDateValue(strDate);
+
+            if (res != null) {
                 return res;
             }
-            res = TimeUtils.getDateFromStr((String) object, "MM/dd/yy");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            res = TimeUtils.getDateFromStr((String) object, "dd/MM/yy");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            res = TimeUtils.getDateFromStr((String) object, "dd/MM/yyyy");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            res = TimeUtils.getDateFromStr((String) object, "yyyy-MM-dd");
-            if (res != null && res instanceof Date) {
-                return res;
-            }
-            throw new Exception(filedSrcName + "[" + (String) object + "]无效的日期格式");
+
+            throw new Exception(filedSrcName + "[" + strDate + "]无效的日期格式");
         } else {
             throw new Exception(filedSrcName + "无效的日期格式");
         }
@@ -328,7 +323,8 @@ public class AssetFileImportService {
         }
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap, Boolean autoGenerateQrcode) {
+    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
+                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum) {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -445,6 +441,19 @@ public class AssetFileImportService {
                 }
             }
 
+            //auto generate financing num
+            String financingNum = newAsset.getFinancingNum();
+            String nationalStandardCode = newAsset.getNationalStandardCode();
+
+            if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
+                financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                        null,
+                        nationalStandardCode,
+                        newAsset.getSiteUID()
+                );
+                newAsset.setFinancingNum(financingNum);
+            }
+
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
                 String qrCode = newAsset.getQrCode();
@@ -452,11 +461,17 @@ public class AssetFileImportService {
                 if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
                     QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
                     newAsset.setQrCode(newCode.getQrCode());
-                    createAsset(newAsset);
-                    item.put("status", ImportStatus.Created);
+                    if(createAsset(newAsset)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
                 } else if (isAvailableQrcode(qrCode, item)) {
-                    createAsset(newAsset);
-                    item.put("status", ImportStatus.Created);
+                    if(createAsset(newAsset)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
                 } else {
                     item.put("status", ImportStatus.Failure);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
@@ -528,8 +543,10 @@ public class AssetFileImportService {
     }
 
     @Transactional
-    private void createAsset(AssetInfo asset) {
-        assetDao.save(asset);
+    Boolean createAsset(AssetInfo asset) {
+        if(!assetCreateService.CreateAeest(asset)){
+            return false;
+        }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
             QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode());
             if (qrCodeLib != null) {
@@ -537,7 +554,7 @@ public class AssetFileImportService {
                 qrcodeDao.save(qrCodeLib);
             }
         }
-        assetDepreciationService.saveAssetDerpeciation(asset);
+        return true;
     }
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
@@ -629,6 +646,6 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.6".equalsIgnoreCase(inputVersion);
+        return "v1.8".equalsIgnoreCase(inputVersion);
     }
 }

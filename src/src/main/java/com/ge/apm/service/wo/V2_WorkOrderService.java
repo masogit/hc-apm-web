@@ -196,6 +196,8 @@ public class V2_WorkOrderService {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
         }
     }
+
+
     public void takeEquip(V2_WorkOrder selectedWorkOrder,String taker, String takeTime){
         V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
         String token = UserContextService.getAccessToken();
@@ -211,7 +213,7 @@ public class V2_WorkOrderService {
 
     public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, String extType,String comments) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
-        selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+     //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
