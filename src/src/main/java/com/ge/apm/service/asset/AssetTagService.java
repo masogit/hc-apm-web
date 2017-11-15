@@ -31,8 +31,18 @@ public class AssetTagService {
 
     public List<BiomedGroup> getBiomedGroupList(BiomedGroup queryBiomedGroup){
         List<SearchFilter> biomedGroupFilters = new ArrayList<>();
-        biomedGroupFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryBiomedGroup.getSiteId()));
-        biomedGroupFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryBiomedGroup.getHospitalId()));
+        if(queryBiomedGroup.getTenantUID() != null){
+            biomedGroupFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryBiomedGroup.getTenantUID()));
+        }
+        if(queryBiomedGroup.getInstitutionUID() != null){
+            biomedGroupFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, queryBiomedGroup.getInstitutionUID()));
+        }
+        if(queryBiomedGroup.getHospitalUID() != null){
+            biomedGroupFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, queryBiomedGroup.getHospitalUID()));
+        }
+        if(queryBiomedGroup.getSiteUID() != null){
+            biomedGroupFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, queryBiomedGroup.getSiteUID()));
+        }
 
         return biomedGroupDao.findBySearchFilter(biomedGroupFilters);
     }
@@ -50,24 +60,38 @@ public class AssetTagService {
     }
 
     public List<AssetInfo> getAssetList(AssetInfo queryAsset) {
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
-        assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
-        //assetFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
-        if (null != queryAsset.getHospitalId() && queryAsset.getHospitalId() != 0) {
-            assetFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
+
+        if(queryAsset.getTenantUID() != null) {
+            List<SearchFilter> assetFilters = new ArrayList<>();
+
+            //assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
+            assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, Boolean.TRUE));
+            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE));
+
+            if (queryAsset.getTenantUID() != null) {
+                assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
+            }
+            if (queryAsset.getInstitutionUID() != null) {
+                assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, queryAsset.getInstitutionUID()));
+            }
+            if (queryAsset.getHospitalUID() != null) {
+                assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, queryAsset.getHospitalUID()));
+            }
+            if (queryAsset.getSiteUID() != null) {
+                assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, queryAsset.getSiteUID()));
+            }
+            if (null != queryAsset.getClinicalDeptId()) {
+                assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+            }
+            if (null != queryAsset.getAssetGroup()) {
+                assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+            }
+
+            return assetDao.findBySearchFilter(assetFilters);
         }else{
-            queryAsset.setClinicalDeptId(null);
-        }
-        if (null != queryAsset.getClinicalDeptId()) {
-            assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
-        }
-        if (null != queryAsset.getAssetGroup()) {
-            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+            return new ArrayList<AssetInfo>();
         }
 
-        return assetDao.findBySearchFilter(assetFilters);
     }
 
     public List<AssetInfo> getTargetAssets(AssetTag tempAssetTag){
@@ -84,6 +108,7 @@ public class AssetTagService {
 
     @Transactional
     public void saveAssetTag(AssetTag tempAssetTag, List<BiomedGroup> targetBiomedGroup, List<AssetInfo> targetAssets){
+
         if(tempAssetTag.getId() != null){
             assetTagBiomedGroupDao.deleteByTagId(tempAssetTag.getId());
             assetTagRuleDao.deleteByTagId(tempAssetTag.getId());

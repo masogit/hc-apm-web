@@ -29,10 +29,10 @@
                             <h:outputText value="#{item.groupName}"/>
                         </p:column>
                         <p:column headerText="租户">
-                            <h:outputText value="#{biomedGroupController.getSiteName(item.siteId)}"/>
+                            <h:outputText value="#{biomedGroupController.getTenantName(item.tenantUID)}"/>
                         </p:column>
                         <p:column headerText="医院">
-                            <h:outputText value="#{biomedGroupController.getHospitalName(item.hospitalId)}"/>
+                            <h:outputText value="#{biomedGroupController.getSiteName(item.siteUID)}"/>
                         </p:column>
 
                         <f:facet name="{Toolbar}">

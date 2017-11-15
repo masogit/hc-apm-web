@@ -11,6 +11,8 @@ import webapp.framework.dao.GenericRepositoryUUID;
 public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObject> {
     
     public V2_BlobObject findByObjectStorageId(String objectId);
+    
+    public List<V2_BlobObject> findByBoUuid(String boUid);
 
     public List<V2_BlobObject> findAllByObjectStorageId(String objectId);
 

@@ -52,7 +52,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 // 关注人tentant下的tag
 	public void takeAssetTags(){
 		//assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
-		assetTags =  assetTagRepository.getTagUnderTanent(userAccountRepository.getById(this.selected.getSubscribeUserId()).getTenantUID());
+		assetTags =  assetTagRepository.getTagBySite(userAccountRepository.getById(this.selected.getSubscribeUserId()).getSiteUID());
 
 	}
 	@Override
@@ -131,13 +131,13 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
 		this.selected.setReceiveMsgMode(null);
-		assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
+		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(currentUser.getSiteUID(), this.selected.getSubscribeUserId());
 	}
 
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-		assetTags= assetTagRepository.getTagUnderTanent(currentUser.getTenantUID());
+		assetTags= assetTagRepository.getTagBySite(currentUser.getSiteUID());
 		//assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), this.selected.getSubscribeUserId());
 	}
 

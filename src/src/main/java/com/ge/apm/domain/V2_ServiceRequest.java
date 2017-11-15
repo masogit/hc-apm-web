@@ -125,6 +125,12 @@ public class V2_ServiceRequest  implements Serializable {
     @Column(name = "nearest_sr_id") 
     private String nearestSrId;//上次报修的id 
 
+    @Column(name = "sr_repair_type")
+    private String srRepairType;
+
+    @Column(name="asset_location")
+    private String assetLocation;
+
     @Column(name = "take_time")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone = "GMT+8")
     @Temporal(TemporalType.TIMESTAMP)
@@ -444,7 +450,22 @@ public class V2_ServiceRequest  implements Serializable {
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
     }
-    
+
+    public String getSrRepairType() {
+        return srRepairType;
+    }
+
+    public void setSrRepairType(String srRepairType) {
+        this.srRepairType = srRepairType;
+    }
+
+    public String getAssetLocation() {
+        return assetLocation;
+    }
+
+    public void setAssetLocation(String assetLocation) {
+        this.assetLocation = assetLocation;
+    }
     @Override
     public int hashCode() {
         Integer hash = 0;

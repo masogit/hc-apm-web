@@ -40,6 +40,7 @@ import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -68,7 +69,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
     private V2_WorkOrderCoworkerRepository coWorkerDao;
-
+    private String locationName;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
@@ -269,6 +270,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
+    public void locateAsset(){
+        System.out.println();
+        if(selectedAsset.getLocationName().isEmpty())  {
+            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+            String lName = orgDao.getByUid(orgInfoUID).getName();
+            selectedAsset.setLocationName(lName);
+            locationName=lName;
+        }
+    }
+
+
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
     }
@@ -400,9 +412,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveServiceRequest() {
-        selectedAsset.setStatus(currentStatus);
-        woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-        cancel();
+        if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else {
+              //如果设备没有指定安装位置，就取当前人的设备科室
+            selectedAsset.setStatus(currentStatus);
+            assetDao.save(selectedAsset);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            cancel();
+        }
     }
 
     @Override
@@ -415,7 +435,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (this.newServiceRequest == null) {
             return;
         }
-
+        if(Strings.isNullOrEmpty(asset.getLocationName()) )  {
+            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+            String lName = orgDao.getByUid(orgInfoUID).getName();
+            asset.setLocationName(lName);
+            locationName=lName;
+        }else{
+            locationName = asset.getLocationName();
+        }
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -663,7 +690,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
         return accessoryList;
     }
+    public String getLocationName() {
+        return locationName;
+    }
 
+    public void setLocationName(String locationName) {
+        this.locationName = locationName;
+    }
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
             return null;

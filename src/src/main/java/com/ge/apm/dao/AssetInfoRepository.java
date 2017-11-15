@@ -27,6 +27,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public void updateAssetInfoPmOrderDate(int id, int siteId);
 
     public AssetInfo getById(Integer id);
+    
+    public AssetInfo getByUid(String uid);
 
     public AssetInfo findByUid(String uid);
 
@@ -42,14 +44,18 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     		+ " and a.financingNum like concat('%',?2,'%')")
 	public String fetchMaxAssetFinacingNumWithSiteUID(String uid, String nationalStardCode);
 
-    @Query("select max(a.financingNum) from AssetInfo a where a.hospitalUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
+    @Query("select max(a.financingNum) from AssetInfo a where a.hospitalUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithHospitalUID(String uid, String nationalStardCode);
 
-    @Query("select max(a.financingNum) from AssetInfo a where a.institutionUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
+    @Query("select max(a.financingNum) from AssetInfo a where a.institutionUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithInstitutionUID(String uid, String nationalStardCode);
 
-    @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID is ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
+    @Query("select max(a.financingNum) from AssetInfo a where a.tenantUID = ?1 and  a.nationalStandardCode=?2 and a.financingNum like concat('%',?2,'%') ")
 	public String fetchMaxAssetFinacingNumWithTenantUID(String uid, String nationalStardCode);
+
+	public List<AssetInfo> findByTenantUID(String tenantUID);
+
+    public AssetInfo findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and a.name like concat(?2,'%') order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);

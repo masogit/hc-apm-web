@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="PmOrderRuleViewDlg" widgetVar="PmOrderRuleViewDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
+            <h:form id="PmOrderRuleViewForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" rendered="#{pmOrderRuleController.selected != null}">
+                        
+                        <h:outputLabel value="#{msg.name}" for="name" />
+                        <h:outputText value="#{pmOrderRuleController.selected.name}"/>
+                        
+                        <h:outputLabel value="#{msg.assetGroup}" for="assetGroup" />
+                        <h:outputText value="#{pmOrderRuleController.selected.assetGroup}"/>
+
+                        <h:outputLabel value="#{msg.manufacture}" for="manufacture" />
+                        <h:outputText value="#{pmOrderRuleController.selected.manufacture}"/>
+                        
+                        <h:outputLabel value="#{msg.functionType}" for="functionType" />
+                        <h:outputText value="#{pmOrderRuleController.selected.functionType}"/>
+                        
+                        <h:outputLabel value="#{msg.approveUserId}" for="approveUserId" />
+                        <h:outputText value="#{pmOrderRuleController.selected.approveUserId}"/>
+                        
+                        <h:outputLabel value="#{msg.ownerId}" for="ownerId" />
+                        <h:outputText value="#{pmOrderRuleController.selected.ownerId}"/>
+                        
+<!--                        <h:outputLabel value="#{msg.ownerName}" for="ownerName" />
+                        <h:outputText value="#{pmOrderRuleController.selected.ownerName}"/>-->
+                        
+                        <h:outputLabel value="#{msg.createdDate}" for="createdDate" />
+                        <h:outputText value="#{pmOrderRuleController.selected.createdDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                        
+                        <h:outputLabel value="#{msg.period}" for="period" />
+                        <h:outputText value="#{pmOrderRuleController.selected.period}"/>
+                        
+                        <h:outputLabel value="#{msg.checkListUID}" for="checkListUID" />
+                        <h:outputText value="#{pmOrderRuleController.selected.checkListUID}"/>
+
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton rendered="#{pmOrderRuleController.deleteAction}" icon="ui-icon-trash" actionListener="#{pmOrderRuleController.delete}" value="#{msg.Delete}" update="display,:PmOrderRuleViewDlg, :PmOrderRuleListForm:datalist, :growl" oncomplete="handleSubmit(args, 'PmOrderRuleViewDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Close}" icon="glyphicon-off" onclick="PF('PmOrderRuleViewDialog').hide()"/>
+                    
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

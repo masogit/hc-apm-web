@@ -6,5 +6,40 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
+    <ui:composition>
+        <p:dialog id="measuringTypeConfigEditDlg" widgetVar="measuringTypeConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{measuringTypeConfigController.CRUDActionName} 计量类型设置">
+            <h:form id="measuringTypeConfigEditForm">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{measuringTypeConfigController.selected != null}">
+
+                    <h:panelGroup >
+                        <label class="label" >计量类别*</label>
+                        <p:selectOneMenu id="measuringItemCategory" value="#{measuringTypeConfigController.selected.measuringItemCategory}"  required="true" requiredMessage="计量类别不能为空">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{measuringTypeConfigController.getmeasuringItemCategory()}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup >
+                        <label class="label">计量等级*</label>
+                        <p:selectOneMenu id="assetTag" value="#{measuringTypeConfigController.selected.measureGrade}" required="true" requiredMessage="计量等级不能为空">
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+
+                    <h:panelGroup >
+                        <label class="label">计量周期(月)*</label>
+                        <p:inputNumber id="measureCycle" decimalPlaces="0" minValue="1" maxValue="9999" value="#{measuringTypeConfigController.selected.measureCycle}" required="true" requiredMessage="计量周期不能为空"/>
+                    </h:panelGroup>
+
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{measuringTypeConfigController.save}" update=":measuringTypeConfigEditDlg, :measuringTypeConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'measuringTypeConfigEditDialog');"/>
+
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('measuringTypeConfigEditDialog').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
 
 </html>
