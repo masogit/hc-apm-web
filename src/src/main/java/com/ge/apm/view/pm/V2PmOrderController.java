@@ -343,6 +343,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
        confirmedUpDate = null;
+       endTime=selectedPmOrder.getEndTime();
        accessoryList = getWorkOrderDetail(woid);
        coWorkerList = getWorkOrderCoworker(woid);
      //  picList = new ArrayList<V2_BlobObject>();
