@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -84,6 +85,7 @@ public class MeasuringService {
     }
 
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
         for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -95,7 +97,7 @@ public class MeasuringService {
             if(header.isEmpty()) {
                 continue;
             }
-            for (int j = header.get("HEADER_ROW") + 1; j < sheet.getLastRowNum(); j++) {
+            for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
                 HSSFRow row = sheet.getRow(j);
                 if (row == null) {
                     continue;
@@ -117,7 +119,10 @@ public class MeasuringService {
                     detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
                 }
 
-                detail.setCertificateNo(row.getCell(header.get("CERTIFICATION_NO_CELL")) == null ? null : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
+                if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
+                    detail.setCertificateNo(CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
+                }
+
                 detail.setCheckDate(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue());
                 detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
                 detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
@@ -125,7 +130,9 @@ public class MeasuringService {
                 detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
                 detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
                 detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
-                detail.setFinanceNo(row.getCell(header.get("ASSET_NO_CELL")) == null ? null : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
+                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                }
                 detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
                 detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
                 detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
