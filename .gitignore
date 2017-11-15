@@ -31,3 +31,5 @@ src/**/build
 src/src/main/webapp/resources
 /src/src/main/resources/database.properties
 !/src/src/main/resources/database.properties
+edgeServer/.project
+edgeServer/.settings/
