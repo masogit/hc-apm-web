@@ -69,16 +69,39 @@ public class AssetFileImportUpdateService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateAll(List<Map<String, Object>> results) throws Exception{
+    public void updateAll(List<AssetInfo> results) throws Exception{
 
-        //clear data like QR code to avoid unique key exception
+        //clear QR code first, otherwise throw unique key exception
         clearBeforeUpdateAll(results);
+
+        for (AssetInfo assetInfo: results) {
+
+            assetInfoDao.save(assetInfo);
+        }
+    }
+
+    public void clearBeforeUpdateAll(List<AssetInfo> results) throws Exception {
+
+        //clear QR code first, otherwise throw unique key exception
+        for (AssetInfo assetInfo : results) {
+
+            assetInfo.setQrCode(null);
+
+            assetInfoDao.save(assetInfo);
+
+        }
+
+    }
+
+    public List<AssetInfo> checkExcelData(List<Map<String, Object>> results) throws Exception {
 
         String stringValue;
         Integer intValue;
         Date dateValue;
-        String columnTitle = null;
+        String columnTitle;
 //        Object columnValue = null;
+
+        List<AssetInfo> assetInfoList = new ArrayList<>(results.size());
 
         int row = 1;
         for (Map<String, Object> record: results) {
@@ -86,7 +109,7 @@ public class AssetFileImportUpdateService {
             stringValue = getColumnStringValue(record, "ID");
             AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
             if (assetInfo == null) {
-                throw new Exception(String.format("第{0}条记录没有找到", row));
+                throw new Exception(String.format("第%s条记录没有找到", row));
             }
 
             stringValue = getColumnStringValue(record, "preventiveMaintenanceAnalysis_deviceName");
@@ -105,7 +128,7 @@ public class AssetFileImportUpdateService {
             intValue = stringValue == null ? null : findSelectionKey(this.assetGroup, stringValue);
             if (!StringUtils.isEmpty(stringValue) && null == intValue) {
                 columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetGroup");
-                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
             }
             assetInfo.setAssetGroup(intValue);
 
@@ -266,49 +289,22 @@ public class AssetFileImportUpdateService {
             stringValue = getColumnStringValue(record, "QRCode");
             assetInfo.setQrCode(stringValue);
 
-
-
-
-            assetInfoDao.save(assetInfo);
+            assetInfoList.add(assetInfo);
 
             ++row;
-
-        }
-    }
-
-    @Transactional(rollbackFor = Exception.class)
-    public void clearBeforeUpdateAll(List<Map<String, Object>> results) throws Exception {
-
-        String stringValue;
-
-        int row = 1;
-        //clear QR code first, otherwise throw unique key exception
-        for (Map<String, Object> record : results) {
-
-            stringValue = getColumnStringValue(record, "ID");
-            AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
-            if (assetInfo == null) {
-                throw new Exception(String.format("第{0}条记录没有找到", row));
-            }
-            assetInfo.setQrCode(null);
-
-
-            ++row;
-
-            assetInfoDao.save(assetInfo);
-
         }
 
+        return assetInfoList;
     }
 
     private Object getColumnValue(Map<String, Object> record, String columnKey) throws Exception {
         String columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString(columnKey);
         if (StringUtils.isEmpty(columnTitle)) {
-            throw new Exception(String.format("列别名{0}没有找到相应的列名", columnKey));
+            throw new Exception(String.format("列别名%s没有找到相应的列名", columnKey));
         }
 
         if (!record.containsKey(columnTitle)) {
-            throw new Exception(String.format("列名{0}不在数据中", columnTitle));
+            throw new Exception(String.format("列名%s不在数据中", columnTitle));
         }
 
         return record.get(columnTitle);
