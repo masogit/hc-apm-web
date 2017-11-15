@@ -36,7 +36,7 @@ public class AssetFileImportUpdateService {
     private Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     private String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     private String orgUid = UserContextService.getCurrentUserAccount().getSiteUID();
-    private List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
+    private List<I18nMessage> functionGroupList = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
     private List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
     private List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
     private List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
@@ -49,6 +49,7 @@ public class AssetFileImportUpdateService {
     private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
     private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
+    private List<I18nMessage> functionGradeList = FieldValueMessageController.getFieldValueList("assetFunctionGrade", siteId);
 
     @Autowired
     private AssetInfoRepository assetInfoDao;
@@ -201,9 +202,69 @@ public class AssetFileImportUpdateService {
             }
             assetInfo.setAccountingCategory(intValue);
 
+            stringValue = getColumnStringValue(record, "systemId");
+            assetInfo.setSystemId(stringValue);
+
+            stringValue = getColumnStringValue(record, "functionGroup");
+            intValue = stringValue == null ? null : findSelectionKey(this.functionGroupList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("functionGroup");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setFunctionGroup(intValue);
+
+            stringValue = getColumnStringValue(record, "functionGrade");
+            intValue = stringValue == null ? null : findSelectionKey(this.functionGradeList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("functionGrade");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setFunctionGrade(intValue);
+
+            stringValue = getColumnStringValue(record, "maitanance");
+            assetInfo.setMaitanance(stringValue);
+
+            stringValue = getColumnStringValue(record, "maitananceTel");
+            assetInfo.setMaitananceTel(stringValue);
 
             stringValue = getColumnStringValue(record, "financingNum");
             assetInfo.setFinancingNum(stringValue);
+
+            stringValue = getColumnStringValue(record, "locationCode");
+            assetInfo.setLocationCode(stringValue);
+
+            stringValue = getColumnStringValue(record, "locationName");
+            assetInfo.setLocationName(stringValue);
+
+            stringValue = getColumnStringValue(record, "registrationNo");
+            assetInfo.setRegistrationNo(stringValue);
+
+            dateValue = getColumnDateValue(record, "manufactDate");
+            assetInfo.setManufactDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "purchaseDate");
+            assetInfo.setPurchaseDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "arriveDate");
+            assetInfo.setArriveDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "installDate");
+            assetInfo.setInstallDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "terminateDate");
+            assetInfo.setTerminateDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "lastPmDate");
+            assetInfo.setLastPmDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "lastMeteringDate");
+            assetInfo.setLastMeteringDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "lastQaDate");
+            assetInfo.setLastQaDate(dateValue);
+
+            dateValue = getColumnDateValue(record, "factoryWarrantyDate");
+            assetInfo.setFactoryWarrantyDate(dateValue);
 
             stringValue = getColumnStringValue(record, "QRCode");
             assetInfo.setQrCode(stringValue);
