@@ -215,7 +215,7 @@ formData.setAssignee(approvaler);
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
+        formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("暂时保存");
         formData.setDetails(accDetails);
@@ -235,7 +235,7 @@ formData.setAssignee(approvaler);
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("accept");
-        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTime));
 formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
         String res = srApi.invokePmOrderAction(token,formData,"accept",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
