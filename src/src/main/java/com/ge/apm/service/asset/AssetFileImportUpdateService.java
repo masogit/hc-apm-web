@@ -78,6 +78,7 @@ public class AssetFileImportUpdateService {
 
         String stringValue;
         Integer intValue;
+        Date dateValue;
         String columnTitle = null;
 //        Object columnValue = null;
 
@@ -113,11 +114,17 @@ public class AssetFileImportUpdateService {
             stringValue = getColumnStringValue(record, "nationalStandardCode");
             assetInfo.setNationalStandardCode(stringValue);
 
+//            stringValue = getColumnStringValue(record, "brand");
+//            assetInfo.setBrand(stringValue);
+
             stringValue = getColumnStringValue(record, "manufacture");
             assetInfo.setManufacture(stringValue);
 
             stringValue = getColumnStringValue(record, "vendor");
             assetInfo.setVendor(stringValue);
+
+            dateValue = getColumnDateValue(record, "warrantyDate");
+            assetInfo.setWarrantyDate(dateValue);
 
             stringValue = getColumnStringValue(record, "aliasName");
             assetInfo.setAliasName(stringValue);
@@ -181,6 +188,12 @@ public class AssetFileImportUpdateService {
         String columnValue = ExcelDocument.getCellStringValue(obj);
 
         return convertToNullIfEmtpy(columnValue);
+    }
+
+    private Date getColumnDateValue(Map<String, Object> record, String columnKey) throws Exception {
+        Object obj = getColumnValue(record, columnKey);
+        Date columnValue = ExcelDocument.getCellDateValue(obj);
+        return columnValue;
     }
 
 
