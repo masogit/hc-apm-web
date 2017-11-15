@@ -129,6 +129,79 @@ public class AssetFileImportUpdateService {
             stringValue = getColumnStringValue(record, "aliasName");
             assetInfo.setAliasName(stringValue);
 
+            stringValue = getColumnStringValue(record, "assetUsage");
+            intValue = stringValue == null ? null : findSelectionKey(this.assetUsageList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetUsage");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setAssetUsage(intValue);
+
+            stringValue = getColumnStringValue(record, "capitalSource");
+            intValue = stringValue == null ? null : findSelectionKey(this.capitalSourceList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("capitalSource");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setCapitalSource(intValue);
+
+            stringValue = getColumnStringValue(record, "measureGrade");
+            intValue = stringValue == null ? null : findSelectionKey(this.measureGradeList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("measureGrade");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setMeasureGrade(intValue);
+
+            stringValue = getColumnStringValue(record, "riskGrade");
+            intValue = stringValue == null ? null : findSelectionKey(this.riskGradeList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("riskGrade");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setRiskGrade(intValue);
+
+            stringValue = getColumnStringValue(record, "emergencyEquipment");
+            intValue = stringValue == null ? null : findSelectionKey(this.emergencyEquipmentList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("emergencyEquipment");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setEmergencyEquipment(intValue);
+
+            stringValue = getColumnStringValue(record, "importEquipment");
+            intValue = stringValue == null ? null : findSelectionKey(this.importEquipmentList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("importEquipment");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setImportEquipment(intValue);
+
+            stringValue = getColumnStringValue(record, "measuringItemCategory");
+            intValue = stringValue == null ? null : findSelectionKey(this.measuringItemCategoryList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("measuringItemCategory");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setMeasuringItemCategory(intValue);
+
+            stringValue = getColumnStringValue(record, "usageStatus");
+            intValue = stringValue == null ? null : findSelectionKey(this.usageStatusList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("usageStatus");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setUsageStatus(intValue);
+
+            stringValue = getColumnStringValue(record, "accountingCategory");
+            intValue = stringValue == null ? null : findSelectionKey(this.accountingCategoryList, stringValue);
+            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("accountingCategory");
+                throw new Exception(String.format("第{0}条记录{1}没有找到", row, columnTitle));
+            }
+            assetInfo.setAccountingCategory(intValue);
+
+
             stringValue = getColumnStringValue(record, "financingNum");
             assetInfo.setFinancingNum(stringValue);
 
