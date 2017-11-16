@@ -140,7 +140,7 @@ public class AssetInstallationController {
 
         return true;
     }
-    
+
     public String finishInstall() {
         Boolean isAckFinished = true;
         if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
@@ -155,10 +155,10 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("技术验收未通过");
             isAckFinished = false;
         }
-        if(!isAvailableQrcode(arrivalListItem.getQrCode())){
+        if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
             isAckFinished = false;
         }
-        if(!isAckFinished){
+        if (!isAckFinished) {
             return "";
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
@@ -195,14 +195,15 @@ public class AssetInstallationController {
         arrivalListItem.setClinicalDeptUID(selectedOrg.getUid());
     }
 
-    private void saveOrUpdateItem(ArrivalListItem arrivalListItem){
+    private void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
         arrivalListItem.setLastModifiedDate(new Date());
         itemDao.save(arrivalListItem);
     }
+
     public void updateItem() {
-        if(Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())){
+        if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-        }else if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+        } else if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             saveOrUpdateItem(arrivalListItem);
             WebUtil.addSuccessMessage("修改成功");
         } else {
@@ -259,7 +260,7 @@ public class AssetInstallationController {
         }
         return assetDao.findBySearchFilter(assetFilters);
     }
-    
+
     public void updateFinancingNumByNationalStandardCode() {
         String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
                 null,
@@ -272,7 +273,7 @@ public class AssetInstallationController {
     }
 
     public void renewQrcode() {
-        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 1);
+        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 3);
         arrivalListItem.setQrCode(qrcodeLib.getQrCode());
     }
 
