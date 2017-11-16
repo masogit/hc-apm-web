@@ -106,19 +106,6 @@ private String dptName;
         blobService.deleteBlobFileByStorageId(storageId);
         picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
     }
-    public void handleFileUpload(FileUploadEvent event) {
-
-        V2_BlobObject blobObject = blobService.uploadFile(event);
-        if (null != blobObject) {
-            picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
-            blobService.saveBlobObject(blobObject);
-            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
-        } else {
-            WebUtil.addErrorMessage("fail to upload file");
-        }
-
-    }
 
     public OrgInfo getOrgInfoByUid(String orgUid) {
         return orgDao.getByUid(orgUid);
@@ -139,11 +126,12 @@ private String dptName;
         cancel();
     }
 
-
-
-    public void createServiceRequest() {
+    public void createServiceRequest(V2_PmOrder selectedPmOrder) {
         cancel();
         selected = null;
+        if(selectedPmOrder!=null){
+            selectedAsset=selectedPmOrder.getAssetInfo();
+        }
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
