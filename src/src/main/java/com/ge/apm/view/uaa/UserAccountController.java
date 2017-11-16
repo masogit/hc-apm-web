@@ -54,7 +54,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      */
     private static final long serialVersionUID = -1L;
 
-    public static final String DEFAULT_USER_ROLE = "设备科科员";
+    public static final String DEFAULT_USER_ROLE = "临床科室人员";
 
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
