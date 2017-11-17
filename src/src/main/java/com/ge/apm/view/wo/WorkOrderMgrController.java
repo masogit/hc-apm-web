@@ -109,6 +109,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<V2_BlobObject> audioList;
 
     private List<Integer> tagGroupAssets;
+    private List<Integer> tagNoGroupAssets;
 
     private String requestAssetUid;
 
@@ -177,7 +178,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             if (!getTagGroupAssets().isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets(), "1*3+4*5+"));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getNoTagGroupAssets(), "1*3+4*5+"));
             }
 
         } else if (queryIndex == 4) { //维修中
@@ -233,6 +235,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+    }
+
+    private List<Integer> getNoTagGroupAssets() {
+        if (tagNoGroupAssets == null) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
+        }
+        return tagNoGroupAssets;
     }
 
     private List<Integer> getTagGroupAssets() {
@@ -424,11 +434,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveServiceRequest() {
-        if(selectedAsset.getStatus()==4){
+        if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
-        }else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
