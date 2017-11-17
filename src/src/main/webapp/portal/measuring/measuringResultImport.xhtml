@@ -36,7 +36,7 @@
                 <h:form id="dataListForm">
                     <p:fieldset  legend="（财产编号）没有匹配到设备的数据">
                         <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
                                      rowsPerPageTemplate="10,20,50">
                             <p:column headerText="EXCEL行数">
@@ -60,6 +60,12 @@
                             <p:column headerText="器具编号">
                                 <h:outputText value="#{item.assetNo}" />
                             </p:column>
+                            <p:column headerText="付款否">
+                                <h:outputText value="#{item.pay}" />
+                            </p:column>
+                            <p:column headerText="检定结论">
+                                <h:outputText value="#{item.statusDisplay}" />
+                            </p:column>
                             <p:column headerText="检定日期">
                                 <h:outputText value="#{item.checkDate}">
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -82,6 +88,20 @@
                             <p:column headerText="种别">
                                 <h:outputText value="#{item.type}" />
                             </p:column>
+                            <p:column headerText="所在科室">
+                                <h:outputText value="#{item.department}" />
+                            </p:column>
+                            <p:column headerText="备注">
+                                <h:outputText value="#{item.comments}" />
+                            </p:column>
+                            <p:column headerText="过期否">
+                                <h:outputText value="#{true.equals(item.expired) ? '已检' : '待检'}" />
+                            </p:column>
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalist" fileName="InspectionOrder_export"/>
+                                </p:commandButton>
+                            </f:facet>
                         </p:dataTable>
                     </p:fieldset>
                 </h:form>

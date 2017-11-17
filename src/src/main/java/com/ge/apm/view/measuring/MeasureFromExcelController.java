@@ -14,6 +14,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 
 /**
@@ -35,7 +36,7 @@ public class MeasureFromExcelController {
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
-    public void handleFileUpload(FileUploadEvent event) throws IOException {
+    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
         noFoundList = measuringService.handleExcel(file, currentUser);
