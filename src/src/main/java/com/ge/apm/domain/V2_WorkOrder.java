@@ -161,6 +161,12 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "man_hours")
     private Double manHours;
 
+    @Column(name = "approval_status")
+    private String approvalStatus;
+
+    @Column(name = "external_expense")
+    private Double externalExpense;
+
     /**
      * 1: auto dispatch 2: grab and manual 3: grab 4: manual
      */
@@ -471,6 +477,23 @@ public class V2_WorkOrder implements Serializable {
         this.serviceRequest = serviceRequest;
     }
 
+    public String getApprovalStatus() {
+        return approvalStatus;
+    }
+
+    public void setApprovalStatus(String approvalStatus) {
+        this.approvalStatus = approvalStatus;
+    }
+
+    public Double getExternalExpense() {
+        return externalExpense;
+    }
+
+    public void setExternalExpense(Double externalExpense) {
+        this.externalExpense = externalExpense;
+    }
+
+    
     @Override
     public int hashCode() {
         Integer hash = 0;
