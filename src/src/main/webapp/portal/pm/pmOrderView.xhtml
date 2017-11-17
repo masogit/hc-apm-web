@@ -22,7 +22,7 @@
                     </p:panelGrid>
 <c:forEach items="#{v2PmOrderController.selectedPmWorkOrderList}" var="pmItem" varStatus="rowIndex">
 
-                   <p:dataTable value="#{v2PmOrderController.getPmOrderStep(woItem.id)}" var="stepItem">
+                   <p:dataTable value="#{v2PmOrderController.getPmOrderStep(pmItem.id)}" var="stepItem">
                        <p:column headerText="#{msg.stepName}">
                            <h:outputText value="#{stepItem.stepName}" />
                        </p:column>

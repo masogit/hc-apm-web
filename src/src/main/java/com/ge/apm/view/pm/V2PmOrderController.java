@@ -317,14 +317,10 @@ private String dptName;
     public void onSelectPmOrder(){
         System.out.println();
         selectedPmOrder =selected;
+        selectedPmWorkOrderList = dao.find();
 
-        //tmp
-       /* selectedPmOrderList =pmOrderService.getPmOrderStep(selected.getId());
-        selected.getId()*/
 
        // selectedPmOrderList = dao.findBySrId(selected.getId());
-
-
 
         accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedPmOrder.getId());
