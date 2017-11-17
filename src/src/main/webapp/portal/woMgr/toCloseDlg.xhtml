@@ -73,6 +73,7 @@
                                 <label class="label">外部费用</label><!--外部费用-->
                                 <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}" readonly="true"/>
                             </h:panelGroup>
+                            <p:spacer />
                             <h:panelGroup>
                                 <p:dataTable id="accessList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetail(workOrderMgrController.selectedWorkOrder.id)}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">
@@ -100,7 +101,7 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="#">
+                                    <p:column headerText="到货状态">
                                         <h:outputText value="#{item.arrived?'已到货':'未到货'}" />
                                     </p:column>
 
