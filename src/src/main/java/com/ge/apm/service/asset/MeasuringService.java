@@ -29,6 +29,8 @@ import java.util.Map;
  */
 @Component
 public class MeasuringService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MeasuringService.class);
+
     private final String HEADER_CERTIFICATION_NO = "证书编号";
     private final String HEADER_APPLIANCE_NAME = "器具名称";
     private final String HEADER_MANUFACTURE = "制造厂";
@@ -47,12 +49,10 @@ public class MeasuringService {
     private final String HEADER_REMARK = "备注";
     private final String HEADER_OVERDUE = "过期否";
 
-
     @Autowired
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
     @Autowired
     private AssetInfoRepository assetInfoDao;
-    private static final Logger LOGGER = LoggerFactory.getLogger(MeasuringService.class);
 
     public boolean operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
@@ -76,6 +76,8 @@ public class MeasuringService {
                 if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
                     tempAssetInfo.setUsageStatus(2);//停用
                 }
+
+                assetInfoDao.save(tempAssetInfo);
 
                 flag = true;
             }
