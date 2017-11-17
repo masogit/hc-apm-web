@@ -24,7 +24,7 @@
                     <p:fieldset legend="费用明细" >
 
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">工时(小时)</label>
                                 <p:inputText value="#{workOrderMgrController.selectedWorkOrder.manHours}" readonly="true" />
                             </h:panelGroup>
@@ -32,6 +32,10 @@
                                 <label class="label">其它费用</label>
                                 <p:inputNumber maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.otherExpense}" readonly="true"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">外部费用</label>外部费用
+                                <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{workOrderMgrController.selectedWorkOrder.externalExpense}" readonly="true"/>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <p:dataTable id="accessList" class="uiTransparent" value="#{workOrderMgrController.getWorkOrderDetail(workOrderMgrController.selectedWorkOrder.id)}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.accessory}">

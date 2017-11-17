@@ -299,6 +299,7 @@ public class V2_WorkOrderService {
         formData.setStepCoworker(coDetails);
         formData.setManHours(selectedWorkOrder.getManHours());
         formData.setOtherExpense(selectedWorkOrder.getOtherExpense());
+        formData.setExternalExpense(selectedWorkOrder.getExternalExpense());
         formData.setAttachments(attachments);
         String res = srApi.invokeWorkOrderAction(token,formData,"repair",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
