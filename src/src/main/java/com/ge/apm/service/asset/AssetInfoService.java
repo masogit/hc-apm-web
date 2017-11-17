@@ -13,6 +13,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
@@ -107,7 +108,9 @@ public class AssetInfoService {
         UserAccount user = UserContextService.getCurrentUserAccount();
         TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
 
-        List<SelectItem> dropdownList = new ArrayList<SelectItem>();
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+
+        List<SelectItem> dropdownList = new ArrayList<>();
         if (rootNode != null) {
             traverse(rootNode, dropdownList);
         }
