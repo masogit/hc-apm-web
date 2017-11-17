@@ -6,6 +6,7 @@ import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
+import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.Arrays;
@@ -49,7 +50,25 @@ public class UserCommonService {
         }
         return null;
     }
+public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
+    Map<String, Object> res = pmApi.getPmOrderSteps(UserContextService.getAccessToken(), pmOrderId == null ? "" : pmOrderId);
+    if (null != res) {
+        List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
+        List<PmOrderSteps> pmOrderStepsList = mapList.stream().map(item -> {
+            PmOrderSteps ps = new PmOrderSteps();
+ps.setComment(Optional.ofNullable(item.get("comment")).orElse("").toString());
+ps.setComment(item.get("endTime").toString());
+ps.setComment(item.get("startTime").toString());
+ps.setComment(Optional.ofNullable(item.get("ownerName")).orElse("").toString());
+ps.setComment(Optional.ofNullable(item.get("startTime")).orElse("").toString());
+ps.setComment(item.get("stepName").toString());
+            return ps;
+        }).collect(Collectors.toList());
 
+        return pmOrderStepsList;
+    }
+    return null;
+}
 
     public List<UserAccount> getApproveList(String assetUid) {
         Map<String, Object> res = pmApi.getApproveByAsset(UserContextService.getAccessToken(), assetUid == null ? "" : assetUid);
@@ -72,5 +91,7 @@ public class UserCommonService {
         List<String> strlist = Arrays.asList(clinicalDept.getTenantUID(),clinicalDept.getInstitutionUID(),clinicalDept.getHospitalUID(),clinicalDept.getSiteUID(),clinicalDept.getUid());
         return userDao.getByClinicalDept(strlist);
     }
+
+
     
 }

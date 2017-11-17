@@ -42,10 +42,15 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     @Value("#{urlProperties.url_getApproveByAsset}")
     private String url_getApproveByAsset;
 
+    @Value("#{urlProperties.url_pmOrderSteps}")
+    private String url_pmOrderSteps;
+
+
+
+
     public Map<String, Object> getApproveByAsset(String token, String assetUid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-
         String url = url_getApproveByAsset.replace("{assetUid}",assetUid);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -55,6 +60,20 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
             return null;
         }
     }
+
+    public Map<String, Object> getPmOrderSteps(String token, String pmOrderId) {
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        String url = url_pmOrderSteps.replace("{pmOrderId}",pmOrderId);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            return (LinkedHashMap<String, Object>) responseMap;
+        } else {
+            return null;
+        }
+    }
+
 
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
