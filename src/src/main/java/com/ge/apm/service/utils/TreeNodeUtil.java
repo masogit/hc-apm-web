@@ -1,6 +1,7 @@
 package com.ge.apm.service.utils;
 
 import com.ge.apm.domain.OrgInfo;
+import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.primefaces.model.TreeNode;
 
 import java.util.Collections;
@@ -31,10 +32,18 @@ public interface TreeNodeUtil {
             childNode.setParent(null);
         }
 
-        Collections.sort(nodeList, (TreeNode o1, TreeNode o2) -> {
-                OrgInfo name1 = (OrgInfo) o1.getData();
-                OrgInfo name2 = (OrgInfo) o2.getData();
-                return name1.getName().compareTo(name2.getName());
+        nodeList.sort( (TreeNode o1, TreeNode o2) -> {
+                OrgInfo org1 = (OrgInfo) o1.getData();
+                OrgInfo org2 = (OrgInfo) o2.getData();
+                try {
+                    String name1 = PinyinHelper.getShortPinyin(org1.getName());
+                    String name2 = PinyinHelper.getShortPinyin(org2.getName());
+                    return name1.compareTo(name2);
+                }catch(Exception e) {
+                    return 0;
+                }
+
+
             }
         );
 
