@@ -1,5 +1,6 @@
 package com.ge.apm.service.utils;
 
+import com.ge.apm.domain.OrgInfo;
 import org.primefaces.model.TreeNode;
 
 import java.util.Collections;
@@ -31,9 +32,9 @@ public interface TreeNodeUtil {
         }
 
         Collections.sort(nodeList, (TreeNode o1, TreeNode o2) -> {
-                String name1 = (String) o1.getData();
-                String name2 = (String) o2.getData();
-                return name1.compareTo(name2);
+                OrgInfo name1 = (OrgInfo) o1.getData();
+                OrgInfo name2 = (OrgInfo) o2.getData();
+                return name1.getName().compareTo(name2.getName());
             }
         );
 
