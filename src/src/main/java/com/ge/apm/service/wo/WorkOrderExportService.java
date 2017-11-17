@@ -141,6 +141,7 @@ public class WorkOrderExportService {
             workOrderMap.put("维修备件", info);
             workOrderMap.put("备件总费用", infoTotalPrice);
             workOrderMap.put("其他费用", workOrder.getOtherExpense());
+            workOrderMap.put("外修费用", workOrder.getExternalExpense());
             workOrderMap.put("维修总费用", workOrder.getTotalPrice());
             if(evaluateStep != null && workOrder.getCurrentStepId() >= 6){
                 workOrderMap.put("验收人", evaluateStep.getOwnerName());
