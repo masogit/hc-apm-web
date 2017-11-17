@@ -101,6 +101,10 @@ public class OrgInfo implements Serializable {
     public OrgInfo() {
     }
 
+    public OrgInfo(String name) {
+        this.name = name;
+    }
+
     public OrgInfo(String uid, String name, Integer orgType, String parentUID) {
         this.uid = uid;
         this.name = name;
