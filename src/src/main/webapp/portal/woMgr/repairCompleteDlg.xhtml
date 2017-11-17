@@ -63,7 +63,7 @@
                         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.manhours}</label>
-                                <p:inputText value="#{workOrderListController.selectedWorkOrder.manHours}"/>
+                                <p:inputNumber value="#{workOrderMgrController.selectedWorkOrder.manHours}" minValue="0"  required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.otherExpense}</label><!--其它费用-->
