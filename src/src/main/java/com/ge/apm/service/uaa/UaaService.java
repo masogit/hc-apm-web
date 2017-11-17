@@ -507,7 +507,7 @@ public class UaaService {
         return userAccountDao.findById(userId);
     }
 
-    //用户可以显示的医院列表(包含含指定科室的医院)
+    //用户可以显示的医院列表(不包含科室)
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
@@ -525,7 +525,7 @@ public class UaaService {
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
-    //用户可以显示的医院列表(包含含指定科室的医院)
+    //用户可以显示的医院列表(包含科室)
     public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
