@@ -113,6 +113,9 @@ public class MeasuringCertificateDetail implements Serializable {
     @Transient
     private Integer excelIdex;
 
+    @Transient
+    private String statusDisplay;
+
     public String getId() {
         return id;
     }
@@ -295,6 +298,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setExcelIdex(Integer excelIdex) {
         this.excelIdex = excelIdex;
+    }
+
+    public String getStatusDisplay() {
+        return statusDisplay;
+    }
+
+    public void setStatusDisplay(String statusDisplay) {
+        this.statusDisplay = statusDisplay;
     }
 
     @Override
