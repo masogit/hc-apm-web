@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -58,7 +59,7 @@ private String dptName;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
-
+    private List<V2_PmOrder> selectedPmOrderList;
     //private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     //status：2-待派工/3-已派工/4-已关单/5-已取消
@@ -113,7 +114,7 @@ private String dptName;
     private V2_PmOrder v2PmOrder;
     public void createPM(){
         if(Strings.isNullOrEmpty(dptName)){
-            WebUtil.addErrorMessage("吴使用科室的资产不能创建保养工单");
+            WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         }else{
@@ -121,6 +122,10 @@ private String dptName;
             cancel();
         }
 
+    }
+
+    public List<PmOrderSteps> getPmOrderStep(String pmOrderId){
+        return pmOrderService.getPmOrderStep(pmOrderId);
     }
     public void createPMRequest(){
         cancel();
@@ -309,7 +314,22 @@ private String dptName;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
-    public void onSelectPmOrder(){}
+    public void onSelectPmOrder(){
+        System.out.println();
+        selectedPmOrder =selected;
+
+        //tmp
+       /* selectedPmOrderList =pmOrderService.getPmOrderStep(selected.getId());
+        selected.getId()*/
+
+       // selectedPmOrderList = dao.findBySrId(selected.getId());
+
+
+
+        accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
+        coWorkerList = getWorkOrderCoworker(selectedPmOrder.getId());
+
+    }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         List<V2_WorkOrder_Detail> list = pmOrderService.getWorkOrderDetails(woId);
@@ -742,5 +762,13 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void setDptName(String dptName) {
         this.dptName = dptName;
+    }
+
+    public List<V2_PmOrder> getSelectedPmWorkOrderList() {
+        return selectedPmWorkOrderList;
+    }
+
+    public void setSelectedPmWorkOrderList(List<V2_PmOrder> selectedPmWorkOrderList) {
+        this.selectedPmWorkOrderList = selectedPmWorkOrderList;
     }
 }
