@@ -69,6 +69,7 @@
                         userContextService.hasRole('SuperAdmin') or
                         userContextService.hasRole('AssetHead') or
                         userContextService.hasRole('AssetStaff')}" >
+                <p:menuitem   value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
                 <p:menuitem id="um25" value="#{msg.Inspection}" outcome="/portal/insp/InspOrderList.xhtml"/>
                 <p:menuitem id="um26" value="#{msg.PmRecord}" outcome="/portal/pm/List"/>
                 <!--<p:menuitem id="um261" value="#{msg.PreventiveMaintaincePlanning}" url="/portal/analysis/reports.xhtml#/MaintenanceStats"/>-->

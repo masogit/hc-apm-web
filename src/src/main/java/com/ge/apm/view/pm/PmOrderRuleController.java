@@ -373,7 +373,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	}
 
 	public Integer getPeriod(){
-		if(selected.getPeriod() != null && selected.getPeriod() != 1){
+		if(selected.getPeriod() != null){
 			return selected.getPeriod();
 		}else{
 			List<Integer> itemIds = new ArrayList<Integer>();

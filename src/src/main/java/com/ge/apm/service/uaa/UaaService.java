@@ -507,7 +507,7 @@ public class UaaService {
         return userAccountDao.findById(userId);
     }
 
-    //用户可以显示的医院列表(包含含指定科室的医院)
+    //用户可以显示的医院列表(不包含科室)
     public List<OrgInfo> getUserAccessibleSiteList(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites
@@ -518,14 +518,14 @@ public class UaaService {
         List<SearchFilter> orgInfoFilters = new ArrayList<>();
         orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
        orgInfoFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-     /*    orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
-        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));*/
-       /* orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));*/
+         orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidSet1, "1*2+"));
+        orgInfoFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, new ArrayList(orgUidSet2), "1*2+"));
         orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
         return orgInfoDao.findBySearchFilter(orgInfoFilters);
     }
 
-    //用户可以显示的医院列表(包含含指定科室的医院)
+    //用户可以显示的医院列表(包含科室)
     public List<OrgInfo> getUserAccessibleSiteListWithClinicalDept(String userUid) {
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         //for accessible sites

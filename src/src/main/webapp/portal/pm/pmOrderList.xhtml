@@ -164,10 +164,10 @@
                         <f:selectItem itemLabel="不合格" itemValue="2" />
                     </p:selectOneRadio>
                     <br/>
-                    <h:panelGroup>
+                    <h:panelGroup>x
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update=":takeOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 
-                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest()}" update=":ServiceRequestCreateForm"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
+                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" update=":ServiceRequestCreateForm"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
