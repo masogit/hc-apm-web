@@ -75,6 +75,8 @@ public class V2_PmOrderService {
     private WorkOrderCoworkerRepository workOrderCoworkerRepository;
     @Autowired
     private UserCommonService ucService;
+    @Autowired
+    private PmOrderRequestApiService pmApi;
 
 
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -169,9 +171,16 @@ formData.setAssignee(approvaler);
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("dispatchWorkOrder"));
         }
         selectedPmOrder.setCurrentStepId("accept");
+
     }
 
+public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
+   // String token = UserContextService.getAccessToken();
+    //PmOrderActionForm formData = new PmOrderActionForm();
+    List<PmOrderSteps> pmOrderStepsList = ucService.getPmOrderStepsList(pmOrderId);
+    return pmOrderStepsList;
 
+}
    /* public List<V2_PmOrder> getWorkOrdersBySR(String serviceRequest) {
         return woDao.findBySrId(serviceRequest);
     }*/
@@ -308,6 +317,7 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
         this.assetUid = assetUid;
     }
 }*/
+
 
 class PmOrderActionForm{
     String assetUid;
