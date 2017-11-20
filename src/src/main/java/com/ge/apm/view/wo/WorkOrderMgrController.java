@@ -334,10 +334,20 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
-        confirmedUpDate = null;
+        confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
+        currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = new ArrayList<V2_BlobObject>();
+    }
+    
+    public void saveRepairWorkOrder(){
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> item.setCreatedDate(null));
+        woService.saveRepairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, comments, picList);
+        cancel();
     }
 
     public List<UserAccount> getWorkerList() {
@@ -398,7 +408,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void takeEquip() {
-
         if (Strings.isNullOrEmpty(equipmentTaker)) {
             WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
         } else if (equipmentTaker.trim().isEmpty()) {
