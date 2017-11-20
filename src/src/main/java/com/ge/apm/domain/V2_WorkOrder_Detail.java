@@ -72,6 +72,9 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "arrived")
     private Boolean arrived;
 
+    @Column(name = "parts_type")
+    private String partsType;
+
     public String getId() {
         return id;
     }
@@ -191,6 +194,14 @@ public class V2_WorkOrder_Detail implements Serializable {
         return hash;
     }
 
+    public String getPartsType() {
+        return partsType;
+    }
+
+    public void setPartsType(String partsType) {
+        this.partsType = partsType;
+    }
+    
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
