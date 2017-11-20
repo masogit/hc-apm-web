@@ -9,6 +9,8 @@ import org.apache.commons.collections.map.HashedMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
 
@@ -90,12 +92,16 @@ public class WorkOrderExportService {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
         }
 
-        List<V2_WorkOrder> tempWorkOrderList = v2WorkOrderDao.findBySearchFilter(searchFilters);
+        PageRequest pageRequest = this.buildPageRequest(0, 100000);
+
+        Page<V2_WorkOrder> pageDate = v2WorkOrderDao.findBySearchFilter(searchFilters, pageRequest);
+
+        //List<V2_WorkOrder> tempWorkOrderList = v2WorkOrderDao.findBySearchFilter(searchFilters);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
 
-        for (V2_WorkOrder workOrder: tempWorkOrderList) {
+        for (V2_WorkOrder workOrder: pageDate.getContent()) {
             AssetInfo assetInfo = assetInfoDao.findById(workOrder.getAssetId());
             V2_ServiceRequest serviceRequest = serviceRequestDao.findOne(workOrder.getSrId());
             List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrder.getId());
@@ -178,6 +184,12 @@ public class WorkOrderExportService {
         }
 
         return Boolean.TRUE;
+    }
+
+    //构建PageRequest
+    private PageRequest buildPageRequest(Integer pageNumber, int pagzSize) {
+        Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
+        return new PageRequest(pageNumber, pagzSize, sort);
     }
 
 }
