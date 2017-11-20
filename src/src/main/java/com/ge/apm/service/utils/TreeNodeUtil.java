@@ -4,8 +4,6 @@ import com.ge.apm.domain.OrgInfo;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.primefaces.model.TreeNode;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 public interface TreeNodeUtil {
