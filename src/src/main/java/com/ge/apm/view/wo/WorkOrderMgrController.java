@@ -26,6 +26,7 @@ import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.io.Serializable;
@@ -108,6 +109,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<V2_BlobObject> audioList;
 
     private List<Integer> tagGroupAssets;
+    private List<Integer> tagNoGroupAssets;
+
+    private String requestAssetUid;
 
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -124,6 +128,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         queryIndex = 0;
         this.filterBySite = false;
         this.filterByHospital = false;
+
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        if (!Strings.isNullOrEmpty(enCodeParameters)) {
+            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+        }
 
     }
 
@@ -146,6 +155,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.siteUID");
         removeFilterOnField("assetInfo.hosputalUID");
         removeFilterOnField("assetInfo.tenantUID");
+        removeFilterOnField("approvalStatus");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -171,7 +181,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             if (!getTagGroupAssets().isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets(), "1*3+4*5+"));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getNoTagGroupAssets(), "1*3+4*5+"));
             }
 
         } else if (queryIndex == 4) { //维修中
@@ -202,7 +213,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else if (queryIndex == 9) { //已取消
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 8));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
+            searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
         } else {//全部
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
@@ -226,6 +238,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+    }
+
+    private List<Integer> getNoTagGroupAssets() {
+        if (tagNoGroupAssets == null) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
+        }
+        return tagNoGroupAssets;
     }
 
     private List<Integer> getTagGroupAssets() {
@@ -270,16 +290,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
-    public void locateAsset(){
+    public void locateAsset() {
         System.out.println();
-        if(selectedAsset.getLocationName().isEmpty())  {
+        if (selectedAsset.getLocationName().isEmpty()) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
             selectedAsset.setLocationName(lName);
-            locationName=lName;
+            locationName = lName;
         }
     }
-
 
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
@@ -402,6 +421,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void createServiceRequest() {
         cancel();
+        if (!Strings.isNullOrEmpty(requestAssetUid)) {
+            selectedAsset = assetDao.findByUid(requestAssetUid);
+            currentStatus = selectedAsset.getStatus();
+            if (currentStatus == 1) {
+                currentStatus = 3;
+            }
+        }
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
@@ -412,12 +438,16 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveServiceRequest() {
-        if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage("所选设备待报废,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
-              //如果设备没有指定安装位置，就取当前人的设备科室
+            //如果设备没有指定安装位置，就取当前人的设备科室
             selectedAsset.setStatus(currentStatus);
             assetDao.save(selectedAsset);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
@@ -435,12 +465,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (this.newServiceRequest == null) {
             return;
         }
-        if(Strings.isNullOrEmpty(asset.getLocationName()) )  {
+        if (Strings.isNullOrEmpty(asset.getLocationName())) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
             asset.setLocationName(lName);
-            locationName=lName;
-        }else{
+            locationName = lName;
+        } else {
             locationName = asset.getLocationName();
         }
         this.selectedAsset = asset;
@@ -690,6 +720,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
         return accessoryList;
     }
+
     public String getLocationName() {
         return locationName;
     }
@@ -697,6 +728,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void setLocationName(String locationName) {
         this.locationName = locationName;
     }
+
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
             return null;
@@ -794,6 +826,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void setAudioList(List<V2_BlobObject> audioList) {
         this.audioList = audioList;
+    }
+
+    public String getRequestAssetUid() {
+        return requestAssetUid;
+    }
+
+    public void setRequestAssetUid(String requestAssetUid) {
+        this.requestAssetUid = requestAssetUid;
     }
 
 }

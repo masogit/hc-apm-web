@@ -28,6 +28,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class ServiceRequestApiService extends MicroServiceInvoker {
+
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     @Value("#{urlProperties.url_serviceRequestCreate}")
     private String url_serviceRequestCreate;
@@ -37,8 +38,6 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
     private String url_createWorkOrder;
     @Value("#{urlProperties.url_getReponserByAsset}")
     private String url_getReponserByAsset;
-
-
 
     public Map<String, Object> getReponserByAsset(String token, Integer assetid) {
         HttpHeaders header = createHttpHeaders(token);
@@ -54,8 +53,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         }
     }
 
-
-    public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset,List<V2_BlobObject> picList) {
+    public Map<String, Object> createServiceRequest(String token, V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         ServiceRequestForm formData = new ServiceRequestForm();
         formData.setAssetId(asset.getId());
         formData.setAssetStatus(String.valueOf(asset.getStatus()));
@@ -82,7 +80,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-           logger.info("Invoke WorkOrderAction "+actionName+" has finished "+responseMap.get("data"));
+            logger.info("Invoke WorkOrderAction " + actionName + " has finished " + responseMap.get("data"));
             return (String) responseMap.get("data");
         } else {
             return null;
@@ -205,9 +203,10 @@ class ServiceRequestForm {
     }
 }
 
-class WorkOrderActionForm{
+class WorkOrderActionForm {
+
     String serviceRequestId;
-    String  strDate;
+    String strDate;
     String desc;
     String estimatedCloseTime;
     String assigneeId;
@@ -228,6 +227,7 @@ class WorkOrderActionForm{
     String equipmentTaker;
     String takeTime;
     Integer repairType;
+    Double externalExpense;
     List<V2_BlobObject> attachments;
 
     public String getServiceRequestId() {
@@ -414,6 +414,14 @@ class WorkOrderActionForm{
         this.otherExpense = otherExpense;
     }
 
+    public Double getExternalExpense() {
+        return externalExpense;
+    }
+
+    public void setExternalExpense(Double externalExpense) {
+        this.externalExpense = externalExpense;
+    }
+
 }
 
 class WorkOrderForm {
@@ -483,4 +491,3 @@ class WorkOrderForm {
     }
 
 }
-

@@ -286,30 +286,12 @@ public class AssetFileImportService {
         }
         if (object instanceof String) {
             String strDate = (String) object;
+
             strDate = strDate.trim();
-            Date res = null;
-            if (strDate.length() == 10) {
-                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yyyy");
-                if (res != null && res instanceof Date) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yyyy");
-                if (res != null && res instanceof Date) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "yyyy-MM-dd");
-                if (res != null && res instanceof Date) {
-                    return res;
-                }
-            } else if (strDate.length() == 8) {
-                res = TimeUtils.getDateFromStr(strDate, "MM/dd/yy");
-                if (res != null && res instanceof Date) {
-                    return res;
-                }
-                res = TimeUtils.getDateFromStr(strDate, "dd/MM/yy");
-                if (res != null && res instanceof Date) {
-                    return res;
-                }
+            Date res = ExcelDocument.getCellDateValue(strDate);
+
+            if (res != null) {
+                return res;
             }
 
             throw new Exception(filedSrcName + "[" + strDate + "]无效的日期格式");

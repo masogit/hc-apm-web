@@ -8,8 +8,8 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 
+import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
-import org.primefaces.component.selectmanycheckbox.SelectManyCheckbox;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -54,7 +54,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
      */
     private static final long serialVersionUID = -1L;
 
-    public static final String DEFAULT_USER_ROLE = "设备科科员";
+    public static final String DEFAULT_USER_ROLE = "临床科室人员";
 
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -107,7 +107,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgTree = new DefaultTreeNode("root",null,null);
         TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
         rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
-        rootNode.setExpanded(true);
+        TreeNodeUtil.expandTreeNode(orgTree);
         selectedOrg = null;
     }
 
@@ -404,6 +404,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         accessOrgTree = uaaService.getOrgTreeBySite(selected.getSiteUID());
         List<OrgInfo> orgList = uaaService.getOrgListByUser(selected.getUid());
         setSelectedOrgTree(accessOrgTree, orgList);
+        TreeNodeUtil.expandTreeNode(accessOrgTree);
     }
 
     private void setSelectedOrgTree(TreeNode node, List<OrgInfo> accessiableOrgList) {

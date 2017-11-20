@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.asset;
 
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.service.asset.AssetFileImportUpdateService;
 import com.ge.apm.service.utils.ExcelDocument;
@@ -53,7 +54,8 @@ public class AssetFileImportUpdateController {
 
             List<Map<String, Object>> results = doc.getAllDataRows(0, 1, 2);
 
-            assetFileUpdateService.updateAll(results);
+            List<AssetInfo> assetInfoList = assetFileUpdateService.checkExcelData(results);
+            assetFileUpdateService.updateAll(assetInfoList);
 
 
         } catch (IOException e) {
