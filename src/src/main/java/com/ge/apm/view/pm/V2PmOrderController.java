@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
@@ -58,13 +59,12 @@ private String dptName;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
-
+    private List<V2_PmOrder> selectedPmOrderList;
     //private V2_WorkOrderCoworkerRepository coWorkerDao;
 
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
-    private List<V2_PmOrder> selectedPmWorkOrderList;
 
     private AssetInfo selectedAsset;
 
@@ -92,12 +92,9 @@ private String dptName;
     private String equipmentTaker;
     private Date takeTime;
     private String approvaler;
-    private String  isActive;
 
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
-
-   // private List<Integer> tagGroupAssets;
 
     //create service request
     private V2_WorkOrderService woService;
@@ -113,7 +110,7 @@ private String dptName;
     private V2_PmOrder v2PmOrder;
     public void createPM(){
         if(Strings.isNullOrEmpty(dptName)){
-            WebUtil.addErrorMessage("吴使用科室的资产不能创建保养工单");
+            WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         }else{
@@ -121,6 +118,12 @@ private String dptName;
             cancel();
         }
 
+    }
+    public List<PmOrderSteps> aquirePmOrderStep(){
+        if(selected!=null)
+        	return pmOrderService.getPmOrderStep(selected.getId());
+        else
+            return new ArrayList<PmOrderSteps>();
     }
     public void createPMRequest(){
         cancel();
@@ -218,10 +221,6 @@ private String dptName;
             return new ArrayList<UserAccount>();
     }
     private List<Integer> tagGroupAssets;
-    public String getIsActive() {
-        return isActive;
-    }
-
 
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
@@ -240,11 +239,8 @@ private String dptName;
         }
         return tagGroupAssets;
     }
-
-
 /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
         CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
-
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
@@ -309,7 +305,10 @@ private String dptName;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
-    public void onSelectPmOrder(){}
+    public void onSelectPmOrder(){
+        accessoryList = getWorkOrderDetail(selected.getId());
+        coWorkerList = getWorkOrderCoworker(selected.getId());
+    }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         List<V2_WorkOrder_Detail> list = pmOrderService.getWorkOrderDetails(woId);
@@ -320,7 +319,6 @@ private String dptName;
     }
 
 public void closePM(V2_PmOrder selectedPmOrder){
-
         pmOrderService.closePM(selectedPmOrder);
 }
     public void approvePMorder(V2_PmOrder selectedPmOrder,String passreject){
@@ -349,9 +347,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
-
-
-
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
         this.searchFilters = null;
@@ -476,10 +471,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerDetail = null;
     }
 
-
-
-
-
     //getter and setter
     public Integer getQueryIndex() {
         return queryIndex;
@@ -488,7 +479,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void setQueryIndex(Integer queryIndex) {
         this.queryIndex = queryIndex;
     }
-
 
     public AssetInfo getSelectedAsset() {
         return selectedAsset;
@@ -632,8 +622,12 @@ public void closePM(V2_PmOrder selectedPmOrder){
         this.confirmedDownTime = confirmedDownTime;
     }
 
-    public List<V2_PmOrder> getselectedPmWorkOrderList() {
-        return selectedPmWorkOrderList;
+    public List<V2_PmOrder> getSelectedPmOrderList() {
+        return selectedPmOrderList;
+    }
+
+    public void setSelectedPmOrderList(List<V2_PmOrder> selectedPmOrderList) {
+        this.selectedPmOrderList = selectedPmOrderList;
     }
 
     public String getEquipmentTaker() {
@@ -743,4 +737,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void setDptName(String dptName) {
         this.dptName = dptName;
     }
+
+
 }

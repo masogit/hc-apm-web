@@ -408,7 +408,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void takeEquip() {
-
         if (Strings.isNullOrEmpty(equipmentTaker)) {
             WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
         } else if (equipmentTaker.trim().isEmpty()) {
