@@ -266,7 +266,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 	
 	public void onSelect(){
-		if(selected != null){
+		if(selected != null && selected.getId() != null){
 			selected = dao.findById(selected.getId());
 		}
 	}
