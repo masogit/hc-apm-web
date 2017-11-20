@@ -25,6 +25,7 @@ import webapp.framework.web.service.DbResourcesUtil;
 
 import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
+import javax.persistence.EntityNotFoundException;
 import java.util.*;
 
 /**
@@ -95,206 +96,213 @@ public class AssetFileImportUpdateService {
 
     public List<AssetInfo> checkExcelData(List<Map<String, Object>> results) throws Exception {
 
-        String stringValue;
-        Integer intValue;
-        Date dateValue;
-        String columnTitle;
-//        Object columnValue = null;
-
         List<AssetInfo> assetInfoList = new ArrayList<>(results.size());
 
         int row = 1;
         for (Map<String, Object> record: results) {
 
-            stringValue = getColumnStringValue(record, "ID");
-            AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
-            if (assetInfo == null) {
-                throw new Exception(String.format("第%s条记录没有找到", row));
-            }
-
-            stringValue = getColumnStringValue(record, "preventiveMaintenanceAnalysis_deviceName");
-            assetInfo.setName(stringValue);
-
-            stringValue = getColumnStringValue(record, "functionType");
-            assetInfo.setFunctionType(stringValue);
-
-            stringValue = getColumnStringValue(record, "serialNum");
-            assetInfo.setSerialNum(stringValue);
-
-            stringValue = getColumnStringValue(record, "departNum");
-            assetInfo.setDepartNum(stringValue);
-
-            stringValue = getColumnStringValue(record, "assetGroup");
-            intValue = stringValue == null ? null : findSelectionKey(this.assetGroup, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetGroup");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setAssetGroup(intValue);
-
-            stringValue = getColumnStringValue(record, "nationalStandardCode");
-            assetInfo.setNationalStandardCode(stringValue);
-
-//            stringValue = getColumnStringValue(record, "brand");
-//            assetInfo.setBrand(stringValue);
-
-            stringValue = getColumnStringValue(record, "manufacture");
-            assetInfo.setManufacture(stringValue);
-
-            stringValue = getColumnStringValue(record, "vendor");
-            assetInfo.setVendor(stringValue);
-
-            dateValue = getColumnDateValue(record, "warrantyDate");
-            assetInfo.setWarrantyDate(dateValue);
-
-            stringValue = getColumnStringValue(record, "aliasName");
-            assetInfo.setAliasName(stringValue);
-
-            stringValue = getColumnStringValue(record, "assetUsage");
-            intValue = stringValue == null ? null : findSelectionKey(this.assetUsageList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetUsage");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setAssetUsage(intValue);
-
-            stringValue = getColumnStringValue(record, "capitalSource");
-            intValue = stringValue == null ? null : findSelectionKey(this.capitalSourceList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("capitalSource");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setCapitalSource(intValue);
-
-            stringValue = getColumnStringValue(record, "measureGrade");
-            intValue = stringValue == null ? null : findSelectionKey(this.measureGradeList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("measureGrade");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setMeasureGrade(intValue);
-
-            stringValue = getColumnStringValue(record, "riskGrade");
-            intValue = stringValue == null ? null : findSelectionKey(this.riskGradeList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("riskGrade");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setRiskGrade(intValue);
-
-            stringValue = getColumnStringValue(record, "emergencyEquipment");
-            intValue = stringValue == null ? null : findSelectionKey(this.emergencyEquipmentList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("emergencyEquipment");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setEmergencyEquipment(intValue);
-
-            stringValue = getColumnStringValue(record, "importEquipment");
-            intValue = stringValue == null ? null : findSelectionKey(this.importEquipmentList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("importEquipment");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setImportEquipment(intValue);
-
-            stringValue = getColumnStringValue(record, "measuringItemCategory");
-            intValue = stringValue == null ? null : findSelectionKey(this.measuringItemCategoryList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("measuringItemCategory");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setMeasuringItemCategory(intValue);
-
-            stringValue = getColumnStringValue(record, "usageStatus");
-            intValue = stringValue == null ? null : findSelectionKey(this.usageStatusList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("usageStatus");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setUsageStatus(intValue);
-
-            stringValue = getColumnStringValue(record, "accountingCategory");
-            intValue = stringValue == null ? null : findSelectionKey(this.accountingCategoryList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("accountingCategory");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setAccountingCategory(intValue);
-
-            stringValue = getColumnStringValue(record, "systemId");
-            assetInfo.setSystemId(stringValue);
-
-            stringValue = getColumnStringValue(record, "functionGroup");
-            intValue = stringValue == null ? null : findSelectionKey(this.functionGroupList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("functionGroup");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setFunctionGroup(intValue);
-
-            stringValue = getColumnStringValue(record, "functionGrade");
-            intValue = stringValue == null ? null : findSelectionKey(this.functionGradeList, stringValue);
-            if (!StringUtils.isEmpty(stringValue) && null == intValue) {
-                columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("functionGrade");
-                throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
-            }
-            assetInfo.setFunctionGrade(intValue);
-
-            stringValue = getColumnStringValue(record, "maitanance");
-            assetInfo.setMaitanance(stringValue);
-
-            stringValue = getColumnStringValue(record, "maitananceTel");
-            assetInfo.setMaitananceTel(stringValue);
-
-            stringValue = getColumnStringValue(record, "financingNum");
-            assetInfo.setFinancingNum(stringValue);
-
-            stringValue = getColumnStringValue(record, "locationCode");
-            assetInfo.setLocationCode(stringValue);
-
-            stringValue = getColumnStringValue(record, "locationName");
-            assetInfo.setLocationName(stringValue);
-
-            stringValue = getColumnStringValue(record, "registrationNo");
-            assetInfo.setRegistrationNo(stringValue);
-
-            dateValue = getColumnDateValue(record, "manufactDate");
-            assetInfo.setManufactDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "purchaseDate");
-            assetInfo.setPurchaseDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "arriveDate");
-            assetInfo.setArriveDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "installDate");
-            assetInfo.setInstallDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "terminateDate");
-            assetInfo.setTerminateDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "lastPmDate");
-            assetInfo.setLastPmDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "lastMeteringDate");
-            assetInfo.setLastMeteringDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "lastQaDate");
-            assetInfo.setLastQaDate(dateValue);
-
-            dateValue = getColumnDateValue(record, "factoryWarrantyDate");
-            assetInfo.setFactoryWarrantyDate(dateValue);
-
-            stringValue = getColumnStringValue(record, "QRCode");
-            assetInfo.setQrCode(stringValue);
-
+            AssetInfo assetInfo = checkExcelRowData(record, row);
             assetInfoList.add(assetInfo);
 
             ++row;
         }
 
         return assetInfoList;
+
+    }
+
+    public AssetInfo checkExcelRowData(Map<String, Object> record, int row) throws Exception {
+
+        String stringValue;
+        Integer intValue;
+        Date dateValue;
+        String columnTitle;
+//        Object columnValue = null;
+
+        stringValue = getColumnStringValue(record, "ID");
+        AssetInfo assetInfo = assetInfoDao.findByUid(stringValue);
+        if (assetInfo == null) {
+            throw new EntityNotFoundException(String.format("第%s条记录没有找到", row));
+        }
+
+        stringValue = getColumnStringValue(record, "preventiveMaintenanceAnalysis_deviceName");
+        assetInfo.setName(stringValue);
+
+        stringValue = getColumnStringValue(record, "functionType");
+        assetInfo.setFunctionType(stringValue);
+
+        stringValue = getColumnStringValue(record, "serialNum");
+        assetInfo.setSerialNum(stringValue);
+
+        stringValue = getColumnStringValue(record, "departNum");
+        assetInfo.setDepartNum(stringValue);
+
+        stringValue = getColumnStringValue(record, "assetGroup");
+        intValue = stringValue == null ? null : findSelectionKey(this.assetGroup, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetGroup");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setAssetGroup(intValue);
+
+        stringValue = getColumnStringValue(record, "nationalStandardCode");
+        assetInfo.setNationalStandardCode(stringValue);
+
+//            stringValue = getColumnStringValue(record, "brand");
+//            assetInfo.setBrand(stringValue);
+
+        stringValue = getColumnStringValue(record, "manufacture");
+        assetInfo.setManufacture(stringValue);
+
+        stringValue = getColumnStringValue(record, "vendor");
+        assetInfo.setVendor(stringValue);
+
+        dateValue = getColumnDateValue(record, "warrantyDate");
+        assetInfo.setWarrantyDate(dateValue);
+
+        stringValue = getColumnStringValue(record, "aliasName");
+        assetInfo.setAliasName(stringValue);
+
+        stringValue = getColumnStringValue(record, "assetUsage");
+        intValue = stringValue == null ? null : findSelectionKey(this.assetUsageList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("assetUsage");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setAssetUsage(intValue);
+
+        stringValue = getColumnStringValue(record, "capitalSource");
+        intValue = stringValue == null ? null : findSelectionKey(this.capitalSourceList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("capitalSource");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setCapitalSource(intValue);
+
+        stringValue = getColumnStringValue(record, "measureGrade");
+        intValue = stringValue == null ? null : findSelectionKey(this.measureGradeList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("measureGrade");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setMeasureGrade(intValue);
+
+        stringValue = getColumnStringValue(record, "riskGrade");
+        intValue = stringValue == null ? null : findSelectionKey(this.riskGradeList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("riskGrade");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setRiskGrade(intValue);
+
+        stringValue = getColumnStringValue(record, "emergencyEquipment");
+        intValue = stringValue == null ? null : findSelectionKey(this.emergencyEquipmentList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("emergencyEquipment");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setEmergencyEquipment(intValue);
+
+        stringValue = getColumnStringValue(record, "importEquipment");
+        intValue = stringValue == null ? null : findSelectionKey(this.importEquipmentList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("importEquipment");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setImportEquipment(intValue);
+
+        stringValue = getColumnStringValue(record, "measuringItemCategory");
+        intValue = stringValue == null ? null : findSelectionKey(this.measuringItemCategoryList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("measuringItemCategory");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setMeasuringItemCategory(intValue);
+
+        stringValue = getColumnStringValue(record, "usageStatus");
+        intValue = stringValue == null ? null : findSelectionKey(this.usageStatusList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("usageStatus");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setUsageStatus(intValue);
+
+        stringValue = getColumnStringValue(record, "accountingCategory");
+        intValue = stringValue == null ? null : findSelectionKey(this.accountingCategoryList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("accountingCategory");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setAccountingCategory(intValue);
+
+        stringValue = getColumnStringValue(record, "systemId");
+        assetInfo.setSystemId(stringValue);
+
+        stringValue = getColumnStringValue(record, "functionGroup");
+        intValue = stringValue == null ? null : findSelectionKey(this.functionGroupList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("functionGroup");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setFunctionGroup(intValue);
+
+        stringValue = getColumnStringValue(record, "functionGrade");
+        intValue = stringValue == null ? null : findSelectionKey(this.functionGradeList, stringValue);
+        if (!StringUtils.isEmpty(stringValue) && null == intValue) {
+            columnTitle = DbResourcesUtil.getInstance().getAsResourceBundle().getString("functionGrade");
+            throw new Exception(String.format("第%s条记录%s没有找到", row, columnTitle));
+        }
+        assetInfo.setFunctionGrade(intValue);
+
+        stringValue = getColumnStringValue(record, "maitanance");
+        assetInfo.setMaitanance(stringValue);
+
+        stringValue = getColumnStringValue(record, "maitananceTel");
+        assetInfo.setMaitananceTel(stringValue);
+
+        stringValue = getColumnStringValue(record, "financingNum");
+        assetInfo.setFinancingNum(stringValue);
+
+        stringValue = getColumnStringValue(record, "locationCode");
+        assetInfo.setLocationCode(stringValue);
+
+        stringValue = getColumnStringValue(record, "locationName");
+        assetInfo.setLocationName(stringValue);
+
+        stringValue = getColumnStringValue(record, "registrationNo");
+        assetInfo.setRegistrationNo(stringValue);
+
+        dateValue = getColumnDateValue(record, "manufactDate");
+        assetInfo.setManufactDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "purchaseDate");
+        assetInfo.setPurchaseDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "arriveDate");
+        assetInfo.setArriveDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "installDate");
+        assetInfo.setInstallDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "terminateDate");
+        assetInfo.setTerminateDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "lastPmDate");
+        assetInfo.setLastPmDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "lastMeteringDate");
+        assetInfo.setLastMeteringDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "lastQaDate");
+        assetInfo.setLastQaDate(dateValue);
+
+        dateValue = getColumnDateValue(record, "factoryWarrantyDate");
+        assetInfo.setFactoryWarrantyDate(dateValue);
+
+        stringValue = getColumnStringValue(record, "QRCode");
+        assetInfo.setQrCode(stringValue);
+
+        return assetInfo;
     }
 
     private Object getColumnValue(Map<String, Object> record, String columnKey) throws Exception {

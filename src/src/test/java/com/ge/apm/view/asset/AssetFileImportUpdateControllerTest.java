@@ -1,12 +1,18 @@
 package com.ge.apm.view.asset;
 
-import static org.junit.Assert.*;
+import org.junit.*;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import static org.junit.Assert.fail;
+
+@RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
+@ContextConfiguration({"/config/applicationContext.xml"})
+//@Sql({"/i18n_message.sql"})
 
 public class AssetFileImportUpdateControllerTest {
 
