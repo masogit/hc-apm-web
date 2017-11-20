@@ -127,13 +127,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         queryIndex = 0;
         this.filterBySite = false;
         this.filterByHospital = false;
-        
         String enCodeParameters = WebUtil.getRequestParameter("str");
         if(!Strings.isNullOrEmpty(enCodeParameters)){
             requestAssetUid = (String)UrlEncryptController.getValueFromMap(enCodeParameters,"assetUID");
         }
-        
-
     }
 
     @Override
@@ -155,7 +152,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.siteUID");
         removeFilterOnField("assetInfo.hosputalUID");
         removeFilterOnField("assetInfo.tenantUID");
-
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
                 searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
@@ -388,7 +384,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void takeEquip() {
-
         if (Strings.isNullOrEmpty(equipmentTaker)) {
             WebUtil.addErrorMessage("取物人" + WebUtil.getMessage("ValidationRequire"));
         } else if (equipmentTaker.trim().isEmpty()) {

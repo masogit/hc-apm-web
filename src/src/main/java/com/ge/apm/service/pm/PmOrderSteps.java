@@ -6,12 +6,13 @@ package com.ge.apm.service.pm;
 public class PmOrderSteps {
 
 	String setName;
-	String comment;
-	String ownerNam;
+	String comments;
+	String ownerName;
 	String startTime;
 	String endTime;
 	String stepId;
 	String ownerId;
+	String stepName;
 
 	public String getSetName() {
 		return setName;
@@ -21,20 +22,20 @@ public class PmOrderSteps {
 		this.setName = setName;
 	}
 
-	public String getComment() {
-		return comment;
+	public String getComments() {
+		return comments;
 	}
 
-	public void setComment(String comment) {
-		this.comment = comment;
+	public void setComments(String comments) {
+		this.comments = comments;
 	}
 
-	public String getOwnerNam() {
-		return ownerNam;
+	public String getOwnerName() {
+		return ownerName;
 	}
 
-	public void setOwnerNam(String ownerNam) {
-		this.ownerNam = ownerNam;
+	public void setOwnerName(String ownerName) {
+		this.ownerName = ownerName;
 	}
 
 	public String getStartTime() {
@@ -67,5 +68,13 @@ public class PmOrderSteps {
 
 	public void setOwnerId(String ownerId) {
 		this.ownerId = ownerId;
+	}
+
+	public String getStepName() {
+		return stepName;
+	}
+
+	public void setStepName(String stepName) {
+		this.stepName = stepName;
 	}
 }

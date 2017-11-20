@@ -56,12 +56,11 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
         List<LinkedHashMap> mapList = (List<LinkedHashMap>) res.get("data");
         List<PmOrderSteps> pmOrderStepsList = mapList.stream().map(item -> {
             PmOrderSteps ps = new PmOrderSteps();
-ps.setComment(Optional.ofNullable(item.get("comment")).orElse("").toString());
-ps.setComment(item.get("endTime").toString());
-ps.setComment(item.get("startTime").toString());
-ps.setComment(Optional.ofNullable(item.get("ownerName")).orElse("").toString());
-ps.setComment(Optional.ofNullable(item.get("startTime")).orElse("").toString());
-ps.setComment(item.get("stepName").toString());
+            ps.setComments(Optional.ofNullable(item.get("comment")).orElse("").toString());
+            ps.setEndTime(Optional.ofNullable(item.get("endTime")).orElse("").toString());
+            ps.setStartTime(Optional.ofNullable(item.get("startTime")).orElse("").toString());
+			ps.setOwnerName(Optional.ofNullable(item.get("ownerName")).orElse("").toString());
+            ps.setStepName(Optional.ofNullable(item.get("stepName")).orElse("").toString());
             return ps;
         }).collect(Collectors.toList());
 

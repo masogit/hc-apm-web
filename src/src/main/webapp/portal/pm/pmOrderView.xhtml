@@ -20,9 +20,8 @@
                         </h:panelGroup>
 
                     </p:panelGrid>
-<c:forEach items="#{v2PmOrderController.selectedPmWorkOrderList}" var="pmItem" varStatus="rowIndex">
 
-                   <p:dataTable value="#{v2PmOrderController.getPmOrderStep(pmItem.id)}" var="stepItem">
+                   <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
                        <p:column headerText="#{msg.stepName}">
                            <h:outputText value="#{stepItem.stepName}" />
                        </p:column>
@@ -44,7 +43,6 @@
                        </p:column>
 
                    </p:dataTable>
-</c:forEach>
 
                    <h:panelGroup>
                        <label class="label">备件信息</label><!--增加备件-->
