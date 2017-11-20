@@ -65,7 +65,6 @@ private String dptName;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
 
-    private List<V2_PmOrder> selectedPmWorkOrderList;
 
     private AssetInfo selectedAsset;
 
@@ -93,12 +92,9 @@ private String dptName;
     private String equipmentTaker;
     private Date takeTime;
     private String approvaler;
-    private String  isActive;
 
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
-
-   // private List<Integer> tagGroupAssets;
 
     //create service request
     private V2_WorkOrderService woService;
@@ -123,9 +119,11 @@ private String dptName;
         }
 
     }
-
-    public List<PmOrderSteps> getPmOrderStep(String pmOrderId){
-        return pmOrderService.getPmOrderStep(pmOrderId);
+    public List<PmOrderSteps> aquirePmOrderStep(){
+        if(selected!=null)
+        	return pmOrderService.getPmOrderStep(selected.getId());
+        else
+            return new ArrayList<PmOrderSteps>();
     }
     public void createPMRequest(){
         cancel();
@@ -223,10 +221,6 @@ private String dptName;
             return new ArrayList<UserAccount>();
     }
     private List<Integer> tagGroupAssets;
-    public String getIsActive() {
-        return isActive;
-    }
-
 
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
@@ -245,11 +239,8 @@ private String dptName;
         }
         return tagGroupAssets;
     }
-
-
 /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
         CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
-
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
@@ -315,16 +306,8 @@ private String dptName;
     }
 
     public void onSelectPmOrder(){
-        System.out.println();
-        selectedPmOrder =selected;
-        selectedPmWorkOrderList = dao.find();
-
-
-       // selectedPmOrderList = dao.findBySrId(selected.getId());
-
-        accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
-        coWorkerList = getWorkOrderCoworker(selectedPmOrder.getId());
-
+        accessoryList = getWorkOrderDetail(selected.getId());
+        coWorkerList = getWorkOrderCoworker(selected.getId());
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
@@ -336,7 +319,6 @@ private String dptName;
     }
 
 public void closePM(V2_PmOrder selectedPmOrder){
-
         pmOrderService.closePM(selectedPmOrder);
 }
     public void approvePMorder(V2_PmOrder selectedPmOrder,String passreject){
@@ -365,9 +347,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
-
-
-
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
         this.searchFilters = null;
@@ -492,10 +471,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerDetail = null;
     }
 
-
-
-
-
     //getter and setter
     public Integer getQueryIndex() {
         return queryIndex;
@@ -504,7 +479,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void setQueryIndex(Integer queryIndex) {
         this.queryIndex = queryIndex;
     }
-
 
     public AssetInfo getSelectedAsset() {
         return selectedAsset;
@@ -648,8 +622,12 @@ public void closePM(V2_PmOrder selectedPmOrder){
         this.confirmedDownTime = confirmedDownTime;
     }
 
-    public List<V2_PmOrder> getselectedPmWorkOrderList() {
-        return selectedPmWorkOrderList;
+    public List<V2_PmOrder> getSelectedPmOrderList() {
+        return selectedPmOrderList;
+    }
+
+    public void setSelectedPmOrderList(List<V2_PmOrder> selectedPmOrderList) {
+        this.selectedPmOrderList = selectedPmOrderList;
     }
 
     public String getEquipmentTaker() {
@@ -760,11 +738,5 @@ public void closePM(V2_PmOrder selectedPmOrder){
         this.dptName = dptName;
     }
 
-    public List<V2_PmOrder> getSelectedPmWorkOrderList() {
-        return selectedPmWorkOrderList;
-    }
 
-    public void setSelectedPmWorkOrderList(List<V2_PmOrder> selectedPmWorkOrderList) {
-        this.selectedPmWorkOrderList = selectedPmWorkOrderList;
-    }
 }
