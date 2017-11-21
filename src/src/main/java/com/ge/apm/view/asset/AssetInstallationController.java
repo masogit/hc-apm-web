@@ -67,6 +67,8 @@ public class AssetInstallationController {
     private I18nMessageRepository i18nDao;
     private Boolean isGeneratePmOrder;
 
+    private String currentQrCode;
+
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetInstallationService.class);
@@ -82,6 +84,7 @@ public class AssetInstallationController {
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
+        currentQrCode = arrivalListItem.getQrCode();
         changeFunctionGroup();
 
         orgTree = uaaService.getOrgTreeBySite(arrivalListItem.getArrivalList().getSiteUID());
@@ -156,9 +159,12 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("技术验收未通过");
             isAckFinished = false;
         }
-        if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
-            isAckFinished = false;
+        if (!currentQrCode.equals(arrivalListItem.getQrCode())) {
+            if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
+                isAckFinished = false;
+            }
         }
+
         if (!isAckFinished) {
             return "";
         }
@@ -168,7 +174,7 @@ public class AssetInstallationController {
                 ArrivalListItem temp = itemDao.findById(arrivalListItem.getId());
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
-                if(isGeneratePmOrder){
+                if (isGeneratePmOrder) {
                     pmService.createPMrequest(newAsset.getUid(), null);
                 }
                 WebUtil.addSuccessMessage("提交成功");
@@ -343,5 +349,5 @@ public class AssetInstallationController {
     public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
-    
+
 }
