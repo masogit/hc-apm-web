@@ -28,13 +28,15 @@ import webapp.framework.web.mvc.ServerEventInterface;
 public class SelectAssetController extends JpaCRUDController<AssetInfo> {
 
     AssetInfoRepository dao = null;
- 
+
     private UaaService uuaService;
-    
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
+        this.filterBySite = false;
+        this.filterByHospital = false;
     }
 
     @Override
@@ -48,89 +50,98 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-        searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        if (!this.hasFilterOnField("siteUID")) {
+
+            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+        }
         return super.loadData(pageRequest);
     }
 
     private TreeNode orgAssetTree;
+
     public TreeNode getOrgAssetTree() {
         return orgAssetTree;
     }
 
-    public void onSelectRow(){
+    public void onSelectRow() {
         selectedAsset = this.selected;
     }
 
     protected TreeNode selectedNode;
+
     public TreeNode getSelectedNode() {
         return selectedNode;
     }
+
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
     }
-    
-    public void onSelectTreeNode(NodeSelectEvent event){
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
-        if(node.getType().equals("org")){
+        if (node.getType().equals("org")) {
             addAssetToOrgNode(node);
             node.setExpanded(true);
             return;
         }
         node.setExpanded(true);
-        
+
         Object nodeData = node.getData();
-        if(nodeData instanceof AssetInfo)
-            selectedAsset = (AssetInfo)nodeData;
-        else
+        if (nodeData instanceof AssetInfo) {
+            selectedAsset = (AssetInfo) nodeData;
+        } else {
             selectedAsset = null;
+        }
     }
 
     private AssetInfo selectedAsset = null;
-    
-    public void confirmSelection(){
-        if(this.selectedAsset==null){
+
+    public void confirmSelection() {
+        if (this.selectedAsset == null) {
             WebUtil.addErrorMessageKey("noAssetSelected");
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             return;
         }
 
         showDialog = false;
-        if(callingController!=null)
+        if (callingController != null) {
             callingController.onServerEvent("onAssetSelected", this.selectedAsset);
+        }
     }
 
     private String updateViewIDs;
+
     public String getUpdateViewIDs() {
         return updateViewIDs;
     }
-    
+
     private ServerEventInterface callingController;
 
-    public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs){
+    public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs) {
         showDialog = true;
 
         this.selected = null;
         this.selectedNode = null;
         this.selectedAsset = null;
-        
+
         this.callingController = callingController;
         this.updateViewIDs = updateViewIDs;
 
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        
+
         orgAssetTree = uaaService.getOrgAccessTreeByUser(UserContextService.getCurrentUserAccount());
-        if(orgAssetTree.getParent()!=null){
+        if (orgAssetTree.getParent() != null) {
             orgAssetTree = orgAssetTree.getParent();
         }
     }
-    
+
     private void addAssetToOrgNode(TreeNode orgNode) {
         if (orgNode.getChildren().stream().filter(item -> item.getType().equals("asset")).count() == 0) {
 
@@ -152,24 +163,27 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             });
         }
     }
-    
-    public void onOrgExpand(NodeExpandEvent event){
-         addAssetToOrgNode(event.getTreeNode());
+
+    public void onOrgExpand(NodeExpandEvent event) {
+        addAssetToOrgNode(event.getTreeNode());
     }
 
-    public void cancelDialog(){
+    public void cancelDialog() {
         showDialog = false;
     }
-    
+
     private boolean showDialog = false;
+
     public boolean isShowDialog() {
         return showDialog;
     }
 
     private TreeNode[] selectedNodes;
+
     public TreeNode[] getSelectedNodes() {
         return selectedNodes;
     }
+
     public void setSelectedNodes(TreeNode[] selectedNodes) {
         this.selectedNodes = selectedNodes;
     }
