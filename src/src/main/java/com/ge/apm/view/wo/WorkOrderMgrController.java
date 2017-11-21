@@ -478,6 +478,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
+        }else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
         } else {
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(locationName);
@@ -566,7 +570,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
-        detailDao.save(itemDetail);
+//        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
 
@@ -576,7 +580,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
-        coWorkerDao.save(coWorkerDetail);
+//        coWorkerDao.save(coWorkerDetail);
         cancelWorkdetail();
     }
 

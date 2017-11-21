@@ -452,7 +452,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
-        detailDao.save(itemDetail);
+//        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
     private V2_WorkOrderCoworkerRepository coWorkerDao;
@@ -462,7 +462,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
-        coWorkerDao.save(coWorkerDetail);
+//        coWorkerDao.save(coWorkerDetail);
         cancelWorkdetail();
     }
 
