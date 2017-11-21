@@ -120,7 +120,12 @@ public final class DbMessageSource extends ResourceBundleMessageSource {
     
     public static void loadExtraDbExtraMessages(){
         Map<String, Object> sqlParams = new HashMap<String, Object>();
-        for(Map.Entry<String, String> item: ExtraDbMessageSource.getExtraMessages().entrySet()){
+        Map<String, String> extraMessages = ExtraDbMessageSource.getExtraMessages();
+        if (null == extraMessages) {
+            return;
+        }
+
+        for(Map.Entry<String, String> item: extraMessages.entrySet()){
             sqlParams.put("_sql", item.getValue());
             List<Map<String, Object>> data = (List<Map<String, Object>>)SiBroker.sendRequestWithHeaders("direct:executeNativeSQL", null, sqlParams);
 
