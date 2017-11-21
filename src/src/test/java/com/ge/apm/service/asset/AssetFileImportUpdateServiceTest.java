@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.mock.FacesContextTestExecutionListener;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -8,14 +9,18 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.web.WebAppConfiguration;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.HashMap;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@WebAppConfiguration
 @ContextConfiguration({"/config/applicationContext.xml"})
+@TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileImportUpdateServiceTest {
 
     @Autowired
