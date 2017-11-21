@@ -275,6 +275,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         equipmentTaker = null;
         takeTime = null;
         picList = null;
+        selectedAsset = null;
+        requestAssetUid = null;
     }
 
 //    public V2_ServiceRequest getServiceRequest(String srId) {
