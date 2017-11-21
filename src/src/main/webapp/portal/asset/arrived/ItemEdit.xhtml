@@ -438,7 +438,9 @@
 
                         <p:commandButton validateClient="true" actionListener="#{assetInstallationController.updateItem}" update=":growl"  value="保存" icon="ui-icon-check" />
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" />
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.rejectInstall}" value="退货" />
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.rejectInstall}" value="退货" >
+                            <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
+                        </p:commandButton>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalItemsList?faces-redirect=true" immediate="true" />
 
                     </h:panelGroup>

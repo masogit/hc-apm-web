@@ -11,7 +11,7 @@
         <div class="ui-g-12 card">
 
             <h:form id="pmOrderDetailForm">
-               <p:fieldset legend="保养单" rendered="#{not empty v2PmOrderController.selected}">
+                <p:fieldset legend="保养单" rendered="#{not empty v2PmOrderController.selected}">
 
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -21,75 +21,78 @@
 
                     </p:panelGrid>
 
-                   <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
-                       <p:column headerText="#{msg.stepName}">
-                           <h:outputText value="#{stepItem.stepName}" />
-                       </p:column>
-                       <p:column headerText="#{msg.ownerName}">
-                           <h:outputText value="#{stepItem.ownerName}" />
-                       </p:column>
-                       <p:column headerText="#{msg.startTime}">
-                           <h:outputText value="#{stepItem.startTime}" >
-                               <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                           </h:outputText>
-                       </p:column>
-                       <p:column headerText="#{msg.endTime}">
-                           <h:outputText value="#{stepItem.endTime}" >
-                               <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                           </h:outputText>
-                       </p:column>
-                       <p:column headerText="#{msg.description}">
-                           <h:outputText value="#{stepItem.comments}" />
-                       </p:column>
+                    <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
+                        <p:column headerText="#{msg.stepName}">
+                            <h:outputText value="#{stepItem.stepName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.ownerName}">
+                            <h:outputText value="#{stepItem.ownerName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.startTime}">
+                            <h:outputText value="#{stepItem.startTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.endTime}">
+                            <h:outputText value="#{stepItem.endTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.description}">
+                            <h:outputText value="#{stepItem.comments}" />
+                        </p:column>
 
-                   </p:dataTable>
+                    </p:dataTable>
 
-                   <h:panelGroup>
-                       <label class="label">备件信息</label><!--增加备件-->
-                       <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                           <p:column headerText="#{msg.accessory}">
-                               <h:outputText value="#{item.parts}"/>
-                           </p:column>
+                    <h:panelGroup>
+                        <label class="label">备件信息</label><!--增加备件-->
+                        <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.accessory}">
+                                <h:outputText value="#{item.parts}"/>
+                            </p:column>
 
-                           <p:column headerText="#{msg.accessoryQuantity}">
-                               <h:outputText value="#{item.apartsQuantity}"/>
-                           </p:column>
-                           <p:column headerText="#{msg.accessoryPrice}">
-                               <h:outputText value="#{item.partsPrice}">
-                                   <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
-                               </h:outputText>
-                           </p:column>
-                           <p:column headerText="序列号">
-                               <h:outputText value="#{item.serialNum}" />
-                           </p:column>
-                           <p:column headerText="质保期">
-                               <h:outputText value="#{item.warrantyDate}">
-                                   <f:convertDateTime pattern="yyyy-MM-dd"/>
-                               </h:outputText>
-                           </p:column>
-                           <p:column headerText="预计到达时间">
-                               <h:outputText value="#{item.estimatedArriveTime}">
-                                   <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
-                               </h:outputText>
-                           </p:column>
-                           <p:column headerText="到货">
-                               <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
-                           </p:column>
+                            <p:column headerText="#{msg.accessoryQuantity}">
+                                <h:outputText value="#{item.apartsQuantity}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.accessoryPrice}">
+                                <h:outputText value="#{item.partsPrice}">
+                                    <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="类型">
+                                <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
+                            </p:column>
+                            <p:column headerText="序列号">
+                                <h:outputText value="#{item.serialNum}" />
+                            </p:column>
+                            <p:column headerText="质保期">
+                                <h:outputText value="#{item.warrantyDate}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="预计到达时间">
+                                <h:outputText value="#{item.estimatedArriveTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="到货">
+                                <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
+                            </p:column>
 
-                       </p:dataTable>
-                   </h:panelGroup>
-                   <h:panelGroup>
-                       <label class="label">协作人信息</label>
-                       <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false"
-                                    rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                           <p:column headerText="#{msg.coworker}">
-                               <h:outputText value="#{item.cowokerUserName}"/>
-                           </p:column>
-                           <p:column headerText="#{msg.manHours}">
-                               <h:outputText value="#{item.manHours}" />
-                           </p:column>
-                       </p:dataTable>
-                   </h:panelGroup>
+                        </p:dataTable>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">协作人信息</label>
+                        <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false"
+                                     rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.coworker}">
+                                <h:outputText value="#{item.cowokerUserName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.manHours}">
+                                <h:outputText value="#{item.manHours}" />
+                            </p:column>
+                        </p:dataTable>
+                    </h:panelGroup>
 
 
 
