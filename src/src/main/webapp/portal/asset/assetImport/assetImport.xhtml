@@ -73,16 +73,15 @@
                             <h:panelGroup>
                                 <h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
                                     <h:panelGroup>
-                                        
-                                <h:outputText value="当二维码为空时自动生成" />
-                                <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateQrcode}" onLabel="是" offLabel="否" disabled="#{assetFileImportController.isImported}"/>
+                                        <label class="label">当二维码为空时自动生成</label>
+                                        <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateQrcode}" onLabel="是" offLabel="否" disabled="#{assetFileImportController.isImported}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">同时生成保养工单</label>
-                                        <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetCreateController.isGeneratePmOrder}" disabled="#{assetFileImportController.isImported}"/>
+                                        <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetFileImportController.isGeneratePmOrder}" disabled="#{assetFileImportController.isImported}"/>
                                     </h:panelGroup>
                                 </h:panelGrid>
-                                
+
                             </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
@@ -121,7 +120,7 @@
 
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
-                        
+
                         <h:panelGroup>
                             <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{!assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
                             <p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">
