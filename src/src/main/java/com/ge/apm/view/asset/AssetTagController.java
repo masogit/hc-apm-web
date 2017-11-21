@@ -262,6 +262,7 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         object.setSiteUID(currentUser.getSiteUID());
 
         selectedOrg = null;
+        clinicalDeptList = null;
 
         targetBiomedGroup = assetTagService.getTargetBiomedGroup(this.getSelected());
         this.getQueryBiomedGroupList();
