@@ -132,6 +132,10 @@
                                 <label class="label">安装工时</label>
                                 <p:inputText value="#{assetInstallationController.arrivalListItem.workHours}" />
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">同时生成保养工单</label>
+                                <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInstallationController.isGeneratePmOrder}"/>
+                            </h:panelGroup>
                         </p:panelGrid>
 
                         

@@ -65,6 +65,7 @@ public class AssetInstallationController {
 
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
+    private Boolean isGeneratePmOrder;
 
     @PostConstruct
     protected void init() {
@@ -167,7 +168,9 @@ public class AssetInstallationController {
                 ArrivalListItem temp = itemDao.findById(arrivalListItem.getId());
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
-                pmService.createPMrequest(newAsset.getUid(), null);
+                if(isGeneratePmOrder){
+                    pmService.createPMrequest(newAsset.getUid(), null);
+                }
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
@@ -333,4 +336,12 @@ public class AssetInstallationController {
         this.code68List = code68List;
     }
 
+    public Boolean getIsGeneratePmOrder() {
+        return isGeneratePmOrder;
+    }
+
+    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
+        this.isGeneratePmOrder = isGeneratePmOrder;
+    }
+    
 }
