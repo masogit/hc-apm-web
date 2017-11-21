@@ -65,7 +65,7 @@ public class AssetInstallationController {
 
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
-    private Boolean isGeneratePmOrder;
+    private Boolean isGeneratePmOrder=false;
 
     private String currentQrCode;
 
@@ -159,7 +159,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("技术验收未通过");
             isAckFinished = false;
         }
-        if (!currentQrCode.equals(arrivalListItem.getQrCode())) {
+        if (!Strings.isNullOrEmpty(currentQrCode) && !currentQrCode.equals(arrivalListItem.getQrCode())) {
             if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
                 isAckFinished = false;
             }
