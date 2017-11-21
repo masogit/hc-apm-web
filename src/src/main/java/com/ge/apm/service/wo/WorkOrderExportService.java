@@ -163,9 +163,9 @@ public class WorkOrderExportService {
                 workOrderMap.put("故障类型", assetFaultTypeDao.findById(workOrder.getCaseType()) != null ? assetFaultTypeDao.findById(workOrder.getCaseType()).getFaultName() : "");
             }
 
-            workOrderMap.put("问题描述", workOrder.getPatProblems());
+            workOrderMap.put("原因描述", workOrder.getPatProblems());
             workOrderMap.put("解决方案", workOrder.getPatActions());
-            workOrderMap.put("测试方法", workOrder.getPatTests());
+            workOrderMap.put("交付前检测", workOrder.getPatTests());
             workOrderMap.put("备注", workOrder.getComment());
 
             resultList.add(workOrderMap);
