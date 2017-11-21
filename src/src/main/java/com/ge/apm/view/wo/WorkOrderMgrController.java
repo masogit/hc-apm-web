@@ -292,7 +292,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
-    public void locateAsset() {
+  /*  public void locateAsset() {
         System.out.println();
         if (selectedAsset.getLocationName().isEmpty()) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
@@ -300,7 +300,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             selectedAsset.setLocationName(lName);
             locationName = lName;
         }
-    }
+    }*/
 
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
@@ -447,20 +447,39 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
     }
-
-    public void saveServiceRequest() {
+/* public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            String oUid= UserContextService.getCurrentUserAccount().getOrgInfoUID();
+            if(Strings.isNullOrEmpty(oUid)){//如果当前人连使用科室都没有，提示手动输入
+                WebUtil.addErrorMessage("所选设备没有使用科室,不能报修,请填写当前位置");
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);}
+            else// 当前位置:=当前人的科室或者所在院区位置
+            {
+                String orgName=orgDao.getByUid(oUid).getName();
+                selectedAsset.setStatus(currentStatus);
+                newServiceRequest.setAssetLocation(orgName);
+                woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+                cancel();
+            }
+        } else { //如果设备上有使用科室
+            selectedAsset.setStatus(currentStatus);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            cancel();
+        }
+    }*/
+    public void saveServiceRequest() {
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
-            //如果设备没有指定安装位置，就取当前人的设备科室
             selectedAsset.setStatus(currentStatus);
-            assetDao.save(selectedAsset);
+            newServiceRequest.setAssetLocation(locationName);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             cancel();
         }
@@ -470,10 +489,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void onServerEvent(String eventName, Object eventObject) {
         AssetInfo asset = (AssetInfo) eventObject;
         if (asset == null) {
-            return;
-        }
-
-        if (this.newServiceRequest == null) {
             return;
         }
         if (Strings.isNullOrEmpty(asset.getLocationName())) {
@@ -490,6 +505,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             currentStatus = 3;
         }
         needConfirmTime = false;
+
+        if (this.newServiceRequest == null) {
+            return;
+        }
+
+
     }
 
     public void onStatusChange() {
