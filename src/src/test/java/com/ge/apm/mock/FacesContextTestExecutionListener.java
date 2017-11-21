@@ -20,16 +20,20 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.TestContext;
 import org.springframework.test.context.support.AbstractTestExecutionListener;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.el.ELContext;
 import javax.el.ExpressionFactory;
 import javax.el.ValueExpression;
 import javax.faces.application.Application;
+import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
 import java.lang.reflect.Method;
+import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
@@ -71,6 +75,8 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         ValueExpression valueExpression = mock(ValueExpression.class);
         UserContextService userContextService = mock(UserContextService.class);
         UserAccount userAccount = mock(UserAccount.class);
+        ExternalContext externalContext = mock(ExternalContext.class);
+        Map<String, Object> applicationMap = mock(Map.class);
 
 
         when(mockFacesContext.getApplication()).thenReturn(application);
@@ -80,6 +86,15 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         when(valueExpression.getValue(any())).thenReturn(userContextService);
         when(userContextService.getLoginUser()).thenReturn(userAccount);
         when(userAccount.getSiteId()).thenReturn(-1);
+
+        ApplicationContext context = testContext.getApplicationContext();
+
+        if (context instanceof WebApplicationContext) {
+            when(mockFacesContext.getExternalContext()).thenReturn(externalContext);
+            when(externalContext.getApplicationMap()).thenReturn(applicationMap);
+            when(applicationMap.get(eq(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))).thenReturn(context);
+
+        }
 
 
 	}

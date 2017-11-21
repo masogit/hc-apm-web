@@ -50,10 +50,19 @@ public class AssetFileImportUpdateServiceTest {
     public void clearBeforeUpdateAll() throws Exception {
     }
 
-    @Test(expected = EntityNotFoundException.class)
-    public void checkExcelData_ID_Not_Exists() throws Exception {
+    @Test(expected = Exception.class)
+    public void checkExcelData_ID_Column_Not_Exists() throws Exception {
 
         Map<String, Object> record = new HashMap<>();
+        service.checkExcelRowData(record, 0);
+
+    }
+
+    @Test(expected = EntityNotFoundException.class)
+    public void checkExcelData_ID_Value_Not_Exists() throws Exception {
+
+        Map<String, Object> record = new HashMap<>();
+        record.put("ID", "111");
         AssetInfo assetInfo = service.checkExcelRowData(record, 0);
 
     }
