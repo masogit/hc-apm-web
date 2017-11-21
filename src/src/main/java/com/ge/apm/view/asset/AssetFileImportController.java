@@ -50,6 +50,7 @@ public class AssetFileImportController {
     private Boolean canbeImported = false;
     private Boolean autoGenerateQrcode = true;
     private Boolean autoGenerateFinancingNum;
+    private Boolean isGeneratePmOrder;
 
     private StreamedContent exportFile;
 
@@ -89,7 +90,7 @@ public class AssetFileImportController {
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, autoGenerateFinancingNum);
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, autoGenerateFinancingNum,isGeneratePmOrder);
             isImported = true;
 
             try {
@@ -182,4 +183,13 @@ public class AssetFileImportController {
     public void setAutoGenerateFinancingNum(Boolean autoGenerateFinancingNum) {
         this.autoGenerateFinancingNum = autoGenerateFinancingNum;
     }
+
+    public Boolean getIsGeneratePmOrder() {
+        return isGeneratePmOrder;
+    }
+
+    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
+        this.isGeneratePmOrder = isGeneratePmOrder;
+    }
+    
 }

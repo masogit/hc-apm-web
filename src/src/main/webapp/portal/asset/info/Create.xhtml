@@ -404,6 +404,11 @@
                                 <label class="label">#{msg.terminateDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.terminateDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">同时生成保养工单</label>
+                                <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}"/>
+                                
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset  style="margin-bottom:20px">
