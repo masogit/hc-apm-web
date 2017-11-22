@@ -92,7 +92,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
-                                <p:selectOneMenu id="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
+                                <p:selectOneMenu id="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="true" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
                                     <p:ajax  update="clinicalOwnerName parentAssetList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInstallationController.getClinicalDeptList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
