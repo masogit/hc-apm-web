@@ -52,18 +52,18 @@
 	                   <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
 	                    <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
-                  	<p:scrollPanel style="height:80px">
-                  		<p:inputTextarea id="safetyReport" cols="100" scrollHeight="50"  rows="50" autoResize="true" value="#{pmOrderRuleController.selected.safetyReport}"/>
+                  	<p:scrollPanel style="height:95px">
+                  		<p:inputTextarea id="safetyReport" cols="100" scrollHeight="50"  rows="5" autoResize="true" value="#{pmOrderRuleController.selected.safetyReport}"/>
                    	</p:scrollPanel>
 
                     <br/>
                     <p:panelGrid columns="3"  styleClass="ui-panelgrid-blank form-group">
 	                     <label class ="label">#{msg.performanceReport}</label>
-	                     <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                     <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
 	                     <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
                     </p:panelGrid>
-                    <p:scrollPanel style="height:80px">
-                           <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50"  rows="50" value="#{pmOrderRuleController.selected.performanceReport}"/>
+                    <p:scrollPanel style="height:95px">
+                           <p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50" rows="5" value="#{pmOrderRuleController.selected.performanceReport}"/>
                    	</p:scrollPanel>
 					<br/>
                     

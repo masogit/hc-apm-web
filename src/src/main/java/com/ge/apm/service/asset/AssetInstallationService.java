@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.common.UserCommonService;
+import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -82,11 +83,11 @@ public class AssetInstallationService {
         return ucService.getWorkerList(0);
     }
 
-    public List<UserAccount> getClinicalOwnerList(OrgInfo clinicalDept) {
-        if (clinicalDept == null){
+    public List<UserAccount> getClinicalOwnerList(String clinicalDeptUid) {
+        if (Strings.isNullOrEmpty(clinicalDeptUid)){
             return null;
         }
-        List<UserAccount> userlist = userDao.findByOrgInfoUID(clinicalDept.getUid());
+        List<UserAccount> userlist = userDao.findByOrgInfoUID(clinicalDeptUid);
         return userlist.stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
                         .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList());
     }

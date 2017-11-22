@@ -124,13 +124,13 @@ public class AssetCreateService {
         return orgDao.findBySearchFilter(OrgInfoFilters);
     }
 
-    public Boolean CreateAeest(AssetInfo assetInfo) {
+    public Boolean CreateAeest(AssetInfo assetInfo,Boolean isGeneratePmOrder) {
         boolean isNew = assetInfo.getId()==null;
         if(null == assetDao.save(assetInfo)){
             return false;
         }
         assetDepreciationService.saveAssetDerpeciation(assetInfo);
-        if(isNew){
+        if(isNew && isGeneratePmOrder){
             pmService.createPMrequest(assetInfo.getUid(), null);
         }
         return true;
