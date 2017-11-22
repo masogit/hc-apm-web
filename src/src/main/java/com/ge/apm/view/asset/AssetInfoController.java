@@ -105,6 +105,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String selectedSiteUID;
 
     private String measuring;
+    
+    private Boolean isGeneratePmOrder;
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -463,7 +465,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Boolean isNew = selected.hashCode()==0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if(isNew){
+        if(isGeneratePmOrder && isNew){
             pmService.createPMrequest(selected.getUid(), null);
         }
         if (resultStatus) {
@@ -1120,4 +1122,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return names;
 
     }
+
+    public Boolean getIsGeneratePmOrder() {
+        return isGeneratePmOrder;
+    }
+
+    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
+        this.isGeneratePmOrder = isGeneratePmOrder;
+    }
+    
 }

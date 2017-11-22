@@ -23,6 +23,13 @@
                             <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">类型</label>
+                            <p:selectOneMenu value="#{v2PmOrderController.itemDetail.partsType}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('partsType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <h:panelGroup>
                             <label class="label">预计到达时间</label>
                             <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm:ss" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>

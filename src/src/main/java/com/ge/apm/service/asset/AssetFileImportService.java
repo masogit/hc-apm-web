@@ -324,7 +324,7 @@ public class AssetFileImportService {
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum) {
+                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum, Boolean isGeneratePmOrder) {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -461,13 +461,13 @@ public class AssetFileImportService {
                 if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
                     QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
                     newAsset.setQrCode(newCode.getQrCode());
-                    if(createAsset(newAsset)){
+                    if(createAsset(newAsset,isGeneratePmOrder)){
                         item.put("status", ImportStatus.Created);
                     }else{
                         item.put("status", ImportStatus.Failure);
                     }
                 } else if (isAvailableQrcode(qrCode, item)) {
-                    if(createAsset(newAsset)){
+                    if(createAsset(newAsset,isGeneratePmOrder)){
                         item.put("status", ImportStatus.Created);
                     }else{
                         item.put("status", ImportStatus.Failure);
@@ -543,8 +543,8 @@ public class AssetFileImportService {
     }
 
     @Transactional
-    Boolean createAsset(AssetInfo asset) {
-        if(!assetCreateService.CreateAeest(asset)){
+    Boolean createAsset(AssetInfo asset, Boolean isGeneratePmOrder) {
+        if(!assetCreateService.CreateAeest(asset,isGeneratePmOrder)){
             return false;
         }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {

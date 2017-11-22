@@ -119,11 +119,11 @@ public class V2_WorkOrder implements Serializable {
     private List<V2_WorkOrder_Step> v2_workOrder_step_list;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "wo_id")
+    @JoinColumn(name="wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     private List<V2_WorkOrder_Detail> v2_workOrder_detail_list;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name = "wo_id")
+    @JoinColumn(name="wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Fetch(FetchMode.SUBSELECT)
     private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list;
 

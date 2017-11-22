@@ -11,6 +11,7 @@ import com.ge.apm.service.common.UserCommonService;
 /*import com.ge.apm.service.wo.PmOrderActionForm;
 import com.ge.apm.service.wo.WorkOrderForm;*/
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -219,12 +220,12 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
 
 
     public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime) {
-
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
+        if(endTime !=null)
+         formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("暂时保存");
         formData.setDetails(accDetails);
