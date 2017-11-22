@@ -102,7 +102,7 @@ public class MeasuringService {
             }
             for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
                 HSSFRow row = sheet.getRow(j);
-                if (row == null) {
+                if (row == null || row.getCell(header.get("APPLIANCE_NAME_CELL")) == null) {
                     continue;
                 }
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
@@ -140,7 +140,7 @@ public class MeasuringService {
                 detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
                 detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
-                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? String.valueOf(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()).intValue()): row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
                 }
                 detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
                 detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());

@@ -390,6 +390,9 @@ public class AssetInfo implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date nextMeteringDate;//下次计量日期
 
+    @Column(name = "is_warranty")
+    private Boolean isWarranty;//是否提醒计量到期
+
 //    public Integer getAssetCategory() {
 //        return assetCategory;
 //    }
@@ -1197,6 +1200,14 @@ public class AssetInfo implements Serializable {
 
     public void setNextMeteringDate(Date nextMeteringDate) {
         this.nextMeteringDate = nextMeteringDate;
+    }
+
+    public Boolean getWarranty() {
+        return isWarranty;
+    }
+
+    public void setWarranty(Boolean warranty) {
+        isWarranty = warranty;
     }
 
     @Override
