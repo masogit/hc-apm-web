@@ -313,8 +313,8 @@ private String dptName;
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
-
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
+
         }
         else if (queryIndex == 0) { //保养中
 logger.info("8888888888888");
