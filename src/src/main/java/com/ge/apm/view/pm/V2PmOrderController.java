@@ -128,12 +128,25 @@ private String dptName;
     public void createPMRequest(){
         cancel();
     }
+	public void onStatusChange() {
+		if (null != selectedAsset) {//new sr
+			needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
+		} else {//update sr
+			needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
+		}
+	}
 
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
         cancel();
         selected = null;
         if(selectedPmOrder!=null){
             selectedAsset=selectedPmOrder.getAssetInfo();
+            if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
+				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+				dptName = orgDao.getByUid(orgInfoUID).getName();
+			}else {
+				dptName = selectedAsset.getClinicalDeptName();
+			}
         }
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
