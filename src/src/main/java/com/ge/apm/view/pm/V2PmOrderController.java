@@ -128,26 +128,40 @@ private String dptName;
     public void createPMRequest(){
         cancel();
     }
+	public void onStatusChange() {
+		if (null != selectedAsset) {//new sr
+			needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
+		} else {//update sr
+			needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
+		}
+	}
 
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
-        cancel();
         selected = null;
-        if(selectedPmOrder!=null){
-            selectedAsset=selectedPmOrder.getAssetInfo();
-        }
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-    }
 
+		if(selectedPmOrder!=null){
+			selectedAsset=selectedPmOrder.getAssetInfo();
+			if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
+				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+				dptName = orgDao.getByUid(orgInfoUID).getName();
+			}else {
+				dptName = selectedAsset.getClinicalDeptName();
+			}
+		}
+    }
     public void saveServiceRequest() {
         //1表示主动报修
         newServiceRequest.setSrRepairType("1");
         selectedAsset.setStatus(currentStatus);
         woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+        //报修完后直接关单
+        pmOrderService.closePM(selectedPmOrder);
         cancel();
     }
     public void cancelsr() {
