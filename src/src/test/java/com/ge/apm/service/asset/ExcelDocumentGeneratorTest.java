@@ -1,6 +1,7 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.service.utils.ExcelDocument;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.List;

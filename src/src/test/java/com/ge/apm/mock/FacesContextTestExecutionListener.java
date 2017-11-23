@@ -41,7 +41,6 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
 
 	private static final Log logger = LogFactory.getLog(FacesContextTestExecutionListener.class);
 
-
 	@Override
 	public final int getOrder() {
 		return Integer.MAX_VALUE;
@@ -56,19 +55,14 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
 	public void beforeTestClass(TestContext testContext) throws Exception {
 		logger.info("beforeTestClass()");
 
-//		WebUtil mockWebUtil = Mockito.mock(WebUtil.class);
-//		Mockito.when(mockWebUtil.
-//        Method method = FacesContext.class.getDeclaredMethod("setCurrentInstance");
-//        ReflectionUtils.makeAccessible(method);
-//        method.invoke(null, mockFacesContext);
 
+		//make private static method accessible
         FacesContext mockFacesContext = mock(FacesContext.class);
-//        Method method = FacesContext.class.getDeclaredMethod("setCurrentInstance");
         Method method = FacesContext.class.getDeclaredMethod("setCurrentInstance", FacesContext.class);
-
         ReflectionUtils.makeAccessible(method);
         method.invoke(null, mockFacesContext);
 
+        //mock instance
         Application application = mock(Application.class);
         ELContext elContext = mock(ELContext.class);
         ExpressionFactory expressionFactory = mock(ExpressionFactory.class);
@@ -78,14 +72,16 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         ExternalContext externalContext = mock(ExternalContext.class);
         Map<String, Object> applicationMap = mock(Map.class);
 
-
+        //mock return value
         when(mockFacesContext.getApplication()).thenReturn(application);
         when(mockFacesContext.getELContext()).thenReturn(elContext);
         when(application.getExpressionFactory()).thenReturn(expressionFactory);
         when(expressionFactory.createValueExpression(any(ELContext.class), anyString(), any())).thenReturn(valueExpression);
         when(valueExpression.getValue(any())).thenReturn(userContextService);
         when(userContextService.getLoginUser()).thenReturn(userAccount);
-        when(userAccount.getSiteId()).thenReturn(-1);
+        when(userAccount.getSiteId()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_SITE_ID);
+        when(userAccount.getSiteUID()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_SITE_UID);
+        when(userAccount.getTenantUID()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_TENANT_UID);
 
         ApplicationContext context = testContext.getApplicationContext();
 
