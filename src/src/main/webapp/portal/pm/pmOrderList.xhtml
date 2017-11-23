@@ -176,6 +176,8 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+          <!--  <ui:include src="/portal/woMgr/srCreate.xhtml"/>-->
+
             <ui:include src="srCreatePM.xhtml"/>
         </p:dialog>
 
@@ -238,7 +240,7 @@
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <h:panelGroup>
                         <label class="label">计划完成时间*</label>
-                        <p:calendar timeZone="GMT+8" id="fillDate3" pattern="yyyy/MM/dd HH:mm:ss"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar timeZone="GMT+8" id="fillDate3" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
                     <br/>
                     <h:panelGroup>
