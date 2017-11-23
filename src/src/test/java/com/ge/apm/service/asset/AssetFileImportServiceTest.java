@@ -5,6 +5,10 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
 import com.ge.apm.service.utils.ExcelDocument;
+import org.apache.poi.ss.SpreadsheetVersion;
+import org.apache.poi.ss.formula.udf.UDFFinder;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -18,12 +22,16 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
-@ContextConfiguration({"/config/applicationContext.xml"})
+@ContextConfiguration({"/config/springmvc-parent.xml"})
 @TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileImportServiceTest {
 
@@ -87,6 +95,9 @@ public class AssetFileImportServiceTest {
     @Test
     public void importData() throws Exception {
 
+        InputStream is = this.getClass().getClassLoader().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+        Workbook workbook = new XSSFWorkbook(is);
+        Sheet sheet = workbook.getSheetAt(1);
 //        service.importData();
     }
 
