@@ -69,6 +69,8 @@ public class AssetFileImportServiceTest {
     }
 
     public void init() {
+
+        OrgInfo orgInfo = new OrgInfo();
         List<OrgInfo> orgInfoList = (List<OrgInfo>) orgInfoDao.findAll();
     }
 
@@ -95,10 +97,12 @@ public class AssetFileImportServiceTest {
     @Test
     public void importData() throws Exception {
 
-        InputStream is = this.getClass().getClassLoader().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
-        Workbook workbook = new XSSFWorkbook(is);
-        Sheet sheet = workbook.getSheetAt(1);
-//        service.importData();
+        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(5000);
+        Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
+        Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+
+
+        service.importData(orgMap, assetMap, false, false, false);
     }
 
     @Ignore

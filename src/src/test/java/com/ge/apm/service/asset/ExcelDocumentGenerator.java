@@ -36,9 +36,15 @@ public class ExcelDocumentGenerator {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             Workbook workbook = new XSSFWorkbook();
+
+            //build asset list sheet
             Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
             buildHeaderRow(assetSheet);
             buildOneLineDataRow(assetSheet);
+
+            //build clinical department list sheet
+            Sheet orgSheet = workbook.createSheet(AssetFileImportService.SHEET_ORG);
+            buildClinicalDeptSheet(orgSheet);
 
             workbook.write(baos);
             byte[] bytes = baos.toByteArray();
@@ -60,13 +66,19 @@ public class ExcelDocumentGenerator {
         ExcelDocument excelDoc = null;
 
         try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
             Workbook workbook = new XSSFWorkbook();
+
+            //build asset list sheet
             Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
             buildHeaderRow(assetSheet);
             buildDataRow(assetSheet, rowCount);
 
+            //build clinical department list sheet
+            Sheet orgSheet = workbook.createSheet(AssetFileImportService.SHEET_ORG);
+            buildClinicalDeptSheet(orgSheet);
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
             workbook.write(baos);
             byte[] bytes = baos.toByteArray();
 
@@ -80,6 +92,15 @@ public class ExcelDocumentGenerator {
 
         return excelDoc;
 
+    }
+
+    private static void buildClinicalDeptSheet(Sheet sheet) {
+
+        Row headerRow = sheet.createRow(AssetFileImportService.EXCEL_ORG_HEADER_ROW - 1);
+        headerRow.createCell(0).setCellValue("部门名称");
+
+        sheet.createRow(AssetFileImportService.EXCEL_ORG_DATA_ROW - 1).createCell(0).setCellValue("内科");
+        sheet.createRow(AssetFileImportService.EXCEL_ORG_DATA_ROW).createCell(0).setCellValue("外科");
     }
 
     private static void buildHeaderRow(Sheet sheet) {
