@@ -81,7 +81,7 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update=":pmOrderListForm:datalist" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancelsr()}" immediate="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
                 </p:fieldset>
