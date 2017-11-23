@@ -25,6 +25,32 @@ public class ExcelDocumentGeneratorTest {
     }
 
     @Test
+    public void getTestDoc_Test_ORG_Titles() throws Exception {
+
+        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
+        String[] titles = excelDoc.getKeyRow(AssetFileImportService.SHEET_ORG, AssetFileImportService.EXCEL_ORG_HEADER_ROW);
+
+        assertEquals(1, titles.length);
+
+        String title = titles[0];
+
+        List<Map<String, Object>> results =  excelDoc.getAllDataRows(1,
+                AssetFileImportService.EXCEL_ORG_HEADER_ROW,
+                AssetFileImportService.EXCEL_ORG_DATA_ROW);
+
+        assertEquals(ExcelDocumentGenerator.defaultOrgData.length, results.size());
+
+        for (int i = 0; i < results.size(); i++) {
+            Map<String, Object> rowData = results.get(i);
+            String expectedColumnValue = ExcelDocumentGenerator.defaultOrgData[i];
+            String actualColumnValue = ExcelDocument.getCellStringValue(rowData.get(title));
+
+            assertEquals(expectedColumnValue, actualColumnValue);
+        }
+
+    }
+
+    @Test
     public void getTestDoc_Test_Data_One_Row() throws Exception {
 
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
