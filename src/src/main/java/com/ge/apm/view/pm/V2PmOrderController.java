@@ -128,26 +128,40 @@ private String dptName;
     public void createPMRequest(){
         cancel();
     }
+	public void onStatusChange() {
+		if (null != selectedAsset) {//new sr
+			needConfirmTime = currentStatus == 2 && selectedAsset.getStatus() != 2;
+		} else {//update sr
+			needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
+		}
+	}
 
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
-        cancel();
         selected = null;
-        if(selectedPmOrder!=null){
-            selectedAsset=selectedPmOrder.getAssetInfo();
-        }
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-    }
 
+		if(selectedPmOrder!=null){
+			selectedAsset=selectedPmOrder.getAssetInfo();
+			if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
+				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+				dptName = orgDao.getByUid(orgInfoUID).getName();
+			}else {
+				dptName = selectedAsset.getClinicalDeptName();
+			}
+		}
+    }
     public void saveServiceRequest() {
         //1表示主动报修
         newServiceRequest.setSrRepairType("1");
         selectedAsset.setStatus(currentStatus);
         woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+        //报修完后直接关单
+        pmOrderService.closePM(selectedPmOrder);
         cancel();
     }
     public void cancelsr() {
@@ -282,19 +296,27 @@ private String dptName;
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }else if (queryIndex == 8) { //待审核
+
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
            //1表示该pm工单已被提交等待审核
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
-             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
         }
         else if (queryIndex == 0) { //保养中
-             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+logger.info("8888888888888");
+
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
-         //   searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*3+"));
+             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
+
+             //   searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+
         }
          else if (queryIndex == 7) { //已关单
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -452,7 +474,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
-        detailDao.save(itemDetail);
+//        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
     private V2_WorkOrderCoworkerRepository coWorkerDao;
@@ -462,7 +484,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
-        coWorkerDao.save(coWorkerDetail);
+//        coWorkerDao.save(coWorkerDetail);
         cancelWorkdetail();
     }
 

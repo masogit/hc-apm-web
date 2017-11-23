@@ -275,6 +275,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         equipmentTaker = null;
         takeTime = null;
         picList = null;
+        selectedAsset = null;
+        requestAssetUid = null;
+        locationName = null;
     }
 
 //    public V2_ServiceRequest getServiceRequest(String srId) {
@@ -290,7 +293,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
-    public void locateAsset() {
+  /*  public void locateAsset() {
         System.out.println();
         if (selectedAsset.getLocationName().isEmpty()) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
@@ -298,7 +301,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             selectedAsset.setLocationName(lName);
             locationName = lName;
         }
-    }
+    }*/
 
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
@@ -335,7 +338,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
-        currentStatus = selectedWorkOrder.getAssetInfo().getStatus();
+        currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = new ArrayList<V2_BlobObject>();
@@ -346,7 +349,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        woService.saveRepairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, comments, picList);
+        woService.saveRepairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
@@ -397,7 +400,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, 1, accessoryList, coWorkerList, comments, picList);
+        woService.repairWorkOrder(selectedWorkOrder, confirmedUpDate, currentStatus, accessoryList, coWorkerList, comments, picList);
         cancel();
     }
 
@@ -445,20 +448,43 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
     }
-
-    public void saveServiceRequest() {
+/* public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            String oUid= UserContextService.getCurrentUserAccount().getOrgInfoUID();
+            if(Strings.isNullOrEmpty(oUid)){//如果当前人连使用科室都没有，提示手动输入
+                WebUtil.addErrorMessage("所选设备没有使用科室,不能报修,请填写当前位置");
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);}
+            else// 当前位置:=当前人的科室或者所在院区位置
+            {
+                String orgName=orgDao.getByUid(oUid).getName();
+                selectedAsset.setStatus(currentStatus);
+                newServiceRequest.setAssetLocation(orgName);
+                woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+                cancel();
+            }
+        } else { //如果设备上有使用科室
+            selectedAsset.setStatus(currentStatus);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            cancel();
+        }
+    }*/
+    public void saveServiceRequest() {
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage("所选设备待报废,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        }else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         } else {
-            //如果设备没有指定安装位置，就取当前人的设备科室
             selectedAsset.setStatus(currentStatus);
-            assetDao.save(selectedAsset);
+            newServiceRequest.setAssetLocation(locationName);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             cancel();
         }
@@ -468,10 +494,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void onServerEvent(String eventName, Object eventObject) {
         AssetInfo asset = (AssetInfo) eventObject;
         if (asset == null) {
-            return;
-        }
-
-        if (this.newServiceRequest == null) {
             return;
         }
         if (Strings.isNullOrEmpty(asset.getLocationName())) {
@@ -488,6 +510,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             currentStatus = 3;
         }
         needConfirmTime = false;
+
+        if (this.newServiceRequest == null) {
+            return;
+        }
+
+
     }
 
     public void onStatusChange() {
@@ -542,7 +570,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
-        detailDao.save(itemDetail);
+//        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
 
@@ -552,7 +580,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
-        coWorkerDao.save(coWorkerDetail);
+//        coWorkerDao.save(coWorkerDetail);
         cancelWorkdetail();
     }
 

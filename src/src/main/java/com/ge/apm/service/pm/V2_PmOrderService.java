@@ -11,6 +11,7 @@ import com.ge.apm.service.common.UserCommonService;
 /*import com.ge.apm.service.wo.PmOrderActionForm;
 import com.ge.apm.service.wo.WorkOrderForm;*/
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,20 +93,22 @@ public class V2_PmOrderService {
         String res = srApi.invokePmOrderAction(token,formData,"close",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("关单成功");
         }
     }
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-
         formData.setActionType("approval");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 formData.setAssignee(approvaler);
-
         formData.setDetails(accessoryList);
         String res = srApi.invokePmOrderAction(token,formData,"approval",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("审批成功");
         }
     }
 
@@ -128,6 +131,8 @@ formData.setAssignee(approvaler);
         String res = srApi.invokePmOrderAction(token,formData,"rate",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")){
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("feedbackComment"));
+        }else{
+            WebUtil.addSuccessMessage("操作成功");
         }
     }
     public void rejectWorkOrder(V2_PmOrder selectedPmOrder,String reason, Integer status, Date confirmedDowntime) {
@@ -141,6 +146,8 @@ formData.setAssignee(approvaler);
         String res = srApi.invokePmOrderAction(token,formData,"ackFailed",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("Acknowledge"));
+        }else{
+            WebUtil.addSuccessMessage("操作成功");
         }
 
 
@@ -154,6 +161,8 @@ formData.setAssignee(approvaler);
         String res = srApi.invokePmOrderAction(token,formData,agree?"approvalPass":"approvalReject",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("审批成功");
         }
     }
 
@@ -169,6 +178,8 @@ formData.setAssignee(approvaler);
         String res = srApi.invokePmOrderAction(token,formData,"assign",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),WebUtil.getMessage("dispatchWorkOrder"));
+        }else{
+            WebUtil.addSuccessMessage("派工成功");
         }
         selectedPmOrder.setCurrentStepId("accept");
 
@@ -195,6 +206,8 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
 
        if (res==null || !res.equalsIgnoreCase("Ok")) {
            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+       }else{
+           WebUtil.addSuccessMessage("审批成功");
        }
    }
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime) {
@@ -214,17 +227,19 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
         String res = srApi.invokePmOrderAction(token,formData,"repair",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+        }else{
+            WebUtil.addSuccessMessage("操作成功");
         }
     }
 
 
     public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime) {
-
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
+        if(endTime !=null)
+         formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("暂时保存");
         formData.setDetails(accDetails);
@@ -232,6 +247,8 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
         String res = srApi.invokePmOrderAction(token,formData,"tempRepair",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+        }else{
+            WebUtil.addSuccessMessage("暂存成功");
         }
     }
     public List<V2_ServiceRequest> getServiceRequestByAssetId(Integer id) {

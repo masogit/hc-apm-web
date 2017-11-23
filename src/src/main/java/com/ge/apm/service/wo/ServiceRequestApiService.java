@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.google.common.base.Strings;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -63,7 +64,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setPriority(newServiceRequest.getCasePriority());
         formData.setRequestReason(newServiceRequest.getRequestReason());
         formData.setAttachments(picList);
-
+        formData.setAssetLocation(newServiceRequest.getAssetLocation());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_serviceRequestCreate, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -113,6 +114,15 @@ class ServiceRequestForm {
     String telephone;
     String wechatId;
     String nickName;
+    String assetLocation;
+
+    public String getAssetLocation() {
+        return assetLocation;
+    }
+
+    public void setAssetLocation(String assetLocation) {
+        this.assetLocation = assetLocation;
+    }
 
     public Integer getAssetId() {
         return assetId;

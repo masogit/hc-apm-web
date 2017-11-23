@@ -44,6 +44,9 @@
                                             <f:convertNumber  maxFractionDigits="4" maxIntegerDigits="10"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="类型">
+                                        <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
+                                    </p:column>
                                     <p:column headerText="序列号">
                                         <h:outputText value="#{item.serialNum}" />
                                     </p:column>
@@ -90,11 +93,11 @@
                             </h:panelGroup>
 
                         </p:panelGrid>
-                        
+
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
-                        <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update=":growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
+                        <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update=":pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
 
                         <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl :approveDialogForm" oncomplete="PF('approveDialog').show()"/>
@@ -127,8 +130,8 @@
 
         <!--PF('pmrepairCompleteDialog').hide()
         -->
-         <ui:include src="pmMoreAccDialog.xhtml"/>
-         <ui:include src="pmCoWorkDialog.xhtml"/>
+        <ui:include src="pmMoreAccDialog.xhtml"/>
+        <ui:include src="pmCoWorkDialog.xhtml"/>
 
     </ui:composition>
 </html>
