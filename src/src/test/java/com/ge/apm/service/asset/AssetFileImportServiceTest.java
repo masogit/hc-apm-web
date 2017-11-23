@@ -4,6 +4,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
+import com.ge.apm.mock.FakeData;
 import com.ge.apm.service.utils.ExcelDocument;
 import org.apache.poi.ss.SpreadsheetVersion;
 import org.apache.poi.ss.formula.udf.UDFFinder;
@@ -53,6 +54,9 @@ public class AssetFileImportServiceTest {
 
     ExcelDocument excelDocument;
 
+    @Autowired
+    FakeData fakeData;
+
     @Before
     public void setUp() throws Exception {
 
@@ -62,16 +66,10 @@ public class AssetFileImportServiceTest {
         orgInfoDao.deleteAll();
 
         if (!initialized) {
-            init();
+            fakeData.initTenantData();
             initialized = true;
         }
 
-    }
-
-    public void init() {
-
-        OrgInfo orgInfo = new OrgInfo();
-        List<OrgInfo> orgInfoList = (List<OrgInfo>) orgInfoDao.findAll();
     }
 
     @After
