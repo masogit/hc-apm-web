@@ -45,9 +45,14 @@ import webapp.framework.web.WebUtil;
 @Scope("prototype")
 public class AssetFileImportService {
 
-    private static final String SHEET_ASSET = "Asset List";
-    private static final String SHEET_ORG = "Org List";
+    public static final String SHEET_ASSET = "Asset List";
+    public static final String SHEET_ORG = "Org List";
 //    private static final String SHEET_USER = "User List";
+    public static final int EXCEL_ASSET_HEADER_ROW = 6;
+    public static final int EXCEL_ASSET_DATA_ROW = 7;
+
+    public static final int EXCEL_ORG_HEADER_ROW = 4;
+    public static final int EXCEL_ORG_DATA_ROW = 5;
 
     public static enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -324,7 +329,7 @@ public class AssetFileImportService {
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum) {
+                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum, Boolean isGeneratePmOrder) {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -461,13 +466,13 @@ public class AssetFileImportService {
                 if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
                     QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
                     newAsset.setQrCode(newCode.getQrCode());
-                    if(createAsset(newAsset)){
+                    if(createAsset(newAsset,isGeneratePmOrder)){
                         item.put("status", ImportStatus.Created);
                     }else{
                         item.put("status", ImportStatus.Failure);
                     }
                 } else if (isAvailableQrcode(qrCode, item)) {
-                    if(createAsset(newAsset)){
+                    if(createAsset(newAsset,isGeneratePmOrder)){
                         item.put("status", ImportStatus.Created);
                     }else{
                         item.put("status", ImportStatus.Failure);
@@ -543,8 +548,8 @@ public class AssetFileImportService {
     }
 
     @Transactional
-    Boolean createAsset(AssetInfo asset) {
-        if(!assetCreateService.CreateAeest(asset)){
+    Boolean createAsset(AssetInfo asset, Boolean isGeneratePmOrder) {
+        if(!assetCreateService.CreateAeest(asset,isGeneratePmOrder)){
             return false;
         }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {

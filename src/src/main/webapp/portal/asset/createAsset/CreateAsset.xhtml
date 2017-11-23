@@ -217,6 +217,11 @@
                                         <label class="label">#{msg.maitananceTel}</label>
                                         <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}"/>
                                     </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">同时生成保养工单</label>
+                                        <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetCreateController.isGeneratePmOrder}"/>
+                                    </h:panelGroup>
+
                                 </p:panelGrid>
                             </p:fieldset>
 

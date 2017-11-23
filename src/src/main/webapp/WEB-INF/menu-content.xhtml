@@ -27,10 +27,10 @@
                 
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
             </p:submenu>
-            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
+            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff')}">
                 <p:menuitem  value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem  value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                <p:menuitem id="um086" value="采购申请" outcome="/portal/asset/ApplicationList.xhtml" rendered="#{userContextService.hasRole('AssetHead')}"/>
+                <!--<p:menuitem id="um086" value="采购申请" outcome="/portal/asset/ApplicationList.xhtml" rendered="#{userContextService.hasRole('AssetHead')}"/>-->
             </p:submenu>
             <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
                 <p:menuitem id="um89" value="维修工单" outcome="/portal/workorder/repaireWorkOrder.xhtml" rendered="false"/>
@@ -61,7 +61,7 @@
                             url="/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
             </p:submenu>
 
-            <p:submenu  id="um60"  label="预防维护" rendered="#{userContextService.hasRole('ClinicalStaff')}" icon="fa fa-check-square-o" >
+            <p:submenu  id="um60"  label="预防维护" rendered="#{userContextService.hasRole('ClinicalStaff') and !userContextService.hasRole('AssetStaff')}" icon="fa fa-check-square-o" >
                 <p:menuitem id="um601"  value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o"

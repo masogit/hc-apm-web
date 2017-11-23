@@ -48,6 +48,8 @@ public class AssetCreateController {
     List<V2_BlobObject> audioList;
 
     private UserAccount clinicalOwner;
+    
+    private Boolean isGeneratePmOrder;
 
     @PostConstruct
     protected void init() {
@@ -134,7 +136,7 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
-        Boolean res = acServie.CreateAeest(assetInfo);
+        Boolean res = acServie.CreateAeest(assetInfo, isGeneratePmOrder);
         if (res) {
             acServie.createAttachments(assetInfo, selectedPictures);
             acServie.updateQrLib(assetInfo.getQrCode(), 3);
@@ -268,6 +270,14 @@ public class AssetCreateController {
 
     public void setClinicalOwner(UserAccount clinicalOwner) {
         this.clinicalOwner = clinicalOwner;
+    }
+
+    public Boolean getIsGeneratePmOrder() {
+        return isGeneratePmOrder;
+    }
+
+    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
+        this.isGeneratePmOrder = isGeneratePmOrder;
     }
 
 }

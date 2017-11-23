@@ -82,7 +82,7 @@ public class ExcelDocument {
         return getKeyRow(sheet, keyRowNum);
     }
 
-    public String[] getKeyRow(Sheet sheet, int keyRowNum) {
+    public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
         Row keyRow = sheet.getRow(keyRowNum - 1);
         String[] result = new String[keyRow.getLastCellNum()];
         int firstCellNum = keyRow.getFirstCellNum();
