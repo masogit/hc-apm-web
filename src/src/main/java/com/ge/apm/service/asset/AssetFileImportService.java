@@ -45,9 +45,11 @@ import webapp.framework.web.WebUtil;
 @Scope("prototype")
 public class AssetFileImportService {
 
-    private static final String SHEET_ASSET = "Asset List";
-    private static final String SHEET_ORG = "Org List";
+    public static final String SHEET_ASSET = "Asset List";
+    public static final String SHEET_ORG = "Org List";
 //    private static final String SHEET_USER = "User List";
+    public static final int EXCEL_ASSET_HEADER_ROW = 6;
+    public static final int EXCEL_ASSET_DATA_ROW = 7;
 
     public static enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
