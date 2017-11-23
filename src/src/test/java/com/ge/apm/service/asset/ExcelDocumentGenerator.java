@@ -1,17 +1,14 @@
 package com.ge.apm.service.asset;
 
 import com.ge.apm.service.utils.ExcelDocument;
-import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 public class ExcelDocumentGenerator {
 
@@ -38,10 +35,37 @@ public class ExcelDocumentGenerator {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
-            XSSFWorkbook workbook = new XSSFWorkbook();
-            XSSFSheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
+            Workbook workbook = new XSSFWorkbook();
+            Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
             buildHeaderRow(assetSheet);
             buildOneLineDataRow(assetSheet);
+
+            workbook.write(baos);
+            byte[] bytes = baos.toByteArray();
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
+
+            excelDoc = new ExcelDocument(bais, ExcelDocument.ExcelType.XLSX);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return excelDoc;
+
+    }
+
+    public static ExcelDocument getTestDoc(int rowCount) {
+
+        ExcelDocument excelDoc = null;
+
+        try {
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+            Workbook workbook = new XSSFWorkbook();
+            Sheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
+            buildHeaderRow(assetSheet);
+            buildDataRow(assetSheet, rowCount);
 
             workbook.write(baos);
             byte[] bytes = baos.toByteArray();
@@ -73,10 +97,26 @@ public class ExcelDocumentGenerator {
 
         Row dataRow = sheet.createRow(AssetFileImportService.EXCEL_ASSET_DATA_ROW - 1);
 
-        int columnIndex = 0;
-        for (String title: defaultRowData) {
-            dataRow.createCell(columnIndex++).setCellValue(title);
+        for (int i = 0; i < headerTitles.length; i ++) {
+            applyCellData(dataRow, headerTitles[i], defaultRowData[i]);
         }
+
+    }
+
+    private static void buildDataRow(Sheet sheet, int rowCount) {
+
+
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            Row dataRow = sheet.createRow(AssetFileImportService.EXCEL_ASSET_DATA_ROW - 1 + rowIndex);
+
+            applyCellData(dataRow, "设备编号", String.format("SBBH%07d", rowIndex + 1));
+            applyCellData(dataRow, "设备名称", "测试名称");
+            applyCellData(dataRow, "设备分类", "其他类");
+            applyCellData(dataRow, "资产编号", null);
+            applyCellData(dataRow, "二维码", null);
+
+        }
+
 
     }
 
