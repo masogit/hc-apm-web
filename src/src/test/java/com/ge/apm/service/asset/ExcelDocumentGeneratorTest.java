@@ -24,7 +24,7 @@ public class ExcelDocumentGeneratorTest {
     }
 
     @Test
-    public void getTestDoc_Test_Data() throws Exception {
+    public void getTestDoc_Test_Data_One_Row() throws Exception {
 
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
         List<Map<String, Object>> results =  excelDoc.getAllDataRows(0,
@@ -42,6 +42,33 @@ public class ExcelDocumentGeneratorTest {
 
             assertEquals(expectedColumnValue, actualColumnValue);
         }
+    }
+
+    @Test
+    public void getTestDoc_Test_Data_Multiple_Row() throws Exception {
+
+        int rowCount = 2;
+
+        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(rowCount);
+        List<Map<String, Object>> results =  excelDoc.getAllDataRows(0,
+                AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
+                AssetFileImportService.EXCEL_ASSET_DATA_ROW);
+
+        assertEquals(2, results.size());
+
+        for (int rowIndex = 0; rowIndex < rowCount; rowIndex++) {
+            Map<String, Object> result = results.get(rowIndex);
+
+            String format = ExcelDocumentGenerator.headerTitles[0] + ": %s, " + ExcelDocumentGenerator.headerTitles[1] + ": %s";
+            String[] args = {
+                    ExcelDocument.getCellStringValue(result.get(ExcelDocumentGenerator.headerTitles[0])),
+                    ExcelDocument.getCellStringValue(result.get(ExcelDocumentGenerator.headerTitles[1]))
+            };
+            String row = String.format(format, args);
+            System.out.println(row);
+
+        }
+
     }
 
 }
