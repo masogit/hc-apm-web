@@ -137,9 +137,7 @@ private String dptName;
 	}
 
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
-        cancel();
         selected = null;
-
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
@@ -155,17 +153,15 @@ private String dptName;
 			}else {
 				dptName = selectedAsset.getClinicalDeptName();
 			}
-			//报修完后直接关单
-			pmOrderService.closePM(selectedPmOrder);
 		}
-
     }
-
     public void saveServiceRequest() {
         //1表示主动报修
         newServiceRequest.setSrRepairType("1");
         selectedAsset.setStatus(currentStatus);
         woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+        //报修完后直接关单
+        pmOrderService.closePM(selectedPmOrder);
         cancel();
     }
     public void cancelsr() {
