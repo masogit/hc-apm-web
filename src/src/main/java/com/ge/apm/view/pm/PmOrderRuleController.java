@@ -379,7 +379,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			List<Integer> itemIds = new ArrayList<Integer>();
 			if(!ids.isEmpty()){
 				Iterator it = ids.iterator();
-				if(it.hasNext()){
+				while(it.hasNext()){
 					Object o = it.next();
 					itemIds.add(Integer.parseInt((String)o));
 				}
