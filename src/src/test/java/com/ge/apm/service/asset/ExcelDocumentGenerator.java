@@ -23,6 +23,14 @@ public class ExcelDocumentGenerator {
             "二维码"
     };
 
+    public static String[] defaultRowData = {
+            "SBBH0001",
+            "TEST Asset",
+            "其他类",
+            "ZCBH0001",
+            "1111111111111111"
+    };
+
     public static ExcelDocument getTestDoc() {
 
         ExcelDocument excelDoc = null;
@@ -32,8 +40,9 @@ public class ExcelDocumentGenerator {
 
             XSSFWorkbook workbook = new XSSFWorkbook();
             XSSFSheet assetSheet = workbook.createSheet(AssetFileImportService.SHEET_ASSET);
-            XSSFRow headerRow = assetSheet.createRow(AssetFileImportService.EXCEL_ASSET_HEADER_ROW - 1);
-            buildHeaderRow(headerRow);
+            buildHeaderRow(assetSheet);
+            buildOneLineDataRow(assetSheet);
+
             workbook.write(baos);
             byte[] bytes = baos.toByteArray();
 
@@ -49,7 +58,9 @@ public class ExcelDocumentGenerator {
 
     }
 
-    private static void buildHeaderRow(XSSFRow headerRow) {
+    private static void buildHeaderRow(Sheet sheet) {
+
+        Row headerRow = sheet.createRow(AssetFileImportService.EXCEL_ASSET_HEADER_ROW - 1);
 
         int columnIndex = 0;
         for (String title: headerTitles) {
@@ -60,18 +71,25 @@ public class ExcelDocumentGenerator {
 
     private static void buildOneLineDataRow(Sheet sheet) {
 
-//        Row headerRow = sheet.getRow(AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
-
-        String[] headers = ExcelDocument.getKeyRow(sheet, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
-
-        Row dataRow = sheet.createRow(AssetFileImportService.EXCEL_ASSET_DATA_ROW);
+        Row dataRow = sheet.createRow(AssetFileImportService.EXCEL_ASSET_DATA_ROW - 1);
 
         int columnIndex = 0;
-        dataRow.createCell(columnIndex++).setCellValue("SBBH0001");
-        dataRow.createCell(columnIndex++).setCellValue("Test Asset");
-        dataRow.createCell(columnIndex++).setCellValue("其他类");
-        dataRow.createCell(columnIndex++).setCellValue("资产编号");
-        dataRow.createCell(columnIndex++).setCellValue("二维码");
+        for (String title: defaultRowData) {
+            dataRow.createCell(columnIndex++).setCellValue(title);
+        }
 
+    }
+
+    private static void applyCellData(Row dataRow, String columnTitle, String columnValue) {
+
+
+        for (int i = 0; i < headerTitles.length; i ++) {
+
+            if (columnTitle.equals(headerTitles[i])) {
+                dataRow.createCell(i).setCellValue(columnValue);
+
+                return;
+            }
+        }
     }
 }
