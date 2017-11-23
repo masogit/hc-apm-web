@@ -91,14 +91,14 @@ public class MeasuringService {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-        for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
-            HSSFSheet sheet = workbook.getSheetAt(i);
+        //for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
+            HSSFSheet sheet = workbook.getSheetAt(0);
             if (sheet == null) {
-                continue;
+                return null;
             }
             Map<String, Integer> header = findHeader(sheet);
             if(header.isEmpty()) {
-                continue;
+                return null;
             }
             for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
                 HSSFRow row = sheet.getRow(j);
@@ -172,8 +172,7 @@ public class MeasuringService {
                     tempMCDList.add(detail);
                 }
             }
-        }
-
+        //}
         return tempMCDList;
     }
 
