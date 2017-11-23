@@ -139,21 +139,26 @@ private String dptName;
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
         cancel();
         selected = null;
-        if(selectedPmOrder!=null){
-            selectedAsset=selectedPmOrder.getAssetInfo();
-            if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
-				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-				dptName = orgDao.getByUid(orgInfoUID).getName();
-			}else {
-				dptName = selectedAsset.getClinicalDeptName();
-			}
-        }
+
         newServiceRequest = new V2_ServiceRequest();
         picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
+
+		if(selectedPmOrder!=null){
+			selectedAsset=selectedPmOrder.getAssetInfo();
+			if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
+				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
+				dptName = orgDao.getByUid(orgInfoUID).getName();
+			}else {
+				dptName = selectedAsset.getClinicalDeptName();
+			}
+			//报修完后直接关单
+			pmOrderService.closePM(selectedPmOrder);
+		}
+
     }
 
     public void saveServiceRequest() {

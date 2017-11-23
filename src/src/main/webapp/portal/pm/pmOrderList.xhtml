@@ -138,7 +138,7 @@
                             <p:inputText  id="assetName" readonly="true" value="#{v2PmOrderController.assetName}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
 
 
-                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM dptName" oncomplete="PF('varSelectAssetDlgPM').show();"/>
+                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM dptName :growl" oncomplete="PF('varSelectAssetDlgPM').show();"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -171,7 +171,7 @@
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update=":takeOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 
-                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" update=":ServiceRequestCreateForm"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
+                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" update=":ServiceRequestCreateForm :pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -228,7 +228,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                      <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.dispatchWorkOrder()}" value="#{msg.dispatchWorkOrder}" update=":pmOrderListForm :pmOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'dispatchDialog');"/>
+                      <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.dispatchWorkOrder()}" value="#{msg.dispatchWorkOrder}" update=":pmOrderListForm :growl :pmOrderDetailForm " icon="ui-icon-check" oncomplete="handleSubmit(args, 'dispatchDialog');"/>
                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('dispatchDialog').hide()"/>
                    </h:panelGroup>
                 </h:panelGroup>
