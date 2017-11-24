@@ -54,8 +54,8 @@ public class AssetFileImportServiceTest {
 
     ExcelDocument excelDocument;
 
-    @Autowired
-    FakeData fakeData;
+//    @Autowired
+//    FakeData fakeData;
 
     @Before
     public void setUp() throws Exception {
@@ -100,7 +100,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
 
-//        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false, false);
 
     }
 
