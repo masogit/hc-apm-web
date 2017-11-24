@@ -102,6 +102,9 @@ public class AssetFileImportService {
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, ++dataRow)) {
             OrgInfo org = new OrgInfo();
             ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper)rowMap.get("部门名称");
+            if (valueWrapper == null) {
+                break;
+            }
             String orgName = (String) valueWrapper.value;
             if (orgName == null || orgName.isEmpty()) {
                 break;
