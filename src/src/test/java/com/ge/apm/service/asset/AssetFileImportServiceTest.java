@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -36,6 +38,8 @@ import java.util.Map;
 @TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileImportServiceTest {
 
+    Logger logger = LoggerFactory.getLogger(AssetFileImportServiceTest.class);
+
     private static boolean initialized = false;
 
     @Autowired
@@ -54,19 +58,20 @@ public class AssetFileImportServiceTest {
 
     ExcelDocument excelDocument;
 
-    @Autowired
-    FakeData fakeData;
+//    @Autowired
+//    FakeData fakeData;
 
     @Before
     public void setUp() throws Exception {
 
         this.transactionTemplate = new TransactionTemplate(transactionManager);
 
-        assetInfoDao.deleteAll();
-        orgInfoDao.deleteAll();
+//        assetInfoDao.deleteAll();
+//        orgInfoDao.deleteAll();
 
         if (!initialized) {
-            fakeData.initTenantData();
+//            fakeData.initTenantData();
+
             initialized = true;
         }
 
@@ -74,8 +79,8 @@ public class AssetFileImportServiceTest {
 
     @After
     public void tearDown() throws Exception {
-        assetInfoDao.deleteAll();
-        orgInfoDao.deleteAll();
+//        assetInfoDao.deleteAll();
+//        orgInfoDao.deleteAll();
     }
 
     @Ignore
@@ -83,7 +88,6 @@ public class AssetFileImportServiceTest {
     public void getOrgInfoMapFromTemplate() throws Exception {
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
         Map<String, Map<String, Object>> map = service.getOrgInfoMapFromTemplate(excelDoc);
-
 
     }
 
@@ -96,11 +100,19 @@ public class AssetFileImportServiceTest {
     public void importData() throws Exception {
 
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(5000);
+
+        logger.info("start to import excel");
+        long startTime = System.currentTimeMillis();
+
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-
         service.importData(orgMap, assetMap, false, false, false);
+
+        long endTime = System.currentTimeMillis();
+        logger.info("finish to import excel");
+
+        logger.info("total time: {0}", (endTime - startTime) / 1000);
     }
 
     @Ignore
