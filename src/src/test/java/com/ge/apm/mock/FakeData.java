@@ -1,12 +1,7 @@
 package com.ge.apm.mock;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFileImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -37,6 +32,15 @@ public class FakeData {
 
     @Autowired
     TenantInfoRepository tenantInfoDao;
+
+    @Autowired
+    UserOrgInfoRepository userOrgInfoDao;
+
+    @Autowired
+    UserRoleRepository userRoleDao;
+
+    @Autowired
+    SysRoleRepository sysRoleDao;
 
 //    @Autowired
 //    PlatformTransactionManager transactionManager;
@@ -272,6 +276,28 @@ public class FakeData {
         }
 
         this.userAccount = userAccountList.get(0);
+
+        List<UserOrgInfo> userOrgInfoList = userOrgInfoDao.findByUserUid(userAccount.getUid());
+        if (userOrgInfoList.isEmpty()) {
+            UserOrgInfo userOrgInfo = new UserOrgInfo();
+            userOrgInfo.setUserUid(userAccount.getUid());
+            userOrgInfo.setOrgType(orgInfo.getOrgType());
+            userOrgInfo.setOrgUid(orgInfo.getUid());
+            userOrgInfoDao.save(userOrgInfo);
+        }
+
+//        List<SysRole> sysRoleList = (List<SysRole>) sysRoleDao.findAll();
+//        if (sysRoleList.isEmpty()) {
+//            SysRole sysRole = new SysRole();
+//            sysRole.setName("AssetStaff");
+//        }
+//
+//        List<UserRole> userRoleList = userRoleDao.findByUserId(userAccount.getId());
+//        if (userRoleList.isEmpty()) {
+//            UserRole userRole = new UserRole();
+//            userRole.setUserId(userAccount.getId());
+//        }
+
 
     }
 
