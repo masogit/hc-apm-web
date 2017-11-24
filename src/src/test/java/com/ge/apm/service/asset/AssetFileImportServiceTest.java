@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestExecutionListeners;
@@ -35,6 +37,8 @@ import java.util.Map;
 @ContextConfiguration({"/config/springmvc-parent.xml"})
 @TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileImportServiceTest {
+
+    Logger logger = LoggerFactory.getLogger(AssetFileImportServiceTest.class);
 
     private static boolean initialized = false;
 
@@ -96,12 +100,17 @@ public class AssetFileImportServiceTest {
     public void importData() throws Exception {
 
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(5000);
+
+        long startTime = System.currentTimeMillis();
+
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-
         service.importData(orgMap, assetMap, false, false, false);
 
+        long endTime = System.currentTimeMillis();
+
+        logger.info("total time: {0}", (endTime - startTime) / 1000);
     }
 
     @Ignore
