@@ -153,6 +153,9 @@ public class AssetInstallationController {
             if (aiService.submitInstallItem(arrivalListItem.getId(), true)) {
                 ArrivalListItem temp = itemDao.findById(arrivalListItem.getId());
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
+                if(!Strings.isNullOrEmpty(newAsset.getQrCode())){
+                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), 3);
+                }
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 if (isGeneratePmOrder) {
                     pmService.createPMrequest(newAsset.getUid(), null);
