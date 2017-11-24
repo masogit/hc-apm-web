@@ -101,6 +101,7 @@ public class AssetFileImportServiceTest {
 
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(5000);
 
+        logger.info("start to import excel");
         long startTime = System.currentTimeMillis();
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
@@ -109,6 +110,7 @@ public class AssetFileImportServiceTest {
         service.importData(orgMap, assetMap, false, false, false);
 
         long endTime = System.currentTimeMillis();
+        logger.info("finish to import excel");
 
         logger.info("total time: {0}", (endTime - startTime) / 1000);
     }
