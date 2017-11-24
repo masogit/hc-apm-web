@@ -16,6 +16,7 @@
 
 package com.ge.apm.mock;
 
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.logging.Log;
@@ -68,7 +69,7 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         ExpressionFactory expressionFactory = mock(ExpressionFactory.class);
         ValueExpression valueExpression = mock(ValueExpression.class);
         UserContextService userContextService = mock(UserContextService.class);
-        UserAccount userAccount = mock(UserAccount.class);
+//        UserAccount userAccount = mock(UserAccount.class);
         ExternalContext externalContext = mock(ExternalContext.class);
         Map<String, Object> applicationMap = mock(Map.class);
 
@@ -78,17 +79,23 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         when(application.getExpressionFactory()).thenReturn(expressionFactory);
         when(expressionFactory.createValueExpression(any(ELContext.class), anyString(), any())).thenReturn(valueExpression);
         when(valueExpression.getValue(any())).thenReturn(userContextService);
-        when(userContextService.getLoginUser()).thenReturn(userAccount);
-        when(userAccount.getSiteId()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_SITE_ID);
-        when(userAccount.getSiteUID()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_SITE_UID);
-        when(userAccount.getTenantUID()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_TENANT_UID);
+        when(mockFacesContext.getExternalContext()).thenReturn(externalContext);
+        when(externalContext.getApplicationMap()).thenReturn(applicationMap);
 
         ApplicationContext context = testContext.getApplicationContext();
+        when(applicationMap.get(eq(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))).thenReturn(context);
 
-        if (context instanceof WebApplicationContext) {
-            when(mockFacesContext.getExternalContext()).thenReturn(externalContext);
-            when(externalContext.getApplicationMap()).thenReturn(applicationMap);
-            when(applicationMap.get(eq(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))).thenReturn(context);
+        if (context != null) {
+
+            FakeData fakeData = context.getBean(FakeData.class);
+            fakeData.initTenantData();
+
+            UserAccount userAccount = fakeData.getUserAccount();
+            when(userContextService.getLoginUser()).thenReturn(userAccount);
+
+//            when(userAccount.getSiteId()).thenReturn(tenantInfo.getId());
+//            when(userAccount.getSiteUID()).thenReturn(tenantInfo.getUid());
+//            when(userAccount.getTenantUID()).thenReturn(tenantInfo.getUid());
 
         }
 
