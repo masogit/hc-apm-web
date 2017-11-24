@@ -156,13 +156,24 @@ private String dptName;
 		}
     }
     public void saveServiceRequest() {
-        //1表示主动报修
-        newServiceRequest.setSrRepairType("1");
-        selectedAsset.setStatus(currentStatus);
-        woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-        //报修完后直接关单
-        pmOrderService.closePM(selectedPmOrder);
-        cancel();
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage("所选设备待报废,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        }else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        } else {
+            //1表示主动报修
+            newServiceRequest.setSrRepairType("1");
+            selectedAsset.setStatus(currentStatus);
+            newServiceRequest.setAssetLocation(dptName);
+            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            //报修完后直接关单
+            pmOrderService.closePM(selectedPmOrder);
+            cancel();
+        }
     }
     public void cancelsr() {
         selected = null;
