@@ -147,11 +147,12 @@ private String dptName;
 
 		if(selectedPmOrder!=null){
 			selectedAsset=selectedPmOrder.getAssetInfo();
-			if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
+
+			if(Strings.isNullOrEmpty(selectedAsset.getLocationName())){
 				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
 				dptName = orgDao.getByUid(orgInfoUID).getName();
 			}else {
-				dptName = selectedAsset.getClinicalDeptName();
+				dptName = selectedAsset.getLocationName();
 			}
 		}
     }
