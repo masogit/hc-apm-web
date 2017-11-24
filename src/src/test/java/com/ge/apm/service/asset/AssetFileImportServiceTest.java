@@ -62,11 +62,12 @@ public class AssetFileImportServiceTest {
 
         this.transactionTemplate = new TransactionTemplate(transactionManager);
 
-        assetInfoDao.deleteAll();
-        orgInfoDao.deleteAll();
+//        assetInfoDao.deleteAll();
+//        orgInfoDao.deleteAll();
 
         if (!initialized) {
-            fakeData.initTenantData();
+//            fakeData.initTenantData();
+
             initialized = true;
         }
 
@@ -74,8 +75,8 @@ public class AssetFileImportServiceTest {
 
     @After
     public void tearDown() throws Exception {
-        assetInfoDao.deleteAll();
-        orgInfoDao.deleteAll();
+//        assetInfoDao.deleteAll();
+//        orgInfoDao.deleteAll();
     }
 
     @Ignore
@@ -83,7 +84,6 @@ public class AssetFileImportServiceTest {
     public void getOrgInfoMapFromTemplate() throws Exception {
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
         Map<String, Map<String, Object>> map = service.getOrgInfoMapFromTemplate(excelDoc);
-
 
     }
 

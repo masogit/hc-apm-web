@@ -16,6 +16,7 @@
 
 package com.ge.apm.mock;
 
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.logging.Log;
@@ -79,9 +80,7 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         when(expressionFactory.createValueExpression(any(ELContext.class), anyString(), any())).thenReturn(valueExpression);
         when(valueExpression.getValue(any())).thenReturn(userContextService);
         when(userContextService.getLoginUser()).thenReturn(userAccount);
-        when(userAccount.getSiteId()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_SITE_ID);
-        when(userAccount.getSiteUID()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_SITE_UID);
-        when(userAccount.getTenantUID()).thenReturn(FakeData.USER_ACCOUNT_DEFAULT_TENANT_UID);
+
 
         ApplicationContext context = testContext.getApplicationContext();
 
@@ -89,6 +88,15 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
             when(mockFacesContext.getExternalContext()).thenReturn(externalContext);
             when(externalContext.getApplicationMap()).thenReturn(applicationMap);
             when(applicationMap.get(eq(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))).thenReturn(context);
+
+            FakeData fakeData = context.getBean(FakeData.class);
+            fakeData.initTenantData();
+
+            TenantInfo tenantInfo = fakeData.tenantInfo;
+
+            when(userAccount.getSiteId()).thenReturn(tenantInfo.getId());
+            when(userAccount.getSiteUID()).thenReturn(tenantInfo.getUid());
+            when(userAccount.getTenantUID()).thenReturn(tenantInfo.getUid());
 
         }
 
