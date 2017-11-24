@@ -139,7 +139,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("技术验收未通过");
             isAckFinished = false;
         }
-        if (!Strings.isNullOrEmpty(currentQrCode) && !currentQrCode.equals(arrivalListItem.getQrCode())) {
+        if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
             if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
                 isAckFinished = false;
             }
@@ -184,9 +184,20 @@ public class AssetInstallationController {
     }
 
     public void updateItem() {
+        Boolean valid = true;
         if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-        } else if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
+            valid = false;
+        }
+        if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
+            valid = false;
+            arrivalListItem.setQrCode(null);
+        } 
+        if(!valid){
+            return;
+        }
+        
+        if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             saveOrUpdateItem(arrivalListItem);
             WebUtil.addSuccessMessage("修改成功");
         } else {
@@ -263,7 +274,7 @@ public class AssetInstallationController {
     }
 
     public void renewQrcode() {
-        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 3);
+        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 1);
         arrivalListItem.setQrCode(qrcodeLib.getQrCode());
     }
 

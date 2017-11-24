@@ -105,7 +105,7 @@
                                     <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInstallationController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:inputText>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText id="financingNum" value="#{assetInstallationController.arrivalListItem.financingNum}" />
@@ -128,9 +128,9 @@
                             </h:panelGroup>
                         </p:panelGrid>
 
-                        
+
                     </p:fieldset>
-                    
+
                     <p:fieldset  legend="#{msg.AssetArrivalListAssetInfoInput}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -159,7 +159,7 @@
                                 </p:selectOneMenu>
 
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalOwnerName}</label>
                                 <p:selectOneMenu id="clinicalOwnerName" value="#{assetInstallationController.arrivalListItem.clinicalOwnerUid}" >
@@ -167,12 +167,12 @@
                                     <f:selectItems value="#{assetInstallationController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.maitanance}</label>
                                 <p:inputText id="maitanance" value="#{assetInstallationController.arrivalListItem.maitanance}"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInstallationController.arrivalListItem.parentAssetId}" >
@@ -184,12 +184,12 @@
                                 <label class="label">#{msg.systemId}</label>
                                 <p:inputText id="systemId" value="#{assetInstallationController.arrivalListItem.systemId}"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.departNum}</label>
                                 <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.barcode}</label>
                                 <p:inputText id="barcode" value="#{assetInstallationController.arrivalListItem.barcode}"/>
@@ -202,13 +202,13 @@
                                 <label class="label">#{msg.modalityId}</label>
                                 <p:inputText id="modalityId" value="#{assetInstallationController.arrivalListItem.modalityId}"/>
                             </h:panelGroup>
-                            
-                            <h:panelGroup>
+
+                            <h:panelGroup id="qrCode">
                                 <label class="label">#{msg.qrCode}</label>
-                                <p:inputText id="qrCode" value="#{assetInstallationController.arrivalListItem.qrCode}" />
-                                <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" rendered="#{empty assetInstallationController.arrivalListItem.qrCode}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}"/>
+                                <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup >
                                 <label class="label">#{msg.medicalInstrumentClassification}</label>
                                 <p:selectOneMenu id="functionGroup" value="#{assetInstallationController.arrivalListItem.functionGroup}" style="width: 100%">
@@ -232,13 +232,13 @@
                                 <label class="label">#{msg.locationName}</label>
                                 <p:inputText id="locationName" value="#{assetInstallationController.arrivalListItem.locationName}"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup >
                                 <label class="label">#{msg.comments}</label>
                                 <p:inputTextarea value="#{assetInstallationController.arrivalListItem.comments}"  maxlength="256"/>
                             </h:panelGroup>
-                            
-                            
+
+
                         </p:panelGrid>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
@@ -424,9 +424,33 @@
 
 
                     </p:fieldset>
+<!--                    <p:fieldset legend="相关报告" >
+                        <h:panelGroup id="addReport">
+                            <p:selectOneMenu value="#{commonReportController.reportUid}">
+                                <p:ajax update="addReport" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                            <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
+                        </h:panelGroup>
+                        <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                            #{commonReportController.getTemplateName(reportItem.schemaId)}
+                            
+                            <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                        </h:outputText>
+                         <p:link value="编辑" target="_blank" outcome="/portal/reporter/EditReport.xhtml?faces-redirect=true">
+                             <f:param name="reportId" value="#{reportItem.id}" />
+                         </p:link>
+                            <p:link value="查看" target="_blank" outcome="/portal/reporter/ViewReport.xhtml?faces-redirect=true">
+                                <f:param name="reportId" value="#{reportItem.id}" />
+                         </p:link>
+                            <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList"/>
+                        </p:dataList>
+                    </p:fieldset>-->
                     <h:panelGroup>
 
-                        <p:commandButton validateClient="true" actionListener="#{assetInstallationController.updateItem}" update=":growl"  value="保存" icon="ui-icon-check" />
+                        <p:commandButton validateClient="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm:qrCode :growl"  value="保存" icon="ui-icon-check" />
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" />
                         <p:commandButton validateClient="true" action="#{assetInstallationController.rejectInstall}" value="退货" >
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
