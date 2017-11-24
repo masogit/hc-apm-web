@@ -16,9 +16,9 @@ import java.util.List;
 @Component
 public class FakeData {
 
-    public static final Integer USER_ACCOUNT_DEFAULT_SITE_ID = -1;
-    public static final String USER_ACCOUNT_DEFAULT_TENANT_UID = "TENANT_UID_XXXXXXXXXX";
-    public static final String USER_ACCOUNT_DEFAULT_SITE_UID = "SITE_UID_XXXXXXXXXX";
+//    public static final Integer USER_ACCOUNT_DEFAULT_SITE_ID = -1;
+//    public static final String USER_ACCOUNT_DEFAULT_TENANT_UID = "TENANT_UID_XXXXXXXXXX";
+//    public static final String USER_ACCOUNT_DEFAULT_SITE_UID = "SITE_UID_XXXXXXXXXX";
 
     @Autowired
     AssetFileImportService service;
@@ -35,7 +35,7 @@ public class FakeData {
     @Autowired
     PlatformTransactionManager transactionManager;
 
-    TransactionTemplate transactionTemplate;
+//    TransactionTemplate transactionTemplate;
 
     TenantInfo tenantInfo;
 
@@ -45,8 +45,8 @@ public class FakeData {
 
         if (tenantInfoList.isEmpty()) {
             TenantInfo tenantInfo = new TenantInfo();
+            tenantInfo.initializeUid();
             tenantInfo.setName("Tenant A");
-            tenantInfo.setUid(USER_ACCOUNT_DEFAULT_TENANT_UID);
             tenantInfoDao.save(tenantInfo);
         }
 
