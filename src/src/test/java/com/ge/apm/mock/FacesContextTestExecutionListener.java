@@ -69,7 +69,7 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         ExpressionFactory expressionFactory = mock(ExpressionFactory.class);
         ValueExpression valueExpression = mock(ValueExpression.class);
         UserContextService userContextService = mock(UserContextService.class);
-        UserAccount userAccount = mock(UserAccount.class);
+//        UserAccount userAccount = mock(UserAccount.class);
         ExternalContext externalContext = mock(ExternalContext.class);
         Map<String, Object> applicationMap = mock(Map.class);
 
@@ -79,24 +79,23 @@ public class FacesContextTestExecutionListener extends AbstractTestExecutionList
         when(application.getExpressionFactory()).thenReturn(expressionFactory);
         when(expressionFactory.createValueExpression(any(ELContext.class), anyString(), any())).thenReturn(valueExpression);
         when(valueExpression.getValue(any())).thenReturn(userContextService);
-        when(userContextService.getLoginUser()).thenReturn(userAccount);
-
+        when(mockFacesContext.getExternalContext()).thenReturn(externalContext);
+        when(externalContext.getApplicationMap()).thenReturn(applicationMap);
 
         ApplicationContext context = testContext.getApplicationContext();
+        when(applicationMap.get(eq(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))).thenReturn(context);
 
-        if (context instanceof WebApplicationContext) {
-            when(mockFacesContext.getExternalContext()).thenReturn(externalContext);
-            when(externalContext.getApplicationMap()).thenReturn(applicationMap);
-            when(applicationMap.get(eq(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE))).thenReturn(context);
+        if (context != null) {
 
             FakeData fakeData = context.getBean(FakeData.class);
             fakeData.initTenantData();
 
-            TenantInfo tenantInfo = fakeData.tenantInfo;
+            UserAccount userAccount = fakeData.getUserAccount();
+            when(userContextService.getLoginUser()).thenReturn(userAccount);
 
-            when(userAccount.getSiteId()).thenReturn(tenantInfo.getId());
-            when(userAccount.getSiteUID()).thenReturn(tenantInfo.getUid());
-            when(userAccount.getTenantUID()).thenReturn(tenantInfo.getUid());
+//            when(userAccount.getSiteId()).thenReturn(tenantInfo.getId());
+//            when(userAccount.getSiteUID()).thenReturn(tenantInfo.getUid());
+//            when(userAccount.getTenantUID()).thenReturn(tenantInfo.getUid());
 
         }
 

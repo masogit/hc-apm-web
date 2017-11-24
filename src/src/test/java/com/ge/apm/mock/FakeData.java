@@ -3,14 +3,17 @@ package com.ge.apm.mock;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetFileImportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 
 @Component
@@ -20,8 +23,8 @@ public class FakeData {
 //    public static final String USER_ACCOUNT_DEFAULT_TENANT_UID = "TENANT_UID_XXXXXXXXXX";
 //    public static final String USER_ACCOUNT_DEFAULT_SITE_UID = "SITE_UID_XXXXXXXXXX";
 
-    @Autowired
-    AssetFileImportService service;
+//    @Autowired
+//    AssetFileImportService service;
 
     @Autowired
     AssetInfoRepository assetInfoDao;
@@ -30,14 +33,19 @@ public class FakeData {
     OrgInfoRepository orgInfoDao;
 
     @Autowired
-    TenantInfoRepository tenantInfoDao;
+    UserAccountRepository userAccountDao;
 
     @Autowired
-    PlatformTransactionManager transactionManager;
+    TenantInfoRepository tenantInfoDao;
+
+//    @Autowired
+//    PlatformTransactionManager transactionManager;
 
 //    TransactionTemplate transactionTemplate;
 
     TenantInfo tenantInfo;
+
+    UserAccount userAccount;
 
     public void initTenantData() {
 
@@ -63,6 +71,13 @@ public class FakeData {
         tenantInfo = tenantInfoList.get(0);
 
         initOrgTree();
+
+        try {
+            buildUserAccount();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -224,6 +239,44 @@ public class FakeData {
         orgInfo.setParentUID(siteOrg.getUid());
 
         return orgInfo;
+    }
+
+    private void buildUserAccount() throws NoSuchAlgorithmException {
+
+        List<OrgInfo> orgInfoList = orgInfoDao.findByTenantUIDAndOrgType(tenantInfo.getUid(), 3);
+        if (orgInfoList.isEmpty()) {
+            throw new IllegalStateException("Specified org not found!");
+        }
+        OrgInfo orgInfo = orgInfoList.get(0);
+
+        List<UserAccount> userAccountList = userAccountDao.getBySiteUID(orgInfo.getSiteUID());
+        if (userAccountList.isEmpty()) {
+            UserAccount userAccount = new UserAccount();
+            userAccount.initializeUid();
+            userAccount.setName("自动化测试人员");
+            userAccount.setPlainPassword("test");
+            userAccount.entryptPassword();
+
+            userAccount.setLoginName("test");
+            userAccount.setOrgInfoId(orgInfo.getId());
+            userAccount.setOrgInfoUID(orgInfo.getUid());
+
+            userAccount.setSiteId(orgInfo.getSiteId());
+            userAccount.setTenantUID(orgInfo.getTenantUID());
+            userAccount.setInstitutionUID(orgInfo.getInstitutionUID());
+            userAccount.setHospitalUID(orgInfo.getHospitalUID());
+            userAccount.setSiteUID(orgInfo.getSiteUID());
+
+            userAccountDao.save(userAccount);
+            userAccountList = userAccountDao.getBySiteUID(userAccount.getSiteUID());
+        }
+
+        this.userAccount = userAccountList.get(0);
+
+    }
+
+    public UserAccount getUserAccount() {
+        return userAccount;
     }
 
 }
