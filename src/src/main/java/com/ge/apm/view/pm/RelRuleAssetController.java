@@ -25,11 +25,12 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 @ManagedBean
 @ViewScoped
-public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
+public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAsset>{
 
 	private static final long serialVersionUID = -1L;
     private DualListModel<AssetInfo> availableAssets;
@@ -124,7 +125,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
     }
 
 	@Override
-	protected GenericRepository<RelRuleAsset> getDAO() {
+	protected RelRuleAssetRepository getDAO() {
 		return relRuleAssetRepository;
 	}
 	
@@ -146,6 +147,8 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
     		RelRuleAsset rel = new RelRuleAsset();
     		rel.setAssetUID(ai.getUid());
     		rel.setRuleUID(pmOrderRuleUID);
+    		rel.setCreatedDate(new Date());
+    		rel.setTenantUID(ai.getTenantUID());
     		rels.add(rel);
     		deleteIds.add(ai.getUid());
 		}
@@ -176,7 +179,7 @@ public class RelRuleAssetController extends JpaCRUDController<RelRuleAsset>{
     }
     
     public String getStrDate(Date lastPmDate){
-    	return TimeUtils.getStrDate(lastPmDate, "yyyy-MM-dd hh:MM:ss");
+    	return TimeUtils.getStrDate(lastPmDate, "yyyy-MM-dd");
     }
     
 	public String getPmOrderRuleUID() {

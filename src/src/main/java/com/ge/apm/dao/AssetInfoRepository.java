@@ -62,4 +62,6 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNames(String tenantUID);
+
+	public List<AssetInfo> findByUidIn(List<String> assetUids);
 }

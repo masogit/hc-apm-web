@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.UUID;
 
@@ -14,9 +15,10 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "pm_order_rule")
-public class PmOrderRule {
-	
-    @Id
+public class PmOrderRule implements Serializable{
+	private static final long serialVersionUID = -1L;
+
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Basic(optional = false)
     @Column(name = "id")
