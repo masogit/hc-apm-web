@@ -79,7 +79,7 @@
                         <p:column headerText="当前处理人"  filterMatchMode="LIKE" filterBy="#{item.currentPersonName}">
                             <h:outputText value="#{item.currentPersonName}"/>
                         </p:column>
-                        <p:column headerText="计划完成时间"  sortBy="#{item.planTime}" filterMatchMode="LIKE" filterBy="#{item.planTime}">
+                        <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
