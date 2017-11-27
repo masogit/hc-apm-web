@@ -112,7 +112,7 @@ public class AssetFileImportServiceTest {
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
 
-        logger.info("total time: {0}", (endTime - startTime) / 1000);
+        logger.info("total time: {}", (endTime - startTime) / 1000);
     }
 
     @Ignore
