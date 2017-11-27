@@ -1,0 +1,82 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+				<div class="ui-g-12 card cardTitle">
+                	<p:outputLabel class="pageTitle" value="#{msg.assetRuleManager}"/>
+            	</div>
+            <h:form id="RelRuleAssetListForm">
+                <p:dataTable id="datalist" value="#{relRuleAssetManagerController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{relRuleAssetManagerController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                   <!--  <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/> -->
+                    <p:ajax event="filter" listener="#{relRuleAssetManagerController.onFilter}" update="createButton editButton viewButton deleteButton"/>
+                   <p:column headerText="规则名称" sortBy="" filterBy="" filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
+                    </p:column>
+                    <p:column headerText="资产名称"  filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getAssetName(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.departNum}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getDepartNum(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetGroup}"  filterMatchMode="LIKE">
+                    	<h:outputText value="#{fieldMsg.fieldValue('assetGroup',relRuleAssetManagerController.getAssetGroup(item.assetUID))}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.clinicalDeptName}" filterMatchMode="EQ">
+                        <h:outputText value="#{relRuleAssetManagerController.getClinicalDeptName(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.nationalStandardCode}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getNationalStandardCode(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.brand}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getBrand(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.manufacture}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{relRuleAssetManagerController.getManufacture(item.assetUID)}"/>
+                    </p:column>
+                    <p:column headerText="配置日期" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}"  filterMatchMode="GTE">
+                            <h:outputText value="#{item.createdDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                     </p:column>
+                     <p:column headerText="#{msg.QRCode}" exportable="true" width="150"  filterMatchMode="LIKE">
+                     	<h:outputText value="#{relRuleAssetManagerController.getQrCode(item.assetUID)}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                    	<!-- <p:link href="./../pmOrderRule/RelRuleAsset.xhtml"  title="批量设置规则" style="color:black;">批量设置规则</p:link>
+                    	<a href="./../pmOrderRule/RelRuleAsset.xhtml"  target="_Blank" title="批量设置规则">批量设置规则</a> -->
+                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true"  
+                    	icon="ui-icon-settings"  class="btn btn-sm btn-gray"  title="批量设置规则"/>
+                        <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
+                        </p:commandButton>
+                        <p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
+                        <p:commandButton render="false" id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareView}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
+                        <p:commandButton render="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
+                        <p:commandButton render="false" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareDelete}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>
