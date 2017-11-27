@@ -114,14 +114,6 @@
                                     <p:outputLabel value="#{fieldMsg.fieldValue('woSteps', woItem.currentStepId)}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">签到时间</label>
-                                    <p:outputLabel value="#{woItem.checkinTime}" />
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.caseType}</label>
-                                    <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
                                     <label class="label">#{msg.totalManHour}</label>
                                     <p:outputLabel value="#{woItem.totalManHour}"/>
                                 </h:panelGroup>
@@ -130,26 +122,16 @@
                                     <p:outputLabel value="#{woItem.totalPrice}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
+                                    <label class="label">签到时间</label>
+                                    <p:outputLabel value="#{woItem.checkinTime}" />
+                                </h:panelGroup>
+                                <h:panelGroup>
                                     <label class="label">#{msg.intExtType}</label>
                                     <p:outputLabel value="#{fieldMsg.fieldValue('intExtType', woItem.intExtType)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
-                                    <label class="label">#{msg.currentPersonName}</label>
-                                    <p:outputLabel value="#{woItem.currentPersonName}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.feedbackRating}</label>
-                                    <p:outputLabel value="#{woItem.feedbackRating}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.feedbackComment}</label>
-                                    <p:outputLabel value="#{woItem.feedbackComment}"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">#{msg.endTime}</label>
-                                    <p:outputLabel value="#{woItem.closeTime}">
-                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                                    </p:outputLabel>
+                                    <label class="label">#{msg.caseType}</label>
+                                    <p:outputLabel value="#{workOrderMgrController.getFaultTypeName(woItem.caseType)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.patProblems}</label>
@@ -174,6 +156,24 @@
                                 <h:panelGroup>
                                     <label class="label">外部费用</label>
                                     <p:outputLabel value="#{woItem.externalExpense}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.currentPersonName}</label>
+                                    <p:outputLabel value="#{woItem.currentPersonName}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.feedbackRating}</label>
+                                    <p:outputLabel value="#{woItem.feedbackRating}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.feedbackComment}</label>
+                                    <p:outputLabel value="#{woItem.feedbackComment}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.endTime}</label>
+                                    <p:outputLabel value="#{woItem.closeTime}">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                    </p:outputLabel>
                                 </h:panelGroup>
 
                             </p:panelGrid>

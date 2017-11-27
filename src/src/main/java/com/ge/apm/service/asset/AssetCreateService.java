@@ -14,6 +14,7 @@ import com.ge.apm.service.utils.ConfigUtils;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.service.wechat.CoreService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import me.chanjar.weixin.common.exception.WxErrorException;
 import me.chanjar.weixin.mp.api.WxMpService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,7 +131,7 @@ public class AssetCreateService {
             return false;
         }
         assetDepreciationService.saveAssetDerpeciation(assetInfo);
-        if(isNew && isGeneratePmOrder){
+        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
             pmService.createPMrequest(assetInfo.getUid(), null);
         }
         return true;
