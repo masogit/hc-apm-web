@@ -87,8 +87,16 @@
                             <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.cancelReason}" />
                         </h:panelGroup>
                     </p:panelGrid>
-                    <p:dataGrid var="picItem" value="#{workOrderMgrController.picList}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.picList}">
-                        <f:facet name="header">相关图片</f:facet>
+                    <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('ServiceRequest')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('ServiceRequest')}">
+                        <f:facet name="header">报修图片</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+                    <p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
+                        <f:facet name="header">维修图片</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
