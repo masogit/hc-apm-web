@@ -108,6 +108,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     
     private Boolean isGeneratePmOrder;
 
+    private List<UserAccount> ownerList;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -634,12 +636,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<UserAccount> getOwnerList() {
-        List<UserAccount> accountList = getEmptyAccountList();
-        List<UserAccount> ownerList = ucService.getWorkerList(selected.getId());
-        if (null != ownerList) {
-            accountList.addAll(ownerList);
+        if (ownerList == null) {
+            ownerList = getEmptyAccountList();
+            List<UserAccount> workerList = ucService.getWorkerList(selected.getId());
+            if (null != workerList) {
+                ownerList.addAll(workerList);
+            }
         }
-        return accountList;
+
+        return ownerList;
     }
 
     private List<UserAccount> getEmptyAccountList() {
