@@ -1316,6 +1316,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('partsType', '3', '外修采购', 'External Buy', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('partsType', '4', '报废设备拆卸', 'Terminated Get', NULL, '-1');
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetRuleManager', '资产规则管理', 'asset rule manager', NULL, '-1');
+
 
 
 

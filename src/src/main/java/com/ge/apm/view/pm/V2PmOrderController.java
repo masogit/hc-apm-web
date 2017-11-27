@@ -147,11 +147,12 @@ private String dptName;
 
 		if(selectedPmOrder!=null){
 			selectedAsset=selectedPmOrder.getAssetInfo();
-			if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptName())){
+
+			if(Strings.isNullOrEmpty(selectedAsset.getLocationName())){
 				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
 				dptName = orgDao.getByUid(orgInfoUID).getName();
 			}else {
-				dptName = selectedAsset.getClinicalDeptName();
+				dptName = selectedAsset.getLocationName();
 			}
 		}
     }
@@ -313,12 +314,10 @@ private String dptName;
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
-
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
+
         }
         else if (queryIndex == 0) { //保养中
-logger.info("8888888888888");
-
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*3+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
