@@ -62,7 +62,7 @@ public class WorkOrderExportService {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 
         if(selectedOrg != null && selectedOrg.getOrgLevel() == 0){
-            SearchFilter tenantFilter = new SearchFilter("tenant_uid", SearchFilter.Operator.EQ, selectedOrg.getUid());
+            SearchFilter tenantFilter = new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid());
             searchFilters.add(tenantFilter);
         }
         if(selectedOrg != null && selectedOrg.getOrgLevel() == 1){
