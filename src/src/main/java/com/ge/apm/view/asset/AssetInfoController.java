@@ -162,6 +162,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             try {
                 prepareCreate();
                 selectedOrg = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+                updateSelectedOrg(selectedOrg);
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -1027,7 +1028,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
-        if (orgInfo.getId() == -1) {
+
+        updateSelectedOrg(orgInfo);
+
+        onAssetGroupChange();
+
+    }
+
+    private void updateSelectedOrg(OrgInfo orgInfo) {
+
+        if (orgInfo == null || orgInfo.getId() == -1) {
             selectedOrg = null;
 
             selected.setTenantUID(null);
@@ -1037,7 +1047,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             setSelectedSiteUID(null);
         } else {
-            selectedOrg = (OrgInfo) node.getData();
+            selectedOrg = orgInfo;
 
             selected.setTenantUID(selectedOrg.getTenantUID());
             selected.setInstitutionUID(selectedOrg.getInstitutionUID());
@@ -1046,8 +1056,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             setSelectedSiteUID(selectedOrg.getUid());
         }
-
-        onAssetGroupChange();
 
     }
 
