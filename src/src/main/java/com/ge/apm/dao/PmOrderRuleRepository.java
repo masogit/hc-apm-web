@@ -14,4 +14,8 @@ public interface PmOrderRuleRepository extends GenericRepository<PmOrderRule> {
 	@Query(value = "select content from default_report_template where type = ?1",nativeQuery = true)
 	String getDefalutReport(int type);
 
+	PmOrderRule findByUid(String ruleUID);
+
+	List<PmOrderRule> findByUidIn(List<String> ruleUids);
+
 }
