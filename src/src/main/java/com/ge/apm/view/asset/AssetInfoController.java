@@ -465,7 +465,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Boolean isNew = selected.hashCode()==0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if(isGeneratePmOrder && isNew){
+        if(isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())){
             pmService.createPMrequest(selected.getUid(), null);
         }
         if (resultStatus) {
