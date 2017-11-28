@@ -1,6 +1,7 @@
 package com.ge.apm.service.utils;
 
 import com.ge.apm.domain.OrgInfo;
+import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.primefaces.model.TreeNode;
 
@@ -34,13 +35,12 @@ public interface TreeNodeUtil {
                 OrgInfo org1 = (OrgInfo) o1.getData();
                 OrgInfo org2 = (OrgInfo) o2.getData();
                 try {
-                    String name1 = PinyinHelper.getShortPinyin(org1.getName());
-                    String name2 = PinyinHelper.getShortPinyin(org2.getName());
+                    String name1 = PinyinHelper.convertToPinyinString(org1.getName(), "", PinyinFormat.WITHOUT_TONE);
+                    String name2 = PinyinHelper.convertToPinyinString(org2.getName(), "", PinyinFormat.WITHOUT_TONE);
                     return name1.compareTo(name2);
                 }catch(Exception e) {
                     return 0;
                 }
-
 
             }
         );
