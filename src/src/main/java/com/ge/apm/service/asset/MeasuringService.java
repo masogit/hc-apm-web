@@ -74,6 +74,7 @@ public class MeasuringService {
                 tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
                 tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
                 tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
+                tempAssetInfo.setMeteringNO(measuringCertificateDetail.getCertificateNo());
                 if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
                     tempAssetInfo.setUsageStatus(2);//停用
                 }

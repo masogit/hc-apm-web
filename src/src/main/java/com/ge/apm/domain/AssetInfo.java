@@ -393,6 +393,9 @@ public class AssetInfo implements Serializable {
     @Column(name = "is_warranty")
     private Boolean isWarranty;//是否提醒计量到期
 
+    @Column(name = "metering_no")
+    private String meteringNO;//计量编号
+
 //    public Integer getAssetCategory() {
 //        return assetCategory;
 //    }
@@ -1208,6 +1211,14 @@ public class AssetInfo implements Serializable {
 
     public void setWarranty(Boolean warranty) {
         isWarranty = warranty;
+    }
+
+    public String getMeteringNO() {
+        return meteringNO;
+    }
+
+    public void setMeteringNO(String meteringNO) {
+        this.meteringNO = meteringNO;
     }
 
     @Override
