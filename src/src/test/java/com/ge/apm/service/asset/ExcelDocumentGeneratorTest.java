@@ -13,7 +13,7 @@ public class ExcelDocumentGeneratorTest {
     @Test
     public void getTestDoc_Test_Header_Titles() throws Exception {
 
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
+        ExcelDocument excelDoc = ExcelDocumentGenerator.getDefaultTestDoc();
         String[] titles = excelDoc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
 
         assertEquals(ExcelDocumentGenerator.headerTitles.length, titles.length);
@@ -27,7 +27,7 @@ public class ExcelDocumentGeneratorTest {
     @Test
     public void getTestDoc_Test_ORG_Titles() throws Exception {
 
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
+        ExcelDocument excelDoc = ExcelDocumentGenerator.getDefaultTestDoc();
         String[] titles = excelDoc.getKeyRow(AssetFileImportService.SHEET_ORG, AssetFileImportService.EXCEL_ORG_HEADER_ROW);
 
         assertEquals(1, titles.length);
@@ -38,11 +38,11 @@ public class ExcelDocumentGeneratorTest {
                 AssetFileImportService.EXCEL_ORG_HEADER_ROW,
                 AssetFileImportService.EXCEL_ORG_DATA_ROW);
 
-        assertEquals(ExcelDocumentGenerator.defaultOrgData.length, results.size());
+        assertEquals(ExcelDocumentGenerator.defaultOrgRowData.length, results.size());
 
         for (int i = 0; i < results.size(); i++) {
             Map<String, Object> rowData = results.get(i);
-            String expectedColumnValue = ExcelDocumentGenerator.defaultOrgData[i];
+            String expectedColumnValue = ExcelDocumentGenerator.defaultOrgRowData[i];
             String actualColumnValue = ExcelDocument.getCellStringValue(rowData.get(title));
 
             assertEquals(expectedColumnValue, actualColumnValue);
@@ -53,7 +53,7 @@ public class ExcelDocumentGeneratorTest {
     @Test
     public void getTestDoc_Test_Data_One_Row() throws Exception {
 
-        ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc();
+        ExcelDocument excelDoc = ExcelDocumentGenerator.getDefaultTestDoc();
         List<Map<String, Object>> results =  excelDoc.getAllDataRows(0,
                                                                     AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
                                                                     AssetFileImportService.EXCEL_ASSET_DATA_ROW);
