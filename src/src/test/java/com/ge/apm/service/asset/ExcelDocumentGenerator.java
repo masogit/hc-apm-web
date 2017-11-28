@@ -28,14 +28,14 @@ public class ExcelDocumentGenerator {
             "1111111111111111"
     };
 
-    public static String orgTitle = "部门名称";
+    public static String orgHeaderTitle = "部门名称";
 
-    public static String[] defaultOrgData = {
+    public static String[] defaultOrgRowData = {
             "内科",
             "外科"
     };
 
-    public static ExcelDocument getTestDoc() {
+    public static ExcelDocument getDefaultTestDoc() {
 
         ExcelDocument excelDoc = null;
 
@@ -104,10 +104,10 @@ public class ExcelDocumentGenerator {
     private static void buildClinicalDeptSheet(Sheet sheet) {
 
         Row headerRow = sheet.createRow(AssetFileImportService.EXCEL_ORG_HEADER_ROW - 1);
-        headerRow.createCell(0).setCellValue("部门名称");
+        headerRow.createCell(0).setCellValue(orgHeaderTitle);
 
-        for (int i = 0; i < defaultOrgData.length; i++) {
-            sheet.createRow(AssetFileImportService.EXCEL_ORG_DATA_ROW - 1 + i).createCell(0).setCellValue(defaultOrgData[i]);
+        for (int i = 0; i < defaultOrgRowData.length; i++) {
+            sheet.createRow(AssetFileImportService.EXCEL_ORG_DATA_ROW - 1 + i).createCell(0).setCellValue(defaultOrgRowData[i]);
         }
 
     }
