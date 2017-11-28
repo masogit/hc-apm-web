@@ -105,7 +105,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private String selectedSiteUID;
 
     private String measuring;
-    
+
     private Boolean isGeneratePmOrder;
 
     private List<UserAccount> ownerList;
@@ -164,6 +164,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             try {
                 prepareCreate();
                 selectedOrg = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+                updateSelectedOrg(selectedOrg);
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -730,10 +731,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (filterAssetStatus != null) {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, filterAssetStatus));
         }
-        if (assetId != null) {
+        /*if (assetId != null) {
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, assetId));
-        }
-        /*if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
+        }*/
+        if (filterWarrantyDate != null && "1".equals(filterWarrantyDate)) {
             Date warrantyDate = new Date();
             //2个月内，则是保修到期时间在2个月后时间之前所有
             Calendar c = Calendar.getInstance();
@@ -741,8 +742,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             c.add(Calendar.MONTH, 2);
             varWarrantyDateTo = c.getTime();
             searchFilters.add(new SearchFilter("warrantyDate", SearchFilter.Operator.LTE, varWarrantyDateTo));
-            filterWarrantyDate = null;
-        }*/
+            searchFilters.add(new SearchFilter("isWarranty", SearchFilter.Operator.EQ, true));
+            searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+            searchFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getSiteId()));
+            searchFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getHospitalId()));
+            //filterWarrantyDate = null;
+        }
     }
 
     public void deleteAsset(AssetInfo asset) {
@@ -1032,7 +1037,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
-        if (orgInfo.getId() == -1) {
+
+        updateSelectedOrg(orgInfo);
+
+        onAssetGroupChange();
+
+    }
+
+    private void updateSelectedOrg(OrgInfo orgInfo) {
+
+        if (orgInfo == null || orgInfo.getId() == -1) {
             selectedOrg = null;
 
             selected.setTenantUID(null);
@@ -1042,7 +1056,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             setSelectedSiteUID(null);
         } else {
-            selectedOrg = (OrgInfo) node.getData();
+            selectedOrg = orgInfo;
 
             selected.setTenantUID(selectedOrg.getTenantUID());
             selected.setInstitutionUID(selectedOrg.getInstitutionUID());
@@ -1051,8 +1065,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             setSelectedSiteUID(selectedOrg.getUid());
         }
-
-        onAssetGroupChange();
 
     }
 
@@ -1135,5 +1147,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
-    
+
+    public void cancleWarranty(Integer assetId){
+        AssetInfo ai = dao.findById(assetId);
+        if(ai != null){
+            ai.setWarranty(false);
+            dao.save(ai);
+        }
+    }
+
 }
