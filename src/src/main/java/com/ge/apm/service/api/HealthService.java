@@ -149,7 +149,7 @@ public class HealthService {
     private static final String asset_warranty
     	= " SELECT id, name, to_char(warranty_date, 'YYYY-MM-DD'), clinical_dept_id "
     	+ " FROM asset_info "
-    	+ " WHERE is_valid = true AND warranty_date <= (NOW() + interval '2 months') AND site_id = :site_id AND hospital_id = :hospital_id "
+    	+ " WHERE is_valid = true AND is_warranty = true AND warranty_date <= (NOW() + interval '2 months') AND site_id = :site_id AND hospital_id = :hospital_id "
     	+ " ORDER BY warranty_date ";
 
 	public Observable<Tuple4<Integer, String, String, Integer>> queryForWarranty(Integer site_id, Integer hospital_id) {
