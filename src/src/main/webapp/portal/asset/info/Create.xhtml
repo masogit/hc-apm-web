@@ -319,6 +319,12 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">#{msg.repairForm}</label>
+                                <p:selectOneMenu id="repairForm" value="#{assetInfoController.selected.repairForm}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.locationCode}</label>
                                 <p:inputText id="locationCode" value="#{assetInfoController.selected.locationCode}"/>
                             </h:panelGroup>
