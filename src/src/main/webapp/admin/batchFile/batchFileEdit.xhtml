@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <h:form id="BatchFileImportEditForm">
+            <p:fieldset  id="editSet" legend="添加" style="margin-bottom:20px" rendered="#{empty batchFileController.selected.id}">
+                <h:panelGroup >
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.fileType}*</label>
+                            <p:selectOneMenu id="fileType" value="#{batchFileController.fileType}"  required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
+                                <p:ajax process="@this"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('batchFileType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
+                            <h:panelGroup>
+                                <p:fileUpload fileUploadListener="#{batchFileController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this fileType"
+                                              multiple="true" sizeLimit="10000000" update=":BatchFileImportEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
+                                <!--<p:growl id="messages" showDetail="true" />-->
+                            </h:panelGroup>
+                            <p:dataList value="#{batchFileController.fileList}" var="item" varStatus="itemIndex" rowIndexVar="idx">
+                                
+                                #{item._1().fileName}#{item._1().fileType}#{itemIndex.index}#{idx}
+                                <p:commandLink value="删除"  actionListener="#{batchFileController.removeFile(idx)}" update=":BatchFileImportEditForm:upload"/>
+                            </p:dataList>
+                            
+                        </p:panel>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{batchFileController.saveFiles}" value="#{msg.Save}" update=":BatchFileImportForm:datalist, :growl :BatchFileImportEditForm" icon="ui-icon-check" />
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{batchFileController.cancel}" update=":BatchFileImportEditForm :growl"/>
+                    </h:panelGroup>
+
+                </h:panelGroup>
+            </p:fieldset>
+            <p:fieldset  id="viewSet" legend="查看" style="margin-bottom:20px" rendered="#{not empty batchFileController.selected.id}">
+                <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.fileType}*</label>
+                            <h:outputText value="#{batchFileController.selected.fileType}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.uploadedTime}*</label>
+                            <h:outputText value="#{batchFileController.selected.uploadedTime}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.creatorUID}*</label>
+                            <h:outputText value="#{batchFileController.selected.creatorUID}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.status}*</label>
+                            <h:outputText value="#{batchFileController.selected.status}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.processStartTime}*</label>
+                            <h:outputText value="#{batchFileController.selected.processStartTime}"/>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.processEndTime}*</label>
+                            <h:outputText value="#{batchFileController.selected.processEndTime}"/>
+                        </h:panelGroup>
+
+                    </p:panelGrid>
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                    
+                        <h:panelGroup>
+                            <label class="label">#{msg.logs}*</label>
+                            <h:outputText value="#{batchFileController.selected.logs}"/>
+                        </h:panelGroup>
+                </p:panelGrid>
+            </p:fieldset>
+        </h:form>
+
+    </ui:composition>
+</html>
