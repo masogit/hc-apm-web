@@ -35,7 +35,7 @@ public class FileScanService {
     }
     
     public String saveBatchUploadedFile(UploadedFile file) throws Exception{
-        return saveFile(file,BATCH_FILE_Folder,"batch");
+        return saveFile(file,BATCH_FILE_Folder,"batchfile").replaceFirst(BATCH_FILE_Folder, "");
     }
     
     public String saveFile(UploadedFile file, String path , String saveFilename) throws Exception {
