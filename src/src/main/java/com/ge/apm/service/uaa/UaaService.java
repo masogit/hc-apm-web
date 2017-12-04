@@ -598,6 +598,8 @@ public class UaaService {
         }
     }
 
+
+
     public TreeNode getOrgTreeByParentIdWithSelectedChildren(String parentOrgId, String userUid) {
 
         List<OrgInfo> orgInfoFullList = orgInfoDao.getOrgInfosByParentId(parentOrgId);

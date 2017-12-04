@@ -238,15 +238,42 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
+
+
+
+                    <p:fieldset  style="margin-bottom:20px">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">设备国标码</label>
+                                <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />
+                                <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
+                                <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                       <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.gbTree}" selection="#{assetInfoController.selectedGbNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectGbTreeNode}" update=":AssetInfoEditForm:selectedgbName" oncomplete="PF('varPanelOrg1').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="gb">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+
+                        </p:panelGrid>
+                    </p:fieldset>
+
                     <p:fieldset  style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
                                 <label class="label">#{msg.functionType}</label>
                                 <p:inputText id="functionType" value="#{assetInfoController.selected.functionType}"/>
-<!--                                <p:selectOneMenu id="assetGroup" value="#{assetInfoController.selected.assetGroup}" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ownAssetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>-->
+                                <!--                                <p:selectOneMenu id="assetGroup" value="#{assetInfoController.selected.assetGroup}" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                                                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ownAssetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                                </p:selectOneMenu>-->
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.functionGroup}</label>
@@ -413,7 +440,7 @@
                             <h:panelGroup>
                                 <label class="label">同时生成保养工单</label>
                                 <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}"/>
-                                
+
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -453,13 +480,13 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </p:dataList>
-                                <p:fileUpload id="type1" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                <p:fileUpload id="type1" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
                                               multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:dataList id="contractList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
                                     <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
-                                        #{fileitem.objectName}
+                                    #{fileitem.objectName}
                                     <p:commandButton actionListener="#{assetInfoController.removeAttachment(fileitem.objectStorageId)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
