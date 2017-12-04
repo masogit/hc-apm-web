@@ -1336,5 +1336,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('repairForm', '3', '先内修再外修', 'repairType3', NULL, '-1');
 
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'EEMonitorCSV', '环境状态监控', '环境状态监控', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'ColdHeaderExcel', 'MR冷头数据监控', 'MR冷头数据监控', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('batchFileType', 'PMProcessExcel', '保养计划', '保养计划', NULL, '-1');
 

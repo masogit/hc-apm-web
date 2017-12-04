@@ -1,0 +1,71 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="批量数据文件导入"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="BatchFileImportForm">
+                    <p:dataTable id="datalist" value="#{batchFileController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{batchFileController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,40,60,90">
+
+                        <p:ajax event="rowSelect" update="createButton  :BatchFileImportEditForm"/>
+                        <p:ajax event="filter" listener="#{batchFileController.onFilter}" oncomplete="rc();"/>
+
+                        <p:column headerText="#{msg.fileName}" sortBy="#{item.fileName}" >
+                            <h:outputText value="#{item.fileName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.fileType}" sortBy="#{item.fileType}" filterBy="#{item.fileType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.fileType}"/>
+                            <!--<h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>-->
+<!--                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>-->
+                        </p:column>
+                        <p:column headerText="#{msg.uploadedTime}" sortBy="#{item.uploadedTime}">
+                            <h:outputText value="#{item.uploadedTime}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}">
+                            <h:outputText value="#{item.creatorUID}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}">
+                            <h:outputText value="#{item.status}"/>
+                        </p:column>
+                        
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{batchFileController.prepareCreate}" update=":BatchFileImportForm :BatchFileImportEditForm" />
+                            <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetFileAttachmentController.prepareView}" update=":AssetFileAttachmentViewDlg" oncomplete="PF('AssetFileAttachmentViewDialog').show()" disabled="#{empty assetFileAttachmentController.selected}"/>-->
+                            <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetFileAttachmentController.prepareEdit}"  update=":AssetFileAttachmentEditForm" disabled="#{empty assetFileAttachmentController.selected}"/>-->
+                            <!--<p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetFileAttachmentController.prepareDelete}" update=":AssetFileAttachmentViewDlg" oncomplete="PF('AssetFileAttachmentViewDialog').show()" disabled="#{empty assetFileAttachmentController.selected or assetFileAttachmentController.creatAction}"/>-->
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="BatchFile_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:remoteCommand name="rc" update="datalist:createButton BatchFileImportEditForm" immediate="true"/>
+                </h:form>
+            <ui:include src="batchFileEdit.xhtml"/>
+            </div>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>
