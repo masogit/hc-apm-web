@@ -7,6 +7,7 @@ package com.ge.apm.view.sysutil;
 
 import com.ge.apm.dao.ImportFilesRepository;
 import com.ge.apm.domain.ImportFiles;
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.FileScanService;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -35,12 +36,14 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     private List<Tuple2<ImportFiles, UploadedFile>> fileList;
 
     private FileScanService fileService;
+    private UserCommonService userService;
 
     private String fileType;
 
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
         fileService = WebUtil.getBean(FileScanService.class);
+        userService = WebUtil.getBean(UserCommonService.class);
 
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -80,13 +83,12 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         fileList.remove(fileList.get(index));
     }
 
+    public String getUserName(String userUid){
+        return userService.getUserByUid(userUid).getName();
+    }
+    
     public void saveFiles() throws Exception {
 
-//        for (Tuple2<ImportFiles, UploadedFile> item : fileList) {
-//            String savedfilePath = fileService.saveBatchUploadedFile(item._2);
-//            item._1.setFilePath(savedfilePath);
-//            dao.save(item._1);
-//        }
         fileList.forEach(item -> {
             try {
                 String savedfilePath = fileService.saveBatchUploadedFile(item._2);
