@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="selectGbDlg" widgetVar="varSelectGbDlg" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" width="80%"  showHeader="false">
+            <h:form id="selectGbForm" rendered="#{selectGbController.showDialog}">
+                <p:tabView style="height:460px; overflow: auto;">
+                    <p:tab title="#选择国标码">
+                        <p:scrollPanel style="width:98%;height:400px;border: 0" mode="native">
+                            <p:tree id="gbTree" class="tree" style="border:0;" value="#{selectGbController.getGbTree}" var="node" dynamic="true" cache="true" selectionMode="single" selection="#{selectGbController.selectedNode}" highlight="true">
+                                <p:ajax event="select" listener="#{selectGbController.onSelectTreeNode}" update="gbTree"/>
+                                <p:ajax process="@this" event="expand"  listener="#{selectGbController.onOrgExpand}"  update="gbTree"/>
+                                <p:ajax process="@this" event="collapse"/>
+
+                                <p:treeNode type="gb" >
+                                    <h:outputText value="#{node.code}/#{node.name}"/>
+                                </p:treeNode>
+                              <!--  <p:treeNode type="gb2" icon="ui-icon-wifi-tethering">
+                                    <h:outputText value="#{node.code}/#{node.name}"/>
+                                </p:treeNode>
+                                <p:treeNode type="gb3">
+                                    <h:outputText value="#{node.code}/#{node.name}"/>
+                                </p:treeNode>-->
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:tab>
+
+                </p:tabView>
+                <br/>
+                <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check" update="growl #{selectAssetController.updateViewIDs}" actionListener="#{selectAssetController.confirmSelection()}" oncomplete="handleSubmit(args, 'varSelectAssetDlgPM');"/>
+                <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varSelectAssetDlgPM').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>
