@@ -141,7 +141,6 @@ this.selected.getNationalStandardCode()
     private boolean showDialog = false;
     private ServerEventInterface callingController;
     private String updateViewIDs;
-    private TreeNode gbCodeTree;
     public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs) {
         showDialog = true;
 
@@ -153,12 +152,7 @@ this.selected.getNationalStandardCode()
         this.updateViewIDs = updateViewIDs;
 
         UaaService uaaService = WebUtil.getBean(UaaService.class);
-        GbCodeService gbCodeService = WebUtil.getBean(GbCodeService.class);
 
-        gbCodeTree = gbCodeService.getGbCodeTree();
-        if (gbCodeTree.getParent() != null) {
-            gbCodeTree = gbCodeTree.getParent();
-        }
     }
     @Override
     protected void init() {
@@ -229,10 +223,10 @@ this.selected.getNationalStandardCode()
         initGbTree();
     }
 
-    public List<GbForm> getGbFormList(){
+  /*  public List<GbForm> getGbFormList(){
         List<GbForm> gbFormList = gbCodeService.tansferGbForm();
         return gbFormList;
-    }
+    }*/
 
     public Boolean getTerminate() {
         return terminate;
@@ -1098,11 +1092,7 @@ this.selected.getNationalStandardCode()
     public void onSelectGbTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
-
         updateSelectedOrgGb(gbCode);
-
-       // onAssetGroupChange();
-
     }
 
 
@@ -1143,18 +1133,9 @@ this.selected.getNationalStandardCode()
 
     public void initGbTree(){
         TreeNode treeNode = gbCodeService.buildGbTree();
-     /*   GbCode rootGb = new GbCode();
-        rootGb.setId(-1);
-        rootGb.setName(WebUtil.getMessage("国标码xxx"));*/
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
-       /* TreeNode rootNode = new DefaultTreeNode("gb", rootGb, gbTree);
-        if (null != treeNode) {
-            rootNode.getChildren().add(treeNode);
-        }*/
-
         treeNode.setExpanded(true);
-       // rootNode.setExpanded(true);
 
     }
     public void initGbTree_bak(){
