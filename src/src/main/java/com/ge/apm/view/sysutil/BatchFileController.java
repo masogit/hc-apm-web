@@ -17,6 +17,9 @@ import webapp.framework.web.WebUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import javaslang.Tuple2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -75,11 +78,19 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         itemFile.setUploadedTime(new Date());
         itemFile.setStatus(ImportFiles.STATUS_STARTING);
         itemFile.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
+        String savedfilePath=null;
+        try {
+            savedfilePath = fileService.saveBatchUploadedFile(event.getFile());
+        } catch (Exception ex) {
+             WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
+        }
+        itemFile.setFilePath(savedfilePath);
 
         fileList.add(new Tuple2<>(itemFile, event.getFile()));
     }
 
     public void removeFile(Integer index) {
+        fileService.deleteUploadedFile(fileList.get(index)._1.getFilePath());
         fileList.remove(fileList.get(index));
     }
 
@@ -89,16 +100,19 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     
     public void saveFiles() throws Exception {
 
-        fileList.forEach(item -> {
-            try {
-                String savedfilePath = fileService.saveBatchUploadedFile(item._2);
-                item._1.setFilePath(savedfilePath);
-                dao.save(item._1);
-            } catch (Exception ex) {
-                WebUtil.addErrorMessage(item._2.getFileName() + "上传失败!");
-            }
-        });
-
+        List<ImportFiles> importFileList = fileList.stream().map(item -> item._1).collect(Collectors.toList());
+        
+        dao.save(importFileList);
+//        fileList.forEach(item -> {
+//            try {
+//                String savedfilePath = fileService.saveBatchUploadedFile(item._2);
+//                item._1.setFilePath(savedfilePath);
+//                dao.save(item._1);
+//            } catch (Exception ex) {
+//                ex.printStackTrace();
+//                WebUtil.addErrorMessage(item._2.getFileName() + "上传失败!");
+//            }
+//        });
         fileList.clear();
     }
     
