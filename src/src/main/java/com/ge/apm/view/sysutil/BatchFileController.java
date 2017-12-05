@@ -101,6 +101,13 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
         fileList.clear();
     }
+    
+    public void restartBatchJob(){
+        selected.setStatus(ImportFiles.STATUS_STARTING);
+        dao.save(selected);
+        WebUtil.addSuccessMessage("任务已经重新启动");
+        this.cancel();
+    }
 
     public void cancel() {
         this.selected = null;
