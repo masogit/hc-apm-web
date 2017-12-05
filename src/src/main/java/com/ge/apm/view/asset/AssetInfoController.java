@@ -110,7 +110,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean isGeneratePmOrder;
 
     private List<UserAccount> ownerList;
-    GbCodeService gbCodeService;
+    private GbCodeService gbCodeService;
+    private GbCodeRepository gbDao;
     public List<GbForm> gbFormList= new ArrayList<GbForm>();
 
 /*public List<GbCode> getGbCodeList(){
@@ -141,6 +142,7 @@ this.selected.getNationalStandardCode()
     private boolean showDialog = false;
     private ServerEventInterface callingController;
     private String updateViewIDs;
+    private TreeNode gbCodeTree;
     public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs) {
         showDialog = true;
 
@@ -150,8 +152,8 @@ this.selected.getNationalStandardCode()
 
         this.callingController = callingController;
         this.updateViewIDs = updateViewIDs;
-
         UaaService uaaService = WebUtil.getBean(UaaService.class);
+
 
     }
     @Override
@@ -174,7 +176,7 @@ this.selected.getNationalStandardCode()
         ucService = WebUtil.getBean(UserCommonService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
-
+        gbDao= WebUtil.getBean(GbCodeRepository.class);
         this.filterBySite = false;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -221,6 +223,7 @@ this.selected.getNationalStandardCode()
             initOrgTree();
         }
         initGbTree();
+
     }
 
   /*  public List<GbForm> getGbFormList(){
@@ -1120,7 +1123,6 @@ this.selected.getNationalStandardCode()
 
     }
     private void updateSelectedOrgGb(GbCode gbCode) {
-
         if (gbCode == null || gbCode.getId() == -1) {
             selectedGb = null;
         } else {
@@ -1129,30 +1131,14 @@ this.selected.getNationalStandardCode()
 
     }
 
-
-
     public void initGbTree(){
         TreeNode treeNode = gbCodeService.buildGbTree();
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
         treeNode.setExpanded(true);
 
-    }
-    public void initGbTree_bak(){
-        TreeNode treeNode = gbCodeService.buildGbTree();
-        GbCode rootGb = new GbCode();
-        rootGb.setId(-1);
-        rootGb.setName(WebUtil.getMessage("国标码xxx"));
-        gbTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("gb", rootGb, gbTree);
-        if (null != treeNode) {
-            rootNode.getChildren().add(treeNode);
-        }
-
-         rootNode.setExpanded(true);
 
     }
-
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -1221,6 +1207,14 @@ this.selected.getNationalStandardCode()
             names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
         }
 
+        return names;
+
+    }
+    public List<String> completeGbName(String prefix) {
+        List<String> names = null;
+        if (!StringUtils.isEmpty(prefix)) {
+            names = gbDao.findGbCodeByPrefix(prefix);
+        }
         return names;
 
     }
