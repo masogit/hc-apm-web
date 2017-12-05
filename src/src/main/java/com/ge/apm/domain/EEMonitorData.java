@@ -145,5 +145,9 @@ public class EEMonitorData implements Serializable{
         this.assetUid = assetUid;
     }
 
-    
+    @Override
+    public String toString() {
+        return new StringBuilder().append("[id:").append(id).append(",assetUid:").append(assetUid)
+                .append(",systemID:").append(systemID).append(",time").append(time).append("]").toString();
+    }
 }

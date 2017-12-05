@@ -33,13 +33,13 @@ public class ColdHeaderMonitorData {
     //"Cryogen System Id" 
     @Column(name = "cryogen_system_id")
     String cryogenSystemId;
-    
+
     //AssetUID
     @Column(name = "asset_uid")
     private String assetUid;
 
     //"Coldhead RuO ! 20k Shield Service"
-     @Column(name = "cold_head_ruo")
+    @Column(name = "cold_head_ruo")
     Double coldheadRuo;
 
     //"Coldhead RuO ! 20k Shield Service - Read Time"
@@ -212,6 +212,10 @@ public class ColdHeaderMonitorData {
     public void setAssetUid(String assetUid) {
         this.assetUid = assetUid;
     }
-    
 
+    @Override
+    public String toString() {
+        return new StringBuilder().append("[id:").append(id).append(",assetUid:").append(assetUid)
+                .append(",systemID:").append(cryogenSystemId).append(",coldheadRuoTime").append(coldheadRuoTime).append("]").toString();
+    }
 }
