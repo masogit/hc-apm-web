@@ -55,7 +55,7 @@
                         -->
                         <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?130:53}">
                             <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
-                            <h:panelGroup>
+                            <h:panelGroup rendered="#{empty assetInfoController.filterWarrantyDate}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
@@ -64,7 +64,7 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
                             </h:panelGroup>
-							<p:commandButton id="cancleWarranty" process="@this" title="取消提醒" actionListener="#{assetInfoController.cancleWarranty(item.id)}" update="datalist" rendered="#{!empty assetInfoController.filterWarrantyDate and item.warranty}">
+							<p:commandButton id="cancleWarranty" process="@this" title="取消保修提醒" actionListener="#{assetInfoController.cancleWarranty(item.id)}" update="datalist" rendered="#{!empty assetInfoController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
 								<p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
 							</p:commandButton>
                         </p:column>
