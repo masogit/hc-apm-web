@@ -52,6 +52,9 @@
                                             <p:inputTextarea value="#{editReportController.tableValue[fieldItem.key]}"  />
                                         </h:panelGroup>
                                     </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Date'}" >
+                                        <p:calendar value="#{editReportController.tableValue[fieldItem.key]}"  />
+                                    </c:if>
                                 </c:forEach>
 
                             </p:panelGrid>

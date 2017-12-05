@@ -12,6 +12,9 @@
             </div>
 
             <div class="ui-g-12 card">
+                <h:form>
+                    <p:commandButton id="batchCreate" icon="ui-icon-extlink" value="批量创建" title="批量创建" update=":FileEditDlg" oncomplete="PF('FileEditDialog').show()"/>
+                </h:form>
 
                 <h:form id="AssetFileAttachmentListForm">
                     <p:dataTable id="datalist" value="#{assetFileAttachmentController.lazyModel}" var="item" widgetVar="varDataList"
@@ -62,6 +65,7 @@
                 </h:form>
                 <ui:include src="Edit.xhtml"/>
                 <ui:include src="View.xhtml"/>
+                <ui:include src="batchCreate.xhtml"/>
             </div>
         </div>
         <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>

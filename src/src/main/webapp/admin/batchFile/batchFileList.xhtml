@@ -1,0 +1,73 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.BatchFileImport}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="BatchFileImportForm">
+                    <p:dataTable id="datalist" value="#{batchFileController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{batchFileController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.uploadedTime}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,40,60,90">
+
+                        <p:ajax event="rowSelect" update="createButton  :BatchFileImportEditForm"/>
+                        <p:ajax event="filter" listener="#{batchFileController.onFilter}" oncomplete="rc();"/>
+
+                        <p:column headerText="#{msg.BatchFileName}" sortBy="#{item.fileName}" >
+                            <h:outputText value="#{item.fileName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.BatchfileType}" sortBy="#{item.fileType}" filterBy="#{item.fileType}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('batchFileType', item.fileType)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('batchFileType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.BatchfileUploadedTime}" sortBy="#{item.uploadedTime}">
+                            <h:outputText value="#{item.uploadedTime}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.creatorUID}" sortBy="#{item.creatorUID}">
+                            <h:outputText value="#{batchFileController.getUserName(item.creatorUID)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('batchFileProcessStatus',item.status)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('batchFileProcessStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{batchFileController.prepareCreate}" update=":BatchFileImportForm :BatchFileImportEditForm" />
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="BatchFile_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                    <p:remoteCommand name="rc" update="datalist:createButton BatchFileImportEditForm" immediate="true"/>
+                </h:form>
+            <ui:include src="batchFileEdit.xhtml"/>
+            </div>
+
+        </div>
+
+    </ui:define>
+
+</ui:composition>

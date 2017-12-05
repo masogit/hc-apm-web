@@ -25,12 +25,24 @@ public class FileScanService {
     
     @Value("#{urlProperties.FileScanFolder}")
     private String FILE_SCAN_FOLDER;
+    
+    @Value("#{urlProperties.BatchFileFolder}")
+    private String BATCH_FILE_Folder;
 
+    //save for file scan
     public String saveUploadedFile(UploadedFile file) throws Exception {
-       
-        String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
+       return saveFile(file,FILE_SCAN_FOLDER,file.getFileName());
+    }
+    
+    public String saveBatchUploadedFile(UploadedFile file) throws Exception{
+        return saveFile(file,BATCH_FILE_Folder,"batchfile").replaceFirst(BATCH_FILE_Folder, "");
+    }
+    
+    public String saveFile(UploadedFile file, String path , String saveFilename) throws Exception {
+        
+        String folderName = path.concat(File.separator).concat(UUID.randomUUID().toString());
         FileUtils.createFolder(folderName, true);
-        String fileName = folderName.concat(File.separator).concat(file.getFileName());
+        String fileName = folderName.concat(File.separator).concat(saveFilename);
         
         try(FileOutputStream out = new FileOutputStream(fileName)) {
             InputStream inputStream = file.getInputstream();
@@ -57,8 +69,8 @@ public class FileScanService {
         } 
         
         return fileName;
-        
     }
+    
 
     public void deleteUploadedFile(String path) {
         FileUtils.deleteFolder(path.substring(0,path.lastIndexOf(File.separator)));
