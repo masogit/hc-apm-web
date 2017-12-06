@@ -156,6 +156,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.hosputalUID");
         removeFilterOnField("assetInfo.tenantUID");
         removeFilterOnField("approvalStatus");
+        removeFilterOnField("assetInfo.assetOwnerId");
+        removeFilterOnField("assetInfo.assetOwnerId2");
+        removeFilterOnField("assetInfo.assetOwnerId3");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
