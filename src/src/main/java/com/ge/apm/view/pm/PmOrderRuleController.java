@@ -45,6 +45,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private PmOrderRuleCheckListRepository pmOrderRuleCheckListRepository;
 	private List<Integer> ids = new ArrayList<Integer>();
 	private String filterPmRuleStatus;
+	private String filterPmRuleLevel;
 	private String defaultReport;
 
 	@Override
@@ -244,6 +245,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	        if (filterPmRuleStatus != null) {
 	            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, Integer.parseInt(filterPmRuleStatus)));
 	        }
+	        if (filterPmRuleLevel != null) {
+	            searchFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, Integer.parseInt(filterPmRuleLevel)));
+	        }
 	 }
 
 	public String getFilterPmRuleStatus() {
@@ -409,6 +413,16 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	public void setDefaultReport(String defaultReport) {
 		this.defaultReport = defaultReport;
 	}
+
+	public String getFilterPmRuleLevel() {
+		return filterPmRuleLevel;
+	}
+
+	public void setFilterPmRuleLevel(String filterPmRuleLevel) {
+		this.filterPmRuleLevel = filterPmRuleLevel;
+	}
+	
+	
 
 	/*
 	 * @Override public void onBeforeNewObject(PmOrderRule object) { }

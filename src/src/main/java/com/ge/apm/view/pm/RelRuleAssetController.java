@@ -177,11 +177,11 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		}
     	relRuleAssetRepository.deleteByAssetUIDIn(deleteIds);
     	relRuleAssetRepository.save(rels);
-    	WebUtil.addSuccessMessage("配置成功！");
+    	WebUtil.addSuccessMessage("配置成功!");
     	targetAssets.clear();
     }
     
-    public void generatePmOrders() {
+ /*   public void generatePmOrders() {
     	List<AssetRuleModel> models = new ArrayList<AssetRuleModel>();
     	for (AssetInfo ai : targetAssets) {
     		AssetRuleModel model = new AssetRuleModel();
@@ -191,7 +191,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     	//TODO invoke userCommonService
     	WebUtil.addSuccessMessage("配置成功！");
     	targetAssets.clear();
-    }
+    }*/
     
     public List<PmOrderRule> getPmOrderRuleList(){
     	List<SearchFilter> assetFilters = new ArrayList<>();//getFilter(user.getSiteUID());
@@ -206,20 +206,13 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 		    assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
 		}
-		if (null != queryAsset.getAssetGroup()) {
+		if (queryAsset.getAssetGroup() != null) {
 		    assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
 		if(queryAsset.getLevel() != null) {
-			if(queryAsset.getLevel() == 1) {//一级
-				
-			}else if(queryAsset.getLevel() == 2){//二级
-				
-			}else if(queryAsset.getLevel() == 3){//三级
-				
-			}
+			assetFilters.add(new SearchFilter("level", SearchFilter.Operator.EQ, queryAsset.getLevel()));
 		}
 		return pmOrderRuleRepository.findBySearchFilter(assetFilters);
-//    	return pmOrderRuleRepository.findByTenantUIDAndStatus(user.getTenantUID(),1);
     }
     
     public String getStrDate(Date lastPmDate){
