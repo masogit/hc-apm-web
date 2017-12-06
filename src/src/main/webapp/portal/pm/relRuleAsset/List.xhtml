@@ -11,6 +11,20 @@
 				<div class="ui-g-12 card cardTitle">
                 	<p:outputLabel class="pageTitle" value="#{msg.assetRuleManager}"/>
             	</div>
+            	
+<!--         		<h:form id="searchForm">
+                <h:panelGrid id="searchPanel" columns="2">
+                    <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}" maxlength="100" style="width: 420px">
+                        <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
+                    </p:inputText>
+
+                    <h:panelGroup id='searchButtons'>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetInfoController.oneSearchStr}"/>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form> -->
+            	
             <h:form id="RelRuleAssetListForm">
                 <p:dataTable id="datalist" value="#{relRuleAssetManagerController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{relRuleAssetManagerController.selected}"
@@ -21,8 +35,8 @@
                     rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,40,60,90">
 
-                   <!--  <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
-                    <p:ajax event="filter" listener="#{relRuleAssetManagerController.onFilter}" update="createButton editButton viewButton deleteButton"/> -->
+                    <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{relRuleAssetManagerController.onFilter}" update="createButton editButton viewButton deleteButton"/>
                    <p:column headerText="规则名称" sortBy="" filterBy="" filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getRuleName(item.ruleUID)}"/>
                     </p:column>
@@ -58,15 +72,17 @@
                     <f:facet name="{Toolbar}">
                     	<!-- <p:link href="./../pmOrderRule/RelRuleAsset.xhtml"  title="批量设置规则" style="color:black;">批量设置规则</p:link>
                     	<a href="./../pmOrderRule/RelRuleAsset.xhtml"  target="_Blank" title="批量设置规则">批量设置规则</a> -->
-                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true"  
-                    	icon="ui-icon-settings"  class="btn btn-sm btn-gray"  title="批量设置规则"/>
+                    	<p:commandButton id="batch" action="/portal/pm/pmOrderRule/RelRuleAsset.xhtml?faces-redirect=true" icon="ui-icon-settings"  
+                    	class="btn btn-sm btn-gray"  title="批量设置规则"/>
+                    	<p:commandButton id="generatePmOrders" action="/portal/pm/pmOrderRule/GeneratePmOrders.xhtml?faces-redirect=true" icon="ui-icon-stars"  
+                    	class="btn btn-sm btn-gray"  title="批量生成保养工单"/>
                         <p:commandButton  icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
                         </p:commandButton>
-                        <!-- <p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
+                        <p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
                         <p:commandButton render="false" id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareView}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
                         <p:commandButton render="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
-                        <p:commandButton render="false" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareDelete}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/> -->
+                        <p:commandButton render="false" id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareDelete}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/> 
                     </f:facet>
                 </p:dataTable>
             </h:form>

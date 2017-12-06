@@ -6,6 +6,21 @@ public class QueryAsset {
 	private String functionType;//设备型号
 	private Integer assetGroup;//设备类型
 	private String manufacture;//品牌
+	private Integer ruleStatus;//规则状态 0：全部 1、已配置 2、未配置
+	private Integer level;
+	
+	public Integer getLevel() {
+		return level;
+	}
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+	public Integer getRuleStatus() {
+		return ruleStatus;
+	}
+	public void setRuleStatus(Integer ruleStatus) {
+		this.ruleStatus = ruleStatus;
+	}
 	public String getTenantUID() {
 		return tenantUID;
 	}
