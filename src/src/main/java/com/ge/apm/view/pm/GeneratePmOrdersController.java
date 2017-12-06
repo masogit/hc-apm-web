@@ -40,6 +40,11 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRuleAsset> {
 	public static final Logger LOGGER = LoggerFactory.getLogger(GeneratePmOrdersController.class);
 	private static final long serialVersionUID = -1L;
+	public static final int RULE_STATUS_CONFIGURED = 1;
+	public static final int RULE_STATUS_NOT_CONFIGURED = 2;
+	public static final int RULE_STATUS_LEVLE_1 = 1;
+	public static final int RULE_STATUS_LEVLE_2 = 2;
+	public static final int RULE_STATUS_LEVLE_3 = 3;
 	private DualListModel<AssetInfo> availableAssets;
 	private List<AssetInfo> sourceAssets;
 	private List<AssetInfo> targetAssets;
@@ -92,12 +97,14 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		List<String> uids = null;
 		if (queryAsset.getRuleStatus() != null) {
 			uids = new ArrayList<String>();
-			if (queryAsset.getRuleStatus() == 1) {// 已配置
+			if (queryAsset.getRuleStatus() == RULE_STATUS_CONFIGURED) {// 已配置
 				uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
 				if (CollectionUtils.isNotEmpty(uids)) {
 					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
 				}
-			} else if (queryAsset.getRuleStatus() == 2) {// 未配置
+			} else if (queryAsset.getRuleStatus() == RULE_STATUS_NOT_CONFIGURED) {// 未配置
+				//TODO need wujb
+				
 				// uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
 				// assetFilters.add(new SearchFilter("uid", SearchFilter.Operator., uids));
 			}
@@ -181,11 +188,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		List<AssetRuleModel> models = new ArrayList<AssetRuleModel>();
 		for (AssetInfo ai : targetAssets) {
 			PmOrderRule rule = null;
-			if (level == 1) {
+			if (level == RULE_STATUS_LEVLE_1) {
 				rule = pmOrderRuleRepository.findPmOrderRuleLevel1(ai.getUid());
-			} else if (level == 2) {
+			} else if (level == RULE_STATUS_LEVLE_2) {
 				rule = pmOrderRuleRepository.findPmOrderRuleLevel2(ai.getUid());
-			} else if (level == 3) {
+			} else if (level == RULE_STATUS_LEVLE_3) {
 				rule = pmOrderRuleRepository.findPmOrderRuleLevel3(ai.getUid());
 			}
 			if (rule == null) {
