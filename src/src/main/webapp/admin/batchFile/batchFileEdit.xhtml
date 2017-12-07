@@ -9,7 +9,8 @@
     <ui:composition>
 
         <h:form id="BatchFileImportEditForm">
-            <p:fieldset  id="editSet" legend="#{msg.add}" style="margin-bottom:20px" rendered="#{empty batchFileController.selected.id}">
+            <p:fieldset  id="editSet" legend="#{msg.add}" style="margin-bottom:20px" rendered="#{empty batchFileController.selected.id}" >
+                
                 <h:panelGroup >
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
@@ -80,6 +81,9 @@
                         <h:outputText value="#{batchFileController.selected.processEndTime}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
                         </h:outputText>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <p:commandButton  value="刷新" immediate="true"  actionListener="#{batchFileController.refreshData()}" update=":BatchFileImportForm:datalist, :growl :BatchFileImportEditForm"/>
                     </h:panelGroup>
 
                 </p:panelGrid>
