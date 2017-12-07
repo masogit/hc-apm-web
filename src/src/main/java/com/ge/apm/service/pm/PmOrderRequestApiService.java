@@ -16,7 +16,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
@@ -31,6 +33,8 @@ import java.util.Map;
  */
 @Component
 public class PmOrderRequestApiService extends MicroServiceInvoker {
+	
+	
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
     /*  @Value("#{urlProperties.url_serviceRequestCreate}")
 	  private String url_serviceRequestCreate;*/
@@ -44,9 +48,9 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
 
     @Value("#{urlProperties.url_pmOrderSteps}")
     private String url_pmOrderSteps;
-
-
-
+    
+    @Value("#{urlProperties.url_createPmOrdersByBatch}")
+    private String url_createPmOrdersByBatch;
 
     public Map<String, Object> getApproveByAsset(String token, String assetUid) {
         HttpHeaders header = createHttpHeaders(token);
@@ -103,10 +107,20 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         } else {
             return null;
         }
-
-
     }
-
+    
+    @Async
+    public void createPmOrdersByBatch(String token,String requestBody){
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(token));
+        ResponseEntity<String> response = template.postForEntity(url_createPmOrdersByBatch, requestEntity, String.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+	        	String result = (String) response.getBody();
+	        	logger.info("invoke createPmOrdersByBatch over,result is {}",result);
+        }else {
+        		logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
+        }
+        
+    }
 //http://apm-dev.hcdigital.com.cn:8090/hcapmworkflowservice/api/apm/pmOrders/ff8080815f525e84015f5764de610000/action?type=accept
 }
 

@@ -72,7 +72,18 @@ public class PmOrderRule implements Serializable{
     @Column(name = "asset_name")
     private String assetName;//设备名称
     
-    public String getRemark() {
+    @Column(name = "level")
+    private Integer level;//规则级别
+    
+    public Integer getLevel() {
+		return level;
+	}
+
+	public void setLevel(Integer level) {
+		this.level = level;
+	}
+
+	public String getRemark() {
 		return remark;
 	}
 
