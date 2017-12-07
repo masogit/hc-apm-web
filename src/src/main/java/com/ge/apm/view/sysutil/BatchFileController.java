@@ -103,17 +103,13 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         List<ImportFiles> importFileList = fileList.stream().map(item -> item._1).collect(Collectors.toList());
         
         dao.save(importFileList);
-//        fileList.forEach(item -> {
-//            try {
-//                String savedfilePath = fileService.saveBatchUploadedFile(item._2);
-//                item._1.setFilePath(savedfilePath);
-//                dao.save(item._1);
-//            } catch (Exception ex) {
-//                ex.printStackTrace();
-//                WebUtil.addErrorMessage(item._2.getFileName() + "上传失败!");
-//            }
-//        });
         fileList.clear();
+    }
+    
+    public void refreshData(){
+        if(selected != null){
+            selected = dao.findById(selected.getId());
+        }
     }
     
     public void restartBatchJob(){
