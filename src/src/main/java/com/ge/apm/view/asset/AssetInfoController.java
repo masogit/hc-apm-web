@@ -2,16 +2,14 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.AssetDepreciationService;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
@@ -21,6 +19,7 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,6 +38,8 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import webapp.framework.web.mvc.ServerEventInterface;
 import webapp.framework.web.service.UserContext;
 
 @ManagedBean
@@ -109,7 +110,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean isGeneratePmOrder;
 
     private List<UserAccount> ownerList;
+    private GbCodeService gbCodeService;
+    private GbCodeRepository gbDao;
+    public List<GbForm> gbFormList= new ArrayList<GbForm>();
 
+/*public List<GbCode> getGbCodeList(){
+this.selected.getNationalStandardCode()
+}*/
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -132,7 +139,23 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         setSelectedSiteUID(selected.getSiteUID());
     }
+    private boolean showDialog = false;
+    private ServerEventInterface callingController;
+    private String updateViewIDs;
+    private TreeNode gbCodeTree;
+    public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs) {
+        showDialog = true;
 
+        this.selected = null;
+        this.selectedNode = null;
+       // this.selectedAsset = null;
+
+        this.callingController = callingController;
+        this.updateViewIDs = updateViewIDs;
+        UaaService uaaService = WebUtil.getBean(UaaService.class);
+
+
+    }
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -152,7 +175,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         ucService = WebUtil.getBean(UserCommonService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
-
+        gbCodeService = WebUtil.getBean(GbCodeService.class);
+        gbDao= WebUtil.getBean(GbCodeRepository.class);
         this.filterBySite = false;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -198,8 +222,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.selected != null) {
             initOrgTree();
         }
+        initGbTree();
 
     }
+
+  /*  public List<GbForm> getGbFormList(){
+        List<GbForm> gbFormList = gbCodeService.tansferGbForm();
+        return gbFormList;
+    }*/
 
     public Boolean getTerminate() {
         return terminate;
@@ -644,7 +674,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 ownerList.addAll(workerList);
             }
         }
-
         return ownerList;
     }
 
@@ -1011,12 +1040,31 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private TreeNode orgTree;
+    private TreeNode gbTree;
 
     private TreeNode selectedNode;
+    private TreeNode selectedGbNode;
 
+    private GbCode selectedGb;
     private OrgInfo selectedOrg;
 
     private UaaService uaaService = WebUtil.getBean(UaaService.class);
+
+    public TreeNode getSelectedGbNode() {
+        return selectedGbNode;
+    }
+
+    public void setSelectedGbNode(TreeNode selectedGbNode) {
+        this.selectedGbNode = selectedGbNode;
+    }
+
+    public TreeNode getGbTree() {
+        return gbTree;
+    }
+
+    public void setGbTree(TreeNode gbTree) {
+        this.gbTree = gbTree;
+    }
 
     public TreeNode getOrgTree() {
         return orgTree;
@@ -1044,6 +1092,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onSelectGbTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        GbCode gbCode = (GbCode) node.getData();
+        updateSelectedOrgGb(gbCode);
+    }
+
+
     private void updateSelectedOrg(OrgInfo orgInfo) {
 
         if (orgInfo == null || orgInfo.getId() == -1) {
@@ -1067,7 +1122,23 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+    private void updateSelectedOrgGb(GbCode gbCode) {
+        if (gbCode == null || gbCode.getId() == -1) {
+            selectedGb = null;
+        } else {
+            selectedGb = gbCode;
+        }
 
+    }
+
+    public void initGbTree(){
+        TreeNode treeNode = gbCodeService.buildGbTree();
+        gbTree = new DefaultTreeNode("root", null, null);
+        gbTree.getChildren().add(treeNode);
+        treeNode.setExpanded(true);
+
+
+    }
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -1139,7 +1210,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return names;
 
     }
+    public List<String> completeGbName(String prefix) {
+        List<String> names = null;
+        if (!StringUtils.isEmpty(prefix)) {
+            names = gbDao.findGbCodeByPrefix(prefix);
+        }
+        return names;
 
+    }
+    public GbCode getSelectedGb() {
+        return selectedGb;
+    }
+
+    public void setSelectedGb(GbCode selectedGb) {
+        this.selectedGb = selectedGb;
+    }
     public Boolean getIsGeneratePmOrder() {
         return isGeneratePmOrder;
     }
@@ -1156,4 +1241,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public boolean isShowDialog() {
+        return showDialog;
+    }
+
+    public void setShowDialog(boolean showDialog) {
+        this.showDialog = showDialog;
+    }
 }
+

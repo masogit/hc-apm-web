@@ -91,6 +91,12 @@ public class PmScheduleData {
     //Modality
     @Column(name = "modality")
     String modality;
+    
+    //Close Date(local)
+    @Column(name = "close_date")
+    @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
+    Date closeDate;
 
     public String getId() {
         return id;
