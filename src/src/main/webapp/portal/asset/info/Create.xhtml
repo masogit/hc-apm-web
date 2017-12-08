@@ -184,17 +184,19 @@
                                 <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}"/>
                             </h:panelGroup>
 
-                           <!-- <h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.nationalStandardCode}</label>
                                 <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64">
                                     <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:inputText>
-                            </h:panelGroup>-->
+                            </h:panelGroup>
 
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
                                 <!--  <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
-                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}"></p:autoComplete>
+                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}">
+                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
+                                </p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -313,12 +315,6 @@
                                 <p:selectOneMenu id="functionGrade" value="#{assetInfoController.selected.functionGrade}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.repairForm}</label>
-                                <p:selectOneMenu id="repairForm" value="#{assetInfoController.selected.repairForm}">
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
