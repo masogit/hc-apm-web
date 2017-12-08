@@ -114,9 +114,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private GbCodeRepository gbDao;
     public List<GbForm> gbFormList= new ArrayList<GbForm>();
 
-/*public List<GbCode> getGbCodeList(){
-this.selected.getNationalStandardCode()
-}*/
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -225,11 +223,6 @@ this.selected.getNationalStandardCode()
         initGbTree();
 
     }
-
-  /*  public List<GbForm> getGbFormList(){
-        List<GbForm> gbFormList = gbCodeService.tansferGbForm();
-        return gbFormList;
-    }*/
 
     public Boolean getTerminate() {
         return terminate;
