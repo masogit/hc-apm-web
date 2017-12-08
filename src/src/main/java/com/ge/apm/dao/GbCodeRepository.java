@@ -17,7 +17,8 @@ public interface GbCodeRepository extends GenericRepository<GbCode> {
 
 	@Query(value="select gb.* from gb_code gb where level=0",nativeQuery = true)
 	public List<GbCode> findGbRoot();
-
+	@Query(value="select gb.* from gb_code gb where code=?",nativeQuery = true)
+	public GbCode getGbByCode(String code);
 
 	@Query(value="select gb.* from gb_code gb where level=?1",nativeQuery = true)
 	public List<GbCode> getSubGb(int level);
