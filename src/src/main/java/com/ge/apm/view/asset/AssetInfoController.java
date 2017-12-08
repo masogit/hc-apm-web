@@ -205,7 +205,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 terminate = Boolean.parseBoolean(terminateStr);
             }
             setSelectedByUrlParam(encodeStr, "selectedid");
-            selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
+            if(!StringUtils.isEmpty(selected.getNationalStandardCode()))
+             selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
             prepareEdit();
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
