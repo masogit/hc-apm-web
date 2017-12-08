@@ -194,7 +194,7 @@
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
                                 <!--  <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
-                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}" requiredMessage="#{msg.name} #{msg.ValidationRequire}"></p:autoComplete>
+                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}"></p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
