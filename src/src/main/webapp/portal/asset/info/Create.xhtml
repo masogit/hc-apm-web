@@ -101,7 +101,7 @@
                             </h:panelGroup>
 
                             <h:panelGroup>
-                                <label class="label">#{msg.hospitalId}</label>
+                                <label class="label">#{msg.hospitalId}</label><!--所属医院-->
                                 <p:inputText id="selectedUserOrgName" value="#{assetInfoController.selectedOrg==null?'':assetInfoController.selectedOrg.name}" readonly="true" />
                                 <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoController.selected.id}"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
@@ -184,11 +184,31 @@
                                 <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}"/>
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                           <!-- <h:panelGroup>
                                 <label class="label">#{msg.nationalStandardCode}</label>
                                 <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64">
                                     <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:inputText>
+                            </h:panelGroup>-->
+
+                            <h:panelGroup>
+                                <label class="label">设备国标码</label>
+                                <!--  <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
+                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}" requiredMessage="#{msg.name} #{msg.ValidationRequire}"></p:autoComplete>
+                                <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
+                                <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.gbTree}" selection="#{assetInfoController.selectedGbNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="gb">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
                             </h:panelGroup>
 
                         </p:panelGrid>
@@ -238,15 +258,12 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-
-
-
-                    <p:fieldset  style="margin-bottom:20px">
+                  <!--  <p:fieldset  style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
-                              <!--  <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
-                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb}" completeMethod="#{assetInfoController.completeGbName}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"></p:autoComplete>
+                              &lt;!&ndash;  <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />&ndash;&gt;
+                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}" requiredMessage="#{msg.name} #{msg.ValidationRequire}"></p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                      <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -264,7 +281,7 @@
                             </h:panelGroup>
 
                         </p:panelGrid>
-                    </p:fieldset>
+                    </p:fieldset>-->
 
                     <p:fieldset  style="margin-bottom:20px">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
