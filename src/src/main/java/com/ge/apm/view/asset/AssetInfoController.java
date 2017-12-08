@@ -205,6 +205,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 terminate = Boolean.parseBoolean(terminateStr);
             }
             setSelectedByUrlParam(encodeStr, "selectedid");
+            selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
             prepareEdit();
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
@@ -487,6 +488,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
         }
+            if(selectedGb.getCode()!=null){
+                selected.setNationalStandardCode(selectedGb.getCode());
+            }
 
         Boolean isNew = selected.hashCode()==0;
         this.save();
@@ -1129,6 +1133,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
         treeNode.setExpanded(true);
+        selectedGb = new GbCode();
 
 
     }
