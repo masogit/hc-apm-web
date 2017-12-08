@@ -1159,8 +1159,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
-                this.selected.getId(),
+        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
                 this.selected.getNationalStandardCode(),
                 this.selected.getSiteUID()
         );
