@@ -1229,14 +1229,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public List<GbCode> completeGbName1(String prefix) {
-        List<GbCode> gbList = null;
-        if (!StringUtils.isEmpty(prefix)) {
-            gbList = gbDao.findGbByPrefix(prefix);
-        }
-        return gbList;
 
-    }
     public GbCode getSelectedGb() {
         return selectedGb;
     }
