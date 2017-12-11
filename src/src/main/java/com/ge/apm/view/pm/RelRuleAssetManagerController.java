@@ -80,8 +80,19 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 			List<String> assetUids = new ArrayList<String>();
 			List<String> ruleUids = new ArrayList<String>();
 			for (RelRuleAsset relRuleAsset : rels) {
-				assetUids.add(relRuleAsset.getAssetUID());
-				ruleUids.add(relRuleAsset.getRuleUID());
+				if(relRuleAsset.getAssetUID() != null) {
+					assetUids.add(relRuleAsset.getAssetUID());
+				}
+				if(relRuleAsset.getRuleUID1() != null) {
+					ruleUids.add(relRuleAsset.getRuleUID1());
+				}
+				if(relRuleAsset.getRuleUID2() != null) {
+					ruleUids.add(relRuleAsset.getRuleUID2());
+				}
+				if(relRuleAsset.getRuleUID() != null) {
+					ruleUids.add(relRuleAsset.getRuleUID());
+				}
+				
 			}
 			if(CollectionUtils.isNotEmpty(assetUids)){
 				List<AssetInfo> assetInfos = assetInfoRepository.findByUidIn(assetUids);
@@ -108,12 +119,20 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 
 	public String getRuleName(String ruleUID) {
-		PmOrderRule rule = pmOrderRuleRepository.findByUid(ruleUID);
+		PmOrderRule rule = ruleMap.get(ruleUID);//pmOrderRuleRepository.findByUid(ruleUID);
 		if (rule != null) {
 			return rule.getName();
 		}
 		return null;
 	}
+	
+/*	public Integer getRuleLevel(String ruleUID) {
+		PmOrderRule rule = ruleMap.get(ruleUID);
+		if (rule != null) {
+			return rule.getLevel();
+		}
+		return null;
+	}*/
 
 	public AssetInfo getAssetInfo(String assetUid) {
 		return assetMap.get(assetUid);
