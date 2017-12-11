@@ -23,6 +23,17 @@
                                 <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
+
+
+                        <h:panelGroup>
+                            <label class="label">维修结果</label>
+                            <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="true" requiredMessage="维修结果 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+
                     </p:panelGrid>
                     
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
