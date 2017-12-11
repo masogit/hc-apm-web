@@ -32,7 +32,7 @@
                         <p:column headerText="#{msg.assetName}" sortBy="#{item.boId}" >
                             <h:outputText value="#{assetInfoService.getAssetInfoName(item.boId)}"/>
                         </p:column>
-                        <p:column headerText="#{msg.fileType}" sortBy="#{item.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
+                        <p:column headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
