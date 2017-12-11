@@ -63,7 +63,12 @@ public class GbCode {
 	}
 
 	public void setCode(String code) {
-		this.code = code;
+		if(code.contains("/"))
+		{
+			this.code= code.split("/")[0];
+		}else {
+			this.code = code;
+		}
 	}
 
 	public String getParentCode() {
@@ -78,8 +83,8 @@ public class GbCode {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(code);
-		builder.append("/");
-		builder.append(name);
+	//	builder.append("/");
+	//	builder.append(name);
 	/*	builder.append("GbCode [id=");
 		builder.append(id);
 		builder.append(", code=");
