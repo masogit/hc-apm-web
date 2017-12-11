@@ -80,7 +80,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         itemFile.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
         String savedfilePath=null;
         try {
-            savedfilePath = fileService.saveBatchUploadedFile(event.getFile());
+            savedfilePath = fileService.saveBatchUploadedFile(event.getFile(),fileType);
         } catch (Exception ex) {
              WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
         }
