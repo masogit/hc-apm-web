@@ -574,15 +574,22 @@ public class AssetFileImportService {
     }
 
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
+
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
-        assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-        if (null != asset.getFinancingNum() && !asset.getFinancingNum().isEmpty()) {
-            assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+
+        if (!StringUtils.isEmpty(asset.getQrCode())) {
+            assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+        } else {
+            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
+            assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+            if (null != asset.getFinancingNum() && !asset.getFinancingNum().isEmpty()) {
+                assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+            }
         }
+
         List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
         return tempList;
     }
