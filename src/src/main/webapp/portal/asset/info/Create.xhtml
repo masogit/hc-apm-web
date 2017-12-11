@@ -201,12 +201,13 @@
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.gbTree}" selection="#{assetInfoController.selectedGbNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
+                                            <p:ajax process="@this :AssetInfoEditForm:financingNum" event="select" listener="#{assetInfoController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname :AssetInfoEditForm:financingNum" oncomplete="PF('varPanelOrg1').hide();"/>
+
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
                                             <p:treeNode type="gb">
-                                                <h:outputText value="#{node}"/>
+                                                <h:outputText value="#{node}/#{node.name}"/>
                                             </p:treeNode>
                                         </p:tree>
                                     </p:scrollPanel>

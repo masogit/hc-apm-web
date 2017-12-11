@@ -46,6 +46,7 @@ import webapp.framework.web.service.UserContext;
 @ViewScoped
 public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
+    private String gbCodeName;
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
@@ -207,6 +208,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             setSelectedByUrlParam(encodeStr, "selectedid");
             if(!StringUtils.isEmpty(selected.getNationalStandardCode()))
              selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
+            gbCodeName = selectedGb.getCode();
             prepareEdit();
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
@@ -1094,6 +1096,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
+
+//联动更新
+        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+                this.selectedGb.getCode(),
+                this.selected.getSiteUID()
+        );
+        if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
+            this.selected.setFinancingNum(financingNum);
+        }
+
     }
 
 
@@ -1160,7 +1172,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void updateFinancingNumByNationalStandardCode() {
         String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
-                this.selected.getNationalStandardCode(),
+                this.selectedGb.getCode(),
                 this.selected.getSiteUID()
         );
         if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
@@ -1216,12 +1228,24 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return names;
 
     }
+
+    public List<GbCode> completeGbName1(String prefix) {
+        List<GbCode> gbList = null;
+        if (!StringUtils.isEmpty(prefix)) {
+            gbList = gbDao.findGbByPrefix(prefix);
+        }
+        return gbList;
+
+    }
     public GbCode getSelectedGb() {
         return selectedGb;
     }
 
     public void setSelectedGb(GbCode selectedGb) {
+
         this.selectedGb = selectedGb;
+
+
     }
     public Boolean getIsGeneratePmOrder() {
         return isGeneratePmOrder;
@@ -1238,6 +1262,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             dao.save(ai);
         }
     }
+
+
+    public String getGbCodeName() {
+        if(gbCodeName!=null) {
+            if (gbCodeName.contains("/")) {
+                return gbCodeName.split("/")[0];
+            }
+        }
+        return gbCodeName;
+    }
+
+    public void setGbCodeName(String gbCodeName) {
+        if(gbCodeName!=null) {
+            if (gbCodeName.contains("/")) {
+                this.gbCodeName = gbCodeName.split("/")[0];
+            }
+        }
+        this.gbCodeName = gbCodeName;
+    }
+
 
     public boolean isShowDialog() {
         return showDialog;
