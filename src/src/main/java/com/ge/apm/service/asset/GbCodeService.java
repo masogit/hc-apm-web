@@ -33,30 +33,25 @@ public class GbCodeService {
 			node.setRowKey("gb_"+gb.getId());
 			treeMap.put(gb.getCode(), node);
 		}
-		TreeNode rootNode = null;
+		TreeNode rootNode = new DefaultTreeNode("gb", null, null);
 		for(GbCode org: gbList){
 			TreeNode node = treeMap.get(org.getCode());
-
 			if (node == null) continue;
 			node.setSelectable(true);
-
 			GbCode current = org;
 			while(current.getParentCode()!=null){
 				TreeNode currentNode = treeMap.get(current.getCode());
 				TreeNode parentNode = treeMap.get(current.getParentCode());
-				if (parentNode == null) break;
+				if (parentNode == null) {
+					rootNode.getChildren().add( treeMap.get(current.getCode()));
+					break;
+				}
 				parentNode.getChildren().add(currentNode);
 				current = (GbCode)parentNode.getData();
 			}
-
-			if (rootNode == null) {
-				if (current.getParentCode() == null) {
-					rootNode = treeMap.get(current.getCode());
-				} else if (treeMap.get(current.getParentCode()) == null){
-					rootNode = treeMap.get(current.getCode());
-				}
+			if (current.getParentCode() == null) {
+				rootNode.getChildren().add( treeMap.get(current.getCode()));
 			}
-
 		}
 		return rootNode;
 	}

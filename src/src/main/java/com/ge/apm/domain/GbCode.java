@@ -23,13 +23,9 @@ public class GbCode {
 	@Column(name = "name")
 	private String name;
 
-	@Basic(optional = false)
 	@Column(name = "level")
 	private int level;
 
-
-
-	@Basic(optional = false)
 	@Column(name = "parent_Code")
 	private String parentCode ;
 
