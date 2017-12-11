@@ -66,6 +66,11 @@ public class TableDefinitionService {
             return true;
         }
     }
+    
+    public Boolean hasDuplicatedKey(TableSchema table){
+        List<String> keyList = getItemKeyList(table);
+        return keyList.size() != keyList.stream().distinct().collect(Collectors.toList()).size();
+    }
 
     public TableDefinition getTemplateById(String templateId) {
         return templateDao.findById(templateId);

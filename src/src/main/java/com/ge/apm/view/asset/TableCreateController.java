@@ -45,7 +45,7 @@ public class TableCreateController {
     private TableDefinition selectedTableDefinition;
 
     private Map<String, Object> tableValue;
-    
+
     private Boolean isStringEditable;
 
     @PostConstruct
@@ -90,10 +90,10 @@ public class TableCreateController {
         }
     }
 
-    public void onTitleChange(){
+    public void onTitleChange() {
         tableString = JSONObject.toJSONString(table);
     }
-    
+
     public void prepareAddGroup() {
         editGroup = new TableGroup();
     }
@@ -163,7 +163,7 @@ public class TableCreateController {
         if (null == editGroup.getItems()) {
             editGroup.setItems(new ArrayList<TableItem>());
         }
-        if(templateService.getItemKeyList(table).contains(editTableItem.getKey())){
+        if (templateService.hasDuplicatedKey(table) || !editGroup.getItems().contains(editTableItem) && templateService.getItemKeyList(table).contains(editTableItem.getKey())) {
             WebUtil.addErrorMessage("Key已经被使用");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -173,7 +173,7 @@ public class TableCreateController {
         if (!editGroup.getItems().contains(editTableItem)) {
             editGroup.getItems().add(editTableItem);
         }
-        
+
         cancel();
         tableString = JSONObject.toJSONString(table);
     }
@@ -190,20 +190,26 @@ public class TableCreateController {
             }
         }
     }
-    
-    public void onStringEdit(){
-        this.isStringEditable=true;
+
+    public void onStringEdit() {
+        this.isStringEditable = true;
     }
-    
-    public void onStringSave(){
-        try{
+
+    public void onStringSave() {
+        try {
+            if (templateService.hasDuplicatedKey(JSONObject.parseObject(tableString, TableSchema.class))) {
+                WebUtil.addErrorMessage("Key已经被使用");
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("validationFailed", true);
+                tableString = JSONObject.toJSONString(table);
+                return;
+            }
             table = JSONObject.parseObject(tableString, TableSchema.class);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             WebUtil.addErrorMessage("不能解析成模版");
             return;
         }
-        this.isStringEditable=false;
+        this.isStringEditable = false;
     }
 
     public void prepareAddOption() {
@@ -296,6 +302,5 @@ public class TableCreateController {
     public void setIsStringEditable(Boolean isStringEditable) {
         this.isStringEditable = isStringEditable;
     }
-    
 
 }
