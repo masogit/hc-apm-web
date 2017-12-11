@@ -304,8 +304,10 @@ table.ui-selectoneradio {
   color: #fff!important;
 }
 
-td {
-  text-align: center;
+td{
+  text-align:center;
+  white-space: normal!important;
+  word-wrap: break-word!important;
 }
 
 .ui-datatable thead th.ui-state-active {
