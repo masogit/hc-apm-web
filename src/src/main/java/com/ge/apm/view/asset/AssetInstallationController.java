@@ -24,8 +24,10 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,8 +66,8 @@ public class AssetInstallationController {
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
     private Boolean isGeneratePmOrder=false;
-
-    private String currentQrCode;
+    
+//    private String currentQrCode;
 
     @PostConstruct
     protected void init() {
@@ -82,7 +84,10 @@ public class AssetInstallationController {
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
-        currentQrCode = arrivalListItem.getQrCode();
+//        currentQrCode = arrivalListItem.getQrCode();
+        if(Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())){
+            arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
+        }
         changeFunctionGroup();
 
 
@@ -147,6 +152,14 @@ public class AssetInstallationController {
 
         if (!isAckFinished) {
             return "";
+        }
+        
+        if(arrivalListItem.getWarrantyYear()!=null){
+            Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear()*12).intValue();
+            Calendar calender = Calendar.getInstance();
+            calender.setTime(new Date());
+            calender.add(Calendar.MONTH, monthLong);
+            arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             saveOrUpdateItem(arrivalListItem);

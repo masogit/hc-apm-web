@@ -33,10 +33,10 @@
                                 <label class="label">#{msg.brand}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.brand}" />
                             </h:panelGroup>-->
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.arrivalListOrderType}</label>
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListOrderType', assetInstallationController.arrivalListItem.arrivalList.orderType)}" />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.functionType}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.functionType}" />
@@ -250,9 +250,13 @@
                                 <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.purchaseDate}" maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">保修时长(年)</label>
+                                <p:inputNumber value="#{assetInstallationController.arrivalListItem.warrantyYear}"  minValue="0" decimalPlaces="2" />
+                            </h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.factoryWarrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.factoryWarrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.warrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
