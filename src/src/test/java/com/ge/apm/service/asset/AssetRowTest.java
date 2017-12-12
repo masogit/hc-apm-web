@@ -33,7 +33,7 @@ public class AssetRowTest {
     }
 
     @Test
-    public void testSetFieldValue_setAliasName_IsNew() {
+    public void testSetFieldValue_setAliasName_IsNew() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         AssetInfo assetInfo = new AssetInfo();
 
@@ -44,6 +44,11 @@ public class AssetRowTest {
         AssetRow assetRow = new AssetRow(assetInfo, true, rowMap);
         assetRow.setAliasName();
         assertEquals("CT", assetInfo.getAliasName());
+
+        rowMap.put("功能等级", "1");
+
+        assetRow.setFieldValue("功能等级", "setFunctionGrade");
+        assertEquals(1, assetInfo.getFunctionGroup().intValue());
 
     }
 

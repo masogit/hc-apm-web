@@ -8,6 +8,7 @@ import com.ge.apm.service.utils.ExcelDocument;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -52,6 +53,62 @@ public class AssetRow {
                     method.invoke(assetInfo, null);
                 } else {
                     method.invoke(assetInfo, fieldValueOfString);
+                }
+            }
+
+        }
+    }
+
+    public void setFieldIntegerValue(String fieldName, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+        Integer fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
+        Method method = AssetInfo.class.getMethod(methodName, Integer.class);
+        if (isNew) {
+            method.invoke(assetInfo, fieldValueOfInteger);
+        } else {
+            if (!StringUtils.isEmpty(fieldValueOfString)) {
+                if (DELETE_MARK.equals(fieldValueOfString)) {
+                    Integer nullInteger = null;
+                    method.invoke(assetInfo, nullInteger);
+                } else {
+                    method.invoke(assetInfo, fieldValueOfInteger);
+                }
+            }
+
+        }
+    }
+
+    public void setFieldDoubleValue(String fieldName, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+        Double fieldValueOfDouble = ExcelDocument.getCellDoubleValue(rowMap.get(fieldName));
+        Method method = AssetInfo.class.getMethod(methodName, Double.class);
+        if (isNew) {
+            method.invoke(assetInfo, fieldValueOfDouble);
+        } else {
+            if (!StringUtils.isEmpty(fieldValueOfString)) {
+                if (DELETE_MARK.equals(fieldValueOfString)) {
+                    Double empty = null;
+                    method.invoke(assetInfo, empty);
+                } else {
+                    method.invoke(assetInfo, fieldValueOfDouble);
+                }
+            }
+
+        }
+    }
+
+    public void setFieldDateValue(String fieldName, String methodName) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+        Date fieldValueOfDate = ExcelDocument.getCellDateValue(rowMap.get(fieldName));
+        Method method = AssetInfo.class.getMethod(methodName, Date.class);
+        if (isNew) {
+            method.invoke(assetInfo, fieldValueOfDate);
+        } else {
+            if (!StringUtils.isEmpty(fieldValueOfString)) {
+                if (DELETE_MARK.equals(fieldValueOfString)) {
+                    method.invoke(assetInfo, null);
+                } else {
+                    method.invoke(assetInfo, fieldValueOfDate);
                 }
             }
 
