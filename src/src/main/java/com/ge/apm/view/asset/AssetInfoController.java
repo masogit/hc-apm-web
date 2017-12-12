@@ -222,7 +222,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-
         if (this.selected != null) {
             initOrgTree();
         }
@@ -494,6 +493,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
         }
         if (selectedGb.getCode() != null) {
+            GbCode gbCode = gbDao.getGbCode(selectedGb.getCode());
+            if(null==gbCode){
+                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
+                return "";
+            }
+
             selected.setNationalStandardCode(selectedGb.getCode());
         }
 
