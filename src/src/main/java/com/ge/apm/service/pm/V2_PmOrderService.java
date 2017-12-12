@@ -100,7 +100,6 @@ formData.setAssignee(approvaler);
             WebUtil.addSuccessMessage("审批成功");
         }
     }
-
     public void createPMrequestApi(String assetUID,PmOrderActionForm formData){
         String token = UserContextService.getAccessToken();
         formData.setAssetUid(assetUID);
@@ -112,8 +111,6 @@ formData.setAssignee(approvaler);
         formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         createPMrequestApi(assetUID,formData);
     }
-
-
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
     }
