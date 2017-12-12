@@ -83,8 +83,8 @@ public class GbCode {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(code);
-	//	builder.append("/");
-	//	builder.append(name);
+		builder.append("/");
+		builder.append(name);
 	/*	builder.append("GbCode [id=");
 		builder.append(id);
 		builder.append(", code=");

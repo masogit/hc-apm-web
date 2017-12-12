@@ -135,6 +135,7 @@ private String dptName;
             }
             formData.setRuleLevel(ruleLevel);
             pmOrderService.createPMrequest(selectedAsset.getUid(),formData);
+
             cancel();
         }
 

@@ -193,8 +193,8 @@
 
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
-                                <!--  <p:inputText id="selectedgbName" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
-                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.code}" completeMethod="#{assetInfoController.completeGbName}">
+                                <!--  <p:inputText id="selectedgbName" value="#Gb{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
+                                <p:autoComplete id="gbname" value="#{assetInfoController.selectedGb==null?'':assetInfoController.gbCodeName}" completeMethod="#{assetInfoController.completeGbName}">
                                     <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
@@ -207,7 +207,7 @@
                                             <p:ajax process="@this" event="collapse"/>
 
                                             <p:treeNode type="gb">
-                                                <h:outputText value="#{node}/#{node.name}"/>
+                                                <h:outputText value="#{node}"/>
                                             </p:treeNode>
                                         </p:tree>
                                     </p:scrollPanel>
