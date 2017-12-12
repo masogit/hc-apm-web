@@ -6,36 +6,19 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.druid.util.StringUtils;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import java.util.*;
 
 /**
  *
@@ -53,6 +36,8 @@ public class AssetFileImportService {
 
     public static final int EXCEL_ORG_HEADER_ROW = 4;
     public static final int EXCEL_ORG_DATA_ROW = 5;
+
+    public static final String DELETE_MARK = "#";
 
     public static enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
@@ -489,8 +474,11 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-                item.put("asset", assetList.get(0));
+//                item.put("asset", assetList.get(0));
                 item.put("status", ImportStatus.Exist);
+//                item.put("assetFromExcel", newAsset);
+
+                updateAsset(assetList.get(0), item);
             }
 
         });
@@ -563,6 +551,76 @@ public class AssetFileImportService {
             }
         }
         return true;
+    }
+
+    @Transactional
+    void updateAsset(AssetInfo asset, Map<String, Object> map) {
+
+        ImportStatus status = (ImportStatus) map.get("status");
+
+        //update existing asset
+        if (status != ImportStatus.Exist) {
+            return;
+        }
+
+        Map<String, Object> rowMap = (Map<String, Object>) map.get("rowData");
+
+        Set<Map.Entry<String, Object>> entrySet = rowMap.entrySet();
+
+        for (Map.Entry<String, Object> entry: entrySet) {
+            String fieldName = entry.getKey();
+            String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+
+            if (StringUtils.isEmpty(fieldValueOfString)) {
+                continue;
+            }
+
+            switch (fieldName) {
+                case "设备名称":
+//                    asset.setName(assetName);
+                    break;
+
+                case "设备编号":
+//                    asset.setDepartNum(departNum);
+                    break;
+
+                case "设备别名":
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        asset.setAliasName(null);
+                    } else {
+                        asset.setAliasName(fieldValueOfString);
+                    }
+
+                case "维修负责人":
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        asset.setAssetOwnerName(null);
+                    } else {
+                        asset.setAssetOwnerName(fieldValueOfString);
+                    }
+
+                case "维修负责人2":
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        asset.setAssetOwnerName2(null);
+                    } else {
+                        asset.setAssetOwnerName2(fieldValueOfString);
+                    }
+
+                case "维修负责人3":
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        asset.setAssetOwnerName3(null);
+                    } else {
+                        asset.setAssetOwnerName3(fieldValueOfString);
+                    }
+
+
+            }//switch
+
+
+        }//for
+
+
+
+        assetDao.save(asset);
     }
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
