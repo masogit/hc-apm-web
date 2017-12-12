@@ -12,18 +12,19 @@
                 	<p:outputLabel class="pageTitle" value="#{msg.assetRuleManager}"/>
             	</div>
             	
-<!--         		<h:form id="searchForm">
-                <h:panelGrid id="searchPanel" columns="2">
-                    <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}" maxlength="100" style="width: 420px">
-                        <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
+            <div class="ui-g-12 card">
+         	<h:form id="searchForm">
+                <h:panelGrid id="searchPanel" columns="2" >
+                    <p:inputText id="searchText" value="#{relRuleAssetManagerController.queryCondition}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}" maxlength="100" style="width: 420px">
+                        <p:ajax  update=":RelRuleAssetListForm :searchForm" />
                     </p:inputText>
 
                     <h:panelGroup id='searchButtons'>
-                        <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetInfoController.oneSearchStr}"/>
-                        <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":RelRuleAssetListForm :searchForm"  rendered="#{empty relRuleAssetManagerController.queryCondition}"/>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":RelRuleAssetListForm :searchForm" actionListener="#{relRuleAssetManagerController.setOneSearchStr()}" rendered="#{not empty relRuleAssetManagerController.queryCondition}"/>
                     </h:panelGroup>
                 </h:panelGrid>
-            </h:form> -->
+            </h:form>
             	
             <h:form id="RelRuleAssetListForm">
                 <p:dataTable id="datalist" value="#{relRuleAssetManagerController.lazyModel}" var="item" widgetVar="varDataList"
@@ -101,7 +102,7 @@
 
             <ui:include src="Edit.xhtml"/>
             <ui:include src="View.xhtml"/>
-
+				</div>
             </div>
         </div>
         
