@@ -11,6 +11,7 @@ import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
@@ -93,12 +94,9 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         }
     }
 
-    public Map<String, Object> createPmRequest(String token, String assetUid,Date planTime){
-        PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setAssetUid(assetUid);
-        if(null!=planTime){
-            formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
-        }
+    public Map<String, Object> createPmRequest(String token,PmOrderActionForm formData ){
+
+
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_pmRequestCreate, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {

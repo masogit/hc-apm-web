@@ -14,6 +14,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -48,6 +49,7 @@ private String dptName;
     private V2_PmOrderService pmOrderService;
     private V2_PmOrder selectedPmOrder;
     private String assetName;
+    private Integer ruleLevel;
 
     private Date startTime;
     private Date endTime;
@@ -122,12 +124,17 @@ private String dptName;
     }
     private V2_PmOrder v2PmOrder;
     public void createPM(){
+          PmOrderActionForm formData = new PmOrderActionForm();
         if(Strings.isNullOrEmpty(dptName)){
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
         }else{
-            pmOrderService.createPMrequest(selectedAsset.getUid(),planTime);
+            if(null!=planTime){
+                formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+            }
+            formData.setRuleLevel(ruleLevel);
+            pmOrderService.createPMrequest(selectedAsset.getUid(),formData);
             cancel();
         }
 
@@ -406,6 +413,8 @@ public void closePM(V2_PmOrder selectedPmOrder){
         selectedPmOrder=null;
         assetName=null;
         endTime=null;
+        ruleLevel=null;
+        dptName=null;
 
     }
 
@@ -783,5 +792,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
         this.dptName = dptName;
     }
 
+    public Integer getRuleLevel() {
+        return ruleLevel;
+    }
 
+    public void setRuleLevel(Integer ruleLevel) {
+        this.ruleLevel = ruleLevel;
+    }
 }
