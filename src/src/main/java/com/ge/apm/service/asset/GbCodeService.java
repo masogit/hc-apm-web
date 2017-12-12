@@ -33,11 +33,9 @@ public class GbCodeService {
 			treeMap.put(gb.getCode(), node);
 		}
 		TreeNode rootNode = new DefaultTreeNode("gb", null, null);
-		//排序gbList
-
-		List<GbCode> gbList1 = gbList.parallelStream().sorted(Comparator.comparing(GbCode::getCode).reversed()).collect((toList()));
-
-		for(GbCode org: gbList1){
+		//对code进行排序
+		 gbList = gbList.parallelStream().sorted(Comparator.comparing(GbCode::getCode).reversed()).collect((toList()));
+		for(GbCode org: gbList){
 			TreeNode node = treeMap.get(org.getCode());
 			if (node == null) continue;
 			node.setSelectable(true);
