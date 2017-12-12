@@ -149,6 +149,19 @@
                             <label class="label">计划完成时间*</label>
                             <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">保养级别</label>
+                            <p:selectOneMenu  value="#{v2PmOrderController.ruleLevel}" required="true" requiredMessage="保养级别 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="2级规则" itemValue="2" />
+                                <f:selectItem itemLabel="3级规则" itemValue="3" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+
+
+
                     <h:panelGroup >
                         <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.createPM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>

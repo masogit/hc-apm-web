@@ -141,7 +141,8 @@ public class V2_PmOrder  implements Serializable {
     @Size(max = 64)
     @Column(name = "current_person_name")
     private String currentPersonName;
-
+    @Column(name="rule_level")
+    private Integer ruleLevel;
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -503,6 +504,14 @@ public class V2_PmOrder  implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public Integer getRuleLevel() {
+        return ruleLevel;
+    }
+
+    public void setRuleLevel(Integer ruleLevel) {
+        this.ruleLevel = ruleLevel;
     }
 
     public AssetInfo getAssetInfo() {
