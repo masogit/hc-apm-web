@@ -12,25 +12,13 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.wo.WorkOrderForm;*/
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
-import com.google.common.base.Strings;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
-import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  *
@@ -113,10 +101,16 @@ formData.setAssignee(approvaler);
         }
     }
 
-    public void createPMrequest(String assetUID,PmOrderActionForm formData){
+    public void createPMrequestApi(String assetUID,PmOrderActionForm formData){
         String token = UserContextService.getAccessToken();
         formData.setAssetUid(assetUID);
         srApi.createPmRequest(token,formData);
+    }
+    
+    public void createPMrequest(String assetUID,Date planTime){
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+        createPMrequestApi(assetUID,formData);
     }
 
 
