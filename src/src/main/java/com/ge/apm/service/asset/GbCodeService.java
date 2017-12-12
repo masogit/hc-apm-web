@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by lsg on 30/11/2017.
@@ -34,7 +33,11 @@ public class GbCodeService {
 			treeMap.put(gb.getCode(), node);
 		}
 		TreeNode rootNode = new DefaultTreeNode("gb", null, null);
-		for(GbCode org: gbList){
+		//排序gbList
+
+		List<GbCode> gbList1 = gbList.parallelStream().sorted(Comparator.comparing(GbCode::getCode).reversed()).collect((toList()));
+
+		for(GbCode org: gbList1){
 			TreeNode node = treeMap.get(org.getCode());
 			if (node == null) continue;
 			node.setSelectable(true);
