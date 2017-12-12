@@ -11,6 +11,7 @@ import com.ge.apm.service.common.UserCommonService;
 /*import com.ge.apm.service.wo.PmOrderActionForm;
 import com.ge.apm.service.wo.WorkOrderForm;*/
 import com.ge.apm.view.sysutil.UserContextService;
+import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -112,10 +113,12 @@ formData.setAssignee(approvaler);
         }
     }
 
-    public void createPMrequest(String assetUID,Date planTime){
+    public void createPMrequest(String assetUID,PmOrderActionForm formData){
         String token = UserContextService.getAccessToken();
-        srApi.createPmRequest(token,assetUID,planTime);
+        formData.setAssetUid(assetUID);
+        srApi.createPmRequest(token,formData);
     }
+
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
@@ -323,142 +326,4 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
 
 }
 
-/*class PmOrderCreateForm{
-    String assetUid;
-
-    public String getAssetUid() {
-        return assetUid;
-    }
-
-    public void setAssetUid(String assetUid) {
-        this.assetUid = assetUid;
-    }
-}*/
-
-
-class PmOrderActionForm{
-    String assetUid;
-    String actionType;
-    String assignee;
-    List<V2_BlobObject> attachments;
-    String desc;
-    String endTime;
-    Double manHours;
-    String startTime;
-    String stepId;
-    String qualityChecking;
-    Object details;
-    Object coworkers;
-    String planTime;
-//V2_WorkOrder_Coworker[] coworkes //optional
-
-    public String getQualityChecking() {
-        return qualityChecking;
-    }
-
-    public void setQualityChecking(String qualityChecking) {
-        this.qualityChecking = qualityChecking;
-    }
-
-    public String getActionType() {
-        return actionType;
-    }
-
-    public void setActionType(String actionType) {
-        this.actionType = actionType;
-    }
-
-    public String getAssignee() {
-        return assignee;
-    }
-
-    public void setAssignee(String assignee) {
-        this.assignee = assignee;
-    }
-
-
-
-    public Double getManHours() {
-        return manHours;
-    }
-
-    public void setManHours(Double manHours) {
-        this.manHours = manHours;
-    }
-
-
-    public String getAssetUid() {
-        return assetUid;
-    }
-
-    public void setAssetUid(String assetUid) {
-        this.assetUid = assetUid;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
-    }
-
-    public List<V2_BlobObject> getAttachments() {
-        return attachments;
-    }
-
-    public void setAttachments(List<V2_BlobObject> attachments) {
-        this.attachments = attachments;
-    }
-
-    public String getEndTime() {
-        return endTime;
-    }
-
-    public void setEndTime(String endTime) {
-        this.endTime = endTime;
-    }
-
-
-
-    public String getStartTime() {
-        return startTime;
-    }
-
-    public void setStartTime(String startTime) {
-        this.startTime = startTime;
-    }
-
-    public String getStepId() {
-        return stepId;
-    }
-
-    public void setStepId(String stepId) {
-        this.stepId = stepId;
-    }
-
-    public Object getDetails() {
-        return details;
-    }
-
-    public void setDetails(Object details) {
-        this.details = details;
-    }
-
-    public Object getCoworkers() {
-        return coworkers;
-    }
-
-    public void setCoworkers(Object coworkers) {
-        this.coworkers = coworkers;
-    }
-
-    public String getPlanTime() {
-        return planTime;
-    }
-
-    public void setPlanTime(String planTime) {
-        this.planTime = planTime;
-    }
-}
 
