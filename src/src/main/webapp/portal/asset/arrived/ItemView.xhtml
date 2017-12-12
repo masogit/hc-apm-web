@@ -29,10 +29,10 @@
                                                     <label class="label">#{msg.brand}</label>
                                                     <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.brand}" />
                                                 </h:panelGroup>-->
-                        <h:panelGroup>
+<!--                        <h:panelGroup>
                             <label class="label">#{msg.arrivalListOrderType}</label>
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListOrderType', assetArrivedItemsController.selected.arrivalList.orderType)}" />
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.functionType}</label>
                             <h:outputText value="#{assetArrivedItemsController.selected.arrivalList.functionType}" />
@@ -109,6 +109,10 @@
                         <h:panelGroup>
                             <label class="label">#{msg.currentPersonUID}</label>
                             <h:outputText value="#{assetArrivedItemsController.getUserAccountByUid(assetArrivedItemsController.selected.currentPersonUID).name}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">安装工时</label>
+                            <h:outputText value="#{assetArrivedItemsController.selected.workHours}" />
                         </h:panelGroup>
                     </p:panelGrid>
 
