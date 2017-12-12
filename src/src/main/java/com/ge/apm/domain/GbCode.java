@@ -63,7 +63,7 @@ public class GbCode {
 	}
 
 	public void setCode(String code) {
-		if(code.contains("/"))
+		if(null!=code && code.contains("/"))
 		{
 			this.code= code.split("/")[0];
 		}else {
