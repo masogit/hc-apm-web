@@ -134,7 +134,7 @@ private String dptName;
                 formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
             }
             formData.setRuleLevel(ruleLevel);
-            pmOrderService.createPMrequest(selectedAsset.getUid(),formData);
+            pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
 
             cancel();
         }
