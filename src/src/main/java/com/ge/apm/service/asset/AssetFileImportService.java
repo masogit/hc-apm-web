@@ -37,9 +37,7 @@ public class AssetFileImportService {
     public static final int EXCEL_ORG_HEADER_ROW = 4;
     public static final int EXCEL_ORG_DATA_ROW = 5;
 
-    public static final String DELETE_MARK = "#";
-
-    public static enum ImportStatus {
+    public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
 
@@ -147,8 +145,6 @@ public class AssetFileImportService {
                 Map<String, Object> map = new LinkedHashMap();
 
                 boolean isNewAsset = true; //flag an asset is new or existing.
-                String fieldName;
-                String fieldStringValue; //use this to check whether it is a special flag to clear data
 
                 AssetInfo asset = new AssetInfo();
                 String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
@@ -560,54 +556,6 @@ public class AssetFileImportService {
             }
         }
         return true;
-    }
-
-    public void clearOrUpdateAsset(String fieldName, String fieldValueOfString, AssetInfo asset, Map<String, Object> rowMap) {
-
-
-            if (StringUtils.isEmpty(fieldValueOfString)) {
-                return;
-            }
-
-            switch (fieldName) {
-                case "设备名称":
-//                    asset.setName(assetName);
-                    break;
-
-                case "设备编号":
-//                    asset.setDepartNum(departNum);
-                    break;
-
-                case "设备别名":
-                    if (DELETE_MARK.equals(fieldValueOfString)) {
-                        asset.setAliasName(null);
-                    } else {
-                        asset.setAliasName(fieldValueOfString);
-                    }
-
-                case "维修负责人":
-                    if (DELETE_MARK.equals(fieldValueOfString)) {
-                        asset.setAssetOwnerName(null);
-                    } else {
-                        asset.setAssetOwnerName(fieldValueOfString);
-                    }
-
-                case "维修负责人2":
-                    if (DELETE_MARK.equals(fieldValueOfString)) {
-                        asset.setAssetOwnerName2(null);
-                    } else {
-                        asset.setAssetOwnerName2(fieldValueOfString);
-                    }
-
-                case "维修负责人3":
-                    if (DELETE_MARK.equals(fieldValueOfString)) {
-                        asset.setAssetOwnerName3(null);
-                    } else {
-                        asset.setAssetOwnerName3(fieldValueOfString);
-                    }
-
-
-            }//switch
     }
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
