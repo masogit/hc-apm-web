@@ -106,11 +106,14 @@ formData.setAssignee(approvaler);
         srApi.createPmRequest(token,formData);
     }
     
-    public void createPMrequest(String assetUID,Date planTime){
+    public void createPMrequest(String assetUID, Date planTime) {
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
-        createPMrequestApi(assetUID,formData);
+        if (null != planTime) {
+            formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
+        }
+        createPMrequestApi(assetUID, formData);
     }
+    
     public List<V2_WorkOrder_Detail> getWorkOrderDetails(String woId) {
         return detailDao.findByWoId(woId);
     }
