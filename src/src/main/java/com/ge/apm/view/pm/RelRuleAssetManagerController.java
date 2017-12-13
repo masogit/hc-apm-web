@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -13,7 +11,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -26,7 +23,6 @@ import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -78,6 +74,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		if(uids == null) {//查询条件为null
 			if (!this.hasFilterOnField("tenantUID")) {
 				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+				searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoUids()));
 			}
 		}else if(uids.size() == 0) {//查询结果为空
 			 //searchFilters.removeAll(searchFilters.stream().filter(item -> "assetUID".equals(item.fieldName)).collect(Collectors.toList()));
@@ -262,6 +259,16 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		return filter;
+	}
+	
+	public List<String> getAssetInfoUids(){
+		List<SearchFilter> filters = getFilter(user.getSiteUID());
+		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(filters);
+		List<String> uids = new ArrayList<String>();
+		if(CollectionUtils.isNotEmpty(assetInfos)) {
+			assetInfos.forEach((asset) -> uids.add(asset.getUid()));
+		}
+		return uids;
 	}
 	
     public void setOneSearchStr() {
