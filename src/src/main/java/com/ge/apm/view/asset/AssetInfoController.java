@@ -492,8 +492,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
         }
-        if (selectedGb.getCode() != null) {
-            GbCode gbCode = gbDao.getGbCode(selectedGb.getCode());
+        if (null!= gbCodeName) {
+            GbCode gbCode = gbDao.getGbCode(gbCodeName);
             if(null==gbCode){
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
                 return "";
@@ -1182,13 +1182,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
-                this.selectedGb.getCode(),
-                this.selected.getSiteUID()
-        );
-        if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
-            this.selected.setFinancingNum(financingNum);
+        if(null != selected && null!=selectedGb ) {
+            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+                    this.selectedGb.getCode(),
+                    this.selected.getSiteUID()
+            );
+            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
+                this.selected.setFinancingNum(financingNum);
+            }
         }
+
     }
 
     public void discard(AssetInfo asset) {
@@ -1273,20 +1276,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getGbCodeName() {
-       /* if (gbCodeName != null) {
-            if (gbCodeName.contains("/")) {
-                return gbCodeName.split("/")[0];
-            }
-        }*/
         return gbCodeName;
     }
 
     public void setGbCodeName(String gbCodeName) {
-        /*if (gbCodeName != null) {
-            if (gbCodeName.contains("/")) {
-                this.gbCodeName = gbCodeName.split("/")[0];
-            }
-        }*/
+
         this.gbCodeName = gbCodeName;
     }
 
