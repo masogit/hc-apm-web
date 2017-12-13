@@ -197,8 +197,10 @@ public class AssetFileImportServiceTest {
         assertEquals("注册证号A", assetInfo.getRegistrationNo());
         assertEquals("供应商A", assetInfo.getVendor());
 
-        assertNotNull(assetInfo.getFunctionGroup());
-        assertNotNull(assetInfo.getAssetCode68());
+        assertEquals(6801, assetInfo.getFunctionGroup().intValue());
+        assertEquals(1, assetInfo.getAssetCode68().intValue());
+
+        assertEquals(1, assetInfo.getAssetGroup().intValue());
 
     }
 
