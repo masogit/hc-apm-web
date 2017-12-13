@@ -176,6 +176,7 @@ public class AssetFileImportServiceTest {
         assertEquals("设备编号A", assetInfo.getDepartNum());
         assertEquals("设备名称A", assetInfo.getName());
         assertEquals("设备别名A", assetInfo.getAliasName());
+
         assertEquals("自动化测试人员", assetInfo.getAssetOwnerName());
         assertNotNull(assetInfo.getAssetOwnerId());
         assertEquals("tel-1", assetInfo.getAssetOwnerTel());
@@ -185,6 +186,19 @@ public class AssetFileImportServiceTest {
         assertEquals("自动化测试人员3", assetInfo.getAssetOwnerName3());
         assertNotNull(assetInfo.getAssetOwnerId3());
         assertEquals("tel-3", assetInfo.getAssetOwnerTel3());
+
+        assertEquals("内科", assetInfo.getClinicalDeptName());
+        assertNotNull(assetInfo.getClinicalDeptId());
+        assertNotNull(assetInfo.getClinicalDeptUID());
+
+        assertEquals("制造商A", assetInfo.getManufacture());
+        assertEquals("品牌/制造商简称A", assetInfo.getMakerShortName());
+        assertEquals("设备标准名称A", assetInfo.getDeviceName());
+        assertEquals("注册证号A", assetInfo.getRegistrationNo());
+        assertEquals("供应商A", assetInfo.getVendor());
+
+        assertNotNull(assetInfo.getFunctionGroup());
+        assertNotNull(assetInfo.getAssetCode68());
 
     }
 

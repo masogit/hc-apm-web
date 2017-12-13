@@ -43,6 +43,9 @@ public class FakeData {
     @Autowired
     SysRoleRepository sysRoleDao;
 
+    @Autowired
+    I18nMessageRepository i18nDao;
+
 //    @Autowired
 //    PlatformTransactionManager transactionManager;
 
@@ -79,6 +82,9 @@ public class FakeData {
 
         try {
             buildUserAccount();
+
+            initI18nMessages();
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -265,8 +271,6 @@ public class FakeData {
         }
         this.userAccount = userAccount;
 
-
-
         userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员2");
         if (userAccount == null) {
             userAccount = buildUserAccount("自动化测试人员2", "tel-2", orgInfo);
@@ -325,6 +329,30 @@ public class FakeData {
         userAccount.setSiteUID(orgInfo.getSiteUID());
 
         return userAccount;
+    }
+
+    private void initI18nMessages() {
+
+        I18nMessage message = i18nDao.getByMsgTypeAndMsgKey("assetFunctionType", "6801");
+        if (message == null) {
+            message = new I18nMessage("assetFunctionType", "6801", "医疗器械分类A");
+            i18nDao.save(message);
+            message = new I18nMessage("assetFunctionType", "6802", "医疗器械分类B");
+            i18nDao.save(message);
+        }
+
+        message = i18nDao.getByMsgTypeAndMsgKey("6801", "1");
+        if (message == null) {
+            message = new I18nMessage("6801", "1", "医疗器械子分类A");
+            i18nDao.save(message);
+        }
+
+        message = i18nDao.getByMsgTypeAndMsgKey("6801", "2");
+        if (message == null) {
+            message = new I18nMessage("6801", "2", "医疗器械子分类B");
+            i18nDao.save(message);
+        }
+
     }
 
     public UserAccount getUserAccount() {
