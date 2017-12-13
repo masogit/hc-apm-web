@@ -51,7 +51,10 @@ public class AssetRow {
     public void setFieldIntegerValue(String fieldName, String methodName) {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
-            Integer fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
+            Integer fieldValueOfInteger = null;
+            if (!DELETE_MARK.equals(fieldValueOfString)) {
+                fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
+            }
             Method method = AssetInfo.class.getMethod(methodName, Integer.class);
             if (isNew) {
                 method.invoke(assetInfo, fieldValueOfInteger);
@@ -74,7 +77,11 @@ public class AssetRow {
     public void setFieldDoubleValue(String fieldName, String methodName) {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
-            Double fieldValueOfDouble = ExcelDocument.getCellDoubleValue(rowMap.get(fieldName));
+            Double fieldValueOfDouble = null;
+            if (!DELETE_MARK.equals(fieldValueOfString)) {
+                fieldValueOfDouble = ExcelDocument.getCellDoubleValue(rowMap.get(fieldName));
+            }
+
             Method method = AssetInfo.class.getMethod(methodName, Double.class);
             if (isNew) {
                 method.invoke(assetInfo, fieldValueOfDouble);
@@ -97,7 +104,11 @@ public class AssetRow {
     public void setFieldDateValue(String fieldName, String methodName) {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
-            Date fieldValueOfDate = ExcelDocument.getCellDateValue(rowMap.get(fieldName));
+            Date fieldValueOfDate = null;
+            if (!DELETE_MARK.equals(fieldValueOfString)) {
+                fieldValueOfDate = ExcelDocument.getCellDateValue(rowMap.get(fieldName));
+            }
+
             Method method = AssetInfo.class.getMethod(methodName, Date.class);
             if (isNew) {
                 method.invoke(assetInfo, fieldValueOfDate);
