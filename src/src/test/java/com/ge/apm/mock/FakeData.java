@@ -10,6 +10,7 @@ import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.util.Assert;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -333,25 +334,23 @@ public class FakeData {
 
     private void initI18nMessages() {
 
-        I18nMessage message = i18nDao.getByMsgTypeAndMsgKey("assetFunctionType", "6801");
-        if (message == null) {
-            message = new I18nMessage("assetFunctionType", "6801", "医疗器械分类A");
-            i18nDao.save(message);
-            message = new I18nMessage("assetFunctionType", "6802", "医疗器械分类B");
-            i18nDao.save(message);
+        List<String[]> messages = new ArrayList<>();
+        messages.add(new String[]{"assetFunctionType", "6801", "医疗器械分类A"});
+        messages.add(new String[]{"assetFunctionType", "6802", "医疗器械分类B"});
+        messages.add(new String[]{"6801", "1", "医疗器械子分类A"});
+        messages.add(new String[]{"6801", "2", "医疗器械子分类B"});
+        messages.add(new String[]{"assetGroup", "1", "设备分类A"});
+        messages.add(new String[]{"assetGroup", "2", "设备分类B"});
+
+
+        for (String[] element: messages) {
+            I18nMessage message = i18nDao.getByMsgTypeAndMsgKey(element[0], element[1]);
+            if (message == null) {
+                message = new I18nMessage(element[0], element[1], element[2]);
+                i18nDao.save(message);
+            }
         }
 
-        message = i18nDao.getByMsgTypeAndMsgKey("6801", "1");
-        if (message == null) {
-            message = new I18nMessage("6801", "1", "医疗器械子分类A");
-            i18nDao.save(message);
-        }
-
-        message = i18nDao.getByMsgTypeAndMsgKey("6801", "2");
-        if (message == null) {
-            message = new I18nMessage("6801", "2", "医疗器械子分类B");
-            i18nDao.save(message);
-        }
 
     }
 
