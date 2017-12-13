@@ -3,14 +3,8 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
-import com.ge.apm.mock.FakeData;
 import com.ge.apm.service.utils.ExcelDocument;
-import org.apache.poi.ss.SpreadsheetVersion;
-import org.apache.poi.ss.formula.udf.UDFFinder;
-import org.apache.poi.ss.usermodel.*;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -24,13 +18,8 @@ import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.support.TransactionTemplate;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -44,8 +33,6 @@ public class AssetFileImportServiceTest {
 
     Logger logger = LoggerFactory.getLogger(AssetFileImportServiceTest.class);
 
-//    private static boolean initialized = false;
-
     @Autowired
     AssetFileImportService service;
 
@@ -58,20 +45,8 @@ public class AssetFileImportServiceTest {
     @Autowired
     PlatformTransactionManager transactionManager;
 
-    TransactionTemplate transactionTemplate;
-
-//    ExcelDocument excelDocument;
-
-    private void clearData() {
-        assetInfoDao.deleteAll();
-//        orgInfoDao.deleteAll();
-
-    }
-
     @Before
     public void setUp() throws Exception {
-
-        this.transactionTemplate = new TransactionTemplate(transactionManager);
 
         clearData();
     }
@@ -163,6 +138,12 @@ public class AssetFileImportServiceTest {
     @Ignore
     @Test
     public void checkDocVersion() throws Exception {
+    }
+
+    private void clearData() {
+        assetInfoDao.deleteAll();
+//        orgInfoDao.deleteAll();
+
     }
 
 }
