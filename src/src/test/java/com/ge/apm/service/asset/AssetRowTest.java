@@ -33,7 +33,7 @@ public class AssetRowTest {
     }
 
     @Test
-    public void testSetFieldValue_setAliasName_IsNew() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void testSetFieldValue_setAliasName_IsNew() {
 
         AssetInfo assetInfo = new AssetInfo();
 
@@ -42,7 +42,7 @@ public class AssetRowTest {
 
 
         AssetRow assetRow = new AssetRow(assetInfo, true, rowMap);
-        assetRow.setAliasName();
+        assetRow.setFieldStringValue("设备别名", "setAliasName");
         assertEquals("CT", assetInfo.getAliasName());
 
     }
@@ -57,7 +57,7 @@ public class AssetRowTest {
 
 
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
-        assetRow.setAliasName();
+        assetRow.setFieldStringValue("设备别名", "setAliasName");
         assertNull(assetInfo.getAliasName());
 
     }
@@ -72,7 +72,7 @@ public class AssetRowTest {
 
 
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
-        assetRow.setAliasName();
+        assetRow.setFieldStringValue("设备别名", "setAliasName");
         assertEquals("New CT", assetInfo.getAliasName());
 
     }
@@ -87,7 +87,7 @@ public class AssetRowTest {
 
 
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
-        assetRow.setAliasName();
+        assetRow.setFieldStringValue("设备别名", "setAliasName");
         assertEquals("CT", assetInfo.getAliasName());
 
     }
