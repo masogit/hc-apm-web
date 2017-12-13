@@ -58,6 +58,9 @@
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
 
+                        <p:column headerText="保养等级" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.ruleLevel}"/>
+                        </p:column>
                         <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                         </p:column>
@@ -129,7 +132,7 @@
             </div>
         </div>
 
-        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养" >
+        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="250"   header="新增保养" >
             <h:form id="PmRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}保养">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -160,14 +163,12 @@
                         </h:panelGroup>
 
 
-
-
-                    <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.createPM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
-                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
-                    </h:panelGroup>
                     </p:panelGrid>
                 </p:fieldset>
+                <h:panelGroup >
+                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.createPM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                    <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                </h:panelGroup>
             </h:form>
             <ui:include src="/portal/asset/selectAssetDialogPM.xhtml"/>
         </p:dialog>
