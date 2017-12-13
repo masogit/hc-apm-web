@@ -85,16 +85,6 @@ public class GbCode {
 		builder.append(code);
 		builder.append("/");
 		builder.append(name);
-	/*	builder.append("GbCode [id=");
-		builder.append(id);
-		builder.append(", code=");
-		builder.append(code);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", code=");
-		builder.append(code);
-
-		builder.append("]");*/
 		return builder.toString();
 	}
 }
