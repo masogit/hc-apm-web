@@ -258,6 +258,7 @@ public class FakeData {
             UserAccount userAccount = new UserAccount();
             userAccount.initializeUid();
             userAccount.setName("自动化测试人员");
+            userAccount.setTelephone("111111111");
             userAccount.setPlainPassword("test");
             userAccount.entryptPassword();
 
