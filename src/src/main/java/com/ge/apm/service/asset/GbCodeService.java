@@ -34,7 +34,7 @@ public class GbCodeService {
 		}
 		TreeNode rootNode = new DefaultTreeNode("gb", null, null);
 		//对code进行排序
-		 gbList = gbList.parallelStream().sorted(Comparator.comparing(GbCode::getCode).reversed()).collect((toList()));
+		 gbList = gbList.parallelStream().sorted(Comparator.comparing(GbCode::getCode)).collect((toList()));
 		for(GbCode org: gbList){
 			TreeNode node = treeMap.get(org.getCode());
 			if (node == null) continue;
