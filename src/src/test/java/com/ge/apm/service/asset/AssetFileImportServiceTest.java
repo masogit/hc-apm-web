@@ -123,7 +123,7 @@ public class AssetFileImportServiceTest {
         rowData.put("条码", "条码A");
         rowData.put("IT系统编号", "IT系统编号A");
         rowData.put("采购价格", 1.5);
-        rowData.put("最终残值", 100.6);
+        rowData.put("最终残值", 100.5);
         rowData.put("折旧算法", "折旧算法A");
         rowData.put("使用年限", 9.5);
         rowData.put("出厂日期", "2017-12-01");
@@ -201,6 +201,19 @@ public class AssetFileImportServiceTest {
         assertEquals(1, assetInfo.getAssetCode68().intValue());
 
         assertEquals(1, assetInfo.getAssetGroup().intValue());
+
+        assertEquals(1, assetInfo.getFunctionGrade().intValue());
+        assertEquals("设备型号A", assetInfo.getFunctionType());
+        assertEquals("制造商序列号A", assetInfo.getSerialNum());
+        assertEquals("SystemIDA", assetInfo.getSystemId());
+        assertEquals("2010国家编码A", assetInfo.getNationalStandardCode());
+        assertEquals("资产编号A", assetInfo.getFinancingNum());
+        assertEquals("条码A", assetInfo.getBarcode());
+        assertEquals("IT系统编号A", assetInfo.getModalityId());
+        assertEquals(1.5, assetInfo.getPurchasePrice(), 0.01);
+        assertEquals(100.5, assetInfo.getSalvageValue(), 0.01);
+
+
 
     }
 
