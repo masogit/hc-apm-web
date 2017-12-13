@@ -113,4 +113,6 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     List<UserAccount> getByClinicalDept(Collection<String> orgList);
     
     List<UserAccount> findByOrgInfoUID(String orgUid);
+
+    UserAccount findByTenantUIDAndName(String tenantUid, String name);
 }

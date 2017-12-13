@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.Assert;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
@@ -253,30 +254,33 @@ public class FakeData {
         }
         OrgInfo orgInfo = orgInfoList.get(0);
 
-        List<UserAccount> userAccountList = userAccountDao.getBySiteUID(orgInfo.getSiteUID());
-        if (userAccountList.isEmpty()) {
-            UserAccount userAccount = new UserAccount();
-            userAccount.initializeUid();
-            userAccount.setName("自动化测试人员");
-            userAccount.setTelephone("111111111");
-            userAccount.setPlainPassword("test");
-            userAccount.entryptPassword();
-
-            userAccount.setLoginName("test");
-            userAccount.setOrgInfoId(orgInfo.getId());
-            userAccount.setOrgInfoUID(orgInfo.getUid());
-
-            userAccount.setSiteId(orgInfo.getSiteId());
-            userAccount.setTenantUID(orgInfo.getTenantUID());
-            userAccount.setInstitutionUID(orgInfo.getInstitutionUID());
-            userAccount.setHospitalUID(orgInfo.getHospitalUID());
-            userAccount.setSiteUID(orgInfo.getSiteUID());
-
+        UserAccount userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
+        if (userAccount == null) {
+            userAccount = buildUserAccount("自动化测试人员", "tel-1", orgInfo);
             userAccountDao.save(userAccount);
-            userAccountList = userAccountDao.getBySiteUID(userAccount.getSiteUID());
+
+            userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
+            assert userAccount != null;
+
+        }
+        this.userAccount = userAccount;
+
+
+
+        userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员2");
+        if (userAccount == null) {
+            userAccount = buildUserAccount("自动化测试人员2", "tel-2", orgInfo);
+            userAccountDao.save(userAccount);
         }
 
-        this.userAccount = userAccountList.get(0);
+        userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员3");
+        if (userAccount == null) {
+            userAccount = buildUserAccount("自动化测试人员3", "tel-3", orgInfo);
+            userAccountDao.save(userAccount);
+        }
+
+        Assert.notNull(userAccount.getId());
+
 
         List<UserOrgInfo> userOrgInfoList = userOrgInfoDao.findByUserUid(userAccount.getUid());
         if (userOrgInfoList.isEmpty()) {
@@ -300,6 +304,27 @@ public class FakeData {
 //        }
 
 
+    }
+
+    private UserAccount buildUserAccount(String name, String tel, OrgInfo orgInfo) throws NoSuchAlgorithmException {
+        UserAccount userAccount = new UserAccount();
+        userAccount.initializeUid();
+        userAccount.setName(name);
+        userAccount.setTelephone(tel);
+        userAccount.setPlainPassword("test");
+        userAccount.entryptPassword();
+
+        userAccount.setLoginName(name);
+        userAccount.setOrgInfoId(orgInfo.getId());
+        userAccount.setOrgInfoUID(orgInfo.getUid());
+
+        userAccount.setSiteId(orgInfo.getSiteId());
+        userAccount.setTenantUID(orgInfo.getTenantUID());
+        userAccount.setInstitutionUID(orgInfo.getInstitutionUID());
+        userAccount.setHospitalUID(orgInfo.getHospitalUID());
+        userAccount.setSiteUID(orgInfo.getSiteUID());
+
+        return userAccount;
     }
 
     public UserAccount getUserAccount() {
