@@ -638,8 +638,9 @@ public class AssetFileImportService {
                 result.add(Boolean.FALSE);
                 addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-                item.put("asset", assetList.get(0));
-                item.put("status", ImportStatus.Exist);
+                //already loaded this data in the previous steps
+//                item.put("asset", assetList.get(0));
+//                item.put("status", ImportStatus.Exist);
             }
 
             if (null == newAsset.getAssetGroup()) {
