@@ -98,11 +98,58 @@ public class AssetFileImportServiceTest {
         final String device_category = "其他类";
         ExcelDocument excelDoc = ExcelDocumentGenerator.getTestDoc(0);
         Map<String, Object> rowData = new HashMap<>();
-        rowData.put("设备编号", device_num);
-        rowData.put("设备名称", device_name);
-        rowData.put("使用科室", clinicalDeptName);
-        rowData.put("设备分类", device_category);
-        rowData.put("二维码", null);
+        rowData.put("设备编号", "设备编号A");
+        rowData.put("设备名称", "设备名称A");
+        rowData.put("设备别名", "设备别名A");
+        rowData.put("维修负责人", "维修负责人A");
+        rowData.put("维修负责人2", "维修负责人B");
+        rowData.put("维修负责人3", "维修负责人C");
+        rowData.put("使用科室", "内科");
+        rowData.put("制造商", "制造商A");
+        rowData.put("品牌/制造商简称", "品牌/制造商简称A");
+        rowData.put("设备标准名称", "设备标准名称A");
+        rowData.put("注册证号", "注册证号A");
+        rowData.put("供应商", "供应商A");
+        rowData.put("医疗器械分类", "医疗器械分类A");
+        rowData.put("医疗器械子分类", "医疗器械子分类A");
+        rowData.put("设备分类", "设备分类A");
+        rowData.put("功能等级", 1);
+        rowData.put("设备型号", "设备型号A");
+        rowData.put("制造商序列号", "制造商序列号A");
+        rowData.put("SystemID/厂商报修ID", "SystemIDA");
+        rowData.put("2010国家编码", "2010国家编码A");
+        rowData.put("资产编号", "资产编号A");
+        rowData.put("条码", "条码A");
+        rowData.put("IT系统编号", "IT系统编号A");
+        rowData.put("采购价格", 1.5);
+        rowData.put("最终残值", 100.6);
+        rowData.put("折旧算法", "折旧算法A");
+        rowData.put("使用年限", 9.5);
+        rowData.put("出厂日期", "2017-12-01");
+        rowData.put("采购日期", "2017-12-02");
+        rowData.put("到货日期", "2017-12-03");
+        rowData.put("启用日期", "2017-12-04");
+        rowData.put("质保日期", "2017-12-05");
+        rowData.put("维保截止日期", "2017-12-06");
+        rowData.put("报废日期", "2017-12-07");
+        rowData.put("上次维护日期", "2017-12-08");
+        rowData.put("上次计量日期", "2017-12-09");
+        rowData.put("上次质检日期", "2017-12-10");
+        rowData.put("维护商", "维护商A");
+        rowData.put("维护商电话", "维护商电话A");
+//        rowData.put("二维码", "二维码A");
+        rowData.put("安装位置编码", "安装位置编码A");
+        rowData.put("安装位置", "安装位置A");
+        rowData.put("使用责任人", "使用责任人A");
+        rowData.put("备注", "备注A");
+        rowData.put("用途分类", "用途分类A");
+        rowData.put("资金来源", "资金来源A");
+        rowData.put("风险等级", "风险等级A");
+        rowData.put("计量等级", "计量等级A");
+        rowData.put("计量项目类别", "计量项目类别A");
+        rowData.put("是否急救设备", "是否急救设备A");
+        rowData.put("是否进口设备", "是否进口设备A");
+        rowData.put("使用状态", "使用状态A");
 
         excelDoc.writeRowData(AssetFileImportService.SHEET_ASSET,
                                 AssetFileImportService.EXCEL_ASSET_HEADER_ROW,
@@ -125,8 +172,9 @@ public class AssetFileImportServiceTest {
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
-        assertEquals(device_num, assetInfo.getDepartNum());
-        assertEquals(device_name, assetInfo.getName());
+        assertEquals("设备编号A", assetInfo.getDepartNum());
+        assertEquals("设备名称A", assetInfo.getName());
+        assertEquals("设备别名A", assetInfo.getAliasName());
 
     }
 
