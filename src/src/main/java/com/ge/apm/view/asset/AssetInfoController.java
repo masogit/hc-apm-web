@@ -493,7 +493,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
         }
         if (null!= gbCodeName) {
-            GbCode gbCode = gbDao.getGbCode(gbCodeName);
+            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if(null==gbCode){
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
                 return "";
