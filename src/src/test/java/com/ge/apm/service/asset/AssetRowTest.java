@@ -45,11 +45,6 @@ public class AssetRowTest {
         assetRow.setAliasName();
         assertEquals("CT", assetInfo.getAliasName());
 
-        rowMap.put("功能等级", "1");
-
-        assetRow.setFieldValue("功能等级", "setFunctionGrade");
-        assertEquals(1, assetInfo.getFunctionGroup().intValue());
-
     }
 
     @Test
@@ -98,7 +93,7 @@ public class AssetRowTest {
     }
 
     @Test
-    public void testSetFieldValue_setFunctionGroup_IsNew() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void testSetFieldDropdownValue_setFunctionGroup_IsNew() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         AssetInfo assetInfo = new AssetInfo();
 
@@ -113,7 +108,7 @@ public class AssetRowTest {
     }
 
     @Test
-    public void testSetFieldValue_setFunctionGroup_IsOld_Clear_Data() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void testSetFieldDropdownValue_setFunctionGroup_IsOld_Clear_Data() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         AssetInfo assetInfo = new AssetInfo();
         assetInfo.setFunctionGroup(1);
@@ -129,7 +124,7 @@ public class AssetRowTest {
     }
 
     @Test
-    public void testSetFieldValue_setFunctionGroup_IsOld_Update_Data() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void testSetFieldDropdownValue_setFunctionGroup_IsOld_Update_Data() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         AssetInfo assetInfo = new AssetInfo();
         assetInfo.setFunctionGroup(1);
@@ -145,7 +140,7 @@ public class AssetRowTest {
     }
 
     @Test
-    public void testSetFieldValue_setFunctionGroup_IsOld_Keep_Data() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+    public void testSetFieldDropdownValue_setFunctionGroup_IsOld_Keep_Data() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
 
         AssetInfo assetInfo = new AssetInfo();
         assetInfo.setFunctionGroup(1);
