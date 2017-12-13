@@ -11,7 +11,6 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.sun.org.apache.xml.internal.security.utils.I18n;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -178,16 +177,16 @@ public class AssetFileImportService {
                 }
 
                 AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
-                assetRow.setFieldValue("设备别名", "setAliasName");
-                assetRow.setFieldValue("维修负责人", "setAssetOwnerName");
-                assetRow.setFieldValue("维修负责人2", "setAssetOwnerName2");
-                assetRow.setFieldValue("维修负责人3", "setAssetOwnerName3");
-                assetRow.setFieldValue("使用科室", "setClinicalDeptName");
-                assetRow.setFieldValue("制造商", "setManufacture");
-                assetRow.setFieldValue("品牌/制造商简称", "setMakerShortName");
-                assetRow.setFieldValue("设备标准名称", "setDeviceName");
-                assetRow.setFieldValue("注册证号", "setRegistrationNo");
-                assetRow.setFieldValue("供应商", "setVendor");
+                assetRow.setFieldStringValue("设备别名", "setAliasName");
+                assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
+                assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
+                assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3");
+                assetRow.setFieldStringValue("使用科室", "setClinicalDeptName");
+                assetRow.setFieldStringValue("制造商", "setManufacture");
+                assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName");
+                assetRow.setFieldStringValue("设备标准名称", "setDeviceName");
+                assetRow.setFieldStringValue("注册证号", "setRegistrationNo");
+                assetRow.setFieldStringValue("供应商", "setVendor");
 
                 assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map);
                 if (asset.getFunctionGroup() != null) {
@@ -198,12 +197,12 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldValue("设备型号", "setFunctionType");
-                assetRow.setFieldValue("制造商序列号", "setSerialNum");
-                assetRow.setFieldValue("SystemID/厂商报修ID", "setSystemId");
-                assetRow.setFieldValue("条码", "setBarcode");
-                assetRow.setFieldValue("2010国家编码", "setNationalStandardCode");
-                assetRow.setFieldValue("IT系统编号", "setModalityId");
+                assetRow.setFieldStringValue("设备型号", "setFunctionType");
+                assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
+                assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
+                assetRow.setFieldStringValue("条码", "setBarcode");
+                assetRow.setFieldStringValue("2010国家编码", "setNationalStandardCode");
+                assetRow.setFieldStringValue("IT系统编号", "setModalityId");
                 assetRow.setFieldDoubleValue("采购价格", "setPurchasePrice");
                 assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
                 assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
@@ -221,12 +220,12 @@ public class AssetFileImportService {
                 assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
                 assetRow.setFieldDateValue("上次质检日期", "setLastQaDate");
 
-                assetRow.setFieldValue("维护商", "setMaitanance");
-                assetRow.setFieldValue("维护商电话", "setMaitananceTel");
-                assetRow.setFieldValue("安装位置编码", "setLocationCode");
-                assetRow.setFieldValue("安装位置", "setLocationName");
-                assetRow.setFieldValue("使用责任人", "setClinicalOwnerName");
-                assetRow.setFieldValue("备注", "setComments");
+                assetRow.setFieldStringValue("维护商", "setMaitanance");
+                assetRow.setFieldStringValue("维护商电话", "setMaitananceTel");
+                assetRow.setFieldStringValue("安装位置编码", "setLocationCode");
+                assetRow.setFieldStringValue("安装位置", "setLocationName");
+                assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
+                assetRow.setFieldStringValue("备注", "setComments");
 
                 assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map);
                 assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map);
@@ -487,6 +486,7 @@ public class AssetFileImportService {
 //                item.put("asset", assetList.get(0));
                 item.put("status", ImportStatus.Exist);
 //                item.put("assetFromExcel", newAsset);
+                assetDao.save(newAsset);
 
             }
 
