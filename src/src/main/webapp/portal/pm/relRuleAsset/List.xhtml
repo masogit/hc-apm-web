@@ -74,7 +74,7 @@
                     <p:column headerText="#{msg.manufacture}"  filterMatchMode="LIKE">
                         <h:outputText value="#{relRuleAssetManagerController.getManufacture(item.assetUID)}"/>
                     </p:column>
-                    <p:column headerText="配置日期" sortBy="#{item.createdDate}" filterBy="#{item.createdDate}"  filterMatchMode="GTE">
+                    <p:column headerText="配置日期"  filterMatchMode="GTE">
                             <h:outputText value="#{item.createdDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
