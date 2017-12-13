@@ -103,8 +103,8 @@ public class AssetFileImportServiceTest {
         rowData.put("设备名称", "设备名称A");
         rowData.put("设备别名", "设备别名A");
         rowData.put("维修负责人", "自动化测试人员");
-        rowData.put("维修负责人2", "自动化测试人员");
-        rowData.put("维修负责人3", "自动化测试人员");
+        rowData.put("维修负责人2", "自动化测试人员2");
+        rowData.put("维修负责人3", "自动化测试人员3");
         rowData.put("使用科室", "内科");
         rowData.put("制造商", "制造商A");
         rowData.put("品牌/制造商简称", "品牌/制造商简称A");
@@ -178,13 +178,13 @@ public class AssetFileImportServiceTest {
         assertEquals("设备别名A", assetInfo.getAliasName());
         assertEquals("自动化测试人员", assetInfo.getAssetOwnerName());
         assertNotNull(assetInfo.getAssetOwnerId());
-        assertNotNull(assetInfo.getAssetOwnerTel());
-        assertEquals("自动化测试人员", assetInfo.getAssetOwnerName2());
+        assertEquals("tel-1", assetInfo.getAssetOwnerTel());
+        assertEquals("自动化测试人员2", assetInfo.getAssetOwnerName2());
         assertNotNull(assetInfo.getAssetOwnerId2());
-        assertNotNull(assetInfo.getAssetOwnerTel2());
-        assertEquals("自动化测试人员", assetInfo.getAssetOwnerName3());
+        assertEquals("tel-2", assetInfo.getAssetOwnerTel2());
+        assertEquals("自动化测试人员3", assetInfo.getAssetOwnerName3());
         assertNotNull(assetInfo.getAssetOwnerId3());
-        assertNotNull(assetInfo.getAssetOwnerTel3());
+        assertEquals("tel-3", assetInfo.getAssetOwnerTel3());
 
     }
 
