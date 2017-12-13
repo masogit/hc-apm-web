@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -101,9 +102,9 @@ public class AssetFileImportServiceTest {
         rowData.put("设备编号", "设备编号A");
         rowData.put("设备名称", "设备名称A");
         rowData.put("设备别名", "设备别名A");
-        rowData.put("维修负责人", "维修负责人A");
-        rowData.put("维修负责人2", "维修负责人B");
-        rowData.put("维修负责人3", "维修负责人C");
+        rowData.put("维修负责人", "自动化测试人员");
+        rowData.put("维修负责人2", "自动化测试人员");
+        rowData.put("维修负责人3", "自动化测试人员");
         rowData.put("使用科室", "内科");
         rowData.put("制造商", "制造商A");
         rowData.put("品牌/制造商简称", "品牌/制造商简称A");
@@ -175,6 +176,15 @@ public class AssetFileImportServiceTest {
         assertEquals("设备编号A", assetInfo.getDepartNum());
         assertEquals("设备名称A", assetInfo.getName());
         assertEquals("设备别名A", assetInfo.getAliasName());
+        assertEquals("自动化测试人员", assetInfo.getAssetOwnerName());
+        assertNotNull(assetInfo.getAssetOwnerId());
+        assertNotNull(assetInfo.getAssetOwnerTel());
+        assertEquals("自动化测试人员", assetInfo.getAssetOwnerName2());
+        assertNotNull(assetInfo.getAssetOwnerId2());
+        assertNotNull(assetInfo.getAssetOwnerTel2());
+        assertEquals("自动化测试人员", assetInfo.getAssetOwnerName3());
+        assertNotNull(assetInfo.getAssetOwnerId3());
+        assertNotNull(assetInfo.getAssetOwnerTel3());
 
     }
 
