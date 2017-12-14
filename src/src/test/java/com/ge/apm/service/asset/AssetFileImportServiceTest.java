@@ -19,6 +19,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.transaction.PlatformTransactionManager;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +34,9 @@ import static org.junit.Assert.assertNotNull;
 @TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class AssetFileImportServiceTest {
 
-    Logger logger = LoggerFactory.getLogger(AssetFileImportServiceTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(AssetFileImportServiceTest.class);
+    private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+
 
     @Autowired
     AssetFileImportService service;
@@ -141,7 +145,7 @@ public class AssetFileImportServiceTest {
 //        rowData.put("二维码", "二维码A");
         rowData.put("安装位置编码", "安装位置编码A");
         rowData.put("安装位置", "安装位置A");
-        rowData.put("使用责任人", "使用责任人A");
+        rowData.put("使用责任人", "自动化测试人员");
         rowData.put("备注", "备注A");
         rowData.put("用途分类", "用途分类A");
         rowData.put("资金来源", "资金来源A");
@@ -212,6 +216,38 @@ public class AssetFileImportServiceTest {
         assertEquals("IT系统编号A", assetInfo.getModalityId());
         assertEquals(1.5, assetInfo.getPurchasePrice(), 0.01);
         assertEquals(100.5, assetInfo.getSalvageValue(), 0.01);
+        assertEquals(1, assetInfo.getDepreciationMethod().intValue());
+        assertEquals(9.5, assetInfo.getLifecycleInYear().doubleValue(), 0.01);
+
+        assertEquals("2017-12-01", df.format(assetInfo.getManufactDate()));
+        assertEquals("2017-12-02", df.format(assetInfo.getPurchaseDate()));
+        assertEquals("2017-12-03", df.format(assetInfo.getArriveDate()));
+        assertEquals("2017-12-04", df.format(assetInfo.getInstallDate()));
+        assertEquals("2017-12-05", df.format(assetInfo.getFactoryWarrantyDate()));
+        assertEquals("2017-12-06", df.format(assetInfo.getWarrantyDate()));
+        assertEquals("2017-12-07", df.format(assetInfo.getTerminateDate()));
+        assertEquals("2017-12-08", df.format(assetInfo.getLastPmDate()));
+        assertEquals("2017-12-09", df.format(assetInfo.getLastMeteringDate()));
+        assertEquals("2017-12-10", df.format(assetInfo.getLastQaDate()));
+
+        assertEquals("维护商A", assetInfo.getMaitanance());
+        assertEquals("维护商电话A", assetInfo.getMaitananceTel());
+//        assertEquals("二维码A", assetInfo.getQrCode());
+        assertEquals("安装位置编码A", assetInfo.getLocationCode());
+        assertEquals("安装位置A", assetInfo.getLocationName());
+        assertEquals("自动化测试人员", assetInfo.getClinicalOwnerName());
+        assertNotNull(assetInfo.getClinicalOwnerId());
+        assertNotNull(assetInfo.getClinicalOwnerTel());
+        assertEquals("备注A", assetInfo.getComments());
+
+        assertEquals(1, assetInfo.getAssetUsage().intValue());
+        assertEquals(1, assetInfo.getCapitalSource().intValue());
+        assertEquals(1, assetInfo.getRiskGrade().intValue());
+        assertEquals(1, assetInfo.getMeasureGrade().intValue());
+        assertEquals(1, assetInfo.getMeasuringItemCategory().intValue());
+        assertEquals(1, assetInfo.getEmergencyEquipment().intValue());
+        assertEquals(1, assetInfo.getImportEquipment().intValue());
+        assertEquals(1, assetInfo.getUsageStatus().intValue());
 
 
 
