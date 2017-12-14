@@ -308,7 +308,8 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "accounting_category")
     private Integer accountingCategory;
     
-    
+    @Column(name = "warranty_year")
+    private Double warrantyYear;
     
     public String getId() {
         return id;
@@ -868,6 +869,14 @@ public class ArrivalListItem implements Serializable {
        this.lifecycle = new Double(lifecycle * 12).intValue();
     }
 
+    public Double getWarrantyYear() {
+        return warrantyYear;
+    }
+
+    public void setWarrantyYear(Double warrantyYear) {
+        this.warrantyYear = warrantyYear;
+    }
+    
     @Override
     public int hashCode() {
         Integer hash = 0;

@@ -460,31 +460,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
     }
-/* public void saveServiceRequest() {
-        if (selectedAsset.getStatus() == 4) {
-            WebUtil.addErrorMessage("所选设备待报废,不能报修");
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            String oUid= UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            if(Strings.isNullOrEmpty(oUid)){//如果当前人连使用科室都没有，提示手动输入
-                WebUtil.addErrorMessage("所选设备没有使用科室,不能报修,请填写当前位置");
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);}
-            else// 当前位置:=当前人的科室或者所在院区位置
-            {
-                String orgName=orgDao.getByUid(oUid).getName();
-                selectedAsset.setStatus(currentStatus);
-                newServiceRequest.setAssetLocation(orgName);
-                woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-                cancel();
-            }
-        } else { //如果设备上有使用科室
-            selectedAsset.setStatus(currentStatus);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-            cancel();
-        }
-    }*/
+
     public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
@@ -615,6 +591,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
+
 
     public String getFaultTypeName(Integer id) {
         return assetFaultTypeService.getFaultName(id);

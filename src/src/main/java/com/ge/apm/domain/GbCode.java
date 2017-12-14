@@ -23,13 +23,9 @@ public class GbCode {
 	@Column(name = "name")
 	private String name;
 
-	@Basic(optional = false)
 	@Column(name = "level")
 	private int level;
 
-
-
-	@Basic(optional = false)
 	@Column(name = "parent_Code")
 	private String parentCode ;
 
@@ -67,7 +63,12 @@ public class GbCode {
 	}
 
 	public void setCode(String code) {
-		this.code = code;
+		if(null!=code && code.contains("/"))
+		{
+			this.code= code.split("/")[0];
+		}else {
+			this.code = code;
+		}
 	}
 
 	public String getParentCode() {
@@ -84,16 +85,6 @@ public class GbCode {
 		builder.append(code);
 		builder.append("/");
 		builder.append(name);
-	/*	builder.append("GbCode [id=");
-		builder.append(id);
-		builder.append(", code=");
-		builder.append(code);
-		builder.append(", name=");
-		builder.append(name);
-		builder.append(", code=");
-		builder.append(code);
-
-		builder.append("]");*/
 		return builder.toString();
 	}
 }

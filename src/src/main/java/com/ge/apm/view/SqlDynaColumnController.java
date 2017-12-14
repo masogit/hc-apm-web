@@ -53,9 +53,12 @@ public class SqlDynaColumnController extends SqlDataController {
         sql = sql.trim();
         if("".equals(sql)) return emptyPage;
         
+        // remove the last ; if exists
+        if(sql.endsWith(";")) sql = sql.substring(0, sql.length()-1);
+        
         try{
             if(!sql.toLowerCase().startsWith("select ")){
-                NativeSqlUtil.execute(sql, null);
+                executeSql();
                 return emptyPage;
             }
 
@@ -100,7 +103,14 @@ public class SqlDynaColumnController extends SqlDataController {
         
         sql = sql.trim();
         if("".equals(sql)) return;
-        
-        NativeSqlUtil.execute(sql, null);
+ 
+        //support multiple SQL statements seperated by ;
+        String[] sqlList = sql.split(";");
+        for (String sqlLine : sqlList) {
+            sqlLine = sqlLine.replaceAll("\n", " ").replaceAll("\r", " ").trim();
+            if("".equals(sqlLine)) continue;
+            
+            NativeSqlUtil.execute(sqlLine, null);
+        }
     }
 }

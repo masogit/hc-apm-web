@@ -16,5 +16,14 @@ public interface RelRuleAssetRepository extends GenericRepositoryUUID<RelRuleAss
 	public List<String> findAssetUidsByTenantUID(String tenantUID);
 
 	public RelRuleAsset findByAssetUID(String uid);
+
+	@	Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid1 is not null",nativeQuery = true)
+	public List<String> findRuleUid1ByLevelAndTenantUID(String tenantUID);
+	
+	@	Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid2 is not null",nativeQuery = true)
+	public List<String> findRuleUid2ByLevelAndTenantUID(String tenantUID);
+	
+	@	Query(value = "select r.asset_uid from rel_rule_asset r where r.tenant_uid = ?1 and r.rule_uid is not null",nativeQuery = true)
+	public List<String> findRuleUid3ByLevelAndTenantUID(String tenantUID);
 	
 }

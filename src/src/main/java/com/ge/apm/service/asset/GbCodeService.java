@@ -10,10 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+
+import static java.util.stream.Collectors.toList;
 
 /**
  * Created by lsg on 30/11/2017.
@@ -33,30 +32,27 @@ public class GbCodeService {
 			node.setRowKey("gb_"+gb.getId());
 			treeMap.put(gb.getCode(), node);
 		}
-		TreeNode rootNode = null;
+		TreeNode rootNode = new DefaultTreeNode("gb", null, null);
+		//对code进行排序
+		 gbList = gbList.parallelStream().sorted(Comparator.comparing(GbCode::getCode)).collect((toList()));
 		for(GbCode org: gbList){
 			TreeNode node = treeMap.get(org.getCode());
-
 			if (node == null) continue;
 			node.setSelectable(true);
-
 			GbCode current = org;
 			while(current.getParentCode()!=null){
 				TreeNode currentNode = treeMap.get(current.getCode());
 				TreeNode parentNode = treeMap.get(current.getParentCode());
-				if (parentNode == null) break;
+				if (parentNode == null) {
+					rootNode.getChildren().add( treeMap.get(current.getCode()));
+					break;
+				}
 				parentNode.getChildren().add(currentNode);
 				current = (GbCode)parentNode.getData();
 			}
-
-			if (rootNode == null) {
-				if (current.getParentCode() == null) {
-					rootNode = treeMap.get(current.getCode());
-				} else if (treeMap.get(current.getParentCode()) == null){
-					rootNode = treeMap.get(current.getCode());
-				}
+			if (current.getParentCode() == null) {
+				rootNode.getChildren().add( treeMap.get(current.getCode()));
 			}
-
 		}
 		return rootNode;
 	}
