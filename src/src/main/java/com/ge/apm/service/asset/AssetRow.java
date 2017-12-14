@@ -48,8 +48,9 @@ public class AssetRow {
     }
 
     public void setFieldIntegerValue(String fieldName, String methodName) {
+        String fieldValueOfString = null;
         try {
-            String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+            fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             Integer fieldValueOfInteger = null;
             if (!DELETE_MARK.equals(fieldValueOfString)) {
                 fieldValueOfInteger = ExcelDocument.getCellIntegerValue(rowMap.get(fieldName));
@@ -69,13 +70,14 @@ public class AssetRow {
 
             }
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException(fieldName + "[" + fieldValueOfString + "]" + e.getMessage());
         }
     }
 
     public void setFieldDoubleValue(String fieldName, String methodName) {
+        String fieldValueOfString = null;
         try {
-            String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+            fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             Double fieldValueOfDouble = null;
             if (!DELETE_MARK.equals(fieldValueOfString)) {
                 fieldValueOfDouble = ExcelDocument.getCellDoubleValue(rowMap.get(fieldName));
@@ -96,7 +98,7 @@ public class AssetRow {
 
             }
         } catch (Exception e) {
-            throw new IllegalStateException(e.getMessage());
+            throw new IllegalStateException(fieldName + "[" + fieldValueOfString + "]" + e.getMessage());
         }
     }
 
@@ -106,6 +108,10 @@ public class AssetRow {
             Date fieldValueOfDate = null;
             if (!DELETE_MARK.equals(fieldValueOfString)) {
                 fieldValueOfDate = ExcelDocument.getCellDateValue(rowMap.get(fieldName));
+            }
+
+            if (fieldValueOfDate == null) {
+                validateDate(fieldName, fieldValueOfString);
             }
 
             Method method = AssetInfo.class.getMethod(methodName, Date.class);
@@ -153,6 +159,20 @@ public class AssetRow {
         } catch (Exception e) {
             throw new IllegalStateException(e.getMessage());
         }
+
+    }
+
+    private void validateDate(String fieldName, String fieldValue) throws Exception {
+
+        if (StringUtils.isEmpty(fieldValue)) {
+            return;
+        }
+
+        if (DELETE_MARK.equals(fieldValue)) {
+            return;
+        }
+
+        throw new Exception(fieldName + "[" + fieldValue + "]无效的日期格式");
 
     }
 
