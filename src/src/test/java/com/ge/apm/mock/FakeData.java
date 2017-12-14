@@ -7,8 +7,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.util.Assert;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 
 @Component
@@ -41,6 +43,9 @@ public class FakeData {
 
     @Autowired
     SysRoleRepository sysRoleDao;
+
+    @Autowired
+    I18nMessageRepository i18nDao;
 
 //    @Autowired
 //    PlatformTransactionManager transactionManager;
@@ -78,6 +83,9 @@ public class FakeData {
 
         try {
             buildUserAccount();
+
+            initI18nMessages();
+
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
@@ -253,29 +261,31 @@ public class FakeData {
         }
         OrgInfo orgInfo = orgInfoList.get(0);
 
-        List<UserAccount> userAccountList = userAccountDao.getBySiteUID(orgInfo.getSiteUID());
-        if (userAccountList.isEmpty()) {
-            UserAccount userAccount = new UserAccount();
-            userAccount.initializeUid();
-            userAccount.setName("自动化测试人员");
-            userAccount.setPlainPassword("test");
-            userAccount.entryptPassword();
-
-            userAccount.setLoginName("test");
-            userAccount.setOrgInfoId(orgInfo.getId());
-            userAccount.setOrgInfoUID(orgInfo.getUid());
-
-            userAccount.setSiteId(orgInfo.getSiteId());
-            userAccount.setTenantUID(orgInfo.getTenantUID());
-            userAccount.setInstitutionUID(orgInfo.getInstitutionUID());
-            userAccount.setHospitalUID(orgInfo.getHospitalUID());
-            userAccount.setSiteUID(orgInfo.getSiteUID());
-
+        UserAccount userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
+        if (userAccount == null) {
+            userAccount = buildUserAccount("自动化测试人员", "tel-1", orgInfo);
             userAccountDao.save(userAccount);
-            userAccountList = userAccountDao.getBySiteUID(userAccount.getSiteUID());
+
+            userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员");
+            assert userAccount != null;
+
+        }
+        this.userAccount = userAccount;
+
+        userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员2");
+        if (userAccount == null) {
+            userAccount = buildUserAccount("自动化测试人员2", "tel-2", orgInfo);
+            userAccountDao.save(userAccount);
         }
 
-        this.userAccount = userAccountList.get(0);
+        userAccount = userAccountDao.findByTenantUIDAndName(orgInfo.getTenantUID(), "自动化测试人员3");
+        if (userAccount == null) {
+            userAccount = buildUserAccount("自动化测试人员3", "tel-3", orgInfo);
+            userAccountDao.save(userAccount);
+        }
+
+        Assert.notNull(userAccount.getId());
+
 
         List<UserOrgInfo> userOrgInfoList = userOrgInfoDao.findByUserUid(userAccount.getUid());
         if (userOrgInfoList.isEmpty()) {
@@ -297,6 +307,70 @@ public class FakeData {
 //            UserRole userRole = new UserRole();
 //            userRole.setUserId(userAccount.getId());
 //        }
+
+
+    }
+
+    private UserAccount buildUserAccount(String name, String tel, OrgInfo orgInfo) throws NoSuchAlgorithmException {
+        UserAccount userAccount = new UserAccount();
+        userAccount.initializeUid();
+        userAccount.setName(name);
+        userAccount.setTelephone(tel);
+        userAccount.setPlainPassword("test");
+        userAccount.entryptPassword();
+
+        userAccount.setLoginName(name);
+        userAccount.setOrgInfoId(orgInfo.getId());
+        userAccount.setOrgInfoUID(orgInfo.getUid());
+
+        userAccount.setSiteId(orgInfo.getSiteId());
+        userAccount.setTenantUID(orgInfo.getTenantUID());
+        userAccount.setInstitutionUID(orgInfo.getInstitutionUID());
+        userAccount.setHospitalUID(orgInfo.getHospitalUID());
+        userAccount.setSiteUID(orgInfo.getSiteUID());
+
+        return userAccount;
+    }
+
+    private void initI18nMessages() {
+
+        List<String[]> messages = new ArrayList<>();
+        messages.add(new String[]{"assetFunctionType", "6801", "医疗器械分类A"});
+        messages.add(new String[]{"assetFunctionType", "6802", "医疗器械分类B"});
+        messages.add(new String[]{"6801", "1", "医疗器械子分类A"});
+        messages.add(new String[]{"6801", "2", "医疗器械子分类B"});
+        messages.add(new String[]{"assetGroup", "1", "设备分类A"});
+        messages.add(new String[]{"assetGroup", "2", "设备分类B"});
+        messages.add(new String[]{"depreciationMethodList", "1", "折旧算法A"});
+        messages.add(new String[]{"depreciationMethodList", "2", "折旧算法B"});
+        messages.add(new String[]{"assetUsage", "1", "用途分类A"});
+        messages.add(new String[]{"assetUsage", "2", "用途分类B"});
+        messages.add(new String[]{"capitalSource", "1", "资金来源A"});
+        messages.add(new String[]{"capitalSource", "2", "资金来源B"});
+        messages.add(new String[]{"riskGrade", "1", "风险等级A"});
+        messages.add(new String[]{"riskGrade", "2", "风险等级B"});
+        messages.add(new String[]{"measureGrade", "1", "计量等级A"});
+        messages.add(new String[]{"measureGrade", "2", "计量等级B"});
+        messages.add(new String[]{"measuringItemCategory", "1", "计量项目类别A"});
+        messages.add(new String[]{"measuringItemCategory", "2", "计量项目类别B"});
+
+        messages.add(new String[]{"emergencyEquipment", "1", "是否急救设备A"});
+        messages.add(new String[]{"emergencyEquipment", "2", "是否急救设备B"});
+        messages.add(new String[]{"importEquipment", "1", "是否进口设备A"});
+        messages.add(new String[]{"importEquipment", "2", "是否进口设备B"});
+        messages.add(new String[]{"usageStatus", "1", "使用状态A"});
+        messages.add(new String[]{"usageStatus", "2", "使用状态B"});
+        messages.add(new String[]{"accountingCategory", "1", "核算类别A"});
+        messages.add(new String[]{"accountingCategory", "2", "核算类别B"});
+
+
+        for (String[] element: messages) {
+            I18nMessage message = i18nDao.getByMsgTypeAndMsgKey(element[0], element[1]);
+            if (message == null) {
+                message = new I18nMessage(element[0], element[1], element[2]);
+                i18nDao.save(message);
+            }
+        }
 
 
     }
