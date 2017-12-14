@@ -189,7 +189,7 @@ public class AssetRow {
         }
     }
 
-    private void addErrMessage(Map<String, Object> item, String comments) {
+    public static void addErrMessage(Map<String, Object> item, String comments) {
         if (item.containsKey("errmsg")) {
             ((List<String>) item.get("errmsg")).add(comments);
         } else {
