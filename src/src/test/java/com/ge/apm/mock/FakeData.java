@@ -341,6 +341,27 @@ public class FakeData {
         messages.add(new String[]{"6801", "2", "医疗器械子分类B"});
         messages.add(new String[]{"assetGroup", "1", "设备分类A"});
         messages.add(new String[]{"assetGroup", "2", "设备分类B"});
+        messages.add(new String[]{"depreciationMethodList", "1", "折旧算法A"});
+        messages.add(new String[]{"depreciationMethodList", "2", "折旧算法B"});
+        messages.add(new String[]{"assetUsage", "1", "用途分类A"});
+        messages.add(new String[]{"assetUsage", "2", "用途分类B"});
+        messages.add(new String[]{"capitalSource", "1", "资金来源A"});
+        messages.add(new String[]{"capitalSource", "2", "资金来源B"});
+        messages.add(new String[]{"riskGrade", "1", "风险等级A"});
+        messages.add(new String[]{"riskGrade", "2", "风险等级B"});
+        messages.add(new String[]{"measureGrade", "1", "计量等级A"});
+        messages.add(new String[]{"measureGrade", "2", "计量等级B"});
+        messages.add(new String[]{"measuringItemCategory", "1", "计量项目类别A"});
+        messages.add(new String[]{"measuringItemCategory", "2", "计量项目类别B"});
+
+        messages.add(new String[]{"emergencyEquipment", "1", "是否急救设备A"});
+        messages.add(new String[]{"emergencyEquipment", "2", "是否急救设备B"});
+        messages.add(new String[]{"importEquipment", "1", "是否进口设备A"});
+        messages.add(new String[]{"importEquipment", "2", "是否进口设备B"});
+        messages.add(new String[]{"usageStatus", "1", "使用状态A"});
+        messages.add(new String[]{"usageStatus", "2", "使用状态B"});
+        messages.add(new String[]{"accountingCategory", "1", "核算类别A"});
+        messages.add(new String[]{"accountingCategory", "2", "核算类别B"});
 
 
         for (String[] element: messages) {

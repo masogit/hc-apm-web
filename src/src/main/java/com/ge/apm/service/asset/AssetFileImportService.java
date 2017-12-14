@@ -408,7 +408,7 @@ public class AssetFileImportService {
             if (userList != null && userList.size() == 1) {
                 UserAccount clinicalOwner = userList.get(0);
                 newAsset.setClinicalOwnerId(clinicalOwner.getId());
-                newAsset.setClinicalOwnerName(clinicalOwner.getTelephone());
+                newAsset.setClinicalOwnerTel(clinicalOwner.getTelephone());
             } else {
                 if (newAsset.getClinicalOwnerName() == null) {
                     addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
