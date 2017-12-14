@@ -46,6 +46,7 @@ import webapp.framework.web.service.UserContext;
 @ViewScoped
 public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
+    private String gbCodeName;
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
@@ -112,8 +113,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<UserAccount> ownerList;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
-    public List<GbForm> gbFormList= new ArrayList<GbForm>();
-
+    public List<GbForm> gbFormList = new ArrayList<GbForm>();
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -141,19 +141,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private ServerEventInterface callingController;
     private String updateViewIDs;
     private TreeNode gbCodeTree;
+
     public void prepareDialogCallback(ServerEventInterface callingController, String updateViewIDs) {
         showDialog = true;
 
         this.selected = null;
         this.selectedNode = null;
-       // this.selectedAsset = null;
+        // this.selectedAsset = null;
 
         this.callingController = callingController;
         this.updateViewIDs = updateViewIDs;
         UaaService uaaService = WebUtil.getBean(UaaService.class);
 
-
     }
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
@@ -174,12 +175,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         ucService = WebUtil.getBean(UserCommonService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
-        gbDao= WebUtil.getBean(GbCodeRepository.class);
+        gbDao = WebUtil.getBean(GbCodeRepository.class);
         this.filterBySite = false;
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
-        this.measuring  = request.getParameter("measuring");
+        this.measuring = request.getParameter("measuring");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         // String actionName = WebUtil.getRequestParameter("actionName");
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -205,8 +206,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 terminate = Boolean.parseBoolean(terminateStr);
             }
             setSelectedByUrlParam(encodeStr, "selectedid");
-            if(!StringUtils.isEmpty(selected.getNationalStandardCode()))
-             selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
+            if (!StringUtils.isEmpty(selected.getNationalStandardCode())) {
+                selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
+                if(null!=selectedGb)
+                 gbCodeName = selectedGb.getCode()+"/"+selectedGb.getName();
+            }
             prepareEdit();
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
@@ -218,7 +222,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
-
         if (this.selected != null) {
             initOrgTree();
         }
@@ -247,7 +250,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         }
 
-        if(!this.hasFilterOnField("siteUID")){
+        if (!this.hasFilterOnField("siteUID")) {
             UserAccount user = UserContextService.getCurrentUserAccount();
             List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -274,7 +277,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             Date remindDate = calendar.getTime();
             searchFilters.add(new SearchFilter("lastMeteringDate", SearchFilter.Operator.NE, null));
             searchFilters.add(new SearchFilter("lastMeteringDate", SearchFilter.Operator.GTE, remindDate));
-        }else{
+        } else {
             this.removeFilterOnField("lastMeteringDate");
         }
 
@@ -479,9 +482,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (!isTimeValidate()) {
             return "";
         }
-        if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim()) ) {
+        if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
             selected.setQrCode(null);
-        }else{
+        } else {
             if (!qrCode.equals(selected.getQrCode())) {
                 if (!updateQrCode()) {
                     qrCode = "";
@@ -489,14 +492,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
         }
-            if(selectedGb.getCode()!=null){
-                selected.setNationalStandardCode(selectedGb.getCode());
+        if (null!= gbCodeName) {
+            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
+            if(null==gbCode){
+                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
+                return "";
             }
 
-        Boolean isNew = selected.hashCode()==0;
+            selected.setNationalStandardCode(selectedGb.getCode());
+        }
+
+        Boolean isNew = selected.hashCode() == 0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if(isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())){
+        if (isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
             pmService.createPMrequest(selected.getUid(), null);
         }
         if (resultStatus) {
@@ -1094,8 +1103,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
-    }
 
+//联动更新
+        if(null!=selectedGb) {
+            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+                    this.selectedGb.getCode(),
+                    this.selected.getSiteUID()
+            );
+            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
+                this.selected.setFinancingNum(financingNum);
+            }
+
+        }
+
+    }
 
     private void updateSelectedOrg(OrgInfo orgInfo) {
 
@@ -1120,24 +1141,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+
     private void updateSelectedOrgGb(GbCode gbCode) {
         if (gbCode == null || gbCode.getId() == -1) {
             selectedGb = null;
         } else {
             selectedGb = gbCode;
+            gbCodeName=gbCode.getCode()+"/"+gbCode.getName();
         }
 
     }
 
-    public void initGbTree(){
+    public void initGbTree() {
         TreeNode treeNode = gbCodeService.buildGbTree();
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
         treeNode.setExpanded(true);
-        selectedGb = new GbCode();
-
+      //  selectedGb = new GbCode();
 
     }
+
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -1159,17 +1182,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
-                this.selected.getNationalStandardCode(),
-                this.selected.getSiteUID()
-        );
-        if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
-            this.selected.setFinancingNum(financingNum);
+        if(null != selected && null!=selectedGb ) {
+            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+                    this.selectedGb.getCode(),
+                    this.selected.getSiteUID()
+            );
+            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
+                this.selected.setFinancingNum(financingNum);
+            }
         }
+
     }
 
     public void discard(AssetInfo asset) {
-        if(asset != null && asset.getUsageStatus() == 3) {
+        if (asset != null && asset.getUsageStatus() == 3) {
             asset.setUsageStatus(4);
             this.selected = dao.save(asset);
             WebUtil.addSuccessMessage("报废成功！");
@@ -1179,7 +1205,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void readyForDiscard(AssetInfo asset) {
-        if(asset != null && asset.getUsageStatus() == 2) {
+        if (asset != null && asset.getUsageStatus() == 2) {
             asset.setUsageStatus(3);
             this.selected = dao.save(asset);
             WebUtil.addSuccessMessage("已将状态修改为待报废！");
@@ -1208,6 +1234,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return names;
 
     }
+
     public List<String> completeGbName(String prefix) {
         List<String> names = null;
         if (!StringUtils.isEmpty(prefix)) {
@@ -1216,13 +1243,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return names;
 
     }
+
     public GbCode getSelectedGb() {
+      /* if(null!= selectedGb && selectedGb.toString().contains("/")){
+         return gbDao.getGbCode(selectedGb.getCode().split("/")[0]);
+       }*/
         return selectedGb;
     }
 
     public void setSelectedGb(GbCode selectedGb) {
+       /* if(null!= selectedGb && selectedGb.toString().contains("/")){
+            this.selectedGb = gbDao.getGbCode(selectedGb.getCode().split("/")[0]);
+        }*/
         this.selectedGb = selectedGb;
+
     }
+
     public Boolean getIsGeneratePmOrder() {
         return isGeneratePmOrder;
     }
@@ -1231,12 +1267,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
 
-    public void cancleWarranty(Integer assetId){
+    public void cancleWarranty(Integer assetId) {
         AssetInfo ai = dao.findById(assetId);
-        if(ai != null){
+        if (ai != null) {
             ai.setWarranty(false);
             dao.save(ai);
         }
+    }
+
+    public String getGbCodeName() {
+        return gbCodeName;
+    }
+
+    public void setGbCodeName(String gbCodeName) {
+
+        this.gbCodeName = gbCodeName;
     }
 
     public boolean isShowDialog() {
@@ -1247,4 +1292,3 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.showDialog = showDialog;
     }
 }
-

@@ -36,13 +36,13 @@
                             <label class="label">#{msg.arrivalListName}*</label>
                             <p:inputText value="#{assetArrivedListController.selected.name}" required="true" requiredMessage="#{msg.arrivalListName} #{msg.ValidationRequire}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
                         </h:panelGroup>
-                        <h:panelGroup>
+<!--                        <h:panelGroup>
                             <label class="label">#{msg.arrivalListOrderType}*</label>
                             <p:selectOneMenu value="#{assetArrivedListController.selected.orderType}" disabled="#{assetArrivedListController.selected.status ne '1'}" required="true" requiredMessage="#{msg.arrivalListOrderType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.assetName}*</label>
                             <p:inputText value="#{assetArrivedListController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListController.selected.status ne '1'}"  />

@@ -79,7 +79,7 @@
                 <simple>sql:${headers._sql}?dataSource=risDataSource</simple>
             </recipientList>
         </route>
-
+<!--
         <route id="initAssetAggregationDataByDateRange">
             <from uri="direct:initAssetAggregationDataByDateRange"/>
             <doTry>
@@ -89,8 +89,9 @@
                 </doCatch>
             </doTry>
         </route>
-
+-->
         <!-- start of aggregate asset cost and exam data in batch !-->
+<!--
         <route id="initAssetAggregationData">
             <from uri="direct:initAssetAggregationData"/>
             <doTry>
@@ -106,13 +107,14 @@
                 </doCatch>
             </doTry>
         </route>
-
+-->
 <!--         <route id="aggregationAssetCostData">
             <from uri="direct:aggregateAssetCostData"/>
             <to uri="direct:initAssetAggregationData"/>
             <bean ref="assetCostDataAggregator" method="aggregateCostData"/>
         </route> -->
         <!--gl working-->
+<!--
         <route id="aggregationAssetSummit">
             <from uri="direct:aggregateAssetExamData"/>
             <to uri="direct:initAssetAggregationData"/>
@@ -122,33 +124,38 @@
             <from uri="direct:aggregateExamSummitData"/>
             <bean ref="assetExamDataAggregator" method="aggregateExamSummit"/>
         </route>
-
+-->
       <!--  <route>
             <from uri="quartz://quartzAssetExamDataAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateAssetExamData"/>
         </route>-->
         <!--gl aggregate for yesterday -->
+<!--
         <route>
             <from uri="direct:aggregationAssetSummitForYesterday"/>
             <bean ref="assetExamDataAggregator" method="aggregateAssetSummitForYesterday"/>
         </route>
+-->
         <!--<route>
             <from uri="quartz://quartzAssetExamDataAggregationForYesterday?cron=0+30/5+2+*+*+?"/>
             <to uri="direct:aggregationAssetSummitForYesterday"/>
         </route>-->
 <!--gl working-->
-     <!--   <route>
+<!--   
+        <route>
             <from uri="quartz://quartzExamSummitAggregation?cron=0+0+*/1+*+*+?"/>
             <to uri="direct:aggregateExamSummitData"/>
-        </route>-->
+        </route>
         
         <route>
             <from uri="servlet:///aggregateAssetExamData?servletName=MyServlet"/>
             <to uri="direct:aggregateAssetExamData"/>
         </route>
+-->
         <!-- end of aggregate asset cost and exam data in batch !-->
 
         <!-- start of aggregate asset cost and exam data by assetId !-->
+<!--
         <route id="initAssetAggregationDataByAssetId">
             <from uri="direct:initAssetAggregationDataByAssetId"/>
             <doTry>
@@ -167,13 +174,13 @@
                 <simple>${headers.assetId}</simple>
             </setBody>
         </route>
-        
-<!--         <route>
+
+        <route>
             <from uri="servlet:///aggregateAssetCostDataByAssetId?servletName=MyServlet"/>
             <to uri="direct:initAssetAggregationDataByAssetId"/>
             <log message="call bean: b=${body}, h=${headers}" loggingLevel="ERROR"/>
             <bean ref="assetCostDataAggregator" method="aggregateCostDataByAssetId"/>
-        </route> -->
+        </route>
         
         <route>
             <from uri="servlet:///aggregateAssetExamDataByAssetId?servletName=MyServlet"/>
@@ -181,6 +188,7 @@
             <log message="call bean: b=${body}, h=${headers}" loggingLevel="ERROR"/>
             <bean ref="assetExamDataAggregator" method="aggregateExamSummit"/>
         </route>
+-->
         <!-- end of aggregate asset cost and exam data by assetId !-->
 
     </routeContext>

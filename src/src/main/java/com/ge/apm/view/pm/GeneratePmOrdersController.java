@@ -3,6 +3,7 @@ package com.ge.apm.view.pm;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -94,8 +95,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public List<AssetInfo> getAssetList() {
 		List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();// getFilter(user.getSiteUID());
-		List<String> uids = null;
-		if (queryAsset.getRuleStatus() != null) {
+		/*			List<String> uids = null;
+	if (queryAsset.getRuleStatus() != null) {
 			uids = new ArrayList<String>();
 			if (queryAsset.getRuleStatus() == RULE_STATUS_CONFIGURED) {// 已配置
 				uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
@@ -108,7 +109,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				// uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
 				// assetFilters.add(new SearchFilter("uid", SearchFilter.Operator., uids));
 			}
-		}
+		}*/
 
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
@@ -121,6 +122,28 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		}
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
+		}
+		if(level != null) {
+			List<String> uids = null;
+			if(level == 1) {
+				uids = relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID());
+				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+				if (CollectionUtils.isNotEmpty(uids)) {
+					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+				}
+			}else if(level == 2) {
+				uids = relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID());
+				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+				if (CollectionUtils.isNotEmpty(uids)) {
+					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+				}
+			}else if(level == 3) {
+				uids = relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID());
+				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
+				if (CollectionUtils.isNotEmpty(uids)) {
+					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+				}
+			}
 		}
 		if (!assetFilters.isEmpty()) {
 			List<SearchFilter> userFilter = getFilter(user.getSiteUID());
@@ -143,6 +166,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
 		}
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		return filter;
 	}
 

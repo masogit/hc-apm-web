@@ -23,9 +23,14 @@ public interface GbCodeRepository extends GenericRepository<GbCode> {
 	@Query(value="select gb.* from gb_code gb where level=?1",nativeQuery = true)
 	public List<GbCode> getSubGb(int level);
 
+	@Query(value="select gb.* from gb_code gb where code=?1",nativeQuery = true)
+	public GbCode getGbCode(String Code);
+
+
 	/*@Query(value = "select distinct a.name from gb_code a where a.tenant_uid=?1 and a.name like concat(?2,'%') order by a.name fetch first 20 rows only", nativeQuery = true)*/
 	@Query(value = "select concat(a.code,'/', a.name) from gb_code a where a.code like concat(?1,'%') order by a.name fetch first 20 rows only", nativeQuery = true)
 	public List<String> findGbCodeByPrefix(String prefix);
+
 /*
 --获取三级目录
 select * from gb_code where (code between 3220100+1 and 3220100+99) and level =2

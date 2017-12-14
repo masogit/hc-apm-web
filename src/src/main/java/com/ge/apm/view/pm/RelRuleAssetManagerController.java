@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -12,17 +11,18 @@ import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
 import com.ge.apm.dao.RelRuleAssetRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -38,7 +38,10 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private Map<String, PmOrderRule> ruleMap;
 	private PmOrderRuleRepository pmOrderRuleRepository;
 	private AssetInfoRepository assetInfoRepository;
-
+	private String queryCondition;
+	private List<String> assetUids;
+	private OrgInfoRepository orgInfoRepository;
+	
 	@Override
 	protected void init() {
 		this.filterByHospital = false;
@@ -47,6 +50,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		user = UserContextService.getCurrentUserAccount();
 		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
+		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		assetMap = new HashMap<String, AssetInfo>();
 		ruleMap = new HashMap<String, PmOrderRule>();
 	}
@@ -58,13 +62,28 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	@Override
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
+		if(searchFilters != null) {
+			searchFilters.clear();
+		}
 		assetMap.clear();
 		ruleMap.clear();
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
 		}
-		if (!this.hasFilterOnField("tenantUID")) {
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		List<String> uids = getAssetInfoByFilter();
+		if(uids == null) {//查询条件为null
+			if (!this.hasFilterOnField("tenantUID")) {
+				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+				searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoUids()));
+			}
+		}else if(uids.size() == 0) {//查询结果为空
+			 //searchFilters.removeAll(searchFilters.stream().filter(item -> "assetUID".equals(item.fieldName)).collect(Collectors.toList()));
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, uids));
+		}else {
+			if (!this.hasFilterOnField("tenantUID")) {
+				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+			}
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, uids));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
@@ -205,7 +224,74 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		}
 		return null;
 	}
+	
+	public List<String> getAssetInfoByFilter() {
+		if(!StringUtils.isEmpty(queryCondition)) {
+			List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
+			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
+			List<String> uids = new ArrayList<String>();
+			if(CollectionUtils.isNotEmpty(assetInfos)) {
+				assetInfos.forEach((asset) -> uids.add(asset.getUid()));
+			}
+			return uids;
+		}
+		return null;
+	}
+	
+	public List<SearchFilter> getFilter(String siteUID) {
+		List<SearchFilter> filter = new ArrayList<SearchFilter>();
+		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
+		if (orgInfo.getOrgType() == 3) {// 院区
+			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else if (orgInfo.getOrgType() == 2) {// 医院
+			filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else if (orgInfo.getOrgType() == 1) {// 集团
+			filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else {// 租户
+			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		}
+		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		return filter;
+	}
+	
+	public List<String> getAssetInfoUids(){
+		List<SearchFilter> filters = getFilter(user.getSiteUID());
+		List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(filters);
+		List<String> uids = new ArrayList<String>();
+		if(CollectionUtils.isNotEmpty(assetInfos)) {
+			assetInfos.forEach((asset) -> uids.add(asset.getUid()));
+		}
+		return uids;
+	}
+	
+    public void setOneSearchStr() {
+    		queryCondition = null;
+    }
 
+	public String getQueryCondition() {
+		return queryCondition;
+	}
+
+	public void setQueryCondition(String queryCondition) {
+		this.queryCondition = queryCondition;
+	}
+
+	public List<String> getAssetUids() {
+		return assetUids;
+	}
+
+	public void setAssetUids(List<String> assetUids) {
+		this.assetUids = assetUids;
+	}
+
+	
 	/*
 	 * @Override public void onBeforeNewObject(RelRuleAsset object) { }
 	 * 
