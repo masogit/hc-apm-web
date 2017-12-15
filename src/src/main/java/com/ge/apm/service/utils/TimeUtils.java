@@ -7,6 +7,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.joda.time.DateTime;
+import org.joda.time.Days;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,4 +57,9 @@ public class TimeUtils {
 		return null;
 	}
 	
+	public static Integer getDays(Date time) {
+		DateTime now = new DateTime();
+		DateTime lastTime = new DateTime(time);
+		return Days.daysBetween(lastTime, now).getDays();
+	}
 }

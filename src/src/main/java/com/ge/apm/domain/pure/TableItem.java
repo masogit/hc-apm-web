@@ -1,0 +1,65 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ge.apm.domain.pure;
+
+import java.util.List;
+import java.util.Map;
+
+/**
+ *
+ * @author 212579464
+ */
+public class TableItem{
+    public static enum ComponentType {
+        Number, Switch,Select,TextArea,Date
+    }
+    private String key;
+    private String label;
+    private ComponentType component;
+    private Map<String, String> props;
+    private List<TableOption> options;
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    public ComponentType getComponent() {
+        return component;
+    }
+
+    public void setComponent(ComponentType component) {
+        this.component = component;
+    }
+
+    public Map<String, String> getProps() {
+        return props;
+    }
+
+    public void setProps(Map<String, String> props) {
+        this.props = props;
+    }
+
+    public List<TableOption> getOptions() {
+        return options;
+    }
+
+    public void setOptions(List<TableOption> options) {
+        this.options = options;
+    }
+    
+}

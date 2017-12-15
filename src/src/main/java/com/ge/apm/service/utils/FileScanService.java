@@ -22,17 +22,30 @@ import org.springframework.stereotype.Component;
 public class FileScanService {
 
     private static Long TIME_OUT = 5000l;
-    
+
     @Value("#{urlProperties.FileScanFolder}")
     private String FILE_SCAN_FOLDER;
 
+    @Value("#{urlProperties.BatchFileFolder}")
+    private String BATCH_FILE_Folder;
+
+    //save for file scan
     public String saveUploadedFile(UploadedFile file) throws Exception {
-       
         String folderName = FILE_SCAN_FOLDER.concat(File.separator).concat(UUID.randomUUID().toString());
+        return saveFile(file, folderName, file.getFileName());
+    }
+
+    public String saveBatchUploadedFile(UploadedFile file,String fileType) throws Exception {
+        String folderName = BATCH_FILE_Folder.concat(File.separator).concat(fileType==null?"":fileType).concat(String.valueOf(System.currentTimeMillis()));
+        return saveFile(file, folderName, "batchfile").replaceFirst(BATCH_FILE_Folder, "");
+    }
+
+    public String saveFile(UploadedFile file, String folderName, String saveFilename) throws Exception {
+
         FileUtils.createFolder(folderName, true);
-        String fileName = folderName.concat(File.separator).concat(file.getFileName());
-        
-        try(FileOutputStream out = new FileOutputStream(fileName)) {
+        String fileName = folderName.concat(File.separator).concat(saveFilename);
+
+        try (FileOutputStream out = new FileOutputStream(fileName)) {
             InputStream inputStream = file.getInputstream();
             int count = 0;
             long starttime = new Date().getTime();
@@ -54,15 +67,13 @@ public class FileScanService {
 
         } catch (Exception e) {
             throw e;
-        } 
-        
+        }
+
         return fileName;
-        
     }
 
     public void deleteUploadedFile(String path) {
-        FileUtils.deleteFolder(path.substring(0,path.lastIndexOf(File.separator)));
+        FileUtils.deleteFolder(path.substring(0, path.lastIndexOf(File.separator)));
     }
-    
-    
+
 }

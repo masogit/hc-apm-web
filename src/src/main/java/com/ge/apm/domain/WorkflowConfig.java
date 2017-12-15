@@ -65,6 +65,9 @@ public class WorkflowConfig implements Serializable {
     
     @Column(name = "is_auto_enabled")
     private Boolean isAutoEnabled; //是否自动派工
+
+    @Column(name = "is_temp_user_report")
+    private Boolean isTempUserReport;
     
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
@@ -297,6 +300,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setTimeoutClose(Integer timeoutClose) {
         this.timeoutClose = timeoutClose;
+    }
+
+    public Boolean getIsTempUserReport() {
+        return isTempUserReport;
+    }
+
+    public void setIsTempUserReport(Boolean tempUserReport) {
+        isTempUserReport = tempUserReport;
     }
 
     @Override

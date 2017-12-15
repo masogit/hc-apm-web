@@ -18,7 +18,7 @@ public class SearchFilter {
     public static final String searchFilterPrefix = ":search_";
 
     public enum Operator {
-        EQ, LIKE, GT, LT, GTE, LTE, NE, IN,IsNull, IsNotNull
+        EQ, LIKE, GT, LT, GTE, LTE, NE, IN,IsNull, IsNotNull, NotIN
     }
 
     public String tableAlias;
@@ -101,7 +101,7 @@ public class SearchFilter {
                 fieldName = fieldName.substring(0, fieldName.length()-6);
             
             SearchFilter filter;
-            if (operator.equals(Operator.IN)) {
+            if (operator.equals(Operator.IN) || operator.equals(Operator.NotIN)) {
                 String[] intList = StringUtils.split((String) value, ",");
                 List<Integer> valueList = new ArrayList<Integer>();
                 for (String intValue : intList) {
@@ -177,6 +177,9 @@ public class SearchFilter {
                 break;
             case IN:
                 where = sqlFieldName + " in (:#" + paramName + ")";
+                break;
+            case NotIN:
+                where = sqlFieldName + " not in (:#" + paramName + ")";
                 break;
             case IsNull:
                 where = sqlFieldName + " is null";

@@ -7,6 +7,7 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.SearchFilter;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -64,4 +65,5 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public List<String> findDistinctAssetNames(String tenantUID);
 
 	public List<AssetInfo> findByUidIn(List<String> assetUids);
+
 }

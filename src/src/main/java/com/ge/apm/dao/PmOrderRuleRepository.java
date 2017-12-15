@@ -18,4 +18,13 @@ public interface PmOrderRuleRepository extends GenericRepository<PmOrderRule> {
 
 	List<PmOrderRule> findByUidIn(List<String> ruleUids);
 
+	@Query(value= "select * from pm_order_rule where uid = (select rule_uid1 from rel_rule_asset where asset_uid = ?1)" ,nativeQuery = true)
+	PmOrderRule findPmOrderRuleLevel1(String uid);
+
+	@Query(value= "select * from pm_order_rule where uid = (select rule_uid2 from rel_rule_asset where asset_uid = ?1)" ,nativeQuery = true)
+	PmOrderRule findPmOrderRuleLevel2(String uid);
+
+	@Query(value= "select * from pm_order_rule where uid = (select rule_uid from rel_rule_asset where asset_uid = ?1)" ,nativeQuery = true)
+	PmOrderRule findPmOrderRuleLevel3(String uid);
+
 }

@@ -26,6 +26,12 @@ public class RelRuleAsset {
 	@Column(name = "rule_uid")
 	private String ruleUID;
 	
+	@Column(name = "rule_uid2")
+	private String ruleUID2;
+	
+	@Column(name = "rule_uid1")
+	private String ruleUID1;
+	
 	 @Column(name = "asset_uid")
 	private String assetUID;
 	 
@@ -37,17 +43,25 @@ public class RelRuleAsset {
     
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
-	
-/*    @JoinColumn(name = "asset_uid",referencedColumnName = "uid", insertable = false, updatable = false)
-    @ManyToMany(fetch = FetchType.EAGER)
-    private AssetInfo assetInfo;
     
-    @JoinColumn(name = "rule_uid",referencedColumnName = "uid", insertable = false, updatable = false)
-    @ManyToMany(fetch = FetchType.EAGER)
-    private PmOrderRule pmOrderRule;*/
-	 
 	public String getTenantUID() {
 		return tenantUID;
+	}
+
+	public String getRuleUID2() {
+		return ruleUID2;
+	}
+
+	public void setRuleUID2(String ruleUID2) {
+		this.ruleUID2 = ruleUID2;
+	}
+
+	public String getRuleUID1() {
+		return ruleUID1;
+	}
+
+	public void setRuleUID1(String ruleUID1) {
+		this.ruleUID1 = ruleUID1;
 	}
 
 	public void setTenantUID(String tenantUID) {

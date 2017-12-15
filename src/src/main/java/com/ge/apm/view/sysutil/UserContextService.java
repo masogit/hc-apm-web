@@ -107,8 +107,11 @@ public class UserContextService implements Serializable {
         if (UserContextService.isSuperAdmin()) return true;
         else if ("SuperAdmin".equals(role)) return false;
 
-        if (UserContextService.isSiteAdmin()) return true;
-        else if ("SiteAdmin".equals(role)) return false;
+//        if (UserContextService.isSiteAdmin()) return true;
+//        else if ("SiteAdmin".equals(role)) return false;
+        if("SiteAdmin".equals(role))
+            return UserContextService.isSiteAdmin();
+
 
         if (UserContextService.isLocalAdmin()) return true;
         else if ("LocalAdmin".equals(role)) return false;
