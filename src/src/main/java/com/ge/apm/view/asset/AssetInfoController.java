@@ -267,6 +267,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
+        } else {
+            this.removeFilterOnField("name");
+            this.removeFilterOnField("departNum");
+            this.removeFilterOnField("financingNum");
+            this.removeFilterOnField("qrCode");
+            this.removeFilterOnField("serialNum");
+            this.removeFilterOnField("manufacture");
+            this.removeFilterOnField("clinicalDeptName");
         }
 
         if ("true".equals(this.measuring)) {
@@ -491,6 +500,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                     return "";
                 }
             }
+
+
         }
         if (null!= gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -1157,8 +1168,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
         treeNode.setExpanded(true);
-      //  selectedGb = new GbCode();
-
     }
 
     public void initOrgTree() {
@@ -1245,16 +1254,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public GbCode getSelectedGb() {
-      /* if(null!= selectedGb && selectedGb.toString().contains("/")){
-         return gbDao.getGbCode(selectedGb.getCode().split("/")[0]);
-       }*/
         return selectedGb;
     }
 
     public void setSelectedGb(GbCode selectedGb) {
-       /* if(null!= selectedGb && selectedGb.toString().contains("/")){
-            this.selectedGb = gbDao.getGbCode(selectedGb.getCode().split("/")[0]);
-        }*/
         this.selectedGb = selectedGb;
 
     }
