@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select } from 'antd'
+import { Select, Checkbox } from 'antd'
 import { is } from 'immutable'
 import { connect } from 'dva/mobile'
 import Chart from './Chart'
@@ -37,7 +37,8 @@ class ImmutableComponent extends React.Component {
 @connect(({assetBrowser}) => ({
   filters: assetBrowser.get('filters'),
   assets: assetBrowser.get('assets'),
-  rulers: assetBrowser.get('rulers')
+  rulers: assetBrowser.get('rulers'),
+  compress: assetBrowser.get('compressMode'),
 }))
 class Header extends ImmutableComponent {
   onOrderByChange = e => {
@@ -51,8 +52,11 @@ class Header extends ImmutableComponent {
       type: 'assetBrowser/filters/removeLast'
     })
   }
+  toggleCompressMode = e => {
+    this.props.dispatch({ type: 'assetBrowser/set/compressMode', payload: !e.target.checked })
+  }
   render() {
-    let { filters, assets, rulers } = this.props
+    let { filters, assets, rulers, compress } = this.props
     assets = assets.filter(asset => {
       return filters.every(filter => {
         const formattedKey = formatKey(asset, filter.get('dimension'), rulers.find(ruler => ruler.get('dimension') === filter.get('dimension')))
@@ -91,6 +95,12 @@ class Header extends ImmutableComponent {
             <Option value="price">按分类平均价值排序</Option>
             <Option value="devices">按分类设备数量排序</Option>
           </Select>
+          <Checkbox
+            checked={!compress}
+            onChange={this.toggleCompressMode}
+          >
+            按设备显示
+          </Checkbox>
         </div>
       </div>
     )

@@ -7,7 +7,7 @@ import { Select } from 'antd'
 import WheelIndicator from 'wheel-indicator'
 import withClientRect from '#/HOC/withClientRect'
 import { trimString } from '#/utils'
-import { formatPrice, CLUSTER_SPACING, ASSET_HEIGHT, ASSET_WIDTH, COLORS, INACTIVE_COLORS } from '#/models/assetBrowser'
+import { formatPrice, CLUSTER_SPACING, ASSET_HEIGHT, COMPRESS_ASSET_HEIGHT, ASSET_WIDTH, COLORS, INACTIVE_COLORS } from '#/models/assetBrowser'
 import styles from './index.scss'
 
 const { Option } = Select
@@ -156,7 +156,7 @@ function sortFilter(a, b) {
   return _a > _b ? -1 : 1;
 }
 
-@connect()
+@connect(({ assetBrowser }) => ({ compress: assetBrowser.get('compressMode') }))
 class Asset extends ImmutableComponent {
   onClick = () => {
     this.props.dispatch({
@@ -177,10 +177,13 @@ class Asset extends ImmutableComponent {
       pointerEvents: 'none',
       position: 'fixed',
       minWidth: 100,
+      // top: clientRect.top,
+      // left: clientRect.left,
       background: '#d8d8d8',
       border: '1px solid #5d87d4',
       borderRadius: 3,
       padding: '12px 7px',
+      // transform: `translate(${clientRect.width + 10}px, ${clientRect.height / 2}px)`
     }
 
     if (clientRect.top > window.innerHeight * 0.6) {
@@ -217,23 +220,22 @@ class Asset extends ImmutableComponent {
   }
 
   render() {
-    const { asset, columnIndex, index } = this.props
+    const { asset, columnIndex, index, compress } = this.props
     return (
       <rect
-        onMouseEnter={this.onMouseEnter}
-        onMouseLeave={this.onMouseLeave}
-        onClick={this.onClick}
+        onMouseEnter={!compress && this.onMouseEnter}
+        onMouseLeave={!compress && this.onMouseLeave}
+        onClick={!compress && this.onClick}
         style={{
           fill: asset.get('active') ? COLORS[columnIndex] : null,
-          cursor: 'pointer',
+          cursor: compress ? undefined : 'pointer',
           stroke: '#eaeaea',
           strokeWidth: 1,
-          strokeDasharray: `${ASSET_WIDTH}, ${ASSET_HEIGHT}`,
         }}
         width={ASSET_WIDTH}
-        height={ASSET_HEIGHT}
+        height={compress ? COMPRESS_ASSET_HEIGHT : ASSET_HEIGHT}
         x={0}
-        y={index * ASSET_HEIGHT}
+        y={(compress ? 0 : index) * ASSET_HEIGHT}
       />
     )
   }
@@ -259,7 +261,7 @@ class Assets extends ImmutableComponent {
   }
 }
 
-@connect()
+@connect(({ assetBrowser }) => ({ compress: assetBrowser.get('compressMode') }))
 class Cluster extends ImmutableComponent {
   calcTextY(columnOffset, clusterTop, clusterHeight, viewBoxYRange) {
     if (clusterTop + clusterHeight + columnOffset - 20 < viewBoxYRange[0]) {
@@ -287,11 +289,14 @@ class Cluster extends ImmutableComponent {
   }
 
   render() {
-    const { cluster, columnIndex, columnOffset, viewBoxOffsetY, viewBoxHeight, dimension} = this.props
-    const textY = this.calcTextY(columnOffset, cluster.get('top'), cluster.get('children').size * ASSET_HEIGHT, [viewBoxOffsetY, viewBoxOffsetY + viewBoxHeight])
+    const { cluster, columnIndex, columnOffset, viewBoxOffsetY, viewBoxHeight, dimension, compress } = this.props
+    let top = cluster.get('top')
+    let topCompress = cluster.get('top_compress')
+    const textY = this.calcTextY(columnOffset, top, cluster.get('children').size * ASSET_HEIGHT, [viewBoxOffsetY, viewBoxOffsetY + viewBoxHeight])
+    let assets = cluster.get('children')
     return (
       <g
-        transform={`translate(0, ${cluster.get('top')})`}
+        transform={`translate(0, ${compress ? topCompress : top})`}
         fill={cluster.get('assetActive') ? INACTIVE_COLORS[columnIndex] : COLORS[columnIndex]}
         >
         <text
@@ -323,7 +328,7 @@ class Cluster extends ImmutableComponent {
           {cluster.get('children').size}台
         </text>
         <Assets
-          assets={cluster.get('children')}
+          assets={assets}
           columnIndex={columnIndex}
         />
       </g>
@@ -371,7 +376,8 @@ class Column extends ImmutableComponent {
   hoveredAssetId: assetBrowser.get('hoveredAssetId'),
   activeAssetId: assetBrowser.get('activeAssetId'),
   columns: assetBrowser.get('columns'),
-  viewBoxHeight: assetBrowser.getIn(['viewBox', 'height'])
+  viewBoxHeight: assetBrowser.getIn(['viewBox', 'height']),
+  compress: assetBrowser.get('compressMode')
 }))
 class Lines extends ImmutableComponent {
   onHover = id => e => this.props.dispatch({
@@ -383,21 +389,9 @@ class Lines extends ImmutableComponent {
     type: 'assetBrowser/asset/hover/set',
     payload: null
   })
-  // lineToD(line) {
-  //   const { columns } = this.props
-  //   return line.reduce((prev, cur, index, line) => {
-  //     if (index === 0) return ''
-  //     const x0 = columns.getIn([index - 1, 'left']) + ASSET_WIDTH / 2
-  //     const y0 = line.getIn([index - 1, 'top']) + ASSET_HEIGHT / 2
-  //     const x1 = columns.getIn([index, 'left']) - ASSET_WIDTH / 2
-  //     const y1 = line.getIn([index, 'top']) + ASSET_HEIGHT / 2
-  //     const midX = (x0 + x1) / 2
-  //     return prev.concat(`M ${x0}, ${y0} C ${midX}, ${y0} ${midX}, ${y1} ${x1} ${y1}`)
-  //   }, '')
-  // }
 
   render() {
-    const { viewBoxOffsetY, viewBoxHeight, hoveredAssetId, activeAssetId, columns } = this.props
+    const { viewBoxOffsetY, viewBoxHeight, hoveredAssetId, activeAssetId, columns, compress } = this.props
     const viewBoxTop = viewBoxOffsetY
     const viewBoxBottom = viewBoxOffsetY + viewBoxHeight
     if (viewBoxHeight === 0) return null
@@ -406,8 +400,8 @@ class Lines extends ImmutableComponent {
     const columnsWithClustersInViewBox = columns.map(column => column.update('clusters', clusters => {
       const columnOffset = column.get('offset')
       return clusters.filter(cluster => {
-        const top = columnOffset + cluster.get('top')
-        const bottom = top + cluster.get('children').size * ASSET_HEIGHT
+        const top = columnOffset + compress ? cluster.get('top_compress') : cluster.get('top')
+        const bottom = top + compress ? COMPRESS_ASSET_HEIGHT : cluster.get('children').size * ASSET_HEIGHT
         return (top <= viewBoxBottom) && (bottom >= viewBoxTop)
       })
     }))
@@ -416,7 +410,7 @@ class Lines extends ImmutableComponent {
       .get('clusters')
       .flatMap(cluster => cluster
         .get('children')
-        .map((asset, index) => asset.set('top', column.get('offset') + cluster.get('top') + index * ASSET_HEIGHT))
+        .map((asset, index) => asset.set('top', column.get('offset') + compress ? (cluster.get('top_compress') + 10) : (cluster.get('top') + index * ASSET_HEIGHT)))
         .filter(asset => {
           const top = asset.get('top')
           const bottom = top + ASSET_HEIGHT
@@ -494,7 +488,7 @@ class Lines extends ImmutableComponent {
 }
 
 
-@connect(({assetBrowser}) => ({assetBrowser}))
+@connect(({ assetBrowser}) => ({assetBrowser}))
 class ChartBody extends ImmutableComponent {
   updateViewBox = () => {
     const clientRect = ReactDOM.findDOMNode(this).getBoundingClientRect()
@@ -572,7 +566,9 @@ class ChartBody extends ImmutableComponent {
 @connect(({assetBrowser}) => ({
   activeAssetId: assetBrowser.get('activeAssetId'),
   pageIndex: assetBrowser.get('pageIndex'),
-  maxPage: assetBrowser.get('maxPage')
+  maxPage: assetBrowser.get('maxPage'),
+  maxPageCompress: assetBrowser.get('maxPageCompress'),
+  compress: assetBrowser.get('compressMode')
 }))
 class Pagination extends ImmutableComponent {
   diffPage = diff => e => {
