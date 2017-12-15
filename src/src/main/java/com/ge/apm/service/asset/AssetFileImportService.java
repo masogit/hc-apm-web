@@ -246,6 +246,23 @@ public class AssetFileImportService {
                     asset.setStatus(1);
                     asset.setDeviceStatus(0);
                     asset.setIsDeleted(Boolean.FALSE);
+                } else {
+                    if (asset.getAssetOwnerName() == null) {
+                        asset.setAssetOwnerId(null);
+                        asset.setAssetOwnerTel(null);
+                    }
+                    if (asset.getAssetOwnerName2() == null) {
+                        asset.setAssetOwnerId2(null);
+                        asset.setAssetOwnerTel2(null);
+                    }
+                    if (asset.getAssetOwnerName3() == null) {
+                        asset.setAssetOwnerId3(null);
+                        asset.setAssetOwnerTel3(null);
+                    }
+                    if (asset.getClinicalOwnerName() == null) {
+                        asset.setClinicalOwnerId(null);
+                        asset.setClinicalOwnerTel(null);
+                    }
                 }
 
                 map.put("asset", asset);

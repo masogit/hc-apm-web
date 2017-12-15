@@ -955,9 +955,11 @@ public class AssetInfo implements Serializable {
 
     public void setLifecycleInYear(Double lifecycle) {
     	if(lifecycle == null){
-    		return;
-    	}
-       this.lifecycle = new Double(lifecycle * 12).intValue();
+            this.lifecycle = null;
+    	} else {
+            this.lifecycle = new Double(lifecycle * 12).intValue();
+        }
+
     }
 
     public String getRegistrationNo() {
