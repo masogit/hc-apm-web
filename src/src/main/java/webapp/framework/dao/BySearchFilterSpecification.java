@@ -64,6 +64,13 @@ public class BySearchFilterSpecification {
                                 }
                                 predicates.add(new Tuple2(filter.conditionPath, expression.in(list)));
                                 break;
+                            case NotIN:
+                                List notInlist = (List) filter.value;
+                                if (notInlist.isEmpty()) {
+                                    notInlist.add("");
+                                }
+                                predicates.add(new Tuple2(filter.conditionPath, builder.not(expression.in(notInlist))));
+                                break;
                             case IsNull:
                                 predicates.add(new Tuple2(filter.conditionPath, expression.isNull()));
                                 break;

@@ -133,6 +133,9 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "repair_type")
     private Integer repairType;
 
+    @Column(name="repair_result", length = 2)
+    private String repairResult;
+
     @Column(name = "checkin_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
@@ -493,7 +496,14 @@ public class V2_WorkOrder implements Serializable {
         this.externalExpense = externalExpense;
     }
 
-    
+    public String getRepairResult() {
+        return repairResult;
+    }
+
+    public void setRepairResult(String repairResult) {
+        this.repairResult = repairResult;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

@@ -13,7 +13,7 @@
 				text-align: left;
 			}
 		</style>
-        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog"  height="580" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
+        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog"  height="600" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
             <h:form id="PmOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
@@ -47,6 +47,13 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.feedbackComment}</label>
                             <p:inputText id="remark" value="#{pmOrderRuleController.selected.remark}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+                        <h:panelGroup >
+                            <label class ="label">#{msg.ruleLevel}*</label>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.level}" disabled="false" required="true" requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </h:panelGroup>
                     </p:panelGrid>
                     

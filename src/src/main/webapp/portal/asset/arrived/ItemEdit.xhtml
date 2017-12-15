@@ -29,14 +29,14 @@
                                 <label class="label">#{msg.assetGroup}</label>
                                 <h:outputText  value="#{fieldMsg.fieldValue('assetGroup', assetInstallationController.arrivalListItem.arrivalList.assetGroup)}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.brand}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.brand}" />
-                            </h:panelGroup>
-                            <h:panelGroup>
+                            </h:panelGroup>-->
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.arrivalListOrderType}</label>
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListOrderType', assetInstallationController.arrivalListItem.arrivalList.orderType)}" />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.functionType}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.functionType}" />
@@ -250,9 +250,13 @@
                                 <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.purchaseDate}" maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">保修时长(年)</label>
+                                <p:inputNumber value="#{assetInstallationController.arrivalListItem.warrantyYear}"  minValue="0" decimalPlaces="2" />
+                            </h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.factoryWarrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.factoryWarrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.warrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
@@ -424,7 +428,7 @@
 
 
                     </p:fieldset>
-<!--                    <p:fieldset legend="相关报告" >
+                    <p:fieldset legend="相关报告" >
                         <h:panelGroup id="addReport">
                             <p:selectOneMenu value="#{commonReportController.reportUid}">
                                 <p:ajax update="addReport" />
@@ -447,12 +451,12 @@
                          </p:link>
                             <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList"/>
                         </p:dataList>
-                    </p:fieldset>-->
+                    </p:fieldset>
                     <h:panelGroup>
 
                         <p:commandButton validateClient="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm:qrCode :growl"  value="保存" icon="ui-icon-check" />
                         <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" />
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.rejectInstall}" value="退货" >
+                        <p:commandButton validateClient="false" action="#{assetInstallationController.rejectInstall}" value="退货" immediate="true" >
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="arrivalItemsList?faces-redirect=true" immediate="true" />

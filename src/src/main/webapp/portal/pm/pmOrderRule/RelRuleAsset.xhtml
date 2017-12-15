@@ -17,7 +17,7 @@
         <h:form id="BatchCreateForm">
 <!--              <p:tabView>
                 <p:tab > -->
-                   <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                           <h:panelGroup >
 		                     <label class ="label">#{msg.name}</label>
 	                         <p:inputText  value="#{relRuleAssetController.queryAsset.name}"  required="false">
@@ -44,6 +44,13 @@
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
 	                          </p:inputText>
 		                 </h:panelGroup>
+		                  <h:panelGroup >
+                                <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上四个条件)</label>
+                                <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
+                                		<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
                     </p:panelGrid>
                     
                     <p:pickList id="AssetsPickList" value="#{relRuleAssetController.availableAssets}" var="item"
@@ -70,20 +77,32 @@
                         </p:column> 
                     </p:pickList>
                     <br/> <br/>
-                    <p:panelGrid id ="PmOrderRule" columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                    	<h:panelGroup >
+                    <p:panelGrid id ="PmOrderRule" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    		<h:panelGroup >
+                              <label class="label">#{msg.ruleLevel}*</label>
+                              <p:selectOneMenu d="ruleLevel" value="#{relRuleAssetController.level}" disabled="false" >
+	                            	<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="PmOrderRule" />
+	                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+	                             <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+		                      </p:selectOneMenu>
+                          </h:panelGroup>
+                            
+                    		<h:panelGroup >
                        		<label class="label">#{msg.PmOrderRule}*</label>
-                               <p:selectOneMenu id="pmOrderRule" value="#{relRuleAssetController.pmOrderRuleUID}"  required="true" requiredMessage="#{msg.PmOrderRule}#{msg.ValidationRequire}" >
+                               <p:selectOneMenu id="pmOrderRule" value="#{relRuleAssetController.pmOrderRuleUID}"  
+                               required="true" requiredMessage="#{msg.PmOrderRule}#{msg.ValidationRequire}"  rendered="#{relRuleAssetController.level > 0}">
                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                   <!--  <f:selectItems value="#{fieldMsg.getFieldValueList('deviceType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/> -->
                                    <f:selectItems value="#{relRuleAssetController.getPmOrderRuleList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>
-                        <center>
-			               <h:panelGroup >
+                        
+                        	<h:panelGroup >
 			                   <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" 
 			            		icon="ui-icon-check" update="BatchCreateForm,:growl" action = "RelRuleAsset"/>
-			               </h:panelGroup>
+			             </h:panelGroup>
+                        <center>
+
 			           </center>
                     </p:panelGrid>
 <!--                 </p:tab>

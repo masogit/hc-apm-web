@@ -9,6 +9,7 @@ import com.ge.apm.service.pm.PmOrderRequestApiService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.wo.ServiceRequestApiService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.List;
@@ -91,6 +92,13 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
         return userDao.getByClinicalDept(strlist);
     }
 
+    
+    public UserAccount getUserByUid(String userUid){
+        if(Strings.isNullOrEmpty(userUid)){
+            return new UserAccount();
+        }
+        return userDao.getByUid(userUid);
+    }
 
     
 }

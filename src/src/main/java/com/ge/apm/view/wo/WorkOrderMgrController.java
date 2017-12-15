@@ -156,6 +156,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.hosputalUID");
         removeFilterOnField("assetInfo.tenantUID");
         removeFilterOnField("approvalStatus");
+        removeFilterOnField("assetInfo.assetOwnerId");
+        removeFilterOnField("assetInfo.assetOwnerId2");
+        removeFilterOnField("assetInfo.assetOwnerId3");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -178,6 +181,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner1*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner1*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner2*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner2*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             if (!getTagGroupAssets().isEmpty()) {
@@ -448,31 +460,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
     }
-/* public void saveServiceRequest() {
-        if (selectedAsset.getStatus() == 4) {
-            WebUtil.addErrorMessage("所选设备待报废,不能报修");
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("validationFailed", true);
-        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
-            String oUid= UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            if(Strings.isNullOrEmpty(oUid)){//如果当前人连使用科室都没有，提示手动输入
-                WebUtil.addErrorMessage("所选设备没有使用科室,不能报修,请填写当前位置");
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("validationFailed", true);}
-            else// 当前位置:=当前人的科室或者所在院区位置
-            {
-                String orgName=orgDao.getByUid(oUid).getName();
-                selectedAsset.setStatus(currentStatus);
-                newServiceRequest.setAssetLocation(orgName);
-                woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-                cancel();
-            }
-        } else { //如果设备上有使用科室
-            selectedAsset.setStatus(currentStatus);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
-            cancel();
-        }
-    }*/
+
     public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
@@ -603,6 +591,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         AssetInfo assetinfo = assetDao.findById(this.selectedWorkOrder.getAssetId());
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
+
 
     public String getFaultTypeName(Integer id) {
         return assetFaultTypeService.getFaultName(id);
