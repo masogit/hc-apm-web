@@ -2,6 +2,7 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetContractRepository;
 import com.ge.apm.dao.AssetDepreciationRepository;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BlobObjectRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
@@ -10,6 +11,8 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.service.pm.PmOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.domain.AssetContract;
 import com.ge.apm.domain.AssetDepreciation;
@@ -55,6 +58,8 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
     
     private V2_BlobObject blobObject;
 
+    private AssetInfoRepository assetInfoDao;
+
     @Override
     protected void init() {
 
@@ -65,6 +70,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 //        fileService = WebUtil.getBean(AttachmentFileService.class);
         assetService = WebUtil.getBean(AssetInfoService.class);
         pmOrderService = WebUtil.getBean(PmOrderService.class);
+        assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         if (null != encodeStr) {
@@ -121,10 +127,8 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         object.setSiteId(UserContextService.getSiteId());
         this.selectedAsset = null;
     }
-
     @Override
     public void save() {
-
         if (selected.getEndDate().before(selected.getStartDate())) {
             WebUtil.addErrorMessage(MessageFormat.format(WebUtil.getMessage("shouldEarly"), WebUtil.getMessage("startTime"), WebUtil.getMessage("endTime")));
         } else if (null == selectedAsset) {
@@ -139,11 +143,15 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             blobObject.setBoUuid(selected.getUid());
             blobDao.save(blobObject);
             saveDepreciation();
+            //结束时间晚于维保时间，那么就更新维保时间
+            udpateAssetInfoWarranty();
 //            if (this.selected.getContractType() == 5) {
 //                pmOrderService.savePmOrder(selectedAsset, this.selected.getStartDate(), this.selected.getEndDate(), pmCount, null);
 //            }
             cancel();
         }
+
+
     }
 
     @Override
@@ -159,6 +167,15 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         }
     }
 
+    private void udpateAssetInfoWarranty(){
+        if(null==selectedAsset.getWarrantyDate()){
+            selectedAsset.setWarrantyDate(selected.getEndDate());
+            assetInfoDao.save(selectedAsset);
+        }else if(selected.getEndDate().after(selectedAsset.getWarrantyDate())){
+            selectedAsset.setWarrantyDate(selected.getEndDate());
+            assetInfoDao.save(selectedAsset);
+        }
+    }
     private void saveDepreciation() {
         List<AssetDepreciation> depreList = depredao.getByContractId(selected.getId());
         depredao.delete(depreList);
