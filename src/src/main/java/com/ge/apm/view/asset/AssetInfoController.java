@@ -491,6 +491,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                     return "";
                 }
             }
+
+
         }
         if (null!= gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -1157,8 +1159,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbTree = new DefaultTreeNode("root", null, null);
         gbTree.getChildren().add(treeNode);
         treeNode.setExpanded(true);
-      //  selectedGb = new GbCode();
-
     }
 
     public void initOrgTree() {
@@ -1245,16 +1245,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public GbCode getSelectedGb() {
-      /* if(null!= selectedGb && selectedGb.toString().contains("/")){
-         return gbDao.getGbCode(selectedGb.getCode().split("/")[0]);
-       }*/
         return selectedGb;
     }
 
     public void setSelectedGb(GbCode selectedGb) {
-       /* if(null!= selectedGb && selectedGb.toString().contains("/")){
-            this.selectedGb = gbDao.getGbCode(selectedGb.getCode().split("/")[0]);
-        }*/
         this.selectedGb = selectedGb;
 
     }
