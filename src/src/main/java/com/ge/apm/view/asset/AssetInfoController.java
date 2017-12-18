@@ -115,6 +115,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private GbCodeRepository gbDao;
     public List<GbForm> gbFormList = new ArrayList<GbForm>();
 
+    private Map<String, Boolean> selectedMap;
+
+    private List<AssetInfo> currentPageAssets;
+
+    private Boolean isSelectedCurrentPage = false;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -177,6 +183,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         this.filterBySite = false;
+        this.selectedMap = new HashMap();
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
         String encodeStr = request.getParameter("str");
@@ -210,7 +217,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
                 if(null!=selectedGb)
                  gbCodeName = selectedGb.getCode()+"/"+selectedGb.getName();
-            }
+                }
             prepareEdit();
         } else if ("Delete".equalsIgnoreCase(actionName)) {
             //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
@@ -302,14 +309,32 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
-            return dao.findBySearchFilter(this.searchFilters, pageRequest);
+            Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
+            currentPageAssets = res.getContent();
+            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+            return res;
         }
     }
 
     public void exportQrCode() throws Exception {
-        List<AssetInfo> exportList = dao.findBySearchFilter(searchFilters);
+        List<AssetInfo> exportList = getExportList();
         List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
         zipFile = qrCodeService.exportQrCodeList(qrCodeList);
+    }
+
+    public void onSelectAllOfPage() {
+        for (AssetInfo item : currentPageAssets) {
+            selectedMap.put(item.getUid(), this.isSelectedCurrentPage);
+        }
+    }
+
+    public void onPageChange() {
+
+    }
+
+    public List<AssetInfo> getExportList() {
+        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        return assetUids.isEmpty()? dao.findBySearchFilter(searchFilters):dao.findByUidIn(assetUids);
     }
 
     public void onSelectAsset() throws IOException {
@@ -1294,4 +1319,21 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setShowDialog(boolean showDialog) {
         this.showDialog = showDialog;
     }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
+    public Boolean getIsSelectedCurrentPage() {
+        return isSelectedCurrentPage;
+    }
+
+    public void setIsSelectedCurrentPage(Boolean isSelectedCurrentPage) {
+        this.isSelectedCurrentPage = isSelectedCurrentPage;
+    }
+
 }
