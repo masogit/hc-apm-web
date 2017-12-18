@@ -5,23 +5,9 @@
  */
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.service.asset.AssetDepreciationService;
-import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AssetInstallationService;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.*;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -37,9 +23,11 @@ import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.JpaCRUDController;
 
 /**
  *
@@ -66,7 +54,13 @@ public class AssetInstallationController {
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
     private Boolean isGeneratePmOrder=false;
-    
+    private GbCodeService gbCodeService;
+    private GbCodeRepository gbDao;
+    AssetInfoRepository dao = null;
+    private TreeNode selectedNode;
+    private TreeNode selectedGbNode;
+    private String gbCodeName;
+    private GbCode selectedGb;
 //    private String currentQrCode;
 
     @PostConstruct
@@ -89,9 +83,12 @@ public class AssetInstallationController {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
         }
         changeFunctionGroup();
-
+        dao = WebUtil.getBean(AssetInfoRepository.class);
+        gbCodeService = WebUtil.getBean(GbCodeService.class);
+        gbDao = WebUtil.getBean(GbCodeRepository.class);
 
         picList = aiService.getPicList(arrivalListItem.getId());
+        initGbTree();
     }
 
     public String rejectInstall() {
@@ -107,7 +104,13 @@ public class AssetInstallationController {
         }
         return "";
     }
-
+    private TreeNode gbTree;
+    public void initGbTree() {
+        TreeNode treeNode = gbCodeService.buildGbTree();
+        gbTree = new DefaultTreeNode("root", null, null);
+        gbTree.getChildren().add(treeNode);
+        treeNode.setExpanded(true);
+    }
     private Boolean isAvailableQrcode(String qrcode) {
         if (Strings.isNullOrEmpty(qrcode)) {
             return true;
@@ -132,6 +135,14 @@ public class AssetInstallationController {
 
     public String finishInstall() {
         Boolean isAckFinished = true;
+        if (null!= gbCodeName) {
+            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
+            if(null==gbCode){
+                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
+                isAckFinished = false;
+            }
+            arrivalListItem.setNationalStandardCode(selectedGb.getCode());
+        }
         if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
             WebUtil.addErrorMessage("商务验收未通过");
             isAckFinished = false;
@@ -198,6 +209,16 @@ public class AssetInstallationController {
 
     public void updateItem() {
         Boolean valid = true;
+        if (null!= gbCodeName) {
+            GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
+            if(null==gbCode){
+                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
+                return;
+            }
+            if(null!=gbCodeName)
+                arrivalListItem.setNationalStandardCode(gbCodeName.split("/")[0]);
+        }
+
         if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
             valid = false;
@@ -276,21 +297,55 @@ public class AssetInstallationController {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
-                null,
-                this.arrivalListItem.getNationalStandardCode(),
-                this.arrivalListItem.getArrivalList().getSiteUID()
-        );
-        if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-            this.arrivalListItem.setFinancingNum(financingNum);
+        if(null!=gbCodeName ) {
+            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                    null,
+                    gbCodeName.split("/")[0],
+                    this.arrivalListItem.getArrivalList().getSiteUID()
+            );
+            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
+                this.arrivalListItem.setFinancingNum(financingNum);
+            }
+        }
+    }
+    public void onSelectGbTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        GbCode gbCode = (GbCode) node.getData();
+        updateSelectedOrgGb(gbCode);
+        //联动更新
+        if(null!=gbCodeName) {
+            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(null,
+                    gbCode.getCode(),
+                    this.arrivalListItem.getArrivalList().getSiteUID()
+            );
+            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
+                this.arrivalListItem.setFinancingNum(financingNum);
+            }
+
         }
     }
 
+    private void updateSelectedOrgGb(GbCode gbCode) {
+        if (gbCode == null || gbCode.getId() == -1) {
+            selectedGb = null;
+        } else {
+            selectedGb = gbCode;
+            gbCodeName=gbCode.getCode()+"/"+gbCode.getName();
+        }
+
+    }
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 1);
         arrivalListItem.setQrCode(qrcodeLib.getQrCode());
     }
+    public List<String> completeGbName(String prefix) {
+        List<String> names = null;
+        if (!StringUtils.isEmpty(prefix)) {
+            names = gbDao.findGbCodeByPrefix(prefix);
+        }
+        return names;
 
+    }
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
     }
@@ -331,4 +386,43 @@ public class AssetInstallationController {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
 
+    public String getGbCodeName() {
+        return gbCodeName;
+    }
+
+    public void setGbCodeName(String gbCodeName) {
+        this.gbCodeName = gbCodeName;
+    }
+
+    public GbCode getSelectedGb() {
+        return selectedGb;
+    }
+
+    public void setSelectedGb(GbCode selectedGb) {
+        this.selectedGb = selectedGb;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
+
+    public TreeNode getSelectedGbNode() {
+        return selectedGbNode;
+    }
+
+    public void setSelectedGbNode(TreeNode selectedGbNode) {
+        this.selectedGbNode = selectedGbNode;
+    }
+
+    public TreeNode getGbTree() {
+        return gbTree;
+    }
+
+    public void setGbTree(TreeNode gbTree) {
+        this.gbTree = gbTree;
+    }
 }

@@ -72,6 +72,14 @@ public class I18nMessage implements Serializable, Comparable {
         this.siteId = siteId;
     }
 
+    public I18nMessage(String msgType, String msgKey, String valueZh) {
+
+        this.msgType = msgType;
+        this.msgKey = msgKey;
+        this.valueZh = valueZh;
+        this.siteId = -1;
+    }
+
     public Integer getId() {
         return id;
     }
