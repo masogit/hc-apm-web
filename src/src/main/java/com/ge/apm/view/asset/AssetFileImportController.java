@@ -67,13 +67,21 @@ public class AssetFileImportController {
     }
 
     public void uploadDataFile(FileUploadEvent event) {
+        ExcelDocument doc = null;
+
         try {
             this.file = event.getFile();
-            ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
             if(!aiService.checkDocVersion(doc)){
                 WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--模版版本不正确");
                 return;
             }
+
+            if(doc.getLastRowNum(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_DATA_ROW) > 5000 + AssetFileImportService.EXCEL_ASSET_HEADER_ROW - 1){
+                WebUtil.addErrorMessage("导入Excel中资产行数最多5000条，请分批导入！");
+                return;
+            }
+
             importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
             importAssetMap = aiService.getAssetMapFromTemplate(doc);
             
@@ -85,6 +93,10 @@ public class AssetFileImportController {
         } catch (Exception e) {
             WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") +"--" +  e.getMessage());
             Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, e);
+        } finally {
+            if (doc != null) {
+                doc.release();
+            }
         }
     }
 
