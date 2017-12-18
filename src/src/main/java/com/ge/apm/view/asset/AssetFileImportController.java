@@ -77,7 +77,8 @@ public class AssetFileImportController {
                 return;
             }
 
-            if(doc.getLastRowNum(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_DATA_ROW) > 5000 + AssetFileImportService.EXCEL_ASSET_HEADER_ROW - 1){
+            int maxRowNum = AssetFileImportService.EXCEL_ASSET_HEADER_ROW + 5000;
+            if(doc.exceedMaxRowNum(AssetFileImportService.SHEET_ASSET, maxRowNum)){
                 WebUtil.addErrorMessage("导入Excel中资产行数最多5000条，请分批导入！");
                 return;
             }
