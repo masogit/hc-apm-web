@@ -327,10 +327,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selectedMap.put(item.getUid(), this.isSelectedCurrentPage);
         }
     }
-
-    public void onPageChange() {
-
+    
+    public void onItemSelected(){
+        isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
     }
+
 
     public List<AssetInfo> getExportList() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
