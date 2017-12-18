@@ -16,18 +16,18 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import org.primefaces.model.TreeNode;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.model.SelectItem;
 import javax.faces.model.SelectItemGroup;
-
-import org.primefaces.model.TreeNode;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -86,7 +86,10 @@ public class AssetInfoService {
     }
 
     public List<OrgInfo> getClinicalDeptList(String siteUid) {
-        return orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        return orgInfos;
     }
 
     public List<SelectItem> getAllAccessibleOrgDeptList() {
