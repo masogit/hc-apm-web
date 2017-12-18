@@ -20,12 +20,14 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
 import com.ge.apm.dao.RelRuleAssetRepository;
+import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.QueryAsset;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.pure.AssetRuleModel;
 import com.ge.apm.domain.pure.AssetRuleModelList;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
@@ -57,6 +59,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private PmOrderRuleRepository pmOrderRuleRepository;
 	private OrgInfoRepository orgInfoRepository;
 	private PmOrderRequestApiService pmOrderRequestApiService;
+	private V2_PmOrderRepository pmOrderRepository;
 
 	@Override
 	protected void init() {
@@ -68,6 +71,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		pmOrderRequestApiService = WebUtil.getBean(PmOrderRequestApiService.class);
+		pmOrderRepository =  WebUtil.getBean(V2_PmOrderRepository.class);
 		targetAssets = new ArrayList<AssetInfo>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
@@ -224,8 +228,13 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				continue;
 			}
 			int period = rule.getPeriod();
-			if (ai.getLastPmDate() != null && TimeUtils.getDays(ai.getLastPmDate()) < period) {
+/*			if (ai.getLastPmDate() != null && TimeUtils.getDays(ai.getLastPmDate()) < period) {
 				LOGGER.warn("during period !");
+				continue;
+			}*/
+			boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level);
+			if(isExists) {
+				LOGGER.warn("open pm exists !");
 				continue;
 			}
 			AssetRuleModel model = new AssetRuleModel();
