@@ -247,22 +247,7 @@ public class AssetFileImportService {
                     asset.setDeviceStatus(0);
                     asset.setIsDeleted(Boolean.FALSE);
                 } else {
-                    if (asset.getAssetOwnerName() == null) {
-                        asset.setAssetOwnerId(null);
-                        asset.setAssetOwnerTel(null);
-                    }
-                    if (asset.getAssetOwnerName2() == null) {
-                        asset.setAssetOwnerId2(null);
-                        asset.setAssetOwnerTel2(null);
-                    }
-                    if (asset.getAssetOwnerName3() == null) {
-                        asset.setAssetOwnerId3(null);
-                        asset.setAssetOwnerTel3(null);
-                    }
-                    if (asset.getClinicalOwnerName() == null) {
-                        asset.setClinicalOwnerId(null);
-                        asset.setClinicalOwnerTel(null);
-                    }
+                    cleanRelatedFieldsWhenUpdating(asset);
                 }
 
                 map.put("asset", asset);
@@ -280,6 +265,25 @@ public class AssetFileImportService {
         }
 
         return result;
+    }
+
+    private void cleanRelatedFieldsWhenUpdating(AssetInfo asset) {
+        if (asset.getAssetOwnerName() == null) {
+            asset.setAssetOwnerId(null);
+            asset.setAssetOwnerTel(null);
+        }
+        if (asset.getAssetOwnerName2() == null) {
+            asset.setAssetOwnerId2(null);
+            asset.setAssetOwnerTel2(null);
+        }
+        if (asset.getAssetOwnerName3() == null) {
+            asset.setAssetOwnerId3(null);
+            asset.setAssetOwnerTel3(null);
+        }
+        if (asset.getClinicalOwnerName() == null) {
+            asset.setClinicalOwnerId(null);
+            asset.setClinicalOwnerTel(null);
+        }
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
