@@ -6,36 +6,19 @@
 package com.ge.apm.service.asset;
 
 import com.alibaba.druid.util.StringUtils;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.QrCodeLibRepository;
-import com.ge.apm.dao.SupplierRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.I18nMessage;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
-import com.ge.apm.domain.Supplier;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.poi.ss.usermodel.Cell;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+
+import java.util.*;
 
 /**
  *
@@ -54,7 +37,7 @@ public class AssetFileImportService {
     public static final int EXCEL_ORG_HEADER_ROW = 4;
     public static final int EXCEL_ORG_DATA_ROW = 5;
 
-    public static enum ImportStatus {
+    public enum ImportStatus {
         New, Exist, Created, Failure, CheckFail
     }
 
@@ -159,114 +142,123 @@ public class AssetFileImportService {
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, ++dataRow)) {
             try{
-            AssetInfo asset = new AssetInfo();
-            String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
-            if (assetName == null || assetName.isEmpty()) {
-                break;
-            }
-            Map<String, Object> map = new LinkedHashMap();
-            String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
-            asset.setDepartNum(departNum);
-            asset.setName(assetName);
-            asset.setAliasName(ExcelDocument.getCellStringValue(rowMap.get("设备别名")));
-            asset.setSiteId(currentOrg.getSiteId());
-            asset.setHospitalId(currentOrg.getHospitalId());
+                Map<String, Object> map = new LinkedHashMap();
 
-            asset.setTenantUID(currentOrg.getTenantUID());
-            asset.setHospitalUID(currentOrg.getHospitalUID());
-            asset.setInstitutionUID(currentOrg.getInstitutionUID());
-            asset.setSiteUID(currentOrg.getSiteUID());
+                boolean isNewAsset = true; //flag an asset is new or existing.
 
-            asset.setIsValid(true);
-            asset.setStatus(1);
-            asset.setDeviceStatus(0);
-            asset.setIsDeleted(Boolean.FALSE);
-            asset.setAssetOwnerName(ExcelDocument.getCellStringValue(rowMap.get("维修负责人")));
-            asset.setAssetOwnerName2(ExcelDocument.getCellStringValue(rowMap.get("维修负责人2")));
-            asset.setAssetOwnerName3(ExcelDocument.getCellStringValue(rowMap.get("维修负责人3")));
+                AssetInfo asset = new AssetInfo();
+                String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
+                if (StringUtils.isEmpty(assetName)) {
+                    break; //return if go beyond the valid cell range
+                }
+                asset.setName(assetName);
 
-            asset.setClinicalDeptName(ExcelDocument.getCellStringValue(rowMap.get("使用科室")));
-            asset.setManufacture(ExcelDocument.getCellStringValue(rowMap.get("制造商")));
-            asset.setMakerShortName(ExcelDocument.getCellStringValue(rowMap.get("品牌/制造商简称")));
-            asset.setDeviceName(ExcelDocument.getCellStringValue(rowMap.get("设备标准名称")));
-            asset.setRegistrationNo(ExcelDocument.getCellStringValue(rowMap.get("注册证号")));
-            asset.setVendor(ExcelDocument.getCellStringValue(rowMap.get("供应商")));
-            String functionGroup = ExcelDocument.getCellStringValue(rowMap.get("医疗器械分类"));
-            asset.setFunctionGroup(getI18nMsgKey(assetFunctionTypes, functionGroup,map,"医疗器械分类"));
-            if (functionGroup != null && functionGroup.length() > 4) {
-                String assetCode68 = ExcelDocument.getCellStringValue(rowMap.get("医疗器械子分类"));
-                String str = functionGroup.substring(0, 3);
-                List<I18nMessage> list = FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId);
-                Integer msgKey = getI18nMsgKey(FieldValueMessageController.getFieldValueList(functionGroup.substring(0, 4), siteId), assetCode68,map,"医疗器械子分类");
-                asset.setAssetCode68(msgKey == null ? null : msgKey);
-            }
-            String assetGroupName = ExcelDocument.getCellStringValue(rowMap.get("设备分类"));
-            asset.setAssetGroup(getI18nMsgKey(assetGroup, assetGroupName,map,"设备分类"));
-            asset.setFunctionGrade(ExcelDocument.getCellIntegerValue(rowMap.get("功能等级")));
-            asset.setFunctionType(ExcelDocument.getCellStringValue(rowMap.get("设备型号")));
-            asset.setSerialNum(ExcelDocument.getCellStringValue(rowMap.get("制造商序列号")));
-            asset.setSystemId(ExcelDocument.getCellStringValue(rowMap.get("SystemID/厂商报修ID")));
-            asset.setBarcode(ExcelDocument.getCellStringValue(rowMap.get("条码")));
-            String nationalStandardCode = ExcelDocument.getCellStringValue(rowMap.get("2010国家编码"));
-            asset.setNationalStandardCode(nationalStandardCode);
-            String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
-            asset.setFinancingNum(financingNum);
-            asset.setModalityId(ExcelDocument.getCellStringValue(rowMap.get("IT系统编号")));
-            asset.setPurchasePrice(ExcelDocument.getCellDoubleValue(rowMap.get("采购价格")));
-            asset.setSalvageValue(ExcelDocument.getCellDoubleValue(rowMap.get("最终残值")));
-            asset.setLifecycleInYear(ExcelDocument.getCellDoubleValue(rowMap.get("使用年限")));
-            String depreciationMethodNmae = ExcelDocument.getCellStringValue(rowMap.get("折旧算法"));
-            asset.setDepreciationMethod(getI18nMsgKey(depreciationMethod, depreciationMethodNmae,map,"折旧算法"));
-            asset.setManufactDate(getDateField(rowMap.get("出厂日期"), "出厂日期"));
-            asset.setPurchaseDate(getDateField(rowMap.get("采购日期"), "采购日期"));
-            asset.setArriveDate(getDateField(rowMap.get("到货日期"), "到货日期"));
-            asset.setInstallDate(getDateField(rowMap.get("启用日期"), "启用日期"));
-            asset.setFactoryWarrantyDate(getDateField(rowMap.get("质保日期"), "质保日期"));
-            asset.setWarrantyDate(getDateField(rowMap.get("维保截止日期"), "维保截止日期"));
-            asset.setTerminateDate(getDateField(rowMap.get("报废日期"), "报废日期"));
-            asset.setLastPmDate(getDateField(rowMap.get("上次维护日期"), "上次维护日期"));
-            asset.setLastMeteringDate(getDateField(rowMap.get("上次计量日期"), "上次计量日期"));
-            asset.setLastQaDate(getDateField(rowMap.get("上次质检日期"), "上次质检日期"));
-            asset.setMaitanance(ExcelDocument.getCellStringValue(rowMap.get("维护商")));
-            Double maitananceTel = ExcelDocument.getCellDoubleValue(rowMap.get("维护商电话"));
-            asset.setMaitananceTel(maitananceTel == null ? "" : String.valueOf(maitananceTel.longValue()));
-            String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-            if (inputQrcode != null) {
-                asset.setQrCode(inputQrcode.replace("-", ""));
-            }
-            asset.setLocationCode(ExcelDocument.getCellStringValue(rowMap.get("安装位置编码")));
-            asset.setLocationName(ExcelDocument.getCellStringValue(rowMap.get("安装位置")));
-            asset.setClinicalOwnerName(ExcelDocument.getCellStringValue(rowMap.get("使用责任人")));
-            asset.setComments(ExcelDocument.getCellStringValue(rowMap.get("备注")));
-//            String assetType = ExcelDocument.getCellStringValue(rowMap.get("设备类型"));
-//            asset.setAssetCategory(getI18nMsgKey(assetCategoryList, assetType,map,"设备类型"));
-            String assetUsage = ExcelDocument.getCellStringValue(rowMap.get("用途分类"));
-            asset.setAssetUsage(getI18nMsgKey(assetUsageList, assetUsage,map,"用途分类"));
-            String capitalSource = ExcelDocument.getCellStringValue(rowMap.get("资金来源"));
-            asset.setCapitalSource(getI18nMsgKey(capitalSourceList, capitalSource,map,"资金来源"));
-            String riskGrade = ExcelDocument.getCellStringValue(rowMap.get("风险等级"));
-            asset.setRiskGrade(getI18nMsgKey(riskGradeList, riskGrade,map,"风险等级"));
-            String measureGrade = ExcelDocument.getCellStringValue(rowMap.get("计量等级"));
-            asset.setMeasureGrade(getI18nMsgKey(measureGradeList, measureGrade,map,"计量等级"));
-            String measuringItemCategory = ExcelDocument.getCellStringValue(rowMap.get("计量项目类别"));
-            asset.setMeasuringItemCategory(getI18nMsgKey(measuringItemCategoryList, measuringItemCategory,map,"计量项目类别"));
-            String emergencyEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否急救设备"));
-            asset.setEmergencyEquipment(getI18nMsgKey(emergencyEquipmentList, emergencyEquipment,map,"是否急救设备"));
-            String importEquipment = ExcelDocument.getCellStringValue(rowMap.get("是否进口设备"));
-            asset.setImportEquipment(getI18nMsgKey(importEquipmentList, importEquipment,map,"是否进口设备"));
-            String usageStatus = ExcelDocument.getCellStringValue(rowMap.get("使用状态"));
-            asset.setUsageStatus(getI18nMsgKey(usageStatusList, usageStatus,map,"使用状态"));
-            String accountingCategory = ExcelDocument.getCellStringValue(rowMap.get("核算类别"));
-            asset.setAccountingCategory(getI18nMsgKey(accountingCategoryList, accountingCategory,map,"核算类别"));
+                String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
+                asset.setDepartNum(departNum);
 
-            map.put("asset", asset);
-            map.put("status", ImportStatus.New);
-            map.put("rowData", rowMap);
 
-            if (departNum == null) {
-                departNum = "";
-            }
-            result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
+                String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
+                if (!StringUtils.isEmpty(inputQrcode)) {
+                    asset.setQrCode(inputQrcode.replace("-", ""));
+                }
+
+                String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
+                asset.setFinancingNum(financingNum);
+
+                //load asset if it is already existed in db, then update the record
+                List<AssetInfo> assetList = getAssetInfos(asset);
+                if (assetList != null && assetList.size() == 1) {
+                    asset = assetList.get(0);
+                    isNewAsset = false;
+                }
+
+                AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
+                assetRow.setFieldStringValue("设备别名", "setAliasName");
+                assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
+                assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
+                assetRow.setFieldStringValue("维修负责人3", "setAssetOwnerName3");
+                assetRow.setFieldStringValue("使用科室", "setClinicalDeptName");
+                assetRow.setFieldStringValue("制造商", "setManufacture");
+                assetRow.setFieldStringValue("品牌/制造商简称", "setMakerShortName");
+                assetRow.setFieldStringValue("设备标准名称", "setDeviceName");
+                assetRow.setFieldStringValue("注册证号", "setRegistrationNo");
+                assetRow.setFieldStringValue("供应商", "setVendor");
+
+                assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map);
+                if (asset.getFunctionGroup() != null) {
+                    List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(asset.getFunctionGroup()), siteId);
+                    assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map);
+                }
+
+                assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
+
+                assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
+                assetRow.setFieldStringValue("设备型号", "setFunctionType");
+                assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
+                assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
+                assetRow.setFieldStringValue("条码", "setBarcode");
+                assetRow.setFieldStringValue("2010国家编码", "setNationalStandardCode");
+                assetRow.setFieldStringValue("IT系统编号", "setModalityId");
+                assetRow.setFieldDoubleValue("采购价格", "setPurchasePrice");
+                assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
+                assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
+
+                assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map);
+
+                assetRow.setFieldDateValue("出厂日期", "setManufactDate");
+                assetRow.setFieldDateValue("采购日期", "setPurchaseDate");
+                assetRow.setFieldDateValue("到货日期", "setArriveDate");
+                assetRow.setFieldDateValue("启用日期", "setInstallDate");
+                assetRow.setFieldDateValue("质保日期", "setFactoryWarrantyDate");
+                assetRow.setFieldDateValue("维保截止日期", "setWarrantyDate");
+                assetRow.setFieldDateValue("报废日期", "setTerminateDate");
+                assetRow.setFieldDateValue("上次维护日期", "setLastPmDate");
+                assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
+                assetRow.setFieldDateValue("上次质检日期", "setLastQaDate");
+
+                assetRow.setFieldStringValue("维护商", "setMaitanance");
+                assetRow.setFieldStringValue("维护商电话", "setMaitananceTel");
+                assetRow.setFieldStringValue("安装位置编码", "setLocationCode");
+                assetRow.setFieldStringValue("安装位置", "setLocationName");
+                assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
+                assetRow.setFieldStringValue("备注", "setComments");
+
+                assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map);
+                assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map);
+                assetRow.setFieldDropdownValue("风险等级", "setRiskGrade", riskGradeList, map);
+                assetRow.setFieldDropdownValue("计量等级", "setMeasureGrade", measureGradeList, map);
+                assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map);
+                assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map);
+                assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map);
+                assetRow.setFieldDropdownValue("使用状态", "setUsageStatus", usageStatusList, map);
+                assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map);
+
+                if (isNewAsset) {
+                    asset.setSiteId(currentOrg.getSiteId());
+                    asset.setHospitalId(currentOrg.getHospitalId());
+
+                    asset.setTenantUID(currentOrg.getTenantUID());
+                    asset.setHospitalUID(currentOrg.getHospitalUID());
+                    asset.setInstitutionUID(currentOrg.getInstitutionUID());
+                    asset.setSiteUID(currentOrg.getSiteUID());
+
+                    asset.setIsValid(true);
+                    asset.setStatus(1);
+                    asset.setDeviceStatus(0);
+                    asset.setIsDeleted(Boolean.FALSE);
+                } else {
+                    cleanRelatedFieldsWhenUpdating(asset);
+                }
+
+                map.put("asset", asset);
+                map.put("status", isNewAsset ? ImportStatus.New : ImportStatus.Exist);
+                map.put("rowData", rowMap);
+
+                if (departNum == null) {
+                    departNum = "";
+                }
+                result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
+
             }catch(Exception e){
                 throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
             }
@@ -275,60 +267,31 @@ public class AssetFileImportService {
         return result;
     }
 
-    private Date getDateField(Object object, String filedSrcName) throws Exception {
-
-
-        ExcelDocument.ValueWrapper valueWrapper = null;
-
-        if (object instanceof ExcelDocument.ValueWrapper) {
-            valueWrapper = (ExcelDocument.ValueWrapper) object;
-            object = valueWrapper.value;
+    private void cleanRelatedFieldsWhenUpdating(AssetInfo asset) {
+        if (asset.getAssetOwnerName() == null) {
+            asset.setAssetOwnerId(null);
+            asset.setAssetOwnerTel(null);
+        }
+        if (asset.getAssetOwnerName2() == null) {
+            asset.setAssetOwnerId2(null);
+            asset.setAssetOwnerTel2(null);
+        }
+        if (asset.getAssetOwnerName3() == null) {
+            asset.setAssetOwnerId3(null);
+            asset.setAssetOwnerTel3(null);
+        }
+        if (asset.getClinicalOwnerName() == null) {
+            asset.setClinicalOwnerId(null);
+            asset.setClinicalOwnerTel(null);
+        }
+        if (asset.getClinicalDeptName() == null) {
+            asset.setClinicalDeptId(null);
+            asset.setClinicalDeptUID(null);
+        }
+        if (asset.getVendor() == null) {
+            asset.setSupplierId(null);
         }
 
-        if (object == null) {
-            return null;
-        }
-
-        if (object instanceof Date) {
-            return (Date) object;
-        }
-        if (object instanceof String) {
-            String strDate = (String) object;
-
-            strDate = strDate.trim();
-            Date res = ExcelDocument.getCellDateValue(strDate);
-
-            if (res != null) {
-                return res;
-            }
-
-            throw new Exception(filedSrcName + "[" + strDate + "]无效的日期格式");
-        } else {
-            throw new Exception(filedSrcName + "无效的日期格式");
-        }
-    }
-
-    private Integer getI18nMsgKey(List<I18nMessage> msgList, String value, Map map, String fieldName) {
-        if (value == null || value.isEmpty()) {
-            return null;
-        }
-        I18nMessage msg = msgList.stream().filter(t -> t.getValueZh().equals(value)).findAny().orElse(null);
-        if (msg == null) {
-            addErrMessage(map, "警告:无效值" + fieldName + "[" + value + "]");
-            return null;
-        } else {
-            return Integer.parseInt(msg.getMsgKey());
-        }
-    }
-
-    private void addErrMessage(Map<String, Object> item, String comments) {
-        if (item.containsKey("errmsg")) {
-            ((List<String>) item.get("errmsg")).add(comments);
-        } else {
-            List<String> c = new ArrayList();
-            c.add(comments);
-            item.put("errmsg", c);
-        }
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
@@ -341,7 +304,7 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Created);
             } else if (orgs.size() > 1) {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
+                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
             } else {
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
@@ -356,7 +319,7 @@ public class AssetFileImportService {
                 OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
                 if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
                     item.put("status", ImportStatus.Failure);
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "无法关联");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "无法关联");
                     newAsset.setClinicalDeptName(null);
                 } else {
                     newAsset.setClinicalDeptName(orgName);
@@ -365,7 +328,7 @@ public class AssetFileImportService {
                 }
             } else {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "不在列表页中");
+                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "不在列表页中");
                 newAsset.setClinicalDeptName(null);
             }
 
@@ -377,9 +340,9 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerTel(assetOwner.getTelephone());
             } else {
                 if (newAsset.getAssetOwnerName() == null) {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + "未设置");
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName") + newAsset.getAssetOwnerName() + "无此用户/无法关联");
                 }
                 newAsset.setAssetOwnerName(null);
             }
@@ -391,9 +354,9 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerTel2(assetOwner.getTelephone());
             } else {
                 if (newAsset.getAssetOwnerName2() == null) {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + "未设置");
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("AssetOwnerName2") + newAsset.getAssetOwnerName2() + "无此用户/无法关联");
                 }
                 newAsset.setAssetOwnerName2(null);
             }
@@ -406,9 +369,9 @@ public class AssetFileImportService {
                 newAsset.setAssetOwnerTel3(assetOwner.getTelephone());
             } else {
                 if (newAsset.getAssetOwnerName3() == null) {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + "未设置");
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("assetOwnerName3") + newAsset.getAssetOwnerName3() + "无此用户/无法关联");
                 }
                 newAsset.setAssetOwnerName3(null);
             }
@@ -418,12 +381,12 @@ public class AssetFileImportService {
             if (userList != null && userList.size() == 1) {
                 UserAccount clinicalOwner = userList.get(0);
                 newAsset.setClinicalOwnerId(clinicalOwner.getId());
-                newAsset.setClinicalOwnerName(clinicalOwner.getTelephone());
+                newAsset.setClinicalOwnerTel(clinicalOwner.getTelephone());
             } else {
                 if (newAsset.getClinicalOwnerName() == null) {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + "未设置");
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("ClinicalOwnerName") + newAsset.getClinicalOwnerName() + "无此用户/无法关联");
                 }
                 newAsset.setClinicalOwnerName(null);
             }
@@ -444,7 +407,7 @@ public class AssetFileImportService {
                     Supplier supplier = supplierList.get(0);
                     newAsset.setSupplierId(supplier.getId());
                 } else {
-                    addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
+                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
                     newAsset.setVendor(null);
                 }
             }
@@ -487,10 +450,13 @@ public class AssetFileImportService {
 
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.Failure);
-                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
+                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-                item.put("asset", assetList.get(0));
+//                item.put("asset", assetList.get(0));
                 item.put("status", ImportStatus.Exist);
+//                item.put("assetFromExcel", newAsset);
+                assetDao.save(newAsset);
+
             }
 
         });
@@ -504,15 +470,15 @@ public class AssetFileImportService {
 
         QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
         if (qrCodeLib == null) {
-            addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
+            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
             return false;
         }
         if (!qrCodeLib.getSiteUID().equals(orgUid)) {
-            addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
+            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
         if (qrCodeLib.getStatus() != 1) {
-            addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
+            AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
             return false;
         }
 
@@ -574,15 +540,22 @@ public class AssetFileImportService {
     }
 
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
+
         List<SearchFilter> assetFilters = new ArrayList<>();
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
-        assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-        if (null != asset.getFinancingNum() && !asset.getFinancingNum().isEmpty()) {
-            assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+
+        if (!StringUtils.isEmpty(asset.getQrCode())) {
+            assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+        } else {
+            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
+            assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+            if (null != asset.getFinancingNum() && !asset.getFinancingNum().isEmpty()) {
+                assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+            }
         }
+
         List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
         return tempList;
     }
@@ -611,7 +584,7 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.New);
             } else if (orgs.size() > 1) {
                 item.put("status", ImportStatus.CheckFail);
-                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
+                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
                 result.add(Boolean.FALSE);
             } else {
                 item.put("org", orgs.get(0));
@@ -636,16 +609,17 @@ public class AssetFileImportService {
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
-                addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
+                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-                item.put("asset", assetList.get(0));
-                item.put("status", ImportStatus.Exist);
+                //already loaded this data in the previous steps
+//                item.put("asset", assetList.get(0));
+//                item.put("status", ImportStatus.Exist);
             }
 
             if (null == newAsset.getAssetGroup()) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
-                addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
+                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
         });
@@ -656,4 +630,5 @@ public class AssetFileImportService {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
         return "v1.8".equalsIgnoreCase(inputVersion);
     }
+
 }
