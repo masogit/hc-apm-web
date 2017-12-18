@@ -88,6 +88,24 @@ public class ExcelDocument {
         return rowNum -1;
     }
 
+    public boolean exceedMaxRowNum(String sheetName, int maxRowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+
+        Row row = sheet.getRow(maxRowNum);
+
+        if (row == null) {
+            return false;
+        }
+
+        Cell cell = row.getCell(0);
+        if (cell == null || StringUtils.isEmpty(cell.getStringCellValue())) {
+            return false;
+        }
+
+        return true;
+
+    }
+
     public String[] getKeyRow(String sheetName, int keyRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         return getKeyRow(sheet, keyRowNum);
