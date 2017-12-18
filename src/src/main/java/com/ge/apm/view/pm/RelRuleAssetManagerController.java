@@ -201,10 +201,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	public String getBrand(String assetUid) {
 		AssetInfo ai = getAssetInfo(assetUid);
 		if (ai != null) {
-			Brand brand = ai.getBrand();
-			if (brand != null) {
-				return brand.getName();
-			}
+			return ai.getMakerShortName();
 		}
 		return null;
 	}
