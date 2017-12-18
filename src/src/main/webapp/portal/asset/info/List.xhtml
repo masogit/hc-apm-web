@@ -48,7 +48,7 @@
 
                         <p:column >
                             <p:selectBooleanCheckbox value="#{assetInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
-                                <p:ajax  update="@this :AssetInfoListForm:datalist:selectCheckBoxHeader"/>
+                                <p:ajax listener="#{assetInfoController.onItemSelected}"  update="@this @(.selectCheckBoxHeader)"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetInfoController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
