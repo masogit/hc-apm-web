@@ -67,9 +67,25 @@ public class ExcelDocument {
         input.close();
     }
 
-    public Integer getLastRowNum(String sheetName) {
+    public int getLastRowNum(String sheetName, int startRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
-        return sheet == null ? 0 : workBook.getSheet(sheetName).getLastRowNum();
+        if (sheet == null) {
+            return 0;
+        }
+
+        int rowNum = startRowNum;
+        Row row;
+        while ((row = sheet.getRow(rowNum)) != null) {
+            Cell cell = row.getCell(0);
+            if (cell == null || StringUtils.isEmpty(cell.getStringCellValue())) {
+                break;
+            }
+
+            ++rowNum;
+        }
+
+
+        return rowNum -1;
     }
 
     public String[] getKeyRow(String sheetName, int keyRowNum) {
