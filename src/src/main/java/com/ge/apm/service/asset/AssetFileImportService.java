@@ -284,6 +284,14 @@ public class AssetFileImportService {
             asset.setClinicalOwnerId(null);
             asset.setClinicalOwnerTel(null);
         }
+        if (asset.getClinicalDeptName() == null) {
+            asset.setClinicalDeptId(null);
+            asset.setClinicalDeptUID(null);
+        }
+        if (asset.getVendor() == null) {
+            asset.setSupplierId(null);
+        }
+
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
