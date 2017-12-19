@@ -392,6 +392,9 @@ class Lines extends ImmutableComponent {
 
   render() {
     const { viewBoxOffsetY, viewBoxHeight, hoveredAssetId, activeAssetId, columns, compress } = this.props
+    if (compress) {
+      return null
+    }
     const viewBoxTop = viewBoxOffsetY
     const viewBoxBottom = viewBoxOffsetY + viewBoxHeight
     if (viewBoxHeight === 0) return null
