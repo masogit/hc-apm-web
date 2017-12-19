@@ -66,6 +66,9 @@ public class V2_WorkOrderService {
     private WorkOrderCoworkerRepository workOrderCoworkerRepository;
     @Autowired
     private UserCommonService ucService;
+    @Autowired
+    private ServiceRequestMsgRepository msgDao;
+    
     public V2_WorkOrder getWorkOrderById(String woId) {
         return woDao.findById(woId);
     }
@@ -242,10 +245,11 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void submitWorkOrder(V2_WorkOrder selectedWorkOrder,List<V2_WorkOrder_Detail> accessoryList) {
+    public void submitWorkOrder(V2_WorkOrder selectedWorkOrder,List<V2_WorkOrder_Detail> accessoryList,String comment) {
         selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
+        formData.setDesc(comment);
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setStepDetail(accessoryList);
         String res = srApi.invokeWorkOrderAction(token,formData,"approval",selectedWorkOrder.getId());
@@ -544,6 +548,10 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
         V2_WorkOrder_Detail detail = detailDao.findById(detailId);
         detail.setArrived(Boolean.TRUE);
         detailDao.save(detail);
+    }
+
+    public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
+        return msgDao.findBySrIdOrderBySendTimeDesc(id);
     }
 
 }

@@ -16,6 +16,7 @@ import com.ge.apm.domain.AssetFaultType;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.ServiceRequestMsg;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_WorkOrder;
@@ -331,6 +332,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return woService.getWorkOrderCoworker(woId);
     }
+    
+    public List<ServiceRequestMsg> getServiceRequestMessageList(String woId) {
+        return selected==null? null:woService.getServiceRequestMessageList(woId);
+    }
 
     public void prepareAct(String woid) {
         selectedWorkOrder = dao.findById(woid);
@@ -634,7 +639,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void submitWorkOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        woService.submitWorkOrder(selectedWorkOrder, accessoryList);
+        woService.submitWorkOrder(selectedWorkOrder, accessoryList,this.comments);
         cancel();
     }
 

@@ -262,13 +262,25 @@
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
-
                             <h:panelGroup >
+                                <p:dataList value="#{workOrderMgrController.getServiceRequestMessageList(woItem.id)}" var="msgItem" rendered="#{not empty workOrderMgrController.getServiceRequestMessageList(woItem.id)}">
+                            <!--#{msgItem.message} #{msgItem.sendTime} #{msgItem.senderUserName}-->
+                            <h:outputText value="#{msgItem.sendTime}" >
+                                 <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
+                            </h:outputText>
+                            <h:outputText value="#{msgItem.senderUserName}"  style="padding-left: 10px"/>
+                            <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
 
-                            </h:panelGroup>
+                        </p:dataList>
+
+                    </h:panelGroup>
+
+
                         </p:fieldset>
 
                     </c:forEach>
+
+                    
 
 
 
