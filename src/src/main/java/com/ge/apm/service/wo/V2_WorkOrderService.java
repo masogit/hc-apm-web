@@ -551,7 +551,7 @@ public Page<V2_WorkOrder> getWorkOrderListToPickup(int type,PageRequest pr, User
     }
 
     public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
-        return msgDao.findBySrIdOrderBySendTimeDesc(id);
+        return msgDao.findBySrIdOrderBySendTime(id);
     }
 
 }
