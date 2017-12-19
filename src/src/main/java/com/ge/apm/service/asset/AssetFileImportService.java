@@ -188,6 +188,9 @@ public class AssetFileImportService {
                 if (asset.getFunctionGroup() != null) {
                     List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(asset.getFunctionGroup()), siteId);
                     assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map);
+                } else {
+                    //only update need to clear old data
+                    asset.setAssetCode68(null);
                 }
 
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
