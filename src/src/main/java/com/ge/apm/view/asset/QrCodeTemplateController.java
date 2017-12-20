@@ -40,11 +40,11 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     QrCodeTemplateElementRepository elementDao;
     OrgInfoRepository orgDao;
     UaaService uaaService;
-    TenantInfoRepository tenantInfoDao ;
+    TenantInfoRepository tenantInfoDao;
     UserContextService userContextService;
     OrgInfoService orgInfoService;
-    
-    String selectedTenantUid; 
+
+    String selectedTenantUid;
 
     @Override
     protected void init() {
@@ -57,7 +57,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
-        
+
     }
 
     @Override
@@ -83,8 +83,8 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
-    
-    public String getTenantName(String tenantUid){
+
+    public String getTenantName(String tenantUid) {
         return Optional.ofNullable(tenantInfoDao.findByuid(tenantUid)).orElse(new TenantInfo()).getName();
     }
 
@@ -108,26 +108,32 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
 
     @Transactional
-    public void setToUsing(String templateId) {
+    public void setToUsing(String templateId, Boolean value) {
         QrCodeTemplate usingTemplate = dao.findById(templateId);
-        List<SearchFilter> templateFilters = new ArrayList();
-        templateFilters.add(new SearchFilter("isUsing", SearchFilter.Operator.EQ, true));
-        templateFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, usingTemplate.getSiteUID()));
-        List<QrCodeTemplate> usingList = dao.findBySearchFilter(templateFilters);
-        usingList.forEach(item -> item.setIsUsing(false));
-        dao.save(usingList);
-        usingTemplate.setIsUsing(true);
-        dao.save(usingTemplate);
+        if (value) {
+            List<SearchFilter> templateFilters = new ArrayList();
+            templateFilters.add(new SearchFilter("isUsing", SearchFilter.Operator.EQ, true));
+            templateFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, usingTemplate.getSiteUID()));
+            List<QrCodeTemplate> usingList = dao.findBySearchFilter(templateFilters);
+            usingList.forEach(item -> item.setIsUsing(false));
+            dao.save(usingList);
+            usingTemplate.setIsUsing(true);
+            dao.save(usingTemplate);
+        } else {
+            usingTemplate.setIsUsing(false);
+            dao.save(usingTemplate);
+        }
+
     }
-    
-    public void onTenantChange(){
-        
+
+    public void onTenantChange() {
+
     }
-    
-    public List<OrgInfo> getHospitalFileterList(){
+
+    public List<OrgInfo> getHospitalFileterList() {
         List<OrgInfo> orgInfoList = null;
         if (null != selectedTenantUid) {
-            orgInfoList = orgDao.getByTenantUID(selectedTenantUid).stream().filter(item-> item.getOrgType()<4).collect(Collectors.toList());
+            orgInfoList = orgDao.getByTenantUID(selectedTenantUid).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         } else {
             UserAccount user = UserContextService.getCurrentUserAccount();
             orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
@@ -140,11 +146,11 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         }
 
     }
-    
+
     public String getHospitalName(String orgUid) {
         return Optional.ofNullable(orgDao.getByUid(orgUid)).orElse(new OrgInfo()).getName();
     }
-    
+
     public List<TenantInfo> getTenantList() {
         List<TenantInfo> tenantList = tenantInfoDao.find();
         return tenantList;
@@ -157,7 +163,5 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     public void setSelectedTenantUid(String selectedTenantUid) {
         this.selectedTenantUid = selectedTenantUid;
     }
-    
-    
 
 }

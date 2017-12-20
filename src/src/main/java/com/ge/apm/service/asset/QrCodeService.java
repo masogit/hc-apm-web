@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
@@ -120,8 +121,7 @@ public class QrCodeService {
     }
 
     public BufferedImage getQrCodeImage(String qrCode) {
-        QrCodeLib qrcodeLib = qrCodeLibDao.findByQrCode(qrCode);
-        QrCodeTemplate template = templateDao.findSiteTemplate(qrcodeLib.getSiteUID());
+        QrCodeTemplate template = getTemplateByQrCode(qrCode);
         List<QrCodeTemplateElement> elementList;
         if (template == null) {
             template = templateService.getDefaultTemplate();
@@ -137,6 +137,14 @@ public class QrCodeService {
             Logger.getLogger(QrCodeTemplateService.class.getName()).log(Level.SEVERE, null, ex);
         }
         return img;
+    }
+
+    public QrCodeTemplate getTemplateByQrCode(String qrCode) {
+        QrCodeLib qrcodeLib = qrCodeLibDao.findByQrCode(qrCode);
+        return Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getSiteUID()))
+                .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getHospitalUID()))
+                        .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getInstitutionUID()))
+                                .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getTenantUID())).orElse(null))));
     }
 
     public String getQrCodeImageBase64(String qrCode) {
@@ -186,7 +194,7 @@ public class QrCodeService {
                     item.setTextValue("");
                 }
                 switch (item.getFieldKey()) {
-                    case "blank" : 
+                    case "blank":
                         item.setTextShowValue(item.getTextValue());
                         break;
                     case "name":
@@ -208,15 +216,15 @@ public class QrCodeService {
                             siteUid = UserContextService.getCurrentUserAccount().getSiteUID();
                         }
                         OrgInfo org = orgInfoDao.getByUid(siteUid);
-                        item.setTextShowValue(item.getTextValue().concat(org.getName() ==null ? "" : org.getName()));
+                        item.setTextShowValue(item.getTextValue().concat(org.getName() == null ? "" : org.getName()));
                         break;
                     case "functionType":
-                        item.setTextShowValue(item.getTextValue().concat(asset.getFunctionType() ==null? "" : asset.getFunctionType()));
+                        item.setTextShowValue(item.getTextValue().concat(asset.getFunctionType() == null ? "" : asset.getFunctionType()));
                         break;
                     case "clinicalDept":
                         if (asset.getClinicalDeptUID() != null) {
                             OrgInfo clinicalDept = orgInfoDao.getByUid(asset.getClinicalDeptUID());
-                            item.setTextShowValue(item.getTextValue().concat(clinicalDept.getName() ==null ? "" : clinicalDept.getName()));
+                            item.setTextShowValue(item.getTextValue().concat(clinicalDept.getName() == null ? "" : clinicalDept.getName()));
                         } else {
                             item.setTextShowValue(item.getTextValue().concat("(待定)"));
                         }
