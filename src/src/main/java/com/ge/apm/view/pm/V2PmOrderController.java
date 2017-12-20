@@ -123,7 +123,7 @@ private String dptName;
         return orgDao.getByUid(orgUid);
     }
     private V2_PmOrder v2PmOrder;
-    public void createPM(){
+    public void savePM(){
           PmOrderActionForm formData = new PmOrderActionForm();
         if(Strings.isNullOrEmpty(dptName)){
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
@@ -134,6 +134,7 @@ private String dptName;
                 formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
             }
             formData.setRuleLevel(ruleLevel);
+            formData.setAttachments(picList);
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
 
             cancel();
@@ -147,6 +148,7 @@ private String dptName;
             return new ArrayList<PmOrderSteps>();
     }
     public void createPMRequest(){
+        picList = new ArrayList();
         cancel();
     }
 	public void onStatusChange() {
@@ -160,7 +162,6 @@ private String dptName;
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
-        picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
