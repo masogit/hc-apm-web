@@ -93,6 +93,20 @@
                             </h:panelGroup>
 
                         </p:panelGrid>
+                        <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                            <f:facet name="header">报修图片</f:facet>
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                    <p:commandButton actionListener="#{v2PmOrderController.removeAttachment(fileitem.objectStorageId)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </h:panelGrid>
+
+                            </p:panel>
+
+                        </p:dataGrid>
+                        <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->

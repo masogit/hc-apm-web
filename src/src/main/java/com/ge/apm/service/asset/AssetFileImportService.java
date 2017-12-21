@@ -89,9 +89,10 @@ public class AssetFileImportService {
                 break;
             }
             String orgName = (String) valueWrapper.value;
-            if (orgName == null || orgName.isEmpty()) {
+            if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
                 break;
             }
+
             org.setName(orgName);
             org.setHospitalId(currentOrg.getHospitalId());
             org.setParentOrg(currentOrg);

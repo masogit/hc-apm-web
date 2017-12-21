@@ -87,9 +87,10 @@
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                       <!-- <p:column headerText="价格"  filterMatchMode="LIKE">
-                            <h:outputText value="#{item.totalPrice}"/>
-                        </p:column>-->
+                        <p:column headerText="#{msg.AssetContractAttachment}" exportable="false">
+                            <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectId)}">下载</p:link>-->
+                        </p:column>
+
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
                             <p:commandButton value="派工" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
@@ -132,7 +133,7 @@
             </div>
         </div>
 
-        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="250"   header="新增保养" >
+        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="400"   header="新增保养" >
             <h:form id="PmRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}保养">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -161,12 +162,11 @@
                                 <f:selectItem itemLabel="3级规则" itemValue="3" />
                             </p:selectOneMenu>
                         </h:panelGroup>
-
-
                     </p:panelGrid>
+
                 </p:fieldset>
                 <h:panelGroup >
-                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.createPM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                 </h:panelGroup>
             </h:form>
@@ -182,6 +182,20 @@
                         <f:selectItem itemLabel="不合格" itemValue="2" />
                     </p:selectOneRadio>
                     <br/>
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                        <f:facet name="header">报修图片</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
+                                <p:commandButton actionListener="#{v2PmOrderController.removeAttachment(fileitem.objectStorageId)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </p:dataGrid>
+                    <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update=":takeOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 

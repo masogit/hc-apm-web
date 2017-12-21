@@ -561,7 +561,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.selected.setIsValid(true);
             this.selected.setTerminateDate(null);
         } else {
-            Integer workOrdersNum = dao.fetchCurrentWorkOrders(selected.getId());
+            int workOrdersNum = dao.fetchCurrentWorkOrders(selected.getId());
             if (workOrdersNum > 0) {
                 WebUtil.addErrorMessage("当前设备存在未完成工单，不能报废！");
                 return null;
@@ -1335,6 +1335,55 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setIsSelectedCurrentPage(Boolean isSelectedCurrentPage) {
         this.isSelectedCurrentPage = isSelectedCurrentPage;
+    }
+
+    public void batchProcessToBeTerminated() {
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry: map.entrySet()) {
+            if (!entry.getValue()) {
+                continue;
+            }
+
+            String assetUid = entry.getKey();
+            AssetInfo assetInfo = dao.getByUid(assetUid);
+            if (assetInfo == null) {
+                continue;
+            }
+
+            assetInfo.setStatus(4);
+
+            dao.save(assetInfo);
+
+
+        }
+
+    }
+
+    public void batchProcessToTerminated() {
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry: map.entrySet()) {
+            if (!entry.getValue()) {
+                continue;
+            }
+
+            String assetUid = entry.getKey();
+            AssetInfo assetInfo = dao.getByUid(assetUid);
+            if (assetInfo == null) {
+                continue;
+            }
+
+            int workOrdersNum = dao.fetchCurrentWorkOrders(assetInfo.getId());
+            if (workOrdersNum > 0) {
+                WebUtil.addErrorMessage(String.format("设备名称[%s]存在未完成工单，不能报废！", assetInfo.getName()));
+                continue;
+            }
+
+            assetInfo.setIsValid(false);
+            assetInfo.setTerminateDate(new Date());
+            dao.save(assetInfo);
+
+        }
+
     }
 
 }
