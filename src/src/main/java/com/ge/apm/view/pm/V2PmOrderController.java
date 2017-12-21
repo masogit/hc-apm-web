@@ -101,6 +101,8 @@ private String dptName;
     //create service request
     private V2_WorkOrderService woService;
     private V2_ServiceRequest newServiceRequest;
+    private BlobObjectRepository blobDao;
+
     public void removeAttachment(String storageId) {
         blobService.deleteBlobFileByStorageId(storageId);
         picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
@@ -110,7 +112,7 @@ private String dptName;
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_ServiceRequest);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
@@ -123,7 +125,7 @@ private String dptName;
         return orgDao.getByUid(orgUid);
     }
     private V2_PmOrder v2PmOrder;
-    public void createPM(){
+    public void savePM(){
           PmOrderActionForm formData = new PmOrderActionForm();
         if(Strings.isNullOrEmpty(dptName)){
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
@@ -134,6 +136,7 @@ private String dptName;
                 formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
             }
             formData.setRuleLevel(ruleLevel);
+            formData.setAttachments(picList);
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
 
             cancel();
@@ -160,7 +163,6 @@ private String dptName;
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
-        picList = new ArrayList();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
@@ -193,7 +195,7 @@ private String dptName;
             newServiceRequest.setAssetLocation(dptName);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             //报修完后直接关单
-            pmOrderService.closePM(selectedPmOrder);
+            pmOrderService.closePM(selectedPmOrder,picList);
             cancel();
         }
     }
@@ -224,6 +226,7 @@ private String dptName;
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
+        blobDao = WebUtil.getBean(BlobObjectRepository.class);
         queryIndex = -1;
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -361,6 +364,9 @@ private String dptName;
     public void onSelectPmOrder(){
         accessoryList = getWorkOrderDetail(selected.getId());
         coWorkerList = getWorkOrderCoworker(selected.getId());
+
+       // 获取picList
+		picList =  blobDao.findByBoUuid(selected.getId());
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
@@ -372,7 +378,9 @@ private String dptName;
     }
 
 public void closePM(V2_PmOrder selectedPmOrder){
-        pmOrderService.closePM(selectedPmOrder);
+
+        pmOrderService.closePM(selectedPmOrder,picList);
+        cancel();
 }
     public void approvePMorder(V2_PmOrder selectedPmOrder,String passreject){
         if(selectedPmOrder!=null)
@@ -385,7 +393,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
        endTime=selectedPmOrder.getEndTime();
        accessoryList = getWorkOrderDetail(woid);
        coWorkerList = getWorkOrderCoworker(woid);
-     //  picList = new ArrayList<V2_BlobObject>();
+       picList = new ArrayList<V2_BlobObject>();
    }
     @Override
     public void setSearchFilter() {
@@ -416,6 +424,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         endTime=null;
         ruleLevel=null;
         dptName=null;
+        picList=null;
 
     }
 
@@ -426,6 +435,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         confirmedUpDate = null;
         confirmedDownTime = null;
         needConfirmTime = false;
+        picList = new ArrayList<V2_BlobObject>();
     }
 
 
@@ -437,7 +447,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,picList);
+
+
         cancel();
     }
 
