@@ -73,9 +73,10 @@ public class V2_PmOrderService {
         return workOrderCoworkerRepository.findByWoId(woId);
     }
 
-    public void closePM(V2_PmOrder selectedPmOrder){
+    public void closePM(V2_PmOrder selectedPmOrder,List<V2_BlobObject> picList ){
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setAttachments(picList);
         formData.setActionType("close");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
       formData.setQualityChecking(selectedPmOrder.getQualityChecking());
@@ -207,13 +208,13 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
            WebUtil.addSuccessMessage("审批成功");
        }
    }
-    public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime) {
+    public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,List<V2_BlobObject> attachment) {
 
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("repair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-
+formData.setAttachments(attachment);
         formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("保养中");
