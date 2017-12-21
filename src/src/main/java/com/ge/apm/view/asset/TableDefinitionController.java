@@ -69,6 +69,12 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     public List<TableDefinition> getItemList() {
         return dao.findBySearchFilter(searchFilters);
     }
+    
+    public void setToUsing(String id , Boolean isUsing){
+        TableDefinition selectedSchema = dao.findById(id);
+        selectedSchema.setStatus(isUsing?TableDefinition.TableDefinitionStatus.Draft.toString():TableDefinition.TableDefinitionStatus.Released.toString());
+        dao.save(selectedSchema);
+    }
 
     public void deleteTemplate(){
         templateService.deleteTemplateById(selected.getId());

@@ -71,6 +71,7 @@ public class TableCreateController {
         selectedTableDefinition.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
         selectedTableDefinition.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
         selectedTableDefinition.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
     }
 
     public void saveTemplate() {

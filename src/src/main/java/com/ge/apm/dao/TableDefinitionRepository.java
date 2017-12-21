@@ -19,5 +19,6 @@ public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDe
 //    @Query("select o from TableDefinition o where o.baseId = ?1 and versionNum=(select max(versionNum) from TableDefinition o2 where o2.baseId=?1)")
 //    public TableDefinition getLatestTemplateByBaseId(String baseId);
     
+    @Query("select o from TableDefinition o where o.siteUID in ?1 and o.status='Released'")
     public List<TableDefinition> getBySiteUIDIn(Collection<String> orgUids);
 }
