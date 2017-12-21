@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 
@@ -63,6 +64,13 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNames(String tenantUID);
+
+	@Modifying
+	@Transactional
+	@Query(value = "update AssetInfo set clinicalDeptName=?1 where clinicalDeptUID=?2")
+	public void updateClinicalName(String name,String uid);
+
+
 
 	public List<AssetInfo> findByUidIn(List<String> assetUids);
 
