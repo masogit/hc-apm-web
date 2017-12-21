@@ -48,7 +48,7 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.QRCode}#{msg.Size}</label>
-                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.size}" min="50" max="500" >
+                                <p:spinner  value="#{qrCodeTemplateCreateController.qrcodeElement.size}" >
                                     <p:ajax update="qrCodeEditForm:preView"/>
                                 </p:spinner>
                             </h:panelGroup>
