@@ -209,9 +209,18 @@ UserAccountRepository userDao;
     }
 
     public void saveSelectedOrg(){
+        //重复增加不被允许
+        String orgName =selected.getName();
+        boolean mark=false;
+        for(TreeNode node: nodeChildren){
+            OrgInfo orgInfo= (OrgInfo)node.getData();
+            if (orgInfo.getName().equalsIgnoreCase(orgName)){
+                WebUtil.addErrorMessage(orgName+"已经存在");
+                return;
+            }
+        }
         super.save();
         initWorkflowConfig();
-        
         buildOrdTree();
     }
     
@@ -281,11 +290,14 @@ UserAccountRepository userDao;
         }
         return true;
     }
+    private OrgInfo currentNode;
+    List<TreeNode> nodeChildren;
     public void onSelectTreeNode(NodeSelectEvent event){
         TreeNode node = event.getTreeNode();
         //node.setExpanded(!node.isExpanded());
-        
+         nodeChildren = node.getChildren();
         selected = (OrgInfo)node.getData();
+        currentNode =(OrgInfo)node.getData();
         if(selected!=null) {
             if (selected.getOrgType() == 4) {
                 acShow = true;
