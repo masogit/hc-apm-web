@@ -9,6 +9,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.UserAccountRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
@@ -38,17 +39,17 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     UaaService uaaService;
     private TenantInfo selectedTenant;
     UserAccount userAccount;
-
+	private AssetInfoRepository assetInfoRepository;
     private boolean acShow=false;
 
     @Override
     protected void init() {
         filterBySite = false;
-        
         dao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         userAccount = new UserAccount();
+		assetInfoRepository  = WebUtil.getBean(AssetInfoRepository.class);
         //userAccount.set
         findPerson();
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -80,7 +81,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.selected = null;
         buildOrdTree();
     }
-UserAccountRepository userDao;
+	UserAccountRepository userDao;
     public TenantInfo getSelectedTenant() {
         return selectedTenant;
     }
@@ -208,10 +209,9 @@ UserAccountRepository userDao;
         this.selected = org;
     }
 
-    public void saveSelectedOrg(){
+	public void saveSelectedOrg(){
         //重复增加不被允许
         String orgName =selected.getName();
-        boolean mark=false;
         for(TreeNode node: nodeChildren){
             OrgInfo orgInfo= (OrgInfo)node.getData();
             if (orgInfo.getName().equalsIgnoreCase(orgName)){
@@ -219,6 +219,9 @@ UserAccountRepository userDao;
                 return;
             }
         }
+        if(!orgName.equalsIgnoreCase(preName)) {
+			assetInfoRepository.updateClinicalName(orgName, selected.getUid());
+		}
         super.save();
         initWorkflowConfig();
         buildOrdTree();
@@ -292,11 +295,13 @@ UserAccountRepository userDao;
     }
     private OrgInfo currentNode;
     List<TreeNode> nodeChildren;
+    private String preName;
     public void onSelectTreeNode(NodeSelectEvent event){
         TreeNode node = event.getTreeNode();
         //node.setExpanded(!node.isExpanded());
          nodeChildren = node.getChildren();
         selected = (OrgInfo)node.getData();
+        preName =selected.getName();
         currentNode =(OrgInfo)node.getData();
         if(selected!=null) {
             if (selected.getOrgType() == 4) {
