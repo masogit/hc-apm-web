@@ -33,8 +33,8 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.arrivalListName}*</label>
-                            <p:inputText value="#{assetArrivedListController.selected.name}" required="true" requiredMessage="#{msg.arrivalListName} #{msg.ValidationRequire}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
+                            <label class="label">#{msg.arrivalListName}</label>
+                            <p:inputText value="#{assetArrivedListController.selected.name}" required="false" requiredMessage="#{msg.arrivalListName} #{msg.ValidationRequire}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
                         </h:panelGroup>
 <!--                        <h:panelGroup>
                             <label class="label">#{msg.arrivalListOrderType}*</label>
