@@ -25,6 +25,8 @@ import org.hibernate.annotations.Type;
 @Table(name = "table_definition")
 public class TableDefinition implements Serializable{
     
+    public enum TableDefinitionStatus { Draft, Released } 
+    
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -63,8 +65,9 @@ public class TableDefinition implements Serializable{
 //    // 1:old 2:using
 //    @Basic(optional = false)
 //    @NotNull
-//    @Column(name = "status")
-//    private int status;
+    
+    @Column(name = "status")
+    private String status;
     
     
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
@@ -150,8 +153,14 @@ public class TableDefinition implements Serializable{
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
     
     
     @Override
