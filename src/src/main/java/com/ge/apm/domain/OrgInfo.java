@@ -296,8 +296,12 @@ public class OrgInfo implements Serializable {
 
         OrgInfo org = this;
         while (org.getParentOrg() != null) {
+            String oName = org.getName();
             org = org.getParentOrg();
-            name = org.getName() + " " + name;
+            String pName = org.getName();
+            
+            if(!(pName.contains(oName) || oName.contains(pName) || name.contains(pName)))
+                name = org.getName() + " " + name;
         }
 
         return name;
