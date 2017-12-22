@@ -268,14 +268,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-        } else {
-            this.removeFilterOnField("name");
-            this.removeFilterOnField("departNum");
-            this.removeFilterOnField("financingNum");
-            this.removeFilterOnField("qrCode");
-            this.removeFilterOnField("serialNum");
-            this.removeFilterOnField("manufacture");
-            this.removeFilterOnField("clinicalDeptName");
         }
 
         if ("true".equals(this.measuring)) {
@@ -1040,6 +1032,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.removeFilterOnField("qrCode");
             this.removeFilterOnField("serialNum");
             this.removeFilterOnField("manufacture");
+            this.removeFilterOnField("clinicalDeptName");
         }
     }
 
