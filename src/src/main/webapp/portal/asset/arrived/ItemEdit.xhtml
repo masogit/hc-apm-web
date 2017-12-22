@@ -101,7 +101,7 @@
 
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
-                                <p:autoComplete id="gbname" value="#{assetInstallationController.gbCodeName}" completeMethod="#{assetInstallationController.completeGbName}">
+                                <p:autoComplete id="gbname" value="#{assetInstallationController.arrivalListItem.nationalStandardCode}" completeMethod="#{assetInstallationController.completeGbName}">
                                     <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInstallationController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
