@@ -151,8 +151,12 @@
                             </p:commandButton>
 
                             <ui:fragment rendered="#{!assetInfoController.terminate}">
-                                <p:commandButton id="batchToBeTerminatedButton" class="btn btn-sm btn-gray" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm"/>
-                                <p:commandButton id="batchToTerminatedButton" class="btn btn-sm btn-gray" title="批量报废" actionListener="#{assetInfoController.batchProcessToTerminated}" update=":AssetInfoListForm"/>
+                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm">
+                                    <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray" title="批量报废" actionListener="#{assetInfoController.batchProcessToTerminated}" update=":AssetInfoListForm">
+                                    <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
+                                </p:commandButton>
                             </ui:fragment>
 
                         </f:facet>
