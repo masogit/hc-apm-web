@@ -48,13 +48,13 @@
                     </h:panelGroup>
                 </p:panelGrid>
                 <p:pickList id="AssetsPickList" value="#{assetFileAttachmentController.availableAssets}" var="item"
-                            itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true" immediate="true"
+                            itemValue="#{item}" itemLabel="#{item.name}#{item.functionType}" showCheckbox="false" responsive="true" immediate="true"
                             showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter">
                     <f:facet name="sourceCaption">待选设备</f:facet>
                     <f:facet name="targetCaption">已选设备</f:facet>
                     <p:ajax event="transfer" listener="#{assetFileAttachmentController.onAssetsTransfer}" />
                     <p:column style="float: left;width:40%;">
-                        <h:outputText value="#{item.name}" />
+                        <h:outputText value="#{item.name}(#{item.functionType})" />
                     </p:column>
                     <p:column style="float: left;width:30%;">
                         <h:outputText value="#{assetFileAttachmentController.getOrgName(item.siteUID)}" />
