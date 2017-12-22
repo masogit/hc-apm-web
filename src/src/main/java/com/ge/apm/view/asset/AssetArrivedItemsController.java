@@ -15,6 +15,7 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import org.primefaces.event.SelectEvent;
@@ -107,6 +108,14 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public void cancel() {
         this.selected = null;
         selectedItem = null;
+    }
+    
+     public void setSelected(String id) {
+         if(Strings.isNullOrEmpty(id)){
+             selected = null;
+         }
+        selected = getDAO().findById(id);
+        
     }
 
     public OrgInfo getOrgInfoByUid(String orgUid){
