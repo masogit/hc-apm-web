@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <h:form id="statisticsDataForm">
+        <p:fieldset legend="#{msg.FilterCondition}">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <label class="label">*#{msg.hospitalId}</label>
+                    <p:inputText id="selectedOrgName_s" value="#{workOrderStatisticsController.selectedOrg==null ? '': workOrderStatisticsController.selectedOrg.name}" readonly="true" required="true" requiredMessage="所属院区不能为空" />
+                    <p:commandButton id="btnOrg_s" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                    <p:overlayPanel id="popupPanel_s" widgetVar="varPanelOrg_s" for="btnOrg_s" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree_s" class="tree" style="width:98%;border:0;" value="#{workOrderStatisticsController.orgTree}" selection="#{workOrderStatisticsController.selectedNode}" var="node" selectionMode="single">
+                                <p:ajax process="@this" event="select" update=":woTab:statisticsDataForm:selectedOrgName_s" listener="#{workOrderStatisticsController.onSelectTreeNode}" oncomplete="PF('varPanelOrg_s').hide();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
+
+        <p:fieldset legend="#{msg.FilterCondition}">
+            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                <h:panelGroup>
+                    <label class="label">*报修开始时间</label>
+                    <p:calendar timeZone="GMT+8"  id="startTime_s" value="#{workOrderStatisticsController.startTime}" pattern="yyyy/MM/dd" required="true" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">*报修结束时间</label>
+                    <p:calendar timeZone="GMT+8"  id="endTime_s" value="#{workOrderStatisticsController.endTime}" pattern="yyyy/MM/dd" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+            </p:panelGrid>
+        </p:fieldset>
+        <p:fieldset legend="统计方式">
+            <h:panelGrid style="margin-bottom:10px" cellpadding="5">
+                <p:selectOneRadio id="statisticsType" value="#{workOrderStatisticsController.statisticsType}">
+                    <f:selectItem itemLabel="按科室" itemValue="depart"/>
+                    <f:selectItem itemLabel="按设备类型" itemValue="assetType" />
+                    <f:selectItem itemLabel="按科室和设备类型" itemValue="departAndassetType" />
+                    <f:selectItem itemLabel="按设备名称" itemValue="assetName" />
+                    <f:selectItem itemLabel="按故障类别" itemValue="faultType" />
+                    <f:selectItem itemLabel="按维修工程师" itemValue="staff" />
+                </p:selectOneRadio>
+            </h:panelGrid>
+        </p:fieldset>
+
+        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+            <h:panelGroup>
+                <p:commandButton value="查看统计结果" actionListener="#{workOrderStatisticsController.previewData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :woTab:dataListForm_statistics :woTab:dataListForm_statistics:datalist_statistics">
+                </p:commandButton>
+            </h:panelGroup>
+        </p:panelGrid>
+    </h:form>
+
+    <h:form id="dataListForm_statistics">
+        <p:dataTable id="datalist_statistics" rendered="#{not empty workOrderStatisticsController.worList}" value="#{workOrderStatisticsController.worList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+                     rowsPerPageTemplate="10,20,50">
+            <p:column headerText="资产名称" rendered="#{workOrderStatisticsController.statisticsType == 'assetName'}">
+                <h:outputText value="#{item.assetName}" />
+            </p:column>
+            <p:column headerText="使用科室" rendered="#{workOrderStatisticsController.statisticsType == 'depart' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">
+                <h:outputText value="#{item.clinicalDeptName}" />
+            </p:column>
+            <p:column headerText="资产类型" rendered="#{workOrderStatisticsController.statisticsType == 'assetType' || workOrderStatisticsController.statisticsType == 'departAndassetType'}">
+                <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}" />
+            </p:column>
+            <p:column headerText="故障类型" rendered="#{workOrderStatisticsController.statisticsType == 'faultType'}">
+                <h:outputText value="#{item.caseTypeName}" />
+            </p:column>
+            <p:column headerText="维修工程师" rendered="#{workOrderStatisticsController.statisticsType == 'staff'}">
+                <h:outputText value="#{item.staffName}" />
+            </p:column>
+            <p:column headerText="平均耗时" rendered="#{workOrderStatisticsController.statisticsType == 'staff'}">
+                <h:outputText value="#{workOrderStatisticsController.calculateAVGDate(item.totalSpendTime, item.closeCount)}" />
+            </p:column>
+            <p:column headerText="总工时" rendered="#{workOrderStatisticsController.statisticsType == 'staff'}">
+                <h:outputText value="#{item.totalManhour}" />
+            </p:column>
+            <!--<p:column headerText="总报修次数">
+                <h:outputText value="#{item.totalCount}" />
+            </p:column>
+            <p:column headerText="未完成报修次数">
+                <h:outputText value="#{item.openCount}" />
+            </p:column>-->
+            <p:column headerText="已完成报修次数">
+                <h:outputText value="#{item.closeCount}" />
+            </p:column>
+            <!--<p:column headerText="已取消报修次数">
+                <h:outputText value="#{item.cleanCount}" />
+            </p:column>-->
+            <p:column headerText="比例">
+                <h:outputText value="#{workOrderStatisticsController.calculateRate(item.closeCount)}" />
+            </p:column>
+
+            <f:facet name="{Toolbar}">
+                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                    <p:dataExporter type="xls" target="datalist_statistics" fileName="work_order_statistics_export"/>
+                </p:commandButton>
+            </f:facet>
+        </p:dataTable>
+    </h:form>
+
+
+</html>

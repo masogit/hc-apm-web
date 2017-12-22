@@ -347,7 +347,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             user.setOrgInfoUID(selectedUserOrg.getUid());
 
             user.setSiteId(selectedUserOrg.getSiteId());
-            user.setHospitalId(selectedUserOrg.getHospitalId());
+            //user.setHospitalId(selectedUserOrg.getHospitalId());
+            user.setHospitalId(orgInfoDao.getByUid(selectedUserOrg.getSiteUID()).getId());
 
             user.setTenantUID(selectedUserOrg.getTenantUID());
             user.setInstitutionUID(selectedUserOrg.getInstitutionUID());

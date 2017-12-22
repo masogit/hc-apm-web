@@ -13,6 +13,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -345,6 +346,28 @@ public class AssetInstallationController {
         }
         return names;
 
+    }
+    
+    public void onParentAssetChange(){
+        if(Strings.isNullOrEmpty(arrivalListItem.getDepartNum()) && arrivalListItem.getParentAssetId()!=null && arrivalListItem.getParentAssetId()>0){
+            AssetInfo parentAsset = assetDao.getById(arrivalListItem.getParentAssetId());
+            if(!Strings.isNullOrEmpty(parentAsset.getDepartNum()) && parentAsset.getDepartNum().length()>2 && parentAsset.getDepartNum().endsWith("00")){
+                List<SearchFilter> parentAssetFilters = Arrays.asList(new SearchFilter("parentAssetId", SearchFilter.Operator.EQ, arrivalListItem.getParentAssetId()));
+                List<String> childrenNumList = assetDao.findBySearchFilter(parentAssetFilters).stream()
+                        .map(item -> item.getDepartNum()).collect(Collectors.toList());
+                childrenNumList.addAll(itemDao.findBySearchFilter(parentAssetFilters).stream()
+                        .filter(item-> "new".equals(item.getInstallStatus()))
+                        .map(item -> item.getDepartNum()).collect(Collectors.toList()));
+                String prefix = parentAsset.getDepartNum().substring(0,parentAsset.getDepartNum().length()-2);
+                for(int i=1;i<100;i++){
+                    String num = prefix.concat(i<10?"0":"").concat(String.valueOf(i));
+                    if(!childrenNumList.contains(num)){
+                        arrivalListItem.setDepartNum(num);
+                        break;
+                    }
+                }
+            }
+        }
     }
     
     public String getQrCodeImageBase64(String code) {
