@@ -36,13 +36,13 @@
                             <label class="label">#{msg.arrivalListName}</label>
                             <p:inputText value="#{assetArrivedListController.selected.name}" required="false" requiredMessage="#{msg.arrivalListName} #{msg.ValidationRequire}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
                         </h:panelGroup>
-<!--                        <h:panelGroup>
-                            <label class="label">#{msg.arrivalListOrderType}*</label>
-                            <p:selectOneMenu value="#{assetArrivedListController.selected.orderType}" disabled="#{assetArrivedListController.selected.status ne '1'}" required="true" requiredMessage="#{msg.arrivalListOrderType} #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                            </p:selectOneMenu>
-                        </h:panelGroup>-->
+                        <!--                        <h:panelGroup>
+                                                    <label class="label">#{msg.arrivalListOrderType}*</label>
+                                                    <p:selectOneMenu value="#{assetArrivedListController.selected.orderType}" disabled="#{assetArrivedListController.selected.status ne '1'}" required="true" requiredMessage="#{msg.arrivalListOrderType} #{msg.ValidationRequire}">
+                                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                        <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListOrderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                                    </p:selectOneMenu>
+                                                </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.assetName}*</label>
                             <p:inputText value="#{assetArrivedListController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListController.selected.status ne '1'}"  />
@@ -55,10 +55,10 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                                <label class="label">#{msg.arrivalDate}*</label>
-                                <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" disabled="#{assetArrivedListController.selected.status ne '1'}" value="#{assetArrivedListController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" 
-                                            required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                            </h:panelGroup>
+                            <label class="label">#{msg.arrivalDate}*</label>
+                            <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" disabled="#{assetArrivedListController.selected.status ne '1'}" value="#{assetArrivedListController.selected.arrivalDate}" maxdate="#{appContextService.curentDate}" 
+                                        required="true" requiredMessage="#{msg.arrivalDate} #{msg.ValidationRequire}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.arrivalListFunctionType}</label>
                             <p:inputText value="#{assetArrivedListController.selected.functionType}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
@@ -71,10 +71,10 @@
                             <label class="label">#{msg.quantity}*</label>
                             <p:inputNumber  maxValue="99999"  decimalPlaces="0" value="#{assetArrivedListController.selected.quantity}"  readonly="#{assetArrivedListController.selected.status ne '1'}" required="true" requiredMessage="#{msg.quantity} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
-<!--                        <h:panelGroup>
-                            <label class="label">#{msg.brand}</label>
-                            <p:inputText value="#{assetArrivedListController.selected.brand}"  readonly="#{assetArrivedListController.selected.status ne '1'}" />
-                        </h:panelGroup>-->
+                        <!--                        <h:panelGroup>
+                                                    <label class="label">#{msg.brand}</label>
+                                                    <p:inputText value="#{assetArrivedListController.selected.brand}"  readonly="#{assetArrivedListController.selected.status ne '1'}" />
+                                                </h:panelGroup>-->
                         <h:panelGroup>
                             <label class="label">#{msg.arrivalListOrigin}</label>
                             <p:inputText value="#{assetArrivedListController.selected.origin}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
@@ -91,14 +91,14 @@
                             <label class="label">#{msg.arrivalListContractPrice}</label>
                             <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{assetArrivedListController.selected.contractPrice}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
                         </h:panelGroup>
-                         <h:panelGroup>
-                                <label class="label">#{msg.vendor}</label>
-                                <p:selectOneMenu id="vendor" value="#{assetArrivedListController.supplier}" converter="supplierConverter" disabled="#{assetArrivedListController.selected.status ne '1'}">
-                                    <p:ajax  listener="#{assetArrivedListController.onSupplierChange()}" process="@parent"/>
-                                    <f:selectItem itemLabel=""/>
-                                    <f:selectItems value="#{supplierController.supplierList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.vendor}</label>
+                            <p:selectOneMenu id="vendor" value="#{assetArrivedListController.supplier}" converter="supplierConverter" disabled="#{assetArrivedListController.selected.status ne '1'}">
+                                <p:ajax  listener="#{assetArrivedListController.onSupplierChange()}" process="@parent"/>
+                                <f:selectItem itemLabel=""/>
+                                <f:selectItems value="#{supplierController.supplierList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.arrivalListAgent}</label>
                             <p:inputText value="#{assetArrivedListController.selected.agent}" readonly="#{assetArrivedListController.selected.status ne '1'}" />
@@ -111,7 +111,7 @@
 
 
                     </p:panelGrid>
-                    <p:dataTable rendered="#{not empty assetArrivedListController.arrivalItemList}"  sortBy="#{item.itemNum}" value="#{assetArrivedListController.arrivalItemList}" var="item">
+                    <p:dataTable id="itemList" rendered="#{not empty assetArrivedListController.arrivalItemList}"  sortBy="#{item.itemNum}" value="#{assetArrivedListController.arrivalItemList}" var="item">
                         <p:column headerText="#{msg.arrivalListItemNum}" >
                             <h:outputText value="#{item.itemNum}"/>
                         </p:column>
@@ -130,6 +130,16 @@
                         <p:column headerText="#{msg.status}">
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                         </p:column>
+                        <p:column width="90" >
+                            <p:commandLink actionListener="#{assetArrivedItemsController.setSelected(item.id)}" update=":ItemDetailViewForm" >详细
+                            </p:commandLink>
+                            <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update="itemList" >接单
+                                <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
+                            </p:commandLink>
+                            <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{item.installStatus=='new'?'安装':item.installStatus=='instorage'?'已入库':'已退货'}
+                                <f:param name="itemId" value="#{item.id}" />
+                            </p:link >
+                        </p:column>
 
                     </p:dataTable>
                     <h:panelGroup rendered="#{assetArrivedListController.selected.status eq '1'}">
@@ -141,6 +151,7 @@
                 </h:panelGroup>
             </p:fieldset>
         </h:form>
+            <ui:include src="ItemDetailView.xhtml"/>
 
     </ui:composition>
 </html>
