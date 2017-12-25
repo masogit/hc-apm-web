@@ -65,7 +65,7 @@
 
                     </p:panelGrid>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
-                        <f:facet name="header">报修图片</f:facet>
+                        <f:facet name="header">附件上传</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 

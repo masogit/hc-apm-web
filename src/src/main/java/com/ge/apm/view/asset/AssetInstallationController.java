@@ -143,6 +143,8 @@ public class AssetInstallationController {
                 isAckFinished = false;
             }
             arrivalListItem.setNationalStandardCode(selectedGb.getCode());
+            //更新资产国标码
+            assetDao.updateStandardCode(selectedGb.getCode(),arrivalListItem.getAssetUID());
         }
         if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
             WebUtil.addErrorMessage("商务验收未通过");
@@ -332,6 +334,7 @@ public class AssetInstallationController {
                     gbCode.getCode(),
                     this.arrivalListItem.getArrivalList().getSiteUID()
             );
+            this.arrivalListItem.setNationalStandardCode(gbCodeName);
             if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
                 this.arrivalListItem.setFinancingNum(financingNum);
             }

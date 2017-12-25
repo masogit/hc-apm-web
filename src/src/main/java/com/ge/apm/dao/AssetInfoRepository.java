@@ -71,6 +71,10 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 	public void updateClinicalName(String name,String uid);
 
 
+	@Modifying
+	@Transactional
+	@Query(value = "update AssetInfo set nationalStandardCode=?1 where uid=?2")
+	public void updateStandardCode(String name,String uid);
 
 	public List<AssetInfo> findByUidIn(List<String> assetUids);
 
