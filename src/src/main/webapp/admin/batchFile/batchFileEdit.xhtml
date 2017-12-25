@@ -22,16 +22,16 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <p:panel id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
+                        <p:panel id="uploadPanel" styleClass="ui-panelgrid-blank" style=" border: 0">
                             <h:panelGroup>
                                 <p:fileUpload fileUploadListener="#{batchFileController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this fileType"
-                                              multiple="true" sizeLimit="10000000" update=":BatchFileImportEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}"  />
+                                              multiple="true" sizeLimit="10000000" update="uploadedList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}"  />
                                 <!--<p:growl id="messages" showDetail="true" />-->
                             </h:panelGroup>
-                            <p:dataList value="#{batchFileController.fileList}" var="item" varStatus="itemIndex" rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">
+                            <p:dataList id="uploadedList" value="#{batchFileController.fileList}" var="item" varStatus="itemIndex" rowIndexVar="idx" emptyMessage="#{msg.noRecordFound}">
 
                                 #{fieldMsg.fieldValue('batchFileType', item._1().fileType)}/#{item._1().fileName}
-                                <p:commandLink value="#{msg.delete}"  actionListener="#{batchFileController.removeFile(idx)}" update=":BatchFileImportEditForm:upload"/>
+                                <p:commandLink value="#{msg.delete}"  actionListener="#{batchFileController.removeFile(idx)}" update="uploadedList"/>
                             </p:dataList>
 
                         </p:panel>

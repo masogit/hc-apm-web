@@ -90,7 +90,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     }
 
     public void removeFile(Integer index) {
-        fileService.deleteUploadedFile(fileList.get(index)._1.getFilePath());
+        fileService.deleteBatchUploadedFile(fileList.get(index)._1.getFilePath());
         fileList.remove(fileList.get(index));
     }
 
@@ -116,11 +116,13 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         selected.setStatus(ImportFiles.STATUS_STARTING);
         dao.save(selected);
         WebUtil.addSuccessMessage("任务已经重新启动");
-        this.cancel();
     }
 
     public void cancel() {
         this.selected = null;
+        while(!fileList.isEmpty()){
+           removeFile(0);
+        }
         this.fileList.clear();
         this.fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();
     }
