@@ -57,6 +57,7 @@ public class AssetFileImportService {
     private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
     private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
+    private List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -197,7 +198,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldIntegerValue("维修类型", "setRepairForm");
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map);
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
