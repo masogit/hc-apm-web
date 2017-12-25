@@ -9,7 +9,6 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.pm.V2_PmOrderService;
-import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
@@ -28,7 +27,6 @@ import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
 
 /**
  *
@@ -45,6 +43,7 @@ public class AssetInstallationController {
     private AssetInfoRepository assetDao;
     private OrgInfoRepository orgDao;
     private BlobFileService blobService;
+    private BlobObjectRepository blobDao;
     private QrCodeService qrCodeService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private AssetDepreciationService assetDepreciationService;
@@ -70,6 +69,7 @@ public class AssetInstallationController {
         blobService = WebUtil.getBean(BlobFileService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
+        blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
@@ -126,7 +126,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
-        if (qrCodeLib.getStatus() != 1) {
+        if (qrCodeLib.getStatus() != 1 || qrCodeLib.getStatus() != 2) {
             WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
             return false;
         }
@@ -185,6 +185,14 @@ public class AssetInstallationController {
                 if (isGeneratePmOrder) {
                     pmService.createPMrequest(newAsset.getUid(), null);
                 }
+                List<V2_BlobObject> assetPicList = getAckPicList("asset");
+                assetPicList.forEach(item -> {
+                    item.setId(null);
+                    item.setBoUuid(newAsset.getUid());
+                    item.setBoSubType("1");
+                    item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
+                });
+                blobDao.save(assetPicList);
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
@@ -206,6 +214,10 @@ public class AssetInstallationController {
     private void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
         arrivalListItem.setLastModifiedDate(new Date());
         itemDao.save(arrivalListItem);
+        if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
+        }
+        
     }
 
     public void updateItem() {
@@ -245,6 +257,7 @@ public class AssetInstallationController {
         typeName = typeName.contains("business") ? "business" : typeName;
         typeName = typeName.contains("clinical") ? "clinical" : typeName;
         typeName = typeName.contains("technical") ? "technical" : typeName;
+        typeName = typeName.contains("asset") ? "asset" : typeName;
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             picList.add(blobObject);
