@@ -539,6 +539,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setNationalStandardCode(selectedGb.getCode());
         }
 
+//        if (selected.getNationalStandardCode() != null && selected.getFinancingNum() != null) {
+//            if (!selected.getFinancingNum().startsWith(selected.getNationalStandardCode())) {
+//                WebUtil.addErrorMessage(WebUtil.getMessage("资产编号应以设备国标码为前缀。"));
+//                return null;
+//            }
+//        }
+
         Boolean isNew = selected.hashCode() == 0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
