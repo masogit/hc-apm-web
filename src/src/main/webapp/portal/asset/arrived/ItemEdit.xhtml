@@ -382,6 +382,21 @@
 
                         </p:panelGrid>
                     </p:fieldset>
+                    <p:fieldset legend="设备图片">
+                        <p:dataGrid id="pictureList0" var="fileitem" value="#{assetInstallationController.getAckPicList('asset')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.addPic}</f:facet>
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachment(fileitem.objectStorageId)}" update="pictureList1" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>   
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        <p:fileUpload id="asset" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                      multiple="false"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    </p:fieldset>
                     <p:fieldset legend="#{msg.AssetArrivalListAckInfo}">
                         <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
                         <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.businessAckStatus}">
