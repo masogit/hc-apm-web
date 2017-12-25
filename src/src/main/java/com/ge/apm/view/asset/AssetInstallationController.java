@@ -126,7 +126,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
-        if (qrCodeLib.getStatus() != 1 || qrCodeLib.getStatus() != 2) {
+        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
             WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
             return false;
         }
