@@ -9,7 +9,7 @@
     <ui:composition>
 
         <h:form id="ItemDetailViewForm">
-            <p:fieldset id="display" legend="#{msg.view}" rendered="#{not empty assetArrivedItemsController.selected}">
+            <p:fieldset id="display" legend="到货单条目信息" rendered="#{not empty assetArrivedItemsController.selected}">
                 <p:fieldset  legend="#{msg.AssetArrivalListAssetInfo}" rendered="#{not empty assetArrivedItemsController.selected}">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -98,6 +98,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.qrCode}</label>
                             <p:inputText id="qrCode" value="#{assetArrivedItemsController.selected.qrCode}" readonly="true"/>
+                            <p:commandButton icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetArrivedItemsController.selected.qrCode}" class="popupIconButton"/>
                         </h:panelGroup>
 
                         <h:panelGroup >
@@ -293,6 +294,15 @@
                 </p:panelGrid>
             </p:fieldset>
         </h:form>
+         <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
+                <h:form id="qrCodeLibShowForm">
+                    <p:panel header="#{qrCodeLibController.qrCode}" style="text-align:center" rendered="#{not empty assetArrivedItemsController.selected.qrCode}">
+                        <h:panelGrid columns="1" style="width:100%">
+                            <img src="#{qrCodeShowController.getQrCodeImageBase64(assetArrivedItemsController.selected.qrCode)}" />
+                        </h:panelGrid>
+                    </p:panel>
+                </h:form>
+            </p:dialog>
 
     </ui:composition>
 </html>
