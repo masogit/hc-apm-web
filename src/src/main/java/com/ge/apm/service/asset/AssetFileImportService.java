@@ -175,6 +175,9 @@ public class AssetFileImportService {
                 }
 
                 AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
+                assetRow.setFieldStringValue("设备名称", "setName");
+                assetRow.setFieldStringValue("设备编号", "setDepartNum");
+                assetRow.setFieldStringValue("资产编号", "setFinancingNum");
                 assetRow.setFieldStringValue("设备别名", "setAliasName");
                 assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
                 assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
