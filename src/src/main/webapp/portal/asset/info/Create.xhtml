@@ -471,7 +471,7 @@
                                     </p:commandButton>
                                 </p:dataList>
                                 <p:fileUpload id="type1" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                              multiple="false"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:dataList id="contractList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -482,7 +482,7 @@
                                     </p:commandButton>
                                 </p:dataList>
                                 <p:fileUpload id="type2" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="false"  sizeLimit="10000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                              multiple="false"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <p:dataList id="manualList" value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
@@ -493,7 +493,7 @@
                                     </p:commandButton>
                                 </p:dataList>
                                 <p:fileUpload id="type3" fileUploadListener="#{assetInfoController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                              multiple="false"  sizeLimit="10000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                              multiple="false"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
