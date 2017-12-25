@@ -383,10 +383,6 @@ public class AssetInstallationController {
         }
     }
     
-    public String getQrCodeImageBase64(String code) {
-        return qrCodeService.getQrCodeImageBase64(code);
-    }
-    
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
     }

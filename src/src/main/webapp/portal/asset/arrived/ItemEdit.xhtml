@@ -501,7 +501,7 @@
                 <h:form id="qrCodeLibShowForm">
                     <p:panel header="#{qrCodeLibController.qrCode}" style="text-align:center" rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
                         <h:panelGrid columns="1" style="width:100%">
-                            <img src="#{assetInstallationController.getQrCodeImageBase64(assetInstallationController.arrivalListItem.qrCode)}" />
+                            <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInstallationController.arrivalListItem.qrCode)}" />
                         </h:panelGrid>
                     </p:panel>
                 </h:form>
