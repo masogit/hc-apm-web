@@ -5,9 +5,12 @@ import com.github.stuxuhai.jpinyin.PinyinFormat;
 import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.primefaces.model.TreeNode;
 
+import java.util.Comparator;
 import java.util.List;
 
 public interface TreeNodeUtil {
+
+    public OrgInfoComparator orgInfoComparator = new OrgInfoComparator();
 
     static void expandTreeNode(TreeNode node) {
 
@@ -35,19 +38,8 @@ public interface TreeNodeUtil {
         nodeList.sort( (TreeNode o1, TreeNode o2) -> {
                 OrgInfo org1 = (OrgInfo) o1.getData();
                 OrgInfo org2 = (OrgInfo) o2.getData();
-                try {
-                    if (org1.getOrgType().equals(org2.getOrgType())) {
-                        String name1 = PinyinHelper.convertToPinyinString(org1.getName(), "", PinyinFormat.WITHOUT_TONE);
-                        String name2 = PinyinHelper.convertToPinyinString(org2.getName(), "", PinyinFormat.WITHOUT_TONE);
-                        return name1.compareTo(name2);
-                    } else {
-                        return org1.getOrgType().compareTo(org2.getOrgType());
 
-                    }
-
-                }catch(Exception e) {
-                    return 0;
-                }
+                return orgInfoComparator.compare(org1, org2);
 
             }
         );
