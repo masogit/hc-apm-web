@@ -5,6 +5,8 @@
  */
 package com.ge.apm.service.utils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +22,9 @@ import org.springframework.http.MediaType;
  */
 @Component
 public class MicroServiceInvoker {
-    
+
+    Logger logger = LoggerFactory.getLogger(MicroServiceInvoker.class);
+
     @Autowired
     protected RestTemplate template;
     
@@ -41,6 +45,8 @@ public class MicroServiceInvoker {
         headers.setContentType(type);
         if(null!= token){
             headers.add("Authorization", token);
+        } else {
+            logger.error("token doesn't exists!");
         }
         return headers;
     }
