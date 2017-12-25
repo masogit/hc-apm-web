@@ -41,7 +41,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     UserAccount userAccount;
 	private AssetInfoRepository assetInfoRepository;
     private boolean acShow=false;
+    OrgInfoRepository orgInfoRepository;
 
+    private String orgName;
     @Override
     protected void init() {
         filterBySite = false;
@@ -50,7 +52,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         userAccount = new UserAccount();
 		assetInfoRepository  = WebUtil.getBean(AssetInfoRepository.class);
-        //userAccount.set
+        orgInfoRepository  = WebUtil.getBean(OrgInfoRepository.class);
         findPerson();
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -68,6 +70,17 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return dao.getBySiteId(pageRequest, tenantId);
     }
 
+    public void checkName(){
+        String orgNameTmp =selected.getName();
+        List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
+        for(OrgInfo orgInfo:orgTypeList){
+            if(orgInfo.getName().equalsIgnoreCase(orgNameTmp)){
+                WebUtil.addErrorMessage(orgNameTmp+"已经存在");
+                return;
+            }
+        }
+        this.orgName =orgNameTmp;
+    }
     private int tenantId;
 
     public int getTenantId() {
@@ -131,7 +144,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));
         org.setTenantUID(selectedTenant.getUid());
-       org.setInstitutionUID(org.getUid());
+        org.setInstitutionUID(org.getUid());
         org.setHospitalUID(org.getUid());
         org.setSiteUID(org.getUid());
         
@@ -209,19 +222,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.selected = org;
     }
 
-	public void saveSelectedOrg(){
+    public void saveSelectedOrg(){
         //重复增加不被允许
         String orgName =selected.getName();
-        for(TreeNode node: nodeChildren){
-            OrgInfo orgInfo= (OrgInfo)node.getData();
-            if (orgInfo.getName().equalsIgnoreCase(orgName)){
+        List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
+        for(OrgInfo orgInfo:orgTypeList){
+            if(orgInfo.getName().equalsIgnoreCase(orgName)){
                 WebUtil.addErrorMessage(orgName+"已经存在");
                 return;
             }
         }
         if(!orgName.equalsIgnoreCase(preName)) {
-			assetInfoRepository.updateClinicalName(orgName, selected.getUid());
-		}
+            assetInfoRepository.updateClinicalName(orgName, selected.getUid());
+        }
         super.save();
         initWorkflowConfig();
         buildOrdTree();
@@ -293,16 +306,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
         return true;
     }
-    private OrgInfo currentNode;
-    List<TreeNode> nodeChildren;
     private String preName;
     public void onSelectTreeNode(NodeSelectEvent event){
         TreeNode node = event.getTreeNode();
-        //node.setExpanded(!node.isExpanded());
-         nodeChildren = node.getChildren();
         selected = (OrgInfo)node.getData();
         preName =selected.getName();
-        currentNode =(OrgInfo)node.getData();
         if(selected!=null) {
             if (selected.getOrgType() == 4) {
                 acShow = true;
