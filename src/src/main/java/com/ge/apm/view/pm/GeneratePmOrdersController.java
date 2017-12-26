@@ -244,6 +244,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			models.add(model);
 		}
 		if (CollectionUtils.isEmpty(models)) {
+			WebUtil.addErrorMessage("该批资产已存在正在执行的保养工单！");
 			LOGGER.warn("no assets need to generate pm orders !");
 			return;
 		}
@@ -254,7 +255,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-		WebUtil.addSuccessMessage("配置成功！");
+		WebUtil.addSuccessMessage("保养工单批量生成成功！");
 		targetAssets.clear();
 	}
 
