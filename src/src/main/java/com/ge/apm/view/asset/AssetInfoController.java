@@ -121,6 +121,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private Boolean isSelectedCurrentPage = false;
 
+    private OrgInfo selectSite;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -215,11 +217,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             setSelectedByUrlParam(encodeStr, "selectedid");
             if (!StringUtils.isEmpty(selected.getNationalStandardCode())) {
                 selectedGb = gbDao.getGbByCode(selected.getNationalStandardCode());
-                if(null!=selectedGb)
-                 gbCodeName = selectedGb.getCode()+"/"+selectedGb.getName();
+                if (null != selectedGb) {
+                    gbCodeName = selectedGb.getCode() + "/" + selectedGb.getName();
                 }
+            }
             prepareEdit();
-        } 
+        }
 //        else if ("Delete".equalsIgnoreCase(actionName)) {
 //            //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
 //            setSelectedByUrlParam(encodeStr, "selectedid");
@@ -264,8 +267,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -309,6 +312,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        selectSite = (OrgInfo) event.getTreeNode().getData();
+        searchFilters.removeAll(searchFilters.stream().filter(item->"siteUID".equals(item.fieldName)&&"1*".equals(item.conditionPath) ||
+                    "institutionUID".equals(item.fieldName)&&"1*".equals(item.conditionPath) || 
+                    "hospitalUID".equals(item.fieldName)&&"1*".equals(item.conditionPath)).collect(Collectors.toList()));
+        if (selectSite != null && selectSite.getId() > 0) {
+            if(selectSite.getOrgType()==1){
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID()));
+            }else if(selectSite.getOrgType()==2){
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID()));
+            }else if(selectSite.getOrgType()==3){
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
+            }
+        }
+    }
+
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
         List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
@@ -320,15 +339,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selectedMap.put(item.getUid(), this.isSelectedCurrentPage);
         }
     }
-    
-    public void onItemSelected(){
+
+    public void onItemSelected() {
         isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
     }
 
-
     public List<AssetInfo> getExportList() {
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        return assetUids.isEmpty()? dao.findBySearchFilter(searchFilters):dao.findByUidIn(assetUids);
+        return assetUids.isEmpty() ? dao.findBySearchFilter(searchFilters) : dao.findByUidIn(assetUids);
     }
 
     public void onSelectAsset() throws IOException {
@@ -511,11 +529,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
 
-
         }
-        if (null!= gbCodeName) {
+        if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
-            if(null==gbCode){
+            if (null == gbCode) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
                 return "";
             }
@@ -809,10 +826,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void deleteAsset(AssetInfo asset) {
         ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
-         List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
+        List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
         if (srlist != null && !srlist.isEmpty()) {
             WebUtil.addErrorMessage("该设备有工单存在,不能删除");
-            return ;
+            return;
         }
         if (asset.getQrCode() != null) {
             qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
@@ -1133,7 +1150,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         updateSelectedOrgGb(gbCode);
 
 //联动更新
-        if(null!=selectedGb) {
+        if (null != selectedGb) {
             String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
                     this.selectedGb.getCode(),
                     this.selected.getSiteUID()
@@ -1175,7 +1192,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selectedGb = null;
         } else {
             selectedGb = gbCode;
-            gbCodeName=gbCode.getCode()+"/"+gbCode.getName();
+            gbCodeName = gbCode.getCode() + "/" + gbCode.getName();
         }
 
     }
@@ -1208,7 +1225,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void updateFinancingNumByNationalStandardCode() {
-        if(null != selected && null!=selectedGb ) {
+        if (null != selected && null != selectedGb) {
             String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
                     this.selectedGb.getCode(),
                     this.selected.getSiteUID()
@@ -1328,9 +1345,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.isSelectedCurrentPage = isSelectedCurrentPage;
     }
 
+    public OrgInfo getSelectSite() {
+        return selectSite;
+    }
+
+    public void setSelectSite(OrgInfo selectSite) {
+        this.selectSite = selectSite;
+    }
+
     public void batchProcessToBeTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry: map.entrySet()) {
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
@@ -1345,14 +1370,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             dao.save(assetInfo);
 
-
         }
 
     }
 
     public void batchProcessToTerminated() {
         Map<String, Boolean> map = this.selectedMap;
-        for (Map.Entry<String, Boolean> entry: map.entrySet()) {
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
             if (!entry.getValue()) {
                 continue;
             }
