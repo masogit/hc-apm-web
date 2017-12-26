@@ -20,8 +20,24 @@
             </div>
 
             <div class="ui-g-12 card">
+
                 <h:form id="searchForm">
-                    <h:panelGrid id="searchPanel" columns="2">
+                    <h:panelGrid id="searchPanel" columns="3">
+                        <h:panelGroup >
+                            <p:commandButton id="btnOrg" value="#{empty assetInfoController.selectSite? msg.AllHospitals:assetInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" var="node" selectionMode="single" dynamic="false">
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm" oncomplete="PF('varPanelOrg').hide();"/>
+<!--                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>-->
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
                         <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
                         </p:inputText>

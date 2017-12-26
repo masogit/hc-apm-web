@@ -438,6 +438,10 @@
                                 <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}"/>
 
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">是否对质保到期进行提醒</label>
+                                <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoController.selected.warranty}"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset  style="margin-bottom:20px">
