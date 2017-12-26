@@ -219,11 +219,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                  gbCodeName = selectedGb.getCode()+"/"+selectedGb.getName();
                 }
             prepareEdit();
-        } else if ("Delete".equalsIgnoreCase(actionName)) {
-            //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
-            setSelectedByUrlParam(encodeStr, "selectedid");
-            prepareDelete();
-        }
+        } 
+//        else if ("Delete".equalsIgnoreCase(actionName)) {
+//            //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
+//            setSelectedByUrlParam(encodeStr, "selectedid");
+//            prepareDelete();
+//        }
 
         ownerOrgList = uuaService.getOrgListByHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
         if (searchFilters == null) {
@@ -465,15 +466,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         resultStatus = isOK;
     }
 
-    public String removeOne() {
-        this.delete();
-        if (resultStatus) {
-            return "List?faces-redirect=true";
-        } else {
-            return "";
-        }
-    }
-
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
@@ -530,13 +522,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
             selected.setNationalStandardCode(selectedGb.getCode());
         }
-
-//        if (selected.getNationalStandardCode() != null && selected.getFinancingNum() != null) {
-//            if (!selected.getFinancingNum().startsWith(selected.getNationalStandardCode())) {
-//                WebUtil.addErrorMessage(WebUtil.getMessage("资产编号应以设备国标码为前缀。"));
-//                return null;
-//            }
-//        }
 
         Boolean isNew = selected.hashCode() == 0;
         this.save();
@@ -823,6 +808,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void deleteAsset(AssetInfo asset) {
+        ServiceRequestRepository srDao = WebUtil.getBean(ServiceRequestRepository.class);
+         List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
+        if (srlist != null && !srlist.isEmpty()) {
+            WebUtil.addErrorMessage("该设备有工单存在,不能删除");
+            return ;
+        }
         if (asset.getQrCode() != null) {
             qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
         }
