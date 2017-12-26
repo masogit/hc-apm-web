@@ -47,8 +47,6 @@ public class V2_PmOrderService {
     @Autowired
     private WorkOrderDetailRepository detailDao;
 
-    @Autowired
-    private UserAccountRepository userDao;
     
     @Autowired
     private BlobObjectRepository blobDao;
@@ -67,6 +65,9 @@ public class V2_PmOrderService {
     private UserCommonService ucService;
     @Autowired
     private PmOrderRequestApiService pmApi;
+
+    @Autowired
+    private UserAccountRepository userDao;
 
 
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -208,11 +209,13 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
            WebUtil.addSuccessMessage("审批成功");
        }
    }
-    public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,List<V2_BlobObject> attachment) {
+    public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
+
 
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("repair");
+        formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 formData.setAttachments(attachment);
         formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
@@ -231,13 +234,34 @@ formData.setAttachments(attachment);
     }
 
 
-    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime) {
+    public void reassignWorkOrder(V2_PmOrder selectedPmOrder, String assigneeId,String comments) {
+        String token = UserContextService.getAccessToken();
+
+
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setActionType("reAssign");
+      //  UserAccount userAccount = userDao.getById(Integer.parseInt(assigneeId));
+        formData.setStepId(selectedPmOrder.getCurrentStepId());
+        formData.setAssignee(assigneeId);
+        formData.setDesc(comments);
+        String res = srApi.invokePmOrderAction(token,formData,"reAssign",selectedPmOrder.getId());
+        if (res==null || !res.contains("ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+        }
+    }
+
+
+
+    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         if(endTime !=null)
          formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
+        if(planTime !=null)
+            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(planTime));
+
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("暂时保存");
         formData.setDetails(accDetails);
@@ -317,8 +341,13 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
         return workOrderCoworkerRepository.findByWoId(woId);
     }*/
 
+    public UserAccountRepository getUserDao() {
+        return userDao;
+    }
 
-
+    public void setUserDao(UserAccountRepository userDao) {
+        this.userDao = userDao;
+    }
 }
 
 
