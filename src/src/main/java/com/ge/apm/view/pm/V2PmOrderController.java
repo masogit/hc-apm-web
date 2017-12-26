@@ -252,7 +252,7 @@ private String dptName;
     public void submitAppvalPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler);
+        pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler,comments);
         cancel();
     }
 
@@ -441,6 +441,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         ruleLevel=null;
         dptName=null;
         picList=null;
+        comments=null;
 
     }
 
