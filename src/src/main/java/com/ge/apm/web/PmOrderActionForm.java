@@ -23,6 +23,7 @@ public class PmOrderActionForm {
 	Object coworkers;
 	String planTime;
 	Integer ruleLevel;
+
 //V2_WorkOrder_Coworker[] coworkes //optional
 
 	public String getQualityChecking() {
@@ -141,4 +142,6 @@ public class PmOrderActionForm {
 	public void setRuleLevel(Integer ruleLevel) {
 		this.ruleLevel = ruleLevel;
 	}
+
+
 }
