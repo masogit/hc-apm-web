@@ -51,6 +51,8 @@ public class WorkOrderExportService {
     AssetFaultTypeRepository assetFaultTypeDao;
     @Autowired
     I18nMessageRepository i18nMessageDao;
+    @Autowired
+    V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
 
 
     //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
@@ -109,6 +111,8 @@ public class WorkOrderExportService {
             V2_WorkOrder_Step acceptStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeAsc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
+            List<V2_WorkOrderCoworker> workOrderList = workOrderCoworkerDao.findByWoId(workOrder.getId());
+
             workOrderMap = new HashedMap();
             workOrderMap.put("woId", workOrder.getId());
             workOrderMap.put("报修单号", serviceRequest.getSrNum() != null ? serviceRequest.getSrNum() : "");
@@ -157,6 +161,14 @@ public class WorkOrderExportService {
                 workOrderMap.put("关单人", closeStep.getOwnerName());
                 workOrderMap.put("关单时间", closeStep.getEndTime() != null ? sdf.format(closeStep.getEndTime()) : "");
             }
+            String coworkerStr = "";
+            String coworkManHourStr = "";
+            for (V2_WorkOrderCoworker woc: workOrderList) {
+                coworkerStr += woc.getCowokerUserName() + ",";
+                coworkManHourStr += woc.getManHours() + ",";
+            }
+            workOrderMap.put("协助者", coworkerStr);
+            workOrderMap.put("协助者工时", coworkManHourStr);
             workOrderMap.put("最终评价", workOrder.getFeedbackRating());
 
             if(workOrder.getCaseType() != null){
