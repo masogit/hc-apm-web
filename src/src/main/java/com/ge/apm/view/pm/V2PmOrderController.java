@@ -154,7 +154,6 @@ private String dptName;
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
-
             cancel();
         }
 
