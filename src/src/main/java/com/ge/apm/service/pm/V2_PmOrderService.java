@@ -88,10 +88,11 @@ public class V2_PmOrderService {
             WebUtil.addSuccessMessage("关单成功");
         }
     }
-    public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ) {
+    public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("approval");
+        formData.setDesc(desc);
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 formData.setAssignee(approvaler);
         formData.setDetails(accessoryList);
