@@ -71,7 +71,8 @@
 
                                     <h:panelGroup>
                                         <label class="label">#{msg.name}*</label>
-                                        <p:inputText id="name" value="#{orgInfoController.selected.name}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+                                        <p:inputText id="name" value="#{orgInfoController.selected.name}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                                            <p:ajax listener="#{orgInfoController.checkName()}"  update=":growl"></p:ajax></p:inputText>
                                     </h:panelGroup>
                                     <p:spacer></p:spacer>
                                     <h:panelGroup>
