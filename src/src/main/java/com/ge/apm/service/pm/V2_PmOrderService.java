@@ -100,7 +100,7 @@ formData.setAssignee(approvaler);
         if (res==null || !res.equalsIgnoreCase("ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }else{
-            WebUtil.addSuccessMessage("审批成功");
+            WebUtil.addSuccessMessage("审批提交成功");
         }
     }
     public void createPMrequestApi(String assetUID,PmOrderActionForm formData){

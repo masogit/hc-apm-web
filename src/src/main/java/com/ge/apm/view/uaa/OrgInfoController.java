@@ -2,6 +2,7 @@ package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -70,17 +71,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return dao.getBySiteId(pageRequest, tenantId);
     }
 
-    public void checkName(){
-        String orgNameTmp =selected.getName();
-        List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
-        for(OrgInfo orgInfo:orgTypeList){
-            if(orgInfo.getName().equalsIgnoreCase(orgNameTmp)){
-                WebUtil.addErrorMessage(orgNameTmp+"已经存在");
-                return;
-            }
-        }
-        this.orgName =orgNameTmp;
-    }
+
     private int tenantId;
 
     public int getTenantId() {
@@ -222,9 +213,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         this.selected = org;
     }
 
-    public void saveSelectedOrg(){
-        //重复增加不被允许
-        String orgName =selected.getName();
+
+    private boolean  exist(List<OrgInfo> orgTypeList){
+        for(OrgInfo orgInfo:orgTypeList){
+            if(orgInfo.getName().equalsIgnoreCase(orgName)){
+                WebUtil.addErrorMessage(orgName+"已经存在");
+return true;
+            }
+        }
+        return false;
+    }
+
+    public void checkName(){
+        // String orgNameTmp =selected.getName();
         List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
         for(OrgInfo orgInfo:orgTypeList){
             if(orgInfo.getName().equalsIgnoreCase(orgName)){
@@ -232,12 +233,25 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
                 return;
             }
         }
-        if(!orgName.equalsIgnoreCase(preName)) {
-            assetInfoRepository.updateClinicalName(orgName, selected.getUid());
+    }
+
+    public void saveSelectedOrg(){
+        //重复增加不被允许
+      //  String orgName =selected.getName();
+        List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
+      boolean flag=  exist(orgTypeList);
+        if(flag){
+            return;
+        }else{
+    assetInfoRepository.updateClinicalName(orgName, selected.getUid());
+    selected.setName(orgName);
+
         }
+      //如果更新的或者添加的org没有重名,就保存或更新
         super.save();
         initWorkflowConfig();
         buildOrdTree();
+        orgName = null;
     }
     
     public void initWorkflowConfig(){
@@ -311,6 +325,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         TreeNode node = event.getTreeNode();
         selected = (OrgInfo)node.getData();
         preName =selected.getName();
+        orgName =selected.getName();;
         if(selected!=null) {
             if (selected.getOrgType() == 4) {
                 acShow = true;
@@ -368,5 +383,21 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void setUserAccount(UserAccount userAccount) {
         this.userAccount = userAccount;
+    }
+
+    public String getOrgName() {
+        return orgName;
+    }
+
+    public void setOrgName(String orgName) {
+        this.orgName = orgName;
+    }
+
+    public String getPreName() {
+        return preName;
+    }
+
+    public void setPreName(String preName) {
+        this.preName = preName;
     }
 }
