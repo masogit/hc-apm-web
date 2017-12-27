@@ -146,7 +146,7 @@ public class AssetCreateService {
     public void createAttachments(AssetInfo assetInfo, String[] selectedPictures) {
         List<V2_BlobObject> attachList = new ArrayList();
         for (String item : selectedPictures) {
-            V2_BlobObject blobObject = blobDao.findByObjectStorageId(item);
+            V2_BlobObject blobObject = blobDao.findAllByObjectStorageId(item).stream().findFirst().get();
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
             blobObject.setBoSubType("1");
             blobObject.setBoUuid(assetInfo.getUid());
@@ -234,21 +234,22 @@ public class AssetCreateService {
         }
     }
 
-    @Transactional
-    public void removeAttachment(Integer id, String fileUrl) {
-        List<SearchFilter> attachFilters = new ArrayList<>();
-        attachFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, id));
-        attachFilters.add(new SearchFilter("fileUrl", SearchFilter.Operator.EQ, fileUrl));
-        List<AssetFileAttachment> attList = attachDao.findBySearchFilter(attachFilters);
-        attList.forEach((item) -> {
-//            fileService.deleteAttachment(item.getFileId());
-            String openId = UserContextService.getCurrentUserAccount().getWeChatId();
-            if (blobService.deleteBlobFileByStorageId(openId, fileUrl)) {
-                attachDao.delete(item);
-            }
-        });
-    }
+//    @Transactional
+//    public void removeAttachment(Integer id, String fileUrl) {
+//        List<SearchFilter> attachFilters = new ArrayList<>();
+//        attachFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, id));
+//        attachFilters.add(new SearchFilter("fileUrl", SearchFilter.Operator.EQ, fileUrl));
+//        List<AssetFileAttachment> attList = attachDao.findBySearchFilter(attachFilters);
+//        attList.forEach((item) -> {
+////            fileService.deleteAttachment(item.getFileId());
+//            String openId = UserContextService.getCurrentUserAccount().getWeChatId();
+//            if (blobService.deleteBlobFileByStorageId(openId, fileUrl)) {
+//                attachDao.delete(item);
+//            }
+//        });
+//    }
 
+    /*
     public void addWechatPicAttachment(AssetInfo assetInfo, String serverId) {
         File file = null;
         try {
@@ -280,6 +281,7 @@ public class AssetCreateService {
         }
         file.delete();
     }
+*/
 
     public String getOrgName(String orgUid) {
         if (orgUid != null) {

@@ -692,11 +692,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return attachements.stream().filter(item -> item.getBoSubType() != null && item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
-    public void removeAttachment(String objectId) {
-
-        blobService.deleteBlobFileByStorageId(objectId);
-        attachements = attachements.stream().filter(item -> !item.getObjectStorageId().equals(objectId)).collect(Collectors.toList());
-
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
     public String getHospitalName(String siteUid) {

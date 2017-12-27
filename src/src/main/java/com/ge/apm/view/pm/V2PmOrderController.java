@@ -103,9 +103,9 @@ private String dptName;
     private V2_ServiceRequest newServiceRequest;
     private BlobObjectRepository blobDao;
 
-    public void removeAttachment(String storageId) {
-        blobService.deleteBlobFileByStorageId(storageId);
-        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
     public List<UserAccount> findRepairPerson(){
