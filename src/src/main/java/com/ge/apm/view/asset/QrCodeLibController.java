@@ -173,6 +173,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
         switch(tempOrgInfo.getOrgLevel()){
 
+            case 0: return tempOrgInfo.getName();
             case 1:{
                 return tempInstitutionName;
             }
