@@ -57,8 +57,7 @@
                         <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
-
-                        <p:column headerText="保养等级" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="LIKE">
+                        <p:column headerText="保养等级" sortBy="#{item.ruleLevel}" filterBy="#{item.ruleLevel}" filterMatchMode="EQ">
                             <h:outputText value="#{item.ruleLevel}"/>
                         </p:column>
                         <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
