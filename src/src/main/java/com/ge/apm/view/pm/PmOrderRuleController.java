@@ -60,7 +60,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
 		pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
 		templateDao = WebUtil.getBean(TableDefinitionRepository.class);
-		defaultReport = getDefalutReport();
+		//defaultReport = getDefalutReport();
 	}
 
 	@Override
@@ -138,8 +138,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		por.setStatus(0);
 		por.setCreatedDate(new Date());
 		por.setOwnerId(user.getId());
-		por.setSafetyReport(defaultReport);
-		por.setPerformanceReport(defaultReport);
+//		por.setSafetyReport(defaultReport);
+//		por.setPerformanceReport(defaultReport);
 		por.setPeriod(1);//默认一个月
 	}
 
