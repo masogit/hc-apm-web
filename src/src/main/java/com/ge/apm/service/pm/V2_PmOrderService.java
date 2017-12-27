@@ -246,7 +246,7 @@ formData.setAttachments(attachment);
         formData.setAssignee(assigneeId);
         formData.setDesc(comments);
         String res = srApi.invokePmOrderAction(token,formData,"reAssign",selectedPmOrder.getId());
-        if (res==null || !res.contains("ok")) {
+        if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
         }
     }
