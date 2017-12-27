@@ -61,6 +61,7 @@
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
+		                   			<p:ajax  update="display" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
 	                       </p:selectOneMenu>
@@ -71,6 +72,7 @@
 	                  <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
 	                     <p:selectOneMenu value="#{pmOrderRuleController.selected.performanceReport}"  >
+	                     		<p:ajax  update="display" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
                        	</p:selectOneMenu>
