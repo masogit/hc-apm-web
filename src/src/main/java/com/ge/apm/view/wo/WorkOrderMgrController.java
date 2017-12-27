@@ -306,7 +306,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
-  /*  public void locateAsset() {
+    /*  public void locateAsset() {
         System.out.println();
         if (selectedAsset.getLocationName().isEmpty()) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
@@ -315,7 +315,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             locationName = lName;
         }
     }*/
-
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
     }
@@ -332,9 +331,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return woService.getWorkOrderCoworker(woId);
     }
-    
+
     public List<ServiceRequestMsg> getServiceRequestMessageList(String woId) {
-        return selected==null? null:woService.getServiceRequestMessageList(woId);
+        return selected == null ? null : woService.getServiceRequestMessageList(woId);
     }
 
     public void prepareAct(String woid) {
@@ -360,8 +359,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         coWorkerList = getWorkOrderCoworker(selectedWorkOrder.getId());
         picList = new ArrayList<V2_BlobObject>();
     }
-    
-    public void saveRepairWorkOrder(){
+
+    public void saveRepairWorkOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -471,7 +470,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
-        }else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
+        } else if (Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())) {
             WebUtil.addErrorMessage("所选设备没有使用科室,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -507,7 +506,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (this.newServiceRequest == null) {
             return;
         }
-
 
     }
 
@@ -597,7 +595,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return assetFaultTypeService.getFaultTypeList(assetinfo.getAssetGroup());
     }
 
-
     public String getFaultTypeName(Integer id) {
         return assetFaultTypeService.getFaultName(id);
     }
@@ -617,9 +614,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
     }
 
-    public void removeAttachment(String storageId) {
-        blobService.deleteBlobFileByStorageId(storageId);
-        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
     public void handleFileUpload(FileUploadEvent event) {
@@ -639,7 +636,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void submitWorkOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        woService.submitWorkOrder(selectedWorkOrder, accessoryList,this.comments);
+        woService.submitWorkOrder(selectedWorkOrder, accessoryList, this.comments);
         cancel();
     }
 
@@ -647,8 +644,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         woService.approveAction(selectedWorkOrder, isAgree, comments);
         cancel();
     }
-    
-    public List<V2_BlobObject> getPicListByBoType(String boType){
+
+    public List<V2_BlobObject> getPicListByBoType(String boType) {
         return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
     }
 
