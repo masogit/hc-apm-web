@@ -122,6 +122,8 @@ public class WorkOrderExportService {
             workOrderMap.put("设备名称", serviceRequest.getAssetName());
             workOrderMap.put("院区", serviceRequest.getHospitalName());
             workOrderMap.put("科室", assetInfo.getClinicalDeptName());
+            workOrderMap.put("制造商", assetInfo.getManufacture());
+            workOrderMap.put("品牌", assetInfo.getBrand() != null ? assetInfo.getBrand().getName() : "");
             workOrderMap.put("当前责任人", workOrder.getCurrentPersonName());
             workOrderMap.put("当前步骤", workOrder.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrder.getCurrentStepId().toString()) : "");
             workOrderMap.put("报修人", serviceRequest.getRequestorName());
