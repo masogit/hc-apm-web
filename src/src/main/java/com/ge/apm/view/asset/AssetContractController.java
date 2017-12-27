@@ -8,14 +8,12 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.pm.PmOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.domain.AssetContract;
-import com.ge.apm.domain.AssetDepreciation;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -24,6 +22,8 @@ import java.text.MessageFormat;
 import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.joda.time.DateTime;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.SelectEvent;
@@ -63,7 +63,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         assetService = WebUtil.getBean(AssetInfoService.class);
         pmOrderService = WebUtil.getBean(PmOrderService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
-
+        fileService = WebUtil.getBean(AttachmentFileService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         if (null != encodeStr) {
             String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -102,6 +102,14 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+
+    private AttachmentFileService fileService;
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+    }
+
+
 
     @Override
     public void onFilter(FilterEvent event) {
@@ -213,8 +221,8 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         }
         this.selected = null;
     }
-
     public void handleFileUpload(FileUploadEvent event) {
+
         blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
             fileName = blobObject.getObjectName();
@@ -224,18 +232,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         }
     }
 
-    public void removeAttachmentById(String storageId) {
-        List<V2_BlobObject> blobList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
-        if(blobList== null || blobList.size()!=1){
-            WebUtil.addErrorMessage("不能删除");
-            return;
-        }
-        if (blobService.deleteBlobFileById(blobList.get(0).getId())) {
-            selected.setName(null);
-            selected.setObjectId(null);
-            this.fileName = "";
-        }
-    }
+
 
     public void onAssetSelected(SelectEvent event) {
         onServerEvent("assetSelected", event.getObject());
