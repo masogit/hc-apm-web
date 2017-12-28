@@ -109,6 +109,7 @@ public class WorkOrderExportService {
             List<V2_WorkOrder_Detail> workOrderDetailList = workOrderDetailDao.findByWoId(workOrder.getId());
             V2_WorkOrder_Step sendStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 2);
             V2_WorkOrder_Step acceptStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeAsc(workOrder.getId(), 4);
+            V2_WorkOrder_Step workStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
             List<V2_WorkOrderCoworker> workOrderList = workOrderCoworkerDao.findByWoId(workOrder.getId());
@@ -119,11 +120,12 @@ public class WorkOrderExportService {
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
             workOrderMap.put("工单状态", workOrder.getStatus() != null ? FieldValueMessageController.fieldValue("status",workOrder.getStatus().toString()) : "");
             workOrderMap.put("资产编号", assetInfo.getFinancingNum());
+            workOrderMap.put("设备序列号", assetInfo.getSerialNum());
             workOrderMap.put("设备名称", serviceRequest.getAssetName());
             workOrderMap.put("院区", serviceRequest.getHospitalName());
             workOrderMap.put("科室", assetInfo.getClinicalDeptName());
             workOrderMap.put("制造商", assetInfo.getManufacture());
-            workOrderMap.put("品牌", assetInfo.getBrand() != null ? assetInfo.getBrand().getName() : "");
+            workOrderMap.put("品牌", assetInfo.getMakerShortName());
             workOrderMap.put("当前责任人", workOrder.getCurrentPersonName());
             workOrderMap.put("当前步骤", workOrder.getCurrentStepId() != null ? FieldValueMessageController.fieldValue(I18N_CURRENT_STEP_, workOrder.getCurrentStepId().toString()) : "");
             workOrderMap.put("报修人", serviceRequest.getRequestorName());
@@ -138,6 +140,9 @@ public class WorkOrderExportService {
             if(acceptStep != null){
                 workOrderMap.put("接单人", acceptStep.getOwnerName());
                 workOrderMap.put("接单时间", acceptStep.getStartTime() != null ? sdf.format(acceptStep.getStartTime()) : "");
+            }
+            if(workStep != null){
+                workOrderMap.put("维修完成时间", workStep.getStartTime() != null ? sdf.format(workStep.getStartTime()) : "");
             }
             workOrderMap.put("签到时间", workOrder.getCheckinTime() != null ? sdf.format(workOrder.getCheckinTime()) : "");
             workOrderMap.put("维修工时",workOrder.getTotalManHour());
