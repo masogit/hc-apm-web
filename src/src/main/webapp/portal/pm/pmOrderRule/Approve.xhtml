@@ -28,7 +28,7 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
                             <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
-                                    <p:ajax  update="display" />
+                                    <p:ajax  update="report" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                              </p:selectOneMenu>
@@ -58,29 +58,29 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     
-                     <p:panelGrid columns="2"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
+                     <p:panelGrid id="report" columns="2"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
-		                   			<p:ajax  update="display" />
+		                   			<p:ajax  update="report" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
 	                       </p:selectOneMenu>
 	                        <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.selected.safetyReport}" />
 	                        &nbsp;&nbsp;
-	                   <p:commandButton rendered="#{pmOrderRuleController.selected.safetyReport != null}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
 	                   
 	                  <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
 	                     <p:selectOneMenu value="#{pmOrderRuleController.selected.performanceReport}"  >
-	                     		<p:ajax  update="display" />
+	                     		<p:ajax  update="report" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
                        	</p:selectOneMenu>
                        	 &nbsp;&nbsp;
                        	  <h:inputHidden id="performanceReport" value="#{pmOrderRuleController.selected.performanceReport}" />
-                     	<p:commandButton rendered="#{pmOrderRuleController.selected.performanceReport != null}" immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}" immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
                    </p:panelGrid>
 					 &nbsp;&nbsp;
