@@ -261,7 +261,7 @@ formData.setAttachments(attachment);
         if(endTime !=null)
          formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
         if(planTime !=null)
-            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(planTime));
+            formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTime));
 
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("暂时保存");
