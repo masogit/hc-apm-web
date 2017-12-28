@@ -13,7 +13,6 @@ public class PmOrderActionForm {
 	String actionType;
 	String assignee;
 	List<V2_BlobObject> attachments;
-	String desc;
 	String endTime;
 	Double manHours;
 	String startTime;
@@ -23,6 +22,8 @@ public class PmOrderActionForm {
 	Object coworkers;
 	String planTime;
 	Integer ruleLevel;
+	String desc;
+
 //V2_WorkOrder_Coworker[] coworkes //optional
 
 	public String getQualityChecking() {
@@ -141,4 +142,6 @@ public class PmOrderActionForm {
 	public void setRuleLevel(Integer ruleLevel) {
 		this.ruleLevel = ruleLevel;
 	}
+
+
 }

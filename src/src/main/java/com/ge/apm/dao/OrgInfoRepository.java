@@ -46,6 +46,8 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public List<OrgInfo> findByParentUIDAndOrgType(String parentUID, Integer orgType);
 
+    public List<OrgInfo> findByParentUID(String parentUID);
+
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc(String siteUID, Integer orgType);
 
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);

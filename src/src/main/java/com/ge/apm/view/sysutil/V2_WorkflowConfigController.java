@@ -59,39 +59,41 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 	public void initDispatchUserList() {
+		dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
+		/*
 		dispatchUserList.clear();
 		Set<String> uids = new HashSet<String>();
 		String tenantUID = user.getTenantUID();
 		if(selected == null){
-			/**
+			*//**
 			 * 默认级别：租户
-			 */
+			 *//*
 			dispatchUserList = userDao.getByTenantUID(tenantUID);
 			return;
 		}else{
 			uids.add(selected.getTenantUID());
 			selected.setTenantUID(tenantUID);
 			
-			/***
+			*//***
 			 * 租户级别
-			 */
+			 *//*
 			if(isNullOrBelongs(selected.getInstitutionUID(),uids) || selected.getTenantUID().equals(selected.getInstitutionUID())){
 				System.out.println("租户级别");
 				dispatchUserList = userDao.getByTenantUID(tenantUID);
 				return;
 			}else{
-				/***
+				*//***
 				 * 集团级别
-				 */
+				 *//*
 				uids.add(selected.getInstitutionUID());
 				if(isNullOrBelongs(selected.getHospitalUID(),uids) || selected.getInstitutionUID().equals(selected.getHospitalUID())){
 					System.out.println("集团级别");
 					dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
 					return;
 				}else{
-					/***
+					*//***
 					 * 医院级别
-					 */
+					 *//*
 					uids.add(selected.getHospitalUID());
 					if(isNullOrBelongs(selected.getSiteUID(),uids) || selected.getHospitalUID().equals(selected.getSiteUID())){
 						System.out.println("医院级别");
@@ -105,7 +107,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				}
 			}
 		}
-	}
+	*/}
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){

@@ -57,6 +57,7 @@ public class AssetFileImportService {
     private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
     private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
+    private List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -174,6 +175,9 @@ public class AssetFileImportService {
                 }
 
                 AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
+                assetRow.setFieldStringValue("设备名称", "setName");
+                assetRow.setFieldStringValue("设备编号", "setDepartNum");
+                assetRow.setFieldStringValue("资产编号", "setFinancingNum");
                 assetRow.setFieldStringValue("设备别名", "setAliasName");
                 assetRow.setFieldStringValue("维修负责人", "setAssetOwnerName");
                 assetRow.setFieldStringValue("维修负责人2", "setAssetOwnerName2");
@@ -197,6 +201,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map);
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
@@ -632,7 +637,7 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.8".equalsIgnoreCase(inputVersion);
+        return "v1.9".equalsIgnoreCase(inputVersion);
     }
 
 }

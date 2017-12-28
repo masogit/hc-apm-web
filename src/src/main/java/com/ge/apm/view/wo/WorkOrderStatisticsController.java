@@ -113,6 +113,16 @@ public class WorkOrderStatisticsController {
         }
     }
 
+    public String getAllorgName(Integer orgID){
+
+        OrgInfo tempOrgInfo = orgDao.findById(orgID);
+        String deptName = tempOrgInfo.getName();
+        String siteName = orgDao.getByUid(tempOrgInfo.getSiteUID()).getName();
+
+        return siteName + "/" + deptName;
+
+    }
+
     public UserAccount getCurrentUser() {
         return currentUser;
     }

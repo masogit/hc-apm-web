@@ -255,6 +255,8 @@ public class V2_WorkOrderService {
         String res = srApi.invokeWorkOrderAction(token,formData,"approval",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("已提交");
         }
     }
     

@@ -23,10 +23,12 @@ import com.alibaba.fastjson.JSON;
 import com.ge.apm.dao.PmOrderRuleCheckListRepository;
 import com.ge.apm.dao.PmOrderRuleItemRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
+import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.PmOrderRuleCheckList;
 import com.ge.apm.domain.PmOrderRuleItem;
+import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.Report;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -47,6 +49,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private String filterPmRuleStatus;
 	private String filterPmRuleLevel;
 	private String defaultReport;
+	private TableDefinitionRepository templateDao;
 
 	@Override
 	protected void init() {
@@ -56,7 +59,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
 		pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
 		pmOrderRuleCheckListRepository = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
-		defaultReport = getDefalutReport();
+		templateDao = WebUtil.getBean(TableDefinitionRepository.class);
+		//defaultReport = getDefalutReport();
 	}
 
 	@Override
@@ -99,6 +103,16 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		}
 		return items;
 	}
+	
+	public List<TableDefinition> getTableDefinition(){
+		List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
+		tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
+		if(this.selected != null && this.selected.getAssetGroup() != null) {
+			tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
+		}
+		return templateDao.findBySearchFilter(tempFilter);
+	}
 
 	@Override
 	@Transactional
@@ -124,8 +138,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		por.setStatus(0);
 		por.setCreatedDate(new Date());
 		por.setOwnerId(user.getId());
-		por.setSafetyReport(defaultReport);
-		por.setPerformanceReport(defaultReport);
+//		por.setSafetyReport(defaultReport);
+//		por.setPerformanceReport(defaultReport);
 		por.setPeriod(1);//默认一个月
 	}
 
