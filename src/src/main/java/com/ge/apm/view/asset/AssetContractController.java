@@ -105,8 +105,10 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
     private AttachmentFileService fileService;
 
-    public void removeAttachmentById(String blobId) {
-        blobService.deleteBlobFileById(blobId);
+    public void removeAttachmentById(V2_BlobObject blobObject) {
+        blobService.deleteBlobFileById(blobObject.getId());
+        //删除附件的时候清空
+        selected.setObjectId(null);
     }
 
 
@@ -144,6 +146,9 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             blobService.saveBlobObject(blobObject);
             saveDepreciation();
             //结束时间晚于维保时间，那么就更新维保时间
+
+
+
             udpateAssetInfoWarranty();
 //            if (this.selected.getContractType() == 5) {
 //                pmOrderService.savePmOrder(selectedAsset, this.selected.getStartDate(), this.selected.getEndDate(), pmCount, null);
@@ -261,6 +266,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             return;
         }
         V2_BlobObject fileObject = fileObjectList.get(0);
+        blobObject=fileObject;
         fileName = fileObject==null?"":fileObject.getObjectName();
         crudActionName = "Edit";
     }
@@ -291,5 +297,13 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
     public void setPmCount(Integer pmCount) {
         this.pmCount = pmCount;
+    }
+
+    public V2_BlobObject getBlobObject() {
+        return blobObject;
+    }
+
+    public void setBlobObject(V2_BlobObject blobObject) {
+        this.blobObject = blobObject;
     }
 }

@@ -70,7 +70,7 @@
                         <h:panelGroup id="namepanel" rendered="#{assetContractController.selected.objectId!=null}">
                             <label class="label">#{msg.AssetContractAttachment}*</label>
                             <p:inputText id="name" value="#{assetContractController.fileName}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" readonly="true"/>
-                            <p:commandButton actionListener="#{assetContractController.removeAttachmentById(assetContractController.selected.objectId)}" id="iconOnly" update=":AssetContractEditForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetContractController.isCreatAction()}">
+                            <p:commandButton actionListener="#{assetContractController.removeAttachmentById(assetContractController.blobObject)}" id="iconOnly" update=":AssetContractEditForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetContractController.isCreatAction()}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                         </h:panelGroup>

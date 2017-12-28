@@ -16,7 +16,7 @@
 
                 <h:form id="pmOrderListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="true"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"/>
 
                         <p:commandButton value="创建保养" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet :pmOrderDetailForm :PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
 
