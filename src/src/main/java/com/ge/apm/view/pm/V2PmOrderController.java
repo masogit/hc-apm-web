@@ -103,10 +103,26 @@ private String dptName;
     private V2_ServiceRequest newServiceRequest;
     private BlobObjectRepository blobDao;
 
-    public void removeAttachment(String storageId) {
-        blobService.deleteBlobFileByStorageId(storageId);
-        picList.removeAll(picList.stream().filter(item -> item.getObjectStorageId().equals(storageId)).collect(Collectors.toList()));
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
+
+    public List<UserAccount> findRepairPerson(){
+        if(this.selectedPmOrder!=null) {
+            return  woService.getWorkerList(this.selectedPmOrder.getAssetId());
+        } else {
+            return Collections.emptyList();
+        }
+
+    }
+
+
+    public void reassignWorkOrder(){
+        pmOrderService.reassignWorkOrder(selectedPmOrder, selectedPmOrder.getCurrentPersonId(), comments);
+       // cancel();
+    }
+
 
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
@@ -138,7 +154,6 @@ private String dptName;
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
-
             cancel();
         }
 
@@ -236,7 +251,7 @@ private String dptName;
     public void submitAppvalPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler);
+        pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler,comments);
         cancel();
     }
 
@@ -425,6 +440,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         ruleLevel=null;
         dptName=null;
         picList=null;
+        comments=null;
 
     }
 
@@ -443,13 +459,14 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if(endTime==null){
             WebUtil.addErrorMessage("结束时间"+WebUtil.getMessage("ValidationRequire"));
         }
+       /* if(planTime==null){
+            WebUtil.addErrorMessage("计划完成时间"+WebUtil.getMessage("ValidationRequire"));
+        }*/
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,picList);
-
-
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         cancel();
     }
 
@@ -458,7 +475,8 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime);
+
+        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime());
         cancel();
     }
 

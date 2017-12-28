@@ -35,8 +35,8 @@ public class FileScanService {
         return saveFile(file, folderName, file.getFileName());
     }
 
-    public String saveBatchUploadedFile(UploadedFile file,String fileType) throws Exception {
-        String folderName = BATCH_FILE_Folder.concat(File.separator).concat(fileType==null?"":fileType).concat(String.valueOf(System.currentTimeMillis()));
+    public String saveBatchUploadedFile(UploadedFile file, String fileType) throws Exception {
+        String folderName = BATCH_FILE_Folder.concat(File.separator).concat(fileType == null ? "" : fileType).concat(String.valueOf(System.currentTimeMillis()));
         return saveFile(file, folderName, "batchfile").replaceFirst(BATCH_FILE_Folder, "");
     }
 
@@ -70,6 +70,10 @@ public class FileScanService {
         }
 
         return fileName;
+    }
+
+    public void deleteBatchUploadedFile(String path) {
+        deleteUploadedFile(BATCH_FILE_Folder.concat(path));
     }
 
     public void deleteUploadedFile(String path) {

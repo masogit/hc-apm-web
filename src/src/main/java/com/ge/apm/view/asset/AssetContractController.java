@@ -11,15 +11,12 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.service.pm.PmOrderService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.domain.AssetContract;
 import com.ge.apm.domain.AssetDepreciation;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetInfoService;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,9 +38,6 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
     AssetDepreciationRepository depredao = null;
     
-    BlobObjectRepository blobDao;
-
-//    AttachmentFileService fileService;
     AssetInfo selectedAsset;
 
     private PmOrderService pmOrderService;
@@ -65,9 +59,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
         dao = WebUtil.getBean(AssetContractRepository.class);
         depredao = WebUtil.getBean(AssetDepreciationRepository.class);
-        blobDao = WebUtil.getBean(BlobObjectRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-//        fileService = WebUtil.getBean(AttachmentFileService.class);
         assetService = WebUtil.getBean(AssetInfoService.class);
         pmOrderService = WebUtil.getBean(PmOrderService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -141,7 +133,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             blobObject.setBoId(selected.getId());
             blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetContract);
             blobObject.setBoUuid(selected.getUid());
-            blobDao.save(blobObject);
+            blobService.saveBlobObject(blobObject);
             saveDepreciation();
             //结束时间晚于维保时间，那么就更新维保时间
             udpateAssetInfoWarranty();
@@ -209,7 +201,12 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
     @Override
     public void delete() {
-        if (blobService.deleteBlobFileByStorageId(selected.getObjectId())) {
+        List<V2_BlobObject> blobList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
+        if(blobList== null || blobList.size()!=1){
+            WebUtil.addErrorMessage("不能删除");
+            return;
+        }
+        if (blobService.deleteBlobFileById(blobList.get(0).getId())) {
             List<AssetDepreciation> depreList = depredao.getByContractId(selected.getId());
             depredao.delete(depreList);
             dao.delete(selected);
@@ -227,8 +224,13 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         }
     }
 
-    public void removeAttachment(String objectId) {
-        if (blobService.deleteBlobFileByStorageId(objectId)) {
+    public void removeAttachmentById(String storageId) {
+        List<V2_BlobObject> blobList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
+        if(blobList== null || blobList.size()!=1){
+            WebUtil.addErrorMessage("不能删除");
+            return;
+        }
+        if (blobService.deleteBlobFileById(blobList.get(0).getId())) {
             selected.setName(null);
             selected.setObjectId(null);
             this.fileName = "";
@@ -256,7 +258,12 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
     public void onSelectedChange() {
         selectedAsset = assetService.getAssetInfo(selected.getAssetId());
-        V2_BlobObject fileObject = blobService.getBlobObjectByStorageId(selected.getObjectId());
+        List<V2_BlobObject> fileObjectList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
+        if(fileObjectList== null || fileObjectList.size()!=1){
+            WebUtil.addErrorMessage("找不到附件");
+            return;
+        }
+        V2_BlobObject fileObject = fileObjectList.get(0);
         fileName = fileObject==null?"":fileObject.getObjectName();
         crudActionName = "Edit";
     }

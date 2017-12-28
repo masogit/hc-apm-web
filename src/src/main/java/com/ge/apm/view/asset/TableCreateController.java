@@ -84,6 +84,7 @@ public class TableCreateController {
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
                 selectedTableDefinition.setSchema(tableString);
                 templateDao.save(selectedTableDefinition);
+                WebUtil.addSuccessMessage("已保存");
             } else {
                 WebUtil.addErrorMessage("字段有变动,不能保存");
             }

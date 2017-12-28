@@ -391,7 +391,7 @@ public class AssetInfo implements Serializable {
     private Date nextMeteringDate;//下次计量日期
 
     @Column(name = "is_warranty")
-    private Boolean isWarranty;//是否提醒计量到期
+    private Boolean isWarranty = Boolean.TRUE;//是否对质保到期进行提醒(默认提醒)
 
     @Column(name = "metering_no")
     private String meteringNO;//计量编号

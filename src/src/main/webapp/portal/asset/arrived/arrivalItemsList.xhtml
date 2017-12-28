@@ -23,7 +23,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm"/>
+                        <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemViewForm :ItemDetailViewForm"/>
                         <p:ajax event="filter" listener="#{assetArrivedItemsController.onFilter}" update="datalist" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.arrivalList.name}" filterBy="#{item.arrivalList.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.name}"/>
@@ -71,6 +71,7 @@
                     </p:dataTable>
                 </h:form>
                 <ui:include src="ItemView.xhtml"/>
+                <ui:include src="ItemDetailView.xhtml"/>
                 <p:dialog id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.TransferOrder}">
                     <h:form id="transferOrderDialogForm" >
                         <h:panelGroup id="display2" rendered="#{not empty assetArrivedItemsController.selectedItem}">
