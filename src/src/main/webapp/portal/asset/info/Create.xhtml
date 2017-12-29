@@ -223,7 +223,7 @@
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInfoController.selected.parentAssetId}" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInfoController.parentAssetList}" var="item" itemLabel="#{item.name}(#{item.departNum})" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{assetInfoController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
