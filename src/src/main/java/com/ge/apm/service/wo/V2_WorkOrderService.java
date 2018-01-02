@@ -214,14 +214,14 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, String extType,String comments) {
+    public void acceptWorkOrder(V2_WorkOrder selectedWorkOrder, Date estimatedCloseTime, Integer extType,String comments) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
      //   selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setEstimatedCloseTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(estimatedCloseTime));
-        formData.setIntExtType(extType);
+        formData.setRepairType(extType);
         formData.setDesc(comments);
         String res = srApi.invokeWorkOrderAction(token,formData,"accept",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
