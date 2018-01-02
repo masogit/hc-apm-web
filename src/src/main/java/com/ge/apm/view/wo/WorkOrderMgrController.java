@@ -525,7 +525,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void acceptWorkOrder() {
-        String repairType = selectedWorkOrder.getRepairType().toString();
+        Integer repairType = selectedWorkOrder.getRepairType();
         woService.acceptWorkOrder(selectedWorkOrder, esTime, repairType, comments);
         cancel();
     }
