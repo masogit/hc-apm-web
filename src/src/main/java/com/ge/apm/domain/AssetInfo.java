@@ -152,6 +152,7 @@ public class AssetInfo implements Serializable {
     @Column(name = "is_valid")
     private boolean isValid;//在用？
 
+    //1:正常,2:停机,3:限制功能使用,4:待报废
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
@@ -369,6 +370,7 @@ public class AssetInfo implements Serializable {
     private Integer meteringCycle;
 
     //设备状态[1:在用,2:停用,3:待报废,4:报废]
+    //1:待完善,2:待审核,3:已经建档
     @Column(name = "usage_status")
     private Integer usageStatus;
 
