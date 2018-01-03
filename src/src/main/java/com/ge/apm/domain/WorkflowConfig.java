@@ -87,6 +87,10 @@ public class WorkflowConfig implements Serializable {
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
     
+    //扫码建档审核人UID, null 表示不需要审核
+    @Column(name="asset_approver",columnDefinition = "CHAR(32)")
+    private String assetApprover;
+    
     public Integer getPmReminderTime() {
 		return pmReminderTime;
 	}
@@ -310,6 +314,14 @@ public class WorkflowConfig implements Serializable {
         isTempUserReport = tempUserReport;
     }
 
+    public String getAssetApprover() {
+        return assetApprover;
+    }
+
+    public void setAssetApprover(String assetApprover) {
+        this.assetApprover = assetApprover;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
