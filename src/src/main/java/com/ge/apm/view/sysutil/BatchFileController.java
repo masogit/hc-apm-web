@@ -17,8 +17,6 @@ import webapp.framework.web.WebUtil;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javaslang.Tuple2;
 import org.springframework.data.domain.Page;
@@ -43,6 +41,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     private String fileType;
 
+    @Override
     protected void init() {
         dao = WebUtil.getBean(ImportFilesRepository.class);
         fileService = WebUtil.getBean(FileScanService.class);
@@ -120,7 +119,7 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public void cancel() {
         this.selected = null;
-        while(!fileList.isEmpty()){
+        while(fileList!=null && !fileList.isEmpty()){
            removeFile(0);
         }
         this.fileList.clear();
