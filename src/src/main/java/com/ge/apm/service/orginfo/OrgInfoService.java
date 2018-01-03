@@ -1,5 +1,6 @@
 package com.ge.apm.service.orginfo;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -7,16 +8,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.faces.model.SelectItem;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import org.springframework.beans.factory.annotation.Autowired;
+import webapp.framework.dao.SearchFilter;
 
 @Service
 public class OrgInfoService {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Autowired
+    private OrgInfoRepository orgDao;
 
     public List<OrgInfo> flattenOrgTree(List<OrgInfo> orgInfoList) {
 

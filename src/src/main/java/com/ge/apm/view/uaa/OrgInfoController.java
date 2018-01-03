@@ -313,6 +313,7 @@ return true;
         checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
         checkFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
         checkFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
+        checkFilters.add(new SearchFilter("orgId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
         List<QrCodeLib> qrcodeList = qrcodeLibDao.findBySearchFilter(checkFilters);
         if(qrcodeList!=null && !qrcodeList.isEmpty()){
             WebUtil.addErrorMessage("该组织下有二维码存在,不能删除.");
