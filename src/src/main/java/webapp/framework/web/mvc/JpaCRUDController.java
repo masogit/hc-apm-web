@@ -58,7 +58,9 @@ public abstract class JpaCRUDController<E> implements Serializable, ServerEventI
     }
     
     public void updateSearchFilter(SearchFilter searchFilter){
-        removeFilterOnField(searchFilter.fieldName);
+        if(searchFilters !=null){
+            searchFilters.removeAll(searchFilters.stream().filter(item -> item.fieldName.equals(searchFilter.fieldName) && item.conditionPath.equals(searchFilter.conditionPath)).collect(Collectors.toList()));
+        }
         searchFilters.add(searchFilter);
     }
 
