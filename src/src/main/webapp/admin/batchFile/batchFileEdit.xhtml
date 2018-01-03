@@ -38,7 +38,7 @@
                     </p:panelGrid>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{batchFileController.saveFiles}" value="#{msg.Save}" update=":BatchFileImportForm:datalist, :growl :BatchFileImportEditForm" icon="ui-icon-check" />
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{batchFileController.cancel}" update=":BatchFileImportEditForm :growl"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{batchFileController.cancel}" update=":BatchFileImportEditForm fileType :growl"/>
                     </h:panelGroup>
 
                 </h:panelGroup>
