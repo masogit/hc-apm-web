@@ -46,31 +46,41 @@
             </p:panelGrid>
         </p:fieldset>
         <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
-                    <label class="label">*报修开始时间</label>
-                    <p:calendar timeZone="GMT+8"  id="startTime" value="#{workOrderReportExportController.startTime}" pattern="yyyy/MM/dd" required="true" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                    <label class="label">报修开始时间</label>
+                    <p:calendar timeZone="GMT+8"  id="startTime" value="#{workOrderReportExportController.startTime}" pattern="yyyy/MM/dd" required="false" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">*报修结束时间</label>
-                    <p:calendar timeZone="GMT+8"  id="endTime" value="#{workOrderReportExportController.endTime}" pattern="yyyy/MM/dd" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+                    <label class="label">报修结束时间</label>
+                    <p:calendar timeZone="GMT+8"  id="endTime" value="#{workOrderReportExportController.endTime}" pattern="yyyy/MM/dd" required="false" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
+		<h:panelGroup>
+                                <label class="label">关单开始时间</label>
+                                <p:calendar timeZone="GMT+8"  id="closedStartTime" value="#{workOrderReportExportController.closedStartTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">关单结束时间</label>
+                                <p:calendar timeZone="GMT+8"  id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
 
         <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
             <h:panelGroup>
-                <p:commandButton value="预览结果" actionListener="#{workOrderReportExportController.previewData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
+                <p:commandButton value="预览结果" actionListener="#{workOrderReportExportController.previewData}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
                 </p:commandButton>
             </h:panelGroup>
         </p:panelGrid>
     </h:form>
 
     <h:form id="dataListForm">
-        <p:dataTable id="datalist" rendered="#{not empty workOrderReportExportController.workOrderList}" value="#{workOrderReportExportController.workOrderList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+        <p:dataTable id="datalist" rendered="#{not empty workOrderReportExportController.workOrderList}" value="#{workOrderReportExportController.workOrderList}" var="item" selection="#{workOrderReportExportController.selectedItems}" 
+	rowKey="#{item.报修单号}" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                      paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
                      rowsPerPageTemplate="10,20,50">
+	    <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
             <p:column headerText="报修单号">
                 <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank"><h:outputText value="#{item.报修单号}" /></a>
             </p:column>
@@ -109,9 +119,18 @@
             </p:column>
 
             <f:facet name="{Toolbar}">
-                <p:commandButton ajax="false" value="导出" actionListener="#{workOrderReportExportController.exportData()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                    <p:fileDownload value="#{workOrderReportExportController.exportFile}" />
-                </p:commandButton>
+                <p:commandButton ajax="false" value="报表全部导出" actionListener="#{workOrderReportExportController.exportAllWo()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                <p:fileDownload value="#{workOrderReportExportController.exportFile}" />
+                            </p:commandButton>
+                            <p:commandButton ajax="false" value="报表选择导出" actionListener="#{workOrderReportExportController.exportSelectedWo()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                <p:fileDownload value="#{workOrderReportExportController.exportFile}" />
+                            </p:commandButton>
+                            <p:commandButton ajax="false" value="详情全部导出" actionListener="#{workOrderReportExportController.exportAllWoPdf()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                <p:fileDownload value="#{workOrderReportExportController.exportPdf}" />
+                            </p:commandButton>
+                            <p:commandButton ajax="false" value="详情选择导出" actionListener="#{workOrderReportExportController.exportSelectedWoPdf()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                                <p:fileDownload value="#{workOrderReportExportController.exportPdf}" />
+                            </p:commandButton>
             </f:facet>
         </p:dataTable>
     </h:form>
