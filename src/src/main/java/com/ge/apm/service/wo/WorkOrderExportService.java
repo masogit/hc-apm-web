@@ -71,8 +71,6 @@ public class WorkOrderExportService {
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
     @Autowired
     UserAccountRepository userAccountDao;
-    @Autowired
-    WorkOrderCoworkerRepository coWorkerDao;
     
     //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
     public List<Map<String,Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList){
@@ -243,8 +241,6 @@ public class WorkOrderExportService {
             //added columns for pdf export
             workOrderMap.put("联系电话", userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone());
             workOrderMap.put("设备型号", assetInfo.getFunctionType());
-//            workOrderMap.put("生产厂家", assetInfo.getManufacture());
-//            workOrderMap.put("序列号", assetInfo.getSerialNum());
             workOrderMap.put("系统编号", assetInfo.getEamId());
             workOrderMap.put("二维码", assetInfo.getQrCode());
 			workOrderMap.put("当前位置", serviceRequest.getAssetLocation() == null ? assetInfo.getLocationName()
@@ -258,14 +254,6 @@ public class WorkOrderExportService {
 			{
 				workOrderMap.put("停机时间", "未停机");
 			}
-			
-//			int i = 0;
-//			for(V2_WorkOrderCoworker co : coWorkerDao.findByWoId(workOrder.getId()))
-//			{
-//				i++;
-//				workOrderMap.put("工时" + String.valueOf(i), co.getManHours());
-//				workOrderMap.put("协作者" + String.valueOf(i), co.getCowokerUserName());
-//			}
 			
 			workOrderMap.put("备件信息", parts);
 			workOrderMap.put("维修流程", null);

@@ -80,7 +80,7 @@
 							</fo:table-cell>
 							<fo:table-cell border-style="solid" border-width="0.5px">
 								<fo:block font-weight="bold" margin-left="-0.4cm" margin-right="-0.4cm">
-									<xsl:value-of select="生产厂家"/>
+									<xsl:value-of select="制造商"/>
 								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
@@ -92,7 +92,7 @@
 							</fo:table-cell>
 							<fo:table-cell border-style="solid" border-width="0.5px">
 								<fo:block font-weight="bold" margin-left="-0.4cm" margin-right="-0.4cm">
-									<xsl:value-of select="序列号"/>
+									<xsl:value-of select="设备序列号"/>
 								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell border-style="solid" border-width="0.5px">
