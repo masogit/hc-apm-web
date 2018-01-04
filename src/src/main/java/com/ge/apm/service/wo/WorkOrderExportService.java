@@ -1,21 +1,6 @@
 package com.ge.apm.service.wo;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.view.sysutil.FieldValueMessageController;
-import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.collections.map.HashedMap;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
-import org.springframework.stereotype.Component;
-import webapp.framework.dao.SearchFilter;
-
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -24,6 +9,37 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.collections.map.HashedMap;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Component;
+
+import com.ge.apm.dao.AssetFaultTypeRepository;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.ServiceRequestRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.V2_WorkOrderCoworkerRepository;
+import com.ge.apm.dao.V2_WorkOrderRepository;
+import com.ge.apm.dao.V2_WorkOrderStepRepository;
+import com.ge.apm.dao.WorkOrderCoworkerRepository;
+import com.ge.apm.dao.WorkOrderDetailRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrder;
+import com.ge.apm.domain.V2_WorkOrderCoworker;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.domain.V2_WorkOrder_Step;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
+
+import webapp.framework.dao.SearchFilter;
 
 /**
  * Created by 212605082 on 2017/7/25.
@@ -53,10 +69,13 @@ public class WorkOrderExportService {
     I18nMessageRepository i18nMessageDao;
     @Autowired
     V2_WorkOrderCoworkerRepository workOrderCoworkerDao;
-
-
+    @Autowired
+    UserAccountRepository userAccountDao;
+    @Autowired
+    WorkOrderCoworkerRepository coWorkerDao;
+    
     //public List<Map<String,Object>> createData(String institutionUID, String hospitalUID, String siteUID, Date startTime, Date endTime, List<Integer> statusList){
-    public List<Map<String,Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, List<Integer> statusList){
+    public List<Map<String,Object>> createData(OrgInfo selectedOrg, Date startTime, Date endTime, Date closedStartTime, Date closedEndTime, List<Integer> statusList){
 
         List<Map<String,Object>> resultList = new ArrayList<>();
         Map<String,Object> workOrderMap;
@@ -81,14 +100,22 @@ public class WorkOrderExportService {
         }
 
         ZoneId zone = ZoneId.systemDefault();
-        LocalDate startDate = LocalDateTime.ofInstant(startTime.toInstant(), zone).toLocalDate();
-        LocalDate endDate = LocalDateTime.ofInstant(endTime.toInstant(), zone).toLocalDate();
+//        LocalDate startDate = LocalDateTime.ofInstant(startTime.toInstant(), zone).toLocalDate();
+        
 
         if(startTime != null){
             searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.GTE, startTime));
         }
         if(endTime != null){
+        	LocalDate endDate = LocalDateTime.ofInstant(endTime.toInstant(), zone).toLocalDate();
             searchFilters.add(new SearchFilter("createdDate", SearchFilter.Operator.LT, Date.from(endDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
+        }
+        if(closedStartTime != null){
+            searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.GTE, closedStartTime));
+        }
+        if(closedEndTime != null){
+        	LocalDate closeEndDate = LocalDateTime.ofInstant(closedEndTime.toInstant(), zone).toLocalDate();
+            searchFilters.add(new SearchFilter("closeTime", SearchFilter.Operator.LT, Date.from(closeEndDate.plus(1, ChronoUnit.DAYS).atStartOfDay().atZone(zone).toInstant())));
         }
         if(statusList != null && !statusList.isEmpty()){
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, statusList));
@@ -112,9 +139,12 @@ public class WorkOrderExportService {
             V2_WorkOrder_Step workStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 4);
             V2_WorkOrder_Step evaluateStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 5);
             V2_WorkOrder_Step closeStep = v2WorkOrderStepDao.findFirstByWoIdAndStepIdOrderByStartTimeDesc(workOrder.getId(), 6);
+
             List<V2_WorkOrderCoworker> workOrderList = workOrderCoworkerDao.findByWoId(workOrder.getId());
 
-            workOrderMap = new HashedMap();
+
+            workOrderMap = new HashedMap();            
+
             workOrderMap.put("woId", workOrder.getId());
             workOrderMap.put("报修单号", serviceRequest.getSrNum() != null ? serviceRequest.getSrNum() : "");
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
@@ -145,14 +175,33 @@ public class WorkOrderExportService {
                 workOrderMap.put("维修完成时间", workStep.getStartTime() != null ? sdf.format(workStep.getStartTime()) : "");
             }
             workOrderMap.put("签到时间", workOrder.getCheckinTime() != null ? sdf.format(workOrder.getCheckinTime()) : "");
-            workOrderMap.put("维修工时",workOrder.getTotalManHour());
+            workOrderMap.put("维修工时", workOrder.getTotalManHour());
             String info = "";
             double infoTotalPrice = 0;
+            List<Map<String, Object>> parts = new ArrayList<Map<String, Object>>();
             for (V2_WorkOrder_Detail workOrderDetail:workOrderDetailList) {
                 Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
                 Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
                 info += workOrderDetail.getParts()+",数量："+ tempQuantity +",单价:"+ tempPrice +";";
                 infoTotalPrice += tempQuantity * tempPrice;
+                
+                Map<String,Object> part = new HashedMap();
+                part.put("备件名", workOrderDetail.getParts());
+                part.put("单价", workOrderDetail.getPartsPrice());
+                part.put("数量", workOrderDetail.getApartsQuantity());
+                part.put("类型", getPartType(workOrderDetail.getPartsType()));
+                part.put("序列号", workOrderDetail.getSerialNum());
+                part.put("质保期", workOrderDetail.getWarrantyDate());
+                if(workOrderDetail.getArrived() == null)
+                {
+                	part.put("到货", null);
+                }
+                else
+                {
+                	String arrived = workOrderDetail.getArrived().equals(Boolean.TRUE)?"到货":"未到货";
+	                part.put("到货", arrived);
+                }
+                parts.add(part);
             }
 
             workOrderMap.put("维修备件", info);
@@ -170,9 +219,14 @@ public class WorkOrderExportService {
             }
             String coworkerStr = "";
             String coworkManHourStr = "";
+            int i = 0;
             for (V2_WorkOrderCoworker woc: workOrderList) {
                 coworkerStr += woc.getCowokerUserName() + ",";
                 coworkManHourStr += woc.getManHours() + ",";
+                
+                i++;
+				workOrderMap.put("工时" + String.valueOf(i), woc.getManHours());
+				workOrderMap.put("协作者" + String.valueOf(i), woc.getCowokerUserName());
             }
             workOrderMap.put("协助者", coworkerStr);
             workOrderMap.put("协助者工时", coworkManHourStr);
@@ -186,13 +240,130 @@ public class WorkOrderExportService {
             workOrderMap.put("解决方案", workOrder.getPatActions());
             workOrderMap.put("交付前检测", workOrder.getPatTests());
             workOrderMap.put("备注", workOrder.getComment());
-
+            //added columns for pdf export
+            workOrderMap.put("联系电话", userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone());
+            workOrderMap.put("设备型号", assetInfo.getFunctionType());
+//            workOrderMap.put("生产厂家", assetInfo.getManufacture());
+//            workOrderMap.put("序列号", assetInfo.getSerialNum());
+            workOrderMap.put("系统编号", assetInfo.getEamId());
+            workOrderMap.put("二维码", assetInfo.getQrCode());
+			workOrderMap.put("当前位置", serviceRequest.getAssetLocation() == null ? assetInfo.getLocationName()
+					: serviceRequest.getAssetLocation());
+			workOrderMap.put("报修状态", getPdfStatus(serviceRequest.getStatus()));
+			if(serviceRequest.getStatus() == 2)
+			{
+				workOrderMap.put("停机时间", (serviceRequest.getConfirmedDownTime() != null ? serviceRequest.getConfirmedDownTime():null));
+			}
+			else
+			{
+				workOrderMap.put("停机时间", "未停机");
+			}
+			
+//			int i = 0;
+//			for(V2_WorkOrderCoworker co : coWorkerDao.findByWoId(workOrder.getId()))
+//			{
+//				i++;
+//				workOrderMap.put("工时" + String.valueOf(i), co.getManHours());
+//				workOrderMap.put("协作者" + String.valueOf(i), co.getCowokerUserName());
+//			}
+			
+			workOrderMap.put("备件信息", parts);
+			workOrderMap.put("维修流程", null);
+			workOrderMap.put("工时", workOrder.getManHours());
+			workOrderMap.put("维修类型", workOrder.getRepairType() != null ? FieldValueMessageController.fieldValue(I18N_REPAIR_TYPE, workOrder.getRepairType().toString()) : "");
+	         
+			List<V2_WorkOrder_Step> steps = v2WorkOrderStepDao.findByWorkOrder(workOrder.getId());
+			List<Map<String, Object>> woSteps = new ArrayList<Map<String, Object>>();
+			Map<String, Object> woStep;
+			for(V2_WorkOrder_Step step : steps)
+			{
+				woStep = new HashedMap();
+				woStep.put("步骤名称", step.getStepName());
+				woStep.put("责任人", step.getOwnerName());
+				woStep.put("开始时间", getBJTime(step.getStartTime()));
+				woStep.put("结束时间", getBJTime(step.getEndTime()));
+				woStep.put("处理描述", step.getComments());
+				woSteps.add(woStep);
+			}
+			
+			workOrderMap.put("维修流程", woSteps);
+			
             resultList.add(workOrderMap);
         }
 
         return resultList;
     }
 
+    private String getPartType(String type)
+    {
+    	String partType = null;
+    	
+    	if(type != null)
+    	{
+	    	switch(type)
+	    	{
+	    	case "1":
+	    		partType = "库房领用";
+	    		break;
+	    	case "2":
+	    		partType = "医工采购";
+	    		break;
+	    	case "3":
+	    		partType = "外修采购";
+	    		break;
+	    	case "4":
+	    		partType = "报废设备拆卸";
+	    		break;
+	    	default:
+	    		break;
+	    	}
+    	}
+    	return partType;
+    }
+    
+    private String getPdfStatus(Integer status)
+    {
+    	String assetStatus = null;
+    	
+    	if(status != null)
+    	{
+	    	switch(status)
+	    	{
+	    	case 1:
+	    		assetStatus = "正常";
+	    		break;
+	    	case 2:
+	    		assetStatus = "停机";
+	    		break;
+	    	case 3:
+	    		assetStatus = "限制功能使用";
+	    		break;
+	    	case 4:
+	    		assetStatus = "待报废";
+	    		break;
+	    	case 5:
+	    		assetStatus = "停用";
+	    		break;
+	    	default:
+	    		break;
+	    	}
+    	}
+    	
+    	return assetStatus;
+    }
+    
+    private String getBJTime(Date date)
+    {
+    	if(date != null)
+    	{
+			SimpleDateFormat formatter; 
+			formatter = new SimpleDateFormat ("yyyy-MM-dd HH:mm:ss"); 
+			return String.valueOf(formatter.format(date));
+    	}
+    	
+    	return null;
+    }
+    
     public Boolean exportData(ExcelDocument doc, List<Map<String,Object>> data){
 
         Integer keyRow = 1;
