@@ -254,8 +254,10 @@ public class AssetCreateService {
     }
     
     public Boolean needShowAssetApprovalByUser(String userUid){
+        UserAccount user = userDao.getByUid(userUid);
         List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().collect(Collectors.toList()));
+        siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
 
