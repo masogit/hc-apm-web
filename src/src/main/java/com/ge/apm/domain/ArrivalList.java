@@ -27,6 +27,8 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "arrival_list")
 public class ArrivalList implements Serializable{
     
+    public enum ProcessType { Normal, Easy } 
+    
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -34,9 +36,7 @@ public class ArrivalList implements Serializable{
     private String id;
     
     //到货单名称
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 64)
+    @Basic(optional = true)
     @Column(name = "name")
     private String name;
     
@@ -117,6 +117,9 @@ public class ArrivalList implements Serializable{
     @Column(name = "arrival_date")
     @Temporal(TemporalType.DATE)
     private Date arrivalDate;
+    
+    @Column(name = "process_type")
+    private String processType;
     
     // 1:new 2:partial finished 3.finished
     @Basic(optional = false)
@@ -328,6 +331,13 @@ public class ArrivalList implements Serializable{
         this.supplierId = supplierId;
     }
 
+    public String getProcessType() {
+        return processType;
+    }
+
+    public void setProcessType(String processType) {
+        this.processType = processType;
+    }
     
     @Override
     public int hashCode() {
