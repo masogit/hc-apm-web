@@ -523,9 +523,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return true;
     }
 
-    public void submitApproval(){
+    public String submitApproval(){
         selected.setUsageStatus(2);
-        applyChange();
+        return applyChange();
     }
     
     @Transactional
