@@ -122,12 +122,14 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         List<SearchFilter> searchFilters = this.searchFilters;
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
 
-        if(currentUser.getOrgLevel() == 1){
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-        }else if(currentUser.getOrgLevel() == 2){
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
-        }else{
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+        if(currentUser.getOrgLevel() != 0){
+            if(currentUser.getOrgLevel() == 1){
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+            }else if(currentUser.getOrgLevel() == 2){
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+            }else{
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+            }
         }
 
         if(searchFilters.size() <= 0){
