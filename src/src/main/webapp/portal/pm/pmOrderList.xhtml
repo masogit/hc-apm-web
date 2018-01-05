@@ -6,6 +6,14 @@
                 template="/WEB-INF/template.xhtml">
 
 
+    <ui:define name="preRenderView">
+        <f:metadata>
+            <f:viewParam name="model" value="#{v2PmOrderController.filterPlanTime}"/>
+            <f:viewParam name="assetId" value="#{v2PmOrderController.pmOrderId}"/>
+        </f:metadata>
+        <f:event type="preRenderView" listener="#{v2PmOrderController.setPlanTimeFilter()}"/>
+    </ui:define>
+
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">

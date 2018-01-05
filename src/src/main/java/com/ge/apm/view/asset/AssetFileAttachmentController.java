@@ -103,8 +103,10 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         }
         String boSubType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("boSubType")).map(item -> (String)item.value).findAny().orElse(""));
         String boName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("objectName")).map(item -> (String)item.value).findAny().orElse(""));
-        
-        return dao.loadDataForPage(orgUidList, boSubType, boName, pageRequest);
+        String assetName = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.name")).map(item -> (String)item.value).findAny().orElse(""));
+        String functionType = "%like%".replace("like", searchFilters.stream().filter(item -> item.fieldName.equals("assetInfo.functionType")).map(item -> (String)item.value).findAny().orElse(""));
+
+        return dao.loadDataForPage(orgUidList, boSubType, boName, assetName, functionType, pageRequest);
         
     }
 

@@ -182,28 +182,28 @@ public class HealthService {
 	}
 
     private static final String asset_pm
-    	/*= " SELECT asset_id, asset_name, to_char(start_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
-    	+ " FROM pm_order "
-    	+ " LEFT JOIN asset_info "
-    	+ " ON pm_order.asset_id = asset_info.id "
-    	+ " WHERE asset_info.site_id=:site_id AND asset_info.hospital_id=:hospital_id AND pm_order.is_finished=false AND pm_order.start_time<(NOW() + interval '1 weeks') "
-    	+ " ORDER BY start_time ";*/
-			= " SELECT pm_order.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
+			= " SELECT po.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), ai.clinical_dept_id "
+			+ " FROM v2_pm_order po "
+			+ " LEFT JOIN asset_info ai "
+			+ " ON po.asset_uid = ai.uid "
+			+ " WHERE po.tenant_uid=:tenantUID AND po.site_uid=:siteUID AND po.is_finished=false AND po.plan_time<(NOW() + interval '1 weeks') "
+			+ " ORDER BY plan_time ";
+			/*= " SELECT pm_order.id as pm_order_id, asset_name, to_char(plan_time, 'YYYY-MM-DD'), asset_info.clinical_dept_id "
 			+ " FROM pm_order "
 			+ " LEFT JOIN asset_info "
 			+ " ON pm_order.asset_id = asset_info.id "
 			+ " WHERE pm_order.site_id=:site_id AND pm_order.hospital_id=:hospital_id AND pm_order.is_finished=false AND pm_order.plan_time<(NOW() + interval '1 weeks') "
-			+ " ORDER BY plan_time ";
+			+ " ORDER BY plan_time ";*/
 
-	public Observable<Tuple4<Integer, String, String, Integer>> queryForPm(Integer site_id, Integer hospital_id) {
+	public Observable<Tuple4<String, String, String, Integer>> queryForPm(String tenantUID, String siteUID) {
 
 		return db
 			.select(asset_pm)
-			.parameter("site_id", site_id)
-			.parameter("hospital_id", hospital_id)
+			.parameter("tenantUID", tenantUID)
+			.parameter("siteUID", siteUID)
 			.get(rs ->
-				new Tuple4<Integer, String, String, Integer> (
-						rs.getInt("pm_order_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
+				new Tuple4<String, String, String, Integer> (
+						rs.getString("pm_order_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 					//rs.getInt("asset_id"), rs.getString("asset_name"), rs.getString("to_char"), rs.getInt("clinical_dept_id") ) )
 		;
 		//.cache();
