@@ -435,7 +435,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">同时生成保养工单</label>
-                                <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}"/>
+                                <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}" disabled="#{not empty assetInfoController.selected.uid}"/>
 
                             </h:panelGroup>
                             <h:panelGroup>
