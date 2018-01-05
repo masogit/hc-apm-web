@@ -29,8 +29,11 @@
                         <p:ajax event="rowSelect" listener="#{assetFileAttachmentController.onSelectedChange}" update="createButton  deleteButton :AssetFileAttachmentEditForm"/>
                         <p:ajax event="filter" listener="#{assetFileAttachmentController.onFilter}" oncomplete="rc();"/>
 
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.boId}" >
-                            <h:outputText value="#{assetInfoService.getAssetInfoName(item.boId)}"/>
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="设备型号" sortBy="#{item.assetInfo.functionType}" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.functionType}"/>
                         </p:column>
                         <p:column headerText="#{msg.fileType}" filterBy="#{item.boSubType}" filterMatchMode="LIKE">
                             <h:outputText value="#{fieldMsg.fieldValue('attachmentType', item.boSubType)}"/>

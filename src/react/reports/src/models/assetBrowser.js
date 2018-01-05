@@ -5,14 +5,16 @@ import isNumber from 'lodash.isnumber'
 import { trimString, IsHead } from '#/utils'
 
 export const CLUSTER_SPACING = 20
+export const COMPRESS_CLUSTER_SPACING = 10
 export const ASSET_HEIGHT = 10
+export const COMPRESS_ASSET_HEIGHT = 32
 export const ASSET_WIDTH = 25
 
 export const COLORS = ['#6e83a7', '#6e9aa9', '#8888a2', '#76aa9f', '#ba82bb', '#58bbb2']
 export const INACTIVE_COLORS = ['#c4cbd6', '#c4d2d7', '#ccccd5', '#c6d7d3', '#dccadc', '#bddcd9']
 
 function distributeColumns(width, num) {
-  const spacing =  width / (num + 1)
+  const spacing = width / (num + 1)
   const res = []
   for (let i = 0; i < num; i++) {
     res.push(spacing * (i + 1))
@@ -93,10 +95,12 @@ function getClusters(dimension, ruler, assets, activeAssetId, hoveredAssetId, or
 
   const res = list.reduce((prev, cur) => {
     const prevCluster = prev.get(-1)
-    if (prevCluster === undefined) return prev.push(cur.set('top', 0))
+    if (prevCluster === undefined) return prev.push(cur.withMutations(cur => cur.set('top', 0).set('top_compress', 0)))
 
-    return prev.push(cur.set('top', prevCluster.get('top') + prevCluster.get('children').size * ASSET_HEIGHT + CLUSTER_SPACING))
-
+    return prev.push(cur.withMutations(cur => {
+      cur.set('top', prevCluster.get('top') + prevCluster.get('children').size * ASSET_HEIGHT + CLUSTER_SPACING)
+         .set('top_compress', prevCluster.get('top_compress') + COMPRESS_ASSET_HEIGHT + COMPRESS_CLUSTER_SPACING)
+    }))
   }, Immutable.fromJS([]))
 
   return res
@@ -142,6 +146,7 @@ export default {
   state: Immutable.fromJS({
     loading: true,
     orderBy: 'price',
+    compressMode: true,
     filters: [],
     hoveredAssetId: null,
     activeAssetId: null,
@@ -219,6 +224,7 @@ export default {
           const dimensions = assetBrowser.get('dimensions')
           const filters = assetBrowser.get('filters')
           const rulers = assetBrowser.get('rulers')
+          const compress = assetBrowser.get('compressMode')
           const assets = assetBrowser.get('assets').filter(asset => {
             return filters.every(filter => {
               const formattedKey = formatKey(asset, filter.get('dimension'), rulers.find(ruler => ruler.get('dimension') === filter.get('dimension')))
@@ -252,7 +258,9 @@ export default {
 
           const maxPage = columns.reduce((prev, column) => {
             const lastCluster = column.getIn(['clusters', -1])
-            const bottom = lastCluster.get('top') + lastCluster.get('children').size * ASSET_HEIGHT + CLUSTER_SPACING
+            const bottom = compress ?
+              lastCluster.get('top_compress') + COMPRESS_ASSET_HEIGHT + COMPRESS_CLUSTER_SPACING :
+              lastCluster.get('top') + lastCluster.get('children').size * ASSET_HEIGHT + CLUSTER_SPACING
             const maxPage = Math.floor(bottom / height) + 1
             return prev > maxPage ? prev : maxPage
           }, 0)
@@ -362,6 +370,9 @@ export default {
           state.get('maxPage') - 1
         ))
       })
+    },
+    'set/compressMode'(state, { payload }) {
+      return state.set('compressMode', payload)
     }
   }
 }
