@@ -51,8 +51,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     AssetInfoRepository dao = null;
 
-    OrgInfoRepository orgInfoRepository;
-
     private UserAccountRepository userDao;
 
     private QrCodeLibRepository qrcodeDao;
@@ -79,7 +77,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private BlobFileService blobService;
 
-    private UaaService uuaService;
+    private UaaService uaaService;
 
     private OrgInfoRepository orgDao;
 
@@ -92,6 +90,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private QrCodeService qrCodeService;
     private UserCommonService ucService;
+    private AssetCreateService acService;
 
     private String oneSearchStr;
     private String qrCode;
@@ -122,6 +121,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean isSelectedCurrentPage = false;
 
     private OrgInfo selectSite;
+    
+    private Boolean needShowAssetApproval;
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -141,7 +142,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         qrCode = selected.getQrCode();
 
-        selectedOrg = orgInfoRepository.getByUid(selected.getSiteUID());
+        selectedOrg = orgDao.getByUid(selected.getSiteUID());
 
         setSelectedSiteUID(selected.getSiteUID());
     }
@@ -159,7 +160,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         this.callingController = callingController;
         this.updateViewIDs = updateViewIDs;
-        UaaService uaaService = WebUtil.getBean(UaaService.class);
+//        UaaService uaaService = WebUtil.getBean(UaaService.class);
 
     }
 
@@ -172,14 +173,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
-        uuaService = WebUtil.getBean(UaaService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        acService = WebUtil.getBean(AssetCreateService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
         pmService = WebUtil.getBean(V2_PmOrderService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
-        orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         ucService = WebUtil.getBean(UserCommonService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
@@ -195,7 +196,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
-                selectedOrg = orgInfoRepository.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+                selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
                 updateSelectedOrg(selectedOrg);
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -229,7 +230,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 //            prepareDelete();
 //        }
 
-        ownerOrgList = uuaService.getOrgListByHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
+        ownerOrgList = uaaService.getOrgListByHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -263,7 +264,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         if (!this.hasFilterOnField("siteUID")) {
             UserAccount user = UserContextService.getCurrentUserAccount();
-            List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -314,15 +315,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         selectSite = (OrgInfo) event.getTreeNode().getData();
-        searchFilters.removeAll(searchFilters.stream().filter(item->"siteUID".equals(item.fieldName)&&"1*".equals(item.conditionPath) ||
-                    "institutionUID".equals(item.fieldName)&&"1*".equals(item.conditionPath) || 
-                    "hospitalUID".equals(item.fieldName)&&"1*".equals(item.conditionPath)).collect(Collectors.toList()));
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
+                || "institutionUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
+                || "hospitalUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
         if (selectSite != null && selectSite.getId() > 0) {
-            if(selectSite.getOrgType()==1){
+            if (selectSite.getOrgType() == 1) {
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID()));
-            }else if(selectSite.getOrgType()==2){
+            } else if (selectSite.getOrgType() == 2) {
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID()));
-            }else if(selectSite.getOrgType()==3){
+            } else if (selectSite.getOrgType() == 3) {
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
             }
         }
@@ -460,6 +461,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public Boolean needAssetApproval(String siteUid){
+        return acService.needAssetApproval(siteUid);
+    }
+    
+    public Boolean needShowAssetApprovalByUser(){
+        return acService.needShowAssetApprovalByUser(UserContextService.getCurrentUserAccount().getUid());
+    }
+    
     @Override
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
@@ -514,10 +523,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return true;
     }
 
+    public void submitApproval(){
+        selected.setUsageStatus(2);
+        applyChange();
+    }
+    
     @Transactional
     public String applyChange() {
         if (!isTimeValidate()) {
             return "";
+        }
+        if(selected.getUsageStatus()==null){
+            selected.setUsageStatus(3);
         }
         if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
             selected.setQrCode(null);
@@ -700,7 +717,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public String getHospitalName(String siteUid) {
         OrgInfo org = orgDao.getByUid(siteUid);
         return org == null ? "" : org.getName();
+//        return acService.getSiteName(siteUid);
     }
+
 
     public void onHospitalChange() {
         OrgInfo org = orgDao.getByUid(selected.getSiteUID());
@@ -1098,8 +1117,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private OrgInfo selectedOrg;
 
-    private UaaService uaaService = WebUtil.getBean(UaaService.class);
-
     public TreeNode getSelectedGbNode() {
         return selectedGbNode;
     }
@@ -1237,7 +1254,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void discard(AssetInfo asset) {
         if (asset != null && asset.getUsageStatus() == 3) {
-            asset.setUsageStatus(4);
+            asset.setIsValid(false);
+            asset.setTerminateDate(new Date());
             this.selected = dao.save(asset);
             WebUtil.addSuccessMessage("报废成功！");
         } else {
@@ -1247,7 +1265,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void readyForDiscard(AssetInfo asset) {
         if (asset != null && asset.getUsageStatus() == 2) {
-            asset.setUsageStatus(3);
+            asset.setStatus(4);
             this.selected = dao.save(asset);
             WebUtil.addSuccessMessage("已将状态修改为待报废！");
         } else {
@@ -1349,6 +1367,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectSite(OrgInfo selectSite) {
         this.selectSite = selectSite;
+    }
+
+    public Boolean getNeedShowAssetApproval() {
+        if(null == needShowAssetApproval){
+            needShowAssetApproval = acService.needShowAssetApprovalByUser(UserContextService.getCurrentUserAccount().getUid());
+        }
+        return needShowAssetApproval;
     }
 
     public void batchProcessToBeTerminated() {
