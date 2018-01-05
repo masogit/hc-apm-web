@@ -87,6 +87,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name="site_uid",columnDefinition = "CHAR(32)")
     private String siteUID;
     
+    @Column(name="asset_approver",columnDefinition = "CHAR(32)")
+    private String assetApprover;
+    
     public Integer getPmReminderTime() {
 		return pmReminderTime;
 	}
@@ -310,6 +313,14 @@ public class WorkflowConfig implements Serializable {
         isTempUserReport = tempUserReport;
     }
 
+    public String getAssetApprover() {
+        return assetApprover;
+    }
+
+    public void setAssetApprover(String assetApprover) {
+        this.assetApprover = assetApprover;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
