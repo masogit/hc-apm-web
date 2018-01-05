@@ -10,22 +10,17 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.pm.V2_PmOrderService;
-import com.ge.apm.service.utils.ConfigUtils;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.service.wechat.CoreService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import me.chanjar.weixin.common.exception.WxErrorException;
-import me.chanjar.weixin.mp.api.WxMpService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 
-import java.io.File;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -34,8 +29,6 @@ import java.util.logging.Logger;
 @Component
 public class AssetCreateService {
 
-    @Autowired
-    protected WxMpService wxMpService;
     @Autowired
     private TenantInfoRepository tenantDao;
     @Autowired
@@ -55,16 +48,16 @@ public class AssetCreateService {
     @Autowired
     BrandRepository brandDao;
     @Autowired
-    CoreService coreService;
-    @Autowired
-    ConfigUtils configUtils;
-    @Autowired
     UserCommonService ucService;
     @Autowired
     WechatSendMsgService wsService;
+    @Autowired
+    WorkflowConfigRepository wcDao;
 
     @Autowired
     BlobObjectRepository blobDao;
+    @Autowired
+    private UaaService uuaService;
     
     @Autowired
     private AssetDepreciationService assetDepreciationService;
@@ -187,7 +180,6 @@ public class AssetCreateService {
         map.put("keyword1", TimeUtils.getStrDate(request.getSubmitDate(), "yyyy-MM-dd HH:mm:ss") + "提交建档".concat(request.getQrCode()));
         map.put("keyword2", rejectText);
         map.put("linkUrl", "/wx/scanQrCode?qrCode=".concat(request.getQrCode()));
-//        map.put("remark", "/wx/scanQrCode?qrCode=".concat(request.getQrCode()));
         if (wsService.sendCreateAssetRejectMsg(map)) {
             rejectText = TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText);
             request.setFeedback(request.getFeedback() == null ? rejectText : request.getFeedback().concat("//").concat(rejectText));
@@ -234,55 +226,6 @@ public class AssetCreateService {
         }
     }
 
-//    @Transactional
-//    public void removeAttachment(Integer id, String fileUrl) {
-//        List<SearchFilter> attachFilters = new ArrayList<>();
-//        attachFilters.add(new SearchFilter("assetId", SearchFilter.Operator.EQ, id));
-//        attachFilters.add(new SearchFilter("fileUrl", SearchFilter.Operator.EQ, fileUrl));
-//        List<AssetFileAttachment> attList = attachDao.findBySearchFilter(attachFilters);
-//        attList.forEach((item) -> {
-////            fileService.deleteAttachment(item.getFileId());
-//            String openId = UserContextService.getCurrentUserAccount().getWeChatId();
-//            if (blobService.deleteBlobFileByStorageId(openId, fileUrl)) {
-//                attachDao.delete(item);
-//            }
-//        });
-//    }
-
-    /*
-    public void addWechatPicAttachment(AssetInfo assetInfo, String serverId) {
-        File file = null;
-        try {
-            file = wxMpService.getMaterialService().mediaDownload(serverId);
-        } catch (WxErrorException ex) {
-            Logger.getLogger(AssetCreateService.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        if (file == null) {
-            return;
-        }
-//        Integer uploadFileId = fileService.uploadFile(file);
-        String openId = UserContextService.getCurrentUserAccount().getWeChatId();
-        V2_BlobObject blobObject = blobService.uploadWxFile(openId, file);
-        if (null != blobObject) {
-            blobObject.setBoId(assetInfo.getId());
-            blobObject.setBoSubType("1");
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-            blobObject.setBoUuid(assetInfo.getUid());
-            blobDao.save(blobObject);
-
-            AssetFileAttachment attach = new AssetFileAttachment();
-            attach.setAssetId(assetInfo.getId());
-            attach.setFileUrl(blobObject.getObjectStorageId());
-            attach.setFileType("1");
-            attach.setHospitalId(assetInfo.getHospitalId());
-            attach.setSiteId(assetInfo.getSiteId());
-            attach.setName(blobObject.getObjectName());
-            attachDao.save(attach);
-        }
-        file.delete();
-    }
-*/
-
     public String getOrgName(String orgUid) {
         if (orgUid != null) {
             OrgInfo org = orgDao.getByUid(orgUid);
@@ -301,6 +244,21 @@ public class AssetCreateService {
 
     public List<Brand> getBrandList() {
         return brandDao.find();
+    }
+    
+    public Boolean needAssetApproval(String siteUid){
+        OrgInfo siteOrg = orgDao.getByUid(siteUid);
+        List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
+    }
+    
+    public Boolean needShowAssetApprovalByUser(String userUid){
+        UserAccount user = userDao.getByUid(userUid);
+        List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
+        siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
 
 }

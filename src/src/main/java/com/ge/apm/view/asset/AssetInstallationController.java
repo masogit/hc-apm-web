@@ -8,6 +8,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -41,7 +42,6 @@ public class AssetInstallationController {
     private AssetInstallationService aiService;
     private QrCodeLibRepository qrcodeDao;
     private AssetInfoRepository assetDao;
-    private OrgInfoRepository orgDao;
     private BlobFileService blobService;
     private BlobObjectRepository blobDao;
     private QrCodeService qrCodeService;
@@ -70,7 +70,6 @@ public class AssetInstallationController {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
         pmService = WebUtil.getBean(V2_PmOrderService.class);
@@ -217,6 +216,7 @@ public class AssetInstallationController {
 
     private void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
         arrivalListItem.setLastModifiedDate(new Date());
+        arrivalListItem.setUsageStatus(3);
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
             qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
@@ -306,13 +306,6 @@ public class AssetInstallationController {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
         return assetDao.findBySearchFilter(assetFilters);
-    }
-
-    public List<OrgInfo> getClinicalDeptList() {
-        List<SearchFilter> orgFilters = new ArrayList<>();
-        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
-        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgDao.findBySearchFilter(orgFilters);
     }
 
     public void updateFinancingNumByNationalStandardCode() {
