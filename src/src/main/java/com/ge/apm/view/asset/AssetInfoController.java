@@ -1424,4 +1424,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public boolean isChecked() {
+
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+
+        }
+
+        return false;
+
+    }
+
 }
