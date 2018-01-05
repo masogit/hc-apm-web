@@ -25,6 +25,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_DeviceType;
 import com.ge.apm.domain.V2_WorkflowConfig;
 import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.service.common.UserCommonService;
 
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -47,6 +48,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private List<OrgInfo> siteList;
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
+	private UserCommonService ucService;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -54,6 +56,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+		ucService = WebUtil.getBean(UserCommonService.class);
 		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
 		initDispatchUserList();
 	}
@@ -156,6 +159,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return tenantInfoRepository.findByuid(tenantUID).getName();
 	}
 
+        public List<UserAccount> getAssetCreateApproverlList(){
+            return ucService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
+        }
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();

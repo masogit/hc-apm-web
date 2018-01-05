@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.WorkflowConfig;
+import com.google.common.base.Strings;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -28,6 +29,7 @@ import java.util.stream.Collectors;
 @ManagedBean(name = "userContextService")
 @SessionScoped
 public class UserContextService implements Serializable {
+
     private static final long serialVersionUID = 1L;
 
     private UserAccount userAccount = null;
@@ -45,10 +47,11 @@ public class UserContextService implements Serializable {
     }
 
     public String getUserName() {
-        if (userAccount == null)
+        if (userAccount == null) {
             return "";
-        else
+        } else {
             return userAccount.getName();
+        }
     }
 
     public boolean isAnonymousUser() {
@@ -62,9 +65,13 @@ public class UserContextService implements Serializable {
     }
 
     public void checkIsSuperAdminAndFirstRequest() {
-        if (!getLoginUser().getIsSuperAdmin()) return;
+        if (!getLoginUser().getIsSuperAdmin()) {
+            return;
+        }
 
-        if (!isFirstRequestAfterLogin) return;
+        if (!isFirstRequestAfterLogin) {
+            return;
+        }
         isFirstRequestAfterLogin = false;
 
         //navigate to super admin's home page
@@ -86,7 +93,9 @@ public class UserContextService implements Serializable {
         for (String role : roles) {
             role = role.trim();
             boolean roleAllowed = UserContextService.checkRole(role);
-            if (roleAllowed) return true;
+            if (roleAllowed) {
+                return true;
+            }
         }
 
         return false;
@@ -97,32 +106,41 @@ public class UserContextService implements Serializable {
         for (String role : roles) {
             role = role.trim();
             boolean roleAllowed = UserContext.getRoles().contains(role);
-            if (roleAllowed) return false;
+            if (roleAllowed) {
+                return false;
+            }
         }
 
         return true;
     }
 
     public static boolean checkRole(String role) {
-        if (UserContextService.isSuperAdmin()) return true;
-        else if ("SuperAdmin".equals(role)) return false;
+        if (UserContextService.isSuperAdmin()) {
+            return true;
+        } else if ("SuperAdmin".equals(role)) {
+            return false;
+        }
 
 //        if (UserContextService.isSiteAdmin()) return true;
 //        else if ("SiteAdmin".equals(role)) return false;
-        if("SiteAdmin".equals(role))
+        if ("SiteAdmin".equals(role)) {
             return UserContextService.isSiteAdmin();
+        }
 
-
-        if (UserContextService.isLocalAdmin()) return true;
-        else if ("LocalAdmin".equals(role)) return false;
+        if (UserContextService.isLocalAdmin()) {
+            return true;
+        } else if ("LocalAdmin".equals(role)) {
+            return false;
+        }
         return UserContext.getRoles().contains(role);
     }
 
     public UserAccount getLoginUser() {
         if (userAccount == null) {
             String userName = getUserLoginName();
-            if (userName == null) return null; // user is not logined
-
+            if (userName == null) {
+                return null; // user is not logined
+            }
             UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
             userAccount = dao.getByLoginName(getUserLoginName());
         } else {
@@ -204,14 +222,18 @@ public class UserContextService implements Serializable {
 
     public static int getUserID() {
         UserAccount userAccount = getCurrentUserAccount();
-        if (userAccount != null) return userAccount.getId();
+        if (userAccount != null) {
+            return userAccount.getId();
+        }
 
         return -1;
     }
 
     public static int getSiteId() {
         UserAccount userAccount = getCurrentUserAccount();
-        if (userAccount != null) return userAccount.getSiteId();
+        if (userAccount != null) {
+            return userAccount.getSiteId();
+        }
 
         return -1;
     }
@@ -227,14 +249,13 @@ public class UserContextService implements Serializable {
     public String getUserDefaultHomePage() {
         this.getLoginUser();
 
-        if (userAccount == null)
+        if (userAccount == null) {
             return "/login.xhtml";
-        else {
+        } else {
             UaaService uaaService = WebUtil.getBean(UaaService.class);
             return uaaService.getUserDefaultHomePage(userAccount);
         }
     }
-
 
     public static String getAccessToken() {
         return getAccessToken(null);
@@ -257,19 +278,45 @@ public class UserContextService implements Serializable {
 
     private Boolean isDispatcher = null;
 
+    private Boolean isAssetApprover = null;
+    
+    private Boolean needAssetApproval = null;
+    
+    public Boolean needAssetApproval(){
+        if (needAssetApproval == null) {
+            getUserPrivilege();
+        }
+        return needAssetApproval;
+    }
+
     public Boolean isDispatcher() {
         if (isDispatcher == null) {
-            UaaService uuaService = WebUtil.getBean(UaaService.class);
-            List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            orgList.add(userAccount.getTenantUID());
-            orgList.add(userAccount.getInstitutionUID());
-            orgList.add(userAccount.getHospitalUID());
-            orgList.add(userAccount.getSiteUID());
-            WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-            List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
-            isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
-                    || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+            getUserPrivilege();
         }
         return isDispatcher;
     }
+
+    public Boolean isAssetApprover() {
+        if (isAssetApprover == null) {
+            getUserPrivilege();
+        }
+        return isAssetApprover;
+    }
+
+    private void getUserPrivilege() {
+        UaaService uuaService = WebUtil.getBean(UaaService.class);
+        List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        orgList.add(userAccount.getTenantUID());
+        orgList.add(userAccount.getInstitutionUID());
+        orgList.add(userAccount.getHospitalUID());
+        orgList.add(userAccount.getSiteUID());
+        WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
+        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+        isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
+        
+        needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
+    }
+
 }
