@@ -107,7 +107,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String measuring;
 
-    private Boolean isGeneratePmOrder;
+    private Boolean isGeneratePmOrder=false;
 
     private List<UserAccount> ownerList;
     private GbCodeService gbCodeService;
