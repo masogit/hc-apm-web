@@ -129,6 +129,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     
     public void prepareCreateInstitution(){
+        orgName=null;
         OrgInfo org = new OrgInfo();
         org.setSiteId(tenantId);
 
