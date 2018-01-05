@@ -110,24 +110,24 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public void applyChange() {
-        if (checkName()) {
+//        if (checkName()) {
             this.save();
-        } else {
-            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
-        }
+//        } else {
+//            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
+//        }
     }
 
-    private Boolean checkName() {
-        if (Strings.isNullOrEmpty(selected.getId())) {
-            List<SearchFilter> nameSearchFilterList = new ArrayList();
-            nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
-            nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
-            List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
-            return (null == res || res.isEmpty());
-        } else {
-            return true;
-        }
-    }
+//    private Boolean checkName() {
+//        if (Strings.isNullOrEmpty(selected.getId())) {
+//            List<SearchFilter> nameSearchFilterList = new ArrayList();
+//            nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
+//            nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
+//            List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
+//            return (null == res || res.isEmpty());
+//        } else {
+//            return true;
+//        }
+//    }
 
     @Override
     public void onBeforeSave(ArrivalList object) {
@@ -167,7 +167,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public void submitArrivalList() {
-        if (checkName()) {
+//        if (checkName()) {
             onBeforeSave(selected);
             dao.save(selected);
             if (aiService.submitArrivalList(selected.getId())) {
@@ -177,9 +177,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             };
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
             selected = dao.findById(selected.getId());
-        } else {
-            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
-        }
+//        } else {
+//            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
+//        }
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {

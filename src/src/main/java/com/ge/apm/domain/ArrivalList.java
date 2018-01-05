@@ -36,9 +36,7 @@ public class ArrivalList implements Serializable{
     private String id;
     
     //到货单名称
-    @Basic(optional = false)
-    @NotNull
-    @Size(min = 1, max = 64)
+    @Basic(optional = true)
     @Column(name = "name")
     private String name;
     
