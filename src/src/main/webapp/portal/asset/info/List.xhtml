@@ -139,6 +139,15 @@
                         <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
+                        <p:column headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoController.needShowAssetApproval}">
+                            <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('usageStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
                         <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?130:53}">
                             <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
                             <h:panelGroup rendered="#{empty assetInfoController.filterWarrantyDate}">
@@ -268,9 +277,9 @@
                             <p:column headerText="#{msg.measuringItemCategory}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
                             </p:column>
-                            <p:column headerText="#{msg.usageStatus}" visible="false" exportable="true">
+<!--                            <p:column headerText="#{msg.usageStatus}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
-                            </p:column>
+                            </p:column>-->
                             <p:column headerText="#{msg.accountingCategory}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
                             </p:column>
