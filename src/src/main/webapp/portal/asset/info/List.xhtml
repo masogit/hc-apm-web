@@ -14,6 +14,10 @@
     </ui:define>
 
     <ui:define name="content">
+        <style>
+            .btn+.btn { margin-left: 0 }
+
+        </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value=" #{assetInfoController.getAssetListTitle()}"/>
@@ -64,11 +68,11 @@
 
                         <p:column >
                             <p:selectBooleanCheckbox value="#{assetInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
-                                <p:ajax listener="#{assetInfoController.onItemSelected}"  update="@this @(.selectCheckBoxHeader)"/>
+                                <p:ajax listener="#{assetInfoController.onItemSelected}"  update="@this @(.selectCheckBoxHeader) :AssetInfoListForm:datalist:batchToBeTerminatedButton :AssetInfoListForm:datalist:batchToTerminatedButton"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetInfoController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
-                                    <p:ajax  listener="#{assetInfoController.onSelectAllOfPage}" update="@(.selectCheckBox)"/>
+                                    <p:ajax  listener="#{assetInfoController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton :AssetInfoListForm:datalist:batchToTerminatedButton"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
@@ -176,10 +180,10 @@
                             </p:commandButton>
 
                             <ui:fragment rendered="#{!assetInfoController.terminate}">
-                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm">
+                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
-                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray" title="批量报废" actionListener="#{assetInfoController.batchProcessToTerminated}" update=":AssetInfoListForm">
+                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray" title="批量报废" actionListener="#{assetInfoController.batchProcessToTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
                                     <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
