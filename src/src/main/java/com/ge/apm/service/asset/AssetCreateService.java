@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -55,6 +56,8 @@ public class AssetCreateService {
 
     @Autowired
     BlobObjectRepository blobDao;
+    @Autowired
+    private UaaService uuaService;
     
     @Autowired
     private AssetDepreciationService assetDepreciationService;
@@ -246,6 +249,14 @@ public class AssetCreateService {
     public Boolean needAssetApproval(String siteUid){
         OrgInfo siteOrg = orgDao.getByUid(siteUid);
         List<String> siteUidList = Arrays.asList(siteOrg.getTenantUID(),siteOrg.getInstitutionUID(),siteOrg.getHospitalUID(),siteOrg.getSiteUID());
+        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
+        return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
+    }
+    
+    public Boolean needShowAssetApprovalByUser(String userUid){
+        UserAccount user = userDao.getByUid(userUid);
+        List<String> siteUidList = uuaService.getUserAccessibleSiteList(userUid).stream().filter(item->item.getOrgType()<4).map(OrgInfo::getUid).distinct().collect(Collectors.toList());
+        siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
         List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }

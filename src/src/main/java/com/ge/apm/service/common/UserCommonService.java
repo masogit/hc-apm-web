@@ -100,5 +100,9 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
         return userDao.getByUid(userUid);
     }
 
-    
+    public List<UserAccount> getAssetCreateApproverlList(String tenantUid){
+        List<UserAccount> assetHeaderList = userDao.getAssetHeadList(tenantUid);
+        assetHeaderList.addAll(userDao.findByTenantUIDAndStaffRole(tenantUid));
+        return assetHeaderList.stream().distinct().collect(Collectors.toList());
+    }
 }
