@@ -33,7 +33,7 @@ public class AssetCreateController {
 
     private AssetInfo assetInfo;
     private QrCodeLib createRequest;
-    private AssetCreateService acServie;
+    private AssetCreateService acService;
     private BrandRepository brandDao;
 
     private String[] selectedPictures;
@@ -54,14 +54,14 @@ public class AssetCreateController {
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
-        acServie = WebUtil.getBean(AssetCreateService.class);
+        acService = WebUtil.getBean(AssetCreateService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
 
-        createRequest = acServie.getCreateRequest(qrCode);
+        createRequest = acService.getCreateRequest(qrCode);
         assetInfo = createAssetInfo();
 
-        pictureList = acServie.getQrCodePictureList(createRequest.getUid());
-        audioList = acServie.getQrCodeAudioList(createRequest.getUid());
+        pictureList = acService.getQrCodePictureList(createRequest.getUid());
+        audioList = acService.getQrCodeAudioList(createRequest.getUid());
 
         //默认图片全选
         selectedPictures = new String[pictureList.size()];
@@ -98,7 +98,7 @@ public class AssetCreateController {
         newAsset.setName(createRequest.getAssetName());
         newAsset.setAssetGroup(createRequest.getAssetGroup());
         if(null!=createRequest.getOrgId() && createRequest.getOrgId()>0){
-            OrgInfo org = acServie.getOrgInfo(createRequest.getOrgId());
+            OrgInfo org = acService.getOrgInfo(createRequest.getOrgId());
             newAsset.setClinicalDeptId(createRequest.getOrgId());
             newAsset.setClinicalDeptUID(org.getUid());
         }
@@ -106,9 +106,10 @@ public class AssetCreateController {
         newAsset.setHospitalUID(createRequest.getHospitalUID());
         newAsset.setInstitutionUID(createRequest.getInstitutionUID());
         newAsset.setSiteUID(createRequest.getSiteUID());
+        newAsset.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID())?2:3);
 
         if (null != createRequest.getUserId()) {
-            owner = acServie.getUserInfo(createRequest.getUserId());
+            owner = acService.getUserInfo(createRequest.getUserId());
             newAsset.setAssetOwnerId(owner.getId());
             newAsset.setAssetOwnerName(owner.getName());
             newAsset.setAssetOwnerTel(owner.getTelephone());
@@ -117,11 +118,11 @@ public class AssetCreateController {
     }
 
     public List<OrgInfo> getClinicalDeptList() {
-        return acServie.getClinicalDeptList(assetInfo.getSiteUID());
+        return acService.getClinicalDeptList(assetInfo.getSiteUID());
     }
 
     public String getHospitalName() {
-        return acServie.getSiteName(assetInfo.getSiteUID());
+        return acService.getSiteName(assetInfo.getSiteUID());
     }
 
     @Transactional
@@ -132,14 +133,14 @@ public class AssetCreateController {
             assetInfo.setAssetOwnerTel(owner.getTelephone());
         }
         if (null != assetInfo.getClinicalDeptId()) {
-            OrgInfo clinicalDept = acServie.getOrgInfo(assetInfo.getClinicalDeptId());
+            OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
-        Boolean res = acServie.CreateAeest(assetInfo, isGeneratePmOrder);
+        Boolean res = acService.CreateAeest(assetInfo, isGeneratePmOrder);
         if (res) {
-            acServie.createAttachments(assetInfo, selectedPictures);
-            acServie.updateQrLib(assetInfo.getQrCode(), 3);
+            acService.createAttachments(assetInfo, selectedPictures);
+            acService.updateQrLib(assetInfo.getQrCode(), 3);
             WebUtil.addSuccessMessage("创建成功");
             return "RequestsList?faces-redirect=true";
         } else {
@@ -149,7 +150,7 @@ public class AssetCreateController {
     }
 
     public void returnBack() {
-        acServie.rejectReturn(createRequest, rejectText);
+        acService.rejectReturn(createRequest, rejectText);
         this.rejectTextHistory.add(TimeUtils.getStrDate(new Date(), "[yyyy-MM-dd HH:mm:ss]").concat(rejectText));
         rejectText = "";
         WebUtil.addSuccessMessage("消息已发送");
@@ -157,14 +158,14 @@ public class AssetCreateController {
 
     public List<UserAccount> getOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(acServie.getWorkerList());
+        accountList.addAll(acService.getWorkerList());
 //        accountList.addAll(acServie.getAssetOwnerList(Optional.ofNullable(assetInfo.getClinicalDeptUID()).orElse(assetInfo.getSiteUID())));
         return accountList;
     }
 
     public void onClinicalDeptChange() {
         if(null!=assetInfo.getClinicalDeptId()){
-            OrgInfo clinicalDept = acServie.getOrgInfo(assetInfo.getClinicalDeptId());
+            OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
@@ -185,7 +186,7 @@ public class AssetCreateController {
 
     public List<UserAccount> getClinicalOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
-        accountList.addAll(acServie.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner)
+        accountList.addAll(acService.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner)
                 .stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
                         .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList()));
         return accountList;
@@ -200,7 +201,7 @@ public class AssetCreateController {
     }
     
     public List<Brand> getBrandList() {
-        return acServie.getBrandList();
+        return acService.getBrandList();
     }
 
     //getter and setter

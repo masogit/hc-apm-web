@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.WorkflowConfig;
+import com.google.common.base.Strings;
 
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -278,6 +279,15 @@ public class UserContextService implements Serializable {
     private Boolean isDispatcher = null;
 
     private Boolean isAssetApprover = null;
+    
+    private Boolean needAssetApproval = null;
+    
+    public Boolean needAssetApproval(){
+        if (needAssetApproval == null) {
+            getUserPrivilege();
+        }
+        return needAssetApproval;
+    }
 
     public Boolean isDispatcher() {
         if (isDispatcher == null) {
@@ -305,6 +315,8 @@ public class UserContextService implements Serializable {
         isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
                 || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
+        
+        needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -55,6 +56,11 @@ public class V2_BlobObject implements Serializable {
 
     @Column(name = "object_source")
     private V2_BlobObject_Source objectSource = V2_BlobObject_Source.STORED_IN_DB;
+
+    @JoinColumn(insertable=false,updatable=false, name = "bo_id", referencedColumnName = "id")
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JsonBackReference
+    private AssetInfo assetInfo;
 
     public String getId() {
         return id;
@@ -136,7 +142,14 @@ public class V2_BlobObject implements Serializable {
         this.boSubType = boSubType;
     }
 
-    
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

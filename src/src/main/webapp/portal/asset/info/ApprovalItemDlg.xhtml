@@ -1,0 +1,319 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+    <ui:composition>
+        <p:dialog id="approvalAssetDialog" widgetVar="approvalAssetDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审核" height="430">
+            <h:form id="approvalAssetDialogForm" >
+                <h:panelGroup id="display3" rendered="#{not empty assetInfoApprovalController.selected}">
+                    <p:fieldset >
+                        <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.serialNum}</label>
+                                    <p:inputText id="serialNum" value="#{assetInfoApprovalController.selected.serialNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.name}</label>
+                                    <p:inputText value="#{assetInfoApprovalController.selected.name}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.aliasName}</label>
+                                    <p:inputText id="aliasName" value="#{assetInfoApprovalController.selected.aliasName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetGroup}</label>
+                                    <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup', assetInfoApprovalController.selected.assetGroup)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerName}</label>
+                                    <p:inputText id="assetOwnerName" value="#{assetInfoApprovalController.selected.assetOwnerName}" readonly="true" required="false"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerTel}</label>
+                                    <p:inputText id="assetOwnerTel" value="#{assetInfoApprovalController.selected.assetOwnerTel}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerName2}</label>
+                                    <p:inputText id="assetOwnerName2" value="#{assetInfoApprovalController.selected.assetOwnerName2}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerTel2}</label>
+                                    <p:inputText id="assetOwnerTel2" value="#{assetInfoApprovalController.selected.assetOwnerTel2}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerName3}</label>
+                                    <p:inputText id="assetOwnerName3" value="#{assetInfoApprovalController.selected.assetOwnerName3}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerTel3}</label>
+                                    <p:inputText id="assetOwnerTel3" value="#{assetInfoApprovalController.selected.assetOwnerTel3}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.hospitalId}</label>
+                                    <p:inputText id="hospitalId" value="#{assetInfoApprovalController.getHospitalName(assetInfoApprovalController.selected.siteUID)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalDeptName}</label>
+                                    <p:inputText value="#{assetInfoApprovalController.selected.clinicalDeptName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalOwnerName}</label>
+                                    <p:inputText id="clinicalOwnerName" value="#{assetInfoApprovalController.selected.clinicalOwnerName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalOwnerTel}</label>
+                                    <p:inputText id="clinicalOwnerTel" value="#{assetInfoApprovalController.selected.clinicalOwnerTel}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.manufacture}</label>
+                                    <p:inputText id="manufacture" value="#{assetInfoApprovalController.selected.manufacture}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">品牌/制造商简称</label>
+                                    <p:inputText id="makerShortName" value="#{assetInfoApprovalController.selected.makerShortName}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.vendor}</label>
+                                    <p:inputText value="#{assetInfoApprovalController.selected.vendor}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.maitanance}</label>
+                                    <p:inputText id="maitanance" value="#{assetInfoApprovalController.selected.maitanance}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.maitananceTel}</label>
+                                    <p:inputText id="maitananceTel" value="#{assetInfoApprovalController.selected.maitananceTel}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.nationalStandardCode}</label>
+                                    <p:inputText id="nationalStandardCode" value="#{assetInfoApprovalController.selected.nationalStandardCode}" readonly="true"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.parentAsset}</label>
+                                    <p:inputText id="parentAssetId" value="#{assetInfoApprovalController.getParentAssetName()}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.deviceName}</label>
+                                    <p:inputText id="deviceName" value="#{assetInfoApprovalController.selected.deviceName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.systemId}</label>
+                                    <p:inputText id="systemId" value="#{assetInfoApprovalController.selected.systemId}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.financingNum}</label>
+                                    <p:inputText id="financingNum2" value="#{assetInfoApprovalController.selected.financingNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.departNum}</label>
+                                    <p:inputText value="#{assetInfoApprovalController.selected.departNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.barcode}</label>
+                                    <p:inputText id="barcode" value="#{assetInfoApprovalController.selected.barcode}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.registrationNo}</label>
+                                    <p:inputText id="registrationNo" value="#{assetInfoApprovalController.selected.registrationNo}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.modalityId}</label>
+                                    <p:inputText id="modalityId" value="#{assetInfoApprovalController.selected.modalityId}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.qrCode}</label>
+                                    <p:inputText id="qrCode" value="#{assetInfoApprovalController.selected.qrCode}" readonly="true"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionType}</label>
+                                    <p:inputText id="functionType" value="#{assetInfoApprovalController.selected.functionType}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionGroup}</label>
+                                    <p:inputText id="functionGroup" value="#{fieldMsg.fieldValue('assetFunctionType', assetInfoApprovalController.selected.functionGroup)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetCode68}</label>
+                                    <p:inputText id="assetCode68" value="#{fieldMsg.fieldValue(assetInfoApprovalController.selected.functionGroup, assetInfoApprovalController.selected.assetCode68)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionGrade}</label>
+                                    <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoApprovalController.selected.functionGrade)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.repairForm}</label>
+                                    <p:inputText id="repairForm" value="#{fieldMsg.fieldValue('repairForm', assetInfoApprovalController.selected.repairForm)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationCode}</label>
+                                    <p:inputText id="locationCode" value="#{assetInfoApprovalController.selected.locationCode}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationName}</label>
+                                    <p:inputText id="locationName" value="#{assetInfoApprovalController.selected.locationName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.status}</label>
+                                    <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoApprovalController.selected.status}" disabled="true">
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.deviceStatus}</label>
+                                    <p:selectOneRadio id="deviceStatus"  label="#{msg.status}" value="#{assetInfoApprovalController.selected.deviceStatus}" disabled="true">
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.comments}</label>
+                                    <p:inputText  value="#{assetInfoApprovalController.selected.comments}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetUsage}</label>
+                                    <p:inputText id="assetUsage" value="#{fieldMsg.fieldValue('assetUsage', assetInfoApprovalController.selected.assetUsage)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.capitalSource}</label>
+                                    <p:inputText id="capitalSource" value="#{fieldMsg.fieldValue('capitalSource', assetInfoApprovalController.selected.capitalSource)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.measureGrade}</label>
+                                    <p:inputText id="measureGrade" value="#{fieldMsg.fieldValue('measureGrade', assetInfoApprovalController.selected.measureGrade)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.riskGrade}</label>
+                                    <p:inputText id="riskGrade" value="#{fieldMsg.fieldValue('riskGrade', assetInfoApprovalController.selected.riskGrade)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.emergencyEquipment}</label>
+                                    <p:inputText id="emergencyEquipment" value="#{fieldMsg.fieldValue('emergencyEquipment', assetInfoApprovalController.selected.emergencyEquipment)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.importEquipment}</label>
+                                    <p:inputText id="importEquipment" value="#{fieldMsg.fieldValue('importEquipment', assetInfoApprovalController.selected.importEquipment)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.measuringItemCategory}</label>
+                                    <p:inputText id="measuringItemCategory" value="#{fieldMsg.fieldValue('measuringItemCategory', assetInfoApprovalController.selected.measuringItemCategory)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.usageStatus}</label>
+                                    <p:inputText id="usageStatus" value="#{fieldMsg.fieldValue('usageStatus', assetInfoApprovalController.selected.usageStatus)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.accountingCategory}</label>
+                                    <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoApprovalController.selected.accountingCategory)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.manufactDate}</label>
+                                    <p:inputText id="manufactDate" value="#{assetInfoApprovalController.selected.manufactDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.purchaseDate}</label>
+                                    <p:inputText value="#{assetInfoApprovalController.selected.purchaseDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.arriveDate}</label>
+                                    <p:inputText id="arriveDate" value="#{assetInfoApprovalController.selected.arriveDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.installDate}</label>
+                                    <p:inputText id="installDate" value="#{assetInfoApprovalController.selected.installDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoApprovalController.selected.installDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.factoryWarrantyDate}</label>
+                                    <p:inputText id="factoryWarrantyDate" value="#{assetInfoApprovalController.selected.factoryWarrantyDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoApprovalController.selected.factoryWarrantyDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.warrantyDate}</label>
+                                    <p:inputText value="#{assetInfoApprovalController.selected.warrantyDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.terminateDate}</label>
+                                    <p:inputText id="terminateDate" value="#{assetInfoApprovalController.selected.terminateDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoApprovalController.selected.terminateDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
+                                </h:panelGroup>
+                                <h:panelGroup></h:panelGroup>
+
+                                <h:panelGroup >
+                                    <label class="label">#{msg.purchasePrice}</label>
+                                    <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoApprovalController.selected.purchasePrice}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.salvageValue}</label>
+                                    <p:inputText id="salvageValue" value="#{assetInfoApprovalController.selected.salvageValue}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lifecycle}</label>
+                                    <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoApprovalController.selected.lifecycleInYear}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.depreciationMethod}</label>
+                                    <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoApprovalController.selected.depreciationMethod)}" readonly="true"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lastPmDate}</label>
+                                    <p:inputText id="lastPmDate" value="#{assetInfoApprovalController.selected.lastPmDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lastQaDate}</label>
+                                    <p:inputText id="lastQaDate" value="#{assetInfoApprovalController.selected.lastQaDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lastMeteringDate}</label>
+                                    <p:inputText id="lastMeteringDate" value="#{assetInfoApprovalController.selected.lastMeteringDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">是否对质保到期进行提醒</label>
+                                    <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoApprovalController.selected.warranty}"  disabled="true"/>
+                                </h:panelGroup>
+
+
+                            </p:panelGrid>
+                        
+                    </p:fieldset>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.rejectCreate()}" value="审核不通过" update=":AssetInfoApprovalListForm :approvalAssetDialogForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
+                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.approveCreate()}" value="审核通过" update=":AssetInfoApprovalListForm :approvalAssetDialogForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetInfoApprovalController.cancel()}" icon="ui-icon-cancel" onclick="PF('easyInstallDialog').hide()"/>
+                    </h:panelGroup>
+
+                    <br/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

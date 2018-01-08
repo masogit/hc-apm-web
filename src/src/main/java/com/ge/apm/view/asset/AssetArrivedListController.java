@@ -15,6 +15,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -43,10 +44,14 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private AssetInstallationService aiService;
     private UaaService uaaService;
     private TreeNode orgTree;
-    
+
     private Supplier supplier;
 
     private TreeNode selectedNode;
+
+    private ArrivalListItem easyInstallItem;
+    
+    private OrgInfoService orgService;
 
     @Override
     protected void init() {
@@ -55,6 +60,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgService = WebUtil.getBean(OrgInfoService.class);
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
@@ -98,29 +104,30 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         UserAccount user = UserContextService.getCurrentUserAccount();
         object.setCreatorUID(user.getUid());
         object.setStatus(1);
+        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
 
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
     }
 
     public void applyChange() {
-        if (checkName()) {
+//        if (checkName()) {
             this.save();
-        } else {
-            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
-        }
+//        } else {
+//            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
+//        }
     }
 
-    private Boolean checkName() {
-        if (Strings.isNullOrEmpty(selected.getId())) {
-            List<SearchFilter> nameSearchFilterList = new ArrayList();
-            nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
-            nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
-            List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
-            return (null == res || res.isEmpty());
-        } else {
-            return true;
-        }
-    }
+//    private Boolean checkName() {
+//        if (Strings.isNullOrEmpty(selected.getId())) {
+//            List<SearchFilter> nameSearchFilterList = new ArrayList();
+//            nameSearchFilterList.add(new SearchFilter("name", SearchFilter.Operator.EQ, selected.getName()));
+//            nameSearchFilterList.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getTenantUID()));
+//            List<ArrivalList> res = dao.findBySearchFilter(nameSearchFilterList);
+//            return (null == res || res.isEmpty());
+//        } else {
+//            return true;
+//        }
+//    }
 
     @Override
     public void onBeforeSave(ArrivalList object) {
@@ -147,7 +154,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     public void onArrivalListSelected(SelectEvent event) {
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
-        if(selected.getSupplierId()!=null){
+        if (selected.getSupplierId() != null) {
             supplier = aiService.getSupplierById(selected.getSupplierId());
         }
         this.prepareEdit();
@@ -160,7 +167,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public void submitArrivalList() {
-        if (checkName()) {
+//        if (checkName()) {
             onBeforeSave(selected);
             dao.save(selected);
             if (aiService.submitArrivalList(selected.getId())) {
@@ -170,9 +177,9 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             };
             arrivalItemList = itemDao.findByArrivalListId(selected.getId());
             selected = dao.findById(selected.getId());
-        } else {
-            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
-        }
+//        } else {
+//            WebUtil.addErrorMessage("到货单名称/编号 已经存在");
+//        }
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {
@@ -186,11 +193,27 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             selected.setVendor(supplier.getName());
         }
     }
-    
+
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }
 
+    public void prepareEasyInstall() {
+        easyInstallItem = new ArrivalListItem();
+    }
+
+    public void saveEasyInstall() {
+        easyInstallItem = new ArrivalListItem();
+    }
+
+    public void submitEasyInstall() {
+        easyInstallItem = new ArrivalListItem();
+    }
+
+    public void cancelsaveEasyInstall() {
+        easyInstallItem = new ArrivalListItem();
+    }
+    
     //geter and setter
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
@@ -230,6 +253,14 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public ArrivalListItem getEasyInstallItem() {
+        return easyInstallItem;
+    }
+
+    public void setEasyInstallItem(ArrivalListItem easyInstallItem) {
+        this.easyInstallItem = easyInstallItem;
     }
 
 }

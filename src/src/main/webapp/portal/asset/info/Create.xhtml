@@ -107,7 +107,7 @@
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.orgTree}" selection="#{assetInfoController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2 :AssetInfoEditForm:parentAssetList" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2 :AssetInfoEditForm:parentAssetList :AssetInfoEditForm:buttonGroup" listener="#{assetInfoController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -384,13 +384,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">#{msg.usageStatus}</label>
                                 <p:selectOneMenu id="usageStatus" value="#{assetInfoController.selected.usageStatus}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('usageStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
                             <h:panelGroup>
                                 <label class="label">#{msg.accountingCategory}</label>
@@ -435,7 +435,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">同时生成保养工单</label>
-                                <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}"/>
+                                <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}" disabled="#{not empty assetInfoController.selected.uid}"/>
 
                             </h:panelGroup>
                             <h:panelGroup>
@@ -507,8 +507,9 @@
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
-                    <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoController.applyChange()}" validateClient="true" update=":growl" style="float:left"/>
+                    <h:panelGroup id="buttonGroup">
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoController.needAssetApproval(assetInfoController.selected.siteUID) and (assetInfoController.CRUDActionName eq msg.Create or assetInfoController.selected.usageStatus ne 3))}"/>
+                        <p:commandButton value="提交审核" icon="ui-icon-check" action="#{assetInfoController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoController.needAssetApproval(assetInfoController.selected.siteUID) and (assetInfoController.CRUDActionName eq msg.Create or assetInfoController.selected.usageStatus ne 3)}"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
                         <p:commandButton id="setIsValid" value="#{assetInfoController.getButtonName()}" action="#{assetInfoController.setValidButton}" immediate="true"  update=":growl" style="float:right;"/>
                     </h:panelGroup>

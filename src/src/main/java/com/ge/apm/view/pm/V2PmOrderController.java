@@ -103,6 +103,9 @@ private String dptName;
     private V2_ServiceRequest newServiceRequest;
     private BlobObjectRepository blobDao;
 
+    private String pmOrderId;
+    private String filterPlanTime;
+
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
@@ -117,12 +120,10 @@ private String dptName;
 
     }
 
-
     public void reassignWorkOrder(){
         pmOrderService.reassignWorkOrder(selectedPmOrder, selectedPmOrder.getCurrentPersonId(), comments);
        // cancel();
     }
-
 
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
@@ -556,6 +557,32 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerDetail = null;
     }
 
+    public void setPlanTimeFilter() {
+        /*if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
+            return;
+        }
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        //1周内所有未完成
+        Date startTime = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(startTime);
+        c.add(Calendar.DAY_OF_WEEK, 1);
+        varPlanTimeTo = c.getTime();
+        searchFilters.add(new SearchFilter("planTime", SearchFilter.Operator.LTE, varPlanTimeTo));
+        searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
+        filterPlanTime = null;
+        filterIsFinished = "false";*/
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if(pmOrderId != null){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderId));
+        }
+    }
+
     //getter and setter
     public Integer getQueryIndex() {
         return queryIndex;
@@ -829,5 +856,21 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void setRuleLevel(Integer ruleLevel) {
         this.ruleLevel = ruleLevel;
+    }
+
+    public String getFilterPlanTime() {
+        return filterPlanTime;
+    }
+
+    public void setFilterPlanTime(String filterPlanTime) {
+        this.filterPlanTime = filterPlanTime;
+    }
+
+    public String getPmOrderId() {
+        return pmOrderId;
+    }
+
+    public void setPmOrderId(String pmOrderId) {
+        this.pmOrderId = pmOrderId;
     }
 }
