@@ -104,7 +104,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         UserAccount user = UserContextService.getCurrentUserAccount();
         object.setCreatorUID(user.getUid());
         object.setStatus(1);
-        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
+//        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
 
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
     }

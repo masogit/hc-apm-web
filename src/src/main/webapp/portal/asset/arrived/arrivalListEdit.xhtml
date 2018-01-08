@@ -106,12 +106,12 @@
 
 
                     </p:panelGrid>
-                    <p:fieldset legend="分配安装" rendered="#{assetArrivedListController.selected.processType eq 'Easy'}">
+<!--                    <p:fieldset legend="分配安装" rendered="#{assetArrivedListController.selected.processType eq 'Easy'}">
                         共计#{assetArrivedListController.selected.quantity}剩余#{34} 
                         <p:commandButton value="分配安装" actionListener="#{assetArrivedListController.prepareEasyInstall()}" oncomplete="PF('easyInstallDialog').show()" update=":easyInstallDialogForm"/>
-                    </p:fieldset>
+                    </p:fieldset>-->
                     
-                    <p:dataTable id="itemList" rendered="#{not empty assetArrivedListController.arrivalItemList and assetArrivedListController.selected.processType ne 'Easy'}"  sortBy="#{item.itemNum}" value="#{assetArrivedListController.arrivalItemList}" var="item">
+                    <p:dataTable id="itemList" rendered="#{not empty assetArrivedListController.arrivalItemList}"  sortBy="#{item.itemNum}" value="#{assetArrivedListController.arrivalItemList}" var="item">
                         <p:column headerText="#{msg.arrivalListItemNum}" >
                             <h:outputText value="#{item.itemNum}"/>
                         </p:column>
