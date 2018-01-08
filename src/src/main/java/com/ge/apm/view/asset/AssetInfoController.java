@@ -107,7 +107,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String measuring;
 
-    private Boolean isGeneratePmOrder;
+    private Boolean isGeneratePmOrder=false;
 
     private List<UserAccount> ownerList;
     private GbCodeService gbCodeService;
@@ -1421,6 +1421,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             dao.save(assetInfo);
 
         }
+
+    }
+
+    public boolean isChecked() {
+
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+
+        }
+
+        return false;
 
     }
 
