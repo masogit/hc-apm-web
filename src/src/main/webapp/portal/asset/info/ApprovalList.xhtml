@@ -23,7 +23,8 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <p:ajax  event="rowSelect" update="viewButton"/>
+                        <p:ajax  event="rowSelect" update="viewButton" oncomplete="selectRow();"/>
+                        <!--<p:ajax  event="rowSelect" update="viewButton" listener="#{assetInfoApprovalController.onSelectAsset()}"  onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />-->
                         <p:ajax event="filter" listener="#{assetInfoApprovalController.onFilter}" oncomplete="rc();"/>
 
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -77,13 +78,13 @@
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton rendered="true" id="viewButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="审核" disabled="#{empty assetInfoApprovalController.selected}" update=":approvalAssetDialogForm" oncomplete="PF('approvalAssetDialog').show()" />
+                            <p:commandButton rendered="true" id="viewButton" icon="ui-icon-check" class="btn btn-sm btn-gray" title="审核" disabled="#{empty assetInfoApprovalController.selected}" action="#{assetInfoApprovalController.checkItem()}" />
 
                         </f:facet>
                     </p:dataTable>
                     <p:remoteCommand name="rc" update="datalist:viewButton " immediate="true"/>
+                    <p:remoteCommand name="selectRow" immediate="true" action="#{assetInfoApprovalController.checkItem()}" />
                 </h:form>
-                <ui:include src="ApprovalItemDlg.xhtml"/>
             </div>
         </div>
 
