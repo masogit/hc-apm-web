@@ -1,11 +1,17 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -17,6 +23,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.stream.Collectors;
+import org.primefaces.context.RequestContext;
 
 @ManagedBean
 @ViewScoped
@@ -25,12 +32,21 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
     private AssetInfoRepository dao;
     private UaaService uaaService;
     private OrgInfoRepository orgDao;
+    private BlobObjectRepository blobDao;
+    private List<V2_BlobObject> picList;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        blobDao = WebUtil.getBean(BlobObjectRepository.class);
+
+        String encodeStr = WebUtil.getRequestParameter("str");
+        if (!Strings.isNullOrEmpty(encodeStr)) {
+            String assetUid = (String) UrlEncryptController.getValueFromMap(encodeStr, "assetUid");
+            this.selected = dao.findByUid(assetUid);
+        }
     }
 
     @Override
@@ -56,6 +72,21 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
 
+    }
+
+    public String checkItem() {
+        String url = "assetUid=".concat(selected.getUid().toString());
+        return "ApprovalItemDetail.xhtml?faces-redirect=true&str=" + UrlParamUtil.encodeUrlQueryString(url);
+    }
+
+    public List<V2_BlobObject> getPicList() {
+        if (selected == null) {
+            return null;
+        }
+        if (picList == null) {
+            picList = blobDao.findByBoUuid(selected.getUid());
+        }
+        return picList;
     }
 
     public void rejectCreate() {
