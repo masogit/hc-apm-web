@@ -1,6 +1,7 @@
 package com.ge.apm.web.chart;
 
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.AssetFinacingNum;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.service.utils.ConfigUtils;
@@ -13,9 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import webapp.framework.util.TimeUtil;
 
 import java.text.DateFormat;
@@ -26,7 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
-@Controller
+@RestController
 @RequestMapping("/asset")
 public class TestController {
 
@@ -109,9 +113,10 @@ public class TestController {
     		return "success";
     }
     
-    @RequestMapping(value = "/{assetId}", method = RequestMethod.POST )
-    @ResponseBody
-	public String createUser(@PathVariable("assetId") Integer assetId) {
-    	return assetFinacingNumGenerateService.generateFinacingNum(assetId, null, null, null);
+    @RequestMapping(value = "/auto", method = RequestMethod.POST )
+	public String autoGenerateFinacingNum(@RequestBody AssetFinacingNum model) {
+		String result = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+				model.getAssetId(), model.getNationalStardCode(), model.getUid(), model.getMajorAssetId(), model.getPrefix());
+		return result;
 	}
 }
