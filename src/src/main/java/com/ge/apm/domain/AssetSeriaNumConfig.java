@@ -63,6 +63,18 @@ public class AssetSeriaNumConfig implements Serializable{
     private String siteUID;
     
     private Integer level = 1;//1、租户 2、集团 3、医院 4、院区
+    
+    @Column(name="format",columnDefinition = "CHAR(10)")
+    private String format;
+    
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
 
 	public Integer getLevel() {
 		return level;
