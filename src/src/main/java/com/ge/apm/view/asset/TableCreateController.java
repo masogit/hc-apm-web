@@ -83,6 +83,7 @@ public class TableCreateController {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
                 selectedTableDefinition.setSchema(tableString);
+                selectedTableDefinition.setName(table.getTitle());
                 templateDao.save(selectedTableDefinition);
                 WebUtil.addSuccessMessage("已保存");
             } else {
