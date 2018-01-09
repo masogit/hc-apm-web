@@ -48,21 +48,21 @@
         <p:fieldset legend="#{msg.FilterCondition}">
             <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
                 <h:panelGroup>
-                    <label class="label">报修开始时间</label>
+                    <label class="label">最早报修时间</label>
                     <p:calendar timeZone="GMT+8"  id="startTime" value="#{workOrderReportExportController.startTime}" pattern="yyyy/MM/dd" required="false" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <label class="label">报修结束时间</label>
+                    <label class="label">最晚报修时间</label>
                     <p:calendar timeZone="GMT+8"  id="endTime" value="#{workOrderReportExportController.endTime}" pattern="yyyy/MM/dd" required="false" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
                 </h:panelGroup>
-		<h:panelGroup>
-                                <label class="label">关单开始时间</label>
-                                <p:calendar timeZone="GMT+8"  id="closedStartTime" value="#{workOrderReportExportController.closedStartTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">关单结束时间</label>
-                                <p:calendar timeZone="GMT+8"  id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
-                            </h:panelGroup>
+				<h:panelGroup>
+                     <label class="label">最早关单时间</label>
+                     <p:calendar timeZone="GMT+8"  id="closedStartTime" value="#{workOrderReportExportController.closedStartTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
+                <h:panelGroup>
+                    <label class="label">最晚关单时间</label>
+                    <p:calendar timeZone="GMT+8"  id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
+                </h:panelGroup>
             </p:panelGrid>
         </p:fieldset>
 
