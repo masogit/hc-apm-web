@@ -31,10 +31,10 @@
                             <p:commandButton id="btnOrg" value="#{empty assetInfoController.selectSite? msg.AllHospitals:assetInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" var="node" selectionMode="single" dynamic="false">
+                                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
                                         <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm" oncomplete="PF('varPanelOrg').hide();"/>
-<!--                                        <p:ajax process="@this" event="expand"/>
-                                        <p:ajax process="@this" event="collapse"/>-->
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
                                             <h:outputText value="#{node.name}"/>
                                         </p:treeNode>
@@ -98,12 +98,26 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUid}" filterMatchMode="EQ">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
-                                </p:selectOneMenu>
+                                <p:overlayPanel id="imagePanel" widgetVar="varPanelDeptOrg" for="clinicalDept" hideEffect="fade">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}" selection="#{orgTreeController.selectedDeptOrgNode}" var="node" selectionMode="single" dynamic="false">
+                                            <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter(orgTreeController.selectedDeptOrgNode.data)}" update=":AssetInfoListForm:datalist" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node.name}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                                </p:overlayPanel>
+
+                                <!--                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                                                                </p:selectOneMenu>-->
+                            <p:inputText id="clinicalDept" value="#{orgTreeController.selectedDeptOrgNode.data.name}"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
