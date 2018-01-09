@@ -107,7 +107,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String measuring;
 
-    private Boolean isGeneratePmOrder;
+    private Boolean isGeneratePmOrder = false;
 
     private List<UserAccount> ownerList;
     private GbCodeService gbCodeService;
@@ -121,7 +121,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean isSelectedCurrentPage = false;
 
     private OrgInfo selectSite;
-    
+
     private Boolean needShowAssetApproval;
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
@@ -188,9 +188,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
-        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String encodeStr = request.getParameter("str");
-        this.measuring = request.getParameter("measuring");
+        String encodeStr = WebUtil.getRequestParameter("str");
+        this.measuring = WebUtil.getRequestParameter("measuring");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
         // String actionName = WebUtil.getRequestParameter("actionName");
         if ("Create".equalsIgnoreCase(actionName)) {
@@ -327,6 +326,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
             }
         }
+        onClinicalDeptFilter(null);
     }
 
     public void exportQrCode() throws Exception {
@@ -461,14 +461,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public Boolean needAssetApproval(String siteUid){
+    public Boolean needAssetApproval(String siteUid) {
         return acService.needAssetApproval(siteUid);
     }
-    
-    public Boolean needShowAssetApprovalByUser(){
+
+    public Boolean needShowAssetApprovalByUser() {
         return acService.needShowAssetApprovalByUser(UserContextService.getCurrentUserAccount().getUid());
     }
-    
+
     @Override
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
@@ -523,17 +523,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return true;
     }
 
-    public String submitApproval(){
+    public String submitApproval() {
         selected.setUsageStatus(2);
         return applyChange();
     }
-    
+
     @Transactional
     public String applyChange() {
         if (!isTimeValidate()) {
             return "";
         }
-        if(selected.getUsageStatus()==null){
+        if (selected.getUsageStatus() == null) {
             selected.setUsageStatus(3);
         }
         if (Strings.isNullOrEmpty(qrCode) || "".equals(qrCode.trim())) {
@@ -720,7 +720,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 //        return acService.getSiteName(siteUid);
     }
 
-
     public void onHospitalChange() {
         OrgInfo org = orgDao.getByUid(selected.getSiteUID());
         selected.setInstitutionUID(org.getInstitutionUID());
@@ -848,6 +847,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             WebUtil.addErrorMessage("该设备有工单存在,不能删除");
             return;
         }
+        V2_PmOrderRepository pmDao = WebUtil.getBean(V2_PmOrderRepository.class);
+        List<SearchFilter> pmFilter = Arrays.asList(new SearchFilter("assetUid", SearchFilter.Operator.EQ, asset.getUid()),
+                new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
+        List<V2_PmOrder> pmList = pmDao.findBySearchFilter(pmFilter);
+        if (pmList != null && !pmList.isEmpty()) {
+            WebUtil.addErrorMessage("该设备有保养工单存在,不能删除");
+            return;
+        }
+
         if (asset.getQrCode() != null) {
             qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
         }
@@ -1252,6 +1260,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onClinicalDeptFilter(Object orgData) {
+        if (null != orgData) {
+            OrgInfo fileterOrg = (OrgInfo) orgData;
+            if (fileterOrg.getOrgType() == 4) {
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+                return;
+            }
+        }
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+
+    }
+
     public void discard(AssetInfo asset) {
         if (asset != null && asset.getUsageStatus() == 3) {
             asset.setIsValid(false);
@@ -1370,7 +1390,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean getNeedShowAssetApproval() {
-        if(null == needShowAssetApproval){
+        if (null == needShowAssetApproval) {
             needShowAssetApproval = acService.needShowAssetApprovalByUser(UserContextService.getCurrentUserAccount().getUid());
         }
         return needShowAssetApproval;
@@ -1421,6 +1441,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             dao.save(assetInfo);
 
         }
+
+    }
+
+    public boolean isChecked() {
+
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
+
+        }
+
+        return false;
 
     }
 

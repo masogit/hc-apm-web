@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="AssetSeriaNumConfigEditDlg" widgetVar="AssetSeriaNumConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSeriaNumConfigController.CRUDActionName} #{msg.AssetSeriaNumConfig}">
+        <p:dialog id="AssetSeriaNumConfigEditDlg" widgetVar="AssetSeriaNumConfigEditDialog" width="400" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{assetSeriaNumConfigController.CRUDActionName} #{msg.AssetSeriaNumConfig}">
             <h:form id="AssetSeriaNumConfigEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{assetSeriaNumConfigController.selected != null}">
