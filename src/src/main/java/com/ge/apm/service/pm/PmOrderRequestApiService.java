@@ -52,6 +52,9 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     
     @Value("#{urlProperties.url_createPmOrdersByBatch}")
     private String url_createPmOrdersByBatch;
+    
+    @Value("#{urlProperties.url_autoGenerateFinancingNum}")
+    private  String url_autoGenerateFinancingNum;
 
     public Map<String, Object> getApproveByAsset(String token, String assetUid) {
         HttpHeaders header = createHttpHeaders(token);
@@ -115,8 +118,21 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         }else {
         		logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
         }
-        
     }
+    
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	public String autoGenerateFinacingNum(String requestBody){
+        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_autoGenerateFinancingNum, requestEntity, LinkedHashMap.class);
+        if (response.getStatusCode() == HttpStatus.OK) {
+        		LinkedHashMap<String, Object> responseMap =  response.getBody();
+        		logger.info("invoke autoGenerateFinacingNum over,result is {}",responseMap.get("data"));
+            return (String) responseMap.get("data");
+        }else {
+        		logger.error("rmi failure,code is {},body is {}",response.getStatusCode(),response.getBody());
+        		return null;
+        }
+    } 
 //http://apm-dev.hcdigital.com.cn:8090/hcapmworkflowservice/api/apm/pmOrders/ff8080815f525e84015f5764de610000/action?type=accept
 }
 

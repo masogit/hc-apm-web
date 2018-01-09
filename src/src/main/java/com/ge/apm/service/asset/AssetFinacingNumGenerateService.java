@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.alibaba.druid.util.StringUtils;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.AssetSeriaNumConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -20,6 +21,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.AssetSeriaNumConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.pm.PmOrderRequestApiService;
 
 @Service
 public class AssetFinacingNumGenerateService {
@@ -36,8 +38,28 @@ public class AssetFinacingNumGenerateService {
 	@Autowired
 	private OrgInfoRepository orgInfoRepository;
 
+/*	@Autowired
+	private UserAccountRepository userAccountRepository;*/
+	
 	@Autowired
-	UserAccountRepository userAccountRepository;
+	private PmOrderRequestApiService pmOrderRequestApiService;
+	
+	public String autoGenerateFinacingNum(Integer assetId, String nationalStardCode, String uid,Integer majorAssetId,String prefix) {
+		JSONObject param = new JSONObject();
+		param.put("assetId", assetId);
+		param.put("nationalStardCode", nationalStardCode);
+		param.put("uid", uid);
+		param.put("majorAssetId", majorAssetId);
+		param.put("prefix", prefix);
+		try {
+			String result = pmOrderRequestApiService.autoGenerateFinacingNum(param.toJSONString());
+			return result;
+		}catch(Exception e) {
+			LOGGER.error(e.getMessage());
+			e.printStackTrace();
+		}
+		return null;
+	}
 
 	/***
 	 * 该方法是新增资产或更新资产(必须是更新该字段)时调用，1是更新，2是新增
