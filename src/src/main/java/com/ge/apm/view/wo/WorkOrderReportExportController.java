@@ -219,29 +219,29 @@ public class WorkOrderReportExportController implements Serializable{
         //workOrderList =                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList());
         if(null == startTime && null == endTime && null == closedStartTime && null == closedEndTime)
         {
-        	showMsgBox("报修时间范围和关单时间范围需任填一组（开始时间/结束时间）");
+        	showMsgBox("报修时间范围和关单时间范围需任填一组（最早时间/最晚时间）");
         	return;
         }
         else
         {
         	if((null != startTime && null == endTime))
         	{
-        		showMsgBox("请选择报修结束时间");
+        		showMsgBox("请选择最晚报修时间");
         		return;
         	}
         	if((null == startTime && null != endTime))
         	{
-        		showMsgBox("请选择报修开始时间");
+        		showMsgBox("请选择最早报修时间");
         		return;
         	}
         	if(null != closedStartTime && null == closedEndTime)
         	{
-        		showMsgBox("请选择关单结束时间");
+        		showMsgBox("请选择最晚关单时间");
         		return;
         	}
         	if(null == closedStartTime && null != closedEndTime)
         	{
-        		showMsgBox("请选择关单开始时间");
+        		showMsgBox("请选择最早关单时间");
         		return;
         	}
         	
