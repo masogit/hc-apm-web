@@ -117,7 +117,7 @@
                                                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                                                     <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
                                                                 </p:selectOneMenu>-->
-                            <p:inputText id="clinicalDept" value="#{orgTreeController.selectedDeptOrgNode.data.name}"/>
+                            <p:inputText id="clinicalDept" value="#{orgTreeController.selectedDeptOrgNode.data.name}" readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>

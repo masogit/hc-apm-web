@@ -39,9 +39,17 @@
                         </h:panelGroup>  
                         
                         <h:panelGroup>
-                            <label class ="label">#{msg.generateMethod}</label>
-                            <p:selectOneMenu value="#{assetSeriaNumConfigController.selected.generateMethod}" disabled="false">
+                            <label class ="label">#{msg.generateMethod} *</label>
+                            <p:selectOneMenu value="#{assetSeriaNumConfigController.selected.generateMethod}" disabled="false" required="true" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                             </p:selectOneMenu>
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class ="label">初始流水号</label>
+                            <p:selectOneMenu value="#{assetSeriaNumConfigController.selected.format}" disabled="false">
+                            		   <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                              </p:selectOneMenu>
                         </h:panelGroup>
                         
