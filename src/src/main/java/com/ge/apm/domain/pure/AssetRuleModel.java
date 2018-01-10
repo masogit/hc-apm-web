@@ -1,9 +1,19 @@
 package com.ge.apm.domain.pure;
 
+import java.util.Date;
+
 public class AssetRuleModel {
 	private String uid;
 	private Integer level;
 	private Integer period;
+	private Date planTime;
+	
+	public Date getPlanTime() {
+		return planTime;
+	}
+	public void setPlanTime(Date planTime) {
+		this.planTime = planTime;
+	}
 	public String getUid() {
 		return uid;
 	}
