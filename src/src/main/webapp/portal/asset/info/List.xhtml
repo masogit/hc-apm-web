@@ -100,7 +100,7 @@
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ" style="word-wrap: break-word;">
                             <f:facet name="filter">
-                                <p:overlayPanel id="imagePanel" widgetVar="varPanelDeptOrg" for="clinicalDept" hideEffect="fade">
+                                <p:overlayPanel id="imagePanel" widgetVar="varPanelDeptOrg" for="clinicalDept" hideEffect="fade" style="text-align: left">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}" selection="#{orgTreeController.selectedDeptOrgNode}" var="node" selectionMode="single" dynamic="false">
                                             <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter(orgTreeController.selectedDeptOrgNode.data)}" update=":AssetInfoListForm:datalist" oncomplete="PF('varPanelDeptOrg').hide();"/>

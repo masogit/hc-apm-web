@@ -104,8 +104,8 @@ public class OrgTreeController {
             deptOrgTree = buildTree(deptList.stream().filter(item -> Strings.isNullOrEmpty(siteUid) || item.getTenantUID().equals(siteUid)
                     || item.getInstitutionUID().equals(siteUid) || item.getHospitalUID().equals(siteUid) || item.getSiteUID().equals(siteUid)).collect(Collectors.toList()));
             deptOrgTree.setRowKey(siteUid);
-            deptOrgTree.setExpanded(true);
             selectedDeptOrgNode = null;
+            expandedByOrgType(deptOrgTree,4);
         }
         return deptOrgTree;
     }
