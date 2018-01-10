@@ -56,7 +56,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private QrCodeLibRepository qrcodeDao;
 
     private BrandRepository brandDao;
-
+    private V2_PmScheduleRepository pmSchDao;
     private boolean resultStatus;
 
     private UserAccount clinicalOwner;
@@ -124,6 +124,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private Boolean needShowAssetApproval;
 
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -146,6 +147,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         setSelectedSiteUID(selected.getSiteUID());
     }
+
     private boolean showDialog = false;
     private ServerEventInterface callingController;
     private String updateViewIDs;
@@ -166,6 +168,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected void init() {
+        pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         dao = WebUtil.getBean(AssetInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
@@ -1443,7 +1446,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
     }
-
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
@@ -1453,9 +1455,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-
         return false;
+    }
 
+    //获取外部报修的记录
+    public List<PmScheduleData> getPmScheduleData(){
+
+        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid());
+        return pmsList;
     }
 
 }

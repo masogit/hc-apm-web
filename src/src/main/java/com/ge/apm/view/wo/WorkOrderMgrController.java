@@ -421,10 +421,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void cancelWorkOrder() {
-        woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason);
+
+        String assetStatus  = String.valueOf(selectedAsset.getStatus());
+        woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason,assetStatus);
+
+
         cancelReason = null;
         cancel();
     }
+
+
+
 
     public void takeEquip() {
         if (Strings.isNullOrEmpty(equipmentTaker)) {
