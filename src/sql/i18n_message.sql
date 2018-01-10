@@ -469,7 +469,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'emergencyEquipment', '是否急救设备', 'Emergency Equipment', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'importEquipment', '是否进口设备', 'Import Equipment', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringItemCategory', '计量项目类别', 'Measuring Item Category', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'usageStatus', '建档状态', 'Create Status', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'usageStatus', '设备状态', 'Usage Status', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'measuringStatus', '计量状态', 'Measuring Status', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'accountingCategory', '核算类别', 'Accounting Category', NULL, '-1');
 
