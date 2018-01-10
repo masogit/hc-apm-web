@@ -60,6 +60,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private OrgInfoRepository orgInfoRepository;
 	private PmOrderRequestApiService pmOrderRequestApiService;
 	private V2_PmOrderRepository pmOrderRepository;
+	private String siteUid;
+	private Date planTime;
 
 	@Override
 	protected void init() {
@@ -76,6 +78,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
 		queryAsset.setRuleStatus(1);// 默认只显示已配置过规则的资产
+		siteUid = user.getSiteUID();
 		getAssetsListByTenantUid();
 	}
 
@@ -127,6 +130,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
+        if (null != queryAsset.getClinicalDeptId()) {
+            assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+        }
 		if(level != null) {
 			List<String> uids = null;
 			if(level == 1) {
@@ -241,6 +247,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setUid(ai.getUid());
 			model.setLevel(level);
 			model.setPeriod(period);
+			model.setPlanTime(planTime);
 			models.add(model);
 		}
 		if (CollectionUtils.isEmpty(models)) {
@@ -322,5 +329,23 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void setLevel(Integer level) {
 		this.level = level;
 	}
+
+	public String getSiteUid() {
+		return siteUid;
+	}
+
+	public void setSiteUid(String siteUid) {
+		this.siteUid = siteUid;
+	}
+
+	public Date getPlanTime() {
+		return planTime;
+	}
+
+	public void setPlanTime(Date planTime) {
+		this.planTime = planTime;
+	}
+	
+	
 
 }

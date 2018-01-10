@@ -48,6 +48,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	private Integer level;
 	private PmOrderRuleRepository pmOrderRuleRepository;
 	private OrgInfoRepository orgInfoRepository;
+	 private String siteUid; 
 	
 	@Override
     protected void init() {
@@ -61,6 +62,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         targetAssets = new ArrayList<AssetInfo>();
         queryAsset = new QueryAsset();
         queryAsset.setTenantUID(user.getTenantUID());
+        siteUid = user.getSiteUID();
         getAssetsListByTenantUid();
     }
 	
@@ -98,7 +100,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
         if (null != queryAsset.getAssetGroup()) {
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
         }
-        
+        if (null != queryAsset.getClinicalDeptId()) {
+            assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+        }
         if(!assetFilters.isEmpty()) {
             if(queryAsset.getRuleStatus() != null) {
         			uids = new ArrayList<String>();
@@ -281,5 +285,17 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	public void setLevel(Integer level) {
 		this.level = level;
 	}
+
+
+	public String getSiteUid() {
+		return siteUid;
+	}
+
+
+	public void setSiteUid(String siteUid) {
+		this.siteUid = siteUid;
+	}
+	
+	
 	
 }
