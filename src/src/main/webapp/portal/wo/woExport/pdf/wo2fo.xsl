@@ -97,12 +97,12 @@
 							</fo:table-cell>
 							<fo:table-cell border-style="solid" border-width="0.5px">
 								<fo:block font-weight="bold" margin-left="-0.4cm" margin-right="-0.4cm">
-								系统编号
+								设备编号
 								</fo:block>
 							</fo:table-cell>
 							<fo:table-cell border-style="solid" border-width="0.5px">
 								<fo:block font-weight="bold" margin-left="-0.4cm" margin-right="-0.4cm">
-									<xsl:value-of select="系统编号"/>
+									<xsl:value-of select="设备编号"/>
 								</fo:block>
 							</fo:table-cell>
 						</fo:table-row>
@@ -512,9 +512,9 @@
 			<fo:table table-layout="fixed">
 					<fo:table-column column-width="13%"/>
 					<fo:table-column column-width="13%"/>
-					<fo:table-column column-width="21%"/>
-					<fo:table-column column-width="21%"/>
-					<fo:table-column column-width="32%"/>
+					<fo:table-column column-width="22%"/>
+					<fo:table-column column-width="22%"/>
+					<fo:table-column column-width="30%"/>
 									
 					
 					<fo:table-header  border-style="solid" border-width="0.8px">
