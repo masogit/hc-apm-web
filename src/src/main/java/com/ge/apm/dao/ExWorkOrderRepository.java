@@ -10,7 +10,7 @@ import java.util.List;
 public interface ExWorkOrderRepository extends GenericRepository<ExternalWorkOrder> {
 
 
-	@Query(value="select ewo.* from external_work_order ewo where psd.asset_uid = ?1", nativeQuery = true)
+	@Query(value="select ewo.* from external_work_order ewo where ewo.asset_uid = ?1", nativeQuery = true)
 	public List<ExternalWorkOrder> getExWorkOrderList(String assetUid);
 
 

@@ -486,7 +486,7 @@
                     </p:panel>
 
                     <p:panel  header="外修工单 external_work_order">
-                        <p:dataTable var="item" value="#{assetInfoController.getExWordOrder}" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable var="item" value="#{assetInfoController.getExWordOrder()}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="工单号" >
                                 <h:outputText value="#{item.srNum}"/>
                             </p:column>
