@@ -241,7 +241,7 @@ public class WorkOrderExportService {
             //added columns for pdf export
             workOrderMap.put("联系电话", userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone());
             workOrderMap.put("设备型号", assetInfo.getFunctionType());
-            workOrderMap.put("系统编号", assetInfo.getEamId());
+            workOrderMap.put("设备编号", assetInfo.getDepartNum());
             workOrderMap.put("二维码", assetInfo.getQrCode());
 			workOrderMap.put("当前位置", serviceRequest.getAssetLocation() == null ? assetInfo.getLocationName()
 					: serviceRequest.getAssetLocation());
