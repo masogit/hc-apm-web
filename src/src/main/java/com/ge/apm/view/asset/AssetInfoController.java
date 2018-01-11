@@ -56,7 +56,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private QrCodeLibRepository qrcodeDao;
 
     private BrandRepository brandDao;
-    private V2_PmScheduleRepository pmSchDao;
+
+    private V2_PmScheduleRepository pmSchDao ;
+    private ExWorkOrderRepository exWoDao;
     private boolean resultStatus;
 
     private UserAccount clinicalOwner;
@@ -188,6 +190,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
+        exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
@@ -1458,11 +1461,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return false;
     }
 
-    //获取外部报修的记录
-    public List<PmScheduleData> getPmScheduleData(){
+    public List<PmScheduleData> getPmScheduleData(String type){
 
-        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid());
+        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(),type);
         return pmsList;
     }
+    //获取外修工单
+    public List<ExternalWorkOrder> getExWordOrder(){
+        List<ExternalWorkOrder> exWorkOrderList = exWoDao.getExWorkOrderList(this.selected.getUid());
+        return exWorkOrderList;
+
+    }
+
 
 }
