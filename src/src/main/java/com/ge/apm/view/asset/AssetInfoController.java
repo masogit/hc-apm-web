@@ -1473,5 +1473,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public ExWorkOrderRepository getExWoDao() {
+        return exWoDao;
+    }
 
+    public void setExWoDao(ExWorkOrderRepository exWoDao) {
+        this.exWoDao = exWoDao;
+    }
 }
