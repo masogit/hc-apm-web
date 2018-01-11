@@ -57,6 +57,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private BrandRepository brandDao;
 
+    private V2_PmScheduleRepository pmSchDao ;
+    private ExWorkOrderRepository exWoDao;
     private boolean resultStatus;
 
     private UserAccount clinicalOwner;
@@ -124,6 +126,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private Boolean needShowAssetApproval;
 
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -146,6 +149,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         setSelectedSiteUID(selected.getSiteUID());
     }
+
     private boolean showDialog = false;
     private ServerEventInterface callingController;
     private String updateViewIDs;
@@ -166,6 +170,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected void init() {
+        pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         dao = WebUtil.getBean(AssetInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
@@ -185,6 +190,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
+        exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
@@ -1443,7 +1449,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
     }
-
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
@@ -1453,9 +1458,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-
         return false;
+    }
+
+    public List<PmScheduleData> getPmScheduleData(String type){
+
+        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(),type);
+        return pmsList;
+    }
+    //获取外修工单
+    public List<ExternalWorkOrder> getExWordOrder(){
+        List<ExternalWorkOrder> exWorkOrderList = exWoDao.getExWorkOrderList(this.selected.getUid());
+        return exWorkOrderList;
 
     }
 
+    public ExWorkOrderRepository getExWoDao() {
+        return exWoDao;
+    }
+
+    public void setExWoDao(ExWorkOrderRepository exWoDao) {
+        this.exWoDao = exWoDao;
+    }
 }

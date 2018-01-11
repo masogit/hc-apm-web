@@ -108,11 +108,12 @@ public class V2_WorkOrderService {
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
-    public void cancelWorkOrder(String workOrderId, String reason) {
+    public void cancelWorkOrder(String workOrderId, String reason,String assetStatus) {
         V2_WorkOrder wo = woDao.findById(workOrderId);
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setDesc(reason);
+        formData.setAssetStatus(assetStatus);
         formData.setCurrentStepId(wo.getCurrentStepId());
         String res = srApi.invokeWorkOrderAction(token,formData,"cancel",workOrderId);
         if (res==null || !res.contains("success")) {
