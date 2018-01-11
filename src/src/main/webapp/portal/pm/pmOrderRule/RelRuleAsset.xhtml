@@ -44,6 +44,14 @@
 	                                    <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
 	                          </p:inputText>
 		                 </h:panelGroup>
+		                 <h:panelGroup >
+		                      <label class ="label">#{msg.clinicalDeptName}</label>
+		                      <p:selectOneMenu value="#{relRuleAssetController.queryAsset.clinicalDeptId}" disabled="false" >
+		                              <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
+		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(relRuleAssetController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+		                      </p:selectOneMenu>
+		                 </h:panelGroup>
 		                  <h:panelGroup >
                                 <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上四个条件)</label>
                                 <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
