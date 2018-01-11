@@ -66,7 +66,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private OrgInfo selectedOrg = null;
 
     private OrgInfoRepository orgInfoDao;
-    
+
     private OrgInfo selectedUserOrg;
 
     @Override
@@ -80,8 +80,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
+        selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         setTenantUid(loginUser.getTenantUID());
-        
+
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -104,11 +105,17 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         OrgInfo rootOrg = new OrgInfo();
         rootOrg.setId(-1);
         rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root",null,null);
-        TreeNode rootNode = new DefaultTreeNode("org",rootOrg,orgTree);
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
         rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
-        TreeNodeUtil.expandTreeNode(orgTree);
-        selectedOrg = null;
+        TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+        if (null != selectedUserOrg) {
+            selectedUserOrg.setSelected(true);
+            TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+        }
+
+//        TreeNodeUtil.expandTreeNode(selectedUserOrg);
+//        selectedOrg = null;
     }
 
     public TenantInfo getSelectedTenant() {
@@ -121,7 +128,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public String getOrgFullName(OrgInfo org) {
-        if(null==org || org.getId()==-1){
+        if (null == org || org.getId() == -1) {
             return null;
         }
         String name = org.getName();
@@ -142,19 +149,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     protected Page<UserAccount> loadData(PageRequest pageRequest) {
         //this.selected = null;
         if (selectedOrg == null) {
-            searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, this.tenantUid));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
         } else {
             if (selectedOrg.getId() == -1) {
-                searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, this.tenantUid));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.tenantUid));
             } else {
-                searchFilters.add(new SearchFilter("tenantUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("institutionUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("hospitalUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("siteUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
-                searchFilters.add(new SearchFilter("orgInfoUID",SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
             }
         }
-        
+
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -250,8 +257,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         } catch (NoSuchAlgorithmException ex) {
             Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-        this.selectedUserOrg=null;
+
+        this.selectedUserOrg = null;
 
     }
 
@@ -272,40 +279,39 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
     }
 
-    
     @Override
     public void onAfterUpdateObject(UserAccount object, boolean isOk) {
         if (isOk && this.crudActionName.equals("Edit")) {
             uaaService.clearUserScope(object.getUid());
             uaaService.setDefaultScope(object);
-            
+
         }
     }
-    
+
     public void deleteSelectedUser() {
         if (canDelete()) {
             super.delete();
-        } 
+        }
     }
 
-    private Boolean canDelete(){
+    private Boolean canDelete() {
         List<SearchFilter> checkFilters = new ArrayList<>();
-        checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
-        checkFilters.add(new SearchFilter("dispatchUserId2", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        checkFilters.add(new SearchFilter("dispatchUserId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        checkFilters.add(new SearchFilter("dispatchUserId2", SearchFilter.Operator.EQ, selected.getId(), "1+"));
         WorkflowConfigRepository wfDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        List<WorkflowConfig> cfgList =  wfDao.findBySearchFilter(checkFilters);
-        if(cfgList!=null && !cfgList.isEmpty()){
+        List<WorkflowConfig> cfgList = wfDao.findBySearchFilter(checkFilters);
+        if (cfgList != null && !cfgList.isEmpty()) {
             WebUtil.addErrorMessage("该用户是派工人,不能删除.");
             return false;
         }
         checkFilters.clear();
-        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
-        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(),"1+"));
-        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(),"1+"));
-        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(),"1+"));
+        checkFilters.add(new SearchFilter("assetOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        checkFilters.add(new SearchFilter("assetOwnerId2", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        checkFilters.add(new SearchFilter("assetOwnerId3", SearchFilter.Operator.EQ, selected.getId(), "1+"));
+        checkFilters.add(new SearchFilter("clinicalOwnerId", SearchFilter.Operator.EQ, selected.getId(), "1+"));
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
         List<AssetInfo> assetList = assetDao.findBySearchFilter(checkFilters);
-        if(assetList!=null && !assetList.isEmpty()){
+        if (assetList != null && !assetList.isEmpty()) {
             WebUtil.addErrorMessage("该用户是设备责任人,不能删除.");
             return false;
         }
@@ -313,24 +319,24 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         checkFilters.add(new SearchFilter("userId", SearchFilter.Operator.EQ, selected.getId()));
         BiomedGroupUserRepository groupDao = WebUtil.getBean(BiomedGroupUserRepository.class);
         List<BiomedGroupUser> groupList = groupDao.findBySearchFilter(checkFilters);
-        if(groupList!=null && !groupList.isEmpty()){
+        if (groupList != null && !groupList.isEmpty()) {
             WebUtil.addErrorMessage("该用户在维修工程师群组中,不能删除.");
             return false;
         }
-        
+
         checkFilters.clear();
         checkFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, selected.getId()));
         checkFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         V2_WorkOrderRepository woDao = WebUtil.getBean(V2_WorkOrderRepository.class);
         List<V2_WorkOrder> woList = woDao.findBySearchFilter(checkFilters);
-        if(woList!=null && !woList.isEmpty()){
+        if (woList != null && !woList.isEmpty()) {
             WebUtil.addErrorMessage("该用户有在修工单,不能删除.");
             return false;
         }
-        
+
         return true;
     }
-    
+
     @Override
     public void onBeforeSave(UserAccount user) {
         //remove space charactors.
@@ -385,7 +391,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     @Override
     public void prepareEdit() {
-        super.prepareEdit(); 
+        super.prepareEdit();
         selectedUserOrg = orgInfoDao.getByUid(selected.getOrgInfoUID());
     }
 
@@ -497,8 +503,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             return;
         }
 
-        List<String> newValues = (List<String>)e.getNewValue();
-        List<String> oldValues = (List<String>)e.getOldValue();
+        List<String> newValues = (List<String>) e.getNewValue();
+        List<String> oldValues = (List<String>) e.getOldValue();
         List<String> newlyCheckedRoles = (List<String>) CollectionUtils.subtract(newValues, oldValues);
 
         if (newlyCheckedRoles.size() > 0) {

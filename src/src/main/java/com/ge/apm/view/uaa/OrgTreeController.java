@@ -45,13 +45,29 @@ public class OrgTreeController {
     }
 
     public TreeNode createSiteOrgTree() {
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        TreeNode rootNode = new DefaultTreeNode("org", null, null);
-        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
+//        OrgInfo rootOrg = new OrgInfo();
+//        rootOrg.setId(-1);
+//        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+//        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+//        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
         List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
-        return buildTree(siteList);
+        TreeNode siteTree = buildTree(siteList);
+        expandedByOrgType(siteTree, 2);
+        return siteTree;
+    }
+
+    private void expandedByOrgType(TreeNode tree, Integer type) {
+        if (tree.getData() != null) {
+            OrgInfo node = (OrgInfo) tree.getData();
+            if (node.getOrgType() > type) {
+                return;
+            }
+        }
+        tree.setExpanded(true);
+        for (TreeNode child : tree.getChildren()) {
+            expandedByOrgType(child, type);
+        }
+
     }
 
     private TreeNode buildTree(List<OrgInfo> orgList) {
@@ -64,6 +80,7 @@ public class OrgTreeController {
                 rootNode.getChildren().add(treeMap.get(org.getUid()));
             }
         }
+        rootNode.setExpanded(true);
         return rootNode;
     }
 
@@ -88,6 +105,7 @@ public class OrgTreeController {
                     || item.getInstitutionUID().equals(siteUid) || item.getHospitalUID().equals(siteUid) || item.getSiteUID().equals(siteUid)).collect(Collectors.toList()));
             deptOrgTree.setRowKey(siteUid);
             selectedDeptOrgNode = null;
+            expandedByOrgType(deptOrgTree,4);
         }
         return deptOrgTree;
     }
