@@ -81,6 +81,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<V2_WorkOrder> selectedWorkOrderList;
 
     private AssetInfo selectedAsset;
+    private String assetStatus;
 
     private Integer currentStatus = 1;
 
@@ -422,7 +423,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void cancelWorkOrder() {
 
-        String assetStatus  = String.valueOf(selectedAsset.getStatus());
         woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason,assetStatus);
 
 
@@ -875,4 +875,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.requestAssetUid = requestAssetUid;
     }
 
+    public String getAssetStatus() {
+        return assetStatus;
+    }
+
+    public void setAssetStatus(String assetStatus) {
+        this.assetStatus = assetStatus;
+    }
 }

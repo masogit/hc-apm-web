@@ -457,6 +457,48 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
+
+                    <p:panel  header="外修保养记录epm">
+                        <p:dataTable var="item" value="#{assetInfoController.getPmScheduleData('epm')}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="保养编号" >
+                                <h:outputText value="#{item.assetNum}"/>
+                            </p:column>
+                            <p:column headerText="关单日期" >
+                                <h:outputText value="#{item.closeDate}"/>
+                            </p:column>
+                            <p:column headerText="当前处理步骤" >
+                                <h:outputText value="#{item.scheduleDate}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel  header="egm">
+                        <p:dataTable var="item" value="#{assetInfoController.getPmScheduleData('pm')}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="保养编号" >
+                                <h:outputText value="#{item.assetNum}"/>
+                            </p:column>
+                            <p:column headerText="关单日期" >
+                                <h:outputText value="#{item.closeDate}"/>
+                            </p:column>
+                            <p:column headerText="当前处理步骤" >
+                                <h:outputText value="#{item.scheduleDate}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+
+                    <p:panel  header="外修工单 external_work_order">
+                        <p:dataTable var="item" value="#{assetInfoController.getExWordOrder}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="工单号" >
+                                <h:outputText value="#{item.srNum}"/>
+                            </p:column>
+                            <p:column headerText="更新日期" >
+                                <h:outputText value="#{item.updateTime}"/>
+                            </p:column>
+                            <p:column headerText="医院" >
+                                <h:outputText value="#{item.hospitalName}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+
                 </p:panelGrid>
             </h:form>
 
