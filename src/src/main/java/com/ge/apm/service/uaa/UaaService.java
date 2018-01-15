@@ -267,9 +267,7 @@ public class UaaService {
     //gaolei2
     public TreeNode getFilterOrgTreeBySite2(String siteUID,String keywords){
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
-
         Iterator<Map.Entry<String, TreeNode>> iterator = xtreeMap.entrySet().iterator();
-        //x1(xtreeMap);
         //遍历xtreeMap为结构的机构树,将保留输入的查找如"设备科".
         for(Map.Entry<String, TreeNode> nodeItem: xtreeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
@@ -311,7 +309,6 @@ public void x2(TreeNode treeNode){
             //一旦找到 设备科 就将其 往上的父节点都加到树立
             buidUpFromNode(treeNodeMap,treeNode);
         }
-        //return null;
     }
      for (TreeNode child : treeNode.getChildren()) {
           x2(child);

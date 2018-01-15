@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="维修工单报表导出"/>
+            </div>
+
+            <div class="ui-g-12 card ">
+                <p:tabView id="woTab">
+                    <p:ajax event="tabChange"/>
+                    <p:tab title="内部工单" id="inWorkOrder">
+                        <ui:include src="woMgrList.xhtml"/>
+                    </p:tab>
+                    <p:tab title="外部工单" id="outWorkOrder">
+                        <!--<ui:include src="statistics.xhtml"/>-->
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
