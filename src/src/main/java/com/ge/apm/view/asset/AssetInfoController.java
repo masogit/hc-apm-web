@@ -272,6 +272,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            onSelectSiteTreeNode(null);
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -316,7 +317,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if(null!=event){
         selectSite = (OrgInfo) event.getTreeNode().getData();
+        }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
                 || "institutionUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
                 || "hospitalUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
