@@ -32,9 +32,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     private AssetInstallationService aiService;
     private UaaService uaaService;
     private List<V2_BlobObject> picList;
-    
-    private ArrivalListItem  selectedItem;
-    
+
+    private ArrivalListItem selectedItem;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
@@ -61,7 +61,9 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
             searchFilters.add(new SearchFilter("arrivalList.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("currentPersonUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }
-
+        if (!this.hasFilterOnField("arrivalList.processType")) {
+            searchFilters.add(new SearchFilter("arrivalList.processType", SearchFilter.Operator.EQ, "Normal"));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -76,30 +78,30 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         picList = aiService.getPicList(selected.getId());
     }
 
-    public void prepareTransOrder(String itemId){
+    public void prepareTransOrder(String itemId) {
         selectedItem = dao.findById(itemId);
     }
-    
-    public List<UserAccount> getWorkerList(){
+
+    public List<UserAccount> getWorkerList() {
         return aiService.getWorkerList();
     }
-    
-    public void reassignWorkOrder(){
+
+    public void reassignWorkOrder() {
         aiService.reAssignWorkOrder(selectedItem);
         cancel();
     }
-    
-    public void takeWorkOrder(String itemId){
+
+    public void takeWorkOrder(String itemId) {
         ArrivalListItem item = dao.findById(itemId);
         item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
         aiService.reAssignWorkOrder(item);
         cancel();
     }
-    
-    public Boolean isAssignToMe(String currentPersonUID){
+
+    public Boolean isAssignToMe(String currentPersonUID) {
         return UserContextService.getCurrentUserAccount().getUid().equals(currentPersonUID);
     }
-    
+
     @Override
     public List<ArrivalListItem> getItemList() {
         return dao.findBySearchFilter(searchFilters);
@@ -109,18 +111,19 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         this.selected = null;
         selectedItem = null;
     }
-    
-     public void setSelected(String id) {
-         if(Strings.isNullOrEmpty(id)){
-             selected = null;
-         }
+
+    public void setSelected(String id) {
+        if (Strings.isNullOrEmpty(id)) {
+            selected = null;
+        }
         selected = getDAO().findById(id);
-        
+
     }
 
-    public OrgInfo getOrgInfoByUid(String orgUid){
+    public OrgInfo getOrgInfoByUid(String orgUid) {
         return aiService.getOrgInfoByUid(orgUid);
     }
+
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }
