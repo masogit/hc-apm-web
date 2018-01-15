@@ -285,6 +285,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private void initEasyInstallItem() {
         easyInstallItem = getNewInstallAssetList().stream().findAny().orElse(new ArrivalListItem());
+        nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
 
     public List<UserAccount> getOwnerList() {
