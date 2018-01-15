@@ -149,6 +149,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void prepareCreateHospital(){
+        orgName=null;
         if(selected==null) return;
         
         OrgInfo org = new OrgInfo();
@@ -171,8 +172,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
         
     public void prepareCreateSite(){
+        orgName=null;
         if(selected==null) return;
-        
+
         OrgInfo org = new OrgInfo();
         org.setParentOrg(selected);
         org.setParentUID(selected.getUid());
@@ -193,6 +195,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     
     public void prepareCreateDepartment(){
+        orgName=null;
         if(selected==null) return;
         
         OrgInfo org = new OrgInfo();
