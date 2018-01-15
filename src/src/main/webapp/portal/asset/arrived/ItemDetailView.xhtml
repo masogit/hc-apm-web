@@ -237,7 +237,7 @@
 
                     </p:panelGrid>
                 </p:fieldset>
-                <p:fieldset  legend="#{msg.AssetArrivalListAckInfo}" rendered="#{not empty assetArrivedItemsController.selected}">
+                <p:fieldset  legend="#{msg.AssetArrivalListAckInfo}" rendered="#{not empty assetArrivedItemsController.selected and assetArrivedItemsController.selected.arrivalList.processType ne 'Easy'}">
                     <h:panelGroup>
                         <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
                         <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.businessAckStatus)}" />
@@ -276,7 +276,7 @@
                     </p:dataGrid>
 
                 </p:fieldset>
-                <p:fieldset legend="相关报告" >
+                <p:fieldset legend="相关报告" rendered="#{not empty assetArrivedItemsController.selected and assetArrivedItemsController.selected.arrivalList.processType ne 'Easy'}">
                     <p:dataList id="reportList" value="#{commonReportController.getReportList(assetArrivedItemsController.selected.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                         #{commonReportController.getTemplateName(reportItem.schemaId)}
 
