@@ -87,7 +87,7 @@ public class AssetInstallationController {
     public String rejectInstall() {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), false,null)) {
+            if (aiService.submitInstallItem(arrivalListItem.getId(), false, null)) {
                 WebUtil.addSuccessMessage("提交成功");
                 return "arrivalItemsList?faces-redirect=true";
             } else {
@@ -96,7 +96,6 @@ public class AssetInstallationController {
         }
         return "";
     }
-    
 
     public void initGbTree() {
         TreeNode treeNode = gbCodeService.buildGbTree();
@@ -170,7 +169,7 @@ public class AssetInstallationController {
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), true,isGeneratePmOrder)) {
+            if (aiService.submitInstallItem(arrivalListItem.getId(), true, isGeneratePmOrder)) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
@@ -273,18 +272,18 @@ public class AssetInstallationController {
         return assetDao.findBySearchFilter(assetFilters);
     }
 
-    public void updateFinancingNumByNationalStandardCode() {
-        if (null != gbCodeName) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
-                    null,
-                    gbCodeName.split("/")[0],
-                    this.arrivalListItem.getArrivalList().getSiteUID()
-            );
-            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-                this.arrivalListItem.setFinancingNum(financingNum);
-            }
-        }
-    }
+//    public void updateFinancingNumByNationalStandardCode() {
+//        if (null != gbCodeName) {
+//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+//                    null,
+//                    gbCodeName.split("/")[0],
+//                    this.arrivalListItem.getArrivalList().getSiteUID()
+//            );
+//            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
+//                this.arrivalListItem.setFinancingNum(financingNum);
+//            }
+//        }
+//    }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
@@ -292,14 +291,14 @@ public class AssetInstallationController {
         updateSelectedOrgGb(gbCode);
         //联动更新
         if (null != gbCodeName) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(null,
-                    gbCode.getCode(),
-                    this.arrivalListItem.getArrivalList().getSiteUID()
-            );
+//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(null,
+//                    gbCode.getCode(),
+//                    this.arrivalListItem.getArrivalList().getSiteUID()
+//            );
             this.arrivalListItem.setNationalStandardCode(gbCodeName);
-            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-                this.arrivalListItem.setFinancingNum(financingNum);
-            }
+//            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
+//                this.arrivalListItem.setFinancingNum(financingNum);
+//            }
 
         }
     }
@@ -327,25 +326,39 @@ public class AssetInstallationController {
 
     }
 
+    public void gennerateFinancingNum() {
+        if (null != arrivalListItem.getNationalStandardCode()) {
+            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(arrivalListItem.getParentAssetId(),
+                    arrivalListItem.getNationalStandardCode().split("/")[0],this.arrivalListItem.getArrivalList().getSiteUID());
+            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
+                this.arrivalListItem.setFinancingNum(financingNum);
+            }
+        }else{
+            WebUtil.addErrorMessage("国标玛为空,无法生成编号");
+        }
+    }
+
     public void onParentAssetChange() {
         if (Strings.isNullOrEmpty(arrivalListItem.getDepartNum()) && arrivalListItem.getParentAssetId() != null && arrivalListItem.getParentAssetId() > 0) {
             AssetInfo parentAsset = assetDao.getById(arrivalListItem.getParentAssetId());
-            if (!Strings.isNullOrEmpty(parentAsset.getDepartNum()) && parentAsset.getDepartNum().length() > 2 && parentAsset.getDepartNum().endsWith("00")) {
-                List<SearchFilter> parentAssetFilters = Arrays.asList(new SearchFilter("parentAssetId", SearchFilter.Operator.EQ, arrivalListItem.getParentAssetId()));
-                List<String> childrenNumList = assetDao.findBySearchFilter(parentAssetFilters).stream()
-                        .map(item -> item.getDepartNum()).collect(Collectors.toList());
-                childrenNumList.addAll(itemDao.findBySearchFilter(parentAssetFilters).stream()
-                        .filter(item -> "new".equals(item.getInstallStatus()))
-                        .map(item -> item.getDepartNum()).collect(Collectors.toList()));
-                String prefix = parentAsset.getDepartNum().substring(0, parentAsset.getDepartNum().length() - 2);
-                for (int i = 1; i < 100; i++) {
-                    String num = prefix.concat(i < 10 ? "0" : "").concat(String.valueOf(i));
-                    if (!childrenNumList.contains(num)) {
-                        arrivalListItem.setDepartNum(num);
-                        break;
-                    }
-                }
-            }
+            String finNum = assetFinacingNumGenerateService.generateFinancingNum(parentAsset.getId(), gbCodeName, arrivalListItem.getArrivalList().getSiteUID());
+            arrivalListItem.setFinancingNum(finNum);
+//            if (!Strings.isNullOrEmpty(parentAsset.getDepartNum()) && parentAsset.getDepartNum().length() > 2 && parentAsset.getDepartNum().endsWith("00")) {
+//                List<SearchFilter> parentAssetFilters = Arrays.asList(new SearchFilter("parentAssetId", SearchFilter.Operator.EQ, arrivalListItem.getParentAssetId()));
+//                List<String> childrenNumList = assetDao.findBySearchFilter(parentAssetFilters).stream()
+//                        .map(item -> item.getDepartNum()).collect(Collectors.toList());
+//                childrenNumList.addAll(itemDao.findBySearchFilter(parentAssetFilters).stream()
+//                        .filter(item -> "new".equals(item.getInstallStatus()))
+//                        .map(item -> item.getDepartNum()).collect(Collectors.toList()));
+//                String prefix = parentAsset.getDepartNum().substring(0, parentAsset.getDepartNum().length() - 2);
+//                for (int i = 1; i < 100; i++) {
+//                    String num = prefix.concat(i < 10 ? "0" : "").concat(String.valueOf(i));
+//                    if (!childrenNumList.contains(num)) {
+//                        arrivalListItem.setDepartNum(num);
+//                        break;
+//                    }
+//                }
+//            }
         }
     }
 
