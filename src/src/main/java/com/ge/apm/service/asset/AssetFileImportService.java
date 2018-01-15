@@ -54,10 +54,11 @@ public class AssetFileImportService {
     private List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
     private List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
     private List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
-    private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
+//    private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
     private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
     private List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
+    private List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -239,7 +240,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map);
                 assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map);
                 assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map);
-                assetRow.setFieldDropdownValue("使用状态", "setUsageStatus", usageStatusList, map);
+                assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map);
                 assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map);
 
                 if (isNewAsset) {
@@ -252,7 +253,7 @@ public class AssetFileImportService {
                     asset.setSiteUID(currentOrg.getSiteUID());
 
                     asset.setIsValid(true);
-                    asset.setStatus(1);
+//                    asset.setStatus(1);
                     asset.setDeviceStatus(0);
                     asset.setIsDeleted(Boolean.FALSE);
                 } else {
@@ -637,7 +638,7 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v1.9".equalsIgnoreCase(inputVersion);
+        return "v2.0".equalsIgnoreCase(inputVersion);
     }
 
 }
