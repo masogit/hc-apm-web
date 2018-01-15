@@ -8,8 +8,6 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.orginfo.OrgInfoService;
-import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
@@ -43,11 +41,8 @@ public class AssetInstallationController {
     private QrCodeLibRepository qrcodeDao;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
-    private BlobObjectRepository blobDao;
     private QrCodeService qrCodeService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
-    private AssetDepreciationService assetDepreciationService;
-    private V2_PmOrderService pmService;
 
     private List<V2_BlobObject> picList;
 
@@ -61,6 +56,7 @@ public class AssetInstallationController {
     private TreeNode selectedGbNode;
     private String gbCodeName;
     private GbCode selectedGb;
+    private TreeNode gbTree;
 //    private String currentQrCode;
 
     @PostConstruct
@@ -69,10 +65,7 @@ public class AssetInstallationController {
         blobService = WebUtil.getBean(BlobFileService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
-        blobDao = WebUtil.getBean(BlobObjectRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
-        assetDepreciationService = WebUtil.getBean(AssetDepreciationService.class);
-        pmService = WebUtil.getBean(V2_PmOrderService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
@@ -93,18 +86,17 @@ public class AssetInstallationController {
 
     public String rejectInstall() {
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), false)) {
+            aiService.saveOrUpdateItem(arrivalListItem);
+            if (aiService.submitInstallItem(arrivalListItem.getId(), false,null)) {
                 WebUtil.addSuccessMessage("提交成功");
                 return "arrivalItemsList?faces-redirect=true";
             } else {
                 WebUtil.addErrorMessage("提交失败");
             }
-
         }
         return "";
     }
-    private TreeNode gbTree;
+    
 
     public void initGbTree() {
         TreeNode treeNode = gbCodeService.buildGbTree();
@@ -177,25 +169,8 @@ public class AssetInstallationController {
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), true)) {
-                ArrivalListItem temp = itemDao.findById(arrivalListItem.getId());
-                AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
-                if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), 3);
-                }
-                assetDepreciationService.saveAssetDerpeciation(newAsset);
-                if (isGeneratePmOrder) {
-                    pmService.createPMrequest(newAsset.getUid(), null);
-                }
-                List<V2_BlobObject> assetPicList = getAckPicList("asset");
-                assetPicList.forEach(item -> {
-                    item.setId(null);
-                    item.setBoUuid(newAsset.getUid());
-                    item.setBoSubType("1");
-                    item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
-                });
-                blobDao.save(assetPicList);
+            aiService.saveOrUpdateItem(arrivalListItem);
+            if (aiService.submitInstallItem(arrivalListItem.getId(), true,isGeneratePmOrder)) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
@@ -212,16 +187,6 @@ public class AssetInstallationController {
 
     public List<V2_BlobObject> getAckPicList(String type) {
         return picList == null ? null : picList.stream().filter(item -> type.equals(item.getBoSubType())).collect(Collectors.toList());
-    }
-
-    private void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
-        arrivalListItem.setLastModifiedDate(new Date());
-        arrivalListItem.setUsageStatus(3);
-        itemDao.save(arrivalListItem);
-        if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
-        }
-
     }
 
     public void updateItem() {
@@ -250,7 +215,7 @@ public class AssetInstallationController {
         }
 
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
-            saveOrUpdateItem(arrivalListItem);
+            aiService.saveOrUpdateItem(arrivalListItem);
             WebUtil.addSuccessMessage("修改成功");
         } else {
             WebUtil.addErrorMessage("不可修改");
@@ -350,8 +315,7 @@ public class AssetInstallationController {
     }
 
     public void renewQrcode() {
-        QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID(), 1);
-        arrivalListItem.setQrCode(qrcodeLib.getQrCode());
+        arrivalListItem.setQrCode(aiService.getNewQrcode(arrivalListItem.getArrivalList().getTenantUID(), arrivalListItem.getArrivalList().getSiteUID()).getQrCode());
     }
 
     public List<String> completeGbName(String prefix) {

@@ -3,8 +3,8 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -19,13 +19,13 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -38,9 +38,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import webapp.framework.web.mvc.ServerEventInterface;
-import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -275,6 +272,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            onSelectSiteTreeNode(null);
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -319,7 +317,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if(null!=event){
         selectSite = (OrgInfo) event.getTreeNode().getData();
+        }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
                 || "institutionUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
                 || "hospitalUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
@@ -411,17 +411,24 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     public void onBeforeNewObject(AssetInfo object) {
-        object.setSiteId(UserContextService.getSiteId());
-        object.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
+
+        assignUserOrg(object);
+
         object.setIsValid(true);
         object.setStatus(1);
         object.setDeviceStatus(0);
         object.setIsDeleted(false);
 
-        object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-        object.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
-        object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
-        object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+    }
+
+    private void assignUserOrg(AssetInfo assetInfo) {
+        assetInfo.setSiteId(UserContextService.getSiteId());
+        assetInfo.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
+
+        assetInfo.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+        assetInfo.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
+        assetInfo.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
+        assetInfo.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
     @Override
@@ -430,11 +437,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             OrgInfo org = orgDao.findById(object.getClinicalDeptId());
             object.setClinicalDeptName(org.getName());
 
-            object.setTenantUID(org.getTenantUID());
-            object.setHospitalUID(org.getHospitalUID());
-            object.setInstitutionUID(org.getInstitutionUID());
-            object.setSiteUID(org.getSiteUID());
+//            object.setTenantUID(org.getTenantUID());
+//            object.setHospitalUID(org.getHospitalUID());
+//            object.setInstitutionUID(org.getInstitutionUID());
+//            object.setSiteUID(org.getSiteUID());
             object.setClinicalDeptUID(org.getUid());
+
         } else {
             //clear uid and its name
             object.setClinicalDeptUID(null);
@@ -1195,13 +1203,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private void updateSelectedOrg(OrgInfo orgInfo) {
 
         if (orgInfo == null || orgInfo.getId() == -1) {
+
+            //revert to current user's org if org is not selected by the user
+            assignUserOrg(selected);
+
             selectedOrg = null;
-
-            selected.setTenantUID(null);
-            selected.setInstitutionUID(null);
-            selected.setHospitalUID(null);
-            selected.setSiteUID(null);
-
             setSelectedSiteUID(null);
         } else {
             selectedOrg = orgInfo;
@@ -1210,6 +1216,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setInstitutionUID(selectedOrg.getInstitutionUID());
             selected.setHospitalUID(selectedOrg.getHospitalUID());
             selected.setSiteUID(selectedOrg.getSiteUID());
+            selected.setHospitalId(selectedOrg.getId());
 
             setSelectedSiteUID(selectedOrg.getUid());
         }
