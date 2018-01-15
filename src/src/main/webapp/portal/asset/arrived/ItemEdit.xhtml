@@ -102,13 +102,13 @@
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
                                 <p:autoComplete id="gbname" value="#{assetInstallationController.arrivalListItem.nationalStandardCode}" completeMethod="#{assetInstallationController.completeGbName}">
-                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInstallationController.updateFinancingNumByNationalStandardCode()}"/>
+                                    <p:ajax process="@this"/>
                                 </p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInstallationController.gbTree}" selection="#{assetInstallationController.selectedGbNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this :ItemEditDlgForm:financingNum" event="select" listener="#{assetInstallationController.onSelectGbTreeNode}" update=":ItemEditDlgForm:gbname :ItemEditDlgForm:financingNum" oncomplete="PF('varPanelOrg1').hide();"/>
+                                            <p:ajax process="@this" event="select" listener="#{assetInstallationController.onSelectGbTreeNode}" update=":ItemEditDlgForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
                                             <p:treeNode type="gb">
@@ -119,9 +119,12 @@
                                 </p:overlayPanel>
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                            <h:panelGroup id="financingNum">
                                 <label class="label">#{msg.financingNum}</label>
-                                <p:inputText id="financingNum" value="#{assetInstallationController.arrivalListItem.financingNum}" />
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" >
+                                    <p:ajax process="@this" update="financingNum"/>
+                                </p:inputText>
+                                <p:commandButton actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{not empty assetInstallationController.arrivalListItem.financingNum}" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.serialNum}</label>
@@ -189,7 +192,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInstallationController.arrivalListItem.parentAssetId}" >
-                                    <p:ajax listener="#{assetInstallationController.onParentAssetChange}" update="departNum2" />
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInstallationController.parentAssetList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
@@ -201,9 +204,7 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}">
-                                    <p:ajax process="@this"/>
-                                </p:inputText>
+                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" />
                             </h:panelGroup>
 
                             <h:panelGroup>
