@@ -138,21 +138,24 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			if(level == 1) {
 				uids = relRuleAssetRepository.findRuleUid1ByLevelAndTenantUID(user.getTenantUID());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
-				if (CollectionUtils.isNotEmpty(uids)) {
+				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+/*				if (CollectionUtils.isNotEmpty(uids)) {
 					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-				}
+				}*/
 			}else if(level == 2) {
 				uids = relRuleAssetRepository.findRuleUid2ByLevelAndTenantUID(user.getTenantUID());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
-				if (CollectionUtils.isNotEmpty(uids)) {
+				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+/*				if (CollectionUtils.isNotEmpty(uids)) {
 					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-				}
+				}*/
 			}else if(level == 3) {
 				uids = relRuleAssetRepository.findRuleUid3ByLevelAndTenantUID(user.getTenantUID());
 				uids = uids.stream().filter(uid -> uid != null).distinct().collect(Collectors.toList());
-				if (CollectionUtils.isNotEmpty(uids)) {
+				assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
+/*				if (CollectionUtils.isNotEmpty(uids)) {
 					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.IN, uids));
-				}
+				}*/
 			}
 		}
 		if (!assetFilters.isEmpty()) {
