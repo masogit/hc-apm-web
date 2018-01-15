@@ -88,7 +88,7 @@
                                     <br/>
                                     <h:panelGroup>
                                         <label class="label">#{msg.nameEn}</label>
-                                        <p:inputText id="nameEn" value="#{orgInfoController.selected.nameEn}" />
+                                        <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}" />
                                     </h:panelGroup>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
@@ -97,19 +97,13 @@
 
                                 <h:panelGroup>
 
-                                    <label class="label">集团</label>
-                                    <label class="label">医院</label>
-                                    <label class="label">科室</label>
-
                                     <h:panelGroup>
-                                        <label class="label">#{msg.serialNum}</label>
-                                        <p:inputText id="serialNum" value="#{assetInfoController.selected.serialNum}"/>
+                                        <label class="label">科室</label>
+                                        <p:inputText id="jituan" value="x"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.serialNum}</label>
-                                        <p:inputText id="serialNum" value="#{assetInfoController.selected.serialNum}"/>
+                                        <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.fitlerNode}" value="查询"  update="orgTree editPanel :growl"/>
                                     </h:panelGroup>
-
 
                                 </h:panelGroup>
 
