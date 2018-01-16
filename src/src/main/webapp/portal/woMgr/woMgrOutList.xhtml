@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+<ui:composition>
+
+
+            <div class="ui-g-12 card">
+                <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+
+                <h:form id="woMgrOutListForm">
+
+                    <p:dataTable id="datalist" value="#{workOrderMgrOutController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{workOrderMgrOutController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="10" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="rowSelect" listener="#{workOrderMgrOutController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
+                        <p:ajax event="filter" listener="#{workOrderMgrOutController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
+
+
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.departNum}"/>
+                        </p:column>
+                        <!--<p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
+                            <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
+                        </p:column>-->
+                        <!--<p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serviceRequest.srNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}">
+                            <h:outputText value="#{item.serviceRequest.requestorName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}">
+                            <h:outputText value="#{item.serviceRequest.requestTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
+                        </p:column>-->
+<!--
+                        <p:column headerText="#{msg.intExtType}">
+                            <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                            <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
+                        </p:column>-->
+
+
+
+                        <!--<f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
+                            </p:commandButton>
+                        </f:facet>-->
+                    </p:dataTable>
+                </h:form>
+
+            </div>
+
+
+
+
+        <script>
+            window.onload = function () {
+                var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+
+            }
+        </script>
+
+
+</ui:composition>
+</html>

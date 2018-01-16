@@ -159,8 +159,8 @@
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl :woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl :woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                         <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="提交审核" update=":submitCommentsDialogForm" icon="ui-icon-check" />
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                     </h:panelGroup>
@@ -175,7 +175,7 @@
                     <label class="label">申请审核原因</label>
                     <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
                 </h:panelGroup>
-                <p:commandButton validateClient="false" immediate="true" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl :woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
+                <p:commandButton validateClient="false" immediate="true" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
             </h:form>
         </p:dialog>
         <!--<ui:include src="expenseDialogforComplete.xhtml"/>-->
