@@ -284,7 +284,6 @@ public class AssetInstallationController {
 //            }
 //        }
 //    }
-
     public void onSelectGbTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
@@ -327,14 +326,11 @@ public class AssetInstallationController {
     }
 
     public void gennerateFinancingNum() {
-        if (null != arrivalListItem.getNationalStandardCode()) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(arrivalListItem.getParentAssetId(),
-                    arrivalListItem.getNationalStandardCode().split("/")[0],this.arrivalListItem.getArrivalList().getSiteUID());
-            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-                this.arrivalListItem.setFinancingNum(financingNum);
-            }
-        }else{
-            WebUtil.addErrorMessage("国标玛为空,无法生成编号");
+        String prifix = arrivalListItem.getFinancingNum() == null ? "" : arrivalListItem.getFinancingNum();
+        String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
+                arrivalListItem.getNationalStandardCode().split("/")[0], this.arrivalListItem.getArrivalList().getSiteUID(), arrivalListItem.getParentAssetId(), prifix);
+        if (financingNum != null && (StringUtils.isEmpty(this.arrivalListItem.getFinancingNum()) || this.arrivalListItem.getFinancingNum().length() <= 3)) {
+            this.arrivalListItem.setFinancingNum(financingNum);
         }
     }
 

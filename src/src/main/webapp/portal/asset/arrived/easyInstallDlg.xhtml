@@ -98,20 +98,22 @@
                                 <label class="label">#{msg.departNum}</label>
                                 <p:inputText id="departNum2" value="#{assetArrivedListEditController.easyInstallItem.departNum}" />
                             </h:panelGroup>
-                            <h:panelGroup id="financingNum" rendered="#{assetArrivedListEditController.installCount eq 1}">
+                            <h:panelGroup id="financingNum" >
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText value="#{assetArrivedListEditController.easyInstallItem.financingNum}" />
-                                <p:commandButton actionListener="#{assetArrivedListEditController.generateFinacialNum()}" disabled="#{not empty assetArrivedListEditController.easyInstallItem.financingNum}" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:selectBooleanButton title="生成#{msg.financingNum}" onLabel="是" offLabel="否"  value="#{assetArrivedListEditController.generateMap['generateFinancingNum']}" rendered="#{assetArrivedListEditController.installCount gt 1}"/>
+                                <p:commandButton actionListener="#{assetArrivedListEditController.generateFinacialNum()}" rendered="#{assetArrivedListEditController.installCount eq 1}" disabled="#{not empty assetArrivedListEditController.easyInstallItem.financingNum}" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@(financingNum)"/>
                             </h:panelGroup>
                             <h:panelGroup id="qrCode" rendered="#{assetArrivedListEditController.installCount eq 1}">
                                 <label class="label">#{msg.qrCode}</label>
                                 <p:inputText  value="#{assetArrivedListEditController.easyInstallItem.qrCode}" readonly="#{not empty assetArrivedListEditController.easyInstallItem.qrCode}"/>
                                 <p:commandButton actionListener="#{assetArrivedListEditController.renewQrcode()}" disabled="#{not empty assetArrivedListEditController.easyInstallItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
-                            <h:panelGroup rendered="#{assetArrivedListEditController.installCount gt 1}">
+<!--                            <h:panelGroup rendered="#{assetArrivedListEditController.installCount gt 1}">
                                 <label class="label">生成#{msg.financingNum}</label>
+                                <p:inputText value="#{assetArrivedListEditController.easyInstallItem.financingNum}" />
                                 <p:selectBooleanButton title="生成#{msg.financingNum}" onLabel="是" offLabel="否"  value="#{assetArrivedListEditController.generateMap['generateFinancingNum']}"/>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
                             <h:panelGroup rendered="#{assetArrivedListEditController.installCount gt 1}">
                                 <label class="label">生成#{msg.qrCode}</label>

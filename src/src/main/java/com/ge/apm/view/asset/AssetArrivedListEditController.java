@@ -16,6 +16,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.orginfo.OrgInfoService;
@@ -67,7 +68,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private Map<String, Boolean> generateMap;
 
     private String nationalStandardCode;
-
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
 
@@ -81,6 +82,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
+        assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
@@ -253,7 +255,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 }
                 if (generateMap.get("generateFinancingNum")) {
                     generateFinacialNum();
-                    item.setFinancingNum(easyInstallItem.getFinancingNum());
+                    item.setFinancingNum(gennerateFinancingNum(item, easyInstallItem.getFinancingNum()));
                 }
             }
 
@@ -268,9 +270,22 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         initEasyInstallItem();
     }
 
+    public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
+        if (prifix != null) {
+            if (prifix.length() > 3) {
+                prifix = prifix.substring(0, 3);
+            }
+        } else {
+            prifix = "";
+        }
+
+        String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
+                item.getNationalStandardCode().split("/")[0], item.getClinicalDeptUID()==null?item.getArrivalList().getSiteUID():item.getClinicalDeptUID(), item.getParentAssetId(), prifix);
+        return financingNum;
+    }
+
     public void generateFinacialNum() {
-        easyInstallItem.setFinancingNum(aiService.generateFinacialNum(easyInstallItem.getNationalStandardCode(),selected.getSiteUID()));
-        
+        easyInstallItem.setFinancingNum(gennerateFinancingNum(easyInstallItem, easyInstallItem.getFinancingNum()));
     }
 
     public void renewQrcode() {
@@ -317,7 +332,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void saveEasyItem() {
-        easyInstallItem.setNationalStandardCode(nationalStandardCode==null? "":nationalStandardCode.split("/")[0]);
+        easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
@@ -378,8 +393,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public List<String> completeGbName(String prefix) {
         return gbCodeService.completeGbName(prefix);
     }
-    
-    public OrgInfo getOrgInfoByUid(String orgUid){
+
+    public OrgInfo getOrgInfoByUid(String orgUid) {
         return aiService.getOrgInfoByUid(orgUid);
     }
 

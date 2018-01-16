@@ -20,7 +20,7 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.arrivalListSiteUID}</label>
 
-                                    <p:inputText id="selectedOrgName" value="#{assetArrivedListEditController.selectedOrg.orgFullName}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                                    <p:inputText id="selectedOrgName" value="#{assetArrivedListEditController.selectedOrg.name}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                                     <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" disabled="#{assetArrivedListEditController.selected.status ne '1'}" />
                                     <p:overlayPanel id="panelOrg" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                         <p:scrollPanel style="height:300px;border: 0" mode="native">
@@ -278,6 +278,9 @@
                                 </p:column>
                                 <p:column headerText="#{msg.serialNum}">
                                     <h:outputText value="#{item.serialNum}"/>
+                                </p:column>
+                                <p:column headerText="#{msg.financingNum}">
+                                    <h:outputText value="#{item.financingNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.clinicalDeptName}" >
                                     <h:outputText value="#{assetArrivedListEditController.getOrgInfoByUid(item.clinicalDeptUID)}" />
