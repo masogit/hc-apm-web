@@ -18,13 +18,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.service.asset.QrCodeService;
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.stream.Collectors;
-import java.util.zip.ZipEntry;
-import javax.imageio.ImageIO;
-import java.util.zip.ZipOutputStream;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.StreamedContent;
 
 @ManagedBean
@@ -55,6 +50,8 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     private UserContextService userContextService;
 
     private List<OrgInfo> hospitalFileterList = new ArrayList();
+
+    OrgInfo selectedOrg;
 
     @Override
     protected void init() {
@@ -129,11 +126,13 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     }
 
     public void createQrCode() {
-    	if(userContextService.hasRole("ITAdmin")){
-    		tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-    		//siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
-    	}
-        qrCodeService.createManyQrCode(tenantUID, siteUID, qrCodeNum);
+        if (userContextService.hasRole("ITAdmin")) {
+            tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+            //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+        }
+        qrCodeService.createManyQrCode(tenantUID, selectedOrg.getSiteUID(), qrCodeNum);
+        this.selectedOrg=null;
+        qrCodeNum = 0;
 
     }
 
@@ -149,6 +148,12 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         }
     }
 
+    public void onHospitalChange(NodeSelectEvent event) {
+        if (null != event.getTreeNode().getData()) {
+            selectedOrg = (OrgInfo)event.getTreeNode().getData();
+        }
+    }
+
     public void onTenantFilterChange() {
         if (tenantUIDFilter == null) {
             hospitalFileterList.clear();
@@ -160,33 +165,34 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
     public void exportQrCode() throws Exception {
         List<QrCodeLib> exportList = dao.findBySearchFilter(searchFilters);
-        List<String> qrCodeList = exportList.stream().filter(item->item.getQrCode()!=null && !item.getQrCode().isEmpty()).map(QrCodeLib::getQrCode).collect(Collectors.toList());
+        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(QrCodeLib::getQrCode).collect(Collectors.toList());
         zipFile = qrCodeService.exportQrCodeList(qrCodeList);
     }
 
-    public String getFullorgName(String uid){
+    public String getFullorgName(String uid) {
         OrgInfo tempOrgInfo = orgInfoDao.getByUid(uid);
         String tempInstitutionName = orgInfoDao.getByUid(tempOrgInfo.getInstitutionUID()).getName();
         String tempHospitalName = orgInfoDao.getByUid(tempOrgInfo.getHospitalUID()).getName();
         String tempSiteName = orgInfoDao.getByUid(tempOrgInfo.getSiteUID()).getName();
 
+        switch (tempOrgInfo.getOrgLevel()) {
 
-        switch(tempOrgInfo.getOrgLevel()){
-
-            case 0: return tempOrgInfo.getName();
-            case 1:{
+            case 0:
+                return tempOrgInfo.getName();
+            case 1: {
                 return tempInstitutionName;
             }
 
-            case 2:{
+            case 2: {
                 return tempInstitutionName + "/" + tempHospitalName;
             }
 
-            case 3:{
+            case 3: {
                 return tempInstitutionName + "/" + tempHospitalName + "/" + tempSiteName;
             }
 
-            default:return "";
+            default:
+                return "";
 
         }
     }
@@ -281,6 +287,14 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
     public void setZipFile(StreamedContent zipFile) {
         this.zipFile = zipFile;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
     }
 
 }
