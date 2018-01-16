@@ -653,7 +653,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
+        if(picList !=null){
         return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
+        }
+        else
+            return null;
     }
 
     //getter and setter
