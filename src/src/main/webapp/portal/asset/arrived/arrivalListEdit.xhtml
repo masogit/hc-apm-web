@@ -279,6 +279,9 @@
                                 <p:column headerText="#{msg.serialNum}">
                                     <h:outputText value="#{item.serialNum}"/>
                                 </p:column>
+                                <p:column headerText="#{msg.financingNum}">
+                                    <h:outputText value="#{item.financingNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.clinicalDeptName}" >
                                     <h:outputText value="#{assetArrivedListEditController.getOrgInfoByUid(item.clinicalDeptUID)}" />
                                 </p:column>

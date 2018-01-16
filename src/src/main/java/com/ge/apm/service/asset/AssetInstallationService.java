@@ -69,10 +69,6 @@ public class AssetInstallationService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private V2_PmOrderService pmService;
-    @Autowired
-    private GbCodeRepository gbDao;
-    @Autowired
-    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
@@ -159,18 +155,6 @@ public class AssetInstallationService {
     public QrCodeLib getNewQrcode(String tenantUid, String siteUid) {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(tenantUid, siteUid, 1);
         return qrcodeLib;
-    }
-
-    public String generateFinacialNum(String gbCode, String siteUid) {
-        if (!Strings.isNullOrEmpty(gbCode)) {
-            GbCode gbCodeObj = gbDao.getGbCode(gbCode);
-            if (null == gbCode) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
-                return null;
-            }
-            return assetFinacingNumGenerateService.generateFinancingNum(null, gbCodeObj.getCode(), siteUid);
-        }
-        return null;
     }
 
 }
