@@ -55,6 +55,7 @@ public class AssetFinacingNumGenerateService {
 		param.put("prefix", prefix);
 		try {
 			String result = pmOrderRequestApiService.autoGenerateFinacingNum(param.toJSONString());
+			LOGGER.info("autoGenerateFinacingNum end , sn is {}",result);
 			return result;
 		}catch(Exception e) {
 			LOGGER.error(e.getMessage());
@@ -76,6 +77,7 @@ public class AssetFinacingNumGenerateService {
 	 *            当前登陆者，如果科室id为空，则user必输
 	 * @return
 	 */
+	@Deprecated
 	public String generateFinacingNum(Integer assetId, String nationalStardCode, Integer clinicalId, UserAccount user) {
 		LOGGER.info("generate finacing num begin ,assetId is {},code is {},clinicalId is {},user is {}", assetId,
 				nationalStardCode, clinicalId, user);
