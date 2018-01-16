@@ -328,7 +328,7 @@ public class AssetInstallationController {
     public void gennerateFinancingNum() {
         String prifix = arrivalListItem.getFinancingNum() == null ? "" : arrivalListItem.getFinancingNum();
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
-                arrivalListItem.getNationalStandardCode().split("/")[0], this.arrivalListItem.getArrivalList().getSiteUID(), arrivalListItem.getParentAssetId(), prifix);
+                arrivalListItem.getNationalStandardCode()==null?null:arrivalListItem.getNationalStandardCode().split("/")[0], this.arrivalListItem.getArrivalList().getSiteUID(), arrivalListItem.getParentAssetId(), prifix);
         if (financingNum != null && (StringUtils.isEmpty(this.arrivalListItem.getFinancingNum()) || this.arrivalListItem.getFinancingNum().length() <= 3)) {
             this.arrivalListItem.setFinancingNum(financingNum);
         }
