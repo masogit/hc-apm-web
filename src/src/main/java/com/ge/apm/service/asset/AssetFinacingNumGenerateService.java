@@ -22,6 +22,8 @@ import com.ge.apm.domain.AssetSeriaNumConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
+import java.util.LinkedHashMap;
+import webapp.framework.web.WebUtil;
 
 @Service
 public class AssetFinacingNumGenerateService {
@@ -45,14 +47,17 @@ public class AssetFinacingNumGenerateService {
 	private PmOrderRequestApiService pmOrderRequestApiService;
 	
 	public String autoGenerateFinacingNum(Integer assetId, String nationalStardCode, String uid,Integer majorAssetId,String prefix) {
-		JSONObject param = new JSONObject();
+		LinkedHashMap<String,Object> param = new LinkedHashMap<>();
 		param.put("assetId", assetId);
 		param.put("nationalStardCode", nationalStardCode);
 		param.put("uid", uid);
 		param.put("majorAssetId", majorAssetId);
 		param.put("prefix", prefix);
 		try {
-			String result = pmOrderRequestApiService.autoGenerateFinacingNum(param.toJSONString());
+			String result = pmOrderRequestApiService.autoGenerateFinacingNum(param);
+                        if(null==result){
+                            WebUtil.addErrorMessage("无法自动生成资产编码");
+                        }
 			return result;
 		}catch(Exception e) {
 			LOGGER.error(e.getMessage());
