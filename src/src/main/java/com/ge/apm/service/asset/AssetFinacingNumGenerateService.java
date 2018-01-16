@@ -45,6 +45,8 @@ public class AssetFinacingNumGenerateService {
 	private PmOrderRequestApiService pmOrderRequestApiService;
 	
 	public String autoGenerateFinacingNum(Integer assetId, String nationalStardCode, String uid,Integer majorAssetId,String prefix) {
+		LOGGER.info("autoGenerateFinacingNum begin ,assetId is {},code is {},uid is {},majorAssetId is {},prefix is {}",
+				assetId,nationalStardCode, uid, majorAssetId,prefix);
 		JSONObject param = new JSONObject();
 		param.put("assetId", assetId);
 		param.put("nationalStardCode", nationalStardCode);
