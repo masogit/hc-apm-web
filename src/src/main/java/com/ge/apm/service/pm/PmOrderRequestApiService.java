@@ -121,8 +121,8 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     }
     
     @SuppressWarnings({ "unchecked", "rawtypes" })
-	public String autoGenerateFinacingNum(String requestBody){
-        HttpEntity<String> requestEntity = new HttpEntity<>(requestBody);
+	public String autoGenerateFinacingNum(LinkedHashMap<String,Object> requestBody){
+        HttpEntity<LinkedHashMap> requestEntity = new HttpEntity<LinkedHashMap>(requestBody);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_autoGenerateFinancingNum, requestEntity, LinkedHashMap.class);
         if (response.getStatusCode() == HttpStatus.OK) {
         		LinkedHashMap<String, Object> responseMap =  response.getBody();
