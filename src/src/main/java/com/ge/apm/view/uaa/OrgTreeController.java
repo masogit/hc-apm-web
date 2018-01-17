@@ -33,8 +33,13 @@ public class OrgTreeController {
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
     private OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
+    
+    
     private TreeNode siteOrgTree;
     private TreeNode selectedOrgNode;
+    
+    private TreeNode tenantOrgTree;
+    private TreeNode selectedTenantOrgNode;
 
     private TreeNode selectedDeptOrgNode;
     private TreeNode deptOrgTree;
@@ -44,12 +49,22 @@ public class OrgTreeController {
 
     }
 
+    public TreeNode createTenantOrgTree() {
+        
+         OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        TreeNode rootNode = new DefaultTreeNode("org", null, null);
+        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
+        List<OrgInfo> siteList = orgDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID())
+                .stream().filter(item -> item.getOrgType()<4).collect(Collectors.toList());
+        TreeNode siteTree = buildTree(siteList);
+        expandedByOrgType(siteTree, 2);
+        rootNode.getChildren().add(siteTree);
+        return rootNode;
+    }
+    
     public TreeNode createSiteOrgTree() {
-//        OrgInfo rootOrg = new OrgInfo();
-//        rootOrg.setId(-1);
-//        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-//        TreeNode rootNode = new DefaultTreeNode("org", null, null);
-//        rootNode.getChildren().add(new DefaultTreeNode("org", rootOrg, null));
         List<OrgInfo> siteList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
         TreeNode siteTree = buildTree(siteList);
         expandedByOrgType(siteTree, 2);
@@ -90,6 +105,13 @@ public class OrgTreeController {
         }
         return siteOrgTree;
     }
+    
+    public TreeNode getTenantOrgTree() {
+        if (null == tenantOrgTree) {
+            tenantOrgTree = createTenantOrgTree();
+        }
+        return tenantOrgTree;
+    }
 
     public List<OrgInfo> getClinicalDeptListBySite(String siteUID) {
         List<SearchFilter> orgFilters = new ArrayList<>();
@@ -124,6 +146,14 @@ public class OrgTreeController {
 
     public void setSelectedDeptOrgNode(TreeNode selectedDeptOrgNode) {
         this.selectedDeptOrgNode = selectedDeptOrgNode;
+    }
+
+    public TreeNode getSelectedTenantOrgNode() {
+        return selectedTenantOrgNode;
+    }
+
+    public void setSelectedTenantOrgNode(TreeNode selectedTenantOrgNode) {
+        this.selectedTenantOrgNode = selectedTenantOrgNode;
     }
 
 }
