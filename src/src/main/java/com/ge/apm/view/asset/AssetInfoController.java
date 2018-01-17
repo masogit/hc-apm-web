@@ -1012,6 +1012,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
         if (this.selected.getAssetGroup() != null) {
+            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
             assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
             assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
@@ -1068,7 +1069,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.selected.getParentAssetId() != null) {
             AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
             if (assetInfo != null) {
-                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                    return assetInfo.getName();
+                }else{
+                    return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                }
             }
         }
         return "";
@@ -1079,7 +1084,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (ai.getParentAssetId() != null) {
             AssetInfo assetInfo = dao.getById(ai.getParentAssetId());
             if (assetInfo != null) {
-                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                    return assetInfo.getName();
+                }else{
+                    return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                }
             }
         }
         return "";
@@ -1188,13 +1197,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
 //联动更新
         if (null != selectedGb) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                    this.selected.getId(),
                     this.selectedGb.getCode(),
-                    this.selected.getSiteUID()
+                    this.selected.getSiteUID(),
+                    this.selected.getParentAssetId(),
+                    this.selected.getFinancingNum()
             );
-            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
-                this.selected.setFinancingNum(financingNum);
-            }
+            this.selected.setFinancingNum(financingNum);
 
         }
 

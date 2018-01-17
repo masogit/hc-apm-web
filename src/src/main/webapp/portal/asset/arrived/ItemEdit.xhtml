@@ -122,9 +122,9 @@
                             <h:panelGroup id="financingNum">
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" >
-                                    <p:ajax process="@this" update="financingNum"/>
+                                    <!--<p:ajax process="@this" update="financingNum"/>-->
                                 </p:inputText>
-                                <p:commandButton actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{not empty assetInstallationController.arrivalListItem.financingNum}" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:commandButton actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{not empty assetInstallationController.arrivalListItem.financingNum}" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@(financingNum)"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.serialNum}</label>
@@ -194,7 +194,7 @@
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInstallationController.arrivalListItem.parentAssetId}" >
                                     <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.parentAssetList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{assetInstallationController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>

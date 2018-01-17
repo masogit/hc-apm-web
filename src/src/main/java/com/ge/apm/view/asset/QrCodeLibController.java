@@ -44,8 +44,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     private String qrCodeImageBase64;
 
     private String tenantUIDFilter;
-    private String siteUIDFilter;
-    private Integer siteIdFilter;
+    private OrgInfo siteUIDFilter;
     private Integer hospitalIdFilter;
     private UserContextService userContextService;
 
@@ -85,8 +84,9 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
         this.setSiteFilter();
 
-        if (hospitalFileterList != null && hospitalFileterList.stream().filter(item -> item.getSiteUID().equals(siteUIDFilter) && item.getTenantUID().equals(tenantUIDFilter)).collect(Collectors.toList()).size() < 1) {
-            this.removeFilterOnField("siteUID");
+         this.removeFilterOnField("siteUID");
+        if(siteUIDFilter!=null && siteUIDFilter.getId()>0){
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter.getSiteUID()));
         }
 
         if (this.searchFilters == null) {
@@ -139,7 +139,6 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     public void showQrCode() {
         qrCode = this.selected.getQrCode();
         qrCodeImageBase64 = qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
-//        qrCodeImageBase64 = QRCodeUtil.getQRCodeImageBase64(this.selected.getQrCode());
     }
 
     public void onSiteChange() {
@@ -151,6 +150,14 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     public void onHospitalChange(NodeSelectEvent event) {
         if (null != event.getTreeNode().getData()) {
             selectedOrg = (OrgInfo)event.getTreeNode().getData();
+        }
+    }
+    
+    public void onSiteFilterChange(NodeSelectEvent event){
+        if (null != event.getTreeNode().getData()) {
+            siteUIDFilter = (OrgInfo)event.getTreeNode().getData();
+        }else{
+            this.removeFilterOnField("siteUID");
         }
     }
 
@@ -205,10 +212,6 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         return qrCodeNum;
     }
 
-    public Integer getSiteIdFilter() {
-        return siteIdFilter;
-    }
-
     public Integer getHospitalIdFilter() {
         return hospitalIdFilter;
     }
@@ -223,10 +226,6 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
     public void setQrCodeNum(Integer qrCodeNum) {
         this.qrCodeNum = qrCodeNum;
-    }
-
-    public void setSiteIdFilter(Integer siteIdFilter) {
-        this.siteIdFilter = siteIdFilter;
     }
 
     public void setHospitalIdFilter(Integer hospitalIdFilter) {
@@ -249,11 +248,11 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         this.tenantUIDFilter = tenantUIDFilter;
     }
 
-    public String getSiteUIDFilter() {
+    public OrgInfo getSiteUIDFilter() {
         return siteUIDFilter;
     }
 
-    public void setSiteUIDFilter(String siteUIDFilter) {
+    public void setSiteUIDFilter(OrgInfo siteUIDFilter) {
         this.siteUIDFilter = siteUIDFilter;
     }
 
