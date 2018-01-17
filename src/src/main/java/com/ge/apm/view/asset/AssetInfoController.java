@@ -1068,7 +1068,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.selected.getParentAssetId() != null) {
             AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
             if (assetInfo != null) {
-                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                    return assetInfo.getName();
+                }else{
+                    return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                }
             }
         }
         return "";
@@ -1079,7 +1083,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (ai.getParentAssetId() != null) {
             AssetInfo assetInfo = dao.getById(ai.getParentAssetId());
             if (assetInfo != null) {
-                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                    return assetInfo.getName();
+                }else{
+                    return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                }
             }
         }
         return "";
