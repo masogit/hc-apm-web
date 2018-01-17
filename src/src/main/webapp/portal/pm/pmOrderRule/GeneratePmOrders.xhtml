@@ -15,24 +15,25 @@
        <div class="ui-g-12 card">
     
         <h:form id="GeneratePmOrderForm">
-                   <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   <p:panelGrid id="param" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   	
 	                   	<h:panelGroup>
 	                       		<label class="label">#{msg.ruleLevel} *</label>
 	                               <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}"  required="true"   requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
-	                                   <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList" />
+	                                   <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList param"  />
 	                                   <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 	                                   <f:selectItems value="#{fieldMsg.getFieldValueList('ruleLevel')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}" /> 
 	                               </p:selectOneMenu>
 	                       </h:panelGroup> 
                           <h:panelGroup >
 		                     <label class ="label">#{msg.name}</label>
-	                         <p:inputText  value="#{generatePmOrdersController.queryAsset.name}"  required="false">
+	                         <p:inputText  value="#{generatePmOrdersController.queryAsset.name}"  disabled="#{generatePmOrdersController.level == null}">
                                     <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList" />
                              </p:inputText>
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.assetGroup}</label>
-		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}" disabled="false" >
+		                     <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.assetGroup}" disabled="#{generatePmOrdersController.level == null}" >
 		                              <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -40,19 +41,19 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                     <label class ="label">#{msg.manufacture}</label>
-		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.manufacture}"  required="false">
+		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.manufacture}"  disabled="#{generatePmOrdersController.level == null}">
 	                                    <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />
 	                          </p:inputText>
 		                 </h:panelGroup>
 		                 <h:panelGroup >
 		                      <label class ="label">#{msg.functionType}</label>
-		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.functionType}"  required="false">
+		                      <p:inputText  value="#{generatePmOrdersController.queryAsset.functionType}"  disabled="#{generatePmOrdersController.level == null}">
 	                                    <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
 	                          </p:inputText>
 		                 </h:panelGroup>
 		                  <h:panelGroup >
 		                      <label class ="label">#{msg.clinicalDeptName}</label>
-		                      <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.clinicalDeptId}" disabled="false" >
+		                      <p:selectOneMenu value="#{generatePmOrdersController.queryAsset.clinicalDeptId}" disabled="#{generatePmOrdersController.level == null}" >
 		                              <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule" />
 		                              <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(generatePmOrdersController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -60,7 +61,8 @@
 		                 </h:panelGroup>
 		                 <h:panelGroup>
                                 <label class="label">预计完成时间</label>
-                                <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}" 
+                                 showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
                             </h:panelGroup>
 		                  <h:panelGroup >
 				                <!-- <label class="label">是否已配置规则</label>
