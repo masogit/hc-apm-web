@@ -132,7 +132,7 @@ public class WorkOrderMgrOutController extends GenericCRUDUUIDController<Externa
     @Override
     protected Page<ExternalWorkOrder> loadData(PageRequest pageRequest) {
 
-
+        this.setSearchFilter();
         this.selected = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }

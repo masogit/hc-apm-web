@@ -40,7 +40,7 @@ public class ExternalWorkOrder implements Serializable {
 	@Column(name = "asset_uid")
 	private String assetUid;
 
-	@JoinColumn(name = "asset_uid", referencedColumnName = "id", insertable = false, updatable = false)
+	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
 	@ManyToOne(fetch = FetchType.EAGER)
 	private AssetInfo assetInfo;
 

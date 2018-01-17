@@ -7,13 +7,8 @@ package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import java.util.Date;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
+
 import org.hibernate.annotations.GenericGenerator;
 
 /**
@@ -97,6 +92,10 @@ public class PmScheduleData {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     Date closeDate;
+
+    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
 
     public String getId() {
         return id;
@@ -230,5 +229,33 @@ public class PmScheduleData {
     public String toString() {
         return new StringBuilder().append("[id:").append(id).append(",assetNumber:").append(assetNumber)
                 .append(",systemId:").append(systemId).append(",scheduleDate").append(scheduleDate).append("]").toString();
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        // TODO: Warning - this method won't work in the case the id fields are not set
+        if (!(object instanceof V2_PmOrder)) {
+            return false;
+        }
+        PmScheduleData other = (PmScheduleData) object;
+        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+            return false;
+        }
+        return true;
     }
 }
