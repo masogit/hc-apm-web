@@ -22,7 +22,7 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "qr_code_lib")
-public class QrCodeLib  implements Serializable {
+public class QrCodeLib implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -65,7 +65,14 @@ public class QrCodeLib  implements Serializable {
     private Integer orgId;
     @Column(name = "user_id")
     private Integer userId;
-    
+
+    @Column(name = "serial_num")
+    private String serialNum;
+    @Column(name = "model_num")
+    private String modelNum;
+    @Column(name = "manufacture_date")
+    private Date manufactureDate;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -110,7 +117,6 @@ public class QrCodeLib  implements Serializable {
         this.siteUID = siteUID;
     }
 
-
     public QrCodeLib() {
     }
 
@@ -129,10 +135,11 @@ public class QrCodeLib  implements Serializable {
 
     @PrePersist
     public void initializeUid() {
-        if(uid==null)
+        if (uid == null) {
             uid = UUID.randomUUID().toString().replace("-", "");
+        }
     }
-    
+
     public String getUid() {
         return uid;
     }
@@ -140,7 +147,7 @@ public class QrCodeLib  implements Serializable {
     public void setUid(String uid) {
         this.uid = uid;
     }
-    
+
     public Integer getId() {
         return id;
     }
@@ -253,6 +260,30 @@ public class QrCodeLib  implements Serializable {
         return userId;
     }
 
+    public String getSerialNum() {
+        return serialNum;
+    }
+
+    public void setSerialNum(String serialNum) {
+        this.serialNum = serialNum;
+    }
+
+    public String getModelNum() {
+        return modelNum;
+    }
+
+    public void setModelNum(String modelNum) {
+        this.modelNum = modelNum;
+    }
+
+    public Date getManufactureDate() {
+        return manufactureDate;
+    }
+
+    public void setManufactureDate(Date manufactureDate) {
+        this.manufactureDate = manufactureDate;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
@@ -277,5 +308,5 @@ public class QrCodeLib  implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.QrCodeLib[ id=" + id + " ]";
     }
-    
+
 }

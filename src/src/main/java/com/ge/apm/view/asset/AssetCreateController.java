@@ -91,6 +91,9 @@ public class AssetCreateController {
         newAsset.setSiteId(createRequest.getSiteId());
         newAsset.setHospitalId(createRequest.getHospitalId());
         newAsset.setQrCode(createRequest.getQrCode());
+        newAsset.setSerialNum(createRequest.getSerialNum());
+        newAsset.setFunctionType(createRequest.getModelNum());
+        newAsset.setManufactDate(createRequest.getManufactureDate());
         newAsset.setIsValid(true);
         newAsset.setStatus(1);
         newAsset.setDeviceStatus(0);
