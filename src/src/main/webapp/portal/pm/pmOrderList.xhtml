@@ -1,49 +1,52 @@
-<ui:composition xmlns="http://www.w3.org/1999/xhtml"
-                xmlns:h="http://java.sun.com/jsf/html"
-                xmlns:f="http://java.sun.com/jsf/core"
-                xmlns:ui="http://java.sun.com/jsf/facelets"
-                xmlns:p="http://primefaces.org/ui"
-                template="/WEB-INF/template.xhtml">
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
+<ui:composition>
 
-    <ui:define name="preRenderView">
+   <!-- <ui:define name="preRenderView">
         <f:metadata>
             <f:viewParam name="model" value="#{v2PmOrderController.filterPlanTime}"/>
             <f:viewParam name="assetId" value="#{v2PmOrderController.pmOrderId}"/>
         </f:metadata>
         <f:event type="preRenderView" listener="#{v2PmOrderController.setPlanTimeFilter()}"/>
-    </ui:define>
+    </ui:define>-->
 
-    <ui:define name="content">
-        <div class="ui-g clearfix">
-            <div class="ui-g-12 card cardTitle">
+    <!--<ui:define name="content">-->
+        <!--<div class="ui-g clearfix">-->
+            <!--<div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="PM工作台"/>
-            </div>
+            </div>-->
             <div class="ui-g-12 card">
                 <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
                 <h:form id="pmOrderListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"/>
 
-                        <p:commandButton value="创建保养" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet :pmOrderDetailForm :PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
+                        <p:commandButton value="创建保养" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm pmTab:PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
 
-                        <p:commandButton value="待派工"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"/>
+                        <p:commandButton value="待派工"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"/>
 
-                        <p:commandButton value="待接单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
+                        <p:commandButton value="待接单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
 
-                        <p:commandButton value="抢单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
+                        <p:commandButton value="抢单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
 
                         <!--<p:commandButton value="待验收"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(5)}" disabled="#{v2PmOrderController.queryIndex==5}" rendered="true"/>-->
-                        <p:commandButton value="保养中"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
+                        <p:commandButton value="保养中"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
 
 
-                        <p:commandButton value="待审核"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="true"/>
+                        <p:commandButton value="待审核"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="true"/>
 
-                        <p:commandButton value="待关单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(6)}" disabled="#{v2PmOrderController.queryIndex==6}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}" />
+                        <p:commandButton value="待关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(6)}" disabled="#{v2PmOrderController.queryIndex==6}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}" />
 
 
-                        <p:commandButton value="已关单"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
+                        <p:commandButton value="已关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('MultiHospital') or userContextService.hasRole('Guest')}"  />
 
                     </h:panelGrid>
                     <p:dataTable id="datalist" value="#{v2PmOrderController.lazyModel}" var="item" widgetVar="varDataList"
@@ -55,8 +58,8 @@
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update=":pmOrderDetailForm"/>
-                        <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist :pmOrderDetailForm"/>
+                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm"/>
+                        <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
 
                         <p:column headerText="资产名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
@@ -95,28 +98,28 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
-                            <p:commandButton value="派工" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
+                            <p:commandButton value="派工" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==3}">
-                            <p:commandButton disabled="#{item.currentPersonId!=userContextService.loginUserUid}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton disabled="#{item.currentPersonId!=userContextService.loginUserUid}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
-                            <p:commandButton  value="抢单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton  value="抢单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
-                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update=":pmrepairCompleteDialogForm" oncomplete="PF('pmrepairCompleteDialog').show()"/>
-                            <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update=":transferOrderDialogForm"   oncomplete="PF('transferOrderDialog').show()"/>
+                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="pmTab:pmrepairCompleteDialogForm" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                            <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="pmTab:transferOrderDialogForm"   oncomplete="PF('transferOrderDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}">
-                            <p:commandButton value="同意" disabled="#{item.approvalStatus!=1}" actionListener="#{v2PmOrderController.approvePMorder(item,'pass')}" update=":pmOrderListForm"/>
-                            <p:commandButton value="不同意" disabled="#{item.approvalStatus!=1}" actionListener="#{v2PmOrderController.approvePMorder(item,'reject')}"  update=":pmOrderListForm"/>
+                            <p:commandButton value="同意" disabled="#{item.approvalStatus!=1}" actionListener="#{v2PmOrderController.approvePMorder(item,'pass')}" update="pmTab:pmOrderListForm"/>
+                            <p:commandButton value="不同意" disabled="#{item.approvalStatus!=1}" actionListener="#{v2PmOrderController.approvePMorder(item,'reject')}"  update="pmTab:pmOrderListForm"/>
                         </p:column>
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==6}">
-                            <p:commandButton value="关单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update=":pmOrderListForm" oncomplete="PF('closePmDialog').show()" />
+                            <p:commandButton value="关单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:pmOrderListForm" oncomplete="PF('closePmDialog').show()" />
                             <!--actionListener="#{v2PmOrderController.closePM(item)}"-->
                         </p:column>
 
@@ -131,7 +134,7 @@
                 <ui:include src="pmRepairCompleteDlg.xhtml"/>
 
             </div>
-        </div>
+       <!-- </div>-->
 
         <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="400"   header="新增保养" >
             <h:form id="PmRequestCreateForm">
@@ -142,7 +145,7 @@
                             <p:inputText  id="assetName" readonly="true" value="#{v2PmOrderController.assetName}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
 
 
-                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':PmRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlgPM dptName :growl" oncomplete="PF('varSelectAssetDlgPM').show();"/>
+                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, 'pmTab:PmRequestCreateForm')}"  process="@this" icon="ui-icon-arrow-drop-down" update="pmTab:selectAssetDlgPM dptName :growl" oncomplete="PF('varSelectAssetDlgPM').show();"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -166,7 +169,7 @@
 
                 </p:fieldset>
                 <h:panelGroup >
-                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update=":pmOrderListForm :PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                 </h:panelGroup>
             </h:form>
@@ -197,9 +200,9 @@
                     </p:dataGrid>
                     <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update=":takeOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
 
-                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" update="ServiceRequestCreateForm :pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
+                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -256,7 +259,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                      <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.dispatchWorkOrder()}" value="#{msg.dispatchWorkOrder}" update=":pmOrderListForm :growl :pmOrderDetailForm " icon="ui-icon-check" oncomplete="handleSubmit(args, 'dispatchDialog');"/>
+                      <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.dispatchWorkOrder()}" value="#{msg.dispatchWorkOrder}" update="pmTab:pmOrderListForm :growl pmTab:pmOrderDetailForm " icon="ui-icon-check" oncomplete="handleSubmit(args, 'dispatchDialog');"/>
                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('dispatchDialog').hide()"/>
                    </h:panelGroup>
                 </h:panelGroup>
@@ -272,7 +275,7 @@
                     </h:panelGroup>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="接单" update=":takeOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="接单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('takeOrderDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -294,12 +297,13 @@
                     <br/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update=":transferOrderDialogForm :growl :pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update="pmTab:transferOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
 
-    </ui:define>
+   <!-- </ui:define>-->
 
 </ui:composition>
+</html>

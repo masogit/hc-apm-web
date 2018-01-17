@@ -20,7 +20,7 @@
                                  selectionMode="single" selection="#{workOrderMgrOutController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
@@ -35,36 +35,15 @@
                         <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
-                        <!--<p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
-                            <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
-                        </p:column>-->
-                        <!--<p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.serviceRequest.srNum}"/>
+
+                        <p:column headerText="更新时间" sortBy="#{item.updateTime}" filterBy="#{item.updateTime}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.updateTime}"/>
                         </p:column>
-                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}">
-                            <h:outputText value="#{item.serviceRequest.requestorName}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}">
-                            <h:outputText value="#{item.serviceRequest.requestTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                            </h:outputText>
-                        </p:column>-->
-<!--
-                        <p:column headerText="#{msg.intExtType}">
-                            <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                        <p:column headerText="请求编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                            <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
-                        </p:column>-->
 
-
-
-                        <!--<f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
-                            </p:commandButton>
-                        </f:facet>-->
                     </p:dataTable>
                 </h:form>
 

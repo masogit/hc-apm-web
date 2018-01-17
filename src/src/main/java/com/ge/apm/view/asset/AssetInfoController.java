@@ -56,6 +56,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private V2_PmScheduleRepository pmSchDao ;
     private ExWorkOrderRepository exWoDao;
+    private V2_PmOrderRepository v2_pmOrderRepository;
+
     private boolean resultStatus;
 
     private UserAccount clinicalOwner;
@@ -170,6 +172,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     protected void init() {
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
+        v2_pmOrderRepository = WebUtil.getBean(V2_PmOrderRepository.class);
         dao = WebUtil.getBean(AssetInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
@@ -190,6 +193,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
+
+
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
@@ -404,7 +409,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void assembleMaintainList() {
-        operation = "/portal/woMgr/woMgrList?faces-redirect=true";
+        operation = "/portal/woMgr/workOrderList?faces-redirect=true";
+       // operation = "/portal/woMgr/woMgrList?faces-redirect=true";
     }
 
     public String getContractListLink() {
@@ -1551,13 +1557,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return false;
     }
 
-    public List<PmScheduleData> getPmScheduleData(String type){
+    public List<V2_PmOrder> getPmOrderList(){
+        if(this.selected==null){
+            return null;
+        }
+        List<V2_PmOrder> pmOrdersForAsset = v2_pmOrderRepository.getPmOrdersForAsset(selected.getUid());
+        return pmOrdersForAsset;
+    }
 
+    public List<PmScheduleData> getPmScheduleData(String type){
+ if(this.selected==null){
+    return null;
+ }
         List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(),type);
         return pmsList;
     }
     //获取外修工单
-    public List<ExternalWorkOrder> getExWordOrder(){
+    public List<ExternalWorkOrder> getExWorkOrder(){
+        if(this.selected==null){
+            return null;
+        }
         List<ExternalWorkOrder> exWorkOrderList = exWoDao.getExWorkOrderList(this.selected.getUid());
         return exWorkOrderList;
 

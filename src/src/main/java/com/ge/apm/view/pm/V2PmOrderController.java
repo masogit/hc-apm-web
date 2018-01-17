@@ -41,9 +41,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
 
-    //V2_WorkOrderRepository dao;
     V2_PmOrderRepository dao;
-private String dptName;
+    private String dptName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_PmOrderService pmOrderService;

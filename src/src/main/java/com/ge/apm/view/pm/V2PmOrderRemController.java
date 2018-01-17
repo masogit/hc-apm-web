@@ -1,0 +1,328 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+package com.ge.apm.view.pm;
+
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+
+/**
+ *v
+ * @author 212579464
+ */
+@ManagedBean
+@ViewScoped
+public class V2PmOrderRemController extends GenericCRUDUUIDController<PmScheduleData> implements Serializable, ServerEventInterface {
+
+    V2_PmScheduleRepository dao;
+    private String dptName;
+    private OrgInfoRepository orgDao;
+    private UserAccountRepository userDao;
+    private String assetName;
+    private Integer ruleLevel;
+
+    private Date startTime;
+    private Date endTime;
+    //private Date planTime;
+
+    private UaaService uaaService;
+
+    private WorkOrderDetailRepository detailDao;
+
+    private Integer queryIndex;
+    private AssetInfo selectedAsset;
+
+    private Integer currentStatus = 1;
+
+    private Boolean needConfirmTime = false;
+
+    private String cancelReason;
+    private String stepFileter;
+
+    private V2_WorkOrder_Detail itemDetail;
+    private V2_WorkOrderCoworker coWorkerDetail;
+
+    private Date esTime;
+    private String comments;
+
+    private String pmOrderId;
+    private String filterPlanTime;
+
+
+
+
+    public OrgInfo getOrgInfoByUid(String orgUid) {
+        return orgDao.getByUid(orgUid);
+    }
+
+
+
+    protected void init() {
+        dao = WebUtil.getBean(V2_PmScheduleRepository.class);
+        userDao = WebUtil.getBean(UserAccountRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+
+        detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
+        queryIndex = -1;
+        this.filterBySite = false;
+        this.filterByHospital = false;
+
+    }
+
+    @Override
+    protected GenericRepositoryUUID<PmScheduleData> getDAO() {
+        return dao;
+    }
+
+    @Override
+    protected Page<PmScheduleData> loadData(PageRequest pageRequest) {
+        this.setSearchFilter();
+
+        searchFilters.add(new SearchFilter("srType", SearchFilter.Operator.EQ, "ePM"));
+        this.selected = null;
+        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+
+    @Override
+    public void setSearchFilter() {
+        if (this.searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+    }
+    public void searchList(Integer buttonIndex) {
+        queryIndex = buttonIndex;
+        this.searchFilters = null;
+        this.stepFileter = null;
+    }
+
+
+    public void onSelectPmOrder(){
+        System.out.println(selected);
+      /*  accessoryList = getWorkOrderDetail(selected.getId());
+        coWorkerList = getWorkOrderCoworker(selected.getId());*/
+
+        // 获取picList
+      //  picList =  blobDao.findByBoUuid(selected.getId());
+    }
+
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        AssetInfo asset = (AssetInfo) eventObject;
+        if (asset == null) {
+            return;
+        }
+        assetName=asset.getName();
+        if(Strings.isNullOrEmpty(asset.getClinicalDeptName()) )  {
+           dptName=null;
+        }
+        else{
+            dptName=asset.getClinicalDeptName();
+        }
+
+        this.selectedAsset = asset;
+        currentStatus = asset.getStatus();
+        if (currentStatus == 1) {
+            currentStatus = 3;
+        }
+        needConfirmTime = false;
+    }
+
+
+    public void setPlanTimeFilter() {
+        /*if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
+            return;
+        }
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        //1周内所有未完成
+        Date startTime = new Date();
+        Calendar c = Calendar.getInstance();
+        c.setTime(startTime);
+        c.add(Calendar.DAY_OF_WEEK, 1);
+        varPlanTimeTo = c.getTime();
+        searchFilters.add(new SearchFilter("planTime", SearchFilter.Operator.LTE, varPlanTimeTo));
+        searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
+        filterPlanTime = null;
+        filterIsFinished = "false";*/
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if(pmOrderId != null){
+            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderId));
+        }
+    }
+
+    //getter and setter
+    public Integer getQueryIndex() {
+        return queryIndex;
+    }
+
+    public void setQueryIndex(Integer queryIndex) {
+        this.queryIndex = queryIndex;
+    }
+
+    public AssetInfo getSelectedAsset() {
+        return selectedAsset;
+    }
+
+    public void setSelectedAsset(AssetInfo selectedAsset) {
+        this.selectedAsset = selectedAsset;
+    }
+
+    public Integer getCurrentStatus() {
+        return currentStatus;
+    }
+
+    public void setCurrentStatus(Integer currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+
+    public Boolean getNeedConfirmTime() {
+        return needConfirmTime;
+    }
+
+    public void setNeedConfirmTime(Boolean needConfirmTime) {
+        this.needConfirmTime = needConfirmTime;
+    }
+
+    public String getCancelReason() {
+        return cancelReason;
+    }
+
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+
+
+
+    public Date getEsTime() {
+        return esTime;
+    }
+
+    public void setEsTime(Date esTime) {
+        this.esTime = esTime;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
+
+
+    public String getStepFileter() {
+        return stepFileter;
+    }
+
+    public void setStepFileter(String stepFileter) {
+        this.stepFileter = stepFileter;
+    }
+
+   /* public V2_PmOrder getSelectedPmOrder() {
+        return selectedPmOrder;
+    }
+
+    public void setSelectedPmOrder(V2_PmOrder selectedPmOrder) {
+        this.selectedPmOrder = selectedPmOrder;
+    }*/
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date startTime) {
+        this.startTime = startTime;
+    }
+
+    public Date getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(Date endTime) {
+        this.endTime = endTime;
+    }
+
+
+   /* public Date getPlanTime() {
+        return planTime;
+    }
+
+    public void setPlanTime(Date planTime) {
+        this.planTime = planTime;
+    }*/
+
+    public String getAssetName() {
+        return assetName;
+    }
+
+    public void setAssetName(String assetName) {
+        this.assetName = assetName;
+    }
+
+    public String getDptName() {
+        return dptName;
+    }
+
+    public void setDptName(String dptName) {
+        this.dptName = dptName;
+    }
+
+    public Integer getRuleLevel() {
+        return ruleLevel;
+    }
+
+    public void setRuleLevel(Integer ruleLevel) {
+        this.ruleLevel = ruleLevel;
+    }
+
+    public String getFilterPlanTime() {
+        return filterPlanTime;
+    }
+
+    public void setFilterPlanTime(String filterPlanTime) {
+        this.filterPlanTime = filterPlanTime;
+    }
+
+    public String getPmOrderId() {
+        return pmOrderId;
+    }
+
+    public void setPmOrderId(String pmOrderId) {
+        this.pmOrderId = pmOrderId;
+    }
+}

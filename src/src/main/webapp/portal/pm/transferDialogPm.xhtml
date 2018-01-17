@@ -22,7 +22,7 @@
                 <br/>
             </h:panelGroup>
             <h:panelGroup>
-                <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.reassignWorkOrder(3)}" value="#{msg.TransferOrder}" update=":transferOrderDialogForm :growl :processListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
+                <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.reassignWorkOrder(3)}" value="#{msg.TransferOrder}" update="pmTab:transferOrderDialogForm :growl pmTab:processListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
             </h:panelGroup>
         </h:form>
