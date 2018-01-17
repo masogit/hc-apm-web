@@ -157,20 +157,23 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
             String fieldName = filter.getKey();
             Object filterValue = filter.getValue();
             if(filterValue==null) continue;
-            
-            if(isDateTimeField(fieldName)){
+
+            if (isDateTimeField(fieldName)) {
                 // support lte & gte for datetime field
-                String[] values = filterValue.toString().split(" ");
-                if(values.length>0){
-                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[0]);
-                    if(filterValue!=null)
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime)filterValue).toDate()));
+                String[] values = filterValue.toString().split("~");
+                if (values.length > 0) {
+                    filterValue = TimeUtil.fromString(values[0]);
+
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.GTE, ((DateTime) filterValue).toDate()));
+                    }
                 }
-                
-                if(values.length>1){
-                    filterValue = TimeUtil.fromString("yyyy-MM-dd", values[2]);
-                    if(filterValue!=null)
-                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime)filterValue).toDate()));
+
+                if (values.length > 1) {
+                    filterValue = TimeUtil.fromString(values[1]);
+                    if (filterValue != null) {
+                        searchFilters.add(new SearchFilter(fieldName, SearchFilter.Operator.LTE, ((DateTime) filterValue).toDate()));
+                    }
                 }
                 continue;
             }
