@@ -68,6 +68,55 @@ public class AssetFinacingNumGenerateService {
         return null;
     }
 
+    public AssetSeriaNumConfig findConfigByUid(String tenantUID, String uid) {
+        List<AssetSeriaNumConfig> configs = assetSeriaNumConfigRepository.findByTenantUID(tenantUID);
+        if(CollectionUtils.isEmpty(configs)) {
+            return null;
+        }
+        Map<String,AssetSeriaNumConfig> siteMap = new HashMap<String,AssetSeriaNumConfig>();
+        Map<String,AssetSeriaNumConfig> hospitalMap = new HashMap<String,AssetSeriaNumConfig>();
+        Map<String,AssetSeriaNumConfig> institutionMap = new HashMap<String,AssetSeriaNumConfig>();
+        Map<String,AssetSeriaNumConfig> tenantMap = new HashMap<String,AssetSeriaNumConfig>();
+        for (AssetSeriaNumConfig assetSeriaNumConfig : configs) {
+            int type = getLevel(assetSeriaNumConfig);
+            if(type == 1) {
+                tenantMap.put(assetSeriaNumConfig.getTenantUID(), assetSeriaNumConfig);
+            }else if(type == 2) {
+                institutionMap.put(assetSeriaNumConfig.getInstitutionUID(), assetSeriaNumConfig);
+            }else if(type == 3) {
+                hospitalMap.put(assetSeriaNumConfig.getHospitalUID(), assetSeriaNumConfig);
+            }else if(type == 4) {
+                siteMap.put(assetSeriaNumConfig.getSiteUID(), assetSeriaNumConfig);
+            }
+        }
+        OrgInfo org = orgInfoRepository.getByUid(uid);
+        if(siteMap.get(org.getSiteUID()) != null) {
+            return siteMap.get(org.getSiteUID());
+        }else if(hospitalMap.get(org.getHospitalUID()) != null){
+            return hospitalMap.get(org.getHospitalUID());
+        }else if(institutionMap.get(org.getInstitutionUID()) != null) {
+            return institutionMap.get(org.getInstitutionUID());
+        }else {
+            return tenantMap.get(org.getTenantUID());
+        }
+    }
+
+
+    public int getLevel(AssetSeriaNumConfig config) {
+        OrgInfo org = orgInfoRepository.getByUid(config.getSiteUID());
+        //orgInfoMapper.fetchByUid(config.getSiteUid());
+        if(org.getOrgType() == 0) {
+            return 1;
+        }else if(org.getOrgType() == 1) {
+            return 2;
+        }else if(org.getOrgType() == 2) {
+            return 3;
+        }else if(org.getOrgType() == 3) {
+            return 4;
+        }
+        return -1;
+    }
+
     /**
      * *
      * 该方法是新增资产或更新资产(必须是更新该字段)时调用，1是更新，2是新增
@@ -78,57 +127,57 @@ public class AssetFinacingNumGenerateService {
      * @param user 当前登陆者，如果科室id为空，则user必输
      * @return
      */
-    @Deprecated
-    public String generateFinacingNum(Integer assetId, String nationalStardCode, Integer clinicalId, UserAccount user) {
-        LOGGER.info("generate finacing num begin ,assetId is {},code is {},clinicalId is {},user is {}", assetId,
-                nationalStardCode, clinicalId, user);
-        if (assetId != null) {
-            AssetInfo asset = assetInfoRepository.findById(assetId);
-            if (asset == null) {
-                LOGGER.error("can't find asset by {}", assetId);
-                return null;
-            }
-            if (StringUtils.isEmpty(nationalStardCode)) {
-                LOGGER.warn("nationalStardCode shouldn't be null !");
-                return null;
-            }
-            OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(), asset.getTenantUID());
-            if (level == null) {
-                return null;
-            } else {
-                return getFinacingNum(nationalStardCode, level);
-            }
-        } else if (clinicalId != null) {
-            OrgInfo orgInfo = orgInfoRepository.findById(clinicalId);
-            if (orgInfo == null) {
-                return null;
-            }
-            if (StringUtils.isEmpty(nationalStardCode)) {
-                LOGGER.warn("can't find nationStandardCode !");
-                return null;
-            }
-            OrgInfoLevel level = fetchConfig(orgInfo.getSiteUID(), orgInfo.getHospitalUID(),
-                    orgInfo.getInstitutionUID(), orgInfo.getTenantUID());
-            if (level == null) {
-                return null;
-            } else {
-                return getFinacingNum(nationalStardCode, level);
-            }
-        } else if (user != null) {
-            if (StringUtils.isEmpty(nationalStardCode)) {
-                LOGGER.warn("can't find nationStandardCode !");
-                return null;
-            }
-            OrgInfoLevel level = fetchConfig(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(),
-                    user.getTenantUID());
-            if (level == null) {
-                return null;
-            } else {
-                return getFinacingNum(nationalStardCode, level);
-            }
-        }
-        return null;
-    }
+//    @Deprecated
+//    public String generateFinacingNum(Integer assetId, String nationalStardCode, Integer clinicalId, UserAccount user) {
+//        LOGGER.info("generate finacing num begin ,assetId is {},code is {},clinicalId is {},user is {}", assetId,
+//                nationalStardCode, clinicalId, user);
+//        if (assetId != null) {
+//            AssetInfo asset = assetInfoRepository.findById(assetId);
+//            if (asset == null) {
+//                LOGGER.error("can't find asset by {}", assetId);
+//                return null;
+//            }
+//            if (StringUtils.isEmpty(nationalStardCode)) {
+//                LOGGER.warn("nationalStardCode shouldn't be null !");
+//                return null;
+//            }
+//            OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(), asset.getTenantUID());
+//            if (level == null) {
+//                return null;
+//            } else {
+//                return getFinacingNum(nationalStardCode, level);
+//            }
+//        } else if (clinicalId != null) {
+//            OrgInfo orgInfo = orgInfoRepository.findById(clinicalId);
+//            if (orgInfo == null) {
+//                return null;
+//            }
+//            if (StringUtils.isEmpty(nationalStardCode)) {
+//                LOGGER.warn("can't find nationStandardCode !");
+//                return null;
+//            }
+//            OrgInfoLevel level = fetchConfig(orgInfo.getSiteUID(), orgInfo.getHospitalUID(),
+//                    orgInfo.getInstitutionUID(), orgInfo.getTenantUID());
+//            if (level == null) {
+//                return null;
+//            } else {
+//                return getFinacingNum(nationalStardCode, level);
+//            }
+//        } else if (user != null) {
+//            if (StringUtils.isEmpty(nationalStardCode)) {
+//                LOGGER.warn("can't find nationStandardCode !");
+//                return null;
+//            }
+//            OrgInfoLevel level = fetchConfig(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(),
+//                    user.getTenantUID());
+//            if (level == null) {
+//                return null;
+//            } else {
+//                return getFinacingNum(nationalStardCode, level);
+//            }
+//        }
+//        return null;
+//    }
 
     /**
      * *

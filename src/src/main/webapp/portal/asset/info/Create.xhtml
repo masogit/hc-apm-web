@@ -222,6 +222,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.parentAsset}</label>
                                 <p:selectOneMenu id="parentAssetList" value="#{assetInfoController.selected.parentAssetId}" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
+                                    <p:ajax  listener="#{assetInfoController.onParentAssetChange()}" process="@parent" update=":AssetInfoEditForm:financingNum"/>
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{assetInfoController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>

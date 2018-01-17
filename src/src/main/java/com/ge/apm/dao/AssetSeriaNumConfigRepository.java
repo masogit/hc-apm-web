@@ -25,4 +25,6 @@ public interface AssetSeriaNumConfigRepository extends GenericRepository<AssetSe
 
 	public Long countAssetSeriaNumConfigByTenantUID(String tenantUID);
 
+	public List<AssetSeriaNumConfig> findByTenantUID(String uid);
+
 }
