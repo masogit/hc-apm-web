@@ -26,9 +26,10 @@ public class AssetDepreciationController {
 		return assetDepreciationService.initAssetDepreciation();
 	}
 	
-	@RequestMapping(value = "/{assetId}", method = RequestMethod.GET)
-	@ResponseBody
-	public String generateFinacingNum(@PathVariable("assetId") Integer assetId) {
-		return assetFinacingNumGenerateService.generateFinacingNum(assetId, null, null, null);
-	}
+//	@RequestMapping(value = "/{assetId}", method = RequestMethod.GET)
+//	@ResponseBody
+//	public String generateFinacingNum(@PathVariable("assetId") Integer assetId) {
+//		return assetFinacingNumGenerateService.generateFinacingNum(assetId, null, null, null);
+//	}
+
 }
