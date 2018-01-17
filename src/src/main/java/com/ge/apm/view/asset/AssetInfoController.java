@@ -1188,13 +1188,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
 //联动更新
         if (null != selectedGb) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                    this.selected.getId(),
                     this.selectedGb.getCode(),
-                    this.selected.getSiteUID()
+                    this.selected.getSiteUID(),
+                    this.selected.getParentAssetId(),
+                    this.selected.getFinancingNum()
             );
-            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
-                this.selected.setFinancingNum(financingNum);
-            }
+            this.selected.setFinancingNum(financingNum);
 
         }
 
