@@ -1195,26 +1195,50 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
 
+//        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+//
+//        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 1) {
+//            //not configured to generate by national standard code
+//            return;
+//        }
+////联动更新
+//        if (null != selectedGb) {
+//
+//            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+//                    this.selected.getId(),
+//                    this.selectedGb.getCode(),
+//                    this.selected.getSiteUID(),
+//                    this.selected.getParentAssetId(),
+//                    this.selected.getFinancingNum()
+//            );
+//            if (financingNum != null && !financingNum.startsWith("error:")) {
+//                this.selected.setFinancingNum(financingNum);
+//            }
+//
+//        }
+
+    }
+
+    public void generateFinancialNum() {
+
+        //check whether generation policy is configured.
         AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
 
-        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 1) {
-            //not configured to generate by national standard code
+        if (config == null || config.getGenerateMethod() == null) {
             return;
         }
-//联动更新
-        if (null != selectedGb) {
 
-            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
-                    this.selected.getId(),
-                    this.selectedGb.getCode(),
-                    this.selected.getSiteUID(),
-                    this.selected.getParentAssetId(),
-                    this.selected.getFinancingNum()
-            );
-            if (financingNum != null && !financingNum.startsWith("error:")) {
-                this.selected.setFinancingNum(financingNum);
-            }
+        String code = this.selectedGb == null ? null : this.selectedGb.getCode();
 
+        String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                this.selected.getId(),
+                code,
+                this.selected.getSiteUID(),
+                this.selected.getParentAssetId(),
+                this.selected.getFinancingNum()
+        );
+        if (financingNum != null && !financingNum.startsWith("error:")) {
+            this.selected.setFinancingNum(financingNum);
         }
 
     }
