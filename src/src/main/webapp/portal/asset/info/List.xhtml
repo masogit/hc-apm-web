@@ -103,8 +103,8 @@
                                 <h:outputText value="#{msg.clinicalDeptName}"/>
                                 <p:overlayPanel id="imagePanel" widgetVar="varPanelDeptOrg" for="clinicalDept" hideEffect="fade" style="text-align: left">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}" selection="#{orgTreeController.selectedDeptOrgNode}" var="node" selectionMode="single" dynamic="false">
-                                            <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter(orgTreeController.selectedDeptOrgNode.data)}" update=":AssetInfoListForm:datalist" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
+                                            <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist" oncomplete="PF('varPanelDeptOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -113,7 +113,7 @@
                                     </p:tree>
                                 </p:scrollPanel>
                                 </p:overlayPanel>
-                            <p:inputText id="clinicalDept"  value="#{orgTreeController.selectedDeptOrgNode.data.name}"  readonly="true"/>
+                            <p:inputText id="clinicalDept"  value="#{assetInfoController.fileterOrg.name}"  readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>

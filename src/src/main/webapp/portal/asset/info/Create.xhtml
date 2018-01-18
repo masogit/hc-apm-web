@@ -38,7 +38,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.assetGroup}*</label>
                                 <p:selectOneMenu id="assetGroup" value="#{assetInfoController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
-                                    <p:ajax listener="#{assetInfoController.onAssetGroupChange}" process="@this" update="parentAssetList"/>
+                                    <!--<p:ajax listener="#{assetInfoController.onAssetGroupChange}" process="@this" update="parentAssetList"/>-->
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
