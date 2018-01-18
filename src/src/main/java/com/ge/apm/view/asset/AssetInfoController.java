@@ -1211,7 +1211,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                     this.selected.getParentAssetId(),
                     this.selected.getFinancingNum()
             );
-            this.selected.setFinancingNum(financingNum);
+            if (financingNum != null && !financingNum.startsWith("error:")) {
+                this.selected.setFinancingNum(financingNum);
+            }
 
         }
 
@@ -1236,7 +1238,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                     this.selected.getParentAssetId(),
                     this.selected.getFinancingNum()
             );
-            this.selected.setFinancingNum(financingNum);
+            if (financingNum != null && !financingNum.startsWith("error:")) {
+                this.selected.setFinancingNum(financingNum);
+            }
+
         }
 
 
