@@ -171,6 +171,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             WebUtil.addErrorMessage("到货清单提交失败");
         };
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+        initEasyInstallItem();
         selected = dao.findById(selected.getId());
     }
 
@@ -191,6 +192,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void prepareEasyInstall() {
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         installCount = 1;
 
@@ -299,7 +301,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void cancelSaveEasyInstall() {
-        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
     }
 
