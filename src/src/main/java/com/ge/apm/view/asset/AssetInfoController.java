@@ -1195,8 +1195,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
 
+        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+
+        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 1) {
+            //not configured to generate by national standard code
+            return;
+        }
 //联动更新
         if (null != selectedGb) {
+
             String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
                     this.selected.getId(),
                     this.selectedGb.getCode(),
@@ -1204,9 +1211,39 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                     this.selected.getParentAssetId(),
                     this.selected.getFinancingNum()
             );
-            this.selected.setFinancingNum(financingNum);
+            if (financingNum != null && !financingNum.startsWith("error:")) {
+                this.selected.setFinancingNum(financingNum);
+            }
 
         }
+
+    }
+
+    public void onParentAssetChange() {
+
+        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+
+        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 2) {
+            //not configured to generate by parent asset
+            return;
+        }
+
+        String code = this.selectedGb == null ? null : this.selectedGb.getCode();
+
+        if (this.selected.getParentAssetId() != null) {
+            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                    this.selected.getId(),
+                    code,
+                    this.selected.getSiteUID(),
+                    this.selected.getParentAssetId(),
+                    this.selected.getFinancingNum()
+            );
+            if (financingNum != null && !financingNum.startsWith("error:")) {
+                this.selected.setFinancingNum(financingNum);
+            }
+
+        }
+
 
     }
 
