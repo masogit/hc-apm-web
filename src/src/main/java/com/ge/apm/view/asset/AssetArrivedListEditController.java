@@ -281,6 +281,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
                 item.getNationalStandardCode().split("/")[0], item.getClinicalDeptUID()==null?item.getArrivalList().getSiteUID():item.getClinicalDeptUID(), item.getParentAssetId(), prifix);
+        if(null!= financingNum && financingNum.startsWith("error:")){
+            WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+            financingNum = "";
+        }
         return financingNum;
     }
 
@@ -295,6 +299,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void cancelSaveEasyInstall() {
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
     }
 

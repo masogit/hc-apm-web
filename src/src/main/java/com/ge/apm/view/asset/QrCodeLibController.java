@@ -146,6 +146,14 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
             hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         }
     }
+    
+    public void onSiteUIDChange(){
+        if(siteUID!=null){
+            selectedOrg = orgInfoDao.getByUid(siteUID);
+        }else{
+            selectedOrg = null;
+        }
+    }
 
     public void onHospitalChange(NodeSelectEvent event) {
         if (null != event.getTreeNode().getData()) {
