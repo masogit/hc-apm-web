@@ -165,10 +165,6 @@
                                         <p:inputNumber value="#{assetArrivedListEditController.easyInstallItem.warrantyYear}"  minValue="0" decimalPlaces="2" />
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">#{msg.factoryWarrantyDate}</label>
-                                        <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.factoryWarrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                                    </h:panelGroup>
-                                    <h:panelGroup>
                                         <label class="label">#{msg.warrantyDate}</label>
                                         <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.warrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                                     </h:panelGroup>
@@ -300,10 +296,10 @@
                                 <p:column width="90" >
                                     <p:commandLink actionListener="#{assetArrivedItemsController.setSelected(item.id)}" update=":ItemDetailViewForm" >详细
                                     </p:commandLink>
-                                    <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update="itemList" >接单
+                                    <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedListEditController.selected.processType ne 'Easy'}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                                     </p:commandLink>
-                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{item.installStatus=='new'?'安装':item.installStatus=='instorage'?'已入库':'已退货'}
+                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{(assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new') and assetArrivedListEditController.selected.processType ne 'Easy'}">#{item.installStatus=='new'?'安装':item.installStatus=='instorage'?'已入库':'已退货'}
                                         <f:param name="itemId" value="#{item.id}" />
                                     </p:link >
                                 </p:column>

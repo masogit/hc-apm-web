@@ -329,16 +329,20 @@ public class AssetInstallationController {
         String prifix = arrivalListItem.getFinancingNum() == null ? "" : arrivalListItem.getFinancingNum();
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
                 arrivalListItem.getNationalStandardCode()==null?null:arrivalListItem.getNationalStandardCode().split("/")[0], this.arrivalListItem.getArrivalList().getSiteUID(), arrivalListItem.getParentAssetId(), prifix);
+        if(null!= financingNum && financingNum.startsWith("error:")){
+            WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+            financingNum = "";
+        }
         if (financingNum != null && (StringUtils.isEmpty(this.arrivalListItem.getFinancingNum()) || this.arrivalListItem.getFinancingNum().length() <= 3)) {
             this.arrivalListItem.setFinancingNum(financingNum);
         }
     }
 
-    public void onParentAssetChange() {
-        if (Strings.isNullOrEmpty(arrivalListItem.getDepartNum()) && arrivalListItem.getParentAssetId() != null && arrivalListItem.getParentAssetId() > 0) {
-            AssetInfo parentAsset = assetDao.getById(arrivalListItem.getParentAssetId());
-            String finNum = assetFinacingNumGenerateService.generateFinancingNum(parentAsset.getId(), gbCodeName, arrivalListItem.getArrivalList().getSiteUID());
-            arrivalListItem.setFinancingNum(finNum);
+//    public void onParentAssetChange() {
+//        if (Strings.isNullOrEmpty(arrivalListItem.getDepartNum()) && arrivalListItem.getParentAssetId() != null && arrivalListItem.getParentAssetId() > 0) {
+//            AssetInfo parentAsset = assetDao.getById(arrivalListItem.getParentAssetId());
+//            String finNum = assetFinacingNumGenerateService.generateFinancingNum(parentAsset.getId(), gbCodeName, arrivalListItem.getArrivalList().getSiteUID());
+//            arrivalListItem.setFinancingNum(finNum);
 //            if (!Strings.isNullOrEmpty(parentAsset.getDepartNum()) && parentAsset.getDepartNum().length() > 2 && parentAsset.getDepartNum().endsWith("00")) {
 //                List<SearchFilter> parentAssetFilters = Arrays.asList(new SearchFilter("parentAssetId", SearchFilter.Operator.EQ, arrivalListItem.getParentAssetId()));
 //                List<String> childrenNumList = assetDao.findBySearchFilter(parentAssetFilters).stream()
@@ -355,8 +359,8 @@ public class AssetInstallationController {
 //                    }
 //                }
 //            }
-        }
-    }
+//        }
+//    }
 
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
