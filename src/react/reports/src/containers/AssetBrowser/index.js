@@ -1,5 +1,5 @@
 import React from 'react'
-import { Select, Checkbox } from 'antd'
+import { Select, Checkbox, Icon } from 'antd'
 import { is } from 'immutable'
 import { connect } from 'dva/mobile'
 import Chart from './Chart'
@@ -77,7 +77,7 @@ class Header extends ImmutableComponent {
             ))
           }
           {
-            filters.size ? <span onClick={this.removeLastFilter} className={styles['remove']}>X</span> : null
+            filters.size ? <span onClick={this.removeLastFilter} className={styles['remove']}><Icon type="close-circle-o"/></span> : null
           }
         </div>
 
