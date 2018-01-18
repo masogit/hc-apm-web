@@ -122,6 +122,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private OrgInfo selectSite;
 
     private Boolean needShowAssetApproval;
+    
+    private OrgInfo fileterOrg;
 
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
@@ -1349,12 +1351,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public void onClinicalDeptFilter(Object orgData) {
-        if (null != orgData) {
-            OrgInfo fileterOrg = (OrgInfo) orgData;
+    public void onClinicalDeptFilter(NodeSelectEvent event) {
+        if (null!=event && null != event.getTreeNode() && null!= event.getTreeNode().getData()) {
+            fileterOrg = (OrgInfo) event.getTreeNode().getData();
             if (fileterOrg.getOrgType() == 4) {
                 this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
                 return;
+            }else{
+                fileterOrg = null;
             }
         }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
@@ -1563,4 +1567,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setExWoDao(ExWorkOrderRepository exWoDao) {
         this.exWoDao = exWoDao;
     }
+
+    public OrgInfo getFileterOrg() {
+        return fileterOrg;
+    }
+
+    public void setFileterOrg(OrgInfo fileterOrg) {
+        this.fileterOrg = fileterOrg;
+    }
+    
+    
 }
