@@ -51,7 +51,6 @@ public class AssetInstallationController {
     private Boolean isGeneratePmOrder = false;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
-    AssetInfoRepository dao = null;
     private TreeNode selectedNode;
     private TreeNode selectedGbNode;
     private String gbCodeName;
@@ -76,7 +75,6 @@ public class AssetInstallationController {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
         }
         changeFunctionGroup();
-        dao = WebUtil.getBean(AssetInfoRepository.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
@@ -328,7 +326,9 @@ public class AssetInstallationController {
     public void gennerateFinancingNum() {
         String prifix = arrivalListItem.getFinancingNum() == null ? "" : arrivalListItem.getFinancingNum();
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
-                arrivalListItem.getNationalStandardCode()==null?null:arrivalListItem.getNationalStandardCode().split("/")[0], this.arrivalListItem.getArrivalList().getSiteUID(), arrivalListItem.getParentAssetId(), prifix);
+                arrivalListItem.getNationalStandardCode()==null?null:arrivalListItem.getNationalStandardCode().split("/")[0],
+                Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())?arrivalListItem.getArrivalList().getSiteUID():arrivalListItem.getClinicalDeptUID(), 
+                arrivalListItem.getParentAssetId(), prifix);
         if(null!= financingNum && financingNum.startsWith("error:")){
             WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             financingNum = "";
