@@ -36,7 +36,7 @@
                             <label class="label">#{msg.equiptaketime}</label>
                             <p:calendar timeZone="GMT+8" label="#{msg.equiptaketime}" pattern="yyyy/MM/dd HH:mm" value="#{workOrderMgrController.takeTime}" showOn="button"
                                         readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
-                            <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update=":toCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
+                            <p:commandButton title="#{msg.equiptake}" process="@(equipmentTaker)" actionListener="#{workOrderMgrController.takeEquip}" update="woTab:toCloseDialogForm:equipmentTaker :growl" disabled="#{not empty workOrderMgrController.equipmentTaker and not empty workOrderMgrController.takeTime}"/>
                         </h:panelGroup>
 
 
@@ -125,7 +125,7 @@
 
                     </p:fieldset>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.closeWorkOrder}" value="#{msg.closeWo}" update=":woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'toCloseDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.closeWorkOrder}" value="#{msg.closeWo}" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'toCloseDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('toCloseDialog').hide()"/>
                     </h:panelGroup>
 
