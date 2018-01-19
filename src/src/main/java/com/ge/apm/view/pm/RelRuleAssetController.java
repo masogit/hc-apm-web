@@ -4,6 +4,8 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
@@ -169,7 +171,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     @Transactional
     public void saveRel(){
     	List<RelRuleAsset> rels = new ArrayList<RelRuleAsset>(targetAssets.size());
-    //	List<String> deleteIds = new ArrayList<String>();
+    	targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
+    	//List<String> deleteIds = new ArrayList<String>();
     	for (AssetInfo ai : targetAssets) {
     		RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
     		if(rel == null ) {
@@ -186,12 +189,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
     			}else if(level == 3) {
     				rel.setRuleUID(pmOrderRuleUID);
     			}
-    		}
-    		rels.add(rel);
-    		//deleteIds.add(ai.getUid());
+    			rels.add(rel);
+    			}
+    		relRuleAssetRepository.save(rels);
 		}
-    //	relRuleAssetRepository.deleteByAssetUIDIn(deleteIds);
-    	relRuleAssetRepository.save(rels);
+   	//relRuleAssetRepository.deleteByAssetUIDIn(deleteIds);
+    
     	WebUtil.addSuccessMessage("配置成功!");
     	targetAssets.clear();
     }
