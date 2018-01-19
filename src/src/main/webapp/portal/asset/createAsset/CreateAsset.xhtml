@@ -93,7 +93,7 @@
                 </p:fieldset>
             </div>
             <div class="ui-g-12 card ">
-                <p:tabView>
+                <p:tabView id="tab">
                     <p:tab title="创建">
                         <h:form id="CreateAsset">
                             <p:fieldset  style="margin-bottom:20px">
@@ -161,7 +161,7 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.clinicalDeptName}</label>
                                         <p:selectOneMenu id="clinicalDeptName" value="#{assetCreateController.assetInfo.clinicalDeptId}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
-                                            <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel assetOwnerName" />
+                                            <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel assetOwnerName parentAssetList" />
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{assetCreateController.getClinicalDeptList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                         </p:selectOneMenu>
@@ -229,20 +229,63 @@
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                     <h:panelGroup>
+                                        <label class="label">设备国标码</label>
+                                        <p:autoComplete id="gbname" value="#{assetCreateController.assetInfo.nationalStandardCode}" completeMethod="#{assetCreateController.completeGbName}" class="gbname">
+                                            <!--<p:ajax process="@this"/>-->
+                                        </p:autoComplete>
+                                        <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
+                                        <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                                <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetCreateController.gbTree}" selection="#{assetCreateController.selectedGbNode}"  var="node" selectionMode="single">
+                                                    <p:ajax process="@this" event="select" listener="#{assetCreateController.onSelectGbTreeNode}"  update="tab:CreateAsset:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
+                                                    <p:ajax process="@this" event="expand"/>
+                                                    <p:ajax process="@this" event="collapse"/>
+                                                    <p:treeNode type="gb">
+                                                        <h:outputText value="#{node}"/>
+                                                    </p:treeNode>
+                                                </p:tree>
+                                            </p:scrollPanel>
+                                        </p:overlayPanel>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
                                         <label class="label">#{msg.functionGrade}</label>
                                         <p:selectOneMenu id="functionGrade" value="#{assetCreateController.assetInfo.functionGrade}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.parentAsset}</label>
+                                        <p:selectOneMenu id="parentAssetList" value="#{assetCreateController.assetInfo.parentAssetId}" >
+                                            <p:ajax process="@this" />
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{assetCreateController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+                                    <p:spacer/>
                                     <h:panelGroup >
                                         <label class="label">#{msg.functionGroup}</label>
                                         <p:selectOneMenu id="functionGroup" value="#{assetCreateController.assetInfo.functionGroup}" style="width: 100%">
+                                            <p:ajax  listener="#{assetCreateController.onFunctionGroupChange()}" update="assetCode68" />
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-                                    <p:spacer/>
+                                    <h:panelGroup >
+                                        <label class="label">#{msg.medicalInstrumentSubclassification}</label>
+                                        <p:selectOneMenu id="assetCode68" value="#{assetCreateController.assetInfo.assetCode68}" style="width: 100%">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItems value="#{assetCreateController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                        </p:selectOneMenu>
+                                    </h:panelGroup>
+                                    <h:panelGroup >
+                                        <label class="label">#{msg.financingNum}</label>
+                                        <p:inputText  value="#{assetCreateController.assetInfo.financingNum}" class="financingNum">
+                                            <p:ajax process="@this" update="#{empty assetCreateController.assetInfo.financingNum? '':'@(.financingNum)'}"/>
+                                        </p:inputText>
+                                        <p:commandButton validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 3}" 
+                                                         update="@(.financingNum) :growl" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
+                                    </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.locationCode}</label>
                                         <p:inputText id="locationCode" value="#{assetCreateController.assetInfo.locationCode}"/>

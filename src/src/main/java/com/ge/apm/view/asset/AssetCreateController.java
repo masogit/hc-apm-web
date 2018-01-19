@@ -5,12 +5,18 @@
  */
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BrandRepository;
+import com.ge.apm.dao.GbCodeRepository;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AttachmentFileService;
+import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.utils.TimeUtils;
+import com.google.common.base.Strings;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
@@ -22,6 +28,11 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+import webapp.framework.dao.SearchFilter;
 
 /**
  *
@@ -36,6 +47,9 @@ public class AssetCreateController {
     private AssetCreateService acService;
     private BrandRepository brandDao;
 
+    private GbCodeRepository gbDao;
+    private GbCodeService gbCodeService;
+
     private String[] selectedPictures;
 
     private UserAccount owner;
@@ -48,14 +62,29 @@ public class AssetCreateController {
     List<V2_BlobObject> audioList;
 
     private UserAccount clinicalOwner;
-    
+
     private Boolean isGeneratePmOrder;
+
+    private List<I18nMessage> code68List;
+    private I18nMessageRepository i18nDao;
+    private GbCode selectedGb;
+    private String gbCodeName;
+
+    private TreeNode gbTree;
+    private AssetInfoRepository assetDao;
+    private TreeNode selectedGbNode;
+    private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
         acService = WebUtil.getBean(AssetCreateService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        gbDao = WebUtil.getBean(GbCodeRepository.class);
+        assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        gbCodeService = WebUtil.getBean(GbCodeService.class);
+        assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
         createRequest = acService.getCreateRequest(qrCode);
         assetInfo = createAssetInfo();
@@ -77,6 +106,8 @@ public class AssetCreateController {
         if (null != createRequest.getComment()) {
             Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
         }
+
+        initGbTree();
 
     }
 
@@ -100,7 +131,7 @@ public class AssetCreateController {
         newAsset.setIsDeleted(Boolean.FALSE);
         newAsset.setName(createRequest.getAssetName());
         newAsset.setAssetGroup(createRequest.getAssetGroup());
-        if(null!=createRequest.getOrgId() && createRequest.getOrgId()>0){
+        if (null != createRequest.getOrgId() && createRequest.getOrgId() > 0) {
             OrgInfo org = acService.getOrgInfo(createRequest.getOrgId());
             newAsset.setClinicalDeptId(createRequest.getOrgId());
             newAsset.setClinicalDeptUID(org.getUid());
@@ -109,7 +140,7 @@ public class AssetCreateController {
         newAsset.setHospitalUID(createRequest.getHospitalUID());
         newAsset.setInstitutionUID(createRequest.getInstitutionUID());
         newAsset.setSiteUID(createRequest.getSiteUID());
-        newAsset.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID())?2:3);
+        newAsset.setUsageStatus(acService.needAssetApproval(createRequest.getSiteUID()) ? 2 : 3);
 
         if (null != createRequest.getUserId()) {
             owner = acService.getUserInfo(createRequest.getUserId());
@@ -167,7 +198,7 @@ public class AssetCreateController {
     }
 
     public void onClinicalDeptChange() {
-        if(null!=assetInfo.getClinicalDeptId()){
+        if (null != assetInfo.getClinicalDeptId()) {
             OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
@@ -190,23 +221,100 @@ public class AssetCreateController {
     public List<UserAccount> getClinicalOwnerList() {
         List<UserAccount> accountList = getEmptyAccountList();
         accountList.addAll(acService.getClinicalOwnerList(assetInfo.getClinicalDeptUID(), this.clinicalOwner)
-                .stream().filter(item -> item.getUserRoleList()!=null && !item.getUserRoleList().stream()
-                        .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList()));
+                .stream().filter(item -> item.getUserRoleList() != null && !item.getUserRoleList().stream()
+                .anyMatch(roleItem -> roleItem.getRole().getName().equals("Guest"))).collect(Collectors.toList()));
         return accountList;
     }
-    
-    private List<UserAccount> getEmptyAccountList(){
+
+    private List<UserAccount> getEmptyAccountList() {
         List<UserAccount> accountList = new ArrayList();
         UserAccount emptyValue = new UserAccount();
         emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
         accountList.add(emptyValue);
         return accountList;
     }
-    
+
     public List<Brand> getBrandList() {
         return acService.getBrandList();
     }
 
+    public void onFunctionGroupChange() {
+        code68List = new ArrayList<>();
+        this.assetInfo.setAssetCode68(null);
+
+        this.changeFunctionGroup();
+    }
+
+    public void changeFunctionGroup() {
+        Integer functionGroupId = this.assetInfo.getFunctionGroup();
+        if (functionGroupId != null) {
+            I18nMessage functionGroup = i18nDao.getByMsgTypeAndMsgKey("assetFunctionType", functionGroupId.toString());
+            if (functionGroup != null) {
+                code68List = i18nDao.getByMsgType(functionGroup.getMsgKey());
+            }
+        }
+    }
+
+    public List<String> completeGbName(String prefix) {
+        List<String> names = null;
+        if (!StringUtils.isEmpty(prefix)) {
+            names = gbDao.findGbCodeByPrefix(prefix);
+        }
+        return names;
+
+    }
+
+    private void initGbTree() {
+        TreeNode treeNode = gbCodeService.buildGbTree();
+        gbTree = new DefaultTreeNode("root", null, null);
+        gbTree.getChildren().add(treeNode);
+        treeNode.setExpanded(true);
+    }
+
+    public void onSelectGbTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        GbCode gbCode = (GbCode) node.getData();
+        updateSelectedOrgGb(gbCode);
+        //联动更新
+        if (null != gbCodeName) {
+            this.assetInfo.setNationalStandardCode(gbCodeName);
+
+        }
+    }
+    
+    private void updateSelectedOrgGb(GbCode gbCode) {
+        if (gbCode == null || gbCode.getId() == -1) {
+            selectedGb = null;
+        } else {
+            selectedGb = gbCode;
+            gbCodeName = gbCode.getCode() + "/" + gbCode.getName();
+        }
+
+    }
+
+    public void gennerateFinancingNum() {
+        String prifix = assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum();
+        String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
+                assetInfo.getNationalStandardCode() == null ? null : assetInfo.getNationalStandardCode().split("/")[0], 
+                Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())?assetInfo.getSiteUID():assetInfo.getClinicalDeptUID(), assetInfo.getParentAssetId(), prifix);
+        if (null != financingNum && financingNum.startsWith("error:")) {
+            WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+            financingNum = "";
+        }
+        if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 3)) {
+            this.assetInfo.setFinancingNum(financingNum);
+        }
+    }
+
+     public List<AssetInfo> getParentAssetList() {
+        List<SearchFilter> assetFilters = new ArrayList<>();
+        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.assetInfo.getTenantUID()));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, assetInfo.getSiteUID()));
+        if (!Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())) {
+            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, assetInfo.getClinicalDeptUID()));
+        }
+        return assetDao.findBySearchFilter(assetFilters);
+    }
     //getter and setter
     public QrCodeLib getCreateRequest() {
         return createRequest;
@@ -284,4 +392,25 @@ public class AssetCreateController {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
 
+    public List<I18nMessage> getCode68List() {
+        return code68List;
+    }
+
+    public TreeNode getGbTree() {
+        return gbTree;
+    }
+
+    public void setGbTree(TreeNode gbTree) {
+        this.gbTree = gbTree;
+    }
+
+    public TreeNode getSelectedGbNode() {
+        return selectedGbNode;
+    }
+
+    public void setSelectedGbNode(TreeNode selectedGbNode) {
+        this.selectedGbNode = selectedGbNode;
+    }
+
+    
 }
