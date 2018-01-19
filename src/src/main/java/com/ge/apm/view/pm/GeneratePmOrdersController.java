@@ -223,6 +223,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public void generatePmOrders() {
 		List<AssetRuleModel> models = new ArrayList<AssetRuleModel>();
+		targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
 		for (AssetInfo ai : targetAssets) {
 			if(ai.getClinicalDeptId() == null) {
 				continue;
