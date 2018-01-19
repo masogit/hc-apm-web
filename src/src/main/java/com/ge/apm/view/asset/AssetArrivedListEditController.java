@@ -233,6 +233,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
         }
 
+        String prefix =  easyInstallItem.getFinancingNum();
         List<ArrivalListItem> submitItem = getNewInstallAssetList().subList(0, installCount);
         for (ArrivalListItem item : submitItem) {
             item.setClinicalDeptUID(easyInstallItem.getClinicalDeptUID());
@@ -256,8 +257,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     item.setQrCode(aiService.getNewQrcode(easyInstallItem.getArrivalList().getTenantUID(), easyInstallItem.getArrivalList().getSiteUID()).getQrCode());
                 }
                 if (generateMap.get("generateFinancingNum")) {
-                    generateFinacialNum();
-                    item.setFinancingNum(gennerateFinancingNum(item, easyInstallItem.getFinancingNum()));
+                    item.setFinancingNum(gennerateFinancingNum(item, prefix));
                 }
             }
 
