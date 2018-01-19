@@ -34,7 +34,15 @@
                                         <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
                                 </p:tree>
+                                <h:panelGroup>
+
+                                    <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.fitlerNode}" value="科室检索"  update="orgTree editPanel :growl"/>
+                                </h:panelGroup>
                             </p:scrollPanel>
+
                         </div>
                     </div>
 
@@ -97,13 +105,8 @@
 
                                 <h:panelGroup>
 
-                                    <h:panelGroup>
-                                        <label class="label">科室</label>
-                                        <p:inputText id="jituan" value="x"/>
-                                    </h:panelGroup>
-                                    <h:panelGroup>
-                                        <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.fitlerNode}" value="查询"  update="orgTree editPanel :growl"/>
-                                    </h:panelGroup>
+
+
 
                                 </h:panelGroup>
 

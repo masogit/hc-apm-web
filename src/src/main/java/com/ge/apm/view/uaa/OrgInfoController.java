@@ -44,6 +44,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     private String orgName;
     private String orgNameEn;
+    private String retrieval;
     @Override
     protected void init() {
         filterBySite = false;
@@ -112,9 +113,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
 
     public void fitlerNode(){
-
-        orgTree = uaaService.getFilterOrgTreeBySite2(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid(),"设备科");
-
+        orgTree = uaaService.getFilterOrgTreeBySite2(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid(),retrieval);
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
         }
@@ -435,5 +434,13 @@ return true;
 
     public void setOrgNameEn(String orgNameEn) {
         this.orgNameEn = orgNameEn;
+    }
+
+    public String getRetrieval() {
+        return retrieval;
+    }
+
+    public void setRetrieval(String retrieval) {
+        this.retrieval = retrieval;
     }
 }
