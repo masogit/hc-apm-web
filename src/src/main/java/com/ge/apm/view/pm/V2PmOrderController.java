@@ -105,6 +105,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String pmOrderId;
     private String filterPlanTime;
 
+
+    public Boolean test(V2_PmOrder item){
+  // if(selected!=null)
+        if(item!=null)
+      return  !item.getCurrentPersonId().equals(userContextService.getLoginUserUid());
+        else{
+            return true;
+        }
+  // return true;
+    }
+
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));

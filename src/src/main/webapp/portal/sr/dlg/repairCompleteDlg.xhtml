@@ -14,7 +14,7 @@
                     <h:panelGroup>
                         <label class="label">签到时间</label>
                         <h:inputText id="time"  value="#{workOrderListController.checkInDate}" />
-                        <p:commandButton process="@this" title="签到"  actionListener="#{workOrderListController.checkIn}" update=":repairCompleteDialogForm:time" />
+                        <p:commandButton process="@this" title="签到"  actionListener="#{workOrderListController.checkIn}" update="woTab:repairCompleteDialogForm:time" />
                     </h:panelGroup>
                     <h:panelGroup>
                         <label class="label">#{msg.recoveryTime}</label>
@@ -79,9 +79,9 @@
                                 </p:column>
 
                                 <p:column headerText="#{msg.Actions}">
-                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderListController.prepareCreateDetail()}" update=":moreAccDialogDlg :moreAccDialogForm" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{!workOrderListController.isAccessListEmpty()}"/>
-                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderListController.accEditDetail(item)}" update=":moreAccDialogDlg :moreAccDialogForm" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{!workOrderListController.isAccessListEmpty()}" />
-                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderListController.deleteItem(item.id,1)}" update=":repairCompleteDialogForm:accessList" >
+                                    <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderListController.prepareCreateDetail()}" update="woTab:moreAccDialogDlg :moreAccDialogForm" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{!workOrderListController.isAccessListEmpty()}"/>
+                                    <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderListController.accEditDetail(item)}" update="woTab:moreAccDialogDlg :moreAccDialogForm" oncomplete="PF('moreAccDialogDlg').show()" rendered="#{!workOrderListController.isAccessListEmpty()}" />
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderListController.deleteItem(item.id,1)}" update="woTab:repairCompleteDialogForm:accessList" >
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </p:column>
@@ -100,7 +100,7 @@
                                 <p:column headerText="#{msg.Actions}">
                                     <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderListController.prepareCreateCoWorkerDetail()}" update=":coworkerDlg :coworkerDlgForm" oncomplete="PF('coworkerDlg').show()"/>
                                     <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderListController.coworkerEditDetail(item)}" update=":coworkerDlg" oncomplete="PF('coworkerDlg').show()"  />
-                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderListController.deleteItem(item.id,2)}" update=":repairCompleteDialogForm:coworkerList" >
+                                    <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderListController.deleteItem(item.id,2)}" update="woTab:repairCompleteDialogForm:coworkerList" >
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                     </p:commandButton>
                                 </p:column>
@@ -111,7 +111,7 @@
                 </p:fieldset>
                 <!--维修完成 转单 新建工单-->
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{workOrderListController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":repairCompleteDialogForm :growl :processListForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderListController.repairWorkOrder()}" value="#{msg.workcomplete}" update="woTab:repairCompleteDialogForm :growl :processListForm:datalist " icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
                     <p:commandButton value="#{msg.transfer}" immediate="true" update=":transferOrderDialogForm1" oncomplete="PF('transferOrderDialog1').show()"/>
                     <p:commandButton immediate="true"  value="#{msg.newWorkOrder}" update=":newWorkorderDlgForm :growl"  oncomplete="PF('newWorkorderDlg').show()"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderListController.initWorkOrderDetailList()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
