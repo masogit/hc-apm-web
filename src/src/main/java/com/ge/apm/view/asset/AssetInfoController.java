@@ -1018,6 +1018,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
 
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
 
         if (this.selected.getClinicalDeptUID() != null) {
