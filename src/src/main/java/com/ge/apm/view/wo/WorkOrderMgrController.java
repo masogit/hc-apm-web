@@ -585,10 +585,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-            detailDao.delete(itemId);
+//            detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-            coWorkerDao.delete(itemId);
+//            coWorkerDao.delete(itemId);
         }
     }
 
