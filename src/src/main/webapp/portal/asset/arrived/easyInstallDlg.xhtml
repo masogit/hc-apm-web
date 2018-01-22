@@ -128,7 +128,7 @@
                     </p:fieldset>
 
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{assetArrivedListEditController.submitEasyInstall()}" value="安装" update=":AssetArrivalEditForm :easyInstallDialogForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'easyInstallDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{assetArrivedListEditController.submitEasyInstall()}" value="安装" update=":AssetArrivalEditForm :easyInstallDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'easyInstallDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetArrivedListEditController.cancelSaveEasyInstall()}" icon="ui-icon-cancel" onclick="PF('easyInstallDialog').hide()"/>
                     </h:panelGroup>
 
