@@ -236,6 +236,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         initGbTree();
 
+        if (selectedOrg != null) {
+            updateParentAssetList();
+        }
+
     }
 
     public Boolean getTerminate() {
@@ -657,7 +661,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setClinicalDeptUID(null);
         }
 
-        onAssetGroupChange();
+        updateParentAssetList();
     }
 
     public void onClinicalOwnerChange() {
@@ -991,25 +995,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return terminate ? WebUtil.getMessage("ActiveAsset") : WebUtil.getMessage("InactiveAsset");
     }
 
-    public void onAssetGroupChange() {
+    public void updateParentAssetList() {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
-        if (this.selected.getAssetGroup() != null) {
-            assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
-            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
-            if (this.selected.getClinicalDeptUID() != null) {
-                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, this.selected.getClinicalDeptUID()));
-            }
+        assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
 
-            if (this.selected.getSiteUID() != null) {
-                assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, this.selected.getSiteUID()));
-            }
-
-            parentAssetList = dao.findBySearchFilter(assetFilters);
-        } else {
-            parentAssetList = new ArrayList<>();
+        if (this.selected.getClinicalDeptUID() != null) {
+            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, this.selected.getClinicalDeptUID()));
         }
+
+        if (this.selected.getSiteUID() != null) {
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, this.selected.getSiteUID()));
+        }
+
+        if (this.selected.getUid() != null) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, this.selected.getUid()));
+        }
+
+        parentAssetList = dao.findBySearchFilter(assetFilters);
+
 
     }
 
@@ -1033,8 +1038,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     public void prepareEdit() {
         super.prepareEdit();
-
-        onAssetGroupChange();
 
         changeFunctionGroup();
     }
@@ -1160,7 +1163,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         updateSelectedOrg(orgInfo);
 
-        onAssetGroupChange();
+        updateParentAssetList();
 
     }
 
