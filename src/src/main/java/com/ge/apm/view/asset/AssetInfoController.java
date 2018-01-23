@@ -1227,11 +1227,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void generateFinancialNum() {
 
         //check whether generation policy is configured.
-        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
-
-        if (config == null || config.getGenerateMethod() == null) {
-            return;
-        }
+//        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+//
+//        if (config == null || config.getGenerateMethod() == null) {
+//            return;
+//        }
 
         String code = this.selectedGb == null ? null : this.selectedGb.getCode();
 
