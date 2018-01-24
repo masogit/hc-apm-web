@@ -264,9 +264,10 @@ public class UaaService {
     }
 
 
-    //gaolei2
-    public TreeNode getFilterOrgTreeBySite2(String siteUID,String keywords){
+    public TreeNode getFilterOrgTreeBySite(String siteUID,String keywords){
+        treeNodeMap = new  LinkedHashMap<>();
         TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
+        //xTreeMap
         Iterator<Map.Entry<String, TreeNode>> iterator = xtreeMap.entrySet().iterator();
         //遍历xtreeMap为结构的机构树,将保留输入的查找如"设备科".
         for(Map.Entry<String, TreeNode> nodeItem: xtreeMap.entrySet()){
@@ -277,7 +278,7 @@ public class UaaService {
                 TreeNode node1 = new DefaultTreeNode("org", org, null);
                 node.setRowKey("org_"+org.getId());
                 treeNodeMap.put(org.getUid(),node1);
-                x2(node);
+                buildTreeByKey(node,keywords);
             }
         }
        //构建过虑好的树
@@ -295,46 +296,133 @@ public class UaaService {
             filteredRoot.getChildren().add(treeNodeMap.get(siteUID));
         }
         return filteredRoot;
-
     }
 
+    public TreeNode getFilterOrgTreeByTotal(String siteUID,String keywords){
 
-public void x2(TreeNode treeNode){
+        treeNodeMap = new  LinkedHashMap<>();
+        for(Map.Entry<String, TreeNode> nodeItem: xtreeMap.entrySet()){
+
+
+        }
+        return null;
+    }
+
+    public TreeNode getFilterOrgTreeByYuanQu(String siteUID,String keywords){
+        treeNodeMap = new  LinkedHashMap<>();
+        TreeNode filteredRoot  = new DefaultTreeNode("root", null, null);
+        //xTreeMap
+        Iterator<Map.Entry<String, TreeNode>> iterator = xtreeMap.entrySet().iterator();
+        for(Map.Entry<String, TreeNode> nodeItem: xtreeMap.entrySet()){
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo)node.getData();
+            //租户必须作为根节点先加入
+            if(org.getOrgType()==0){
+                TreeNode node1 = new DefaultTreeNode("org", org, null);
+                node.setRowKey("org_"+org.getId());
+                treeNodeMap.put(org.getUid(),node1);
+            }
+            buildTreeByKeyYuanqu(node,keywords);
+        }
+        //构建过虑好的树
+        for(Map.Entry<String, TreeNode> nodeItem: treeNodeMap.entrySet()){
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo)node.getData();
+            if(org.getParentUID()!=null){
+                TreeNode parentNode = treeNodeMap.get(org.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+        if(treeNodeMap.get(siteUID)!=null) {
+            filteredRoot.getChildren().add(treeNodeMap.get(siteUID));
+        }
+        return filteredRoot;
+    }
+
+public void buildTreeByKey(TreeNode treeNode,String keyWords){
     //如果当前节点是最后一级即科室 则将该科室包括其上的父节点们添加到treeMapG
     if(treeNode.getChildren().isEmpty()){
         OrgInfo orgInfo =(OrgInfo)treeNode.getData();
-        if(orgInfo.getName().contains("设备科")){
+        if(orgInfo.getName().contains(keyWords)){
             //将其到orgtype=0的所有父节点装入treeNodeMap
             treeNodeMap.put(orgInfo.getUid(),treeNode);
-            //一旦找到 设备科 就将其 往上的父节点都加到树立
+            //一旦找到 设备科 就将其 往上的父节点都加到树枝
             buidUpFromNode(treeNodeMap,treeNode);
         }
     }
      for (TreeNode child : treeNode.getChildren()) {
-          x2(child);
+         buildTreeByKey(child,keyWords);
      }
-
 }
 
-    public TreeNode x2_backup(TreeNode treeNode){
-        //如果当前节点是最后一级即科室 则将该科室包括其上的父节点们添加到treeMapG
-        if(treeNode.getChildren().isEmpty()){
-            OrgInfo orgInfo =(OrgInfo)treeNode.getData();
-            if(orgInfo.getName().contains("设备科")){
-                //将其到orgtype=0的所有父节点装入treeNodeMap
-                treeNodeMap.put(orgInfo.getUid(),treeNode);
-                //一旦找到 设备科 就将其 往上的父节点都加到树立
-                buidUpFromNode(treeNodeMap,treeNode);
+    public void buildTreeByKeyYuanqu(TreeNode treeNode,String keyWords){
+       // if(treeNode.getParent()!=null) {
+            OrgInfo orgInfo = (OrgInfo) treeNode.getData();
+
+            if (orgInfo.getName().contains(keyWords)) {
+                treeNodeMap.put(orgInfo.getUid(), treeNode);
+                //如果找到 xx机构 就将其包括其父节点到到根节点都放到 treeNodeMap中
+
+                buidUpFromNodeYuanQu(treeNodeMap, treeNode);
+//往下操作
+                buidUpFromNodeYuanQuDown(treeNodeMap, treeNode);
+
+if(orgInfo.getOrgType()==4){
+    buidUpFromNode(treeNodeMap, treeNode);
+}
+
+
             }
-            //return null;
-        }
-        for (TreeNode child : treeNode.getChildren()) {
-            TreeNode res = x2_backup(child);
-        }
-        return null;
+     //   }
+       /* for (TreeNode child : treeNode.getChildren()) {
+            buildTreeByKeyYuanqu(child,keyWords);
+        }*/
     }
-//一旦找到 设备科 就将其包括之上的父节点都加到treeMapG for building the filltered tree.
-public void buidUpFromNode(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
+    //就将该treeNode包括其父节点到到根节点都放到 treeNodeMap中
+    public void buidUpFromNodeYuanQu(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
+        if(treeNode==null){
+            return;
+        }
+        OrgInfo orgInfo = (OrgInfo) treeNode.getData();
+       if( orgInfo.getOrgType()>0){
+if(orgInfo.getName().contains("曙光东院")){
+    System.out.println();
+}
+TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
+           treeNodeMap.put(orgInfo.getUid(), treeNode1);
+
+           buidUpFromNodeYuanQu(treeNodeMap, treeNode.getParent());
+       }
+
+    }
+    public void buidUpFromNodeYuanQuDown(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
+        ///
+         if( treeNode.getChildren().size()!=0){
+             for( TreeNode trn:treeNode.getChildren()){
+                 OrgInfo orgInfo= (OrgInfo) trn.getData();
+                 treeNodeMap.put(orgInfo.getUid(), trn);
+                 buidUpFromNodeYuanQuDown(treeNodeMap,trn);
+             }
+         }
+
+/*
+
+        OrgInfo orgInfo = (OrgInfo) treeNode.getData();
+        if( orgInfo.getOrgType()>0){
+
+            TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
+            treeNodeMap.put(orgInfo.getUid(), treeNode1);
+
+            buidUpFromNodeYuanQuDown(treeNodeMap, treeNode.getParent());
+        }
+*/
+
+    }
+
+    //一旦找到 设备科 就将其包括之上的父节点都加到treeMapG for building the filltered tree.
+    public void buidUpFromNode(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
       OrgInfo orgInfo =(OrgInfo)treeNode.getData();
       if(orgInfo.getParentUID()!=null){
           TreeNode node = new DefaultTreeNode("org", orgInfo, null);
@@ -343,24 +431,8 @@ public void buidUpFromNode(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
          TreeNode parentNode = (TreeNode)treeMapG.get(orgInfo.getParentUID());
           buidUpFromNode(treeNodeMap,parentNode);
       }
-
 }
-
-    public void removeElement(List<TreeNode> trList){
-        Iterator<TreeNode> it = trList.iterator();
-        while(it.hasNext()){
-
-            TreeNode treeNode = (TreeNode)it.next();
-            OrgInfo orgInfo =(OrgInfo)treeNode.getData();
-            if(!orgInfo.getName().contains("设备科")){
-                it.remove();
-            }
-        }
-    }
-
-public Map<String,TreeNode> treeNodeMap = new  LinkedHashMap<>();
-
-
+    public Map<String,TreeNode> treeNodeMap = new  LinkedHashMap<>();
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
         List<OrgInfo> orgList = null;
@@ -368,14 +440,12 @@ public Map<String,TreeNode> treeNodeMap = new  LinkedHashMap<>();
         TreeNode root  = new DefaultTreeNode("root", null, null);;
         
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
-        
         for(OrgInfo org: orgList){
             TreeNode node = new DefaultTreeNode("org", org, null);
             node.setRowKey("org_"+org.getId());
             treeMap.put(org.getUid(), node);
             treeMapG.put(org.getUid(),node);
         }
-        
         for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
             TreeNode node = nodeItem.getValue();
             OrgInfo org = (OrgInfo)node.getData();
@@ -393,7 +463,7 @@ public Map<String,TreeNode> treeNodeMap = new  LinkedHashMap<>();
         xtreeMap = treeMap;
         return root;
     }
-public  Map<String, TreeNode> xtreeMap;
+    public  Map<String, TreeNode> xtreeMap;
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
         List<OrgInfo> orgList = null;
         orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
