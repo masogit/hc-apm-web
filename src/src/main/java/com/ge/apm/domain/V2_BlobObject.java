@@ -5,6 +5,9 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import org.hibernate.annotations.JoinColumnOrFormula;
+import org.hibernate.annotations.JoinColumnsOrFormulas;
+import org.hibernate.annotations.JoinFormula;
 import org.hibernate.annotations.Where;
 
 @Entity
@@ -58,9 +61,8 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "object_source")
     private V2_BlobObject_Source objectSource = V2_BlobObject_Source.STORED_IN_DB;
 
-    @JoinColumn(insertable=false,updatable=false, name = "bo_id", referencedColumnName = "id")
+    @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
-    @Where(clause="objectType='AssetInfo'")
     @JsonBackReference
     private AssetInfo assetInfo;
 
