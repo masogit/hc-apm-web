@@ -194,13 +194,13 @@
                                 <label class="label">设备国标码</label>
                                 <!--  <p:inputText id="selectedgbName" value="#Gb{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
                                 <p:autoComplete id="gbname" value="#{assetInfoController.gbCodeName}" completeMethod="#{assetInfoController.completeGbName}">
-                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
+                                    <p:ajax process="@this" update="" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
                                 </p:autoComplete>
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoController.gbTree}" selection="#{assetInfoController.selectedGbNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this :AssetInfoEditForm:financingNum" event="select" listener="#{assetInfoController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname :AssetInfoEditForm:financingNum" oncomplete="PF('varPanelOrg1').hide();"/>
+                                            <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
 
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
@@ -233,10 +233,13 @@
                                 <label class="label">#{msg.systemId}</label>
                                 <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}"/>
                             </h:panelGroup>
-                            <h:panelGroup id="financingNum">
+                            <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
-                                <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum"/>
-                                <p:commandButton actionListener="#{assetInfoController.generateFinancialNum()}" process="financingNum parentAssetList gbname" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton"/>
+                                <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum">
+                                    <p:ajax process="@this" update="#{empty assetInfoController.selected.financingNum ? '':'@(.financingNum)'}"/>
+                                </p:inputText>
+                                <p:commandButton actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 3}"
+                                    process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) " icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
                             </h:panelGroup>
 
                             <h:panelGroup>
