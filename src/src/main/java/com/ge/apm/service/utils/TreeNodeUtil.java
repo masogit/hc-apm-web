@@ -52,9 +52,15 @@ public interface TreeNodeUtil {
 
         List<TreeNode> nodeList = node.getChildren();
 
+//        for (TreeNode childNode : nodeList) {
+//            childNode.setParent(null);
+//        }
+
         for (TreeNode childNode : nodeList) {
-            childNode.setParent(null);
+            System.out.println("=======childNode.getName()"+((OrgInfo)childNode.getData()).getName());
+            System.out.println("=======childNode.getChildCount()"+childNode.getChildCount());
         }
+         System.out.println("-------------before sort-------------------");
 
         nodeList.sort((TreeNode o1, TreeNode o2) -> {
             OrgInfo org1 = (OrgInfo) o1.getData();
@@ -64,12 +70,20 @@ public interface TreeNodeUtil {
 
         }
         );
+        
+         for (TreeNode childNode : nodeList) {
+            System.out.println("=======childNode.getName()"+((OrgInfo)childNode.getData()).getName());
+            System.out.println("=======childNode.getChildCount()"+childNode.getChildCount());
+        }
+        System.out.println("-------------end-------------------");
 
+        node.getChildren().clear();
         for (TreeNode childNode : nodeList) {
-            childNode.setParent(node);
+//            childNode.setParent(node);
+            node.getChildren().add(childNode);
         }
 
-        nodeList.stream().forEach((TreeNode childNode) -> sortTreeNodeByName(childNode));
+        nodeList.forEach((TreeNode childNode) -> sortTreeNodeByName(childNode));
 
     }
 

@@ -68,8 +68,9 @@ public class QrCodeTemplateService {
         qrcodeElement.setSize(300);
         qrcodeElement.setPositionX(10);
         qrcodeElement.setPositionY(20);
-        qrcodeElement.setFontType(9);
+        qrcodeElement.setFontType(14);
         qrcodeElement.setFontSize(24);
+        qrcodeElement.setFontName("Microsoft YaHei");
         elementList.add(qrcodeElement);
 
         elementList.add(createTextElement("", "hospital", 320, 40, 40, 1, "Microsoft YaHei", "000000"));
