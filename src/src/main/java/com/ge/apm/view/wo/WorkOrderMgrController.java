@@ -81,6 +81,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<V2_WorkOrder> selectedWorkOrderList;
 
     private AssetInfo selectedAsset;
+    private String assetStatus;
 
     private Integer currentStatus = 1;
 
@@ -421,10 +422,16 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void cancelWorkOrder() {
-        woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason);
+
+        woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason,assetStatus);
+
+
         cancelReason = null;
         cancel();
     }
+
+
+
 
     public void takeEquip() {
         if (Strings.isNullOrEmpty(equipmentTaker)) {
@@ -578,10 +585,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-            detailDao.delete(itemId);
+//            detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-            coWorkerDao.delete(itemId);
+//            coWorkerDao.delete(itemId);
         }
     }
 
@@ -868,4 +875,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.requestAssetUid = requestAssetUid;
     }
 
+    public String getAssetStatus() {
+        return assetStatus;
+    }
+
+    public void setAssetStatus(String assetStatus) {
+        this.assetStatus = assetStatus;
+    }
 }

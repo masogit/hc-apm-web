@@ -78,4 +78,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
 	public List<AssetInfo> findByUidIn(List<String> assetUids);
 
+    @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and (ai.assetOwnerId = ?2 or ai.assetOwnerId2 = ?2 or ai.assetOwnerId3 = ?2)")
+    public List<AssetInfo> getByTenantUIDAndAssetOwner(String tenantUID, Integer assetOwnerId);
+
 }

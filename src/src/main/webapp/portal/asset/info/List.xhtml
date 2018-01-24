@@ -98,12 +98,13 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ" style="word-wrap: break-word;">
-                            <f:facet name="filter">
+                        <p:column headerText="#{msg.clinicalDeptName}"  style="word-wrap: break-word;">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/>
                                 <p:overlayPanel id="imagePanel" widgetVar="varPanelDeptOrg" for="clinicalDept" hideEffect="fade" style="text-align: left">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}" selection="#{orgTreeController.selectedDeptOrgNode}" var="node" selectionMode="single" dynamic="false">
-                                            <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter(orgTreeController.selectedDeptOrgNode.data)}" update=":AssetInfoListForm:datalist" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
+                                            <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist" oncomplete="PF('varPanelDeptOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -112,12 +113,7 @@
                                     </p:tree>
                                 </p:scrollPanel>
                                 </p:overlayPanel>
-
-                                <!--                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
-                                                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
-                                                                </p:selectOneMenu>-->
-                            <p:inputText id="clinicalDept" value="#{orgTreeController.selectedDeptOrgNode.data.name}" readonly="true"/>
+                            <p:inputText id="clinicalDept"  value="#{assetInfoController.fileterOrg.name}"  readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
@@ -412,7 +408,7 @@
                         </p:dataTable>
                     </div>
 
-                    <p:remoteCommand name="rc" update="datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton " immediate="true"/>
+                    <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton " immediate="true"/>
                     <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
                 </h:form>
             </div>

@@ -240,7 +240,7 @@ public class ServiceRequestController extends GenericCRUDUUIDController<V2_Servi
     }
     
     public void cancelWorkOrder(String woId){
-        woService.cancelWorkOrder(woId,cancelReason);
+        woService.cancelWorkOrder(woId,cancelReason,"");
         cancelReason=null;
         cancel();
     }
