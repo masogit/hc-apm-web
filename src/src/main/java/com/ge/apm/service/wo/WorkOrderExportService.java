@@ -239,7 +239,7 @@ public class WorkOrderExportService {
             workOrderMap.put("交付前检测", workOrder.getPatTests());
             workOrderMap.put("备注", workOrder.getComment());
             //added columns for pdf export
-            workOrderMap.put("联系电话", userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone());
+            workOrderMap.put("联系电话", (userAccountDao.getById(serviceRequest.getRequestorId()) != null) ? userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone():null);
             workOrderMap.put("设备型号", assetInfo.getFunctionType());
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
             workOrderMap.put("二维码", assetInfo.getQrCode());
