@@ -7,6 +7,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.UserAccountRepository;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -98,11 +99,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return userList;
     }
     public void buildOrdTree(){
-//        if(selected!=null)
-//            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, selected.getId());
-//        else
-//            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, null);
-
         orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
@@ -110,18 +106,19 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         catch(Exception ex){
         }
     }
-
-
-    public void fitlerNode(){
-        orgTree = uaaService.getFilterOrgTreeBySite2(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid(),retrieval);
-        try{
-            this.selectedNode = (TreeNode)orgTree.getData();
-        }
-        catch(Exception ex){
-        }
-
-
+    public void filterNode(){
+      if(!StringUtils.isEmpty(retrieval)) {
+          orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+/*if(mark==4)
+    orgTree = uaaService.getFilterOrgTreeBySite(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);*/
+      }else{//列出所有机构
+ orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+      }
+        this.selectedNode = (TreeNode) orgTree.getData();
     }
+
+
+
 
     public List<OrgInfo> getHospitalListBySiteId(){
         return uaaService.getHospitalListBySiteId(tenantId);

@@ -35,12 +35,23 @@
                                     </p:treeNode>
                                 </p:tree>
                                 <h:panelGroup>
-
                                     <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
+                                    <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.fitlerNode}" value="科室检索"  update="orgTree editPanel :growl"/>
+
+                              <!--  <h:panelGroup>
+                                    <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="院区检索"  update="orgTree editPanel :growl"/>
                                 </h:panelGroup>
+-->
+
+                                <!--<h:panelGroup>
+                                    <label class="label">检索</label>
+                                    <p:autoComplete id="search" value="#{orgInfoController.filterNode()}" completeMethod="#{assetInstallationController.completeGbName}">
+                                        <p:ajax process="@this"/>
+                                    </p:autoComplete>
+
+
+                                </h:panelGroup>-->
                             </p:scrollPanel>
 
                         </div>
