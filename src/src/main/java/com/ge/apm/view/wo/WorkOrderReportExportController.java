@@ -1,12 +1,10 @@
 package com.ge.apm.view.wo;
 
-import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -174,16 +172,10 @@ public class WorkOrderReportExportController implements Serializable{
 			File conf = new File(WorkOrderReportExportController.class.getClassLoader().
 					getResource("../../portal/wo/woExport/pdf/fop.xml").getPath());
 			
-			// Setup directories
-            File baseDir = new File(".");
-			
 			FopFactory fopFactory = FopFactory.newInstance(conf);
 			FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
 			
-			File pdffile = new File(baseDir, "woPDF.pdf");
-			OutputStream out = new FileOutputStream(pdffile);
-	        out = new BufferedOutputStream(out);
-			
+			ByteArrayOutputStream out = new ByteArrayOutputStream();
 			TransformerFactory factory = TransformerFactory.newInstance();
             try 
             {
@@ -195,8 +187,7 @@ public class WorkOrderReportExportController implements Serializable{
 			}
             finally 
             {
-                out.close();
-                exportPdf = new DefaultStreamedContent((new FileInputStream(pdffile)), MimeConstants.MIME_PDF, "WorkOrderDetails.pdf");
+                exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, "WorkOrderDetails.pdf");
             }
 		} 
 		catch (Exception e) 
