@@ -21,6 +21,7 @@
             <br/>
             <h:outputLabel for="hospitalIdSelect" value="医院 ： " />
             <p:selectOneMenu id="hospitalIdSelect" value="#{qrCodeLibController.siteUID}" required="true" requiredMessage="医院不能为空" >
+                <p:ajax  listener="#{qrCodeLibController.onSiteUIDChange}" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
             </p:selectOneMenu>

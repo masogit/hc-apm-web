@@ -36,8 +36,7 @@
 
                             <p:selectOneMenu id="search_EQ_assetOwnerId">
                                 <f:selectItem itemLabel="#{msg.selectAssetOwner}"/>
-                                <f:selectItems value="#{workOrderController.usersWithAssetHeadOrStaffRole}" var="item"
-                                               itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{selectAssetController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                             
                             <p:commandButton value="#{msg.Search}" actionListener="#{selectAssetController.setSearchFilter}" update="selectAssetDatalist"/>

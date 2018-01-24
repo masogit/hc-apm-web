@@ -14,10 +14,6 @@
             <div class="ui-g-12 card">
                 <h:form >
                     <p:commandButton id="qrCodeLibCreateButton" icon="ui-icon-extlink" value="生成二维码" title="生成二维码" update=":qrCodeLibCreateDlg" oncomplete="PF('qrCodeLibCreateDialog').show()"/>
-                    &#160;
-                    <!--                    <p:commandButton id="generateQrCodesButton" icon="ui-icon-arrowthick-1-s" value="生成并导出二维码" 
-                                                         title="生成并导出二维码" actionListener="#{generateQrCodesController.createQrCode}" update=":generateQrCodesDlg" 
-                                                         oncomplete="PF('generateQrCodesDialog').show()"/>-->
                 </h:form>
 
                 <h:form id="qrCodeLibListForm">
@@ -32,26 +28,26 @@
 
                         <p:ajax event="rowSelect" update="viewButton"/>
                         <p:ajax event="filter" listener="#{qrCodeLibController.onFilter}" />
-
-<!--                         <p:column headerText="租户" sortBy="#{item.siteId}" filterBy="#{item.tenantUID}" filterMatchMode="EQ" rendered="#{userContextService.hasRole('SuperAdmin')}">
-                            <f:facet name="filter">
-                                <p:selectOneMenu value="#{qrCodeLibController.tenantUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" disabled="#{qrCodeLibController.isChooseTenant()}">
-                                    <p:ajax  listener="#{qrCodeLibController.onTenantFilterChange}" update="hospitalIdSelect_list" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{qrCodeLibController.tenantList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                        <p:column headerText="医院" style="word-wrap: break-word;" exportable="false">
+                            <f:facet name="header">
+                                <h:outputText value="医院"/><br/>
+                                <p:overlayPanel widgetVar="varPanelSiteFilter" for="filterOrg" hideEffect="fade" dynamic="false" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                            <p:ajax process="@this" event="select" listener="#{qrCodeLibController.onSiteFilterChange}" update=":qrCodeLibListForm:datalist" oncomplete="PF('varPanelSiteFilter').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node.name}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                                <p:inputText id="filterOrg"  value="#{qrCodeLibController.siteUIDFilter==null?'':qrCodeLibController.siteUIDFilter.name}"  readonly="true"/>
                             </f:facet>
-                            <h:outputText value="#{qrCodeLibController.getSiteName(item.siteId)}"/>
-                        </p:column> -->
-                        <p:column headerText="医院" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
-                            <f:facet name="filter">
-                                <p:selectOneMenu id="hospitalIdSelect_list" value="#{qrCodeLibController.siteUIDFilter}" onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
-                                   	<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                					<f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{qrCodeLibController.getFullorgName(item.uid)}" itemValue="#{item.uid}"/>
-                                   <!--  <f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{qrCodeLibController.hospitalFileterList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/> -->
-                                </p:selectOneMenu>
-                            </f:facet>
+                            <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
+                        </p:column>
+                        <p:column headerText="医院" style="word-wrap: break-word;" exportable="true" visible="false">
                             <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
                         </p:column>
                         <p:column headerText="二维码" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">

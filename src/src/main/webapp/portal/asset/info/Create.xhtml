@@ -38,7 +38,6 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.assetGroup}*</label>
                                 <p:selectOneMenu id="assetGroup" value="#{assetInfoController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
-                                    <p:ajax listener="#{assetInfoController.onAssetGroupChange}" process="@this" update="parentAssetList"/>
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -234,10 +233,12 @@
                                 <label class="label">#{msg.systemId}</label>
                                 <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}"/>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup id="financingNum">
                                 <label class="label">#{msg.financingNum}</label>
-                                <p:inputText id="financingNum" value="#{assetInfoController.selected.financingNum}"/>
+                                <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum"/>
+                                <p:commandButton actionListener="#{assetInfoController.generateFinancialNum()}" process="financingNum parentAssetList gbname" update="financingNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton"/>
                             </h:panelGroup>
+
                             <h:panelGroup>
                                 <label class="label">#{msg.departNum}</label>
                                 <p:inputText id="departNum2" value="#{assetInfoController.selected.departNum}"/>

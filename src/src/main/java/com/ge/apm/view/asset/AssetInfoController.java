@@ -3,8 +3,8 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
-import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -19,13 +19,13 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -38,9 +38,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-
-import webapp.framework.web.mvc.ServerEventInterface;
-import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -57,6 +54,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private BrandRepository brandDao;
 
+    private V2_PmScheduleRepository pmSchDao ;
+    private ExWorkOrderRepository exWoDao;
     private boolean resultStatus;
 
     private UserAccount clinicalOwner;
@@ -123,6 +122,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private OrgInfo selectSite;
 
     private Boolean needShowAssetApproval;
+    
+    private OrgInfo fileterOrg;
+
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -146,6 +148,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         setSelectedSiteUID(selected.getSiteUID());
     }
+
     private boolean showDialog = false;
     private ServerEventInterface callingController;
     private String updateViewIDs;
@@ -166,6 +169,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected void init() {
+        pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         dao = WebUtil.getBean(AssetInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
@@ -185,6 +189,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
+        exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
@@ -238,6 +243,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         initGbTree();
 
+        if (selectedOrg != null) {
+            updateParentAssetList();
+        }
+
     }
 
     public Boolean getTerminate() {
@@ -269,6 +278,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            onSelectSiteTreeNode(null);
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -313,7 +323,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
+        if(null!=event){
         selectSite = (OrgInfo) event.getTreeNode().getData();
+        }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
                 || "institutionUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
                 || "hospitalUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
@@ -405,17 +417,24 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     public void onBeforeNewObject(AssetInfo object) {
-        object.setSiteId(UserContextService.getSiteId());
-        object.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
+
+        assignUserOrg(object);
+
         object.setIsValid(true);
         object.setStatus(1);
         object.setDeviceStatus(0);
         object.setIsDeleted(false);
 
-        object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-        object.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
-        object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
-        object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+    }
+
+    private void assignUserOrg(AssetInfo assetInfo) {
+        assetInfo.setSiteId(UserContextService.getSiteId());
+        assetInfo.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
+
+        assetInfo.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+        assetInfo.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
+        assetInfo.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
+        assetInfo.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
     @Override
@@ -424,11 +443,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             OrgInfo org = orgDao.findById(object.getClinicalDeptId());
             object.setClinicalDeptName(org.getName());
 
-            object.setTenantUID(org.getTenantUID());
-            object.setHospitalUID(org.getHospitalUID());
-            object.setInstitutionUID(org.getInstitutionUID());
-            object.setSiteUID(org.getSiteUID());
+//            object.setTenantUID(org.getTenantUID());
+//            object.setHospitalUID(org.getHospitalUID());
+//            object.setInstitutionUID(org.getInstitutionUID());
+//            object.setSiteUID(org.getSiteUID());
             object.setClinicalDeptUID(org.getUid());
+
         } else {
             //clear uid and its name
             object.setClinicalDeptUID(null);
@@ -652,7 +672,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setClinicalDeptUID(null);
         }
 
-        onAssetGroupChange();
+        updateParentAssetList();
     }
 
     public void onClinicalOwnerChange() {
@@ -994,25 +1014,27 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return terminate ? WebUtil.getMessage("ActiveAsset") : WebUtil.getMessage("InactiveAsset");
     }
 
-    public void onAssetGroupChange() {
+    public void updateParentAssetList() {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
-        if (this.selected.getAssetGroup() != null) {
-            assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
-            assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, this.selected.getAssetGroup()));
 
-            if (this.selected.getClinicalDeptUID() != null) {
-                assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, this.selected.getClinicalDeptUID()));
-            }
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, this.selected.getSiteId()));
 
-            if (this.selected.getSiteUID() != null) {
-                assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, this.selected.getSiteUID()));
-            }
-
-            parentAssetList = dao.findBySearchFilter(assetFilters);
-        } else {
-            parentAssetList = new ArrayList<>();
+        if (this.selected.getClinicalDeptUID() != null) {
+            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, this.selected.getClinicalDeptUID()));
         }
+
+        if (this.selected.getSiteUID() != null) {
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, this.selected.getSiteUID()));
+        }
+
+        if (this.selected.getUid() != null) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, this.selected.getUid()));
+        }
+
+        parentAssetList = dao.findBySearchFilter(assetFilters);
+
 
     }
 
@@ -1037,8 +1059,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void prepareEdit() {
         super.prepareEdit();
 
-        onAssetGroupChange();
-
         changeFunctionGroup();
     }
 
@@ -1054,7 +1074,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.selected.getParentAssetId() != null) {
             AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
             if (assetInfo != null) {
-                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                    return assetInfo.getName();
+                }else{
+                    return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                }
             }
         }
         return "";
@@ -1065,7 +1089,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (ai.getParentAssetId() != null) {
             AssetInfo assetInfo = dao.getById(ai.getParentAssetId());
             if (assetInfo != null) {
-                return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                    return assetInfo.getName();
+                }else{
+                    return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
+                }
             }
         }
         return "";
@@ -1163,7 +1191,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         updateSelectedOrg(orgInfo);
 
-        onAssetGroupChange();
+        updateParentAssetList();
 
     }
 
@@ -1172,13 +1200,52 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
 
-//联动更新
-        if (null != selectedGb) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
-                    this.selectedGb.getCode(),
-                    this.selected.getSiteUID()
-            );
-            if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
+//        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+//
+//        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 1) {
+//            //not configured to generate by national standard code
+//            return;
+//        }
+////联动更新
+//        if (null != selectedGb) {
+//
+//            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+//                    this.selected.getId(),
+//                    this.selectedGb.getCode(),
+//                    this.selected.getSiteUID(),
+//                    this.selected.getParentAssetId(),
+//                    this.selected.getFinancingNum()
+//            );
+//            if (financingNum != null && !financingNum.startsWith("error:")) {
+//                this.selected.setFinancingNum(financingNum);
+//            }
+//
+//        }
+
+    }
+
+    public void generateFinancialNum() {
+
+        //check whether generation policy is configured.
+//        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+//
+//        if (config == null || config.getGenerateMethod() == null) {
+//            return;
+//        }
+
+        String code = this.selectedGb == null ? null : this.selectedGb.getCode();
+
+        String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                this.selected.getId(),
+                code,
+                this.selected.getSiteUID(),
+                this.selected.getParentAssetId(),
+                this.selected.getFinancingNum()
+        );
+        if (financingNum != null) {
+            if (financingNum.startsWith("error:")) {
+                WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+            } else {
                 this.selected.setFinancingNum(financingNum);
             }
 
@@ -1186,16 +1253,42 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public void onParentAssetChange() {
+
+        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+
+        if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 2) {
+            //not configured to generate by parent asset
+            return;
+        }
+
+        String code = this.selectedGb == null ? null : this.selectedGb.getCode();
+
+        if (this.selected.getParentAssetId() != null) {
+            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                    this.selected.getId(),
+                    code,
+                    this.selected.getSiteUID(),
+                    this.selected.getParentAssetId(),
+                    this.selected.getFinancingNum()
+            );
+            if (financingNum != null && !financingNum.startsWith("error:")) {
+                this.selected.setFinancingNum(financingNum);
+            }
+
+        }
+
+
+    }
+
     private void updateSelectedOrg(OrgInfo orgInfo) {
 
         if (orgInfo == null || orgInfo.getId() == -1) {
+
+            //revert to current user's org if org is not selected by the user
+            assignUserOrg(selected);
+
             selectedOrg = null;
-
-            selected.setTenantUID(null);
-            selected.setInstitutionUID(null);
-            selected.setHospitalUID(null);
-            selected.setSiteUID(null);
-
             setSelectedSiteUID(null);
         } else {
             selectedOrg = orgInfo;
@@ -1204,6 +1297,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setInstitutionUID(selectedOrg.getInstitutionUID());
             selected.setHospitalUID(selectedOrg.getHospitalUID());
             selected.setSiteUID(selectedOrg.getSiteUID());
+            selected.setHospitalId(selectedOrg.getId());
 
             setSelectedSiteUID(selectedOrg.getUid());
         }
@@ -1260,12 +1354,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
-    public void onClinicalDeptFilter(Object orgData) {
-        if (null != orgData) {
-            OrgInfo fileterOrg = (OrgInfo) orgData;
+    public void onClinicalDeptFilter(NodeSelectEvent event) {
+        if (null!=event && null != event.getTreeNode() && null!= event.getTreeNode().getData()) {
+            fileterOrg = (OrgInfo) event.getTreeNode().getData();
             if (fileterOrg.getOrgType() == 4) {
                 this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
                 return;
+            }else{
+                fileterOrg = null;
             }
         }
         searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
@@ -1443,7 +1539,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
     }
-
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
@@ -1453,9 +1548,36 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-
         return false;
+    }
+
+    public List<PmScheduleData> getPmScheduleData(String type){
+
+        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(),type);
+        return pmsList;
+    }
+    //获取外修工单
+    public List<ExternalWorkOrder> getExWordOrder(){
+        List<ExternalWorkOrder> exWorkOrderList = exWoDao.getExWorkOrderList(this.selected.getUid());
+        return exWorkOrderList;
 
     }
 
+    public ExWorkOrderRepository getExWoDao() {
+        return exWoDao;
+    }
+
+    public void setExWoDao(ExWorkOrderRepository exWoDao) {
+        this.exWoDao = exWoDao;
+    }
+
+    public OrgInfo getFileterOrg() {
+        return fileterOrg;
+    }
+
+    public void setFileterOrg(OrgInfo fileterOrg) {
+        this.fileterOrg = fileterOrg;
+    }
+    
+    
 }

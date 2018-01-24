@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "v2_blob_object")
@@ -59,6 +60,7 @@ public class V2_BlobObject implements Serializable {
 
     @JoinColumn(insertable=false,updatable=false, name = "bo_id", referencedColumnName = "id")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @Where(clause="objectType='AssetInfo'")
     @JsonBackReference
     private AssetInfo assetInfo;
 

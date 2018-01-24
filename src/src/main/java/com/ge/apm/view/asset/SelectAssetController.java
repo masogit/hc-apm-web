@@ -8,6 +8,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
@@ -30,11 +31,13 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     AssetInfoRepository dao = null;
 
     private UaaService uuaService;
+    private AssetInstallationService aiService;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         uuaService = WebUtil.getBean(UaaService.class);
+        aiService = WebUtil.getBean(AssetInstallationService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
     }
@@ -58,6 +61,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         }
@@ -162,6 +166,10 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
 //             assetNode.setRowKey(item.getUid());
             });
         }
+    }
+    
+     public List<UserAccount> getOwnerList() {
+        return aiService.getWorkerList();
     }
 
     public void onOrgExpand(NodeExpandEvent event) {

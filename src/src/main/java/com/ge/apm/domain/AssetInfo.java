@@ -152,11 +152,11 @@ public class AssetInfo implements Serializable {
     @Column(name = "is_valid")
     private boolean isValid;//在用？
 
-    //1:正常,2:停机,3:限制功能使用,4:待报废
+    //1:正常,2:停机,3:限制功能使用,4:待报废,5:停用
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
-    private int status;//当前状态
+    private Integer status;//当前状态
 
     @Column(name = "manufact_date")
     @Temporal(TemporalType.DATE)
@@ -828,11 +828,11 @@ public class AssetInfo implements Serializable {
         this.isValid = isValid;
     }
 
-    public int getStatus() {
+    public Integer getStatus() {
         return status;
     }
 
-    public void setStatus(int status) {
+    public void setStatus(Integer status) {
         this.status = status;
     }
 
