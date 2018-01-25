@@ -300,7 +300,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         locationName = null;
     }
 
-
     public void onSelectWorkOrder() {
         newServiceRequest = null;
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -310,7 +309,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         audioList = getServiceRequestPicList(selected.getSrId(), 2);
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
-
 
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
@@ -344,7 +342,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         prepareAct(woid);
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
-        approvedDetails.stream().filter(item -> item.getApproved()==null || !item.getApproved()).forEach(item ->selectedMap.put((item.getId()), false));
+        approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
     }
 
     public void prepareCloseOrder(String woid) {
@@ -584,7 +582,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
 
-           // detailDao.delete(itemId);
+            // detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
@@ -652,15 +650,18 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
-        if(picList !=null){
-        return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
+        if (picList != null) {
+            return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
+        }else{
+            return null;
+        }
     }
 
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
             approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
         } else {
-            selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item-> !item.getKey().equals("All") && !item.getValue()));
+            selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
         }
     }
 
@@ -904,3 +905,4 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
 }
+
