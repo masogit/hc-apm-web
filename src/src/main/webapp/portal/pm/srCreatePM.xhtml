@@ -19,7 +19,7 @@
                         <h:panelGroup >
                             <label class="label">#{msg.assetName}*</label>
                             <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
-                           <!-- <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, ':ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg assetstatus" oncomplete="PF('varSelectAssetDlg').show();"/>-->
+                           <!-- <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, 'pmTab:ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg assetstatus" oncomplete="PF('varSelectAssetDlg').show();"/>-->
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -81,7 +81,7 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update=":pmOrderListForm:datalist" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm:datalist" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancelsr()}" immediate="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
                 </p:fieldset>

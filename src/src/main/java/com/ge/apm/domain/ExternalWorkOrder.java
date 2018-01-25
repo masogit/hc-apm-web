@@ -35,8 +35,14 @@ public class ExternalWorkOrder implements Serializable {
 	private String systemId;
 	@Column(name = "asset_serial_no")
 	private String assetSerialNo;
+
+
 	@Column(name = "asset_uid")
 	private String assetUid;
+
+	@JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+	@ManyToOne(fetch = FetchType.EAGER)
+	private AssetInfo assetInfo;
 
 	public String getId() {
 		return id;
@@ -108,5 +114,13 @@ public class ExternalWorkOrder implements Serializable {
 
 	public void setAssetUid(String assetUid) {
 		this.assetUid = assetUid;
+	}
+
+	public AssetInfo getAssetInfo() {
+		return assetInfo;
+	}
+
+	public void setAssetInfo(AssetInfo assetInfo) {
+		this.assetInfo = assetInfo;
 	}
 }

@@ -300,9 +300,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         locationName = null;
     }
 
-//    public V2_ServiceRequest getServiceRequest(String srId) {
-//        return srDao.findById(srId);
-//    }
+
     public void onSelectWorkOrder() {
         newServiceRequest = null;
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -313,15 +311,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
-    /*  public void locateAsset() {
-        System.out.println();
-        if (selectedAsset.getLocationName().isEmpty()) {
-            final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
-            String lName = orgDao.getByUid(orgInfoUID).getName();
-            selectedAsset.setLocationName(lName);
-            locationName = lName;
-        }
-    }*/
+
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
         return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
     }
@@ -593,10 +583,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void deleteWoDetail(String itemId, Integer index) {
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-//            detailDao.delete(itemId);
+
+           // detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-//            coWorkerDao.delete(itemId);
         }
     }
 
@@ -662,6 +652,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
+        if(picList !=null){
         return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
     }
 

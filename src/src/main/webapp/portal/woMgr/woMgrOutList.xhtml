@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+<ui:composition>
+
+
+            <div class="ui-g-12 card">
+                <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+
+                <h:form id="woMgrOutListForm">
+
+                    <p:dataTable id="datalist" value="#{workOrderMgrOutController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{workOrderMgrOutController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                                 rows="10" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,30,90">
+
+                        <p:ajax event="rowSelect" listener="#{workOrderMgrOutController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
+                        <p:ajax event="filter" listener="#{workOrderMgrOutController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
+
+
+                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetInfo.departNum}"/>
+                        </p:column>
+
+                        <p:column headerText="更新时间" sortBy="#{item.updateTime}" filterBy="#{item.updateTime}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.updateTime}"/>
+                        </p:column>
+                        <p:column headerText="请求编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+
+
+                    </p:dataTable>
+                </h:form>
+
+            </div>
+
+
+
+
+        <script>
+            window.onload = function () {
+                var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
+
+            }
+        </script>
+
+
+</ui:composition>
+</html>

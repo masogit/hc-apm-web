@@ -55,7 +55,7 @@ public class AssetsApi {
   }
 
   private ResponseEntity<Map<String, Object>> serialize(HttpServletRequest request, Map<Integer, String> groups, Map<Integer, String> types, Map<Integer, String> depts, Map<Integer, String> suppliers, Observable<Tuple8<Integer, String, Integer, Integer, Integer, Integer, Money, Integer>> assets, String orderBy, Integer limit, Integer start) {
-    final Observable<Tuple8<Integer, String, String, String, String, String, Double, Integer>> items = assets.map(t -> Tuple.of(t._1, t._2, groups.getOrDefault(t._3, ""), types.getOrDefault(t._4, ""), Option.of(depts.get(t._5)).getOrElse(Option.of(t._5).map(Object::toString).getOrElse("")), Option.of(suppliers.get(t._6)).getOrElse(Option.of(t._5).map(Object::toString).getOrElse("")), t._7.getNumber().doubleValue(), t._8));
+    final Observable<Tuple8<Integer, String, String, String, String, String, Double, Integer>> items = assets.map(t -> Tuple.of(t._1, t._2, groups.getOrDefault(t._3, ""), types.getOrDefault(t._4, ""), Option.of(depts.get(t._5)).getOrElse(Option.of(t._5).flatMap(i->Option.of(i).filter(v->v!=0)).map(Object::toString).getOrElse("无")), Option.of(suppliers.get(t._6)).getOrElse(Option.of(t._5).map(Object::toString).getOrElse("")), t._7.getNumber().doubleValue(), t._8));
     final Map<String, Object> body = new ImmutableMap.Builder<String, Object>()
       .put("pages", new ImmutableMap.Builder<String, Object>().put("total", assets.count().toBlocking().single()).put("limit", Option.of(limit).getOrElse(Integer.MAX_VALUE)).put("start", start).build())
       .put("items", items.skip(start).limit(Option.of(limit).getOrElse(Integer.MAX_VALUE)).map(t -> new ImmutableMap.Builder<String, Object>()
