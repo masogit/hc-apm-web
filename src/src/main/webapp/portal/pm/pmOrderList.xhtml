@@ -101,7 +101,7 @@
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==3}">
-                            <p:commandButton disabled="#{item.currentPersonId!=userContextService.loginUserUid}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton disabled="#{item.currentPersonId!=userContextService.loginUserUid}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
@@ -109,8 +109,8 @@
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
-                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}"  rendered="#{item.currentPersonId == userContextService.loginUserUid}"  update="pmTab:pmrepairCompleteDialogForm" oncomplete="PF('pmrepairCompleteDialog').show()"/>
-                            <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  rendered="#{item.currentPersonId == userContextService.loginUserUid}" update="pmTab:transferOrderDialogForm"   oncomplete="PF('transferOrderDialog').show()"/>
+                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.takeOrderDialogClass)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                            <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}">
@@ -264,7 +264,7 @@
             </h:form>
         </p:dialog>
 <!--接单对话框-->
-        <p:dialog id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.takeorder}">
+        <p:dialog class ="t1" id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.takeorder}">
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <h:panelGroup>
@@ -280,8 +280,8 @@
             </h:form>
         </p:dialog>
 <!--转单-->
-        <p:dialog id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="转单">
-            <h:form id="transferOrderDialogForm" >
+        <p:dialog class ="transferOrderClass" id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="转单">
+            <h:form class ="transferOrderDialogClass" id="transferOrderDialogForm" >
                 <h:panelGroup id="display2" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
@@ -295,7 +295,7 @@
                     <br/>
                 </h:panelGroup>
                 <h:panelGroup>
-                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update="pmTab:transferOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.reassignWorkOrder()}" value="#{msg.TransferOrder}" update="@(.transferOrderDialogClass) :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'transferOrderDialog');"/>
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
