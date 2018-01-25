@@ -1,13 +1,13 @@
 package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.AssetInfoRepository;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+
+import java.util.*;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.UserAccountRepository;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +29,6 @@ import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.QrCodeLib;
-import java.util.UUID;
 import webapp.framework.dao.SearchFilter;
 
 @ManagedBean
@@ -45,6 +44,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     OrgInfoRepository orgInfoRepository;
 
     private String orgName;
+    private String orgNameEn;
+    private String retrieval;
     @Override
     protected void init() {
         filterBySite = false;
@@ -98,11 +99,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return userList;
     }
     public void buildOrdTree(){
-//        if(selected!=null)
-//            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, selected.getId());
-//        else
-//            orgTree = uaaService.getFullOrgTreeBySiteId(this.tenantId, null);
-
         orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
@@ -110,12 +106,24 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         catch(Exception ex){
         }
     }
+    public void filterNode(){
+      if(!StringUtils.isEmpty(retrieval)) {
+          orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+      }else{//列出所有机构
+ orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+      }
+        this.selectedNode = (TreeNode) orgTree.getData();
+    }
+
+
+
 
     public List<OrgInfo> getHospitalListBySiteId(){
         return uaaService.getHospitalListBySiteId(tenantId);
     }
     
     private TreeNode orgTree;
+
     public TreeNode getOrgTree(){
         return orgTree;
     }
@@ -130,6 +138,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     
     public void prepareCreateInstitution(){
         orgName=null;
+        orgNameEn=null;
         OrgInfo org = new OrgInfo();
         org.setSiteId(tenantId);
 
@@ -173,6 +182,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         
     public void prepareCreateSite(){
         orgName=null;
+        orgNameEn=null;
         if(selected==null) return;
 
         OrgInfo org = new OrgInfo();
@@ -196,6 +206,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     
     public void prepareCreateDepartment(){
         orgName=null;
+        orgNameEn=null;
         if(selected==null) return;
         
         OrgInfo org = new OrgInfo();
@@ -220,7 +231,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     private boolean  exist(List<OrgInfo> orgTypeList){
         for(OrgInfo orgInfo:orgTypeList){
-            if(orgInfo.getName().equalsIgnoreCase(orgName)){
+            if(orgInfo.getNameEn()!=null){
+
+            };
+
+            if(orgInfo.getName().equalsIgnoreCase(orgName) && orgNameEn.equalsIgnoreCase(orgInfo.getNameEn())){
                 WebUtil.addErrorMessage(orgName+"已经存在");
 return true;
             }
@@ -232,7 +247,7 @@ return true;
         // String orgNameTmp =selected.getName();
         List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
         for(OrgInfo orgInfo:orgTypeList){
-            if(orgInfo.getName().equalsIgnoreCase(orgName)){
+            if(orgInfo.getName().equalsIgnoreCase(orgName) && orgNameEn.equalsIgnoreCase(orgInfo.getNameEn())){
                 WebUtil.addErrorMessage(orgName+"已经存在");
                 return;
             }
@@ -249,6 +264,7 @@ return true;
         }else{
     assetInfoRepository.updateClinicalName(orgName, selected.getUid());
     selected.setName(orgName);
+    selected.setNameEn(orgNameEn);
 
         }
       //如果更新的或者添加的org没有重名,就保存或更新
@@ -256,6 +272,7 @@ return true;
         initWorkflowConfig();
         buildOrdTree();
         orgName = null;
+        orgNameEn = null;
     }
     
     public void initWorkflowConfig(){
@@ -330,7 +347,8 @@ return true;
         TreeNode node = event.getTreeNode();
         selected = (OrgInfo)node.getData();
         preName =selected.getName();
-        orgName =selected.getName();;
+        orgName =selected.getName();
+        orgNameEn = selected.getNameEn();
         if(selected!=null) {
             if (selected.getOrgType() == 4) {
                 acShow = true;
@@ -352,7 +370,6 @@ return true;
             if(exFkey.getRootCause().getMessage().toLowerCase().contains("foreign key constraint ")){
                 String errMessage = WebUtil.getMessage("ForeighKeyErrorWithOrgId");
                 WebUtil.addErrorMessage(errMessage);
-
                 return true;
             }
         }
@@ -404,5 +421,21 @@ return true;
 
     public void setPreName(String preName) {
         this.preName = preName;
+    }
+
+    public String getOrgNameEn() {
+        return orgNameEn;
+    }
+
+    public void setOrgNameEn(String orgNameEn) {
+        this.orgNameEn = orgNameEn;
+    }
+
+    public String getRetrieval() {
+        return retrieval;
+    }
+
+    public void setRetrieval(String retrieval) {
+        this.retrieval = retrieval;
     }
 }

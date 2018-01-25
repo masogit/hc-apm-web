@@ -41,9 +41,8 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
 
-    //V2_WorkOrderRepository dao;
     V2_PmOrderRepository dao;
-private String dptName;
+    private String dptName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
     private V2_PmOrderService pmOrderService;
@@ -105,6 +104,17 @@ private String dptName;
 
     private String pmOrderId;
     private String filterPlanTime;
+
+
+    public boolean test(V2_PmOrder item){
+  // if(selected!=null)
+        if(item!=null)
+      return  item.getCurrentPersonId().equals(userContextService.getLoginUserUid());
+        else{
+            return false;
+        }
+  // return true;
+    }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -243,7 +253,7 @@ private String dptName;
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        queryIndex = -1;
+        queryIndex = 8;
         this.filterBySite = false;
         this.filterByHospital = false;
 
@@ -477,7 +487,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
 
-        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime());
+        pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         cancel();
     }
 
@@ -503,7 +513,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         needConfirmTime = false;
     }
 
-
     public void prepareEditAccDetail(String itemId) {
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
@@ -514,13 +523,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
-    public void deleteWoDetail(String itemId, Integer index) {
+    public void removeWoDetail(String itemId, Integer index) {
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-            detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
-            coWorkerDao.delete(itemId);
         }
     }
     public void prepareEditCoWorkerDetail(String itemId) {
@@ -538,7 +545,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
-//        detailDao.save(itemDetail);
         cancelWorkdetail();
     }
     private V2_WorkOrderCoworkerRepository coWorkerDao;
@@ -548,7 +554,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
-//        coWorkerDao.save(coWorkerDetail);
         cancelWorkdetail();
     }
 
