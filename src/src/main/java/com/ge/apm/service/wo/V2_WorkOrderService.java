@@ -261,14 +261,15 @@ public class V2_WorkOrderService {
         }
     }
     
-    public void approveAction(V2_WorkOrder selectedWorkOrder, Boolean agree,String comments) {
+    public void approveAction(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> approvedDetails,String comments) {
         selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         
-        String res = srApi.invokeWorkOrderAction(token,formData,agree?"approvalPass":"approvalReject",selectedWorkOrder.getId());
+        String res = srApi.invokeWorkOrderAction(token,formData,"approvalPass",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }
