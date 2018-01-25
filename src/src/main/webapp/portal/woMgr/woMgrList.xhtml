@@ -106,7 +106,7 @@
                             <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
                         </p:column>
                         <p:column headerText="审批" rendered="#{workOrderMgrController.queryIndex==10}">
-                            <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update=":approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                            <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                         </p:column>
                         <p:column headerText="#{msg.Acknowledge}" rendered="#{workOrderMgrController.queryIndex==5}">
                             <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update=":ackDialogForm" oncomplete="PF('ackDialog').show()"/>
