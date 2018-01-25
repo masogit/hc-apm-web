@@ -70,9 +70,9 @@
                                         <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
                                     </p:column>
                                     <p:column headerText="#{msg.Actions}">
-                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}" update=":pmmoreAccDialogDlg :pmmoreAccDialogForm" oncomplete="PF('pmmoreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update=":pmmoreAccDialogDlg :pmmoreAccDialogForm" oncomplete="PF('pmmoreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
-                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.deleteWoDetail(item.id,1)}" update=":pmrepairCompleteDialogForm:accessList" rendered="#{item.id ne '000'}">
+                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}" update="pmTab:pmmoreAccDialogDlg pmTab:pmmoreAccDialogForm" oncomplete="PF('pmmoreAccDialogDlg').show()" rendered="#{item.id eq '000'}"/>
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update="pmTab:pmmoreAccDialogDlg pmTab:pmmoreAccDialogForm" oncomplete="PF('pmmoreAccDialogDlg').show()" rendered="#{item.id ne '000'}" />
+                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.removeWoDetail(item.id,1)}" update="pmTab:pmrepairCompleteDialogForm:accessList" rendered="#{item.id ne '000'}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                         </p:commandButton>
                                     </p:column>
@@ -89,9 +89,9 @@
                                         <h:outputText value="#{item.manHours}" />
                                     </p:column>
                                     <p:column headerText="#{msg.Actions}">
-                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail('new')}" update=":pmcoworkerDlg :pmcoworkerDlgForm" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id eq '000'}"/>
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail(item.id)}" update=":pmcoworkerDlg" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
-                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.deleteWoDetail(item.id,2)}" update=":pmrepairCompleteDialogForm :pmrepairCompleteDialogForm:pmcoworkerList" rendered="#{item.id ne '000'}">
+                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail('new')}" update="pmTab:pmcoworkerDlg pmTab:pmcoworkerDlgForm" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id eq '000'}"/>
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail(item.id)}" update="pmTab:pmcoworkerDlg" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
+                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.removeWoDetail(item.id,2)}" update="pmTab:pmrepairCompleteDialogForm pmTab:pmrepairCompleteDialogForm:pmcoworkerList" rendered="#{item.id ne '000'}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                         </p:commandButton>
                                     </p:column>
@@ -117,10 +117,10 @@
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
-                        <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update=":pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
+                        <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
 
-                        <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl :approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                        <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl pmTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -146,7 +146,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.submitAppvalPmOrder}" value="确认" icon="ui-icon-check" update=":pmOrderListForm:datalist" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.submitAppvalPmOrder}" value="确认" icon="ui-icon-check" update="pmTab:pmOrderListForm:datalist" oncomplete="PF('pmrepairCompleteDialog').hide();handleSubmit(args, 'approveDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>

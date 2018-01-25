@@ -38,7 +38,8 @@
                 <p:menuitem id="um10" value="#{msg.ServiceRequestMgmt}" outcome="/portal/sr/srList.xhtml" rendered="false"/>
                 <p:menuitem  id="um2001" value="#{msg.dispatchMgmt}" outcome="/portal/sr/dispatchList.xhtml" rendered="false"/> 
 
-                <p:menuitem  value="维修工作台" outcome="/portal/woMgr/woMgrList.xhtml"/>
+               <!-- <p:menuitem  value="维修工作台" outcome="/portal/woMgr/woMgrList.xhtml"/>-->
+                <p:menuitem  value="维修工作台" outcome="/portal/woMgr/workOrderList.xhtml"/>
                 <p:menuitem id="um12" value="我的维修工单" outcome="/portal/sr/processList.xhtml" rendered="false"/>
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
                 <p:menuitem id="um085" value="#{msg.AssetTagMsgSubscriber}" outcome="/portal/asset/assetTag/TagSubscribeList.xhtml"/>
@@ -63,11 +64,11 @@
             </p:submenu>
 
             <p:submenu  id="um60"  label="预防维护" rendered="#{userContextService.hasAnyRole('ClinicalStaff, DeptHead') and !userContextService.hasRole('AssetStaff')}" icon="fa fa-check-square-o" >
-                <p:menuitem id="um601"  value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
+                <p:menuitem id="um601"  value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o"
                        rendered="#{userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')}" >
-                <p:menuitem   value="保养工作台" outcome="/portal/pm/pmOrderList.xhtml"/>
+                <p:menuitem   value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml"/>
 <!--                <p:menuitem id="um25" value="#{msg.Inspection}" outcome="/portal/insp/InspOrderList.xhtml"/>
                 <p:menuitem id="um26" value="#{msg.PmRecord}" outcome="/portal/pm/List"/>-->
                 <!--<p:menuitem id="um261" value="#{msg.PreventiveMaintaincePlanning}" url="/portal/analysis/reports.xhtml#/MaintenanceStats"/>-->
@@ -124,6 +125,8 @@
                 <p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>
                  <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasRole('ITAdmin') and !userContextService.hasRole('SuperAdmin')}"/>
                  <p:menuitem value="报告模版管理" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,DeptHead,SuperAdmin,AssetHead')}"/>
+                <p:menuitem id="um701" value="排班管理" outcome="/portal/schedule/userWorkList.xhtml" rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>
+                <p:menuitem id="um702" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml"/>
             </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>

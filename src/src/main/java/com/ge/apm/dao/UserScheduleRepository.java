@@ -1,0 +1,20 @@
+package com.ge.apm.dao;
+
+import com.ge.apm.domain.UserSchedule;
+import webapp.framework.dao.GenericRepositoryUUID;
+
+import java.util.Date;
+import java.util.List;
+
+/**
+ * Created by 212605082 on 2017/11/13.
+ */
+public interface UserScheduleRepository extends GenericRepositoryUUID<UserSchedule> {
+
+    public List<UserSchedule> findByTypeAndUserUID(String type, String userUID);
+
+    public UserSchedule findByTypeAndUserUIDAndScheduleDate(String type, String userUID, Date scheduleDate);
+
+    public List<UserSchedule> findByTypeAndScheduleDateAndTenantUID(String type, Date scheduleDate, String tenantUID);
+
+}
