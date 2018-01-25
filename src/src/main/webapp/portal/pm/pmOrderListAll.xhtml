@@ -1,0 +1,34 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="保养工单报表"/>
+            </div>
+
+            <div class="ui-g-12 ">
+                <p:tabView class="ui-g-12" id="pmTab" dynamic="true" cache="false">
+                   <!-- <p:ajax event="tabChange"/>-->
+                    <p:tab class="ui-g-12" title="内部保养" id="inWorkOrder">
+                        <ui:include src="pmOrderList.xhtml"/>
+                    </p:tab>
+                    <p:tab class="ui-g-12" title="外部保养" id="pmOrderListIn">
+                        <ui:include src="pmOrderListOut.xhtml"/>
+                    </p:tab>
+
+                    <p:tab class="ui-g-12" title="远程保养"  id="pmOrderListRemote">
+                        <ui:include src="pmOrderListRemote.xhtml"/>
+                    </p:tab>
+
+
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

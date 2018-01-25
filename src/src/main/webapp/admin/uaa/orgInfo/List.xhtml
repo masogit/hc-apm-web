@@ -34,6 +34,10 @@
                                         <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
                                 </p:tree>
+                                <h:panelGroup>
+                                    <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
+                                    <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
+                                </h:panelGroup>
                             </p:scrollPanel>
                         </div>
                     </div>
@@ -88,12 +92,19 @@
                                     <br/>
                                     <h:panelGroup>
                                         <label class="label">#{msg.nameEn}</label>
-                                        <p:inputText id="nameEn" value="#{orgInfoController.selected.nameEn}" />
+                                        <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}" />
                                     </h:panelGroup>
                                     <p:spacer></p:spacer>
                                     <p:commandButton style="width: 90px;" process=":editForm:editPanel" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}"  update="orgTree editPanel :growl"/>
 
                                 </p:panelGrid>
+
+                                <h:panelGroup>
+
+
+
+
+                                </h:panelGroup>
 
                             </h:panelGroup>
                         </div>

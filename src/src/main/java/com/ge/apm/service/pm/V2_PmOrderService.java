@@ -253,9 +253,10 @@ formData.setAttachments(attachment);
 
 
 
-    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime) {
+    public void stagingPmrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setAttachments(attachment);
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         if(endTime !=null)

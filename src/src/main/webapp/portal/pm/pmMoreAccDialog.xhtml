@@ -15,8 +15,9 @@
                             <p:inputText id="parts" value="#{v2PmOrderController.itemDetail.parts}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">备件(数量)*</label>
-                            <p:inputNumber  maxValue="999999" decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}"/>
+
+                            <label class="label">备件(数量)</label>
+                            <p:inputNumber  maxValue="999999"  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">备件单价(元)*</label>
@@ -50,7 +51,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addAcessItem}" value="#{msg.Save}" update=":pmrepairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addAcessItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                         <p:commandButton immediate="true" actionListener="#{v2PmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                     </h:panelGroup>
                 </h:panelGroup>

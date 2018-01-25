@@ -436,11 +436,10 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
-
-                    <p:panel  header="保养记录">
+<!--test-->
+                    <p:panel  header="内部保养记录">
                         <f:facet name="actions">
-                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderList?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/MetrologyOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         </f:facet>
                         <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoController.selected.uid,3)}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="创建人" >
@@ -457,8 +456,10 @@
                             </p:column>
                         </p:dataTable>
                     </p:panel>
-
-                   <!-- <p:panel  header="外修保养记录epm">
+                    <p:panel  header="远程保养记录">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                        </f:facet>
                         <p:dataTable var="item" value="#{assetInfoController.getPmScheduleData('epm')}" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="保养编号" >
                                 <h:outputText value="#{item.assetNum}"/>
@@ -470,35 +471,7 @@
                                 <h:outputText value="#{item.scheduleDate}"/>
                             </p:column>
                         </p:dataTable>
-                    </p:panel>-->
-                   <!-- <p:panel  header="egm">
-                        <p:dataTable var="item" value="#{assetInfoController.getPmScheduleData('pm')}" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="保养编号" >
-                                <h:outputText value="#{item.assetNum}"/>
-                            </p:column>
-                            <p:column headerText="关单日期" >
-                                <h:outputText value="#{item.closeDate}"/>
-                            </p:column>
-                            <p:column headerText="当前处理步骤" >
-                                <h:outputText value="#{item.scheduleDate}"/>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>-->
-
-                   <!-- <p:panel  header="外修工单 external_work_order">
-                        <p:dataTable var="item" value="#{assetInfoController.getExWordOrder()}" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="工单号" >
-                                <h:outputText value="#{item.srNum}"/>
-                            </p:column>
-                            <p:column headerText="更新日期" >
-                                <h:outputText value="#{item.updateTime}"/>
-                            </p:column>
-                            <p:column headerText="医院" >
-                                <h:outputText value="#{item.hospitalName}"/>
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>-->
-
+                    </p:panel>
                 </p:panelGrid>
             </h:form>
 

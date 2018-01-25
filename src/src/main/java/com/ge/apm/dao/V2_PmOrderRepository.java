@@ -12,6 +12,9 @@ import java.util.List;
 public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> {
 
 
+	@Query(value = "select * from v2_pm_order  where asset_uid =?1  order by created_date desc limit 4", nativeQuery = true)
+	public List<V2_PmOrder> getPmOrdersForAsset(String assetUid);
+
 	@Query("select distinct tr.assetId from BiomedGroupUser bgu,AssetTagBiomedGroup tbg, AssetTagRule tr where bgu.groupId = tbg.biomedGroupId and tbg.tagId = tr.tagId and bgu.userId = ?1")
 	public List<Integer> getAssetsByTagGroup(Integer currentPersonId);
    /* List<V2_PmOrder> findBySrId(String srId);
