@@ -91,7 +91,18 @@ public class WorkflowConfig implements Serializable {
     @Column(name="asset_approver",columnDefinition = "CHAR(32)")
     private String assetApprover;
     
-    public Integer getPmReminderTime() {
+    @Column(name = "warranty_remind_days")
+    private Integer warrantyRemindDays;//维保提前通知时间，单位：天
+
+	public Integer getWarrantyRemindDays() {
+		return warrantyRemindDays;
+	}
+
+	public void setWarrantyRemindDays(Integer warrantyRemindDays) {
+		this.warrantyRemindDays = warrantyRemindDays;
+	}
+
+	public Integer getPmReminderTime() {
 		return pmReminderTime;
 	}
 

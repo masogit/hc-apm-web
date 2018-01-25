@@ -11,7 +11,7 @@
         <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
+                    <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                         <h:panelGroup >
 
                             <label class="label">集团</label>
@@ -109,6 +109,10 @@
                         <h:panelGroup rendered="true">
                             <label class = "label">不允许临时账号?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">维保提醒时间(天)</label>
+                            <p:inputText id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" />
                         </h:panelGroup >
 
                         <!-- <p:spacer/> -->
