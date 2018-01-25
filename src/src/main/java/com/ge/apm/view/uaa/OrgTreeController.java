@@ -124,7 +124,7 @@ public class OrgTreeController {
     public TreeNode getDeptOrgTree(String siteUid) {
         if (null == deptOrgTree || !siteUid.equals(deptOrgTree.getRowKey())) {
             List<OrgInfo> deptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid());
-            deptOrgTree = buildTree(deptList.stream().filter(item -> Strings.isNullOrEmpty(siteUid) || item.getTenantUID().equals(siteUid)
+            deptOrgTree = buildTree(deptList.stream().distinct().filter(item -> Strings.isNullOrEmpty(siteUid) || item.getTenantUID().equals(siteUid)
                     || item.getInstitutionUID().equals(siteUid) || item.getHospitalUID().equals(siteUid) || item.getSiteUID().equals(siteUid)).collect(Collectors.toList()));
             deptOrgTree.setRowKey(siteUid);
             selectedDeptOrgNode = null;
