@@ -94,6 +94,10 @@
                             <label class = "label">工单完工不需要验收?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
                         </h:panelGroup >
+                        <h:panelGroup >
+                            <label class = "label">工单完工自动关单?</label>
+                            <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}"/>
+                        </h:panelGroup >
                         <h:panelGroup rendered="true">
                             <label class = "label">是否自动派工?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}"/>

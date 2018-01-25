@@ -71,6 +71,9 @@ public class WorkflowConfig implements Serializable {
     
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
+
+    @Column(name = "auto_close")
+    private Boolean autoClose;// 自动关单
     
     @Column(name = "pm_reminder_time")
     private Integer pmReminderTime;//保养提醒时间，单位‘天’
@@ -332,7 +335,15 @@ public class WorkflowConfig implements Serializable {
     public void setAssetApprover(String assetApprover) {
         this.assetApprover = assetApprover;
     }
-    
+
+    public Boolean getAutoClose() {
+        return autoClose;
+    }
+
+    public void setAutoClose(Boolean autoClose) {
+        this.autoClose = autoClose;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
