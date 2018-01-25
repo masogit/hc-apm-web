@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="保养">
+        <p:dialog class ="takeOrderDialogClass" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@(body)" header="保养">
             <h:form id="pmrepairCompleteDialogForm" >
                 <h:panelGroup  id="display5" style="height:500px">
                     <!--<p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
@@ -120,14 +120,14 @@
                         <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
 
-                        <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl pmTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                        <p:commandButton validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1}" actionListener="" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
 
-        <p:dialog id="approveDialog" widgetVar="approveDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="选择审核人">
+        <p:dialog class ="approveDialogClass" id="approveDialog" widgetVar="approveDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="选择审核人">
             <h:form id="approveDialogForm" >
                 <h:panelGroup id="display2" rendered="#{v2PmOrderController.selectedPmOrder !=null}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
