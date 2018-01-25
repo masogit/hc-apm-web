@@ -109,8 +109,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void filterNode(){
       if(!StringUtils.isEmpty(retrieval)) {
           orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
-/*if(mark==4)
-    orgTree = uaaService.getFilterOrgTreeBySite(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);*/
       }else{//列出所有机构
  orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
       }
