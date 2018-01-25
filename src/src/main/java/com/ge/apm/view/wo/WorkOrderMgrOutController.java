@@ -352,11 +352,6 @@ public class WorkOrderMgrOutController extends GenericCRUDUUIDController<Externa
         cancel();
     }
 
-    public void approveWorkOrder(Boolean isAgree) {
-        woService.approveAction(selectedWorkOrder, isAgree, comments);
-        cancel();
-    }
-
     public List<V2_BlobObject> getPicListByBoType(String boType) {
         if(picList !=null){
         return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
