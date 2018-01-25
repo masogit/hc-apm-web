@@ -125,6 +125,8 @@
                 <p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>
                  <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{userContextService.hasRole('ITAdmin') and !userContextService.hasRole('SuperAdmin')}"/>
                  <p:menuitem value="报告模版管理" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,DeptHead,SuperAdmin,AssetHead')}"/>
+                <p:menuitem id="um701" value="排班管理" outcome="/portal/schedule/userWorkList.xhtml" rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>
+                <p:menuitem id="um702" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml"/>
             </p:submenu>
 
             <p:menuitem id="um53" value="#{msg.profile}" icon="person" outcome="/portal/profile.xhtml"/>
