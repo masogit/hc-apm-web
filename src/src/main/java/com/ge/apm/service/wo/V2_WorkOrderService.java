@@ -266,6 +266,7 @@ public class V2_WorkOrderService {
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        approvedDetails.stream().forEach(item -> item.setCreatedDate(null));
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         
