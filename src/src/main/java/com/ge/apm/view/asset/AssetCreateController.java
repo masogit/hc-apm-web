@@ -202,6 +202,9 @@ public class AssetCreateController {
             OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
+        } else {
+            assetInfo.setClinicalDeptName(null);
+            assetInfo.setClinicalDeptUID(null);
         }
         this.owner = null;
         this.clinicalOwner = null;
