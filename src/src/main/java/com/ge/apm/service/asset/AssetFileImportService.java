@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -137,6 +139,8 @@ public class AssetFileImportService {
 //    }
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
 
+        Date now = new Date();
+
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
         int dataRow = 7;
@@ -243,6 +247,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map);
                 assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map);
 
+
                 if (isNewAsset) {
                     asset.setSiteId(currentOrg.getSiteId());
                     asset.setHospitalId(currentOrg.getHospitalId());
@@ -256,8 +261,17 @@ public class AssetFileImportService {
 //                    asset.setStatus(1);
                     asset.setDeviceStatus(0);
                     asset.setIsDeleted(Boolean.FALSE);
+
+                    asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+                    asset.setCreatedDate(now);
+                    asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+                    asset.setLastModifiedDate(now);
+
                 } else {
                     cleanRelatedFieldsWhenUpdating(asset);
+
+                    asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+                    asset.setLastModifiedDate(now);
                 }
 
                 map.put("asset", asset);
