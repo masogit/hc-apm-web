@@ -261,6 +261,7 @@ public class AssetInstallationController {
 
     public List<AssetInfo> getParentAssetList() {
         List<SearchFilter> assetFilters = new ArrayList<>();
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
 //        assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getAssetGroup()));
