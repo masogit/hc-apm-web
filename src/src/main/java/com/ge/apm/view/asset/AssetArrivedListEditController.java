@@ -107,10 +107,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
                 initEasyInstallItem();
                 this.changeFunctionGroup();
-                TreeNode treeNode = gbCodeService.buildGbTree();
-                gbTree = new DefaultTreeNode("root", null, null);
-                gbTree.getChildren().add(treeNode);
-                treeNode.setExpanded(true);
+
             }
             prepareEdit();
         }
@@ -233,8 +230,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
         }
 
-        StringBuilder financingNumErrorMsg= new StringBuilder();
-        
+        StringBuilder financingNumErrorMsg = new StringBuilder();
+
         String prefix = easyInstallItem.getFinancingNum();
         List<ArrivalListItem> submitItem = getNewInstallAssetList().subList(0, installCount);
         for (ArrivalListItem item : submitItem) {
@@ -262,7 +259,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     String financingNum = gennerateFinancingNum(easyInstallItem, easyInstallItem.getFinancingNum());
                     if (null != financingNum && financingNum.startsWith("error:")) {
                         String errorMsg = financingNum.replace("error:", "");
-                        if(financingNumErrorMsg.lastIndexOf(errorMsg)<0){
+                        if (financingNumErrorMsg.lastIndexOf(errorMsg) < 0) {
                             financingNumErrorMsg.append(errorMsg).append("\r\n");
                         }
                         financingNum = "";
@@ -277,7 +274,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 break;
             }
         }
-        if(financingNumErrorMsg.length() >0 ){
+        if (financingNumErrorMsg.length() > 0) {
             WebUtil.addErrorMessage(financingNumErrorMsg.toString());
         }
         WebUtil.addSuccessMessage("提交成功");
@@ -488,11 +485,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public TreeNode getGbTree() {
+        if (gbTree == null) {
+            TreeNode treeNode = gbCodeService.buildGbTree();
+            gbTree = new DefaultTreeNode("root", null, null);
+            gbTree.getChildren().add(treeNode);
+            treeNode.setExpanded(true);
+        }
         return gbTree;
-    }
-
-    public void setGbTree(TreeNode gbTree) {
-        this.gbTree = gbTree;
     }
 
 }
