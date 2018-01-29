@@ -82,26 +82,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String approvaler;
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
-    //create service request
     private V2_WorkOrderService woService;
     private V2_ServiceRequest newServiceRequest;
     private BlobObjectRepository blobDao;
     private String pmOrderId;
     private String filterPlanTime;
-
-
-   /* private ServerEventInterface callingController;
-    public void onChange(TabChangeEvent event) {
-        Tab activeTab = event.getTab();
-        switch (activeTab.getId()) {
-            case "pmOrderList":
-                break;
-            case "pmOrderListOut":
-                break;
-            case "pmOrderListRemote":
-                break;
-        }
-    }*/
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -132,7 +117,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public OrgInfo getOrgInfoByUid(String orgUid) {
         return orgDao.getByUid(orgUid);
     }
-    private V2_PmOrder v2PmOrder;
     public void savePM(){
           PmOrderActionForm formData = new PmOrderActionForm();
         if(Strings.isNullOrEmpty(dptName)){
