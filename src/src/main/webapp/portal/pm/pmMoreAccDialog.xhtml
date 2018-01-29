@@ -6,7 +6,7 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
     <ui:composition>
-        <p:dialog id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="550"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
+        <p:dialog class="pmmoreAccDialogDlgCls" id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="550"  resizable="true" draggable="true" appendTo="@(body)" header="备件对话框">
             <h:form id="pmmoreAccDialogForm" >
                 <h:panelGroup id="display42" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -51,7 +51,7 @@
                     </p:panelGrid>
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addAcessItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.addAcessItem}" value="#{msg.Save}" update="pmTab:pmrepairCompleteDialogForm pmTab:pmrepairCompleteDialogForm:accessList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                         <p:commandButton immediate="true" actionListener="#{v2PmOrderController.cancelWorkdetail}" value="#{msg.Cancel}" update=":growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmmoreAccDialogDlg');"/>
                     </h:panelGroup>
                 </h:panelGroup>
