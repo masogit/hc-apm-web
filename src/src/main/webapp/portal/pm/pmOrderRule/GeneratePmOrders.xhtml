@@ -26,7 +26,7 @@
 	                               </p:selectOneMenu>
 	                       </h:panelGroup> 
                           <h:panelGroup >
-		                     <label class ="label">#{msg.name}</label>
+		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{generatePmOrdersController.queryAsset.name}"  disabled="#{generatePmOrdersController.level == null}">
                                     <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList" />
                              </p:inputText>
