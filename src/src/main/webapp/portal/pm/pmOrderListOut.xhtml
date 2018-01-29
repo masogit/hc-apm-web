@@ -21,7 +21,7 @@
                     <p:dataTable id="datalist" value="#{v2PmOrderExController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{v2PmOrderExController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.scheduleDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
@@ -33,16 +33,25 @@
                         <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
+
+                        <p:column headerText="工单编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+
                         <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                         </p:column>
+
+                        <p:column headerText="状态" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.status}"/>
+                        </p:column>
+
                         <p:column headerText="保养计划时间" sortBy="#{item.scheduleDate}" filterBy="#{item.scheduleDate}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.scheduleDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
 
                         </p:column>
-
 
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
@@ -51,9 +60,6 @@
                         </f:facet>
                     </p:dataTable>
                 </h:form>
-             <!-- <ui:include src="pmOrderView.xhtml"/>-->
-
-
             </div>
         </div>
 

@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package com.ge.apm.view.pm;
-
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetFaultTypeService;
@@ -16,8 +15,10 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -25,14 +26,12 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-
 /**
  *v
  * @author 212579464
@@ -40,7 +39,6 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
-
     V2_PmOrderRepository dao;
     private String dptName;
     private OrgInfoRepository orgDao;
@@ -49,11 +47,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private V2_PmOrder selectedPmOrder;
     private String assetName;
     private Integer ruleLevel;
-
     private Date startTime;
     private Date endTime;
     private Date planTime;
-
     private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
@@ -62,27 +58,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private WorkOrderDetailRepository detailDao;
     private List<V2_PmOrder> selectedPmOrderList;
     //private V2_WorkOrderCoworkerRepository coWorkerDao;
-
     //status：2-待派工/3-已派工/4-已关单/5-已取消
     private Integer queryIndex;
-
-
     private AssetInfo selectedAsset;
-
     private Integer currentStatus = 1;
-
     private Boolean needConfirmTime = false;
-
     private String cancelReason;
     private String stepFileter;
-
     //for details form
     private List<V2_WorkOrder_Detail> accessoryList;
     private List<V2_WorkOrderCoworker> coWorkerList;
-
     private V2_WorkOrder_Detail itemDetail;
     private V2_WorkOrderCoworker coWorkerDetail;
-
     private Date esTime;
     private String comments;
     private Date confirmedUpDate;
@@ -93,48 +80,44 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String equipmentTaker;
     private Date takeTime;
     private String approvaler;
-
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
-
     //create service request
     private V2_WorkOrderService woService;
     private V2_ServiceRequest newServiceRequest;
     private BlobObjectRepository blobDao;
-
     private String pmOrderId;
     private String filterPlanTime;
 
 
-    public boolean test(V2_PmOrder item){
-  // if(selected!=null)
-        if(item!=null)
-      return  item.getCurrentPersonId().equals(userContextService.getLoginUserUid());
-        else{
-            return false;
+   /* private ServerEventInterface callingController;
+    public void onChange(TabChangeEvent event) {
+        Tab activeTab = event.getTab();
+        switch (activeTab.getId()) {
+            case "pmOrderList":
+                break;
+            case "pmOrderListOut":
+                break;
+            case "pmOrderListRemote":
+                break;
         }
-  // return true;
-    }
+    }*/
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
-
     public List<UserAccount> findRepairPerson(){
         if(this.selectedPmOrder!=null) {
             return  woService.getWorkerList(this.selectedPmOrder.getAssetId());
         } else {
             return Collections.emptyList();
         }
-
     }
-
     public void reassignWorkOrder(){
         pmOrderService.reassignWorkOrder(selectedPmOrder, selectedPmOrder.getCurrentPersonId(), comments);
        // cancel();
     }
-
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
@@ -145,9 +128,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
-
     }
-
     public OrgInfo getOrgInfoByUid(String orgUid) {
         return orgDao.getByUid(orgUid);
     }
@@ -167,7 +148,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
             cancel();
         }
-
     }
     public List<PmOrderSteps> aquirePmOrderStep(){
         if(selected!=null)
@@ -185,7 +165,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 			needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
 		}
 	}
-
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
@@ -193,10 +172,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
-
 		if(selectedPmOrder!=null){
 			selectedAsset=selectedPmOrder.getAssetInfo();
-
 			if(Strings.isNullOrEmpty(selectedAsset.getLocationName())){
 				final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
 				dptName = orgDao.getByUid(orgInfoUID).getName();
@@ -238,7 +215,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = null;
     }
     ///
-
     protected void init() {
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         dao = WebUtil.getBean(V2_PmOrderRepository.class);
@@ -253,19 +229,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        queryIndex = 8;
+        if(userContextService.hasRole("DeptHead")){
+            queryIndex= 8;
+        }else{
+            queryIndex = -1;
+        }
         this.filterBySite = false;
         this.filterByHospital = false;
-
     }
-
     public void submitAppvalPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler,comments);
         cancel();
     }
-
     public void rateWorkOrder() {
         pmOrderService.rateWorkOrder(selectedPmOrder, rating, comments);
         cancel();
@@ -289,7 +266,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         else
             return new ArrayList<UserAccount>();
     }
-
     public List<UserAccount> getApproveList() {
         if(this.selectedPmOrder!=null)
             return pmOrderService.getApproveList(selectedPmOrder.getAssetUid());
@@ -297,18 +273,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return new ArrayList<UserAccount>();
     }
     private List<Integer> tagGroupAssets;
-
     @Override
     protected GenericRepositoryUUID<V2_PmOrder> getDAO() {
         return dao;
     }
-
     public void acceptWorkOrder() {
         Date planTime =selectedPmOrder.getPlanTime();
         pmOrderService.acceptWorkOrder(selectedPmOrder, esTime,planTime);
         cancel();
     }
-
     private List<Integer> getTagGroupAssets() {
         if (tagGroupAssets == null) {
             tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
@@ -335,7 +308,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -358,25 +330,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         }else if (queryIndex == 8) { //待审核
-
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
            //1表示该pm工单已被提交等待审核
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
-
         }
         else if (queryIndex == 0) { //保养中
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*3+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-
              //   searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-
         }
          else if (queryIndex == 7) { //已关单
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -386,15 +354,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.selected = null;
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
-
     public void onSelectPmOrder(){
         accessoryList = getWorkOrderDetail(selected.getId());
         coWorkerList = getWorkOrderCoworker(selected.getId());
-
        // 获取picList
 		picList =  blobDao.findByBoUuid(selected.getId());
     }
-
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         List<V2_WorkOrder_Detail> list = pmOrderService.getWorkOrderDetails(woId);
         return pmOrderService.getWorkOrderDetails(woId);
@@ -402,9 +367,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
-
 public void closePM(V2_PmOrder selectedPmOrder){
-
         pmOrderService.closePM(selectedPmOrder,picList);
         cancel();
 }
@@ -412,12 +375,16 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if(selectedPmOrder!=null)
         pmOrderService.approvePMorder(selectedPmOrder,passreject);
     }
-
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
        confirmedUpDate = null;
        endTime=selectedPmOrder.getEndTime();
        accessoryList = getWorkOrderDetail(woid);
+       //临时添加
+       /* itemDetail = new V2_WorkOrder_Detail();
+        itemDetail.setId("2");
+        itemDetail.setParts("fuck");
+        accessoryList.add(itemDetail);*/
        coWorkerList = getWorkOrderCoworker(woid);
        picList = new ArrayList<V2_BlobObject>();
    }
@@ -440,8 +407,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         this.stepFileter = null;
         cancel();
     }
-
-
     public void cancel() {
         this.selectedAsset = null;
         planTime=null;
@@ -452,9 +417,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         dptName=null;
         picList=null;
         comments=null;
-
     }
-
     public void prepareAct(String woid) {
         selectedPmOrder = dao.findById(woid);
         /*if(selectedPmOrder.getAssetInfo()!=null)
@@ -464,8 +427,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
-
-
     public void repairPmOrder() {
         if(endTime==null){
             WebUtil.addErrorMessage("结束时间"+WebUtil.getMessage("ValidationRequire"));
@@ -480,17 +441,14 @@ public void closePM(V2_PmOrder selectedPmOrder){
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         cancel();
     }
-
     public void stagingPmOrder(){
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-
         pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         cancel();
     }
-
     @Override
     public void onServerEvent(String eventName, Object eventObject) {
         AssetInfo asset = (AssetInfo) eventObject;
@@ -504,7 +462,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         else{
             dptName=asset.getClinicalDeptName();
         }
-
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
@@ -512,13 +469,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
         }
         needConfirmTime = false;
     }
-
     public void prepareEditAccDetail(String itemId) {
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedPmOrder.getId());
-
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
@@ -535,12 +490,10 @@ public void closePM(V2_PmOrder selectedPmOrder){
             coWorkerDetail = new V2_WorkOrderCoworker();
             coWorkerDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             coWorkerDetail.setWoId(selectedPmOrder.getId());
-
         } else {
             coWorkerDetail = coWorkerList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
         }
     }
-
     public void addAcessItem() {
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
@@ -556,12 +509,10 @@ public void closePM(V2_PmOrder selectedPmOrder){
         }
         cancelWorkdetail();
     }
-
     public void cancelWorkdetail() {
         itemDetail = null;
         coWorkerDetail = null;
     }
-
     public void setPlanTimeFilter() {
         /*if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
             return;
@@ -579,7 +530,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
         filterPlanTime = null;
         filterIsFinished = "false";*/
-
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -587,91 +537,81 @@ public void closePM(V2_PmOrder selectedPmOrder){
             searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderId));
         }
     }
-
+    public boolean x2(){
+        if(accessoryList==null){
+return true;
+        }
+        if(accessoryList.size()>1){
+            return false;
+        }else {
+            return true;
+        }
+    }
     //getter and setter
     public Integer getQueryIndex() {
         return queryIndex;
     }
-
     public void setQueryIndex(Integer queryIndex) {
         this.queryIndex = queryIndex;
     }
-
     public AssetInfo getSelectedAsset() {
         return selectedAsset;
     }
-
     public void setSelectedAsset(AssetInfo selectedAsset) {
         this.selectedAsset = selectedAsset;
     }
-
     public Integer getCurrentStatus() {
         return currentStatus;
     }
-
     public void setCurrentStatus(Integer currentStatus) {
         this.currentStatus = currentStatus;
     }
-
     public Boolean getNeedConfirmTime() {
         return needConfirmTime;
     }
-
     public void setNeedConfirmTime(Boolean needConfirmTime) {
         this.needConfirmTime = needConfirmTime;
     }
-
     public String getCancelReason() {
         return cancelReason;
     }
-
     public void setCancelReason(String cancelReason) {
         this.cancelReason = cancelReason;
     }
-
     public V2_ServiceRequest getNewServiceRequest() {
         return newServiceRequest;
     }
-
     public void setNewServiceRequest(V2_ServiceRequest newServiceRequest) {
         this.newServiceRequest = newServiceRequest;
     }
-
     public Date getEsTime() {
         return esTime;
     }
-
     public void setEsTime(Date esTime) {
         this.esTime = esTime;
     }
-
     public String getComments() {
         return comments;
     }
-
     public void setComments(String comments) {
         this.comments = comments;
     }
-
     public Date getConfirmedUpDate() {
         return confirmedUpDate;
     }
-
     public void setConfirmedUpDate(Date confirmedUpDate) {
         this.confirmedUpDate = confirmedUpDate;
     }
-
     public String getCheckInDate() {
         return checkInDate;
     }
-
     public void setCheckInDate(String checkInDate) {
         this.checkInDate = checkInDate;
     }
-
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
-            return null;
+           // return null;
+            accessoryList = new ArrayList<V2_WorkOrder_Detail>();
         }
         V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
         emptyDetail.setId("000");
@@ -683,7 +623,6 @@ public void closePM(V2_PmOrder selectedPmOrder){
         }
         return accessoryList;
     }
-
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
             return null;
@@ -698,183 +637,138 @@ public void closePM(V2_PmOrder selectedPmOrder){
         }
         return coWorkerList;
     }
-
     public V2_WorkOrder_Detail getItemDetail() {
         return itemDetail;
     }
-
     public void setItemDetail(V2_WorkOrder_Detail itemDetail) {
         this.itemDetail = itemDetail;
     }
-
     public V2_WorkOrderCoworker getCoWorkerDetail() {
         return coWorkerDetail;
     }
-
     public void setCoWorkerDetail(V2_WorkOrderCoworker coWorkerDetail) {
         this.coWorkerDetail = coWorkerDetail;
     }
-
     public Integer getRating() {
         return rating;
     }
-
     public void setRating(Integer rating) {
         this.rating = rating;
     }
-
     public String getFailReason() {
         return failReason;
     }
-
     public void setFailReason(String failReason) {
         this.failReason = failReason;
     }
-
     public Date getConfirmedDownTime() {
         return confirmedDownTime;
     }
-
     public void setConfirmedDownTime(Date confirmedDownTime) {
         this.confirmedDownTime = confirmedDownTime;
     }
-
     public List<V2_PmOrder> getSelectedPmOrderList() {
         return selectedPmOrderList;
     }
-
     public void setSelectedPmOrderList(List<V2_PmOrder> selectedPmOrderList) {
         this.selectedPmOrderList = selectedPmOrderList;
     }
-
     public String getEquipmentTaker() {
         return equipmentTaker;
     }
-
     public void setEquipmentTaker(String equipmentTaker) {
         this.equipmentTaker = equipmentTaker;
     }
-
     public Date getTakeTime() {
         return takeTime;
     }
-
     public void setTakeTime(Date takeTime) {
         this.takeTime = takeTime;
     }
-
     public String getStepFileter() {
         return stepFileter;
     }
-
     public void setStepFileter(String stepFileter) {
         this.stepFileter = stepFileter;
     }
-
     public List<V2_BlobObject> getPicList() {
         return picList;
     }
-
     public void setPicList(List<V2_BlobObject> picList) {
         this.picList = picList;
     }
-
     public List<V2_BlobObject> getAudioList() {
         return audioList;
     }
-
     public void setAudioList(List<V2_BlobObject> audioList) {
         this.audioList = audioList;
     }
-
     public V2_PmOrder getSelectedPmOrder() {
         return selectedPmOrder;
     }
-
     public void setSelectedPmOrder(V2_PmOrder selectedPmOrder) {
         this.selectedPmOrder = selectedPmOrder;
     }
-
     public Date getStartTime() {
         return startTime;
     }
-
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
-
     public Date getEndTime() {
         return endTime;
     }
-
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
-
     public void setCoWorkerList(List<V2_WorkOrderCoworker> coWorkerList) {
         this.coWorkerList = coWorkerList;
     }
-
     public V2_WorkOrderCoworkerRepository getCoWorkerDao() {
         return coWorkerDao;
     }
-
     public void setCoWorkerDao(V2_WorkOrderCoworkerRepository coWorkerDao) {
         this.coWorkerDao = coWorkerDao;
     }
-
     public String getApprovaler() {
         return approvaler;
     }
-
     public void setApprovaler(String approvaler) {
         this.approvaler = approvaler;
     }
-
     public Date getPlanTime() {
         return planTime;
     }
-
     public void setPlanTime(Date planTime) {
         this.planTime = planTime;
     }
-
     public String getAssetName() {
         return assetName;
     }
-
     public void setAssetName(String assetName) {
         this.assetName = assetName;
     }
-
     public String getDptName() {
         return dptName;
     }
-
     public void setDptName(String dptName) {
         this.dptName = dptName;
     }
-
     public Integer getRuleLevel() {
         return ruleLevel;
     }
-
     public void setRuleLevel(Integer ruleLevel) {
         this.ruleLevel = ruleLevel;
     }
-
     public String getFilterPlanTime() {
         return filterPlanTime;
     }
-
     public void setFilterPlanTime(String filterPlanTime) {
         this.filterPlanTime = filterPlanTime;
     }
-
     public String getPmOrderId() {
         return pmOrderId;
     }
-
     public void setPmOrderId(String pmOrderId) {
         this.pmOrderId = pmOrderId;
     }
