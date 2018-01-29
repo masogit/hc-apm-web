@@ -136,7 +136,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.addworker}</label>
-                                <p:dataTable id="coworkerList" class="uiTransparent" value="#{workOrderMgrController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
+                                <p:dataTable id="coworkerList" class="coworkerList" value="#{workOrderMgrController.coWorkerList}" var="item" widgetVar="coworkerDataList" lazy="false" paginator="false"
                                              rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.coworker}">
                                         <h:outputText value="#{item.cowokerUserName}"/>
@@ -145,9 +145,9 @@
                                         <h:outputText value="#{item.manHours}" />
                                     </p:column>
                                     <p:column headerText="#{msg.Actions}">
-                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditCoWorkerDetail('new')}" update="woTab:coworkerDlg woTab:coworkerDlgForm" oncomplete="PF('coworkerDlg').show()" rendered="#{item.id eq '000'}"/>
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditCoWorkerDetail(item.id)}" update="woTab:coworkerDlg" oncomplete="PF('coworkerDlg').show()" rendered="#{item.id ne '000'}" />
-                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,2)}" update="woTab:repairCompleteDialogForm woTab:repairCompleteDialogForm:coworkerList" rendered="#{item.id ne '000'}">
+                                        <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}" actionListener="#{workOrderMgrController.prepareEditCoWorkerDetail('new')}" update="@(.coworkerDlg)" oncomplete="PF('coworkerDlg').show()" rendered="#{item.id eq '000'}"/>
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{workOrderMgrController.prepareEditCoWorkerDetail(item.id)}" update="@(.coworkerDlg)" oncomplete="PF('coworkerDlg').show()" rendered="#{item.id ne '000'}" />
+                                        <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,2)}" update="@(.coworkerList)" rendered="#{item.id ne '000'}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                         </p:commandButton>
                                     </p:column>
