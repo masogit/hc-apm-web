@@ -108,14 +108,11 @@
                             </h:panelGroup>
                             <h:panelGroup id="qrCode" rendered="#{assetArrivedListEditController.installCount eq 1}">
                                 <label class="label">#{msg.qrCode}</label>
-                                <p:inputText  value="#{assetArrivedListEditController.easyInstallItem.qrCode}" readonly="#{not empty assetArrivedListEditController.easyInstallItem.qrCode}"/>
+                                <p:inputText  value="#{assetArrivedListEditController.easyInstallItem.qrCode}">
+                                    <p:ajax process="@this" update="qrCode" />
+                                </p:inputText>
                                 <p:commandButton actionListener="#{assetArrivedListEditController.renewQrcode()}" disabled="#{not empty assetArrivedListEditController.easyInstallItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                             </h:panelGroup>
-<!--                            <h:panelGroup rendered="#{assetArrivedListEditController.installCount gt 1}">
-                                <label class="label">生成#{msg.financingNum}</label>
-                                <p:inputText value="#{assetArrivedListEditController.easyInstallItem.financingNum}" />
-                                <p:selectBooleanButton title="生成#{msg.financingNum}" onLabel="是" offLabel="否"  value="#{assetArrivedListEditController.generateMap['generateFinancingNum']}"/>
-                            </h:panelGroup>-->
 
                             <h:panelGroup rendered="#{assetArrivedListEditController.installCount gt 1}">
                                 <label class="label">生成#{msg.qrCode}</label>
