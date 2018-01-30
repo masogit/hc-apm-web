@@ -65,6 +65,13 @@
                             <label class="label">&nbsp;</label>
                             <p:selectBooleanCheckbox itemLabel="#{msg.isEnabled}" value="#{tenantInfoController.selected.isEnabled}"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.tenantType}</label>
+                            <p:selectOneMenu value="#{tenantInfoController.selected.type}" >
+                                <!-- <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" /> -->
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('tenantType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                     </p:panelGrid>
                     <br/>
                     <p:fieldset legend="#{msg.WorkOrderConfig}" rendered="false">
