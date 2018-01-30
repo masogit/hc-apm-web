@@ -131,7 +131,8 @@
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="到货">
-                                        <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
+                                        <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
+                                        <p:commandLink process="@this"  actionListener="#{workOrderMgrController.accessoryArrival(item.id)}" class="arrivalItem" rendered="#{item.id ne '000' and !item.arrived}" update="@(.accessList)">到货</p:commandLink>
                                     </p:column>
 
                                     <p:column headerText="#{msg.Actions}">
@@ -140,6 +141,7 @@
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{workOrderMgrController.deleteWoDetail(item.id,1)}" update="@(.accessList)" rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                         </p:commandButton>
+                                        <h:outputText value="已审核" rendered="#{item.id ne '000' and ( empty item.approved? false: item.approved)}" />
                                     </p:column>
                                 </p:dataTable>
                             </h:panelGroup>
@@ -178,7 +180,7 @@
             </h:form>
 
         </p:dialog>
-        <p:dialog id="submitCommentsDlg" widgetVar="submitCommentsDlg" modal="true" height="100" width="300"  resizable="false" draggable="true" appendTo="@(body)" header="#{msg.workcomplete}">
+        <p:dialog id="submitCommentsDlg" widgetVar="submitCommentsDlg" modal="true" height="100" width="300"  resizable="false" draggable="true" appendTo="@(body)" header="提交审核">
             <h:form id="submitCommentsDialogForm" >
                 <h:panelGroup>
                     <label class="label">申请审核原因</label>

@@ -664,6 +664,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
         }
     }
+    
+    public void accessoryArrival(String itemId){
+        accessoryList.stream().filter(item -> itemId.equals(item.getId())).forEach(item -> item.setArrived(true));
+    }
 
     //getter and setter
     public Integer getQueryIndex() {
