@@ -276,15 +276,21 @@ public class AssetFileImportService {
                 map.put("status", isNewAsset ? ImportStatus.New : ImportStatus.Exist);
                 map.put("rowData", rowMap);
 
-                if (departNum == null) {
-                    departNum = "";
-                }
-                result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
+                result.put(getAssetKey(asset), map);
 
             }catch(Exception e){
                 throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
             }
         }
+
+        return result;
+    }
+
+    public String getAssetKey(AssetInfo assetInfo) {
+        String result = assetInfo.getName();
+        result.concat(assetInfo.getDepartNum() == null ? "" : assetInfo.getDepartNum());
+        result.concat(assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum());
+        result.concat(assetInfo.getQrCode() == null ? "" : assetInfo.getQrCode());
 
         return result;
     }
@@ -572,8 +578,12 @@ public class AssetFileImportService {
             assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
         } else {
             assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
-            assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-            if (null != asset.getFinancingNum() && !asset.getFinancingNum().isEmpty()) {
+
+            if (!StringUtils.isEmpty(asset.getDepartNum())) {
+                assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+            }
+
+            if (!StringUtils.isEmpty(asset.getFinancingNum())) {
                 assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
             }
         }
