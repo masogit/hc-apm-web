@@ -93,7 +93,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url_createWorkOrder, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
-            return (String) responseMap.get("data");
+            return (String) responseMap.get("message");
         } else {
             return null;
         }

@@ -337,6 +337,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         confirmedDownTime = null;
         needConfirmTime = false;
     }
+    
+    public void prepareNewWorkOrder(String woid){
+        prepareAct(woid);
+        picList = new ArrayList<V2_BlobObject>();
+    }
 
     public void prepareAproval(String woid) {
         prepareAct(woid);
@@ -402,7 +407,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void createWorkOrder() {
         selectedWorkOrder.setComment(comments);
-        woService.reCreateWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), 2, comments, selectedWorkOrder.getIntExtType());
+        woService.reCreateWorkOrder(selectedWorkOrder, comments, selectedWorkOrder.getIntExtType(),picList);
+        cancel();
     }
 
     public void checkIn(String woid) {

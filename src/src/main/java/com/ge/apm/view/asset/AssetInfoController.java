@@ -404,8 +404,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return UrlEncryptController.encodeUrlParam(operation);
     }
 
-    public void assembleMaintainData() {
-        operation = "/portal/woMgr/woMgrList?faces-redirect=true&assetUID=" + selected.getUid();
+    public void assembleMaintainData(String assetUid) {
+        operation = "/portal/woMgr/workOrderList?faces-redirect=true&assetUID=" + assetUid;
     }
 
     public void assembleMaintainList() {
