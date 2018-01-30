@@ -39,8 +39,7 @@ public class AssetFileImportController {
     private UploadedFile file;
 
     private Map<String, Map<String, Object>> importOrgMap;
-//    private Map<String, Map<String, Object>> importAssetMap;
-    private List<Map<String, Object>> importAssetList;
+    private Map<String, Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
     private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
@@ -85,9 +84,9 @@ public class AssetFileImportController {
             }
 
             importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
-            importAssetList = aiService.getAssetMapFromTemplate(doc);
+            importAssetMap = aiService.getAssetMapFromTemplate(doc);
             
-            canbeImported = aiService.checkData(importOrgMap,importAssetList);
+            canbeImported = aiService.checkData(importOrgMap,importAssetMap);
 
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
@@ -103,15 +102,15 @@ public class AssetFileImportController {
     }
 
     public void importData() {
-        if (null != importAssetList) {
-            aiService.importData(importOrgMap, importAssetList, autoGenerateQrcode, autoGenerateFinancingNum,isGeneratePmOrder);
+        if (null != importAssetMap) {
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, autoGenerateFinancingNum,isGeneratePmOrder);
             isImported = true;
 
             try {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
 //                InputStream stream = this.file.getInputstream();
                 ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetList);
+                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
             } catch (IOException ex) {
                 Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
@@ -125,19 +124,19 @@ public class AssetFileImportController {
     }
     
     public Integer getAssetErrorCounts(){
-        if(null!=importAssetList && !importAssetList.isEmpty()){
-           return Integer.parseInt(String.valueOf(importAssetList.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+        if(null!=importAssetMap && !importAssetMap.isEmpty()){
+           return Integer.parseInt(String.valueOf(importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
         }else{
             return 0;
         }
     }
     
     public List<String> getAssetErrorList(){
-        if(null == importAssetList) {
+        if(null == importAssetMap) {
             return null;
         }
-        List<String> errors = importAssetList.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
-                .map(item -> item.get("errmsg").toString()).collect(Collectors.toList());
+        List<String> errors = importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
+                .map(item -> item.getValue().get("errmsg").toString()).collect(Collectors.toList());
         return errors;
     }
     
@@ -154,8 +153,8 @@ public class AssetFileImportController {
         return importOrgMap;
     }
 
-    public List<Map<String, Object>> getImportAssetList() {
-        return importAssetList;
+    public Map<String, Map<String, Object>> getImportAssetMap() {
+        return importAssetMap;
     }
 
     public Boolean getIsImported() {

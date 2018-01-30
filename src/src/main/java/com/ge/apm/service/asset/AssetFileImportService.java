@@ -135,11 +135,11 @@ public class AssetFileImportService {
 //        }
 //        return result;
 //    }
-    public List<Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
+    public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
 
         Date now = new Date();
 
-        List<Map<String, Object>> result = new LinkedList<>();
+        Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
         int dataRow = 7;
 
@@ -279,8 +279,7 @@ public class AssetFileImportService {
                 if (departNum == null) {
                     departNum = "";
                 }
-//                result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
-                result.add(map);
+                result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
 
             }catch(Exception e){
                 throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
@@ -317,7 +316,7 @@ public class AssetFileImportService {
 
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetList,
+    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum, Boolean isGeneratePmOrder) {
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
@@ -334,7 +333,7 @@ public class AssetFileImportService {
             }
         });
 
-        importAssetList.forEach(item -> {
+        importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             String orgName = newAsset.getClinicalDeptName();
@@ -508,7 +507,7 @@ public class AssetFileImportService {
         return true;
     }
 
-    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetList) {
+    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
         Boolean hasFailData = false;
@@ -526,8 +525,8 @@ public class AssetFileImportService {
 //        }
         Integer keyRowAsset = 6;
         Integer dataRowAsset = 7;
-        doc.clearRowsData(SHEET_ASSET, 7, 6 + importAssetList.size());
-        for (Map<String, Object> item : importAssetList) {
+        doc.clearRowsData(SHEET_ASSET, 7, 6 + importAssetMap.values().size());
+        for (Map<String, Object> item : importAssetMap.values()) {
             if (item.get("status").equals(ImportStatus.Failure)) {
                 doc.writeRowData(SHEET_ASSET, keyRowAsset, dataRowAsset++, (Map<String, Object>) item.get("rowData"));
                 hasFailData = true;
@@ -598,7 +597,7 @@ public class AssetFileImportService {
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetList) {
+    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
 
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
@@ -615,7 +614,7 @@ public class AssetFileImportService {
             }
         });
 
-        importAssetList.forEach(item -> {
+        importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
