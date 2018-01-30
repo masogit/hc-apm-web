@@ -48,7 +48,7 @@ public class AssetRowTest {
         AssetRow assetRow = new AssetRow(assetInfo, true, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
-        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null);
+        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
 
@@ -86,7 +86,7 @@ public class AssetRowTest {
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
-        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null);
+        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
 
@@ -117,7 +117,7 @@ public class AssetRowTest {
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
-        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null);
+        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
 
@@ -145,7 +145,7 @@ public class AssetRowTest {
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
         assetRow.setFieldDateValue("出厂日期", "setManufactDate");
-        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null);
+        assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
 

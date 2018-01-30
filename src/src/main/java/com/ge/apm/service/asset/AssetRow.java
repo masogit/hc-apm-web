@@ -133,7 +133,7 @@ public class AssetRow {
         }
     }
 
-    public void setFieldDropdownValue(String fieldName, String methodName, List<I18nMessage> msgList, Map map) {
+    public void setFieldDropdownValue(String fieldName, String methodName, List<I18nMessage> msgList, Map map, Integer defaultValue) {
         try {
             String fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
             Method method = AssetInfo.class.getMethod(methodName, Integer.class);
@@ -141,6 +141,10 @@ public class AssetRow {
             Integer selectedOption = null;
             if (!StringUtils.isEmpty(fieldValueOfString) && !DELETE_MARK.equals(fieldValueOfString)) {
                 selectedOption = getI18nMsgKey(msgList, fieldValueOfString, map, fieldName);
+            }
+
+            if (selectedOption == null) {
+                selectedOption = defaultValue;
             }
 
             if (isNew) {
