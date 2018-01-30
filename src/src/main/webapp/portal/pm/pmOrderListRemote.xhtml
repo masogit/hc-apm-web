@@ -19,13 +19,13 @@
 
                         <p:ajax event="rowSelect" listener="#{v2PmOrderRemController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm"/>
                         <p:ajax event="filter" listener="#{v2PmOrderRemController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
-
-                        <p:column headerText="工单编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.srNum}"/>
-                        </p:column>
                         <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.departNum}"/>
                         </p:column>
+                        <p:column headerText="工单编号" sortBy="#{item.srNum}" filterBy="#{item.srNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.srNum}"/>
+                        </p:column>
+
                         <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                         </p:column>

@@ -82,26 +82,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String approvaler;
     private List<V2_BlobObject> picList;
     private List<V2_BlobObject> audioList;
-    //create service request
     private V2_WorkOrderService woService;
     private V2_ServiceRequest newServiceRequest;
     private BlobObjectRepository blobDao;
     private String pmOrderId;
     private String filterPlanTime;
-
-
-   /* private ServerEventInterface callingController;
-    public void onChange(TabChangeEvent event) {
-        Tab activeTab = event.getTab();
-        switch (activeTab.getId()) {
-            case "pmOrderList":
-                break;
-            case "pmOrderListOut":
-                break;
-            case "pmOrderListRemote":
-                break;
-        }
-    }*/
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -132,7 +117,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public OrgInfo getOrgInfoByUid(String orgUid) {
         return orgDao.getByUid(orgUid);
     }
-    private V2_PmOrder v2PmOrder;
     public void savePM(){
           PmOrderActionForm formData = new PmOrderActionForm();
         if(Strings.isNullOrEmpty(dptName)){
@@ -304,7 +288,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
          if (queryIndex == 2) { //待派工  Assign
 			 List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
-           // searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
@@ -345,6 +328,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+
+
         }
          else if (queryIndex == 7) { //已关单
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -399,6 +384,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
     public void searchList(Integer buttonIndex) {
@@ -625,7 +611,7 @@ return true;
     }
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
-            return null;
+            coWorkerList  = new ArrayList<V2_WorkOrderCoworker>();
         }
         V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();
         emptyDetail.setId("000");
