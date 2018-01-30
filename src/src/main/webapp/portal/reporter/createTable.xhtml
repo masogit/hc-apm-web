@@ -14,12 +14,12 @@
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="CreateTemplateForm">
-                    <p:tabView  >
+                    <p:tabView  id="tabView">
                         <p:tab title="模版编辑">
 
                             <div class="ui-g-12 card cardTitle">
                                 <p:inputText id="pageTitle1" class="pageTitle" value="#{tableCreateController.table.title}"  required="true" requiredMessage="#{msg.name}#{msg.ValidationRequire}" >
-                                    <p:ajax update=":CreateTemplateForm"  listener="#{tableCreateController.onTitleChange}"/>
+                                    <p:ajax update=":CreateTemplateForm:tabView"  listener="#{tableCreateController.onTitleChange}"/>
                                 </p:inputText>
                             </div>
                             <c:forEach  items="#{tableCreateController.table.groups}" var="groupItem" varStatus="groupIndex">
