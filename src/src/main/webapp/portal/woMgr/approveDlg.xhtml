@@ -9,10 +9,7 @@
         <p:dialog id="approveDialog" widgetVar="approveDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审批" height="430">
             <h:form id="approveDialogForm" >
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
-                    <h:panelGroup>
-                        <label class="label">备注</label>
-                        <p:inputTextarea value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
-                    </h:panelGroup>
+                    
                     <p:fieldset legend="费用明细" >
 
                         <p:dataTable  id="accessList123" value="#{workOrderMgrController.approvedDetails}" var="item" paginator="false" 
@@ -24,9 +21,10 @@
                                 </p:selectBooleanCheckbox>
                                 <h:outputText value="已经通过审批"  rendered="#{item.approved}"/>
                                 <f:facet name="header"  >
-                                    <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
+                                    <p:selectBooleanCheckbox itemLabel="勾选审批" id="selectCheckBoxHeader" value="#{workOrderMgrController.selectedMap['All']}" class="selectCheckBoxHeader">
                                         <p:ajax  listener="#{workOrderMgrController.onApprovedDetailsSelected('All')}" update="@(.selectCheckBox)"/>
                                     </p:selectBooleanCheckbox>
+                                    <!--<h:outputText value="勾选审批" />-->
                                 </f:facet>
                             </p:column>
                             <p:column headerText="#{msg.accessory}">
@@ -62,12 +60,16 @@
 
                     </p:fieldset>
                     <h:panelGroup>
+                        <label class="label">备注</label>
+                        <p:inputTextarea value="#{workOrderMgrController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                    </h:panelGroup>
+                    <br/>
+                    <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approveDialog');"/>
                         <!--<p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder('false')}" value="拒绝" update=":woMgrListForm :woMgrDetailForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approveDialog');"/>-->
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('approveDialog').hide()"/>
                     </h:panelGroup>
 
-                    <br/>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
