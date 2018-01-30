@@ -95,8 +95,19 @@ public class TenantInfo implements Serializable {
 
     @Column(name = "password_lifetime")
     private Integer passwordLifeTime; //密码有效天数
+    
+    @Column(name = "type")
+    private Integer type = 0;//0、普通租户，1、代理商租户
 
-    public TenantInfo() {
+    public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
+	public TenantInfo() {
         isEnabled = true;
         wfAutoStep2 = false;
         wfAutoStep3 = false;
