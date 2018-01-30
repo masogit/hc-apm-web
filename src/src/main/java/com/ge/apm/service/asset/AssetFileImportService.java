@@ -192,19 +192,19 @@ public class AssetFileImportService {
                 assetRow.setFieldStringValue("注册证号", "setRegistrationNo");
                 assetRow.setFieldStringValue("供应商", "setVendor");
 
-                assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map);
+                assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map, null);
                 if (asset.getFunctionGroup() != null) {
                     List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(asset.getFunctionGroup()), siteId);
-                    assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map);
+                    assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map, null);
                 } else {
                     //only update need to clear old data
                     asset.setAssetCode68(null);
                 }
 
-                assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
+                assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map);
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, null);
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
@@ -215,7 +215,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
                 assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
 
-                assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map);
+                assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map, null);
 
                 assetRow.setFieldDateValue("出厂日期", "setManufactDate");
                 assetRow.setFieldDateValue("采购日期", "setPurchaseDate");
@@ -235,15 +235,15 @@ public class AssetFileImportService {
                 assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
                 assetRow.setFieldStringValue("备注", "setComments");
 
-                assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map);
-                assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map);
-                assetRow.setFieldDropdownValue("风险等级", "setRiskGrade", riskGradeList, map);
-                assetRow.setFieldDropdownValue("计量等级", "setMeasureGrade", measureGradeList, map);
-                assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map);
-                assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map);
-                assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map);
-                assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map);
-                assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map);
+                assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map, null);
+                assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map, null);
+                assetRow.setFieldDropdownValue("风险等级", "setRiskGrade", riskGradeList, map, null);
+                assetRow.setFieldDropdownValue("计量等级", "setMeasureGrade", measureGradeList, map, null);
+                assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map, null);
+                assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map, null);
+                assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map, null);
+                assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
+                assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
 
 
                 if (isNewAsset) {
