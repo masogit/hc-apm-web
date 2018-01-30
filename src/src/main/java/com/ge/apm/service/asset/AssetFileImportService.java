@@ -88,11 +88,9 @@ public class AssetFileImportService {
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, ++dataRow)) {
             OrgInfo org = new OrgInfo();
-            ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper)rowMap.get("部门名称");
-            if (valueWrapper == null) {
-                break;
-            }
-            String orgName = (String) valueWrapper.value;
+
+            String orgName = ExcelDocument.getCellStringValue(rowMap.get("部门名称"));
+
             if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
                 break;
             }
