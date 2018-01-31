@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <div class="ui-g">
+        <div class="ui-g-12 card">
+            <h:form enctype="multipart/form-data">
+                <p:fieldset  legend="批量导入计量数据" id="uploaderContainer">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <p:fileUpload fileUploadListener="#{measureFromExcelController.handleFileUpload}" mode="advanced"
+                                      dragDropSupport="false" multiple="false" auto="true"
+                                      invalidFileMessage="只支持xls或xlsx格式的文件"
+                                      invalidSizeMessage="文件大小不得超过5M"
+                                      update=":measuringTab:dataListForm, :measuringTab:measuringResultListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                      label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                        <p:growl id="messages" showDetail="true"/>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p>说明</p>
+                        <p>1. <a href="APM_MEASURING_Template.xls" title="download">#{msg.downloadTemplateFile}</a> </p>
+                        <p>2. 文件中填入要导入的计量数据</p>
+                        <p>3. 上传文件进行导入</p>
+                    </h:panelGroup>
+                </p:fieldset>
+            </h:form>
+        </div>
+
+        <div class="ui-g-12 card">
+            <h:form id="dataListForm">
+                <p:fieldset  legend="（设备序列号或资产编号）没有匹配到设备的数据">
+                    <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="10,20,50">
+                        <p:column headerText="EXCEL行数">
+                            <h:outputText value="#{item.excelIdex}" />
+                        </p:column>
+                        <p:column headerText="证书编号">
+                            <h:outputText value="#{item.certificateNo}" />
+                        </p:column>
+                        <p:column headerText="器具名称">
+                            <h:outputText value="#{item.assetName}" />
+                        </p:column>
+                        <p:column headerText="制造厂">
+                            <h:outputText value="#{item.assetManufacturer}" />
+                        </p:column>
+                        <p:column headerText="型号">
+                            <h:outputText value="#{item.assetModel}" />
+                        </p:column>
+                        <p:column headerText="资产编号">
+                            <h:outputText value="#{item.financeNo}" />
+                        </p:column>
+                        <p:column headerText="器具编号">
+                            <h:outputText value="#{item.assetNo}" />
+                        </p:column>
+                        <p:column headerText="付款否">
+                            <h:outputText value="#{item.pay}" />
+                        </p:column>
+                        <p:column headerText="检定结论">
+                            <h:outputText value="#{item.statusDisplay}" />
+                        </p:column>
+                        <p:column headerText="检定日期">
+                            <h:outputText value="#{item.checkDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="有效期至">
+                            <h:outputText value="#{item.validDateTo}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="检测单位">
+                            <h:outputText value="#{item.checkCompany}" />
+                        </p:column>
+                        <p:column headerText="检定人员">
+                            <h:outputText value="#{item.checkPerson}" />
+                        </p:column>
+                        <p:column headerText="项别">
+                            <h:outputText value="#{item.checkItem}" />
+                        </p:column>
+                        <p:column headerText="种别">
+                            <h:outputText value="#{item.type}" />
+                        </p:column>
+                        <p:column headerText="送检单位">
+                            <h:outputText value="#{item.department}" />
+                        </p:column>
+                        <p:column headerText="备注">
+                            <h:outputText value="#{item.comments}" />
+                        </p:column>
+                        <p:column headerText="过期否">
+                            <h:outputText value="#{true.equals(item.expired) ? '已检' : '待检'}" />
+                        </p:column>
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist" fileName="MeasuringFailed_export"/>
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </p:fieldset>
+            </h:form>
+        </div>
+    </div>
+</html>
