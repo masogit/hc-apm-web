@@ -288,9 +288,9 @@ public class AssetFileImportService {
 
     public String getAssetKey(AssetInfo assetInfo) {
         String result = assetInfo.getName();
-        result.concat(assetInfo.getDepartNum() == null ? "" : assetInfo.getDepartNum());
-        result.concat(assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum());
-        result.concat(assetInfo.getQrCode() == null ? "" : assetInfo.getQrCode());
+        result = result.concat(assetInfo.getDepartNum() == null ? "" : assetInfo.getDepartNum());
+        result = result.concat(assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum());
+        result = result.concat(assetInfo.getQrCode() == null ? "" : assetInfo.getQrCode());
 
         return result;
     }
