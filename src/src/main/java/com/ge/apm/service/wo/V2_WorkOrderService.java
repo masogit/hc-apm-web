@@ -102,12 +102,12 @@ public class V2_WorkOrderService {
         Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset,picList);
     }
     
-    public List<V2_BlobObject> getServiceRequestPicList(String srUid){
+    public List<V2_BlobObject> getPicListBySrUid(String srUid){
         List<SearchFilter> blobSearchFilters = new ArrayList();
         blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
-
+    
     public void cancelWorkOrder(String workOrderId, String reason,String assetStatus) {
         V2_WorkOrder wo = woDao.findById(workOrderId);
         String token = UserContextService.getAccessToken();
