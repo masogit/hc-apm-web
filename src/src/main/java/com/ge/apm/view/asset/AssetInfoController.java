@@ -485,6 +485,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             temp = new DateTime(object.getTerminateDate());
             object.setTerminateDate(temp.plusHours(12).toDate());
         }
+
+        Date now = new Date();
+
+        if (object.getId() == null) {
+            object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setCreatedDate(now);
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedDate(now);
+        } else {
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedDate(now);
+        }
     }
 
     public Boolean needAssetApproval(String siteUid) {
