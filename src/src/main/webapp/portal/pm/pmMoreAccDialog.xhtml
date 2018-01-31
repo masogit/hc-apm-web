@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
     <ui:composition>
         <p:dialog class="pmmoreAccDialogDlgCls" id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="550"  resizable="true" draggable="true" appendTo="@(body)" header="备件对话框">
-            <h:form id="pmmoreAccDialogForm" >
+            <h:form class="pmmoreAccDialogFormCls"  id="pmmoreAccDialogForm" >
                 <h:panelGroup id="display42" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>

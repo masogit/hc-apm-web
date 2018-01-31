@@ -16,7 +16,10 @@
 
                     <div class="ui-g-12 ui-lg-4">
                         <div class="card" style="height:400px;">
-
+                            <h:panelGroup>
+                                <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
+                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
+                            </h:panelGroup>
                             <p:commandButton id="btnSite" style="max-width:160px;" value="#{orgInfoController.selectedTenant.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelSite" for="btnSite" hideEffect="fade" dynamic="false" modal="false">
                                 <p:selectOneListbox style="border: none;" value="#{orgInfoController.tenantId}">
@@ -34,10 +37,10 @@
                                         <h:outputText value="#{node.name}"/>
                                     </p:treeNode>
                                 </p:tree>
-                                <h:panelGroup>
+                                <!--<h:panelGroup>
                                     <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
                                     <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
-                                </h:panelGroup>
+                                </h:panelGroup>-->
                             </p:scrollPanel>
                         </div>
                     </div>

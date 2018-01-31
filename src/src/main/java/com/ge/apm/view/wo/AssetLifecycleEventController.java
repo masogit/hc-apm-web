@@ -27,30 +27,31 @@ import java.util.stream.Collectors;
  */
 @ManagedBean
 @ViewScoped
-public class WorkOrderMgrOutController extends GenericCRUDUUIDController<ExternalWorkOrder> implements Serializable {
+public class AssetLifecycleEventController extends GenericCRUDUUIDController<AssetLifecycleEvent> implements Serializable {
 
-    private ExWorkOrderRepository dao;
+    private AssetLifecycleEventRepository dao;
 
     private UaaService uaaService;
 
     protected void init() {
         uaaService = WebUtil.getBean(UaaService.class);
-        dao = WebUtil.getBean(ExWorkOrderRepository.class);
+        dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
         this.filterBySite = false;
         this.filterByHospital = false;
 
     }
 
     @Override
-    protected GenericRepositoryUUID<ExternalWorkOrder> getDAO() {
+    protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
         return dao;
     }
 
     @Override
-    protected Page<ExternalWorkOrder> loadData(PageRequest pageRequest) {
+    protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
 
         this.setSearchFilter();
         this.selected = null;
+        searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, "3"));//3外部维修
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -59,14 +60,32 @@ public class WorkOrderMgrOutController extends GenericCRUDUUIDController<Externa
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-       // uaaService.get
-        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+
+
+        // uaaService.get
+        /*if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-}
+}*/
+    }
+
+    public void onSelectAssetLifecycleEvent() {
+        System.out.println("kdkdkd");
+    }
+
+    public String getX(int status) {
+        if (status == 1) {
+            return "open";
+        }
+        if (status == 2) {
+            return "close";
+        }
+
+        return "cancel";
+
     }
 
 }
