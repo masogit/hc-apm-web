@@ -64,7 +64,7 @@ public class MeasuringResultListController extends GenericCRUDUUIDController<Mea
             }
         }
 
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
 }
