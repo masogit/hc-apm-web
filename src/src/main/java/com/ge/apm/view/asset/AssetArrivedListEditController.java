@@ -66,6 +66,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private I18nMessageRepository i18nDao;
     private Integer installCount;
     private Map<String, Boolean> generateMap;
+    private Boolean generatePmorder;
 
     private String nationalStandardCode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
@@ -192,6 +193,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         installCount = 1;
+        generatePmorder = null;
 
         if (generateMap == null) {
             generateMap = new HashMap();
@@ -269,7 +271,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
 
             aiService.saveOrUpdateItem(item);
-            if (!aiService.submitInstallItem(item.getId(), true, generateMap.get("generatePmorder"))) {
+            if (!aiService.submitInstallItem(item.getId(), true, generatePmorder)) {
                 WebUtil.addErrorMessage("提交失败");
                 break;
             }
@@ -493,5 +495,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         return gbTree;
     }
+
+    public Boolean getGeneratePmorder() {
+        return generatePmorder;
+    }
+
+    public void setGeneratePmorder(Boolean generatePmorder) {
+        this.generatePmorder = generatePmorder;
+    }
+    
+    
 
 }
