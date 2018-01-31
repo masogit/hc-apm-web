@@ -48,7 +48,7 @@ public class AssetInstallationController {
 
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
-    private Boolean isGeneratePmOrder = false;
+    private Boolean isGeneratePmOrder;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
     private TreeNode selectedNode;
@@ -167,7 +167,7 @@ public class AssetInstallationController {
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), true, isGeneratePmOrder)) {
+            if (aiService.submitInstallItem(arrivalListItem.getId(), true, isGeneratePmOrder==null?false:isGeneratePmOrder)) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
