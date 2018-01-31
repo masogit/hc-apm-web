@@ -1,5 +1,6 @@
 package com.ge.apm.domain;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -24,6 +25,15 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(columnDefinition = "CHAR(32)")
     private String id;
 
+    //设备UID
+    @Column(name = "asset_uid")
+    private String assetUID;
+
+    @JoinColumn(insertable=false,updatable=false, name = "asset_uid", referencedColumnName = "uid")
+    @ManyToOne(optional = true, fetch = FetchType.EAGER)
+    @JsonBackReference
+    private AssetInfo assetInfo;
+
     //证书编号
     @Column(name = "certificate_no")
     private String certificateNo;
@@ -39,6 +49,10 @@ public class MeasuringCertificateDetail implements Serializable {
     //型号
     @Column(name = "asset_model")
     private String assetModel;
+
+    //设备序列号
+    @Column(name = "asset_sn")
+    private String assetSN;
 
     //财产编号
     @Column(name = "finance_no")
@@ -85,7 +99,7 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "type")
     private String type;
 
-    //所在科室
+    //送检单位
     @Column(name = "department")
     private String department;
 
@@ -306,6 +320,30 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setStatusDisplay(String statusDisplay) {
         this.statusDisplay = statusDisplay;
+    }
+
+    public String getAssetUID() {
+        return assetUID;
+    }
+
+    public void setAssetUID(String assetUID) {
+        this.assetUID = assetUID;
+    }
+
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
+    public String getAssetSN() {
+        return assetSN;
+    }
+
+    public void setAssetSN(String assetSN) {
+        this.assetSN = assetSN;
     }
 
     @Override

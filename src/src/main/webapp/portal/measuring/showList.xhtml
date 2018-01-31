@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:form id="measuringResultListForm">
+    <p:dataTable id="datalist" value="#{measuringResultListController.lazyModel}" var="item" widgetVar="varDataList"
+                 selectionMode="single" selection="#{measuringResultListController.selected}"
+                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                 rowsPerPageTemplate="20,40,60,90">
+
+        <p:ajax event="filter" listener="#{measuringResultListController.onFilter}"/>
+
+        <p:column headerText="设备名称"  filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetInfo.name}"/>
+        </p:column>
+        <p:column headerText="设备序列号" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetInfo.serialNum}"/>
+        </p:column>
+        <p:column headerText="资产编号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetInfo.financingNum}"/>
+        </p:column>
+        <p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetInfo.functionType}"/>
+        </p:column>
+        <p:column headerText="证书编号" filterBy="#{item.certificateNo}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.certificateNo}"/>
+        </p:column>
+        <p:column headerText="制造厂" filterBy="#{item.assetManufacturer}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetManufacturer}"/>
+        </p:column>
+        <p:column headerText="检定结论" filterBy="#{item.status}" filterMatchMode="EQ">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('measuringStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.status)}"/>
+        </p:column>
+        <p:column headerText="检定日期" sortBy="#{item.checkDate}" filterBy="#{item.checkDate}" filterMatchMode="GTE">
+            <f:facet name="filter">
+                <p:inputText id="filterCheckDate" widgetVar="varFilterCheckDate" />
+            </f:facet>
+            <h:outputText value="#{item.checkDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+        </p:column>
+        <p:column headerText="有效期至" sortBy="#{item.validDateTo}" filterBy="#{item.validDateTo}" filterMatchMode="GTE">
+            <f:facet name="filter">
+                <p:inputText id="filterValidDateTo" widgetVar="varFilterValidDateTo" />
+            </f:facet>
+            <h:outputText value="#{item.validDateTo}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+        </p:column>
+        <p:column headerText="送检单位" filterBy="#{item.department}">
+            <h:outputText value="#{item.department}"/>
+        </p:column>
+        <p:column headerText="检测单位" filterBy="#{item.checkCompany}">
+            <h:outputText value="#{item.checkCompany}"/>
+        </p:column>
+        <f:facet name="{Toolbar}">
+            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                <p:dataExporter type="xls" target="datalist" fileName="Measuring_export"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dataTable>
+</h:form>
+
+<p:overlayPanel widgetVar="panelFilterCheckDate" for=":measuringTab:measuringResultListForm:datalist:filterCheckDate" dismissable="false">
+    <h:panelGrid columns="2">
+        <p:outputLabel value="#{msg.From}"/>
+        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+        <p:outputLabel value="#{msg.To}"/>
+        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+    </h:panelGrid>
+    <p:commandButton onclick="setDateFilter('varDataList','varFilterCheckDate','varStartTimeFrom','varStartTimeTo'); PF('panelFilterCheckDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+    <p:commandButton onclick="PF('panelFilterCheckDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+</p:overlayPanel>
+
+<p:overlayPanel widgetVar="panelFilterValidDateTo" for=":measuringTab:measuringResultListForm:datalist:filterValidDateTo" dismissable="false">
+    <h:panelGrid columns="2">
+        <p:outputLabel value="#{msg.From}"/>
+        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+        <p:outputLabel value="#{msg.To}"/>
+        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+    </h:panelGrid>
+    <p:commandButton onclick="setDateFilter('varDataList','varFilterValidDateTo','varStartTimeFrom','varStartTimeTo'); PF('panelFilterValidDateTo').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+    <p:commandButton onclick="PF('panelFilterValidDateTo').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+</p:overlayPanel>
+
+</html>
