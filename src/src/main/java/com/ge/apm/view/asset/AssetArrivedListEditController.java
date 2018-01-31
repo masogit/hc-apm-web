@@ -258,7 +258,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     item.setQrCode(aiService.getNewQrcode(easyInstallItem.getArrivalList().getTenantUID(), easyInstallItem.getArrivalList().getSiteUID()).getQrCode());
                 }
                 if (generateMap.get("generateFinancingNum")) {
-                    String financingNum = gennerateFinancingNum(easyInstallItem, easyInstallItem.getFinancingNum());
+                    String financingNum = gennerateFinancingNum(easyInstallItem, prefix);
                     if (null != financingNum && financingNum.startsWith("error:")) {
                         String errorMsg = financingNum.replace("error:", "");
                         if (financingNumErrorMsg.lastIndexOf(errorMsg) < 0) {
