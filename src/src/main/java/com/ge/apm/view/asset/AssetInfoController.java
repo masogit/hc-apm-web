@@ -108,7 +108,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String measuring;
 
-    private Boolean isGeneratePmOrder = false;
+    private Boolean isGeneratePmOrder;
 
     private List<UserAccount> ownerList;
     private GbCodeService gbCodeService;
@@ -586,7 +586,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Boolean isNew = selected.hashCode() == 0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if (isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
+        if (isGeneratePmOrder!=null && isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
             pmService.createPMrequest(selected.getUid(), null);
         }
         if (resultStatus) {
