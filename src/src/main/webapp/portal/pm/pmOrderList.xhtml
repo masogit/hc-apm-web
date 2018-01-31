@@ -93,7 +93,7 @@
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
-                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialogForm)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialog)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
 
                             <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
@@ -251,9 +251,6 @@
         </p:dialog>
 <!--接单对话框-->
         <p:dialog class ="t1" id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="接单对话框">
-            <p:commandButton process="@(.t1)" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}">
-                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-            </p:commandButton>
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <h:panelGroup>

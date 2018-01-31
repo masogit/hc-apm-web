@@ -213,7 +213,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        if(userContextService.hasRole("DeptHead")){
+        if(userContextService.hasRole("DeptHead") || userContextService.hasRole("ClinicalStaff")){
             queryIndex= 8;
         }else{
             queryIndex = -1;
@@ -364,13 +364,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
        selectedPmOrder = dao.findById(woid);
        confirmedUpDate = null;
        endTime=selectedPmOrder.getEndTime();
+       planTime=selectedPmOrder.getPlanTime();
        accessoryList = getWorkOrderDetail(woid);
-       //临时添加
-       /* itemDetail = new V2_WorkOrder_Detail();
-        itemDetail.setId("2");
-        itemDetail.setParts("fuck");
-        accessoryList.add(itemDetail);*/
-       coWorkerList = getWorkOrderCoworker(woid);
+        coWorkerList = getWorkOrderCoworker(woid);
        picList = new ArrayList<V2_BlobObject>();
    }
     @Override
@@ -455,6 +451,8 @@ public void closePM(V2_PmOrder selectedPmOrder){
         }
         needConfirmTime = false;
     }
+
+
     public void prepareEditAccDetail(String itemId) {
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
@@ -484,7 +482,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (!accessoryList.contains(itemDetail)) {
             accessoryList.add(itemDetail);
         }
-        cancelWorkdetail();
+      //  cancelWorkdetail();
     }
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     public void addCoWokerItem() {
@@ -493,7 +491,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
         }
-        cancelWorkdetail();
+       // cancelWorkdetail();
     }
     public void cancelWorkdetail() {
         itemDetail = null;
@@ -525,7 +523,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
     public boolean x2(){
         if(accessoryList==null){
-return true;
+            return true;
         }
         if(accessoryList.size()>1){
             return false;
