@@ -97,6 +97,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
 
+    @Column(name="pm_simplify")
+    private Boolean pmSimplify; // 简化保养
+
 	public Integer getWarrantyRemindDays() {
 		return warrantyRemindDays;
 	}
@@ -342,6 +345,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setAutoClose(Boolean autoClose) {
         this.autoClose = autoClose;
+    }
+
+    public Boolean getPmSimplify() {
+        return pmSimplify;
+    }
+
+    public void setPmSimplify(Boolean pmSimplify) {
+        this.pmSimplify = pmSimplify;
     }
 
     @Override
