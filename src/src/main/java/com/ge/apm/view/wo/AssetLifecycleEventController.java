@@ -60,23 +60,20 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-
-
-        // uaaService.get
-        /*if (!this.hasFilterOnField("assetInfo.siteUID")) {
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-}*/
+}
     }
 
     public void onSelectAssetLifecycleEvent() {
         System.out.println("kdkdkd");
     }
 
-    public String getX(int status) {
+    public String getEvStatus(int status) {
         if (status == 1) {
             return "open";
         }
