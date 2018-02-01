@@ -6,15 +6,14 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 <ui:composition>
-    <p:dialog id="pmapproveDialog" widgetVar="pmapproveDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审批" height="430">
-        <h:form id="pmapproveDialogForm" >
+    <p:dialog class="pmapproveDialogCls" id="pmapproveDialog" widgetVar="pmapproveDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审批" height="430">
+        <h:form id="pmapproveDialogForm">
             <h:panelGroup id="display3" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
 
-                <p:fieldset legend="费用明细" >
+                <p:fieldset legend="备件审批" >
 
                     <p:dataTable  id="accessList123" value="#{v2PmOrderController.accessoryList}" var="item" paginator="false"
                                   rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                        <!--<p:column selectionMode="multiple" style="text-align:center;color: #000!important"/>-->
                         <p:column >
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
                                 <p:ajax listener="#{v2PmOrderController.onApprovedDetailsSelected(item.id)}"  update="@this @(.selectCheckBoxHeader)"/>
@@ -30,7 +29,6 @@
                         <p:column headerText="#{msg.accessory}">
                             <h:outputText value="#{item.parts}"/>
                         </p:column>
-
                        <!-- <p:column headerText="#{msg.accessoryQuantity}">
                             <h:outputText value="#{item.apartsQuantity}"/>
                         </p:column>
@@ -65,7 +63,7 @@
                 </h:panelGroup>
                 <br/>
                 <h:panelGroup>
-                   <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.approvePMorder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmapproveDialog');"/>
+                <!--   <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.approvePMorder()}" value="审批" update="woTab:woMgrListForm woTab:woMgrDetailForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmapproveDialog');"/>-->
                     <!--a<p:commandButton validateClient="true" actionListener="#{workOrderMgrController.approveWorkOrder('false')}" value="拒绝" update=":woMgrListForm :woMgrDetailForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'pmapproveDialog');"/>&ndash;&gt;
                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmapproveDialog').hide()"/>-->
                 </h:panelGroup>
