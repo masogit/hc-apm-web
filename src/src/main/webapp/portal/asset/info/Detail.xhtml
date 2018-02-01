@@ -389,7 +389,7 @@
                     <p:panel  header="#{msg.MaintainanceRecord}">
                         <f:facet name="actions">
                             <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" actionListener="#{assetInfoController.assembleMaintainList}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" actionListener="#{assetInfoController.assembleMaintainData}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" actionListener="#{assetInfoController.assembleMaintainData(assetInfoController.selected.uid)}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                         </f:facet>
 
                         <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoController.selected.id, 3)}" emptyMessage="#{msg.noRecordFound}">

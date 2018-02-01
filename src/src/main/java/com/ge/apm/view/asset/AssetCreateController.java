@@ -202,6 +202,9 @@ public class AssetCreateController {
             OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
+        } else {
+            assetInfo.setClinicalDeptName(null);
+            assetInfo.setClinicalDeptUID(null);
         }
         this.owner = null;
         this.clinicalOwner = null;
@@ -308,6 +311,7 @@ public class AssetCreateController {
 
      public List<AssetInfo> getParentAssetList() {
         List<SearchFilter> assetFilters = new ArrayList<>();
+         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.assetInfo.getTenantUID()));
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, assetInfo.getSiteUID()));
         if (!Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())) {
