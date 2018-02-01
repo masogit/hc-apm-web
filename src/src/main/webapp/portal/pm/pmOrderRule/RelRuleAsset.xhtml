@@ -19,7 +19,7 @@
                 <p:tab > -->
                    <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                           <h:panelGroup >
-		                     <label class ="label">#{msg.name}</label>
+		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{relRuleAssetController.queryAsset.name}"  required="false">
                                     <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule" />
                              </p:inputText>

@@ -9,16 +9,19 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="保养工单报表"/>
+                <p:outputLabel class="pageTitle" value="保养工单"/>
             </div>
 
             <div class="ui-g-12 ">
-                <p:tabView class="ui-g-12" id="pmTab" dynamic="true" cache="false">
+                <p:tabView class="ui-g-12" id="pmTab" dynamic="false" cache="false">
                    <!-- <p:ajax event="tabChange"/>-->
-                    <p:tab class="ui-g-12" title="内部保养" id="inWorkOrder">
+                 <!--   <p:ajax event="tabChange" listener="#{v2PmOrderController.onChange}" update="@(.pmOrderListFormRemote)"></p:ajax>-->
+
+                    <p:tab   class="ui-g-12" title="内部保养" id="pmOrderList">
+
                         <ui:include src="pmOrderList.xhtml"/>
                     </p:tab>
-                    <p:tab class="ui-g-12" title="外部保养" id="pmOrderListIn">
+                    <p:tab class="ui-g-12" title="外部保养" id="pmOrderListOut">
                         <ui:include src="pmOrderListOut.xhtml"/>
                     </p:tab>
 

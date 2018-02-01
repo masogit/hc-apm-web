@@ -35,7 +35,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -114,6 +117,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> tagNoGroupAssets;
 
     private String requestAssetUid;
+
+    private List<V2_WorkOrder_Detail> approvedDetails;
+    private Map<String, Boolean> selectedMap;
 
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
@@ -294,7 +300,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         locationName = null;
     }
 
-
     public void onSelectWorkOrder() {
         newServiceRequest = null;
         AssetInfoRepository assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -305,9 +310,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = getServiceRequestPicList(selected.getSrId(), 1);
     }
 
-
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
-        return woService.getServiceRequestPicList(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
+        return woService.getPicListBySrUid(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
@@ -315,7 +319,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
-        List<V2_WorkOrder_Detail> list = woService.getWorkOrderDetails(woId);
         return woService.getWorkOrderDetails(woId);
     }
 
@@ -333,6 +336,18 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         confirmedUpDate = null;
         confirmedDownTime = null;
         needConfirmTime = false;
+    }
+    
+    public void prepareNewWorkOrder(String woid){
+        prepareAct(woid);
+        picList = new ArrayList<V2_BlobObject>();
+    }
+
+    public void prepareAproval(String woid) {
+        prepareAct(woid);
+        selectedMap = new HashMap<>();
+        approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
+        approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
     }
 
     public void prepareCloseOrder(String woid) {
@@ -392,7 +407,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void createWorkOrder() {
         selectedWorkOrder.setComment(comments);
-        woService.reCreateWorkOrder(selectedWorkOrder, selectedWorkOrder.getCurrentPersonId(), 2, comments, selectedWorkOrder.getIntExtType());
+        woService.reCreateWorkOrder(selectedWorkOrder, comments, selectedWorkOrder.getIntExtType(),picList);
+        cancel();
     }
 
     public void checkIn(String woid) {
@@ -413,15 +429,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void cancelWorkOrder() {
 
-        woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason,assetStatus);
-
+        woService.cancelWorkOrder(selectedWorkOrder.getId(), cancelReason, assetStatus);
 
         cancelReason = null;
         cancel();
     }
-
-
-
 
     public void takeEquip() {
         if (Strings.isNullOrEmpty(equipmentTaker)) {
@@ -576,7 +588,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         if (index == 1) {
             accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
 
-           // detailDao.delete(itemId);
+            // detailDao.delete(itemId);
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
@@ -637,17 +649,30 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         cancel();
     }
 
-    public void approveWorkOrder(Boolean isAgree) {
-        woService.approveAction(selectedWorkOrder, isAgree, comments);
+    public void approveWorkOrder() {
+        approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
+        woService.approveAction(selectedWorkOrder, approvedDetails, comments);
         cancel();
     }
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
-        if(picList !=null){
-        return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
-        }
-        else
+        if (picList != null) {
+            return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
+        }else{
             return null;
+        }
+    }
+    
+    public void onApprovedDetailsSelected(String id) {
+        if ("All".equals(id)) {
+            approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
+        } else {
+            selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
+        }
+    }
+    
+    public void accessoryArrival(String itemId){
+        accessoryList.stream().filter(item -> itemId.equals(item.getId())).forEach(item -> item.setArrived(true));
     }
 
     //getter and setter
@@ -876,4 +901,18 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public void setAssetStatus(String assetStatus) {
         this.assetStatus = assetStatus;
     }
+
+    public List<V2_WorkOrder_Detail> getApprovedDetails() {
+        return approvedDetails;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
 }
+

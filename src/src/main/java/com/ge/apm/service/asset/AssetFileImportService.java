@@ -18,6 +18,8 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -86,11 +88,9 @@ public class AssetFileImportService {
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, ++dataRow)) {
             OrgInfo org = new OrgInfo();
-            ExcelDocument.ValueWrapper valueWrapper = (ExcelDocument.ValueWrapper)rowMap.get("部门名称");
-            if (valueWrapper == null) {
-                break;
-            }
-            String orgName = (String) valueWrapper.value;
+
+            String orgName = ExcelDocument.getCellStringValue(rowMap.get("部门名称"));
+
             if (orgName == null || orgName.isEmpty() || orgName.equals(AssetRow.DELETE_MARK)) {
                 break;
             }
@@ -136,6 +136,8 @@ public class AssetFileImportService {
 //        return result;
 //    }
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
+
+        Date now = new Date();
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
@@ -190,19 +192,19 @@ public class AssetFileImportService {
                 assetRow.setFieldStringValue("注册证号", "setRegistrationNo");
                 assetRow.setFieldStringValue("供应商", "setVendor");
 
-                assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map);
+                assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", assetFunctionTypes, map, null);
                 if (asset.getFunctionGroup() != null) {
                     List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(asset.getFunctionGroup()), siteId);
-                    assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map);
+                    assetRow.setFieldDropdownValue("医疗器械子分类", "setAssetCode68", msgList, map, null);
                 } else {
                     //only update need to clear old data
                     asset.setAssetCode68(null);
                 }
 
-                assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map);
+                assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map);
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, null);
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
@@ -213,7 +215,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
                 assetRow.setFieldDoubleValue("使用年限", "setLifecycleInYear");
 
-                assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map);
+                assetRow.setFieldDropdownValue("折旧算法", "setDepreciationMethod", depreciationMethod, map, null);
 
                 assetRow.setFieldDateValue("出厂日期", "setManufactDate");
                 assetRow.setFieldDateValue("采购日期", "setPurchaseDate");
@@ -233,15 +235,16 @@ public class AssetFileImportService {
                 assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
                 assetRow.setFieldStringValue("备注", "setComments");
 
-                assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map);
-                assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map);
-                assetRow.setFieldDropdownValue("风险等级", "setRiskGrade", riskGradeList, map);
-                assetRow.setFieldDropdownValue("计量等级", "setMeasureGrade", measureGradeList, map);
-                assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map);
-                assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map);
-                assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map);
-                assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map);
-                assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map);
+                assetRow.setFieldDropdownValue("用途分类", "setAssetUsage", assetUsageList, map, null);
+                assetRow.setFieldDropdownValue("资金来源", "setCapitalSource", capitalSourceList, map, null);
+                assetRow.setFieldDropdownValue("风险等级", "setRiskGrade", riskGradeList, map, null);
+                assetRow.setFieldDropdownValue("计量等级", "setMeasureGrade", measureGradeList, map, null);
+                assetRow.setFieldDropdownValue("计量项目类别", "setMeasuringItemCategory", measuringItemCategoryList, map, null);
+                assetRow.setFieldDropdownValue("是否急救设备", "setEmergencyEquipment", emergencyEquipmentList, map, null);
+                assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map, null);
+                assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
+                assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
+
 
                 if (isNewAsset) {
                     asset.setSiteId(currentOrg.getSiteId());
@@ -256,23 +259,38 @@ public class AssetFileImportService {
 //                    asset.setStatus(1);
                     asset.setDeviceStatus(0);
                     asset.setIsDeleted(Boolean.FALSE);
+
+                    asset.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+                    asset.setCreatedDate(now);
+                    asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+                    asset.setLastModifiedDate(now);
+
                 } else {
                     cleanRelatedFieldsWhenUpdating(asset);
+
+                    asset.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+                    asset.setLastModifiedDate(now);
                 }
 
                 map.put("asset", asset);
                 map.put("status", isNewAsset ? ImportStatus.New : ImportStatus.Exist);
                 map.put("rowData", rowMap);
 
-                if (departNum == null) {
-                    departNum = "";
-                }
-                result.put(departNum.concat(assetName).concat(financingNum == null ? "" : financingNum), map);
+                result.put(getAssetKey(asset), map);
 
             }catch(Exception e){
                 throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
             }
         }
+
+        return result;
+    }
+
+    public String getAssetKey(AssetInfo assetInfo) {
+        String result = assetInfo.getName();
+        result = result.concat(assetInfo.getDepartNum() == null ? "" : assetInfo.getDepartNum());
+        result = result.concat(assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum());
+        result = result.concat(assetInfo.getQrCode() == null ? "" : assetInfo.getQrCode());
 
         return result;
     }
@@ -560,8 +578,12 @@ public class AssetFileImportService {
             assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
         } else {
             assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
-            assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-            if (null != asset.getFinancingNum() && !asset.getFinancingNum().isEmpty()) {
+
+            if (!StringUtils.isEmpty(asset.getDepartNum())) {
+                assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+            }
+
+            if (!StringUtils.isEmpty(asset.getFinancingNum())) {
                 assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
             }
         }

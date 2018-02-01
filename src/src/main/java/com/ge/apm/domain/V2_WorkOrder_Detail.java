@@ -75,6 +75,9 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "parts_type")
     private String partsType;
 
+    @Column(name = "approved")
+    private Boolean approved;
+
     public String getId() {
         return id;
     }
@@ -187,6 +190,14 @@ public class V2_WorkOrder_Detail implements Serializable {
         this.arrived = arrived;
     }
 
+    public Boolean getApproved() {
+        return approved;
+    }
+
+    public void setApproved(Boolean approved) {
+        this.approved = approved;
+    }
+    
     @Override
     public int hashCode() {
         Integer hash = 0;
@@ -201,7 +212,7 @@ public class V2_WorkOrder_Detail implements Serializable {
     public void setPartsType(String partsType) {
         this.partsType = partsType;
     }
-    
+
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set

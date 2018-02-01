@@ -66,6 +66,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private I18nMessageRepository i18nDao;
     private Integer installCount;
     private Map<String, Boolean> generateMap;
+    private Boolean generatePmorder;
 
     private String nationalStandardCode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
@@ -107,10 +108,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
                 initEasyInstallItem();
                 this.changeFunctionGroup();
-                TreeNode treeNode = gbCodeService.buildGbTree();
-                gbTree = new DefaultTreeNode("root", null, null);
-                gbTree.getChildren().add(treeNode);
-                treeNode.setExpanded(true);
+
             }
             prepareEdit();
         }
@@ -195,6 +193,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         installCount = 1;
+        generatePmorder = null;
 
         if (generateMap == null) {
             generateMap = new HashMap();
@@ -233,7 +232,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
         }
 
-        String prefix =  easyInstallItem.getFinancingNum();
+        StringBuilder financingNumErrorMsg = new StringBuilder();
+
+        String prefix = easyInstallItem.getFinancingNum();
         List<ArrivalListItem> submitItem = getNewInstallAssetList().subList(0, installCount);
         for (ArrivalListItem item : submitItem) {
             item.setClinicalDeptUID(easyInstallItem.getClinicalDeptUID());
@@ -257,15 +258,26 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                     item.setQrCode(aiService.getNewQrcode(easyInstallItem.getArrivalList().getTenantUID(), easyInstallItem.getArrivalList().getSiteUID()).getQrCode());
                 }
                 if (generateMap.get("generateFinancingNum")) {
-                    item.setFinancingNum(gennerateFinancingNum(item, prefix));
+                    String financingNum = gennerateFinancingNum(easyInstallItem, prefix);
+                    if (null != financingNum && financingNum.startsWith("error:")) {
+                        String errorMsg = financingNum.replace("error:", "");
+                        if (financingNumErrorMsg.lastIndexOf(errorMsg) < 0) {
+                            financingNumErrorMsg.append(errorMsg).append("\r\n");
+                        }
+                        financingNum = "";
+                    }
+                    item.setFinancingNum(financingNum);
                 }
             }
 
             aiService.saveOrUpdateItem(item);
-            if (!aiService.submitInstallItem(item.getId(), true, generateMap.get("generatePmorder"))) {
+            if (!aiService.submitInstallItem(item.getId(), true, generatePmorder)) {
                 WebUtil.addErrorMessage("提交失败");
                 break;
             }
+        }
+        if (financingNumErrorMsg.length() > 0) {
+            WebUtil.addErrorMessage(financingNumErrorMsg.toString());
         }
         WebUtil.addSuccessMessage("提交成功");
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
@@ -282,16 +294,17 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
 
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
-                item.getNationalStandardCode().split("/")[0], item.getClinicalDeptUID()==null?item.getArrivalList().getSiteUID():item.getClinicalDeptUID(), item.getParentAssetId(), prifix);
-        if(null!= financingNum && financingNum.startsWith("error:")){
-            WebUtil.addErrorMessage(financingNum.replace("error:", ""));
-            financingNum = "";
-        }
+                item.getNationalStandardCode().split("/")[0], item.getClinicalDeptUID() == null ? item.getArrivalList().getSiteUID() : item.getClinicalDeptUID(), item.getParentAssetId(), prifix);
         return financingNum;
     }
 
     public void generateFinacialNum() {
-        easyInstallItem.setFinancingNum(gennerateFinancingNum(easyInstallItem, easyInstallItem.getFinancingNum()));
+        String financingNum = gennerateFinancingNum(easyInstallItem, easyInstallItem.getFinancingNum());
+        if (null != financingNum && financingNum.startsWith("error:")) {
+            WebUtil.addErrorMessage(financingNum.replace("error:", ""));
+            financingNum = "";
+        }
+        easyInstallItem.setFinancingNum(financingNum);
     }
 
     public void renewQrcode() {
@@ -382,18 +395,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         } else {
             nationalStandardCode = gbCode.getCode() + "/" + gbCode.getName();
         }
-        //联动更新
-//        if (null != gbCodeName) {
-//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(null,
-//                    gbCode.getCode(),
-//                    this.arrivalListItem.getArrivalList().getSiteUID()
-//            );
-//            this.arrivalListItem.setNationalStandardCode(gbCodeName);
-//            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-//                this.arrivalListItem.setFinancingNum(financingNum);
-//            }
-////
-//        }
     }
 
     public List<String> completeGbName(String prefix) {
@@ -486,11 +487,23 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public TreeNode getGbTree() {
+        if (gbTree == null) {
+            TreeNode treeNode = gbCodeService.buildGbTree();
+            gbTree = new DefaultTreeNode("root", null, null);
+            gbTree.getChildren().add(treeNode);
+            treeNode.setExpanded(true);
+        }
         return gbTree;
     }
 
-    public void setGbTree(TreeNode gbTree) {
-        this.gbTree = gbTree;
+    public Boolean getGeneratePmorder() {
+        return generatePmorder;
     }
+
+    public void setGeneratePmorder(Boolean generatePmorder) {
+        this.generatePmorder = generatePmorder;
+    }
+    
+    
 
 }

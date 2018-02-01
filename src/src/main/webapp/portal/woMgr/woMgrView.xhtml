@@ -96,14 +96,14 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <!--<p:dataGrid var="picItem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="4" layout="grid"  rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
-                        <f:facet name="header">维修图片</f:facet>
+                    <p:dataGrid var="woPicItem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
+                        <f:facet name="header">维修图片#</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
-                                <p:graphicImage url="#{fileDownloadService.getFileUrl(picItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(woPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
                             </h:panelGrid>
                         </p:panel>
-                    </p:dataGrid>-->
+                    </p:dataGrid>
                     <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
                         <f:facet name="header">报修语音</f:facet>
                         <p:panel  style="text-align:center">
@@ -266,22 +266,22 @@
                             <h:panelGroup >
                                 <p:dataList value="#{workOrderMgrController.getServiceRequestMessageList(woItem.id)}" var="msgItem" rendered="#{not empty workOrderMgrController.getServiceRequestMessageList(woItem.id)}">
                             <!--#{msgItem.message} #{msgItem.sendTime} #{msgItem.senderUserName}-->
-                            <h:outputText value="#{msgItem.sendTime}" >
-                                 <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
-                            </h:outputText>
-                            <h:outputText value="#{msgItem.senderUserName}"  style="padding-left: 10px"/>
-                            <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
+                                    <h:outputText value="#{msgItem.sendTime}" >
+                                        <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
+                                    </h:outputText>
+                                    <h:outputText value="#{msgItem.senderUserName}"  style="padding-left: 10px"/>
+                                    <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
 
-                        </p:dataList>
+                                </p:dataList>
 
-                    </h:panelGroup>
+                            </h:panelGroup>
 
 
                         </p:fieldset>
 
                     </c:forEach>
 
-                    
+
 
 
 

@@ -65,6 +65,7 @@
 
 
                     </p:panelGrid>
+                    
                     <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="5" layout="grid">
                         <f:facet name="header">报修图片</f:facet>
                         <p:panel  style="text-align:center">
@@ -82,9 +83,13 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" validateClient="true" update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" disabled="#{workOrderMgrController.selectedAsset.repairForm eq 2}" validateClient="true" update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
 
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update="woTab:ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                    </h:panelGroup>
+                    
+                     <h:panelGroup >
+                       <h:outputText style="color:red; font-size:18px" value="   该设备可以外修,报修电话:4008128188" rendered="#{workOrderMgrController.selectedAsset.repairForm eq 2 or workOrderMgrController.selectedAsset.repairForm eq 3}"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>

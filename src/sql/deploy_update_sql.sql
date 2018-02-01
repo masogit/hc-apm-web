@@ -48,3 +48,8 @@ update v2_service_request s set from_dept_uid=(select uid from org_info o where 
 
 -- update asset_group for "其他"
 update Asset_info set asset_group=99 where asset_group=22
+
+
+--删除多院区角色
+delete from  user_role where role_id=6
+delete from sys_role where "name"='MultiHospital'

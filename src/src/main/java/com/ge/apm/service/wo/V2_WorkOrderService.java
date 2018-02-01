@@ -102,12 +102,12 @@ public class V2_WorkOrderService {
         Map<String, Object> data = srApi.createServiceRequest(token, newServiceRequest, asset,picList);
     }
     
-    public List<V2_BlobObject> getServiceRequestPicList(String srUid){
+    public List<V2_BlobObject> getPicListBySrUid(String srUid){
         List<SearchFilter> blobSearchFilters = new ArrayList();
         blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
-
+    
     public void cancelWorkOrder(String workOrderId, String reason,String assetStatus) {
         V2_WorkOrder wo = woDao.findById(workOrderId);
         String token = UserContextService.getAccessToken();
@@ -261,14 +261,16 @@ public class V2_WorkOrderService {
         }
     }
     
-    public void approveAction(V2_WorkOrder selectedWorkOrder, Boolean agree,String comments) {
+    public void approveAction(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> approvedDetails,String comments) {
         selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
+        approvedDetails.stream().forEach(item -> item.setCreatedDate(null));
+        formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         
-        String res = srApi.invokeWorkOrderAction(token,formData,agree?"approvalPass":"approvalReject",selectedWorkOrder.getId());
+        String res = srApi.invokeWorkOrderAction(token,formData,"approvalPass",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }
@@ -364,15 +366,16 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void reCreateWorkOrder(V2_WorkOrder selectedWorkOrder,Integer assigneeId, Integer assetSuatus,String reason,Integer extType) {
+    public void reCreateWorkOrder(V2_WorkOrder selectedWorkOrder,String reason,Integer extType,List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
         WorkOrderForm formData = new WorkOrderForm();
         formData.setServiceRequestId(selectedWorkOrder.getSrId());
-        formData.setAssigneeId(assigneeId.toString());
+        formData.setAssigneeId(selectedWorkOrder.getCurrentPersonId().toString());
         formData.setAssetId(selectedWorkOrder.getAssetId());
-        formData.setAssetStatus(assetSuatus.toString());
+        formData.setAssetStatus("2");
         formData.setRequestReason(reason);
         formData.setIntExtType(extType);
+        formData.setAttachments(picList);
         String res = srApi.createWorkOrder(token,formData);
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"创建");

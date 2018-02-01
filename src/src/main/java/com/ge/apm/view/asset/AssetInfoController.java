@@ -108,7 +108,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String measuring;
 
-    private Boolean isGeneratePmOrder = false;
+    private Boolean isGeneratePmOrder;
 
     private List<UserAccount> ownerList;
     private GbCodeService gbCodeService;
@@ -404,8 +404,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return UrlEncryptController.encodeUrlParam(operation);
     }
 
-    public void assembleMaintainData() {
-        operation = "/portal/woMgr/woMgrList?faces-redirect=true&assetUID=" + selected.getUid();
+    public void assembleMaintainData(String assetUid) {
+        operation = "/portal/woMgr/workOrderList?faces-redirect=true&assetUID=" + assetUid;
     }
 
     public void assembleMaintainList() {
@@ -484,6 +484,18 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (null != object.getTerminateDate()) {
             temp = new DateTime(object.getTerminateDate());
             object.setTerminateDate(temp.plusHours(12).toDate());
+        }
+
+        Date now = new Date();
+
+        if (object.getId() == null) {
+            object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setCreatedDate(now);
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedDate(now);
+        } else {
+            object.setLastModifiedBy(UserContextService.getCurrentUserAccount().getLoginName());
+            object.setLastModifiedDate(now);
         }
     }
 
@@ -586,7 +598,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Boolean isNew = selected.hashCode() == 0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if (isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
+        if (isGeneratePmOrder!=null && isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
             pmService.createPMrequest(selected.getUid(), null);
         }
         if (resultStatus) {
