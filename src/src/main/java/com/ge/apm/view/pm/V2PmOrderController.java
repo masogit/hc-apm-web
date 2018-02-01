@@ -777,4 +777,12 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void setPmOrderId(String pmOrderId) {
         this.pmOrderId = pmOrderId;
     }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
 }
