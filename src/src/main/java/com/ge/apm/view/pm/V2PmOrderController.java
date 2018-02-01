@@ -87,6 +87,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private BlobObjectRepository blobDao;
     private String pmOrderId;
     private String filterPlanTime;
+    private Map<String, Boolean> selectedMap;
+
+    public void prepareAproval(String woid) {
+        prepareAct(woid);
+        selectedMap = new HashMap<>();
+        accessoryList = getWorkOrderDetail(selectedPmOrder.getId());
+        accessoryList.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+    }
+
+    public void onApprovedDetailsSelected(String id) {
+        if ("All".equals(id)) {
+            accessoryList.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
+        } else {
+            selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
+        }
+    }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -359,6 +375,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void approvePMorder(V2_PmOrder selectedPmOrder,String passreject){
         if(selectedPmOrder!=null)
         pmOrderService.approvePMorder(selectedPmOrder,passreject);
+    }
+    public void approvePMorderX(){
+        if(selectedPmOrder!=null)
+            accessoryList.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
+            pmOrderService.approvePMorderX(selectedPmOrder,accessoryList,this.comments);
     }
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
