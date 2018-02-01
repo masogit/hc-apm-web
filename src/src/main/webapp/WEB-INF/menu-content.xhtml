@@ -62,7 +62,9 @@
                 <p:menuitem id="um22" value="#{msg.ProcessAnalysis}"
                             url="/portal/analysis/reports.xhtml#/ProcessAnalysis" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem id="um23" value="#{msg.AdvancedDeviceInfoTracking}"
-                            url="/portal/analysis/reports.xhtml#/ScanDetails" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+                            url="/portal/analysis/reports.xhtml#/ScanDetails" 
+                            rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+               <p:menuitem id="um151" value="CT球管预测" rendered="#{userContextService.isAgentTenant()}" outcome="/portal/config/tubeData/List.xhtml"/>
             </p:submenu>
 
             <p:submenu  id="um60"  label="预防维护" rendered="#{userContextService.hasAnyRole('ClinicalStaff, DeptHead') and !userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')}" icon="fa fa-check-square-o" >
