@@ -361,7 +361,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setManufactDate(easyInstallItem.getManufactDate());
             item.setPurchaseDate(easyInstallItem.getPurchaseDate());
             item.setWarrantyYear(easyInstallItem.getWarrantyYear());
-            item.setFactoryWarrantyDate(easyInstallItem.getFactoryWarrantyDate());
+            item.setWarrantyDate(easyInstallItem.getWarrantyDate());
             item.setTerminateDate(easyInstallItem.getTerminateDate());
             item.setPurchasePrice(easyInstallItem.getPurchasePrice());
             item.setSalvageValue(easyInstallItem.getSalvageValue());
