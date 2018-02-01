@@ -359,6 +359,18 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
+if(selectedWorkOrder.getManHours()==0){
+    selectedWorkOrder.setManHours(null);
+}
+        if(selectedWorkOrder.getOtherExpense()==0){
+            selectedWorkOrder.setOtherExpense(null);
+        }
+        if(selectedWorkOrder.getManHours()==0){
+            selectedWorkOrder.setManHours(null);
+        }
+        if(selectedWorkOrder.getExternalExpense()==0){
+            selectedWorkOrder.setExternalExpense(null);
+        }
         confirmedUpDate = selectedWorkOrder.getServiceRequest().getConfirmedUpTime();
         currentStatus = 1;//selectedWorkOrder.getAssetInfo().getStatus();
         accessoryList = getWorkOrderDetail(selectedWorkOrder.getId());
