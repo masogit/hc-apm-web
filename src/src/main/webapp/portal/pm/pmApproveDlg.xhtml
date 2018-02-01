@@ -29,7 +29,7 @@
                         <p:column headerText="#{msg.accessory}">
                             <h:outputText value="#{item.parts}"/>
                         </p:column>
-                       <!-- <p:column headerText="#{msg.accessoryQuantity}">
+                        <p:column headerText="#{msg.accessoryQuantity}">
                             <h:outputText value="#{item.apartsQuantity}"/>
                         </p:column>
                         <p:column headerText="#{msg.accessoryPrice}">
@@ -53,7 +53,6 @@
                         <p:column headerText="到货">
                             <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}"/>
                         </p:column>
--->
                     </p:dataTable>
 
                 </p:fieldset>

@@ -29,34 +29,40 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
+/**
+ *v
+ * @author 212579464
+ */
 @ManagedBean
 @ViewScoped
-public class V2PmOrderRemController extends GenericCRUDUUIDController<AssetLifecycleEvent> implements Serializable{
+public class V2PmOrderRemController extends GenericCRUDUUIDController<PmScheduleData> implements Serializable {
 
-    private AssetLifecycleEventRepository dao;
-    private UserAccountRepository userDao;
+    V2_PmScheduleRepository dao;
+    private OrgInfoRepository orgDao;
     private UaaService uaaService;
-    protected void init() {
-        dao = WebUtil.getBean(AssetLifecycleEventRepository.class);
-        userDao = WebUtil.getBean(UserAccountRepository.class);
-        uaaService = WebUtil.getBean(UaaService.class);
 
+    protected void init() {
+        dao = WebUtil.getBean(V2_PmScheduleRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
 
     }
-    protected GenericRepositoryUUID<AssetLifecycleEvent> getDAO() {
+
+    @Override
+    protected GenericRepositoryUUID<PmScheduleData> getDAO() {
         return dao;
     }
 
     @Override
-    protected Page<AssetLifecycleEvent> loadData(PageRequest pageRequest) {
+    protected Page<PmScheduleData> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
+
+        searchFilters.add(new SearchFilter("srType", SearchFilter.Operator.EQ, "ePM"));
         this.selected = null;
-        searchFilters.add(new SearchFilter("eventType", SearchFilter.Operator.EQ, "5"));//4外部保养
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
+
 
 
     @Override
@@ -72,17 +78,21 @@ public class V2PmOrderRemController extends GenericCRUDUUIDController<AssetLifec
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
-    public String getEvStatus(int status) {
-        if (status == 1) {
-            return "open";
-        }
-        if (status == 2) {
-            return "close";
-        }
-
-        return "cancel";
-
+    public void searchList(Integer buttonIndex) {
+        this.searchFilters = null;
     }
+
+
+    public void onSelectPmOrder(){
+        System.out.println(selected);
+      /*  accessoryList = getWorkOrderDetail(selected.getId());
+        coWorkerList = getWorkOrderCoworker(selected.getId());*/
+
+        // 获取picList
+        //  picList =  blobDao.findByBoUuid(selected.getId());
+    }
+
+
 
 
 }
