@@ -23,7 +23,6 @@ public class PmOrderActionForm {
 	String planTime;
 	Integer ruleLevel;
 	String desc;
-	Object accessList;
 String comments;
 
 
@@ -36,14 +35,6 @@ String comments;
 
 	public void setComments(String comments) {
 		this.comments = comments;
-	}
-
-	public Object getAccessList() {
-		return accessList;
-	}
-
-	public void setAccessList(Object accessList) {
-		this.accessList = accessList;
 	}
 
 	public String getQualityChecking() {

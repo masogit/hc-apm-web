@@ -348,6 +348,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+
     }
 
     public void prepareCloseOrder(String woid) {
