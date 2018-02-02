@@ -3,6 +3,7 @@ package com.ge.apm.view.sysutil;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 import javaslang.control.Option;
@@ -154,6 +155,16 @@ public class UserContextService implements Serializable {
         }
 
         return userAccount;
+    }
+    
+    public boolean isAgentTenant() {
+    		UserAccount user = getLoginUser();
+    		TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
+    		TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+    		if(tenant.getType() != null && tenant.getType() == 1) {
+    			return true;
+    		}
+    		return false;
     }
 
     public int getLoginUserId() {

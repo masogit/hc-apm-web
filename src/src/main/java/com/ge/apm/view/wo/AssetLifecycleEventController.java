@@ -5,10 +5,15 @@
  */
 package com.ge.apm.view.wo;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.core.util.JsonUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -71,6 +76,16 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
 
     public void onSelectAssetLifecycleEvent() {
         System.out.println("kdkdkd");
+    }
+    public String getMsStatus(AssetLifecycleEvent alse){
+        String strStatus=null;
+        JSONObject parse = (JSONObject)JSON.parse(alse.getDescription());
+        JSONArray status = (JSONArray)parse.get("messages");
+        if(status!=null){
+         strStatus= StringUtils.removeEnd(status.get(0).toString(),"状态: ");
+        strStatus =StringUtils.removeEnd(strStatus,"状态: ");
+        }
+        return strStatus;
     }
 
     public String getEvStatus(int status) {
