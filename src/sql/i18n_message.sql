@@ -1400,3 +1400,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'tenantType', '租户类型', 'tenant type', NULL, '-1');
 
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'Normal', '正常', 'Normal', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'Abnormal', '不正常', 'Normal', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'High', '过高', 'Normal', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'Low', '过低', 'Normal', NULL, '-1');
+
+
