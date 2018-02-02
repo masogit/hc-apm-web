@@ -187,7 +187,7 @@
                     <label class="label">申请审核原因</label>
                     <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
                 </h:panelGroup>
-                <p:commandButton validateClient="false" immediate="true" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
+                <p:commandButton validateClient="false" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
             </h:form>
         </p:dialog>
         <!--<ui:include src="expenseDialogforComplete.xhtml"/>-->
