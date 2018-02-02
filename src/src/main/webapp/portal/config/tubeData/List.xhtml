@@ -54,13 +54,13 @@
                         <h:outputText value="#{item.tubeScan}"/>
                     </p:column>
                      <p:column headerText="最大检查数">
-                        <h:outputText value="#{tubeDataController.getMaxPatientExam(item.assetUid)}"/>
+                        <h:outputText value="#{tubeDataController.getMaxPatientExam(item.assetUid,item.seriaNum)}"/>
                     </p:column>
                     <p:column headerText="最大毫安秒" >
-                        <h:outputText value="#{tubeDataController.getMaxTubeMas(item.assetUid)}"/>
+                        <h:outputText value="#{tubeDataController.getMaxTubeMas(item.assetUid,item.seriaNum)}"/>
                     </p:column>
                     <p:column headerText="最大曝光量" >
-                        <h:outputText value="#{tubeDataController.getMaxTubeScan(item.assetUid)}"/>
+                        <h:outputText value="#{tubeDataController.getMaxTubeScan(item.assetUid,item.seriaNum)}"/>
                     </p:column>
                     <p:column headerText="最后检查时间">
                         <f:facet name="filter">
@@ -71,7 +71,7 @@
                         </h:outputText>
                     </p:column>
                     <p:column headerText="预计报警时间">
-                        <h:outputText value="#{tubeDataController.getMinDate(item.assetUid)}"/>
+                        <h:outputText value="#{tubeDataController.getMinDate(item.assetUid,item.seriaNum)}"/>
                     </p:column>
                   
                     <f:facet name="{Toolbar}">

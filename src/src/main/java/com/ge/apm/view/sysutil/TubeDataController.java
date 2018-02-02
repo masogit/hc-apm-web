@@ -82,7 +82,7 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
 			}
         		List<TubeConfig> configs = tubeConfigRepository.findbyTenantUidAndAssetUidIn(tenantUid,uids);
         		for (TubeConfig tubeConfig : configs) {
-        			configMap.put(tubeConfig.getAssetUid(), tubeConfig);
+        			configMap.put(tubeConfig.getAssetUid() + "_" + tubeConfig.getSeriaNum(), tubeConfig);
 			}
     		}
     	}
@@ -99,8 +99,8 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
     		return assetMap.get(uid);
     }
     
-    public TubeConfig getConfigByUid(String uid) {
-    		return configMap.get(uid);
+    public TubeConfig getConfigByUid(String uid,String sn) {
+    		return configMap.get(uid +"_"+sn);
     }
     
     public String getAssetName(String uid) {
@@ -146,63 +146,66 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
 		return null;
 	}
 	
-	public String getPatientExamDueDate(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public String getPatientExamDueDate(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
 		if(config != null && config.getPatientExamDueDate() != null) {
 			return new DateTime(config.getPatientExamDueDate()).toString("yyyy-MM-dd");
 		}
 		return null;
 	}
 	
-	public String getMinDate(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public String getMinDate(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
+		if(config == null) {
+			return null;
+		}
 		Long l1 = config.getPatientExamDueDate() == null ? 0 : config.getPatientExamDueDate().getTime();
 		Long l2 = config.getTubeMASDueDate() == null ? 0 : config.getTubeMASDueDate().getTime();
 		Long l3 = config.getTubeScanDueDate() == null ? 0 : config.getTubeScanDueDate().getTime();
 		if(l1 == 0 && l2 == 0 && l3 == 0) {
 			return null;
 		}
-		Long temp = l1 >= l2 ? l1 : l2;
-		temp = temp >= l3 ? temp :l3;
+		Long temp = l1 <= l2 ? l1 : l2;
+		temp = temp <= l3 ? temp :l3;
 		DateTime dt = new DateTime(temp);
 		return dt.toString("yyyy-MM-dd");
 	}
 
 	
-	public String getTubeMas(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public String getTubeMas(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
 		if(config != null && config.getTubeMASDueDate() != null) {
 			return new DateTime(config.getTubeMASDueDate()).toString("yyyy-MM-dd");
 		}
 		return null;
 	}
 	
-	public String getTubeScan(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public String getTubeScan(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
 		if(config != null && config.getTubeScanDueDate() != null) {
 			return new DateTime(config.getTubeScanDueDate()).toString("yyyy-MM-dd");
 		}
 		return null;
 	}
 	
-	public Integer getMaxPatientExam(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public Integer getMaxPatientExam(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
 		if(config != null ) {
 			return config.getMaxTotalPatientExam();
 		}
 		return null;
 	}
 	
-	public Integer getMaxTubeMas(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public Integer getMaxTubeMas(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
 		if(config != null ) {
 			return config.getMaxTotalTubeMAS();
 		}
 		return null;
 	}
 	
-	public Integer getMaxTubeScan(String assetUid) {
-		TubeConfig config = getConfigByUid(assetUid);
+	public Integer getMaxTubeScan(String assetUid,String sn) {
+		TubeConfig config = getConfigByUid(assetUid,sn);
 		if(config != null ) {
 			return config.getMaxTotalTubeScan();
 		}
