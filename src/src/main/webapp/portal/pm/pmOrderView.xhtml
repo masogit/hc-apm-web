@@ -89,7 +89,7 @@
                             <p:column headerText="类型">
                                 <h:outputText value="#{fieldMsg.fieldValue('partsType', item.partsType)}" />
                             </p:column>
-                            <p:column headerText="序列号">
+                            <p:column headerText="序列号----">
                                 <h:outputText value="#{item.serialNum}" />
                             </p:column>
                             <p:column headerText="质保期">
@@ -97,6 +97,11 @@
                                     <f:convertDateTime pattern="yyyy-MM-dd"/>
                                 </h:outputText>
                             </p:column>
+
+                            <p:column headerText="审批通过">
+                                <h:outputText value="#{item.approved ?'通过':'拒绝'}"/>
+                            </p:column>
+
                             <p:column headerText="预计到达时间">
                                 <h:outputText value="#{item.estimatedArriveTime}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
