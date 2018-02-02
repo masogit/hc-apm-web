@@ -65,39 +65,30 @@ public class AssetLifecycleEventController extends GenericCRUDUUIDController<Ass
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+      /*  if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-}
+        }*/
     }
 
     public void onSelectAssetLifecycleEvent() {
         System.out.println("kdkdkd");
     }
-    public String getMsStatus(AssetLifecycleEvent alse){
-        String strStatus=null;
-        JSONObject parse = (JSONObject)JSON.parse(alse.getDescription());
-        JSONArray status = (JSONArray)parse.get("messages");
-        if(status!=null){
-         strStatus= StringUtils.removeEnd(status.get(0).toString(),"状态: ");
-        strStatus =StringUtils.removeEnd(strStatus,"状态: ");
+
+    public String getMsStatus(AssetLifecycleEvent alse) {
+        String strStatus = null;
+        JSONObject parse = (JSONObject) JSON.parse(alse.getDescription());
+        JSONArray status = (JSONArray) parse.get("messages");
+        if (status != null) {
+            {
+                strStatus = StringUtils.removeEnd(status.get(0).toString(), "状态: ");
+                strStatus = strStatus.replace("状态：","");
+            }
+
         }
         return strStatus;
     }
-
-    public String getEvStatus(int status) {
-        if (status == 1) {
-            return "open";
-        }
-        if (status == 2) {
-            return "close";
-        }
-
-        return "cancel";
-
-    }
-
 }
