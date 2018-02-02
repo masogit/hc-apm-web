@@ -105,6 +105,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    public void accessoryArrival(String itemId){
+        accessoryList.stream().filter(item -> itemId.equals(item.getId())).forEach(item -> item.setArrived(true));
+    }
+
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
