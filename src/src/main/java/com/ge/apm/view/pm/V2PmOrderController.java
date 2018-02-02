@@ -66,6 +66,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String cancelReason;
     private String stepFileter;
     //for details form
+    private List<V2_WorkOrder_Detail> approvedDetails;
     private List<V2_WorkOrder_Detail> accessoryList;
     private List<V2_WorkOrderCoworker> coWorkerList;
     private V2_WorkOrder_Detail itemDetail;
@@ -87,6 +88,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private BlobObjectRepository blobDao;
     private String pmOrderId;
     private String filterPlanTime;
+    private Map<String, Boolean> selectedMap;
+
+    public void prepareAproval(String woid) {
+        prepareAct(woid);
+        selectedMap = new HashMap<>();
+        approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
+        approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+    }
+
+    public void onApprovedDetailsSelected(String id) {
+        if ("All".equals(id)) {
+            approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
+        } else {
+            selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
+        }
+    }
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
@@ -360,6 +377,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if(selectedPmOrder!=null)
         pmOrderService.approvePMorder(selectedPmOrder,passreject);
     }
+    public void approvePMorderX(){
+        if(selectedPmOrder!=null)
+            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
+            pmOrderService.approvePMorderX(selectedPmOrder,approvedDetails,this.comments);
+    }
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
        confirmedUpDate = null;
@@ -594,8 +616,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
-           // return null;
-            accessoryList = new ArrayList<V2_WorkOrder_Detail>();
+           // accessoryList = new ArrayList<V2_WorkOrder_Detail>();
+            return null;
+
         }
         V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
         emptyDetail.setId("000");
@@ -609,7 +632,8 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
-            coWorkerList  = new ArrayList<V2_WorkOrderCoworker>();
+           // coWorkerList  = new ArrayList<V2_WorkOrderCoworker>();
+            return null;
         }
         V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();
         emptyDetail.setId("000");
@@ -755,5 +779,25 @@ public void closePM(V2_PmOrder selectedPmOrder){
     }
     public void setPmOrderId(String pmOrderId) {
         this.pmOrderId = pmOrderId;
+    }
+
+    public Map<String, Boolean> getSelectedMap() {
+        return selectedMap;
+    }
+
+    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+        this.selectedMap = selectedMap;
+    }
+
+    public void setAccessoryList(List<V2_WorkOrder_Detail> accessoryList) {
+        this.accessoryList = accessoryList;
+    }
+
+    public List<V2_WorkOrder_Detail> getApprovedDetails() {
+        return approvedDetails;
+    }
+
+    public void setApprovedDetails(List<V2_WorkOrder_Detail> approvedDetails) {
+        this.approvedDetails = approvedDetails;
     }
 }

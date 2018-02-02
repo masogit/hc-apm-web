@@ -210,6 +210,21 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
            WebUtil.addSuccessMessage("审批成功");
        }
    }
+    public void approvePMorderX(V2_PmOrder selectedPmOrder,Object accessList,String comments){
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setActionType("pass");
+        formData.setStepId(selectedPmOrder.getCurrentStepId());
+        formData.setComments(comments);
+        formData.setDetails(accessList);
+        String res = srApi.invokePmOrderAction(token,formData,"审批",selectedPmOrder.getId());
+
+        if (res==null || !res.equalsIgnoreCase("Ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
+        }else{
+            WebUtil.addSuccessMessage("审批成功");
+        }
+    }
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
 
 
