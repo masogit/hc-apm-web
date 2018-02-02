@@ -200,10 +200,10 @@
                                         <p:inputText id="departNum2" value="#{assetCreateController.assetInfo.departNum}"/>
 
                                     </h:panelGroup>
-<!--                                    <h:panelGroup>
-                                        <label class="label">#{msg.financingNum}</label>
-                                        <p:inputText id="financingNum2" value="#{assetCreateController.assetInfo.financingNum}"/>
-                                    </h:panelGroup>-->
+                                    <!--                                    <h:panelGroup>
+                                                                            <label class="label">#{msg.financingNum}</label>
+                                                                            <p:inputText id="financingNum2" value="#{assetCreateController.assetInfo.financingNum}"/>
+                                                                        </h:panelGroup>-->
 
                                     <h:panelGroup>
                                         <label class="label">#{msg.modalityId}</label>
@@ -218,8 +218,13 @@
                                         <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}"/>
                                     </h:panelGroup>
                                     <h:panelGroup>
-                                        <label class="label">同时生成保养工单</label>
-                                        <p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetCreateController.isGeneratePmOrder}"/>
+                                        <label class="label">同时生成保养工单*</label>
+                                        <p:selectOneMenu  value="#{assetCreateController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItem itemLabel="是" itemValue="true"/>
+                                            <f:selectItem itemLabel="否" itemValue="false"/>
+                                        </p:selectOneMenu>
+                                        <!--<p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetCreateController.isGeneratePmOrder}"/>-->
                                     </h:panelGroup>
 
                                 </p:panelGrid>
