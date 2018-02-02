@@ -213,9 +213,10 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     public void approvePMorderX(V2_PmOrder selectedPmOrder,Object accessList,String comments){
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setActionType("pass");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         formData.setComments(comments);
-        formData.setAccessList(accessList);
+        formData.setDetails(accessList);
         String res = srApi.invokePmOrderAction(token,formData,"审批",selectedPmOrder.getId());
 
         if (res==null || !res.equalsIgnoreCase("Ok")) {
