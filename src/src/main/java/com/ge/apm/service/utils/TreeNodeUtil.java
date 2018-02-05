@@ -7,7 +7,6 @@ import org.primefaces.model.TreeNode;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 
 public interface TreeNodeUtil {
 
@@ -23,27 +22,6 @@ public interface TreeNodeUtil {
 
     }
 
-    static TreeNode findNodeFromTree(TreeNode tree, Object data) {
-        if (null!=tree.getData() && tree.getData().equals(data)) {
-            return tree;
-        }
-        for (TreeNode child : tree.getChildren()) {
-            TreeNode res = findNodeFromTree(child, data);
-            if(res != null){
-                return res;
-            }
-        }
-        return null;
-    }
-    
-    static void expandParentsNodes(TreeNode node){
-        if(node.getParent()!=null){
-            node.setExpanded(true);
-            expandParentsNodes(node.getParent());
-        }
-    }
-    
-
     static void sortTreeNodeByName(TreeNode node) {
 
         if (node.isLeaf()) {
@@ -52,38 +30,25 @@ public interface TreeNodeUtil {
 
         List<TreeNode> nodeList = node.getChildren();
 
-//        for (TreeNode childNode : nodeList) {
-//            childNode.setParent(null);
-//        }
 
-        for (TreeNode childNode : nodeList) {
-            System.out.println("=======childNode.getName()"+((OrgInfo)childNode.getData()).getName());
-            System.out.println("=======childNode.getChildCount()"+childNode.getChildCount());
+        for (TreeNode childNode: nodeList) {
+            childNode.setParent(null);
         }
-         System.out.println("-------------before sort-------------------");
 
-        nodeList.sort((TreeNode o1, TreeNode o2) -> {
-            OrgInfo org1 = (OrgInfo) o1.getData();
-            OrgInfo org2 = (OrgInfo) o2.getData();
+        nodeList.sort( (TreeNode o1, TreeNode o2) -> {
+                OrgInfo org1 = (OrgInfo) o1.getData();
+                OrgInfo org2 = (OrgInfo) o2.getData();
 
-            return orgInfoComparator.compare(org1, org2);
+                return orgInfoComparator.compare(org1, org2);
 
-        }
+            }
         );
-        
-         for (TreeNode childNode : nodeList) {
-            System.out.println("=======childNode.getName()"+((OrgInfo)childNode.getData()).getName());
-            System.out.println("=======childNode.getChildCount()"+childNode.getChildCount());
-        }
-        System.out.println("-------------end-------------------");
 
-        node.getChildren().clear();
-        for (TreeNode childNode : nodeList) {
-//            childNode.setParent(node);
-            node.getChildren().add(childNode);
+        for (TreeNode childNode: nodeList) {
+            childNode.setParent(node);
         }
 
-        nodeList.forEach((TreeNode childNode) -> sortTreeNodeByName(childNode));
+        nodeList.stream().forEach((TreeNode childNode) -> sortTreeNodeByName(childNode));
 
     }
 
