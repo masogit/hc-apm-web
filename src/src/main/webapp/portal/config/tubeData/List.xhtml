@@ -44,7 +44,7 @@
                     <p:column headerText="球管序列号">
                         <h:outputText value="#{item.seriaNum}"/>
                     </p:column>
-                    <p:column headerText="当前检查数">
+                    <p:column headerText="当前病人检查数">
                         <h:outputText value="#{item.patientExam}"/>
                     </p:column>
                     <p:column headerText="当前毫安秒" >
@@ -53,7 +53,7 @@
                     <p:column headerText="当前曝光量" >
                         <h:outputText value="#{item.tubeScan}"/>
                     </p:column>
-                     <p:column headerText="最大检查数">
+                     <p:column headerText="最大病人检查数">
                         <h:outputText value="#{tubeDataController.getMaxPatientExam(item.assetUid,item.seriaNum)}"/>
                     </p:column>
                     <p:column headerText="最大毫安秒" >

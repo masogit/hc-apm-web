@@ -35,7 +35,7 @@ public class TubeConfig {
     private Integer maxTotalTubeScan;//最大曝光量
     
     @Column(name = "patient_exam_due_date")
-    private Date patientExamDueDate;//病人扫描量告警时间
+    private Date patientExamDueDate;//检查数告警时间
     
     @Column(name = "tube_mas_due_date")
     private Date tubeMASDueDate;//管电流告警时间
