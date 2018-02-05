@@ -22,6 +22,27 @@ public interface TreeNodeUtil {
 
     }
 
+    static TreeNode findNodeFromTree(TreeNode tree, Object data) {
+        if (null!=tree.getData() && tree.getData().equals(data)) {
+            return tree;
+        }
+        for (TreeNode child : tree.getChildren()) {
+            TreeNode res = findNodeFromTree(child, data);
+            if(res != null){
+                return res;
+            }
+        }
+        return null;
+    }
+    
+    static void expandParentsNodes(TreeNode node){
+        if(node.getParent()!=null){
+            node.setExpanded(true);
+            expandParentsNodes(node.getParent());
+        }
+    }
+    
+
     static void sortTreeNodeByName(TreeNode node) {
 
         if (node.isLeaf()) {
