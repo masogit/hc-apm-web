@@ -18,7 +18,7 @@
 
             <h:form id="pmOrderListFormOut">
 
-                <p:dataTable id="datalist" value="#{v2PmOrderExController.lazyModel}" var="item" widgetVar="varDataList1"
+                <p:dataTable id="datalist" value="#{v2PmOrderExController.lazyModel}" var="item" widgetVar="varDataList4"
                              selectionMode="single" selection="#{v2PmOrderExController.selected}"
                              lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                              rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.scheduleDate}"
@@ -35,6 +35,10 @@
                     <p:column headerText="设备编号(院方)" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.departNum}"/>
                     </p:column>
+                    <p:column headerText="资产名称" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.name}"/>
+                    </p:column>
+
                     <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.assetInfo.clinicalDeptName}"/>
                     </p:column>
