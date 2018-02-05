@@ -1,8 +1,6 @@
 package com.ge.apm.service.utils;
 
 import com.ge.apm.domain.OrgInfo;
-import com.github.stuxuhai.jpinyin.PinyinFormat;
-import com.github.stuxuhai.jpinyin.PinyinHelper;
 import org.primefaces.model.TreeNode;
 
 import java.util.Comparator;

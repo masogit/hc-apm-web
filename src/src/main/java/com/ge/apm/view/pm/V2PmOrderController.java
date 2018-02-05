@@ -236,7 +236,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
 
          //如果当前人员只是 临床科室主任或者 只是临床科室人员...
-        if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) ||userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff")){
+        if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") &&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))){
             queryIndex= 8;
         }else {
             queryIndex = -1;
