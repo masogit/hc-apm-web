@@ -19,7 +19,7 @@ public interface TubeDataRepository extends GenericRepository<TubeData> {
 	
 	@Query("select new com.ge.apm.domain.TubeData(max(td.id) as id,"
 			+ "td.assetUid,td.seriaNum,max(td.patientExam),max(td.tubeMAS),max(td.tubeScan),max(td.inputDate) as inputDate) "
-			+ "from TubeData td where td.geDeviceType = 22 and td.tenantUID = ?1 group by td.assetUid,td.seriaNum order by inputDate desc")
+			+ "from TubeData td where td.tenantUID = ?1 group by td.assetUid,td.seriaNum order by inputDate desc")
 	Page<TubeData> findByCondition(String tenantUID, Pageable pageable);
 
 }
