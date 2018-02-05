@@ -234,9 +234,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        if(userContextService.hasRole("DeptHead") || userContextService.hasRole("ClinicalStaff")){
+
+         //如果当前人员只是 临床科室主任或者 只是临床科室人员...
+        if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) ||userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff")){
             queryIndex= 8;
-        }else{
+        }else {
             queryIndex = -1;
         }
         this.filterBySite = false;
