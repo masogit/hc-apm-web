@@ -93,7 +93,7 @@
                         </p:column>
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
-                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialog)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                            <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
 
                             <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
