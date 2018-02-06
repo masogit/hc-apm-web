@@ -46,7 +46,7 @@ public class TableCreateController {
 
     private Map<String, Object> tableValue;
 
-    private Boolean isStringEditable;
+    private Boolean isStringEditable = false;
 
     @PostConstruct
     protected void init() {
@@ -156,6 +156,8 @@ public class TableCreateController {
     public void prepareAddItem(TableGroup group) {
         editGroup = group;
         editTableItem = new TableItem();
+        editTableItem.setExp(new HashMap<String,String>());
+        
     }
 
     public void prepareEditItem(TableGroup group, TableItem item) {
@@ -193,6 +195,8 @@ public class TableCreateController {
                 editTableItem.setOptions(new ArrayList<TableOption>());
             }
         }
+        editTableItem.getExp().clear();
+        
     }
 
     public void onStringEdit() {
@@ -242,6 +246,13 @@ public class TableCreateController {
         tableString = JSONObject.toJSONString(table);
     }
 
+    public void onRuleChange(){
+        
+        if(!Strings.isNullOrEmpty(editTableItem.getKey())){
+            editTableItem.setResKey(editTableItem.getKey().concat("_res"));
+        }
+    }
+    
     //getter and setter
     public TableSchema getTable() {
         return table;
