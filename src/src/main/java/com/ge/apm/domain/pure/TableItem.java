@@ -14,13 +14,19 @@ import java.util.Map;
  */
 public class TableItem{
     public static enum ComponentType {
-        Number, Switch,Select,TextArea,Date
+        Text,Number, Switch,Select,TextArea,Date
     }
     private String key;
     private String label;
+    
+    //参考值说明
+    private String ref;
+    //计算结果key
+    private String resKey;
     private ComponentType component;
     private Map<String, String> props;
     private List<TableOption> options;
+    private Map<String, String> exp;
 
     public String getKey() {
         return key;
@@ -60,6 +66,30 @@ public class TableItem{
 
     public void setOptions(List<TableOption> options) {
         this.options = options;
+    }
+
+    public String getRef() {
+        return ref;
+    }
+
+    public void setRef(String ref) {
+        this.ref = ref;
+    }
+
+    public String getResKey() {
+        return resKey;
+    }
+
+    public void setResKey(String resKey) {
+        this.resKey = resKey;
+    }
+
+    public Map<String, String> getExp() {
+        return exp;
+    }
+
+    public void setExp(Map<String, String> exp) {
+        this.exp = exp;
     }
     
 }
