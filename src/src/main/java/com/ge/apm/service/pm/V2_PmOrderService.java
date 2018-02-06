@@ -196,21 +196,8 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
         return woDao.findBySrId(serviceRequest);
     }*/
 
-   public void approvePMorder(V2_PmOrder selectedPmOrder,String passreject){
-       String token = UserContextService.getAccessToken();
-       PmOrderActionForm formData = new PmOrderActionForm();
-       formData.setActionType(passreject);
-       formData.setStepId(selectedPmOrder.getCurrentStepId());
 
-       String res = srApi.invokePmOrderAction(token,formData,passreject,selectedPmOrder.getId());
-
-       if (res==null || !res.equalsIgnoreCase("Ok")) {
-           WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
-       }else{
-           WebUtil.addSuccessMessage("审批成功");
-       }
-   }
-    public void approvePMorderX(V2_PmOrder selectedPmOrder,Object accessList,String comments){
+    public void approvePMorder(V2_PmOrder selectedPmOrder,Object accessList,String comments){
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("pass");
