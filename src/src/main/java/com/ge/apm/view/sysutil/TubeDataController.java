@@ -159,15 +159,18 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
 		if(config == null) {
 			return null;
 		}
-		Long l1 = config.getPatientExamDueDate() == null ? 0 : config.getPatientExamDueDate().getTime();
-		Long l2 = config.getTubeMASDueDate() == null ? 0 : config.getTubeMASDueDate().getTime();
-		Long l3 = config.getTubeScanDueDate() == null ? 0 : config.getTubeScanDueDate().getTime();
-		if(l1 == 0 && l2 == 0 && l3 == 0) {
+		Long l1 = config.getPatientExamDueDate() == null ? Long.MAX_VALUE : config.getPatientExamDueDate().getTime();
+		Long l2 = config.getTubeMASDueDate() == null ? Long.MAX_VALUE : config.getTubeMASDueDate().getTime();
+		Long l3 = config.getTubeScanDueDate() == null ? Long.MAX_VALUE : config.getTubeScanDueDate().getTime();
+		if(l1 == Long.MAX_VALUE && l2 == Long.MAX_VALUE && l3 == Long.MAX_VALUE) {
 			return null;
 		}
-		Long temp = l1 <= l2 ? l1 : l2;
-		temp = temp <= l3 ? temp :l3;
-		DateTime dt = new DateTime(temp);
+		Long min = l1 <= l2 ? l1 : l2;
+		min = min <= l3 ? min :l3;
+		if(min == Long.MAX_VALUE) {
+			return null;
+		}
+		DateTime dt = new DateTime(min);
 		return dt.toString("yyyy-MM-dd");
 	}
 
