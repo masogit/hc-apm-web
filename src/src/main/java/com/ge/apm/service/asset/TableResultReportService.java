@@ -43,12 +43,58 @@ public class TableResultReportService {
                         }
                         break;
                     }
+                    case "VerifyRule": {
+                        String res = getResultForVerifyRule(tableValue, item);
+                        if (res != null) {
+                            resMap.put(item.getResKey(), res);
+                        }
+                        break;
+                    }
                 }
             });
         });
         return resMap;
     }
 
+    /**
+     * 计算示值误差是否超限
+     * @param tableValue
+     * @param tableItem
+     * @return 
+     */
+    private static String getResultForVerifyRule(Map<String, Object> tableValue, TableItem tableItem) {
+        Double x = toDouble(tableItem.getExp().get("norm"));
+        Double y = toDouble(tableValue.get(tableItem.getExp().get("Y_Key")));
+        Double z = toDouble(tableValue.get(tableItem.getExp().get("Z_Key")));
+        if (x == null || y == null || z == null) {
+            return null;
+        }
+
+        Double delta = x == 0 ? y - x : (y - x) / x;
+        Double mu = z == 0 ? y - z : (y - z) / z;
+
+        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0)/100;
+        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0)/100;
+
+        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0)/100;
+        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0)/100;
+
+        if (delta < deltaMin || delta > deltaMax) {
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "DeltaException");
+        }
+        if (mu < muMin || mu > muMax) {
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "MuException");
+        }
+
+        return "Normal";
+    }
+
+    /**
+     * 测量值是否超出设定值的上下限范围
+     * @param tableValue
+     * @param tableItem
+     * @return 
+     */
     private static String getResultForScopeRule(Map<String, Object> tableValue, TableItem tableItem) {
         Double value = toDouble(tableValue.get(tableItem.getKey()));
         if (value == null) {
@@ -59,20 +105,20 @@ public class TableResultReportService {
             return null;
         }
         Double min = Math.min(norm + Optional.ofNullable(toDouble(tableItem.getExp().get("min"))).orElse(0.0),
-                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("minPercent"))).orElse(0.0)));
+                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("minPercent"))).orElse(0.0))/100);
         Double max = Math.max(norm + Optional.ofNullable(toDouble(tableItem.getExp().get("max"))).orElse(0.0),
-                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("maxPercent"))).orElse(0.0)));
+                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("maxPercent"))).orElse(0.0))/100);
         if (value < min) {
-            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "-1");
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "Low");
         }
         if (value > max) {
-            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "1");
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "High");
         }
         return "Normal";
     }
 
     /**
-     *
+     * 测量值是否超出给定上下限
      * @param tableValue
      * @param tableItem
      * @return
@@ -86,10 +132,10 @@ public class TableResultReportService {
         Double min = toDouble(tableItem.getExp().get("min"));
         Double max = toDouble(tableItem.getExp().get("max"));
         if (min != null && value < min) {
-            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "-1");
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "Low");
         }
         if (max != null && value > max) {
-            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "1");
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "High");
         }
         return "Normal";
     }
@@ -103,24 +149,16 @@ public class TableResultReportService {
     }
 
     /**
-     * 返回值: 合格/不合格 : resIdentify_1: 'Normal' / 'Abnormal' 合格/过高/过低 :
-     * resIdentify_2: 'Normal' / 'High' / 'Low'
+     * 返回值: 合格/不合格 : resIdentify_1: 'Normal' / 'Abnormal' 
+     * 合格/过高/过低 : resIdentify_2: 'Normal' / 'High' / 'Low'
+     * 合格/误差超限/偏差超限 :resIdentify_3: 'Normal' / 'deltaException' / 'muException'
      */
     private static String getReturnValue(String resIdentify, String result) {
         switch (resIdentify) {
             case "resIdentify_1":
                 return result.equals("0") ? "Normal" : "Abnormal";
-            case "resIdentify_2":
-                switch (result) {
-                    case "1":
-                        return "High";
-                    case "-1":
-                        return "Low";
-                    default:
-                        return "Normal";
-                }
             default:
-                return null;
+                return result;
         }
     }
 }
