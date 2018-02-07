@@ -95,6 +95,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+
     }
 
     public void onApprovedDetailsSelected(String id) {
@@ -379,14 +380,11 @@ public void closePM(V2_PmOrder selectedPmOrder){
         pmOrderService.closePM(selectedPmOrder,picList);
         cancel();
 }
-    public void approvePMorder(V2_PmOrder selectedPmOrder,String passreject){
-        if(selectedPmOrder!=null)
-        pmOrderService.approvePMorder(selectedPmOrder,passreject);
-    }
-    public void approvePMorderX(){
+
+    public void approvePMorder(){
         if(selectedPmOrder!=null)
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
-            pmOrderService.approvePMorderX(selectedPmOrder,approvedDetails,this.comments);
+            pmOrderService.approvePMorder(selectedPmOrder,approvedDetails,this.comments);
     }
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
