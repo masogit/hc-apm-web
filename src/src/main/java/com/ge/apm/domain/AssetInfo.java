@@ -415,6 +415,9 @@ public class AssetInfo implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+    
+    @Column(name="ib_status")
+    private Integer ibStatus;
 
     public Integer getAssetUsage() {
         return assetUsage;
@@ -1274,6 +1277,15 @@ public class AssetInfo implements Serializable {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    public Integer getIbStatus() {
+        return ibStatus;
+    }
+
+    public void setIbStatus(Integer ibStatus) {
+        this.ibStatus = ibStatus;
+    }
+    
 
     @Override
     public int hashCode() {

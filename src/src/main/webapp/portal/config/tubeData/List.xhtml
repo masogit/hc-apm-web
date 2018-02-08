@@ -1,0 +1,98 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+       <div class="ui-g">
+            <div class="ui-g-12">
+				<div class="ui-g-12 card cardTitle">
+                	<p:outputLabel class="pageTitle" value="CT球管监控管理"/>
+            	</div>
+            	
+            <div class="ui-g-12 card">
+            <h:form id="TubeDataListForm">
+                <p:dataTable id="datalist" value="#{tubeDataController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{tubeDataController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <!-- <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/> -->
+                    <!-- <p:ajax event="filter" listener="#{tubeDataController.onFilter}" update="createButton editButton viewButton deleteButton"/> -->
+                    
+                    <p:column headerText="资产名称" >
+                        <h:outputText value="#{tubeDataController.getAssetName(item.assetUid)}"/>
+                    </p:column>
+                    <p:column headerText="资产编号" >
+                        <h:outputText value="#{tubeDataController.getAssetSN(item.assetUid)}"/>
+                    </p:column>
+                    <p:column headerText="systemId" >
+                        <h:outputText value="#{tubeDataController.getAssetSystemId(item.assetUid)}"/>
+                    </p:column>
+                    <p:column headerText="院区" >
+                        <h:outputText value="#{tubeDataController.getAssetSiteName(item.assetUid)}"/>
+                    </p:column>
+                    <p:column headerText="科室" >
+                        <h:outputText value="#{tubeDataController.getClinicalDeptName(item.assetUid)}"/>
+                    </p:column>
+                    <p:column headerText="球管序列号">
+                        <h:outputText value="#{item.seriaNum}"/>
+                    </p:column>
+                    <p:column headerText="当前病人检查数">
+                        <h:outputText value="#{item.patientExam}"/>
+                    </p:column>
+                    <p:column headerText="当前毫安秒" >
+                        <h:outputText value="#{item.tubeMAS}"/>
+                    </p:column>
+                    <p:column headerText="当前曝光量" >
+                        <h:outputText value="#{item.tubeScan}"/>
+                    </p:column>
+                     <p:column headerText="最大病人检查数">
+                        <h:outputText value="#{tubeDataController.getMaxPatientExam(item.assetUid,item.seriaNum)}"/>
+                    </p:column>
+                    <p:column headerText="最大毫安秒" >
+                        <h:outputText value="#{tubeDataController.getMaxTubeMas(item.assetUid,item.seriaNum)}"/>
+                    </p:column>
+                    <p:column headerText="最大曝光量" >
+                        <h:outputText value="#{tubeDataController.getMaxTubeScan(item.assetUid,item.seriaNum)}"/>
+                    </p:column>
+                    <p:column headerText="最后检查时间">
+                        <f:facet name="filter">
+                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                        </f:facet>
+                        <h:outputText value="#{item.inputDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="预计报警时间">
+                        <h:outputText value="#{tubeDataController.getMinDate(item.assetUid,item.seriaNum)}"/>
+                    </p:column>
+                  
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="TubeData_export"/>
+                        </p:commandButton>
+                        <!-- <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tubeDataController.prepareCreate}" update=":TubeDataEditDlg" oncomplete="PF('TubeDataEditDialog').show()"/>
+                        <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tubeDataController.prepareView}" update=":TubeDataViewDlg" oncomplete="PF('TubeDataViewDialog').show()" disabled="#{empty tubeDataController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{tubeDataController.prepareEdit}" update=":TubeDataEditDlg" oncomplete="PF('TubeDataEditDialog').show()" disabled="#{empty tubeDataController.selected}"/>
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{tubeDataController.prepareDelete}" update=":TubeDataViewDlg" oncomplete="PF('TubeDataViewDialog').show()" disabled="#{empty tubeDataController.selected}"/> -->
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+
+            <ui:include src="Edit.xhtml"/>
+            <ui:include src="View.xhtml"/>
+
+				</div>
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>

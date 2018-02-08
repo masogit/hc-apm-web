@@ -32,6 +32,7 @@ public class UnstructuredDataCollection implements Serializable {
     private String boUuid;
     @OneToMany(cascade = ALL, fetch = EAGER)
     @JoinColumn(name = "collection_id", foreignKey = @ForeignKey(NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private List<UnstructuredData> data = new ArrayList<>();
 
     @Column(name = "created_date")

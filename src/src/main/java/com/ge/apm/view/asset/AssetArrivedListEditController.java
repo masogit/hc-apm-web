@@ -25,6 +25,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -353,6 +354,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void saveEasyItem() {
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
+        if (easyInstallItem.getWarrantyYear() != null) {
+                Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
+                Calendar calender = Calendar.getInstance();
+                calender.setTime(new Date());
+                calender.add(Calendar.MONTH, monthLong);
+                easyInstallItem.setFactoryWarrantyDate(calender.getTime());
+            }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
             item.setMaitanance(easyInstallItem.getMaitanance());
@@ -360,7 +368,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setAssetCode68(easyInstallItem.getAssetCode68());
             item.setManufactDate(easyInstallItem.getManufactDate());
             item.setPurchaseDate(easyInstallItem.getPurchaseDate());
-            item.setWarrantyYear(easyInstallItem.getWarrantyYear());
+            item.setWarrantyDate(easyInstallItem.getWarrantyDate());
             item.setFactoryWarrantyDate(easyInstallItem.getFactoryWarrantyDate());
             item.setTerminateDate(easyInstallItem.getTerminateDate());
             item.setPurchasePrice(easyInstallItem.getPurchasePrice());
@@ -503,7 +511,5 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void setGeneratePmorder(Boolean generatePmorder) {
         this.generatePmorder = generatePmorder;
     }
-    
-    
 
 }

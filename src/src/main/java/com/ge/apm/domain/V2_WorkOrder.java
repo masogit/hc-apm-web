@@ -120,11 +120,13 @@ public class V2_WorkOrder implements Serializable {
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name="wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrder_Detail> v2_workOrder_detail_list;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     @JoinColumn(name="wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Fetch(FetchMode.SUBSELECT)
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list;
 
     @Column(name = "comment")
