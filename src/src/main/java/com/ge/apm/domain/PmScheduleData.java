@@ -97,6 +97,8 @@ public class PmScheduleData {
     @ManyToOne(fetch = FetchType.EAGER)
     private AssetInfo assetInfo;
 
+
+
     public String getId() {
         return id;
     }
