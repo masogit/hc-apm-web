@@ -23,8 +23,19 @@ public class PmOrderActionForm {
 	String planTime;
 	Integer ruleLevel;
 	String desc;
+String comments;
+
 
 //V2_WorkOrder_Coworker[] coworkes //optional
+
+
+	public String getComments() {
+		return comments;
+	}
+
+	public void setComments(String comments) {
+		this.comments = comments;
+	}
 
 	public String getQualityChecking() {
 		return qualityChecking;

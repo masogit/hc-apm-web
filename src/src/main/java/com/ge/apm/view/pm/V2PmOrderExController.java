@@ -139,6 +139,7 @@ public class V2PmOrderExController extends GenericCRUDUUIDController<PmScheduleD
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
     public void searchList(Integer buttonIndex) {
@@ -154,7 +155,7 @@ public class V2PmOrderExController extends GenericCRUDUUIDController<PmScheduleD
         coWorkerList = getWorkOrderCoworker(selected.getId());*/
 
         // 获取picList
-      //  picList =  blobDao.findByBoUuid(selected.getId());
+        //  picList =  blobDao.findByBoUuid(selected.getId());
     }
 
 
@@ -166,7 +167,7 @@ public class V2PmOrderExController extends GenericCRUDUUIDController<PmScheduleD
         }
         assetName=asset.getName();
         if(Strings.isNullOrEmpty(asset.getClinicalDeptName()) )  {
-           dptName=null;
+            dptName=null;
         }
         else{
             dptName=asset.getClinicalDeptName();

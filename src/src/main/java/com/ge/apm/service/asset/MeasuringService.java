@@ -211,10 +211,10 @@ public class MeasuringService {
                         case "合格":
                             status = 1;
                             break;
-                        case "校准不合格":
+                        case "不合格":
                             status = 2;
                             break;
-                        case "没有校准结果":
+                        case "无结果":
                             status = 3;
                             break;
                         case "校准合格":

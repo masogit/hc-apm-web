@@ -42,7 +42,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.requestReason}</label>
-                            <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestReason}" />
+                            <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.requestReason}" style="word-wrap: break-word;"/>
                         </h:panelGroup>
                         <h:panelGroup id="assetstatus" class="updateDownTime">
                             <label class="label">#{msg.status}</label>
@@ -97,7 +97,7 @@
                         </p:panel>
                     </p:dataGrid>
                     <p:dataGrid var="woPicItem" value="#{workOrderMgrController.getPicListByBoType('WorkOrder')}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.getPicListByBoType('WorkOrder')}">
-                        <f:facet name="header">维修图片#</f:facet>
+                        <f:facet name="header">维修图片</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%">
                                 <p:graphicImage url="#{fileDownloadService.getFileUrl(woPicItem.objectStorageId)}"   style="max-width: 100%;height: auto"/> 
