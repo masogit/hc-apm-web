@@ -40,7 +40,7 @@ public class HealthApi {
   private static final String redirect_1 = "/portal/woMgr/workOrderList.xhtml";
   private static final String redirect_2 = "/portal/asset/info/List.xhtml?assetStatus=2";
   private static final String redirect_3 = "/portal/asset/info/List.xhtml?model=1";
-  private static final String redirect_4 = "/portal/pm/pmOrderList.xhtml?model=1";
+  private static final String redirect_4 = "/portal/pm/pmOrderListAll.xhtml?model=1";
   private static final String redirect_5 = "/portal/insp/MetrologyOrderList.xhtml?model=1";
   private static final String redirect_6 = "/portal/insp/InspOrderList.xhtml?model=1";
   private static final String categorized = "?category=";
