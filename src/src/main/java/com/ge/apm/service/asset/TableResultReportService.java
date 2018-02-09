@@ -50,6 +50,13 @@ public class TableResultReportService {
                         }
                         break;
                     }
+                    case "DeltaRule": {
+                        String res = getResultForDeltaVerifyRule(tableValue, item);
+                        if (res != null) {
+                            resMap.put(item.getResKey(), res);
+                        }
+                        break;
+                    }
                 }
             });
         });
@@ -57,15 +64,17 @@ public class TableResultReportService {
     }
 
     /**
-     * 计算示值误差是否超限
+     * 计算示值误差是否超限 
+     * 合格: 偏差下限范围*FS<|Y-X|/X<偏差上限范围*FS 误差下限范围*FS<|Y-Z|/Z<误差上限范围*FS 
      * @param tableValue
      * @param tableItem
-     * @return 
+     * @return
      */
     private static String getResultForVerifyRule(Map<String, Object> tableValue, TableItem tableItem) {
         Double x = toDouble(tableItem.getExp().get("norm"));
         Double y = toDouble(tableValue.get(tableItem.getExp().get("Y_Key")));
         Double z = toDouble(tableValue.get(tableItem.getExp().get("Z_Key")));
+        Double fs = toDouble(tableValue.get(tableItem.getExp().get("FS")));
         if (x == null || y == null || z == null) {
             return null;
         }
@@ -73,11 +82,11 @@ public class TableResultReportService {
         Double delta = x == 0 ? y - x : (y - x) / x;
         Double mu = z == 0 ? y - z : (y - z) / z;
 
-        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0)/100;
-        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0)/100;
+        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0) / 100 *fs;
+        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100 *fs;
 
-        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0)/100;
-        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0)/100;
+        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0) / 100 *fs;
+        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0) / 100 *fs;
 
         if (delta < deltaMin || delta > deltaMax) {
             return getReturnValue((String) tableItem.getExp().get("resIdentify"), "DeltaException");
@@ -90,10 +99,34 @@ public class TableResultReportService {
     }
 
     /**
-     * 测量值是否超出设定值的上下限范围
+     * 实际值和示值差
+     *
      * @param tableValue
      * @param tableItem
-     * @return 
+     * @return
+     */
+    private static String getResultForDeltaVerifyRule(Map<String, Object> tableValue, TableItem tableItem) {
+        Double y = toDouble(tableValue.get(tableItem.getExp().get("Y_Key")));
+        Double z = toDouble(tableValue.get(tableItem.getExp().get("Z_Key")));
+        Double max = toDouble(tableItem.getExp().get("deltaMax"));
+        if (y == null || z == null || max == null) {
+            return null;
+        }
+
+        Double delta = Math.abs(y - z);
+        if (delta - max > 0.0001) {
+            return getReturnValue((String) tableItem.getExp().get("resIdentify"), "DeltaException");
+        }
+
+        return "Normal";
+    }
+
+    /**
+     * 测量值是否超出设定值的上下限范围
+     *
+     * @param tableValue
+     * @param tableItem
+     * @return
      */
     private static String getResultForScopeRule(Map<String, Object> tableValue, TableItem tableItem) {
         Double value = toDouble(tableValue.get(tableItem.getKey()));
@@ -105,9 +138,9 @@ public class TableResultReportService {
             return null;
         }
         Double min = Math.min(norm + Optional.ofNullable(toDouble(tableItem.getExp().get("min"))).orElse(0.0),
-                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("minPercent"))).orElse(0.0))/100);
+                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("minPercent"))).orElse(0.0)) / 100);
         Double max = Math.max(norm + Optional.ofNullable(toDouble(tableItem.getExp().get("max"))).orElse(0.0),
-                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("maxPercent"))).orElse(0.0))/100);
+                norm * (1 + Optional.ofNullable(toDouble(tableItem.getExp().get("maxPercent"))).orElse(0.0)) / 100);
         if (value < min) {
             return getReturnValue((String) tableItem.getExp().get("resIdentify"), "Low");
         }
@@ -119,6 +152,7 @@ public class TableResultReportService {
 
     /**
      * 测量值是否超出给定上下限
+     *
      * @param tableValue
      * @param tableItem
      * @return
@@ -149,9 +183,9 @@ public class TableResultReportService {
     }
 
     /**
-     * 返回值: 合格/不合格 : resIdentify_1: 'Normal' / 'Abnormal' 
-     * 合格/过高/过低 : resIdentify_2: 'Normal' / 'High' / 'Low'
-     * 合格/误差超限/偏差超限 :resIdentify_3: 'Normal' / 'deltaException' / 'muException'
+     * 返回值: 合格/不合格 : resIdentify_1: 'Normal' / 'Abnormal' 合格/过高/过低 :
+     * resIdentify_2: 'Normal' / 'High' / 'Low' 合格/误差超限/偏差超限 :resIdentify_3:
+     * 'Normal' / 'deltaException' / 'muException'
      */
     private static String getReturnValue(String resIdentify, String result) {
         switch (resIdentify) {
