@@ -167,10 +167,10 @@ public class WorkOrderReportExportController implements Serializable{
 			String woXml = getWoXml(data);
 			
 			File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-					getResource("../../portal/wo/woExport/pdf/wo2fo.xsl").getPath());
+					getResource("../../portal/pdf/wo2fo.xsl").getPath());
 			
 			File conf = new File(WorkOrderReportExportController.class.getClassLoader().
-					getResource("../../portal/wo/woExport/pdf/fop.xml").getPath());
+					getResource("../../portal/pdf/fop.xml").getPath());
 			
 			FopFactory fopFactory = FopFactory.newInstance(conf);
 			FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
