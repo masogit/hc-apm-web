@@ -90,6 +90,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String filterPlanTime;
     private Map<String, Boolean> selectedMap;
 
+
+   /* public boolean isOneClick(){
+        return selectedPmOrder.getSimplify()
+        if(==true){
+            retur
+        }
+    }*/
     public void prepareAproval(String woid) {
         prepareAct(woid);
         selectedMap = new HashMap<>();
