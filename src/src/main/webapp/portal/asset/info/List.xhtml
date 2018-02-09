@@ -16,7 +16,6 @@
     <ui:define name="content">
         <style>
             .btn+.btn { margin-left: 0 }
-
             .ui-column-resizer:before {content: none!important;}
             th{font-size: 12px!important;}
             td{font-size: 12px!important;padding: 0px!important;}
@@ -437,17 +436,14 @@
                     }
                 });
             }
-
             var newWin;
             function prepareAssetViewWindow() {
                 newWin = window.open('about:blank', '_blank');
                 newWin.document.body.innerHTML = '加载中...';
             }
-
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
             }
-
         </script>
     </ui:define>
 </ui:composition>
