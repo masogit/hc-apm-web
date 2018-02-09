@@ -57,10 +57,17 @@ public class TableCreateController {
         if (Strings.isNullOrEmpty(templateId)) {
             CreateTemplate();
             table = new TableSchema();
+            selectedTableDefinition.setId(UUID.randomUUID().toString().replaceAll("-", ""));
+            table.setSchemaId(selectedTableDefinition.getId());
         } else {
             selectedTableDefinition = templateService.getTemplateById(templateId);
             table = JSONObject.parseObject(selectedTableDefinition.getSchema(), TableSchema.class);
-            tableString = selectedTableDefinition.getSchema();
+            if (Strings.isNullOrEmpty(table.getSchemaId())) {
+                table.setSchemaId(selectedTableDefinition.getId());
+                tableString = JSONObject.toJSONString(table);
+            } else {
+                tableString = selectedTableDefinition.getSchema();
+            }
         }
 
     }
@@ -156,8 +163,8 @@ public class TableCreateController {
     public void prepareAddItem(TableGroup group) {
         editGroup = group;
         editTableItem = new TableItem();
-        editTableItem.setExp(new HashMap<String,String>());
-        
+        editTableItem.setExp(new HashMap<String, String>());
+
     }
 
     public void prepareEditItem(TableGroup group, TableItem item) {
@@ -196,7 +203,7 @@ public class TableCreateController {
             }
         }
         editTableItem.getExp().clear();
-        
+
     }
 
     public void onStringEdit() {
@@ -246,13 +253,13 @@ public class TableCreateController {
         tableString = JSONObject.toJSONString(table);
     }
 
-    public void onRuleChange(){
-        
-        if(!Strings.isNullOrEmpty(editTableItem.getKey())){
+    public void onRuleChange() {
+
+        if (!Strings.isNullOrEmpty(editTableItem.getKey())) {
             editTableItem.setResKey(editTableItem.getKey().concat("_res"));
         }
     }
-    
+
     //getter and setter
     public TableSchema getTable() {
         return table;
