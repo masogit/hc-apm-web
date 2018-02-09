@@ -22,7 +22,6 @@
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
-
                         <p:ajax event="rowSelect" update="createButton deleteButton viewButton" />
                         <p:ajax event="filter" listener="#{assetArrivedListController.onFilter}" update="createButton deleteButton " />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -62,6 +61,9 @@
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
+                            </p:commandButton>
+                            <p:commandButton title="导出选中记录到PDF" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false" actionListener="#{assetArrivedListController.exportSelectedToPdf()}">
+                                <p:fileDownload value="#{assetArrivedListController.exportPdf}" />
                             </p:commandButton>
                         </f:facet>
                     </p:dataTable>
