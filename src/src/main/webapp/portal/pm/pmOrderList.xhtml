@@ -90,18 +90,23 @@
                             <p:commandButton disabled="#{item.currentPersonId!=userContextService.loginUserUid}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
-                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
+                        <!--<p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
                             <p:commandButton  value="抢单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
-                        </p:column>
+                        </p:column> backup-->
+                        <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
+                            <p:commandButton  value="一键完成" rendered="#{v2PmOrderController.selectedPmOrder.simplify}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:takeOrderDialogForm" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
+                            <p:commandButton  value="抢单" rendered="#{v2PmOrderController.selectedPmOrder.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                                               </p:column>
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==0}">
                             <p:commandButton value="保养"  actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
-                            <p:column headerText="操作">
-                                <p:commandButton value="一键完成" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
-                            </p:column>
 
                             <p:commandButton value="转单" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
                         </p:column>
+
+                        <!--<p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==-2}">
+                            <p:commandButton value="一键完成" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                        </p:column>-->
 
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==8}">
                             <p:commandButton value="审核" actionListener="#{v2PmOrderController.prepareAproval(item.id)}" update="@(.pmapproveDialogCls)" oncomplete="PF('pmapproveDialog').show()"/>
