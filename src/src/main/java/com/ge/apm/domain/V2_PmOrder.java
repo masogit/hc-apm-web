@@ -91,6 +91,10 @@ public class V2_PmOrder  implements Serializable {
     @Column(name = "man_hours")
     private Double manHours;
 
+    @Column(name="simplify")
+    private Boolean simplify;
+
+
     @Column(name = "plan_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -521,5 +525,13 @@ public class V2_PmOrder  implements Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public Boolean getSimplify() {
+        return simplify;
+    }
+
+    public void setSimplify(Boolean simplify) {
+        this.simplify = simplify;
     }
 }

@@ -91,7 +91,7 @@ public class V2_PmOrderService {
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setActionType("approval");
+            formData.setActionType("approval");
         formData.setDesc(desc);
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 formData.setAssignee(approvaler);
@@ -103,6 +103,9 @@ formData.setAssignee(approvaler);
             WebUtil.addSuccessMessage("审批提交成功");
         }
     }
+
+
+
     public void createPMrequestApi(String assetUID,PmOrderActionForm formData){
         String token = UserContextService.getAccessToken();
         formData.setAssetUid(assetUID);
@@ -213,11 +216,13 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
         }
     }
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
-
-
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setActionType("repair");
+        if(selectedPmOrder.getSimplify()==true){
+            formData.setActionType("simplify");
+        }else{
+            formData.setActionType("repair");
+        }
         formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 formData.setAttachments(attachment);
@@ -235,7 +240,6 @@ formData.setAttachments(attachment);
             WebUtil.addSuccessMessage("操作成功");
         }
     }
-
 
     public void reassignWorkOrder(V2_PmOrder selectedPmOrder, String assigneeId,String comments) {
         String token = UserContextService.getAccessToken();
