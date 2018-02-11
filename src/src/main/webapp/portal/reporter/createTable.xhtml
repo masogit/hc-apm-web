@@ -193,18 +193,28 @@
                     </p:panelGrid>
                     <h:panelGroup id="advanceSetting">
                         <p:fieldset legend="上下限设置"  rendered="#{'RangeRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label"> 合格: 下限≤测量值≤上限 </p>
+                            <h:outputText id="RangeRuleComments" value="合格: 下限#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}上限" />
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
-                                    <label class="label">计算结果Key*</label>
+                                    <label class="label ">计算结果Key*</label>
                                     <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="计算结果Key#{msg.ValidationRequire}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
                                     <label class="label">上限</label>
+                                    <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['maxCompare']}" >
+                                        <p:ajax update="RangeRuleComments" process="@this"/>
+                                        <f:selectItem itemLabel="小于等于" itemValue="#{'LE'}"/>
+                                        <f:selectItem itemLabel="小于" itemValue="#{'LT'}"/>
+                                    </p:selectOneMenu>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
                                     <label class="label">下限</label>
+                                    <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['minCompare']}" >
+                                        <p:ajax update="RangeRuleComments" process="@this"/>
+                                        <f:selectItem itemLabel="大于等于" itemValue="#{'GE'}"/>
+                                        <f:selectItem itemLabel="大于" itemValue="#{'GT'}"/>
+                                    </p:selectOneMenu>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" />
                                 </h:panelGroup> 
                                 <h:panelGroup >
@@ -218,7 +228,7 @@
                             </p:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="范围上下限"  rendered="#{'ScopeRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                            <p class="label"> 合格: (1-下限范围)*标准值≤测量值≤(1+上限范围)*标准值 </p>
+                            <h:outputText id="ScopeRuleComments" value="合格: (1-下限范围)*标准值#{tableCreateController.editTableItem.exp['minCompare'] eq 'GT'? '&lt;':'≤'}测量值#{tableCreateController.editTableItem.exp['maxCompare'] eq 'LT'? '&lt;':'≤'}(1+上限范围)*标准值" />
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
                                     <label class="label">计算结果Key*</label>
@@ -230,11 +240,21 @@
                                 </h:panelGroup> 
                                 <h:panelGroup >
                                     <label class="label">上限范围</label>
+                                    <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['maxCompare']}" >
+                                        <p:ajax update="ScopeRuleComments" process="@this"/>
+                                        <f:selectItem itemLabel="小于等于" itemValue="#{'LE'}"/>
+                                        <f:selectItem itemLabel="小于" itemValue="#{'LT'}"/>
+                                    </p:selectOneMenu>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['max']}" minValue="0" />或
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['maxPercent']}" symbol="%" symbolPosition="s" minValue="0"/>
                                 </h:panelGroup> 
                                 <h:panelGroup >
                                     <label class="label">下限范围</label>
+                                    <p:selectOneMenu  value="#{tableCreateController.editTableItem.exp['minCompare']}" >
+                                        <p:ajax update="ScopeRuleComments" process="@this"/>
+                                        <f:selectItem itemLabel="大于等于" itemValue="#{'GE'}"/>
+                                        <f:selectItem itemLabel="大于" itemValue="#{'GT'}"/>
+                                    </p:selectOneMenu>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['min']}" maxValue="0" />或
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['minPercent']}" symbol="%" symbolPosition="s" maxValue="0"/>
                                 </h:panelGroup> 
