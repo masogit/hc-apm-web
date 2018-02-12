@@ -77,7 +77,7 @@ public class TableResultReportService {
         Double x = toDouble(tableItem.getExp().get("norm"));
         Double y = toDouble(tableValue.get(tableItem.getExp().get("Y_Key")));
         Double z = toDouble(tableValue.get(tableItem.getExp().get("Z_Key")));
-        Double fs = toDouble(tableValue.get(tableItem.getExp().get("FS")));
+        Double fs = toDouble(tableItem.getExp().get("FS"));
         if (x == null || y == null || z == null) {
             return null;
         }
@@ -184,7 +184,7 @@ public class TableResultReportService {
 
     private static Double toDouble(Object input) {
         try {
-            return input == null ? null : Double.parseDouble(input.toString());
+            return input == null ? null : Double.parseDouble(input.toString().replaceAll("\"", ""));
         } catch (NumberFormatException e) {
             return null;
         }
