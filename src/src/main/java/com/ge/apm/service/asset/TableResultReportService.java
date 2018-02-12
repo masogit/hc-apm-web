@@ -66,7 +66,7 @@ public class TableResultReportService {
     }
 
     /**
-     * 计算示值误差是否超限 合格: 偏差下限范围*FS<|Y-X|/X<偏差上限范围*FS 误差下限范围*FS<|Y-Z|/Z<误差上限范围*FS 
+     * 计算相对误差是否超限 合格: 偏差下限范围*FS<|Y-X|/X<偏差上限范围 误差下限范围*FS<|Y-Z|/Z<误差上限范围
      * @p
      *
      * aram tableValue
@@ -77,7 +77,7 @@ public class TableResultReportService {
         Double x = toDouble(tableItem.getExp().get("norm"));
         Double y = toDouble(tableValue.get(tableItem.getExp().get("Y_Key")));
         Double z = toDouble(tableValue.get(tableItem.getExp().get("Z_Key")));
-        Double fs = toDouble(tableItem.getExp().get("FS"));
+//        Double fs = toDouble(tableItem.getExp().get("FS"));
         if (x == null || y == null || z == null) {
             return null;
         }
@@ -85,11 +85,11 @@ public class TableResultReportService {
         Double delta = x == 0 ? y - x : (y - x) / x;
         Double mu = z == 0 ? y - z : (y - z) / z;
 
-        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0) / 100 * fs;
-        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100 * fs;
+        Double deltaMin = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMinPercent"))).orElse(0.0) / 100 ;
+        Double deltaMax = Optional.ofNullable(toDouble(tableItem.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100 ;
 
-        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0) / 100 * fs;
-        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0) / 100 * fs;
+        Double muMin = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMinPercent"))).orElse(0.0) / 100 ;
+        Double muMax = Optional.ofNullable(toDouble(tableItem.getExp().get("MuMaxPercent"))).orElse(0.0) / 100 ;
 
         if (delta < deltaMin || delta > deltaMax) {
             return getReturnValue((String) tableItem.getExp().get("resIdentify"), "DeltaException");
