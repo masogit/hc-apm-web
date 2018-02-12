@@ -66,10 +66,8 @@ public class TableResultReportService {
     }
 
     /**
-     * 计算相对误差是否超限 合格: 偏差下限范围*FS<|Y-X|/X<偏差上限范围 误差下限范围*FS<|Y-Z|/Z<误差上限范围
-     * @p
-     *
-     * aram tableValue
+     * 计算相对误差是否超限 合格: 偏差下限范围*FS<|Y-X|/X\<偏差上限范围 误差下限范围*FS<|Y-Z|/Z<误差上限范围
+     * @param tableValue
      * @param tableItem
      * @return
      */
