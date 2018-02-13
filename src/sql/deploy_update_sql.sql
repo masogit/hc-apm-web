@@ -53,3 +53,29 @@ update Asset_info set asset_group=99 where asset_group=22
 --删除多院区角色
 delete from  user_role where role_id=6
 delete from sys_role where "name"='MultiHospital'
+
+
+--for v1.9.1 change
+--PM rule create table_definition
+insert into table_definition (id,name,tenant_uid,institution_uid,hospital_uid,site_uid,schema,status) 
+(select distinct replace('' || uuid_generate_v4(),'-','')as newuid,'performance_report', rul.tenant_uid ,rul.tenant_uid,rul.tenant_uid,rul.tenant_uid, rul.performance_report,'Released' from 
+(select distinct pr.tenant_uid,pr.performance_report from pm_order_rule pr 
+where pr.performance_report not in (Select Schema from table_definition where tenant_uid=pr.tenant_uid) and BIT_LENGTH(pr.performance_report)>0 )rul );
+
+insert into table_definition (id,name,tenant_uid,institution_uid,hospital_uid,site_uid,schema,status) 
+(select distinct replace('' || uuid_generate_v4(),'-','')as newuid,'safety_report', rul.tenant_uid ,rul.tenant_uid,rul.tenant_uid,rul.tenant_uid, rul.safety_report,'Released' from 
+(select distinct pr.tenant_uid,pr.safety_report from pm_order_rule pr where pr.safety_report not in (Select Schema from table_definition where tenant_uid=pr.tenant_uid) and BIT_LENGTH(pr.safety_report)>0 )rul );
+
+--PM rule refrence to table_definition
+update pm_order_rule pr  set safety_report=(select id from table_definition td where td.Schema=pr.safety_report and td.tenant_uid=pr.tenant_uid) 
+where pr.safety_report in (Select Schema from table_definition where tenant_uid=pr.tenant_uid);
+
+update pm_order_rule pr  set performance_report=(select id from table_definition td where td.Schema=pr.performance_report and td.tenant_uid=pr.tenant_uid) 
+where pr.performance_report in (Select Schema from table_definition where tenant_uid=pr.tenant_uid);
+
+--data refrence change
+update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-safety-report';
+
+update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-performance-report';
+
+--end for v1.9.1 change
