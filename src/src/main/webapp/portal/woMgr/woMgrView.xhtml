@@ -84,7 +84,7 @@
                         </h:panelGroup>
                         <h:panelGroup rendered="#{workOrderMgrController.selected.serviceRequest.status eq 3}">
                             <label class="label">取消原因</label>
-                            <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.cancelReason}" />
+                            <p:outputLabel value="#{workOrderMgrController.selected.serviceRequest.cancelReason}" style="word-wrap: break-word;"/>
                         </h:panelGroup>
                     </p:panelGrid>
 
@@ -144,15 +144,15 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.patProblems}</label>
-                                    <p:outputLabel value="#{woItem.patProblems}"/>
+                                    <p:outputLabel value="#{woItem.patProblems}" style="word-wrap: break-word;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.patActions}</label>
-                                    <p:outputLabel value="#{woItem.patActions}"/>
+                                    <p:outputLabel value="#{woItem.patActions}" style="word-wrap: break-word;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.patTests}</label>
-                                    <p:outputLabel value="#{woItem.patTests}"/>
+                                    <p:outputLabel value="#{woItem.patTests}" style="word-wrap: break-word;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.manHours}</label>
@@ -176,7 +176,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.feedbackComment}</label>
-                                    <p:outputLabel value="#{woItem.feedbackComment}"/>
+                                    <p:outputLabel value="#{woItem.feedbackComment}" style="word-wrap: break-word;"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.endTime}</label>
@@ -206,7 +206,7 @@
                                     </h:outputText>
                                 </p:column>
                                 <p:column headerText="#{msg.description}">
-                                    <h:outputText value="#{stepItem.comments}" />
+                                    <h:outputText value="#{stepItem.comments}"  style="word-wrap: break-word;"/>
                                 </p:column>
 
                             </p:dataTable>
@@ -280,10 +280,6 @@
                         </p:fieldset>
 
                     </c:forEach>
-
-
-
-
 
                 </p:fieldset>
             </h:form>
