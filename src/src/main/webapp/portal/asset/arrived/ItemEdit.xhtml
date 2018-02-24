@@ -401,7 +401,7 @@
                             </p:panel>
                         </p:dataGrid>
                         <p:fileUpload id="asset" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="false"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                      multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     </p:fieldset>
                     <p:fieldset legend="#{msg.AssetArrivalListAckInfo}">
                         <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
@@ -422,7 +422,7 @@
 
                         </p:dataGrid>
                         <p:fileUpload id="business" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="false"  sizeLimit="10000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                      multiple="true"  sizeLimit="10000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                         <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.clinicalAckStatus}">
@@ -442,7 +442,7 @@
 
                         </p:dataGrid>
                         <p:fileUpload id="clinical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="false"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                      multiple="true"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                         <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
@@ -462,7 +462,7 @@
 
                         </p:dataGrid>
                         <p:fileUpload id="technical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                      multiple="false"  sizeLimit="10000000"  update="pictureList3" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                                      multiple="true"  sizeLimit="10000000"  update="pictureList3" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
 
                     </p:fieldset>
