@@ -120,7 +120,7 @@
 
                     </p:panelGrid>
                     <h:panelGroup>
-                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":growl"/>
+                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":CreateTemplateForm :growl"/>
                         <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="schemaList.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
                     </h:panelGroup>
                 </h:form>
