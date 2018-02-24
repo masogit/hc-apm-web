@@ -101,6 +101,7 @@ public class AssetInstallationService {
                 assetPicList.forEach(item -> {
                     item.setId(null);
                     item.setBoUuid(newAsset.getUid());
+                    item.setBoId(newAsset.getId());
                     item.setBoSubType("1");
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });

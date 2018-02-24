@@ -166,6 +166,8 @@ public class QrCodeService {
             FieldsMap.put("financingNum", WebUtil.getMessage("financingNum"));   //资产编号  AssetInfo.financingNum
             FieldsMap.put("departNum", WebUtil.getMessage("departNum"));         //设备编号（院方）  AssetInfo.departNum
             FieldsMap.put("modalityId", WebUtil.getMessage("modalityId"));       //院内IT系统编号  AssetInfo.modalityId
+            FieldsMap.put("makerShortName", WebUtil.getMessage("makerShortName"));       //品牌/制造商简称  AssetInfo.makerShortName
+            FieldsMap.put("systemId", WebUtil.getMessage("systemId"));           //SystemID/厂商报修ID  AssetInfo.systemId
 
         }
         return FieldsMap;
@@ -240,6 +242,12 @@ public class QrCodeService {
                         break;
                     case "modalityId":
                         item.setTextShowValue(item.getTextValue().concat(asset.getModalityId() == null ? "" : asset.getModalityId()));
+                        break;
+                    case "makerShortName":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getMakerShortName() == null ? "" : asset.getMakerShortName()));
+                        break;
+                    case "systemId":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getSystemId() == null ? "" : asset.getSystemId()));
                         break;
                 }
             }

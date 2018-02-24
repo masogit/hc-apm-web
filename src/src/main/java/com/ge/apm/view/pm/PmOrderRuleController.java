@@ -32,6 +32,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.Report;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.Optional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -50,6 +51,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private String filterPmRuleLevel;
 	private String defaultReport;
 	private TableDefinitionRepository templateDao;
+        
+        private String safetyReportJson;
+        private String performanceReportJson;
 
 	@Override
 	protected void init() {
@@ -156,38 +160,38 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 	@Transactional
 	public void applyChange() {
-		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-		if(!StringUtils.isEmpty(selected.getSafetyReport())){
-			try{
-				if(!selected.getSafetyReport().contains("title")){
-					WebUtil.addErrorMessage("安全检测报告必须包含title元素！");
-					return;
-				}else if(!selected.getSafetyReport().contains("groups")){
-					WebUtil.addErrorMessage("安全检测报告必须包含groups元素！");
-					return;
-				}
-				JSON.parseObject(selected.getSafetyReport(),Report.class);
-			}catch(Exception e){
-				WebUtil.addErrorMessage("安全检测报告JSON不合法！");
-				return;
-			}
-		}
-		if(!StringUtils.isEmpty(selected.getPerformanceReport())){
-			try{
-				if(!selected.getPerformanceReport().contains("title")){
-					WebUtil.addErrorMessage("性能检测报告必须包含title元素！");
-					return;
-				}else if(!selected.getPerformanceReport().contains("groups")){
-					WebUtil.addErrorMessage("性能检测报告必须包含groups元素！");
-					return;
-				}
-				JSON.parseObject(selected.getPerformanceReport(),Report.class);
-			}catch(Exception e){
-				WebUtil.addErrorMessage("性能检测报告JSON不合法！");
-				return;
-			}
-		}
-		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
+//		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//		if(!StringUtils.isEmpty(selected.getSafetyReport())){
+//			try{
+//				if(!selected.getSafetyReport().contains("title")){
+//					WebUtil.addErrorMessage("安全检测报告必须包含title元素！");
+//					return;
+//				}else if(!selected.getSafetyReport().contains("groups")){
+//					WebUtil.addErrorMessage("安全检测报告必须包含groups元素！");
+//					return;
+//				}
+//				JSON.parseObject(selected.getSafetyReport(),Report.class);
+//			}catch(Exception e){
+//				WebUtil.addErrorMessage("安全检测报告JSON不合法！");
+//				return;
+//			}
+//		}
+//		if(!StringUtils.isEmpty(selected.getPerformanceReport())){
+//			try{
+//				if(!selected.getPerformanceReport().contains("title")){
+//					WebUtil.addErrorMessage("性能检测报告必须包含title元素！");
+//					return;
+//				}else if(!selected.getPerformanceReport().contains("groups")){
+//					WebUtil.addErrorMessage("性能检测报告必须包含groups元素！");
+//					return;
+//				}
+//				JSON.parseObject(selected.getPerformanceReport(),Report.class);
+//			}catch(Exception e){
+//				WebUtil.addErrorMessage("性能检测报告JSON不合法！");
+//				return;
+//			}
+//		}
+//		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", false);
 		
 		selected.setPeriod(getPeriod());
 		
@@ -242,7 +246,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	
 	@Transactional
 	public void approve(){
-		applyChange();
+//		applyChange();
 		selected.setStatus(1);
 		selected.setApproveUserId(user.getId());
 		dao.save(selected);
@@ -298,7 +302,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
         selected.setOwnerId(user.getId());
-        applyChange();
+//        applyChange();
 	}
 	
 /*	public void saveOwn(){
@@ -409,6 +413,17 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			return period;
 		}
 	}
+        
+        public void onSchemaChange(String type){
+            if("safetyReport".equals(type)){
+                TableDefinition schema = templateDao.findById(selected.getSafetyReport());
+                safetyReportJson = schema==null? null:schema.getSchema();
+            }else if("performanceReport".equals(type)){
+                TableDefinition schema = templateDao.findById(selected.getPerformanceReport());
+                performanceReportJson = schema==null? null:schema.getSchema();
+            }
+            
+        }
 	
 	public void initSaveAs(){
 		selected.setPeriod(null);
@@ -435,8 +450,22 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	public void setFilterPmRuleLevel(String filterPmRuleLevel) {
 		this.filterPmRuleLevel = filterPmRuleLevel;
 	}
-	
-	
+
+    public String getSafetyReportJson() {
+        return safetyReportJson;
+    }
+
+    public String getPerformanceReportJson() {
+        return performanceReportJson;
+    }
+    
+    public void setSafetyReportJson(String safetyReportJson) {
+        this.safetyReportJson = safetyReportJson;
+    }
+
+    public void setPerformanceReportJson(String performanceReportJson) {
+        this.performanceReportJson = performanceReportJson;
+    }
 
 	/*
 	 * @Override public void onBeforeNewObject(PmOrderRule object) { }
@@ -458,4 +487,6 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	 * 
 	 * @Override public void onAfterDataChanged(){ };
 	 */
+
+   
 }

@@ -15,11 +15,11 @@ import com.ge.apm.domain.pure.TableSchema;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -93,4 +93,10 @@ public class TableDefinitionService {
         TableDefinition template = Strings.isNullOrEmpty(templateId) ? null : templateDao.findById(templateId);
         return template == null ? "" : template.getSchema();
     }
+
+    public Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
+        return TableResultReportService.getRuleResultData(tableValue, table);
+    }
+    
+    
 }
