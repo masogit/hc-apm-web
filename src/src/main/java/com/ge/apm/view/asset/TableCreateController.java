@@ -1,6 +1,5 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.view.*;
 import com.ge.apm.domain.pure.TableSchema;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -16,13 +15,9 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.stream.Collectors;
 import org.primefaces.context.RequestContext;
-import org.primefaces.event.RowEditEvent;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -46,7 +41,7 @@ public class TableCreateController {
 
     private Map<String, Object> tableValue;
 
-    private Boolean isStringEditable;
+    private Boolean isStringEditable = false;
 
     @PostConstruct
     protected void init() {
@@ -60,7 +55,12 @@ public class TableCreateController {
         } else {
             selectedTableDefinition = templateService.getTemplateById(templateId);
             table = JSONObject.parseObject(selectedTableDefinition.getSchema(), TableSchema.class);
-            tableString = selectedTableDefinition.getSchema();
+            if (Strings.isNullOrEmpty(table.getSchemaId())) {
+                table.setSchemaId(selectedTableDefinition.getId());
+                tableString = JSONObject.toJSONString(table);
+            } else {
+                tableString = selectedTableDefinition.getSchema();
+            }
         }
 
     }
@@ -74,10 +74,14 @@ public class TableCreateController {
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
     }
 
+    @Transactional
     public void saveTemplate() {
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
-            selectedTableDefinition.setSchema(JSONObject.toJSONString(table));
             selectedTableDefinition.setName(table.getTitle());
+            templateDao.save(selectedTableDefinition);
+            table.setSchemaId(selectedTableDefinition.getId());
+            tableString = JSONObject.toJSONString(table);
+            selectedTableDefinition.setSchema(tableString);
             templateDao.save(selectedTableDefinition);
             WebUtil.addSuccessMessage("已保存");
         } else {
@@ -156,6 +160,8 @@ public class TableCreateController {
     public void prepareAddItem(TableGroup group) {
         editGroup = group;
         editTableItem = new TableItem();
+        editTableItem.setExp(new HashMap<String, String>());
+
     }
 
     public void prepareEditItem(TableGroup group, TableItem item) {
@@ -193,6 +199,8 @@ public class TableCreateController {
                 editTableItem.setOptions(new ArrayList<TableOption>());
             }
         }
+        editTableItem.getExp().clear();
+
     }
 
     public void onStringEdit() {
@@ -240,6 +248,13 @@ public class TableCreateController {
         editTableItem.getOptions().add(selectedOption);
         selectedOption = null;
         tableString = JSONObject.toJSONString(table);
+    }
+
+    public void onRuleChange() {
+
+        if (!Strings.isNullOrEmpty(editTableItem.getKey())) {
+            editTableItem.setResKey(editTableItem.getKey().concat("_res"));
+        }
     }
 
     //getter and setter

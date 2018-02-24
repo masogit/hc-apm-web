@@ -59,8 +59,10 @@ public class EditReportController {
     public void save() {
         
         List<UnstructuredData> dataList = report.getData();
+        tableValue.putAll(tableService.getRuleResultData(tableValue,table));
+        
         tableValue.entrySet().forEach(item -> {
-            UnstructuredData dataItem = dataList.stream().filter(eachData -> eachData.getKey().equals(item.getKey())).findFirst().orElse(null);
+            UnstructuredData dataItem = dataList.stream().filter(eachData -> eachData.getKey().equals((String)item.getKey())).findFirst().orElse(null);
             if(null == dataItem){
                 dataItem = new UnstructuredData();
                 dataItem.setCollectionId(report.getId());

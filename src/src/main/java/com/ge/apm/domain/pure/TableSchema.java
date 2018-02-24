@@ -13,6 +13,7 @@ import java.util.List;
  */
 public class TableSchema {
 
+    private String schemaId;
     private String title;
     private List<TableGroup> groups;
 
@@ -30,6 +31,14 @@ public class TableSchema {
 
     public void setGroups(List<TableGroup> groups) {
         this.groups = groups;
+    }
+
+    public String getSchemaId() {
+        return schemaId;
+    }
+
+    public void setSchemaId(String schemaId) {
+        this.schemaId = schemaId;
     }
     
 }
