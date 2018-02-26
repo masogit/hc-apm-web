@@ -70,6 +70,12 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
             searchFilters.add(new SearchFilter("usageStatus", SearchFilter.Operator.EQ, 2));
         }
+        
+        if (null != fileterOrg) {
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
 
     }
@@ -101,16 +107,13 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
         if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            fileterOrg = (OrgInfo) event.getTreeNode().getData();
-            if (fileterOrg.getOrgType() == 4) {
-                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
+            if (deptOrg.getOrgType() == 4) {
+                fileterOrg = deptOrg;
                 return;
-            } else {
-                fileterOrg = null;
             }
         }
-        searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-
+        fileterOrg = null;
     }
 
     public void cancel() {
