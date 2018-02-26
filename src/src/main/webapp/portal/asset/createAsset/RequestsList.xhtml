@@ -24,18 +24,8 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <!--<p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton"/>-->
                         <p:ajax event="filter" listener="#{qrCodeLibCreateController.onFilter}" />
-<!--                        <p:column headerText="#{msg.SiteInfo}" sortBy="#{item.siteId}" filterBy="#{item.siteId}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{qrCodeLibCreateController.getSiteList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{qrCodeLibCreateController.getSiteName(item.siteId)}"/>
-                        </p:column>-->
-                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
+<!--                        <p:column headerText="#{msg.hospitalId}" sortBy="#{item.hospitalId}" filterBy="#{item.siteUID}" filterMatchMode="EQ">
                              <f:facet name="filter">
                                  <p:selectOneMenu value="#{qrCodeLibCreateController.selectedSiteUid}" >
                                      <p:ajax listener="#{qrCodeLibCreateController.onSiteChange}"  update="datalist clinicalDeptName"/>
@@ -53,7 +43,23 @@
                                 </p:selectOneMenu>
 	                         </f:facet>
                         	<h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
+                        </p:column>-->
+                        <p:column headerText="#{msg.hospitalId}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.hospitalId}"/><br/>
+                                <p:inputText id="hospitalId"  value="#{qrCodeLibCreateController.fileterSiteOrg.name}"  readonly="true"/>
+                            </f:facet>
+                            <h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>
                         </p:column>
+                        
+                        <p:column headerText="#{msg.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:inputText id="clinicalDept"  value="#{qrCodeLibCreateController.fileterDeptOrg.name}"  readonly="true"/>
+                            </f:facet>
+                            <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
+                        </p:column>
+                        
                         <p:column headerText="#{msg.name}" sortBy="#{item}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
@@ -70,19 +76,6 @@
                                 <f:convertDateTime pattern="MM/dd HH:mm:ss" />
                             </h:outputText>
                         </p:column>
-                        
-                        
-                        
-                        
-<!--                        <p:column headerText="#{msg.submitWechatId}" sortBy="#{item.submitWechatId}">
-                            <h:outputText value="#{item.submitWechatId}"/>
-                        </p:column>-->
-    <!--                    <p:column headerText="#{msg.comment}" sortBy="#{item.comment}" filterBy="#{item.comment}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.comment}"/>
-                        </p:column>-->
-    <!--                    <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
-                            <h:outputText value="#{item.status}"/>
-                        </p:column>-->
                         <p:column headerText="创建" >
                             <p:link   outcome="CreateAsset" >#{msg.Create}
                                 <f:param name="qrCode" value="#{item.qrCode}" />
@@ -93,11 +86,6 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="QrCodeLib_export"/>
                             </p:commandButton>
-                            <!--
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{qrCodeLibCreateController.prepareCreate}" update=":QrCodeLibEditDlg" oncomplete="PF('QrCodeLibEditDialog').show()"/>
-                            <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{qrCodeLibCreateController.prepareView}" update=":QrCodeLibViewDlg" oncomplete="PF('QrCodeLibViewDialog').show()" disabled="#{empty qrCodeLibCreateController.selected}"/>
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{qrCodeLibCreateController.prepareEdit}" update=":QrCodeLibEditDlg" oncomplete="PF('QrCodeLibEditDialog').show()" disabled="#{empty qrCodeLibCreateController.selected}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{qrCodeLibCreateController.prepareDelete}" update=":QrCodeLibViewDlg" oncomplete="PF('QrCodeLibViewDialog').show()" disabled="#{empty qrCodeLibCreateController.selected}"/>-->
                         </f:facet>
                     </p:dataTable>
                 </h:form>
@@ -105,6 +93,30 @@
             </div>
         </div>
 
+        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":QrCodeLibListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
+            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                <p:tree class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(empty qrCodeLibCreateController.fileterSiteOrg ? userContextService.loginUser.siteUID : qrCodeLibCreateController.fileterSiteOrg.uid)}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{qrCodeLibCreateController.onClinicalDeptFilter}" update=":QrCodeLibListForm:datalist :idVarPanelDeptOrg :idVarPanelSiteOrg" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
+        </p:overlayPanel>
+        <p:overlayPanel id="idVarPanelSiteOrg" widgetVar="varPanelSiteOrg" for=":QrCodeLibListForm:datalist:hospitalId" dismissable="true" style="text-align: left;">
+            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                <p:tree class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{qrCodeLibCreateController.onSelectSiteTreeNode}" update=":QrCodeLibListForm:datalist :idVarPanelSiteOrg :idVarPanelDeptOrg" oncomplete="PF('varPanelSiteOrg').hide();"/>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
+        </p:overlayPanel>
     </ui:define>
 
 </ui:composition>

@@ -11,7 +11,6 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.data.domain.Page;
@@ -23,7 +22,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.stream.Collectors;
-import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
 
 @ManagedBean
 @ViewScoped
@@ -34,6 +33,7 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
     private OrgInfoRepository orgDao;
     private BlobObjectRepository blobDao;
     private List<V2_BlobObject> picList;
+    private OrgInfo fileterOrg;
 
     @Override
     protected void init() {
@@ -99,6 +99,20 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
         dao.save(selected);
     }
 
+    public void onClinicalDeptFilter(NodeSelectEvent event) {
+        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            fileterOrg = (OrgInfo) event.getTreeNode().getData();
+            if (fileterOrg.getOrgType() == 4) {
+                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+                return;
+            } else {
+                fileterOrg = null;
+            }
+        }
+        searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+
+    }
+
     public void cancel() {
         this.selected = null;
     }
@@ -118,4 +132,12 @@ public class AssetInfoApprovalController extends JpaCRUDController<AssetInfo> {
         return "";
     }
 
+    public OrgInfo getFileterOrg() {
+        return fileterOrg;
+    }
+
+    public void setFileterOrg(OrgInfo fileterOrg) {
+        this.fileterOrg = fileterOrg;
+    }
+    
 }
