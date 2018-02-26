@@ -218,7 +218,7 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        if(selectedPmOrder.getSimplify()==true){
+        if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
             formData.setActionType("simplify");
         }else{
             formData.setActionType("repair");

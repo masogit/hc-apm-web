@@ -72,7 +72,17 @@
                         <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.pmNum}"/>
                         </p:column>
-                        <!--待派工 2-->
+                        <p:column headerText="当前处理步骤"  filterMatchMode="LIKE">
+                            <h:outputText value="#{item.currentStepName}"/>
+                        </p:column>
+                        <p:column headerText="当前处理人"  filterMatchMode="LIKE" filterBy="#{item.currentPersonName}">
+                            <h:outputText value="#{item.currentPersonName}"/>
+                        </p:column>
+                        <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
+                            <h:outputText value="#{item.planTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
                             <p:commandButton value="派工" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="pmTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
                         </p:column>
@@ -84,11 +94,11 @@
                             <p:commandButton disabled="#{item.currentPersonId!=userContextService.loginUserUid}" rendered="#{item.simplify ne true}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
-                        <!--抢单 31-->
+                        <!--抢单操作 31-->
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
                             <p:commandButton  value="一键完成" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
-                            <p:commandButton  value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton  value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <!--已计划 0-->
@@ -97,7 +107,6 @@
 
                             <p:commandButton value="转单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
                             <p:commandButton  value="一键完成" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
-
                         </p:column>
 
 
@@ -125,7 +134,7 @@
             </div>
        <!-- </div>-->
 
-        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="400"   header="新增保养" >
+        <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养" >
             <h:form id="PmRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}保养">
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -230,7 +239,7 @@
             </h:form>
         </p:dialog>
         <!--派工对话框-->
-        <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
+        <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="派工对话框">
             <h:form id="dispatchDialogForm" >
                 <h:panelGroup id="display8" >
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -266,7 +275,7 @@
 
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="接单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="确认接单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('takeOrderDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
