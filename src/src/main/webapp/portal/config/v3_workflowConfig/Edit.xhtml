@@ -83,6 +83,14 @@
                             <label class="label">#{msg.pmReminderTime}</label>
                             <p:inputText id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" />
                         </h:panelGroup>
+                        <h:panelGroup rendered="true">
+                            <label class = "label">维保提醒时间(天)</label>
+                            <p:inputText id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" />
+                        </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">维保提醒次数</label>
+                            <p:inputText id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" />
+                        </h:panelGroup >
                         <h:panelGroup >
                             <label class="label">资产创建审核人</label>
                             <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetApprover}">
@@ -93,6 +101,10 @@
                         <h:panelGroup >
                             <label class = "label">工单完工不需要验收?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
+                        </h:panelGroup >
+                        <h:panelGroup rendered="true">
+                            <label class = "label">系统自动验收(天)</label>
+                            <p:inputText id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" />
                         </h:panelGroup >
                         <h:panelGroup >
                             <label class = "label">工单完工自动关单?</label>
@@ -115,13 +127,10 @@
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
-                            <label class = "label">维保提醒时间(天)</label>
-                            <p:inputText id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" />
-                        </h:panelGroup >
-                        <h:panelGroup rendered="true">
                             <label class = "label">简化保养?</label>
                             <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.pmSimplify}"/>
                         </h:panelGroup >
+						
 
                         <!-- <p:spacer/> -->
                     </p:panelGrid>
