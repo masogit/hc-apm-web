@@ -35,6 +35,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Date;
+import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 
 import org.apache.commons.collections.map.HashedMap;
@@ -59,6 +61,8 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private UaaService uaaService;
     private StreamedContent exportPdf;
 
+    private Date varArrivalDateTo = null;
+    private String arrivalFormatTime = null;
 
     @Override
     protected void init() {
@@ -95,7 +99,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         selected = null;
         super.onFilter(event);
     }
-    
+
     @Override
     public void delete() {
         if (selected.getStatus() == 1) {
@@ -106,122 +110,133 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         }
     }
 
-    public String createAction(){
+    public String createAction() {
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create");
     }
-    
-    public String editAction(){
-         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId="+selected.getId());
+
+    public String editAction() {
+        return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + selected.getId());
     }
-    
-    public void exportSelectedToPdf()
-    {
-		Map<String, Object> info = new HashedMap();
-    	String itemId = selected.getId();
-    	getBasicInfo(itemId, info);
-    	getDetails(itemId, info);
-    	doExportToPdf(info);
+
+    public void exportSelectedToPdf() {
+        Map<String, Object> info = new HashedMap();
+        String itemId = selected.getId();
+        getBasicInfo(itemId, info);
+        getDetails(itemId, info);
+        doExportToPdf(info);
     }
-    
-    private void doExportToPdf(Map<String, Object> info)
-    {
-    	try 
-		{
-			String woXml = getWoXml(info);
-			
-			File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-					getResource("../../portal/pdf/arrivalItem.xsl").getPath());
-			
-			File conf = new File(WorkOrderReportExportController.class.getClassLoader().
-					getResource("../../portal/pdf/fop.xml").getPath());
-			
-			FopFactory fopFactory = FopFactory.newInstance(conf);
-			FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-			
-			ByteArrayOutputStream out = new ByteArrayOutputStream();
-			TransformerFactory factory = TransformerFactory.newInstance();
-            try 
-            {
-				Transformer transformer = factory.newTransformer(new StreamSource(xsl));
-				Source src = new StreamSource(new StringReader(woXml));
+
+    private void doExportToPdf(Map<String, Object> info) {
+        try {
+            String woXml = getWoXml(info);
+
+            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/arrivalItem.xsl").getPath());
+
+            File conf = new File(WorkOrderReportExportController.class.getClassLoader().
+                    getResource("../../portal/pdf/fop.xml").getPath());
+
+            FopFactory fopFactory = FopFactory.newInstance(conf);
+            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            TransformerFactory factory = TransformerFactory.newInstance();
+            try {
+                Transformer transformer = factory.newTransformer(new StreamSource(xsl));
+                Source src = new StreamSource(new StringReader(woXml));
                 Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
                 Result res = new SAXResult(fop.getDefaultHandler());
                 transformer.transform(src, res);
-			}
-            finally 
-            {
+            } finally {
                 exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, "AssetArrivalList.pdf");
             }
-		} 
-		catch (Exception e) 
-		{
-			e.printStackTrace();
-		}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-    
-    private String getWoXml(Map<String,Object> data)
-    {
-    	XStream xStream = new XStream(new DomDriver());
+
+    private String getWoXml(Map<String, Object> data) {
+        XStream xStream = new XStream(new DomDriver());
         xStream.registerConverter(new Map2XmlConverter(new DefaultMapper(XStream.class.getClassLoader())));
         xStream.alias("List", List.class);
         xStream.alias("map", HashedMap.class);
-    	
-    	return xStream.toXML(data);
-    }
-    
-    private void getDetails(String itemId, Map<String, Object> info)
-    {
-    	List<Map<String, Object>> details = new ArrayList<Map<String, Object>>();
-    	List<ArrivalListItem> items = aiService.getListItem(itemId);
-    	for(ArrivalListItem item : items)
-    	{
-    		Map<String,Object> detail = new HashedMap();
-    		detail.put("序号", item.getItemNum());
-			detail.put("使用科室",
-					aiService.getOrgInfoByUid(item.getClinicalDeptUID()) != null
-							? aiService.getOrgInfoByUid(item.getClinicalDeptUID()).getName()
-							: null);
-    		detail.put("制造商序列号", item.getSerialNum());
-    		detail.put("SystemID", item.getSystemId());
-    		detail.put("资产编号", item.getFinancingNum() );
-    		detail.put("注册证号", item.getRegistrationNo());
-    		detail.put("院方设备编号", item.getDepartNum());
-    		detail.put("二维码", item.getQrCode());
-    		detail.put("出厂日期", item.getManufactDate());
-    		detail.put("启用日期", item.getInstallDate());
-    		detail.put("维保截止日期", item.getWarrantyDate());
-    		detail.put("质保日期", item.getFactoryWarrantyDate());
-    		details.add(detail);
-    	}
-    	info.put("到货条目", details);
-    }
-    
-    private void getBasicInfo(String itemId, Map<String, Object> info)
-    {
-    	ArrivalList curItem = dao.findById(itemId);
-    	info.put("设备名称", curItem.getAssetName());
-    	info.put("规格型号", curItem.getFunctionType());
-    	info.put("数量", curItem.getQuantity());
-    	info.put("生产厂家", curItem.getManufacture());
-    	info.put("产地", curItem.getOrigin());
-    	info.put("发票号", curItem.getInvoiceNum());
-    	info.put("合同价格", curItem.getContractPrice());
-    	info.put("合同号", curItem.getContractNum());
-    	info.put("供应商", curItem.getVendor());
-    	info.put("经办人", curItem.getAgent());
-    	info.put("设备分类编码", curItem.getClassCode());
-    	info.put("到货单类型", curItem.getOrderType());// [1:医院购买,2:赠送,3:投放,4;试用,5:借用]
-    }
-    
-    public UserAccount getUserAccountByUid(String uid) {
-        return aiService.getUserAccountByUid(uid);
+
+        return xStream.toXML(data);
     }
 
-	public StreamedContent getExportPdf() {
-		return exportPdf;
-	}
+    private void getDetails(String itemId, Map<String, Object> info) {
+        List<Map<String, Object>> details = new ArrayList<Map<String, Object>>();
+        List<ArrivalListItem> items = aiService.getListItem(itemId);
+        for (ArrivalListItem item : items) {
+            Map<String, Object> detail = new HashedMap();
+            detail.put("序号", item.getItemNum());
+            detail.put("使用科室",
+                    aiService.getOrgInfoByUid(item.getClinicalDeptUID()) != null
+                    ? aiService.getOrgInfoByUid(item.getClinicalDeptUID()).getName()
+                    : null);
+            detail.put("制造商序列号", item.getSerialNum());
+            detail.put("SystemID", item.getSystemId());
+            detail.put("资产编号", item.getFinancingNum());
+            detail.put("注册证号", item.getRegistrationNo());
+            detail.put("院方设备编号", item.getDepartNum());
+            detail.put("二维码", item.getQrCode());
+            detail.put("出厂日期", item.getManufactDate());
+            detail.put("启用日期", item.getInstallDate());
+            detail.put("维保截止日期", item.getWarrantyDate());
+            detail.put("质保日期", item.getFactoryWarrantyDate());
+            details.add(detail);
+        }
+        info.put("到货条目", details);
+    }
 
-	public void setExportPdf(StreamedContent exportPdf) {
-		this.exportPdf = exportPdf;
-	}
+    private void getBasicInfo(String itemId, Map<String, Object> info) {
+        ArrivalList curItem = dao.findById(itemId);
+        info.put("设备名称", curItem.getAssetName());
+        info.put("规格型号", curItem.getFunctionType());
+        info.put("数量", curItem.getQuantity());
+        info.put("生产厂家", curItem.getManufacture());
+        info.put("产地", curItem.getOrigin());
+        info.put("发票号", curItem.getInvoiceNum());
+        info.put("合同价格", curItem.getContractPrice());
+        info.put("合同号", curItem.getContractNum());
+        info.put("供应商", curItem.getVendor());
+        info.put("经办人", curItem.getAgent());
+        info.put("设备分类编码", curItem.getClassCode());
+        info.put("到货单类型", curItem.getOrderType());// [1:医院购买,2:赠送,3:投放,4;试用,5:借用]
+    }
+
+//    public UserAccount getUserAccountByUid(String uid) {
+//        return aiService.getUserAccountByUid(uid);
+//    }
+
+    public StreamedContent getExportPdf() {
+        return exportPdf;
+    }
+
+    public void setExportPdf(StreamedContent exportPdf) {
+        this.exportPdf = exportPdf;
+    }
+
+    public String getArrivalFormatTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        if (varArrivalDateTo == null) {
+            return arrivalFormatTime;
+        } else {
+            return "~" + sdf.format(varArrivalDateTo);
+        }
+    }
+
+    public void setArrivalFormatTime(String arrivalFormatTime) {
+        this.arrivalFormatTime = arrivalFormatTime;
+    }
+
+    public Date getVarArrivalDateTo() {
+        return varArrivalDateTo;
+    }
+
+    public void setVarArrivalDateTo(Date varArrivalDateTo) {
+        this.varArrivalDateTo = varArrivalDateTo;
+    }
+
+    
 }

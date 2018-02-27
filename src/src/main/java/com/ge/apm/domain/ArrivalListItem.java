@@ -182,9 +182,9 @@ public class ArrivalListItem implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date purchaseDate;//采购日期
 
-    @Column(name = "arrive_date")
-    @Temporal(TemporalType.DATE)
-    private Date arriveDate;//到货日期
+//    @Column(name = "arrive_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date arriveDate;//到货日期
 
     @Column(name = "install_date")
     @Temporal(TemporalType.DATE)
@@ -535,13 +535,13 @@ public class ArrivalListItem implements Serializable {
         this.purchaseDate = purchaseDate;
     }
 
-    public Date getArriveDate() {
-        return arriveDate;
-    }
-
-    public void setArriveDate(Date arriveDate) {
-        this.arriveDate = arriveDate;
-    }
+//    public Date getArriveDate() {
+//        return arriveDate;
+//    }
+//
+//    public void setArriveDate(Date arriveDate) {
+//        this.arriveDate = arriveDate;
+//    }
 
     public Date getInstallDate() {
         return installDate;
