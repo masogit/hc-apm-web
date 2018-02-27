@@ -10,8 +10,11 @@ import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -139,6 +142,11 @@ public class ArrivalList implements Serializable{
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
+    
+    @JoinColumn(name = "creator_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private UserAccount creator;
+    
     public String getId() {
         return id;
     }
@@ -337,6 +345,14 @@ public class ArrivalList implements Serializable{
 
     public void setProcessType(String processType) {
         this.processType = processType;
+    }
+
+    public UserAccount getCreator() {
+        return creator;
+    }
+
+    public void setCreator(UserAccount creator) {
+        this.creator = creator;
     }
     
     @Override
