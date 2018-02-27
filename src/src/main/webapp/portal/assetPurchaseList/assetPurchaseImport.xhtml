@@ -1,0 +1,67 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="到货导入"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form enctype="multipart/form-data">
+                    <p:fieldset  legend="批量导入到货数据" id="uploaderContainer">
+                        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <p:fileUpload fileUploadListener="#{purchaseFromExcelController.handleFileUpload}" mode="advanced"
+                                          dragDropSupport="false" multiple="false" auto="true"
+                                          invalidFileMessage="只支持xls或xlsx格式的文件"
+                                          invalidSizeMessage="文件大小不得超过5M"
+                                          update=":dataListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                          label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
+                            <p:growl id="messages" showDetail="true"/>
+                        </p:panelGrid>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>1. <a href="APM_PURCHASE_Template.xls" title="download">#{msg.downloadTemplateFile}</a> </p>
+                            <p>2. 文件中填入要导入的计量数据</p>
+                            <p>3. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:fieldset>
+                </h:form>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="dataListForm">
+                    <p:fieldset  legend="数据概览">
+                        <p:dataTable id="datalist" rendered="#{not empty purchaseFromExcelController.purchaseList}" value="#{purchaseFromExcelController.purchaseList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
+                                     rowsPerPageTemplate="10,20,50">
+                            <p:column headerText="设备类别">
+                                <h:outputText value="#{item.assetType}" />
+                            </p:column>
+                             <p:column headerText="使用科室">
+                                <h:outputText value="#{item.clinicalDeptName}" />
+                            </p:column>
+                             <p:column headerText="采购数量">
+                                <h:outputText value="#{item.purchaseQty}" />
+                            </p:column>
+                             <p:column headerText="创建日期">
+                                <h:outputText value="#{item.createDate}" />
+                            </p:column>
+                           
+                            <f:facet name="{Toolbar}">
+                                <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                    <p:dataExporter type="xls" target="datalist" fileName="MeasuringFailed_export"/>
+                                </p:commandButton>
+                            </f:facet>
+                        </p:dataTable>
+                    </p:fieldset>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>
