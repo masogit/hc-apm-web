@@ -418,6 +418,9 @@ public class AssetInfo implements Serializable {
     
     @Column(name="ib_status")
     private Integer ibStatus;
+    
+    @Column(name = "ge_device_type")
+    private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
 
     public Integer getAssetUsage() {
         return assetUsage;
@@ -1285,8 +1288,15 @@ public class AssetInfo implements Serializable {
     public void setIbStatus(Integer ibStatus) {
         this.ibStatus = ibStatus;
     }
-    
 
+    public Integer getGeDeviceType() {
+        return geDeviceType;
+    }
+
+    public void setGeDeviceType(Integer geDeviceType) {
+        this.geDeviceType = geDeviceType;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
