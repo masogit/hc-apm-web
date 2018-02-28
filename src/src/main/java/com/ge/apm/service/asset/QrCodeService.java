@@ -16,6 +16,7 @@ import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -121,6 +122,10 @@ public class QrCodeService {
     }
 
     public BufferedImage getQrCodeImage(String qrCode) {
+       return getQrCodeImage(qrCode, null);
+    }
+    
+    public BufferedImage getQrCodeImage(String qrCode, AssetInfo asset) {
         QrCodeTemplate template = getTemplateByQrCode(qrCode);
         List<QrCodeTemplateElement> elementList;
         if (template == null) {
@@ -129,7 +134,12 @@ public class QrCodeService {
         } else {
             elementList = templateService.getElementsByTemplate(template.getId());
         }
-        elementList = getElementsValue(template, elementList, qrCode);
+        if(!Strings.isNullOrEmpty(qrCode)){
+            elementList = getElementsValue(template, elementList, qrCode);
+        }else{
+            elementList = getElementsValue(template, elementList, asset);
+        }
+        
         BufferedImage img = null;
         try {
             img = qrCodeDrawService.createQrCodeTag(template.getWidth(), template.getHeight(), elementList);
@@ -141,7 +151,7 @@ public class QrCodeService {
 
     public QrCodeTemplate getTemplateByQrCode(String qrCode) {
         QrCodeLib qrcodeLib = qrCodeLibDao.findByQrCode(qrCode);
-        return Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getSiteUID()))
+        return qrcodeLib==null? null : Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getSiteUID()))
                 .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getHospitalUID()))
                         .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getInstitutionUID()))
                                 .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getTenantUID())).orElse(null))));
@@ -149,6 +159,10 @@ public class QrCodeService {
 
     public String getQrCodeImageBase64(String qrCode) {
         return qrCodeDrawService.getImageBase64(getQrCodeImage(qrCode));
+    }
+    
+    public String getQrCodeImageBase64(AssetInfo asset) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImage(null,asset));
     }
 
     private static Map<String, String> FieldsMap;
@@ -173,9 +187,8 @@ public class QrCodeService {
         return FieldsMap;
     }
 
-    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode) {
-
-        AssetInfo asset = assetDao.getByQrCode(qrCode);
+     public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode) {
+         AssetInfo asset = assetDao.getByQrCode(qrCode);
         if (asset == null) {
             //Demo asset for preview
             asset = new AssetInfo();
@@ -186,10 +199,15 @@ public class QrCodeService {
             asset.setDepartNum("(待定)");
             asset.setModalityId("(待定)");
             asset.setFunctionType("(待定)");
+            asset.setQrCode(qrCode);
         }
+        return getElementsValue(template,elements,asset);
+     }
+    
+    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, AssetInfo asset) {
         for (QrCodeTemplateElement item : elements) {
             if (item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)) {
-                item.setTextValue(qrCode);
+                item.setTextValue(asset.getQrCode());
             }
             if (item.getFieldKey() != null && !item.getFieldKey().isEmpty()) {
                 if (item.getTextValue() == null) {
@@ -208,7 +226,7 @@ public class QrCodeService {
                     case "hospital":
                         String siteUid = asset.getSiteUID();
                         if (siteUid == null) {
-                            QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode);
+                            QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(asset.getQrCode());
                             siteUid = qrCodeLib == null ? null : qrCodeLib.getSiteUID();
                         }
                         if (siteUid == null) {

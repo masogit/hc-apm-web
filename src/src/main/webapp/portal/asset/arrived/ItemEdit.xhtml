@@ -229,7 +229,7 @@
                                 <label class="label">#{msg.qrCode}</label>
                                 <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}"/>
                                 <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
-                                <p:commandButton icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
+                                <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
                             </h:panelGroup>
 
                             <h:panelGroup >
@@ -507,7 +507,7 @@
                 <h:form id="qrCodeLibShowForm">
                     <p:panel header="#{qrCodeLibController.qrCode}" style="text-align:center" rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
                         <h:panelGrid columns="1" style="width:100%">
-                            <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInstallationController.arrivalListItem.qrCode)}" />
+                            <img src="#{assetInstallationController.getQrCodeImageForAsset()}" />
                         </h:panelGrid>
                     </p:panel>
                 </h:form>

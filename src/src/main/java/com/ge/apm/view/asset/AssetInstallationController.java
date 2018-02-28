@@ -339,30 +339,22 @@ public class AssetInstallationController {
         }
     }
 
-//    public void onParentAssetChange() {
-//        if (Strings.isNullOrEmpty(arrivalListItem.getDepartNum()) && arrivalListItem.getParentAssetId() != null && arrivalListItem.getParentAssetId() > 0) {
-//            AssetInfo parentAsset = assetDao.getById(arrivalListItem.getParentAssetId());
-//            String finNum = assetFinacingNumGenerateService.generateFinancingNum(parentAsset.getId(), gbCodeName, arrivalListItem.getArrivalList().getSiteUID());
-//            arrivalListItem.setFinancingNum(finNum);
-//            if (!Strings.isNullOrEmpty(parentAsset.getDepartNum()) && parentAsset.getDepartNum().length() > 2 && parentAsset.getDepartNum().endsWith("00")) {
-//                List<SearchFilter> parentAssetFilters = Arrays.asList(new SearchFilter("parentAssetId", SearchFilter.Operator.EQ, arrivalListItem.getParentAssetId()));
-//                List<String> childrenNumList = assetDao.findBySearchFilter(parentAssetFilters).stream()
-//                        .map(item -> item.getDepartNum()).collect(Collectors.toList());
-//                childrenNumList.addAll(itemDao.findBySearchFilter(parentAssetFilters).stream()
-//                        .filter(item -> "new".equals(item.getInstallStatus()))
-//                        .map(item -> item.getDepartNum()).collect(Collectors.toList()));
-//                String prefix = parentAsset.getDepartNum().substring(0, parentAsset.getDepartNum().length() - 2);
-//                for (int i = 1; i < 100; i++) {
-//                    String num = prefix.concat(i < 10 ? "0" : "").concat(String.valueOf(i));
-//                    if (!childrenNumList.contains(num)) {
-//                        arrivalListItem.setDepartNum(num);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//    }
-
+    public String getQrCodeImageForAsset(){
+        AssetInfo asset = new AssetInfo();
+        asset.setQrCode(arrivalListItem.getQrCode());
+        asset.setName(arrivalListItem.getArrivalList().getAssetName());
+        asset.setAssetGroup(arrivalListItem.getArrivalList().getAssetGroup());
+        asset.setSiteUID(arrivalListItem.getArrivalList().getSiteUID());
+        asset.setFunctionType(arrivalListItem.getArrivalList().getFunctionType());
+        asset.setClinicalDeptUID(arrivalListItem.getClinicalDeptUID());
+        asset.setSerialNum(arrivalListItem.getSerialNum());
+        asset.setDepartNum(arrivalListItem.getDepartNum());
+        asset.setFinancingNum(arrivalListItem.getFinancingNum());
+        asset.setModalityId(arrivalListItem.getModalityId());
+        asset.setSystemId(arrivalListItem.getSystemId());
+        return qrCodeService.getQrCodeImageBase64(asset);
+    }
+    
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
     }
