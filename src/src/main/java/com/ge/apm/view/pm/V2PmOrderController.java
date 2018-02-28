@@ -97,6 +97,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             retur
         }
     }*/
+
+    //是否允许内修
+    public Boolean canCreateSr(){
+        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() !=1){
+            if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
+                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 22){
+                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
+                }
+                return false;
+            }
+        }
+        return true;
+    }
     public void prepareAproval(String woid) {
         prepareAct(woid);
         selectedMap = new HashMap<>();
