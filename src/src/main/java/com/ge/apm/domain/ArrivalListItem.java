@@ -60,7 +60,7 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "financing_num")
     private String financingNum;
     
-    //主机序列号
+    //制造商序列号
     @Size(max = 64)
     @Column(name = "serial_num")
     private String serialNum;
