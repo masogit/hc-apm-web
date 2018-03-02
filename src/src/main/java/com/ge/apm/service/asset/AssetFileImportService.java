@@ -248,7 +248,7 @@ public class AssetFileImportService {
 
                 if (isNewAsset) {
                     asset.setSiteId(currentOrg.getSiteId());
-                    asset.setHospitalId(currentOrg.getHospitalId());
+                    asset.setHospitalId(currentOrg.getId());
 
                     asset.setTenantUID(currentOrg.getTenantUID());
                     asset.setHospitalUID(currentOrg.getHospitalUID());
