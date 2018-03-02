@@ -65,31 +65,31 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.timeoutDispatch}</label>
-                            <p:inputText id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" />
+                            <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class="label">#{msg.timeoutAccept}</label>
-                            <p:inputText id="timeoutAccept" value="#{v2_WorkflowConfigController.selected.timeoutAccept}" />
+                            <p:inputNumber id="timeoutAccept" value="#{v2_WorkflowConfigController.selected.timeoutAccept}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.timeoutClose}</label>
-                            <p:inputText id="timeoutClose" value="#{v2_WorkflowConfigController.selected.timeoutClose}" />
+                            <p:inputNumber id="timeoutClose" value="#{v2_WorkflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.maxMessageCount}</label>
-                            <p:inputText id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" />
+                            <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup> 
                         <h:panelGroup>
                             <label class="label">#{msg.pmReminderTime}</label>
-                            <p:inputText id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" />
+                            <p:inputNumber id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup rendered="true">
                             <label class = "label">维保提醒时间(天)</label>
-                            <p:inputText id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" />
+                            <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
                             <label class = "label">维保提醒次数</label>
-                            <p:inputText id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" />
+                            <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup >
                         <h:panelGroup >
                             <label class="label">资产创建审核人</label>
@@ -104,7 +104,7 @@
                         </h:panelGroup >
                         <h:panelGroup rendered="true">
                             <label class = "label">系统自动验收(天)</label>
-                            <p:inputText id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" />
+                            <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup >
                         <h:panelGroup >
                             <label class = "label">工单完工自动关单?</label>
