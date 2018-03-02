@@ -199,7 +199,9 @@ public class TableCreateController {
                 editTableItem.setOptions(new ArrayList<TableOption>());
             }
         }
-        editTableItem.getExp().clear();
+        if(null != editTableItem.getExp()){
+            editTableItem.getExp().clear();
+        }
 
     }
 
