@@ -42,23 +42,23 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.timeoutDispatch}*</label>
-                            <p:inputText id="timeoutDispatch" value="#{v2_WorkOrderWorkflowConfigController.selected.timeoutDispatch}" 
-                            	 required="true" requiredMessage="#{msg.timeoutDispatch}#{msg.ValidationRequire}" />
+                            <p:inputNumber id="timeoutDispatch" value="#{v2_WorkOrderWorkflowConfigController.selected.timeoutDispatch}" 
+                            	 required="true" requiredMessage="#{msg.timeoutDispatch}#{msg.ValidationRequire}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class="label">#{msg.timeoutAccept}*</label>
-                            <p:inputText id="timeoutAccept" value="#{v2_WorkOrderWorkflowConfigController.selected.timeoutAccept}" 
-                            required="true" requiredMessage="#{msg.timeoutAccept}#{msg.ValidationRequire}" />
+                            <p:inputNumber id="timeoutAccept" value="#{v2_WorkOrderWorkflowConfigController.selected.timeoutAccept}" 
+                            required="true" requiredMessage="#{msg.timeoutAccept}#{msg.ValidationRequire}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.timeoutClose}*</label>
-                            <p:inputText id="timeoutClose" value="#{v2_WorkOrderWorkflowConfigController.selected.timeoutClose}" 
-                            required="true" requiredMessage="#{msg.timeoutClose}#{msg.ValidationRequire}" />
+                            <p:inputNumber id="timeoutClose" value="#{v2_WorkOrderWorkflowConfigController.selected.timeoutClose}" 
+                            required="true" requiredMessage="#{msg.timeoutClose}#{msg.ValidationRequire}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.maxMessageCount}*</label>
-                            <p:inputText id="maxMessageCount" value="#{v2_WorkOrderWorkflowConfigController.selected.maxMessageCount}" 
-                            required="true" requiredMessage="#{msg.maxMessageCount}#{msg.ValidationRequire}"/>
+                            <p:inputNumber id="maxMessageCount" value="#{v2_WorkOrderWorkflowConfigController.selected.maxMessageCount}" 
+                            required="true" requiredMessage="#{msg.maxMessageCount}#{msg.ValidationRequire}" minValue="0" decimalPlaces="0"/>
                         </h:panelGroup>
 <!-- 	                    <h:panelGroup >
 	                            <label class = "label">工单完工不需要验收?*</label>
