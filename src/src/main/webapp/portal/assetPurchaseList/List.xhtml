@@ -31,7 +31,7 @@
                              <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{assetPurchaseListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
                              <p:ajax event="filter" listener="#{assetPurchaseListController.onFilter}" update="createButton editButton deleteButton"/>
                              <p:column headerText="操作">
-                                 <p:commandButton  class="btn btn-sm btn-gray" title="到货" action="#{assetPurchaseListController.getReachEditPage(item.id)}" rendered="#{item.reachState != 3}"/>
+                                 <p:commandButton  title="到货" class="ui-button" action="#{assetPurchaseListController.getReachEditPage(item.id)}" rendered="#{item.reachState != 3}"/>
                                  <h:outputText value="" rendered="#{item.reachState eq 3}"/>
          <!--                        <p:commandButton  class="btn btn-sm btn-gray" title="详单" action="#{urlEncryptController.encodeUrlParam('reachDetail?actionName=Create')}" />-->
                              </p:column>

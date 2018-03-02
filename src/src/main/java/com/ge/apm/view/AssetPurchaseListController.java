@@ -88,9 +88,8 @@ public class AssetPurchaseListController extends GenericCRUDUUIDController<Asset
         AssetPurchaseList list=dao.findById(this.selected.getId());
         
         arrivalList.setAssetGroup(list.getAssetType());
-        arrivalList.setStatus(list.getReachState());
-        arrivalList.setQuantity(list.getReachQty());
-        arrivalList.setStatus(list.getReachState());
+        //arrivalList.setStatus(list.getReachState());
+        arrivalList.setStatus(1); // not finished
         arrivalList.setQuantity(list.getReachQty());
         arrivalList.setSiteUID(list.getSiteUID());
         arrivalList.setTenantUID(list.getTenantUID());
@@ -104,25 +103,8 @@ public class AssetPurchaseListController extends GenericCRUDUUIDController<Asset
         AssetArrivedListEditController arrivalController = WebUtil.getBean(AssetArrivedListEditController.class);
         arrivalController.setSelected(arrivalList);
         arrivalController.onBeforeNewObject(arrivalList);
-        arrivalController.submitArrivalList();
-/*        
-        ArrivalListRepository arrival=WebUtil.getBean(ArrivalListRepository.class);
-//        ArrivalList arrivalList=new ArrivalList();
-        arrivalList.setAssetGroup(list.getAssetType());
-        arrivalList.setStatus(list.getReachState());
-        arrivalList.setQuantity(list.getReachQty());
-        arrivalList.setStatus(list.getReachState());
-        arrivalList.setQuantity(list.getReachQty());
-        arrivalList.setSiteUID(list.getSiteUID());
-        arrivalList.setTenantUID(list.getTenantUID());
-        arrivalList.setHospitalUID(list.getHospitalUID());
-        arrivalList.setInstitutionUID(list.getInstitutionUID());
-        if (arrivalList.getSupplierId() !=null){
-        String supplierName=supplierdao.findById(arrivalList.getSupplierId()).getName();
-        arrivalList.setVendor(supplierName);}
-
-        arrival.save(arrivalList);
-*/
+        //arrivalController.submitArrivalList();
+        arrivalController.save();
     }
     
     @Override
@@ -164,6 +146,23 @@ public class AssetPurchaseListController extends GenericCRUDUUIDController<Asset
         }
     }
    
+    public void setSelected(AssetPurchaseList selectedObj) {
+        super.setSelected(selectedObj);
+
+        fileName = "";
+        if(selected == null) return;
+
+        if(selected.getObjectId()!=null){
+            List<V2_BlobObject> fileObjectList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
+            if(fileObjectList== null || fileObjectList.size()!=1){
+                WebUtil.addErrorMessage("找不到附件");
+            }
+            else{
+                V2_BlobObject fileObject = fileObjectList.get(0);
+                fileName = fileObject==null?"":fileObject.getObjectName();
+            }
+        }
+    }
 
     @Override
     protected AssetPurchaseListRepository getDAO() {
@@ -205,8 +204,7 @@ public class AssetPurchaseListController extends GenericCRUDUUIDController<Asset
         return url;
     }
     public void onSelectAsset() throws IOException {
-        String url = "actionName=Edit&selectedid="
-                + selected.getId();
+        String url = "actionName=Edit&selectedid=" + selected.getId();
         url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         //FacesContext.getCurrentInstance().getExternalContext().redirect(url);
