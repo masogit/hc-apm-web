@@ -311,6 +311,9 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "warranty_year")
     private Double warrantyYear;
     
+    @Column(name = "is_generate_pmorder")
+    private Boolean isGeneratePmOrder;
+    
     public String getId() {
         return id;
     }
@@ -535,13 +538,13 @@ public class ArrivalListItem implements Serializable {
         this.purchaseDate = purchaseDate;
     }
 
-//    public Date getArriveDate() {
-//        return arriveDate;
-//    }
-//
-//    public void setArriveDate(Date arriveDate) {
-//        this.arriveDate = arriveDate;
-//    }
+    public Boolean getIsGeneratePmOrder() {
+        return isGeneratePmOrder;
+    }
+
+    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
+        this.isGeneratePmOrder = isGeneratePmOrder;
+    }
 
     public Date getInstallDate() {
         return installDate;
