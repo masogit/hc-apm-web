@@ -8,6 +8,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
@@ -69,6 +70,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfo selectedUserOrg;
 
+    private UserCommonService userCommonService;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -77,6 +80,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
 
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
 
@@ -289,6 +293,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void deleteSelectedUser() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         if (canDelete()) {
             super.delete();
         }
@@ -365,7 +376,26 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     }
 
+    @Override
+    public void save() {
+        if (selectedUserOrg != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedUserOrg.getSiteUID())){
+                return;
+            }
+        }
+
+        super.save();
+    }
+
     public void resetPassword() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
         try {
             selected.entryptPassword();
@@ -376,6 +406,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void lockAccount() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         selected.setIsActive(false);
         selected.setIsLocked(true);
         selected.setLockTime(TimeUtil.timeNow().toDate());
@@ -383,6 +420,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void unlockAccount() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         selected.setIsActive(true);
         selected.setIsLocked(false);
         selected.setPasswordErrorCount(0);
