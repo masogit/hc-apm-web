@@ -687,7 +687,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     //是否允许内修
     public Boolean canCreateSr(){
-        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() !=1){
+        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() ==1){
             if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
                 if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 22){
                     return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
