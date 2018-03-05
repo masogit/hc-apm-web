@@ -178,14 +178,14 @@
                                 <label class="label">#{msg.arrivalListItemNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.itemNum}" />
                             </h:panelGroup>
-<!--                            <h:panelGroup>
-                                <label class="label">#{msg.clinicalDeptName}*</label>
-                                <p:selectOneMenu id="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="true" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
-                                    <p:ajax  update="clinicalOwnerName parentAssetList" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{orgTreeController.getClinicalDeptListBySite(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>-->
+                            <!--                            <h:panelGroup>
+                                                            <label class="label">#{msg.clinicalDeptName}*</label>
+                                                            <p:selectOneMenu id="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="true" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
+                                                                <p:ajax  update="clinicalOwnerName parentAssetList" />
+                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                                <f:selectItems value="#{orgTreeController.getClinicalDeptListBySite(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                                            </p:selectOneMenu>
+                                                        </h:panelGroup>-->
 
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
@@ -214,18 +214,18 @@
                                     <f:selectItems value="#{assetInstallationController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-<!--                            <h:panelGroup >
-                                <label class="label">#{msg.financingNum}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
-                                    <p:ajax process="@this" update="#{empty assetInstallationController.arrivalListItem.financingNum? '':'@(.financingNum)'}"/>
-                                </p:inputText>
-                                <p:commandButton validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 3}" 
-                                                 update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
-                            </h:panelGroup>-->
-<!--                            <h:panelGroup>
-                                <label class="label">#{msg.serialNum}</label>
-                                <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" />
-                            </h:panelGroup>-->
+                            <!--                            <h:panelGroup >
+                                                            <label class="label">#{msg.financingNum}</label>
+                                                            <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
+                                                                <p:ajax process="@this" update="#{empty assetInstallationController.arrivalListItem.financingNum? '':'@(.financingNum)'}"/>
+                                                            </p:inputText>
+                                                            <p:commandButton validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 3}" 
+                                                                             update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
+                                                        </h:panelGroup>-->
+                            <!--                            <h:panelGroup>
+                                                            <label class="label">#{msg.serialNum}</label>
+                                                            <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" />
+                                                        </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.currentPersonUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.currentPersonUID).name}" />
@@ -241,21 +241,21 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
-                                <p:selectOneMenu id="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="true" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
+                                <p:selectOneMenu id="clinicalDeptName" widgetVar="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
                                     <p:ajax  update="clinicalOwnerName parentAssetList" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{orgTreeController.getClinicalDeptListBySite(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.aliasName}</label>
                                 <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}"/>
                             </h:panelGroup>
-                            
+
                             <h:panelGroup>
                                 <label class="label">#{msg.serialNum}*</label>
-                                <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" required="true" requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="false" requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.departNum}</label>
@@ -313,7 +313,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">同时生成保养工单*</label>
-                                <p:selectOneMenu  value="#{assetInstallationController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
+                                <p:selectOneMenu  value="#{assetInstallationController.arrivalListItem.isGeneratePmOrder}" id="IsGeneratePmOrder" required="false"  requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItem itemLabel="是" itemValue="true"/>
                                     <f:selectItem itemLabel="否" itemValue="false"/>
@@ -326,42 +326,10 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    
+
 
                     <p:fieldset  legend="#{msg.AssetArrivalListAssetInfoInput}" rendered="#{assetInstallationController.arrivalListItem.arrivalList.processType ne 'Easy'}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-<!--                            <h:panelGroup>
-                                <label class="label">#{msg.aliasName}</label>
-                                <p:inputText id="aliasName" value="#{assetInstallationController.arrivalListItem.aliasName}"/>
-                            </h:panelGroup>-->
-<!--                            <h:panelGroup >
-                                <label class="label">#{msg.assetOwnerName}</label>
-                                <p:selectOneMenu id="assetOwnerName" value="#{assetInstallationController.arrivalListItem.assetOwnerUID}" >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>-->
-<!--                            <h:panelGroup >
-                                <label class="label">#{msg.assetOwnerName2}</label>
-                                <p:selectOneMenu id="assetOwnerName2" value="#{assetInstallationController.arrivalListItem.assetOwnerUID2}"  >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup >
-                                <label class="label">#{msg.assetOwnerName3}</label>
-                                <p:selectOneMenu id="assetOwnerName3" value="#{assetInstallationController.arrivalListItem.assetOwnerUID3}"  >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.clinicalOwnerName}</label>
-                                <p:selectOneMenu id="clinicalOwnerName" value="#{assetInstallationController.arrivalListItem.clinicalOwnerUid}" >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
-                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.maitanance}</label>
                                 <p:inputText id="maitanance" value="#{assetInstallationController.arrivalListItem.maitanance}"/>
@@ -370,10 +338,6 @@
                                 <label class="label">#{msg.systemId}</label>
                                 <p:inputText id="systemId" value="#{assetInstallationController.arrivalListItem.systemId}"/>
                             </h:panelGroup>
-<!--                            <h:panelGroup>
-                                <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" />
-                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.barcode}</label>
                                 <p:inputText id="barcode" value="#{assetInstallationController.arrivalListItem.barcode}"/>
@@ -386,12 +350,6 @@
                                 <label class="label">#{msg.modalityId}</label>
                                 <p:inputText id="modalityId" value="#{assetInstallationController.arrivalListItem.modalityId}"/>
                             </h:panelGroup>
-<!--                            <h:panelGroup id="qrCode">
-                                <label class="label">#{msg.qrCode}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}"/>
-                                <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
-                                <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
-                            </h:panelGroup>-->
                             <h:panelGroup >
                                 <label class="label">#{msg.medicalInstrumentClassification}</label>
                                 <p:selectOneMenu id="functionGroup" value="#{assetInstallationController.arrivalListItem.functionGroup}" style="width: 100%">
@@ -407,14 +365,6 @@
                                     <f:selectItems value="#{assetInstallationController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-<!--                            <h:panelGroup>
-                                <label class="label">#{msg.locationCode}</label>
-                                <p:inputText id="locationCode" value="#{assetInstallationController.arrivalListItem.locationCode}"/>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.locationName}</label>
-                                <p:inputText id="locationName" value="#{assetInstallationController.arrivalListItem.locationName}"/>
-                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.manufactDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.manufactDate}" maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
@@ -514,14 +464,6 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-
-                            <!--                            <h:panelGroup>
-                                                            <label class="label">#{msg.usageStatus}</label>
-                                                            <p:selectOneMenu id="usageStatus" value="#{assetInstallationController.arrivalListItem.usageStatus}">
-                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                                <f:selectItems value="#{fieldMsg.getFieldValueList('usageStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                                            </p:selectOneMenu>
-                                                        </h:panelGroup>-->
 
                             <h:panelGroup>
                                 <label class="label">#{msg.accountingCategory}</label>
@@ -637,8 +579,8 @@
                     </p:fieldset>
                     <h:panelGroup>
 
-                        <p:commandButton validateClient="true" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm:qrCode :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
-                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl"/>
+                        <p:commandButton validateClient="false" actionListener="#{assetInstallationController.updateItem}" update=":ItemEditDlgForm:qrCode :growl"  value="保存" icon="ui-icon-check"  disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}"/>
+                        <p:commandButton validateClient="true" action="#{assetInstallationController.finishInstall}" value="完成安装" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=" :growl" oncomplete="handleComplete(xhr, status, args);"/>
                         <p:commandButton validateClient="false" action="#{assetInstallationController.rejectInstall}" value="退货" immediate="true" disabled="#{assetInstallationController.arrivalListItem.installStatus ne 'new'}" update=":growl">
                             <p:confirm header="退货确认" message="确定退货?" icon="ui-icon-warning"/>
                         </p:commandButton>
@@ -662,6 +604,20 @@
 
         </div>
 
+        <script type="text/javascript">
+            function handleComplete(xhr, status, args) {
+                if(args.ClinicalDeptName){
+                    $('#ItemEditDlgForm\\:clinicalDeptName').addClass("ui-state-error");
+                }
+                if(args.IsGeneratePmOrder){
+                    $('#ItemEditDlgForm\\:IsGeneratePmOrder').addClass("ui-state-error");
+                }
+                if(args.SerialNum){
+                    $('#ItemEditDlgForm\\:serialNum').addClass("ui-state-error");
+                }
+                
+            }
+        </script>
 
     </ui:define>
 
