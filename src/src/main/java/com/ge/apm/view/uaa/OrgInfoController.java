@@ -8,6 +8,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -47,6 +48,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String orgName;
     private String orgNameEn;
     private String retrieval;
+
+    private UserCommonService userCommonService;
     @Override
     protected void init() {
         filterBySite = false;
@@ -56,6 +59,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         userAccount = new UserAccount();
 		assetInfoRepository  = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository  = WebUtil.getBean(OrgInfoRepository.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
         findPerson();
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -259,6 +263,11 @@ return true;
     }
 
     public void saveSelectedOrg(){
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)){
+            return;
+        }
+
         //重复增加不被允许
       //  String orgName =selected.getName();
         List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
@@ -309,6 +318,11 @@ return true;
     }
 
     private Boolean canDelete(){
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)){
+            return false;
+        }
+
         List<SearchFilter> checkFilters = new ArrayList<>();
         checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
         checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
