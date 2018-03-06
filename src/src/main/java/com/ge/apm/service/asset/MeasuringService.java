@@ -58,11 +58,18 @@ public class MeasuringService {
 
     public boolean operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
+        AssetInfo tempAssetInfo = null;
 
-        AssetInfo tempAssetInfo = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getTenantUID());
+        List<AssetInfo> tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getTenantUID());
 
-        if(tempAssetInfo == null){
-            tempAssetInfo = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getTenantUID());
+        if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getTenantUID());
+        }
+
+        if(tempAssetInfoList != null && !tempAssetInfoList.isEmpty()){
+            if(tempAssetInfoList.size() == 1){
+                tempAssetInfo = tempAssetInfoList.get(0);
+            }
         }
 
         if(tempAssetInfo != null){
@@ -96,24 +103,24 @@ public class MeasuringService {
         return flag;
     }
 
-    private AssetInfo getAssetInfoByFinancingNum(String financingNum, String tenantUID){
-        AssetInfo tempAssetInfo = null;
+    private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String tenantUID){
+        List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(financingNum)){
-            tempAssetInfo = assetInfoDao.findByFinancingNumAndTenantUID(financingNum, tenantUID);
+            tempAssetInfoList = assetInfoDao.findByFinancingNumAndTenantUID(financingNum, tenantUID);
         }
 
-        return tempAssetInfo;
+        return tempAssetInfoList;
     }
 
-    private AssetInfo getAssetInfoBySerialNum(String serialNum, String tenantUID){
-        AssetInfo tempAssetInfo = null;
+    private List<AssetInfo> getAssetInfoBySerialNum(String serialNum, String tenantUID){
+        List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(serialNum)){
-            tempAssetInfo = assetInfoDao.findBySerialNumAndTenantUID(serialNum, tenantUID);
+            tempAssetInfoList = assetInfoDao.findBySerialNumAndTenantUID(serialNum, tenantUID);
         }
 
-        return tempAssetInfo;
+        return tempAssetInfoList;
     }
 
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
