@@ -246,7 +246,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	
 	@Transactional
 	public void approve(){
-//		applyChange();
+		applyChange();
 		selected.setStatus(1);
 		selected.setApproveUserId(user.getId());
 		dao.save(selected);
@@ -302,7 +302,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
         selected.setOwnerId(user.getId());
-//        applyChange();
+        applyChange();
 	}
 	
 /*	public void saveOwn(){

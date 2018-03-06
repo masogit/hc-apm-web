@@ -242,11 +242,16 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				WebUtil.addErrorMessage("找不到该设备该级别的保养规则！");
 				return;
 			}
-			int period = rule.getPeriod();
+			Integer period = rule.getPeriod();
 /*			if (ai.getLastPmDate() != null && TimeUtils.getDays(ai.getLastPmDate()) < period) {
 				LOGGER.warn("during period !");
 				continue;
 			}*/
+			if(period == null) {
+				period = 1;
+//				WebUtil.addErrorMessage("该设备该级别的保养规则周期不能为空！");
+//				return;
+			}
 			boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level);
 			if(isExists) {
 				WebUtil.addErrorMessage("保养工单已存在！");
