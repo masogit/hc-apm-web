@@ -75,6 +75,7 @@
                         <p:column headerText="当前处理步骤"  filterMatchMode="LIKE">
                             <h:outputText value="#{item.currentStepName}"/>
                         </p:column>
+
                         <p:column headerText="计划完成时间"  sortBy="#{item.planTime}">
                             <h:outputText value="#{item.planTime}">
                             <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -121,6 +122,14 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="PmOrder_export"/>
                             </p:commandButton>
+
+
+                            <ui:fragment rendered="#{!assetInfoController.terminate}">
+                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量接单" actionListener="#{v2PmOrderController.batchProcessOnTakeOrder}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
+                                    <p:confirm header="批量接单确认" message="您确定要批量接单么?" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </ui:fragment>
+
                         </f:facet>
                     </p:dataTable>
                 </h:form>
