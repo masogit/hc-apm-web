@@ -57,9 +57,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
 	public List<AssetInfo> findByTenantUID(String tenantUID);
 
-    public AssetInfo findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
+    public List<AssetInfo> findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
 
-    public AssetInfo findBySerialNumAndTenantUID(String serialNum, String tenantUID);
+    public List<AssetInfo> findBySerialNumAndTenantUID(String serialNum, String tenantUID);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and a.name like concat('%',?2,'%') order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
