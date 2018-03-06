@@ -105,6 +105,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 22){
                     return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
                 }
+                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 3){
+                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
+                }
                 return false;
             }
         }
