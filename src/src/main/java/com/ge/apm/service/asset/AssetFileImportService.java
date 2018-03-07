@@ -431,9 +431,11 @@ public class AssetFileImportService {
                     newSupplier.setSiteUID(currentOrg.getSiteUID());
                     supplierDao.save(newSupplier);
                     newAsset.setSupplierId(newSupplier.getId());
+                    newAsset.setVendor(newAsset.getVendor());
                 } else if (supplierList.size() == 1) {
                     Supplier supplier = supplierList.get(0);
                     newAsset.setSupplierId(supplier.getId());
+                    newAsset.setVendor(supplier.getName());
                 } else {
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
                     newAsset.setVendor(null);

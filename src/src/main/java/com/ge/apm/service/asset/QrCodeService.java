@@ -318,5 +318,28 @@ public class QrCodeService {
         List<QrCodeTemplateElement> elementList = templateService.getElementsByTemplate(templateId);
         return getPreViewBase64(template, elementList);
     }
+    
+     /**
+     * Return "Normal" is available; 
+     * @param qrcode
+     * @return 
+     */
+    public String isAvailableQrcode(String qrcode,String siteUid) {
+        if (Strings.isNullOrEmpty(qrcode)) {
+            return "Normal";
+        }
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode);
+        if (qrCodeLib == null) {
+            return "InvalidQRCode";
+        }
+        if (!qrCodeLib.getSiteUID().equals(siteUid)) {
+            return "WrongHospitalQRCode";
+        }
+        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
+            return "AlreadyUsingQrCode";
+        }
+
+        return "Normal";
+    }
 
 }

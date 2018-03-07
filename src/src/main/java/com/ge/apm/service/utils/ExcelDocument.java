@@ -10,6 +10,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -22,11 +23,14 @@ import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.DateUtil;
+import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import webapp.framework.util.TimeUtil;
 
 /**
  *
@@ -84,8 +88,7 @@ public class ExcelDocument {
             ++rowNum;
         }
 
-
-        return rowNum -1;
+        return rowNum - 1;
     }
 
     public boolean exceedMaxRowNum(String sheetName, int maxRowNum) {
@@ -127,15 +130,52 @@ public class ExcelDocument {
         return result;
     }
 
+    public Map<String, String> getStringDataRowMap(String sheetName, int keyRowNum, Integer dataRowNum) {
+        String[] rowKey = getKeyRow(sheetName, keyRowNum);
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(dataRowNum - 1);
+        Map<String, String> dataMap = new LinkedHashMap();
+        if (dataRow == null) {
+            return dataMap;
+        }
+        for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
+            Cell cell = dataRow.getCell(cellIndex);
+            if (cell == null) {
+                continue;
+            }
+            switch (cell.getCellTypeEnum()) {
+                case NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        Date date = cell.getDateCellValue();
+                        dataMap.put(rowKey[cellIndex], TimeUtils.getStrDate(date, "yyyy-MM-dd HH:mm:ss"));
+                    } else {
+                        dataMap.put(rowKey[cellIndex], new DecimalFormat("##############.#####").format(cell.getNumericCellValue()));
+                    }
+                    break;
+                case BOOLEAN:
+                    dataMap.put(rowKey[cellIndex], (String.valueOf(cell.getBooleanCellValue())));
+                    break;
+                case STRING:
+                case BLANK:
+                    dataMap.put(rowKey[cellIndex], cell.getStringCellValue());
+                    break;
+                case FORMULA:
+                default:
+                    dataMap.put(rowKey[cellIndex], "");
+            }
+        }
+        return dataMap;
+    }
+
     public Map<String, Object> getDataRowMap(String sheetName, String[] rowKey, Integer dataRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(dataRowNum - 1);
         Map<String, Object> dataMap = new LinkedHashMap();
-        
-        if(dataRow==null){
+
+        if (dataRow == null) {
             return dataMap;
         }
-        
+
         for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
             Cell cell = dataRow.getCell(cellIndex);
             if (cell == null) {
@@ -242,7 +282,7 @@ public class ExcelDocument {
                 }
 
                 if (cell instanceof XSSFCell) {
-                    return ((XSSFCell)cell).getRawValue();
+                    return ((XSSFCell) cell).getRawValue();
                 }
                 if (cell instanceof HSSFCell) {
                     cell.setCellType(CellType.STRING);
@@ -457,6 +497,7 @@ public class ExcelDocument {
     }
 
     public static class ValueWrapper {
+
         public Object value;
         public String rawValue;
 
@@ -477,4 +518,7 @@ public class ExcelDocument {
         }
     }
 
+    public Workbook getWorkBook() {
+        return workBook;
+    }
 }
