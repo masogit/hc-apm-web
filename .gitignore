@@ -33,3 +33,4 @@ src/src/main/webapp/resources
 edgeServer/.project
 edgeServer/.settings/
 edgeServer/.classpath
+edgeServer/target
