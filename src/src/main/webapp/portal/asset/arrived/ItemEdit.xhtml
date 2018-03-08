@@ -47,7 +47,9 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.arrivalListContractPrice}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.contractPrice}" />
+                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.contractPrice}" >
+                                    <f:convertNumber minIntegerDigits="0"  minFractionDigits="2" />
+                                </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.arrivalListContractNum}</label>
@@ -127,7 +129,15 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.purchasePrice}</label>
-                                <h:outputText  value="#{assetInstallationController.arrivalListItem.purchasePrice}"/>
+                                <h:outputText  value="#{assetInstallationController.arrivalListItem.purchasePrice}">
+                                    <f:convertNumber minIntegerDigits="0"  minFractionDigits="2" />
+                                </h:outputText>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.salvageValue}</label>
+                                <h:outputText  value="#{assetInstallationController.arrivalListItem.salvageValue}">
+                                    <f:convertNumber minIntegerDigits="0"  minFractionDigits="2" />
+                                </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.lifecycle}</label>
