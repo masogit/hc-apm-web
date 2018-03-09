@@ -112,9 +112,21 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
 		tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
+		//tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
 		if(this.selected != null && this.selected.getAssetGroup() != null) {
 			tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
 		}
+		return templateDao.findBySearchFilter(tempFilter);
+	}
+	
+	public List<TableDefinition> getTableDefinitionForES(){
+		List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
+		tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
+		tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNull, null));
+//		if(this.selected != null && this.selected.getAssetGroup() != null) {
+//			tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator., selected.getAssetGroup()));
+//		}
 		return templateDao.findBySearchFilter(tempFilter);
 	}
 
