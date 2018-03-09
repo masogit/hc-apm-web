@@ -8,6 +8,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
@@ -48,7 +50,7 @@ public class AssetInstallationController {
 
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
-    private Boolean isGeneratePmOrder;
+//    private Boolean isGeneratePmOrder;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
     private TreeNode selectedNode;
@@ -87,7 +89,7 @@ public class AssetInstallationController {
             aiService.saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), false, null)) {
                 WebUtil.addSuccessMessage("提交成功");
-                return "arrivalItemsList?faces-redirect=true";
+                return returnAction();
             } else {
                 WebUtil.addErrorMessage("提交失败");
             }
@@ -125,36 +127,55 @@ public class AssetInstallationController {
     }
 
     public String finishInstall() {
-        Boolean isAckFinished = true;
+        Boolean isValidate = true;
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
             if (null == gbCode) {
                 WebUtil.addErrorMessage(WebUtil.getMessage("无效的国标码"));
-                isAckFinished = false;
+                isValidate = false;
             }
             arrivalListItem.setNationalStandardCode(selectedGb.getCode());
             //更新资产国标码
             assetDao.updateStandardCode(selectedGb.getCode(), arrivalListItem.getAssetUID());
         }
-        if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
-            WebUtil.addErrorMessage("商务验收未通过");
-            isAckFinished = false;
+        if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+            RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
+            isValidate = false;
         }
-        if (!arrivalListItem.getClinicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
-            WebUtil.addErrorMessage("临床验收未通过");
-            isAckFinished = false;
+        if (null == arrivalListItem.getIsGeneratePmOrder()) {
+            WebUtil.addErrorMessage("同时生成保养工单" + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("IsGeneratePmOrder", true);
+            isValidate = false;
         }
-        if (!arrivalListItem.getTechnicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
-            WebUtil.addErrorMessage("技术验收未通过");
-            isAckFinished = false;
+        if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("SerialNum", true);
+            isValidate = false;
         }
-        if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
-                isAckFinished = false;
+        if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
+            if (!arrivalListItem.getBusinessAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
+                WebUtil.addErrorMessage("商务验收未通过");
+                isValidate = false;
+            }
+            if (!arrivalListItem.getClinicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
+                WebUtil.addErrorMessage("临床验收未通过");
+                isValidate = false;
+            }
+            if (!arrivalListItem.getTechnicalAckStatus().equals(ArrivalListItem.ACK_STATUS_PASS)) {
+                WebUtil.addErrorMessage("技术验收未通过");
+                isValidate = false;
             }
         }
 
-        if (!isAckFinished) {
+        if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
+            if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
+                isValidate = false;
+            }
+        }
+
+        if (!isValidate) {
             return "";
         }
 
@@ -167,14 +188,14 @@ public class AssetInstallationController {
         }
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
-            if (aiService.submitInstallItem(arrivalListItem.getId(), true, isGeneratePmOrder==null?false:isGeneratePmOrder)) {
+            if (aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
                 WebUtil.addSuccessMessage("提交成功");
             } else {
                 WebUtil.addErrorMessage("提交失败");
             }
 
         }
-        return "arrivalItemsList?faces-redirect=true";
+        return returnAction();
     }
 
     public void removeAttachmentById(String blobId) {
@@ -184,6 +205,14 @@ public class AssetInstallationController {
 
     public List<V2_BlobObject> getAckPicList(String type) {
         return picList == null ? null : picList.stream().filter(item -> type.equals(item.getBoSubType())).collect(Collectors.toList());
+    }
+
+    public String returnAction() {
+        if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
+            return "arrivalItemsList?faces-redirect=true";
+        } else {
+            return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + arrivalListItem.getArrivalListId());
+        }
     }
 
     public void updateItem() {
@@ -199,10 +228,6 @@ public class AssetInstallationController {
             }
         }
 
-        if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
-            WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-            valid = false;
-        }
         if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
             valid = false;
             arrivalListItem.setQrCode(null);
@@ -264,40 +289,19 @@ public class AssetInstallationController {
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
-//        assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getAssetGroup()));
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
         return assetDao.findBySearchFilter(assetFilters);
     }
 
-//    public void updateFinancingNumByNationalStandardCode() {
-//        if (null != gbCodeName) {
-//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(
-//                    null,
-//                    gbCodeName.split("/")[0],
-//                    this.arrivalListItem.getArrivalList().getSiteUID()
-//            );
-//            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-//                this.arrivalListItem.setFinancingNum(financingNum);
-//            }
-//        }
-//    }
     public void onSelectGbTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
         //联动更新
         if (null != gbCodeName) {
-//            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(null,
-//                    gbCode.getCode(),
-//                    this.arrivalListItem.getArrivalList().getSiteUID()
-//            );
             this.arrivalListItem.setNationalStandardCode(gbCodeName);
-//            if (financingNum != null && StringUtils.isEmpty(this.arrivalListItem.getFinancingNum())) {
-//                this.arrivalListItem.setFinancingNum(financingNum);
-//            }
-
         }
     }
 
@@ -327,10 +331,10 @@ public class AssetInstallationController {
     public void gennerateFinancingNum() {
         String prifix = arrivalListItem.getFinancingNum() == null ? "" : arrivalListItem.getFinancingNum();
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
-                arrivalListItem.getNationalStandardCode()==null?null:arrivalListItem.getNationalStandardCode().split("/")[0],
-                Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())?arrivalListItem.getArrivalList().getSiteUID():arrivalListItem.getClinicalDeptUID(), 
+                arrivalListItem.getNationalStandardCode() == null ? null : arrivalListItem.getNationalStandardCode().split("/")[0],
+                Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID()) ? arrivalListItem.getArrivalList().getSiteUID() : arrivalListItem.getClinicalDeptUID(),
                 arrivalListItem.getParentAssetId(), prifix);
-        if(null!= financingNum && financingNum.startsWith("error:")){
+        if (null != financingNum && financingNum.startsWith("error:")) {
             WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             financingNum = "";
         }
@@ -339,29 +343,21 @@ public class AssetInstallationController {
         }
     }
 
-//    public void onParentAssetChange() {
-//        if (Strings.isNullOrEmpty(arrivalListItem.getDepartNum()) && arrivalListItem.getParentAssetId() != null && arrivalListItem.getParentAssetId() > 0) {
-//            AssetInfo parentAsset = assetDao.getById(arrivalListItem.getParentAssetId());
-//            String finNum = assetFinacingNumGenerateService.generateFinancingNum(parentAsset.getId(), gbCodeName, arrivalListItem.getArrivalList().getSiteUID());
-//            arrivalListItem.setFinancingNum(finNum);
-//            if (!Strings.isNullOrEmpty(parentAsset.getDepartNum()) && parentAsset.getDepartNum().length() > 2 && parentAsset.getDepartNum().endsWith("00")) {
-//                List<SearchFilter> parentAssetFilters = Arrays.asList(new SearchFilter("parentAssetId", SearchFilter.Operator.EQ, arrivalListItem.getParentAssetId()));
-//                List<String> childrenNumList = assetDao.findBySearchFilter(parentAssetFilters).stream()
-//                        .map(item -> item.getDepartNum()).collect(Collectors.toList());
-//                childrenNumList.addAll(itemDao.findBySearchFilter(parentAssetFilters).stream()
-//                        .filter(item -> "new".equals(item.getInstallStatus()))
-//                        .map(item -> item.getDepartNum()).collect(Collectors.toList()));
-//                String prefix = parentAsset.getDepartNum().substring(0, parentAsset.getDepartNum().length() - 2);
-//                for (int i = 1; i < 100; i++) {
-//                    String num = prefix.concat(i < 10 ? "0" : "").concat(String.valueOf(i));
-//                    if (!childrenNumList.contains(num)) {
-//                        arrivalListItem.setDepartNum(num);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//    }
+    public String getQrCodeImageForAsset() {
+        AssetInfo asset = new AssetInfo();
+        asset.setQrCode(arrivalListItem.getQrCode());
+        asset.setName(arrivalListItem.getArrivalList().getAssetName());
+        asset.setAssetGroup(arrivalListItem.getArrivalList().getAssetGroup());
+        asset.setSiteUID(arrivalListItem.getArrivalList().getSiteUID());
+        asset.setFunctionType(arrivalListItem.getArrivalList().getFunctionType());
+        asset.setClinicalDeptUID(arrivalListItem.getClinicalDeptUID());
+        asset.setSerialNum(arrivalListItem.getSerialNum());
+        asset.setDepartNum(arrivalListItem.getDepartNum());
+        asset.setFinancingNum(arrivalListItem.getFinancingNum());
+        asset.setModalityId(arrivalListItem.getModalityId());
+        asset.setSystemId(arrivalListItem.getSystemId());
+        return qrCodeService.getQrCodeImageBase64(asset);
+    }
 
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
@@ -393,14 +389,6 @@ public class AssetInstallationController {
 
     public void setCode68List(List<I18nMessage> code68List) {
         this.code68List = code68List;
-    }
-
-    public Boolean getIsGeneratePmOrder() {
-        return isGeneratePmOrder;
-    }
-
-    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
-        this.isGeneratePmOrder = isGeneratePmOrder;
     }
 
     public String getGbCodeName() {

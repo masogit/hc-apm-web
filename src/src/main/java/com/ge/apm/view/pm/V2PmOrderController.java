@@ -90,6 +90,26 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String filterPlanTime;
     private Map<String, Boolean> selectedMap;
 
+
+   /* public boolean isOneClick(){
+        return selectedPmOrder.getSimplify()
+        if(==true){
+            retur
+        }
+    }*/
+
+    //是否允许内修
+	public Boolean canCreateSr(){
+		if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() ==1){
+			if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
+				if(null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)){
+					return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
+				}
+				return false; //按钮就会亮
+			}
+		}
+		return true;
+	}
     public void prepareAproval(String woid) {
         prepareAct(woid);
         selectedMap = new HashMap<>();
@@ -306,6 +326,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("dispatchMode");
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
+        if(queryIndex==-2){
+            searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
+        }
+
         if (queryIndex == -1) {
             return dao.findBySearchFilter(searchFilters,pageRequest);
         }
@@ -400,12 +424,12 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        if (!this.hasFilterOnField("siteUID")) {
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }

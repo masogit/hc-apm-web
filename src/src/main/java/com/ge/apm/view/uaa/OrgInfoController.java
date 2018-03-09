@@ -7,6 +7,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,6 +30,7 @@ import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.QrCodeLib;
+import org.primefaces.util.TreeUtils;
 import webapp.framework.dao.SearchFilter;
 
 @ManagedBean
@@ -100,8 +102,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     public void buildOrdTree(){
         orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+        TreeNodeUtil.sortTreeNodeByName(orgTree);
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
+           // this.selectedNode.setExpanded(true);
         }
         catch(Exception ex){
         }
@@ -109,10 +113,12 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     public void filterNode(){
       if(!StringUtils.isEmpty(retrieval)) {
           orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+          TreeNodeUtil.expandTreeNode(orgTree);
       }else{//列出所有机构
  orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
       }
-        this.selectedNode = (TreeNode) orgTree.getData();
+
+
     }
 
 

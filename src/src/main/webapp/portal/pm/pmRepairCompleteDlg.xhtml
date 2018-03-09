@@ -75,6 +75,10 @@
                                         <p:commandLink process="@this"  actionListener="#{v2PmOrderController.accessoryArrival(item.id)}" class="arrivalItem" rendered="#{item.id ne '000' and !item.arrived}" update="accessList">未到货</p:commandLink>
                                     </p:column>
 
+                                    <p:column headerText="发票号">
+                                        <h:outputText value="#{item.invoiceNum}" />
+                                    </p:column>
+
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}"  oncomplete="PF('pmmoreAccDialogDlg').show()" update="@(.pmmoreAccDialogDlgCls)" rendered="#{item.id eq '000'}" />
                                         <!-- <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}"  oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}"/>-->

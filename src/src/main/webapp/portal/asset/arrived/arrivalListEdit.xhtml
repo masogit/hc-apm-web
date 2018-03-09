@@ -110,7 +110,7 @@
 
 
                             </p:panelGrid>
-                            <p:fieldset legend="分配安装" rendered="#{assetArrivedListEditController.selected.processType eq 'Easy' and assetArrivedListEditController.selected.status eq 2}">
+                            <p:fieldset legend="设备信息" rendered="#{assetArrivedListEditController.selected.processType eq 'Easy' and assetArrivedListEditController.selected.status eq 2}">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup>
                                         <label class="label">设备国标码</label>
@@ -173,8 +173,6 @@
                                         <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.terminateDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                                     </h:panelGroup>
 
-                                </p:panelGrid>
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup>
                                         <label class="label">#{msg.purchasePrice}</label>
                                         <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
@@ -264,7 +262,7 @@
                                 </p:panelGrid>
                                 <h:panelGroup>
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":easyInstallDialogForm :growl"/>
-                                    <p:commandButton value="分配安装(#{assetArrivedListEditController.getNewInstallAssetList().size()})" actionListener="#{assetArrivedListEditController.prepareEasyInstall()}" oncomplete="PF('easyInstallDialog').show()" update=":easyInstallDialogForm"/>
+                                    <!--<p:commandButton value="分配安装(#{assetArrivedListEditController.getNewInstallAssetList().size()})" actionListener="#{assetArrivedListEditController.prepareEasyInstall()}" oncomplete="PF('easyInstallDialog').show()" update=":easyInstallDialogForm"/>-->
                                 </h:panelGroup>
                             </p:fieldset>
 
@@ -294,8 +292,12 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                                 </p:column>
                                 <p:column width="90" >
-                                    <p:commandLink actionListener="#{assetArrivedItemsController.setSelected(item.id)}" update=":ItemDetailViewForm" >详细
-                                    </p:commandLink>
+                                    <p:commandLink actionListener="#{assetArrivedItemsController.setSelected(item.id)}" update=":ItemDetailViewForm" value="详细" />
+                                    
+                                    <p:link  outcome="ItemEdit" value="安装" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedListEditController.selected.processType eq 'Easy'}" >
+                                        <f:param name="itemId" value="#{item.id}" />
+                                    </p:link>
+                                    
                                     <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedListEditController.selected.processType ne 'Easy'}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                                     </p:commandLink>

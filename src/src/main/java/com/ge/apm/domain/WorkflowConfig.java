@@ -71,6 +71,9 @@ public class WorkflowConfig implements Serializable {
     
     @Column(name = "auto_ack")
     private Boolean autoAck;//是否需要验收
+    
+    @Column(name = "auto_ack_days")
+    private Integer autoAckDays;//系统自动验收时间,单位‘天’
 
     @Column(name = "auto_close")
     private Boolean autoClose;// 自动关单
@@ -96,6 +99,28 @@ public class WorkflowConfig implements Serializable {
     
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
+
+    @Column(name="pm_simplify")
+    private Boolean pmSimplify; // 简化保养
+    
+    @Column(name = "warranty_remind_times")
+    private Integer warrantyRemindTimes;//维保提醒次数
+    
+	public Integer getAutoAckDays() {
+		return autoAckDays;
+	}
+
+	public void setAutoAckDays(Integer autoAckDays) {
+		this.autoAckDays = autoAckDays;
+	}
+
+	public Integer getWarrantyRemindTimes() {
+		return warrantyRemindTimes;
+	}
+
+	public void setWarrantyRemindTimes(Integer warrantyRemindTimes) {
+		this.warrantyRemindTimes = warrantyRemindTimes;
+	}
 
 	public Integer getWarrantyRemindDays() {
 		return warrantyRemindDays;
@@ -342,6 +367,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setAutoClose(Boolean autoClose) {
         this.autoClose = autoClose;
+    }
+
+    public Boolean getPmSimplify() {
+        return pmSimplify;
+    }
+
+    public void setPmSimplify(Boolean pmSimplify) {
+        this.pmSimplify = pmSimplify;
     }
 
     @Override

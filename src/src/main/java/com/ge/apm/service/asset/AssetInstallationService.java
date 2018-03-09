@@ -76,6 +76,11 @@ public class AssetInstallationService {
         return res.contains("successfully");
     }
 
+    public List<ArrivalListItem> getListItem(String arrivalListId)
+    {
+    	return itemDao.findByArrivalListId(arrivalListId);
+    }
+    
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {
         String token = UserContextService.getAccessToken();
         String res = installApiService.submitArrivalListItem(token, itemId, isFinish);

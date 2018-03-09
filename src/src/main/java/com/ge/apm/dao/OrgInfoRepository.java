@@ -26,7 +26,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public Page<OrgInfo> getByHospitalId(Pageable pageRequest, int hospitalId);
     public Page<OrgInfo> getBySiteId(Pageable pageRequest, int siteId);
     
-    @Query("select o from OrgInfo o where institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1")
+    @Query("select o from OrgInfo o where institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1 order by name")
     public List<OrgInfo> getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(String siteId);
 
     @Query("select o from OrgInfo o where orgType<>4 and (institutionUID=?1 or hospitalUID=?1 or siteUID=?1 or tenantUID=?1)")

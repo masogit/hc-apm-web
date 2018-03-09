@@ -260,5 +260,9 @@ public class AssetCreateService {
         List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
     }
+    
+    public UserAccount getUserByWechatId(String wechatId){
+        return userDao.getByWeChatId(wechatId);
+    }
 
 }

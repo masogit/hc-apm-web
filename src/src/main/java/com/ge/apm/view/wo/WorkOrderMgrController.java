@@ -201,8 +201,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             if (!getTagGroupAssets().isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets(), "1*3+4*5+"));
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getNoTagGroupAssets(), "1*3+4*5+"));
+                List<Integer> tagGroupAssets = getTagGroupAssets();
+                if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
+                    searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
+                }
+                tagGroupAssets = getNoTagGroupAssets();
+                if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
+                    searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
+                }
             }
 
         } else if (queryIndex == 4) { //维修中
@@ -685,6 +691,19 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         accessoryList.stream().filter(item -> itemId.equals(item.getId())).forEach(item -> item.setArrived(true));
     }
 
+    //是否允许内修
+    public Boolean canCreateSr(){
+        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() ==1){
+            if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
+                if(null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)){
+                    return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
+                }
+                return false;    
+            }
+        }
+        return true;
+    }
+    
     //getter and setter
     public Integer getQueryIndex() {
         return queryIndex;
