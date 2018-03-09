@@ -16,8 +16,11 @@ import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Collectors;
+import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
@@ -35,11 +38,17 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private ArrivalListItem selectedItem;
 
+    private Date varArrivalDateTo = null;
+    private String arrivalFormatTime = null;
+    
+    private OrgInfo fileterDeptOrg;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        addDateTimeFields("arrivalList.arrivalDate");
     }
 
     @Override
@@ -63,6 +72,12 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         }
         if (!this.hasFilterOnField("arrivalList.processType")) {
             searchFilters.add(new SearchFilter("arrivalList.processType", SearchFilter.Operator.EQ, "Normal"));
+        }
+        
+        if(null != fileterDeptOrg){
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterDeptOrg.getUid(), "1*"));
+        }else{
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
@@ -140,4 +155,44 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         this.selectedItem = selectedItem;
     }
 
+    public void onClinicalDeptFilter(NodeSelectEvent event) {
+        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
+            if (deptOrg.getOrgType() == 4) {
+                fileterDeptOrg =deptOrg;
+                return;
+            }
+        }
+        fileterDeptOrg = null;
+    }
+    
+    public String getArrivalFormatTime() {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        if (varArrivalDateTo == null) {
+            return arrivalFormatTime;
+        } else {
+            return "~" + sdf.format(varArrivalDateTo);
+        }
+    }
+
+    public void setArrivalFormatTime(String arrivalFormatTime) {
+        this.arrivalFormatTime = arrivalFormatTime;
+    }
+
+    public Date getVarArrivalDateTo() {
+        return varArrivalDateTo;
+    }
+
+    public void setVarArrivalDateTo(Date varArrivalDateTo) {
+        this.varArrivalDateTo = varArrivalDateTo;
+    }
+
+    public OrgInfo getFileterDeptOrg() {
+        return fileterDeptOrg;
+    }
+
+    public void setFileterDeptOrg(OrgInfo fileterDeptOrg) {
+        this.fileterDeptOrg = fileterDeptOrg;
+    }
+    
 }

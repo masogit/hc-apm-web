@@ -92,7 +92,7 @@
 
                             <f:facet name="header">
                                 #{msg.Text}#{msg.modify}
-                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  actionListener="#{qrCodeTemplateCreateController.createNewElement}" update="elementTable" />
+                                <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  actionListener="#{qrCodeTemplateCreateController.createNewElement}" update="elementTable" process="@this" />
                             </f:facet>
                             <p:ajax event="rowEdit" listener="#{qrCodeTemplateCreateController.onRowEdit}" update="qrCodeEditForm:preView :growl" />
                             <p:ajax event="rowEditCancel" listener="#{qrCodeTemplateCreateController.onRowCancel}" update=":growl" />

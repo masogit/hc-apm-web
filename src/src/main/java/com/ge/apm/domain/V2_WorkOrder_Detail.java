@@ -78,6 +78,18 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Column(name = "approved")
     private Boolean approved;
 
+    @Column(name="invoice_num")
+    private String invoiceNum;
+
+
+    public String getInvoiceNum() {
+        return invoiceNum;
+    }
+
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
+    }
+
     public String getId() {
         return id;
     }

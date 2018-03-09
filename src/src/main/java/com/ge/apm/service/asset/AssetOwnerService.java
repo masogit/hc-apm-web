@@ -63,6 +63,8 @@ public class AssetOwnerService {
     public Page getAssetListEx(AssetInfo queryAsset) {
 
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
+        OrgInfoFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        OrgInfoFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         OrgInfoFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, queryAsset.getSiteId()));
 //        OrgInfoFilters.add(new SearchFilter("hospitalId", SearchFilter.Operator.EQ, queryAsset.getHospitalId()));
         if (null != queryAsset.getAssetGroup()) {

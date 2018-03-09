@@ -9,6 +9,7 @@ import com.ge.apm.dao.ImportFilesRepository;
 import com.ge.apm.domain.ImportFiles;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.FileScanService;
+import com.google.common.base.Strings;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.primefaces.event.FileUploadEvent;
@@ -77,41 +78,53 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
         itemFile.setUploadedTime(new Date());
         itemFile.setStatus(ImportFiles.STATUS_STARTING);
         itemFile.setCreatorUID(UserContextService.getCurrentUserAccount().getUid());
-        String savedfilePath=null;
+        String savedfilePath = null;
         try {
-            savedfilePath = fileService.saveBatchUploadedFile(event.getFile(),fileType);
+            savedfilePath = fileService.saveBatchUploadedFile(event.getFile(), fileType);
         } catch (Exception ex) {
-             WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
+            WebUtil.addErrorMessage(event.getFile().getFileName() + "上传失败!");
         }
-        itemFile.setFilePath(savedfilePath);
+        if (Strings.isNullOrEmpty(savedfilePath)) {
+            itemFile.setStatus("FAILEDUPLOAD");
+            WebUtil.addErrorMessage(event.getFile().getFileName() + "保存失败!");
+        } else {
+            itemFile.setFilePath(savedfilePath);
+        }
 
         fileList.add(new Tuple2<>(itemFile, event.getFile()));
     }
 
+    public void removeFailedFile(String id){
+        ImportFiles file = dao.findById(id);
+        if(null != file && Strings.isNullOrEmpty(file.getFilePath())){
+            dao.delete(file);
+        }
+    }
+    
     public void removeFile(Integer index) {
         fileService.deleteBatchUploadedFile(fileList.get(index)._1.getFilePath());
         fileList.remove(fileList.get(index));
     }
 
-    public String getUserName(String userUid){
+    public String getUserName(String userUid) {
         return userService.getUserByUid(userUid).getName();
     }
-    
+
     public void saveFiles() throws Exception {
 
         List<ImportFiles> importFileList = fileList.stream().map(item -> item._1).collect(Collectors.toList());
-        
+
         dao.save(importFileList);
         fileList.clear();
     }
-    
-    public void refreshData(){
-        if(selected != null){
+
+    public void refreshData() {
+        if (selected != null) {
             selected = dao.findById(selected.getId());
         }
     }
-    
-    public void restartBatchJob(){
+
+    public void restartBatchJob() {
         selected.setStatus(ImportFiles.STATUS_STARTING);
         dao.save(selected);
         WebUtil.addSuccessMessage("任务已经重新启动");
@@ -119,8 +132,8 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
 
     public void cancel() {
         this.selected = null;
-        while(fileList!=null && !fileList.isEmpty()){
-           removeFile(0);
+        while (fileList != null && !fileList.isEmpty()) {
+            removeFile(0);
         }
         this.fileList.clear();
         this.fileType = ImportFiles.ImportFileType.ColdHeaderExcel.toString();

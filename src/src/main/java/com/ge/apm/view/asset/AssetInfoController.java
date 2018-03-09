@@ -54,7 +54,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private BrandRepository brandDao;
 
-    private V2_PmScheduleRepository pmSchDao ;
+    private V2_PmScheduleRepository pmSchDao;
     private ExWorkOrderRepository exWoDao;
     private V2_PmOrderRepository v2_pmOrderRepository;
 
@@ -124,9 +124,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private OrgInfo selectSite;
 
     private Boolean needShowAssetApproval;
-    
-    private OrgInfo fileterOrg;
 
+    private OrgInfo fileterOrg;
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -193,7 +192,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
-
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -296,6 +294,19 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
         }
 
+        if (null != fileterOrg) {
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
+        if (null != selectSite) {
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+            this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+            this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*2+"));
+        }
+
         if ("true".equals(this.measuring)) {
             Calendar calendar = new GregorianCalendar();
             calendar.setTime(new Date());
@@ -328,22 +339,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
-        if(null!=event){
-        selectSite = (OrgInfo) event.getTreeNode().getData();
-        }
-        searchFilters.removeAll(searchFilters.stream().filter(item -> "siteUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
-                || "institutionUID".equals(item.fieldName) && "1*".equals(item.conditionPath)
-                || "hospitalUID".equals(item.fieldName) && "1*".equals(item.conditionPath)).collect(Collectors.toList()));
-        if (selectSite != null && selectSite.getId() > 0) {
-            if (selectSite.getOrgType() == 1) {
-                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getInstitutionUID()));
-            } else if (selectSite.getOrgType() == 2) {
-                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getHospitalUID()));
-            } else if (selectSite.getOrgType() == 3) {
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getSiteUID()));
+
+        if (null != event) {
+            if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+                selectSite = (OrgInfo) event.getTreeNode().getData();
+            } else {
+                selectSite = null;
             }
+            onClinicalDeptFilter(null);
         }
-        onClinicalDeptFilter(null);
+
     }
 
     public void exportQrCode() throws Exception {
@@ -410,7 +415,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void assembleMaintainList() {
         operation = "/portal/woMgr/workOrderList?faces-redirect=true";
-       // operation = "/portal/woMgr/woMgrList?faces-redirect=true";
+        // operation = "/portal/woMgr/woMgrList?faces-redirect=true";
     }
 
     public String getContractListLink() {
@@ -598,7 +603,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Boolean isNew = selected.hashCode() == 0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if (isGeneratePmOrder!=null && isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
+        if (isGeneratePmOrder != null && isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
             pmService.createPMrequest(selected.getUid(), null);
         }
         if (resultStatus) {
@@ -1053,7 +1058,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         parentAssetList = dao.findBySearchFilter(assetFilters);
 
-
     }
 
     public void onFunctionGroupChange() {
@@ -1092,9 +1096,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (this.selected.getParentAssetId() != null) {
             AssetInfo assetInfo = this.dao.getById(this.selected.getParentAssetId());
             if (assetInfo != null) {
-                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                if (StringUtils.isEmpty(assetInfo.getFunctionType())) {
                     return assetInfo.getName();
-                }else{
+                } else {
                     return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
                 }
             }
@@ -1107,9 +1111,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (ai.getParentAssetId() != null) {
             AssetInfo assetInfo = dao.getById(ai.getParentAssetId());
             if (assetInfo != null) {
-                if(StringUtils.isEmpty(assetInfo.getFunctionType())){
+                if (StringUtils.isEmpty(assetInfo.getFunctionType())) {
                     return assetInfo.getName();
-                }else{
+                } else {
                     return assetInfo.getName() + "(" + assetInfo.getFunctionType() + ")";
                 }
             }
@@ -1239,7 +1243,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 //            }
 //
 //        }
-
     }
 
     public void generateFinancialNum() {
@@ -1250,7 +1253,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 //        if (config == null || config.getGenerateMethod() == null) {
 //            return;
 //        }
-
         String code = this.selectedGb == null ? null : this.selectedGb.getCode();
 
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -1295,7 +1297,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }
 
         }
-
 
     }
 
@@ -1373,17 +1374,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
-        if (null!=event && null != event.getTreeNode() && null!= event.getTreeNode().getData()) {
-            fileterOrg = (OrgInfo) event.getTreeNode().getData();
-            if (fileterOrg.getOrgType() == 4) {
-                this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+
+        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
+            if (deptOrg.getOrgType() == 4) {
+                fileterOrg = deptOrg;
                 return;
-            }else{
-                fileterOrg = null;
             }
         }
-        searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
-
+        fileterOrg = null;
     }
 
     public void discard(AssetInfo asset) {
@@ -1557,6 +1556,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
     }
+
     public boolean isChecked() {
 
         Map<String, Boolean> map = this.selectedMap;
@@ -1569,24 +1569,25 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return false;
     }
 
-    public List<V2_PmOrder> getPmOrderList(){
-        if(this.selected==null){
+    public List<V2_PmOrder> getPmOrderList() {
+        if (this.selected == null) {
             return null;
         }
         List<V2_PmOrder> pmOrdersForAsset = v2_pmOrderRepository.getPmOrdersForAsset(selected.getUid());
         return pmOrdersForAsset;
     }
 
-    public List<PmScheduleData> getPmScheduleData(String type){
- if(this.selected==null){
-    return null;
- }
-        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(),type);
+    public List<PmScheduleData> getPmScheduleData(String type) {
+        if (this.selected == null) {
+            return null;
+        }
+        List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(), type);
         return pmsList;
     }
+
     //获取外修工单
-    public List<ExternalWorkOrder> getExWorkOrder(){
-        if(this.selected==null){
+    public List<ExternalWorkOrder> getExWorkOrder() {
+        if (this.selected == null) {
             return null;
         }
         List<ExternalWorkOrder> exWorkOrderList = exWoDao.getExWorkOrderList(this.selected.getUid());
@@ -1609,6 +1610,5 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setFileterOrg(OrgInfo fileterOrg) {
         this.fileterOrg = fileterOrg;
     }
-    
-    
+
 }

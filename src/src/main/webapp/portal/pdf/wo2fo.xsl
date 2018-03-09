@@ -28,7 +28,7 @@
 			<fo:block font-family="SimSun" font-weight="bold" font-size="17px" text-align="center" space-after="0.8cm">
 				医疗设备维修工单
 			</fo:block>
-			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.2cm">
+			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.4cm">
 				设备信息
 			</fo:block>
 			
@@ -131,7 +131,7 @@
 					</fo:table-body>					
 				</fo:table>
 			</fo:block>
-			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.2cm">
+			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.4cm">
 				报修信息
 			</fo:block>
 			
@@ -224,7 +224,7 @@
 				</fo:table>
 			</fo:block>
 			
-			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.2cm">
+			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.4cm">
 				维修信息
 			</fo:block>
 			
@@ -407,7 +407,7 @@
 				</fo:table>
 			</fo:block>
 			
-			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.2cm">
+			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.4cm">
 				备件信息
 			</fo:block>
 			
@@ -504,7 +504,7 @@
 				</fo:table>
 			</fo:block>
 			
-			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.2cm">
+			<fo:block font-family="SimSun" font-weight="bold" font-size="13px" text-align="center" space-after="0.4cm">
 				维修流程
 			</fo:block>
 			

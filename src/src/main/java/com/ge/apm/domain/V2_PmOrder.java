@@ -3,21 +3,19 @@
 package com.ge.apm.domain;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import org.hibernate.annotations.*;
+import org.hibernate.annotations.GenericGenerator;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.hibernate.annotations.Where;
 
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.ForeignKey;
-import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author 212547631
@@ -93,6 +91,10 @@ public class V2_PmOrder  implements Serializable {
     @Column(name = "man_hours")
     private Double manHours;
 
+    @Column(name="simplify")
+    private Boolean simplify;
+
+
     @Column(name = "plan_time")
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
@@ -105,16 +107,19 @@ public class V2_PmOrder  implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "bo_uuid", referencedColumnName = "id", foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @Where(clause = "bo_type = 'PmOrder'")
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_BlobObject> attachments = new ArrayList<>();
 
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrder_Detail> details;
 
     @OneToMany(cascade = CascadeType.ALL)
     @LazyCollection(LazyCollectionOption.FALSE)
     @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrderCoworker> coworkers;
 
     @Column(name = "nearest_sr_days")
@@ -520,5 +525,13 @@ public class V2_PmOrder  implements Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public Boolean getSimplify() {
+        return simplify;
+    }
+
+    public void setSimplify(Boolean simplify) {
+        this.simplify = simplify;
     }
 }

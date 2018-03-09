@@ -13,6 +13,28 @@
             	</div>
             	
             <div class="ui-g-12 card">
+            <h:form id="searchForm">
+                <h:panelGrid id="searchPanel" columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:inputText id="searchText" value="#{tubeDataController.queryCondition}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/systemId" maxlength="100" style="width: 420px">
+                        <p:ajax event="keyup" update=":TubeDataListForm :searchForm" />
+                    </p:inputText>
+                    
+                    <h:panelGroup id='searchButtons'>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":TubeDataListForm :searchForm:searchText"  rendered="#{empty tubeDataController.queryCondition}"/>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":TubeDataListForm :searchForm:searchText" actionListener="#{tubeDataController.setOneSearchStr()}" rendered="#{not empty tubeDataController.queryCondition}"/>
+                    </h:panelGroup>
+                    
+                    <p:inputText id="searchText2" value="#{tubeDataController.query}" placeholder="球管序列号" maxlength="100" style="width: 420px">
+                        <p:ajax event="keyup" update=":TubeDataListForm" />
+                    </p:inputText>
+                    
+                    <h:panelGroup id='searchButtons2'>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":TubeDataListForm :searchForm:searchText2"  rendered="#{empty tubeDataController.query}"/>
+                        <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":TubeDataListForm :searchForm:searchText2" actionListener="#{tubeDataController.setQueryNull()}" rendered="#{not empty tubeDataController.query}"/>
+                    </h:panelGroup>
+                </h:panelGrid>
+            </h:form>
+            
             <h:form id="TubeDataListForm">
                 <p:dataTable id="datalist" value="#{tubeDataController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{tubeDataController.selected}"

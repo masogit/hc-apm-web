@@ -1,0 +1,109 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+<ui:define name="content">
+    
+               <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="采购清单-到货"/>
+                </div>
+                
+                        <h:form id="PurchaseApplicationForm">
+                            <div class="ui-g-12 card ">
+                            <div class="ui-g">
+                                <div class="ui-g-2"> <p:outputLabel value="设备类别:"/></div>
+                                <div class="ui-g-4"> 
+                                    <p:selectOneMenu id="assetGroup" value="#{assetPurchaseListController.selected.assetType}"  >
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                                <div class="ui-g-2"><p:outputLabel value="院区:"  /></div>
+                                <div class="ui-g-4"> <p:inputText   readonly="true" value="#{assetPurchaseListController.siteName}" /></div>
+                            </div>
+                            <div class="ui-g">
+                                <div class="ui-g-2"><p:outputLabel value="采购数量:"/></div>
+                                <div class="ui-g-4"><p:inputText id="clinicalContact" required="true" value="#{assetPurchaseListController.selected.purchaseQty}"/></div>
+                                <div class="ui-g-2"><p:outputLabel value="创建日期:"/></div>
+                                <div class="ui-g-4">
+                                    <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{assetPurchaseListController.selected.createDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="填表日期 #{msg.ValidationRequire}"></p:calendar>
+                                </div>
+                            </div>
+                            <div class="ui-g">
+                                <div class="ui-g-2"><p:outputLabel value="到货数量:"/></div>
+                                <div class="ui-g-4"><p:inputText id="shebeimingcheng" value="#{assetPurchaseListController.selected.reachQty}" /></div>
+                                <div class="ui-g-2"><p:outputLabel value="到货状态:"/></div>
+                                <div class="ui-g-4">
+                                    <p:selectOneMenu  value="#{assetPurchaseListController.selected.reachState}" required="false" >
+        <!--                                <f:selectItem itemLabel="未到货" itemValue='1'/>-->
+                                        <f:selectItem itemLabel="全部到货" itemValue='3'/>
+                                        <f:selectItem itemLabel="部分到货" itemValue='2'/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+        <!--                    <div class="ui-g">
+                                <div class="ui-g-2"><p:outputLabel value="是否到货详单:"/></div>
+                                <div class="ui-g-4"><p:inputText   value="#{assetPurchaseListController.selected.reachDetailState}" readonly="true"/></div>
+                                <div class="ui-g-2"><p:outputLabel value="到货详单日期:"/></div>
+                                <div class="ui-g-4">
+                                    <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" readonly="true" value="#{assetPurchaseListController.selected.reachDetailDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" ></p:calendar>
+                                </div>
+                            </div>-->
+                            <div class="ui-g">
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.assetName}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.assetName}"/></div>
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListName}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.name}"/></div>
+                            </div>
+                            <div class="ui-g">
+        <!--                        <div class="ui-g-2"> <p:outputLabel value="资产名称:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.status}"/></div>-->
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalDate}:"/></div>
+                                <div class="ui-g-4">
+                                    <p:calendar timeZone="GMT+8" pattern="yyyy/MM/dd"  value="#{assetPurchaseListController.arrivalList.arrivalDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="填表日期 #{msg.ValidationRequire}"></p:calendar>
+                                </div>
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListFunctionType}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.functionType}"/></div>
+                            </div>  
+                            <div class="ui-g">
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListManufacture}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.manufacture}"/></div>
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListOrigin}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.origin}"/></div>
+                            </div>
+                            <div class="ui-g">
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListInvoiceNum}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.invoiceNum}"/></div>
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListContractNum}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.contractNum}"/></div>
+                            </div>
+                            <div class="ui-g">
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListContractPrice}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.contractPrice}"/></div>
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.vendor}:"/></div>
+                                <div class="ui-g-4"> 
+                                    <p:selectOneMenu  value="#{assetPurchaseListController.arrivalList.supplierId}">
+                                            <f:selectItem itemLabel=""/>
+                                            <f:selectItems value="#{supplierController.supplierList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    </p:selectOneMenu>
+                                </div>
+                            </div>
+                            <div class="ui-g">
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListAgent}:"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.agent}"/></div>
+                                <div class="ui-g-2"> <p:outputLabel value="#{msg.arrivalListClassCode}"/></div>
+                                <div class="ui-g-4"> <p:inputText   value="#{assetPurchaseListController.arrivalList.classCode}"/></div>
+                            </div>
+                            <h:panelGroup>
+                               <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{assetPurchaseListController.saves()}" action="List?faces-redirect=true" validateClient="true" update=":growl" style="float:left"/>
+                               <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
+        <!--                       <p:commandButton value="转到到货详单"  actionListener="#{assetPurchaseListController.save()}" validateClient="true" update=":growl" style="float:left"/>-->
+                            </h:panelGroup>
+                            </div>
+                        </h:form>
+           
+    
+</ui:define>
+</ui:composition>
