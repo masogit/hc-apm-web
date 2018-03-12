@@ -61,11 +61,11 @@
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu  value="#{pmOrderRuleController.selected.safetyReport}"  >
-                                       <p:ajax listener="#{pmOrderRuleController.onSchemaChange('safetyReport')}"  update="report" />
+                                       <p:ajax   update="report" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
 	                       </p:selectOneMenu>
-                                 <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.safetyReportJson}"  />
+                                 <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}"  />
 	                        &nbsp;&nbsp;
 	                   <p:commandButton  rendered="#{not empty pmOrderRuleController.selected.safetyReport}" immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
@@ -73,11 +73,11 @@
 	                  <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
 	                     <p:selectOneMenu  value="#{pmOrderRuleController.selected.performanceReport}"  >
-	                     		<p:ajax listener="#{pmOrderRuleController.onSchemaChange('performanceReport')}"   update="report" />
+	                     		<p:ajax   update="report" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                        	</p:selectOneMenu>
-                                        <h:inputHidden id="performanceReport" value="#{pmOrderRuleController.performanceReportJson}"  />
+                                        <h:inputHidden id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
                        	 &nbsp;&nbsp;
                      	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
