@@ -14,7 +14,7 @@
 			}
 		</style>
 
-        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog" onHide="#{pmOrderRuleController.onSelect()}" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRule} 另存为">
+        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog" onHide="#{pmOrderRuleController.onSelect()}" height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 另存为">
             <h:form id="PmOrderRuleSaveAsForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
