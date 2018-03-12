@@ -6,12 +6,16 @@
 package com.ge.apm.view;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
+import com.ge.apm.service.asset.QrCodeTemplateService;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Named;
 import org.tiefaces.components.websheet.TieWebSheetBean;
+import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -23,16 +27,18 @@ import org.tiefaces.components.websheet.TieWebSheetBean;
 public class TieFacesController extends TieWebSheetBean{
     
     QrCodeTemplate thisTemplate;
-    List<QrCodeTemplateElement> thisTemplateElementList;
+    List<QrCodeTemplateElement> templateElementList;
     
     @Override
     public void initialLoad() {
-        
-        thisTemplateElementList = (List<QrCodeTemplateElement>) defaultTemplate.get("elementList");
-        
+        QrCodeTemplateService templateService = WebUtil.getBean(QrCodeTemplateService.class);
+        Map<String, Object> defaultTemplate = templateService.generateDefaultTemplate();
+        templateElementList = (List<QrCodeTemplateElement>) defaultTemplate.get("elementList");
+        HashMap<String, Object> context = new HashMap<String, Object>();
+        context.put("templateElementList", templateElementList);
         
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("tiefaces/tiefaces.xlsx");
-        loadWebSheet(stream);        
+        loadWebSheet(stream,context);        
     }
 
     public QrCodeTemplate getThisTemplate() {
@@ -43,14 +49,13 @@ public class TieFacesController extends TieWebSheetBean{
         this.thisTemplate = thisTemplate;
     }
 
-    public List<QrCodeTemplateElement> getThisTemplateElementList() {
-        return thisTemplateElementList;
+    public List<QrCodeTemplateElement> getTemplateElementList() {
+        return templateElementList;
     }
 
-    public void setThisTemplateElementList(List<QrCodeTemplateElement> thisTemplateElementList) {
-        this.thisTemplateElementList = thisTemplateElementList;
+    public void setTemplateElementList(List<QrCodeTemplateElement> templateElementList) {
+        this.templateElementList = templateElementList;
     }
-    
-    
+
     
 }
