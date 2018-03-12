@@ -14,7 +14,7 @@
 			}
 		</style>
 
-        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
+        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRule} 另存为">
             <h:form id="PmOrderRuleSaveAsForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
@@ -40,7 +40,9 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}(月)</label>
-                            <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
+                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0" 
+                            required="true" requiredMessage="超出范围（只能是1到120）！"  />
+                            <!-- <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.feedbackComment}</label>
@@ -56,17 +58,32 @@
                     </p:panelGrid>
                     
                     <p:panelGrid id="report" columns="2"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
+                    
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
-		                  			 <p:ajax  update="report" />
+		                   			<p:ajax listener="#{pmOrderRuleController.onSchemaChange('safetyReport')}" update="report" />
+	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
+	                       </p:selectOneMenu>
+	                        <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.safetyReportJson}" />
+	                        &nbsp;&nbsp;
+	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                       </h:panelGroup>
+                    
+                    <!-- 	<h:panelGroup>
+	                    	 <label class ="label" >#{msg.safetyReport}</label>
+		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
+		                  			 <p:ajax listener="#{pmOrderRuleController.onSchemaChange('safetyReport')}" update="report" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
 	                       </p:selectOneMenu>
 	                        <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.selected.safetyReport}" />
 	                        &nbsp;&nbsp;
 	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
-                       </h:panelGroup>
+                       </h:panelGroup> -->
+                       
+                       
 	                   
 	                  <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
