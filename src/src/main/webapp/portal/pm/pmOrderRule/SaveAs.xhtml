@@ -66,7 +66,7 @@
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
 	                       </p:selectOneMenu>
-	                        <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}" />
+                                 <h:inputHidden immediate="true" id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}" />
 	                        &nbsp;&nbsp;
 	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
@@ -78,7 +78,7 @@
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                        	</p:selectOneMenu>
-                                        <h:inputHidden id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
+                                        <h:inputHidden immediate="true" id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
                        	 &nbsp;&nbsp;
                      	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
