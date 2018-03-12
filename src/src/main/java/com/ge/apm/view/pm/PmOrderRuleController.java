@@ -32,6 +32,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.Report;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.Optional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -52,8 +53,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private String defaultReport;
 	private TableDefinitionRepository templateDao;
         
-        private String safetyReportJson;
-        private String performanceReportJson;
+//        private String safetyReportJson;
+//        private String performanceReportJson;
 
 	@Override
 	protected void init() {
@@ -426,17 +427,27 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		}
 	}
         
-        public void onSchemaChange(String type){
-            if("safetyReport".equals(type)){
-                TableDefinition schema = templateDao.findById(selected.getSafetyReport());
-                safetyReportJson = schema==null? null:schema.getSchema();
-            }else if("performanceReport".equals(type)){
-                TableDefinition schema = templateDao.findById(selected.getPerformanceReport());
-                performanceReportJson = schema==null? null:schema.getSchema();
-            }
-            
+//        public void onSchemaChange(String type){
+//            if("safetyReport".equals(type)){
+//                TableDefinition schema = templateDao.findById(selected.getSafetyReport());
+//                safetyReportJson = schema==null? null:schema.getSchema();
+//            }else if("performanceReport".equals(type)){
+//                TableDefinition schema = templateDao.findById(selected.getPerformanceReport());
+//                performanceReportJson = schema==null? null:schema.getSchema();
+//            }
+//            
+//        }
+
+    public String getJsonValueById(String id) {
+        if (!Strings.isNullOrEmpty(id)) {
+            TableDefinition schema = templateDao.findById(id);
+            return schema == null ? null : schema.getSchema();
+        } else {
+            return null;
         }
-	
+    }
+        
+        
 	public void initSaveAs(){
 		selected.setPeriod(null);
 //		selected.setId(null);
@@ -463,21 +474,21 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		this.filterPmRuleLevel = filterPmRuleLevel;
 	}
 
-    public String getSafetyReportJson() {
-        return safetyReportJson;
-    }
-
-    public String getPerformanceReportJson() {
-        return performanceReportJson;
-    }
-    
-    public void setSafetyReportJson(String safetyReportJson) {
-        this.safetyReportJson = safetyReportJson;
-    }
-
-    public void setPerformanceReportJson(String performanceReportJson) {
-        this.performanceReportJson = performanceReportJson;
-    }
+//    public String getSafetyReportJson() {
+//        return safetyReportJson;
+//    }
+//
+//    public String getPerformanceReportJson() {
+//        return performanceReportJson;
+//    }
+//    
+//    public void setSafetyReportJson(String safetyReportJson) {
+//        this.safetyReportJson = safetyReportJson;
+//    }
+//
+//    public void setPerformanceReportJson(String performanceReportJson) {
+//        this.performanceReportJson = performanceReportJson;
+//    }
 
 	/*
 	 * @Override public void onBeforeNewObject(PmOrderRule object) { }
