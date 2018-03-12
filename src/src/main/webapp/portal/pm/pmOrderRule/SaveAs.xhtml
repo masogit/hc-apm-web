@@ -14,7 +14,7 @@
 			}
 		</style>
 
-        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRule} 另存为">
+        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog" onHide="#{pmOrderRuleController.onSelect()}" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRule} 另存为">
             <h:form id="PmOrderRuleSaveAsForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
@@ -113,7 +113,7 @@
                     update="display,:PmOrderRuleSaveAsForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
                     oncomplete="handleSubmit(args, 'SaveAsDialog');"/>
                     &nbsp;&nbsp;
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SaveAsDialog').hide()"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SaveAsDialog').hide()" update = ":PmOrderRuleListForm:datalist"/>
                     &nbsp;&nbsp;
                 </h:panelGroup>
             </h:form>

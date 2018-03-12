@@ -201,7 +201,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 			// relRuleAssetRepository.deleteByAssetUIDIn(deleteIds);
 
 			WebUtil.addSuccessMessage("配置成功!");
-			targetAssets.clear();
+			//targetAssets.clear();
 		}
 
 	}

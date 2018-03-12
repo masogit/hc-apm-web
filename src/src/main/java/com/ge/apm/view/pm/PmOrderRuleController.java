@@ -109,6 +109,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		return items;
 	}
 	
+	public void onSelect(){
+		if(selected != null && selected.getId() != null){
+			selected = dao.findById(selected.getId());
+		}
+	}
+	
 	public List<TableDefinition> getTableDefinition(){
 		List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
 		tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
@@ -315,6 +321,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
         selected.setOwnerId(user.getId());
+        selected.setApproveUserId(null);
         applyChange();
 	}
 	
@@ -408,7 +415,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	}
 
 	public Integer getPeriod(){
-		if(selected.getPeriod() != null){
+		if(selected.getPeriod() != null && selected.getPeriod() > 0){
 			return selected.getPeriod();
 		}else{
 			List<Integer> itemIds = new ArrayList<Integer>();
@@ -422,6 +429,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			Integer period = 1;
 			if(itemIds.size() > 0){
 				 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
+			}
+			if(period <= 0) {
+				period = 1;
 			}
 			return period;
 		}
