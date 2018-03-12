@@ -68,7 +68,7 @@
 	                       </p:selectOneMenu>
                                  <h:outputText style="display:none" id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}" />
 	                        &nbsp;&nbsp;
-	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1,'PmOrderRuleSaveAsForm');" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
                        
                        <h:panelGroup>
@@ -80,7 +80,7 @@
                        	</p:selectOneMenu>
                                         <h:outputText style="display:none" id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
                        	 &nbsp;&nbsp;
-                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2,'PmOrderRuleSaveAsForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
                        
 	                  <!-- <h:panelGroup>
@@ -117,22 +117,7 @@
                     &nbsp;&nbsp;
                 </h:panelGroup>
             </h:form>
-            <script>
-                function preparePreview(index) {
-                    var $jasonText;
-                    if(index == '1'){
-                        $jasonText = $("#PmOrderRuleEditForm\\:safetyReport")[0];
-                    }else if(index == '2'){
-                        $jasonText = $("#PmOrderRuleEditForm\\:performanceReport")[0];
-                    }
-                    if ('localStorage' in window) {
-                        localStorage.setItem("hc-apm-form-preview", $jasonText.innerText || ''); // # for test/dev perpose
-                        localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
-                    }
-                  
-                }
-
-            </script>
+           
         </p:dialog>
 
     </ui:composition>
