@@ -14,7 +14,7 @@
 			}
 		</style>
 
-        <p:dialog id="PmOrderRuleEditDlg" widgetVar="PmOrderRuleEditDialog"  height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header=" #{msg.PmOrderRule} #{pmOrderRuleController.CRUDActionName}">
+        <p:dialog id="PmOrderRuleEditDlg" widgetVar="PmOrderRuleEditDialog" height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header=" #{msg.PmOrderRule}">
             <h:form id="PmOrderRuleEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
@@ -40,7 +40,7 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}(月)</label>
-                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0" 
+                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="0" maxValue="120" decimalPlaces="0" 
                             required="true" requiredMessage="超出范围（只能是1到120）！"  />
                            <!--  <p: id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
@@ -127,7 +127,8 @@
                     update="display,:PmOrderRuleEditForm, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'PmOrderRuleEditDialog');"/>
                     &nbsp;&nbsp;
 
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleEditDialog').hide()"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" 
+                    onclick="PF('PmOrderRuleEditDialog').hide()" update = ":PmOrderRuleListForm:datalist"/>
                     &nbsp;&nbsp;
                 </h:panelGroup>
             </h:form>
