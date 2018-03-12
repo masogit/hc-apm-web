@@ -1,0 +1,28 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:tie="http://tiefaces.org/tiefaces"
+                template="/WEB-INF/template.xhtml"
+                >
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.AssetArrivalListInstallInfo}"/>
+            </div>
+            <div class="ui-g-12 card ">
+
+                <tie:websheet id="sheet1" webSheetBean="#{tieFacesController}"  maxRowsPerPage="30"/>
+            </div>
+
+
+        </div>
+
+    </ui:define>
+
+
+</ui:composition>
