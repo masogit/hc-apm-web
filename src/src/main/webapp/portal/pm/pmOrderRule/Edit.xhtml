@@ -65,7 +65,7 @@
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
 	                       </p:selectOneMenu>
-                                 <h:inputHidden id="safetyReport" immediate="true" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}"  />
+                                 <h:outputText id="safetyReport"  value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}"  style="display:none" />
 	                        &nbsp;&nbsp;
 	                   <p:commandButton  rendered="#{not empty pmOrderRuleController.selected.safetyReport}" immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
@@ -77,7 +77,7 @@
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                        	</p:selectOneMenu>
-                                        <h:inputHidden immediate="true" id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
+                                        <h:outputText id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  style="display:none"  />
                        	 &nbsp;&nbsp;
                      	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
@@ -140,7 +140,7 @@
                         $jasonText = $("#PmOrderRuleEditForm\\:performanceReport")[0];
                     }
                     if ('localStorage' in window) {
-                        localStorage.setItem("hc-apm-form-preview", $jasonText.value || ''); // # for test/dev perpose
+                        localStorage.setItem("hc-apm-form-preview", $jasonText.innerText || ''); // # for test/dev perpose
                         localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
                     }
                   
