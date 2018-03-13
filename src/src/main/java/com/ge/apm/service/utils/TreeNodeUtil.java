@@ -5,6 +5,7 @@ import org.primefaces.model.TreeNode;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.ArrayList;
 
 public interface TreeNodeUtil {
 
@@ -47,12 +48,10 @@ public interface TreeNodeUtil {
             return;
         }
 
-        List<TreeNode> nodeList = node.getChildren();
+        List<TreeNode> nodeList = new ArrayList<TreeNode>();
+        nodeList.addAll(node.getChildren());
 
 
-        for (TreeNode childNode: nodeList) {
-            childNode.setParent(null);
-        }
 
         nodeList.sort( (TreeNode o1, TreeNode o2) -> {
                 OrgInfo org1 = (OrgInfo) o1.getData();
@@ -63,9 +62,8 @@ public interface TreeNodeUtil {
             }
         );
 
-        for (TreeNode childNode: nodeList) {
-            childNode.setParent(node);
-        }
+        node.getChildren().clear();
+        node.getChildren().addAll(nodeList);
 
         nodeList.stream().forEach((TreeNode childNode) -> sortTreeNodeByName(childNode));
 

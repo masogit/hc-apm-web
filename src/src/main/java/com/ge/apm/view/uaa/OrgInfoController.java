@@ -30,6 +30,7 @@ import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.QrCodeLib;
+import org.primefaces.util.TreeUtils;
 import webapp.framework.dao.SearchFilter;
 
 @ManagedBean
@@ -101,6 +102,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     public void buildOrdTree(){
         orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+        TreeNodeUtil.sortTreeNodeByName(orgTree);
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
            // this.selectedNode.setExpanded(true);
