@@ -99,7 +99,7 @@ public class OrgTreeController {
                 rootNode.getChildren().add(treeMap.get(org.getUid()));
             }
         }
-//        TreeNodeUtil.sortTreeNodeByName(rootNode);
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
         rootNode.setExpanded(true);
         return rootNode;
     }
