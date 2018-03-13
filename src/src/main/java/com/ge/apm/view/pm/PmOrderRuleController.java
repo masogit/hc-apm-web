@@ -170,10 +170,14 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		if (userId == null) {
 			return null;
 		}
+		if(userId <= 0) {
+			return null;
+		}
 		UserAccount user = userAccountRepository.findById(userId);
 		if (user == null) {
 			return null;
 		}
+		
 		return user.getName();
 	}
 
