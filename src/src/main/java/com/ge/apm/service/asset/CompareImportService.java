@@ -91,5 +91,9 @@ public class CompareImportService {
         List<ArrivalListItem> itemList = arrivalListItemDao.findBySearchFilter(itemFilters);
         return (itemList != null && itemList.size() == 1) ? itemList.get(0) : null;
     }
+    
+    public ArrivalListItem updateArrivalListItem(ArrivalListItem item) {
+       return arrivalListItemDao.save(item);
+    }
 
 }

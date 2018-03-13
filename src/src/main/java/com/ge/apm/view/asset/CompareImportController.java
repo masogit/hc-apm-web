@@ -5,8 +5,10 @@
  */
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
@@ -59,6 +61,8 @@ public class CompareImportController {
     private UserAccountRepository userDao;
 
     private QrCodeService qrCodeService;
+    
+    private AssetInfoRepository assetDao;
 
     @PostConstruct
     protected void init() {
@@ -66,6 +70,7 @@ public class CompareImportController {
         uaaService = WebUtil.getBean(UaaService.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
+        assetDao = WebUtil.getBean(AssetInfoRepository.class);
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -104,6 +109,7 @@ public class CompareImportController {
     public void updateField(String fieldName) {
         Date date = null;
         Integer index = null;
+        Boolean canUpdate = true;
         switch (fieldName) {
             case "All":
             case "name":
@@ -137,6 +143,7 @@ public class CompareImportController {
                     selectedAsset.setAssetGroup(index);
                 } else {
                     WebUtil.addErrorMessage("无效的设备分类:" + (String) selectedItem.get("设备分类"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -146,6 +153,7 @@ public class CompareImportController {
                 OrgInfo org = orgList.stream().filter(t -> t.getName().equals((String) selectedItem.get("使用科室"))).findAny().orElse(null);
                 if (null == org) {
                     WebUtil.addErrorMessage("无效的科室名称:" + (String) selectedItem.get("使用科室"));
+                    canUpdate = false;
                 } else {
                     selectedAsset.setClinicalDeptId(org.getId());
                     selectedAsset.setClinicalDeptName(org.getName());
@@ -167,6 +175,7 @@ public class CompareImportController {
                 List<Supplier> supplierList = supplierDao.findBySearchFilter(supplierFilters);
                 if (null == supplierList || supplierList.isEmpty() || supplierList.size() > 1) {
                     WebUtil.addErrorMessage("无效的供应商名称:" + (String) selectedItem.get("供应商"));
+                    canUpdate = false;
                 } else {
                     Supplier supplier = supplierList.get(0);
                     selectedAsset.setVendor(supplier.getName());
@@ -186,6 +195,7 @@ public class CompareImportController {
                     selectedAsset.setWarrantyDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的维保截止日期:" + (String) selectedItem.get("维保截止日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -198,6 +208,7 @@ public class CompareImportController {
                     selectedAsset.setAssetOwnerTel(owner.getTelephone());
                 } else {
                     WebUtil.addErrorMessage("未找到用户:" + (String) selectedItem.get("维修负责人"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -210,6 +221,7 @@ public class CompareImportController {
                     selectedAsset.setAssetOwnerTel2(owner2.getTelephone());
                 } else {
                     WebUtil.addErrorMessage("未找到用户:" + (String) selectedItem.get("维修负责人2"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -222,6 +234,7 @@ public class CompareImportController {
                     selectedAsset.setAssetOwnerTel3(owner3.getTelephone());
                 } else {
                     WebUtil.addErrorMessage("未找到用户:" + (String) selectedItem.get("维修负责人3"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -234,6 +247,7 @@ public class CompareImportController {
                     selectedAsset.setClinicalOwnerTel(clinicalOwner.getTelephone());
                 } else {
                     WebUtil.addErrorMessage("未找到用户:" + (String) selectedItem.get("使用责任人"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -244,6 +258,7 @@ public class CompareImportController {
                     selectedAsset.setAssetUsage(index);
                 } else {
                     WebUtil.addErrorMessage("无效的用途分类:" + (String) selectedItem.get("用途分类"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -254,6 +269,7 @@ public class CompareImportController {
                     selectedAsset.setCapitalSource(index);
                 } else {
                     WebUtil.addErrorMessage("无效的资金来源:" + (String) selectedItem.get("资金来源"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -264,6 +280,7 @@ public class CompareImportController {
                     selectedAsset.setMeasureGrade(index);
                 } else {
                     WebUtil.addErrorMessage("无效的计量等级:" + (String) selectedItem.get("计量等级"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -274,6 +291,7 @@ public class CompareImportController {
                     selectedAsset.setRiskGrade(index);
                 } else {
                     WebUtil.addErrorMessage("无效的风险等级:" + (String) selectedItem.get("风险等级"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -284,6 +302,7 @@ public class CompareImportController {
                     selectedAsset.setEmergencyEquipment(index);
                 } else {
                     WebUtil.addErrorMessage("无效的是否急救设备值:" + (String) selectedItem.get("是否急救设备"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -294,6 +313,7 @@ public class CompareImportController {
                     selectedAsset.setImportEquipment(index);
                 } else {
                     WebUtil.addErrorMessage("无效的是否进口设备值:" + (String) selectedItem.get("是否进口设备"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -304,6 +324,7 @@ public class CompareImportController {
                     selectedAsset.setMeasuringItemCategory(index);
                 } else {
                     WebUtil.addErrorMessage("无效的计量项目类别值:" + (String) selectedItem.get("计量项目类别"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -314,6 +335,7 @@ public class CompareImportController {
                     selectedAsset.setAccountingCategory(index);
                 } else {
                     WebUtil.addErrorMessage("无效的核算类别值:" + (String) selectedItem.get("核算类别"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -331,6 +353,7 @@ public class CompareImportController {
                     assetCode68 = getDropDownValue(String.valueOf(functionGroup), (String) selectedItem.get("医疗器械子分类"));
                 } else {
                     WebUtil.addErrorMessage("无效的医疗器械分类值:" + (String) selectedItem.get("医疗器械分类"));
+                    canUpdate = false;
                 }
                 selectedAsset.setFunctionGroup(functionGroup);
                 selectedAsset.setAssetCode68(assetCode68);
@@ -343,6 +366,7 @@ public class CompareImportController {
                     selectedAsset.setFunctionGrade(index);
                 } else {
                     WebUtil.addErrorMessage("无效的功能等级值:" + (String) selectedItem.get("功能等级"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -393,6 +417,7 @@ public class CompareImportController {
                     selectedAsset.setManufactDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的出厂日期:" + (String) selectedItem.get("出厂日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -403,6 +428,7 @@ public class CompareImportController {
                     selectedAsset.setPurchaseDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的采购日期:" + (String) selectedItem.get("采购日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -413,6 +439,7 @@ public class CompareImportController {
                     selectedAsset.setArriveDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的日期:" + (String) selectedItem.get("到货日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -423,6 +450,7 @@ public class CompareImportController {
                     selectedAsset.setInstallDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的启用日期:" + (String) selectedItem.get("启用日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -433,6 +461,7 @@ public class CompareImportController {
                     selectedAsset.setTerminateDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的报废日期:" + (String) selectedItem.get("报废日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -443,6 +472,7 @@ public class CompareImportController {
                     selectedAsset.setFactoryWarrantyDate(date);
                 } else {
                     WebUtil.addErrorMessage("无效的质保日期:" + (String) selectedItem.get("质保日期"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -455,6 +485,7 @@ public class CompareImportController {
                     }
                 } catch (NumberFormatException e) {
                     WebUtil.addErrorMessage("无效的采购价格数据:" + (String) selectedItem.get("采购价格(元)"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -467,6 +498,7 @@ public class CompareImportController {
                     }
                 } catch (NumberFormatException e) {
                     WebUtil.addErrorMessage("无效的最终残值数据:" + (String) selectedItem.get("最终残值(元)"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -479,6 +511,7 @@ public class CompareImportController {
                     }
                 } catch (NumberFormatException e) {
                     WebUtil.addErrorMessage("无效的使用年限:" + (String) selectedItem.get("使用年限"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -489,6 +522,7 @@ public class CompareImportController {
                     selectedAsset.setDepreciationMethod(index);
                 } else {
                     WebUtil.addErrorMessage("无效的折旧算法:" + (String) selectedItem.get("折旧算法"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -498,6 +532,7 @@ public class CompareImportController {
                     selectedAsset.setQrCode((String) selectedItem.get("二维码"));
                 } else {
                     WebUtil.addErrorMessage("无效的二维码:" + (String) selectedItem.get("折旧算法"));
+                    canUpdate = false;
                 }
                 if (!"All".equals(fieldName)) {
                     break;
@@ -508,6 +543,27 @@ public class CompareImportController {
                     break;
                 }
 
+        }
+        
+        if(canUpdate){
+            if(assetDao.save(selectedAsset)==null){
+                WebUtil.addErrorMessage("更新失败");
+            }else{
+                WebUtil.addSuccessMessage("更新成功");
+            }
+        }else{
+            WebUtil.addErrorMessage("不能更新");
+            selectedAsset = assetDao.findByUid(selectedAsset.getUid());
+        }
+    }
+    
+    public void instorage(ArrivalListItem item){
+        if(ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())){
+            item.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
+            ciService.updateArrivalListItem(item);
+            WebUtil.addSuccessMessage("入库成功");
+        }else{
+            WebUtil.addErrorMessage("不能更新");
         }
     }
 
