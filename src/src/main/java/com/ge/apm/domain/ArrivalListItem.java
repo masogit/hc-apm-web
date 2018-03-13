@@ -37,6 +37,7 @@ public class ArrivalListItem implements Serializable {
     public static final String INSTALL_STATUS_NEW = "new";
     public static final String INSTALL_STATUS_INSTORAGE = "instorage";
     public static final String INSTALL_STATUS_REJECT = "rejected";
+    public static final String INSTALL_STATUS_FINISHED = "finished";
     
     @Id
     @GeneratedValue(generator = "uuid")
