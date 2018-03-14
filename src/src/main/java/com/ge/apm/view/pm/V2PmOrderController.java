@@ -99,20 +99,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }*/
 
     //是否允许内修
-    public Boolean canCreateSr(){
-        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() !=1){
-            if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
-                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 22){
-                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
-                }
-                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 3){
-                    return selectedAsset.getWarrantyDate() == null && selectedAsset.getWarrantyDate().before(new Date());
-                }
-                return false;
-            }
-        }
-        return true;
-    }
+	public Boolean canCreateSr(){
+		if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() ==1){
+			if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
+				if(null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)){
+					return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
+				}
+				return false; //按钮就会亮
+			}
+		}
+		return true;
+	}
     public void prepareAproval(String woid) {
         prepareAct(woid);
         selectedMap = new HashMap<>();
@@ -313,6 +310,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         pmOrderService.acceptWorkOrder(selectedPmOrder, esTime,planTime);
         cancel();
     }
+    private List<Integer> tagNoGroupAssets;
+    private List<Integer> getNoTagGroupAssets() {
+        if (tagNoGroupAssets == null) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+
+            tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
+        }
+        return tagNoGroupAssets;
+    }
+    //获取当前登陆人可看到的设备, 这个人需要在标签组里面
     private List<Integer> getTagGroupAssets() {
         if (tagGroupAssets == null) {
             tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
@@ -351,11 +358,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));
+
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-            if (!getTagGroupAssets().isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
-            }
+        //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过设备的标签
+                 //打过标签的设备(该标签都和组绑定过)
+                 List<Integer> tagGroupAssets = getTagGroupAssets();
+                 if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                 }
+                 //没有打过标签的设备
+                 tagGroupAssets = getNoTagGroupAssets();
+                 if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                 }
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
         else if (queryIndex == 6) { //待关单
@@ -379,8 +395,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-
-
         }
          else if (queryIndex == 7) { //已关单
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));

@@ -49,6 +49,10 @@ public class OrgTreeController {
 
     }
 
+    public OrgInfo getOrgInfoByUID(String uid){
+        return orgDao.getByUid(uid);
+    }
+    
     public TreeNode createTenantOrgTree() {
         
          OrgInfo rootOrg = new OrgInfo();
@@ -115,10 +119,7 @@ public class OrgTreeController {
     }
 
     public List<OrgInfo> getClinicalDeptListBySite(String siteUID) {
-        List<SearchFilter> orgFilters = new ArrayList<>();
-        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID));
-        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-        return orgDao.findBySearchFilter(orgFilters);
+        return uaaService.getClinicalDeptListBySiteUID(siteUID);
     }
 
     public TreeNode getDeptOrgTree(String siteUid) {

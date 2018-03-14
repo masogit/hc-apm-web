@@ -66,10 +66,10 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "vendor")
-    private String vendor;//供应商名称
+    private String vendor;//供应商名称 =Supplier.name
 
     @Column(name = "supplier_id")
-    private Integer supplierId; //供应商Id
+    private Integer supplierId; //供应商Id =Supplier.id
 
     @Size(max = 64)
     @Column(name = "maitanance")
@@ -365,7 +365,7 @@ public class AssetInfo implements Serializable {
     @Column(name = "usage_status")
     private Integer usageStatus;
 
-    //计量状态[1:已检,2:待检,3:过期]
+    //核算类别[1:医用电子仪器,2:光学仪器及内窥镜,3:医用机械设备,4:电子产品及通讯设备,5:仪器仪表计量标准器具,6:其他设备]
     @Column(name = "accounting_category")
     private Integer accountingCategory;
 
