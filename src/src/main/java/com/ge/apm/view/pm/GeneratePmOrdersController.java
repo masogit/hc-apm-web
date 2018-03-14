@@ -222,6 +222,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	 */
 
 	public void generatePmOrders() {
+		if (targetAssets.isEmpty()) {
+			WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
+			return;
+		}
 		List<AssetRuleModel> models = new ArrayList<AssetRuleModel>();
 		targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
 		if(targetAssets.size() == 1) {
@@ -311,7 +315,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
 		WebUtil.addSuccessMessage("保养工单生成成功！");
-		targetAssets.clear();
+		//targetAssets.clear();
 	}
 
 	/*

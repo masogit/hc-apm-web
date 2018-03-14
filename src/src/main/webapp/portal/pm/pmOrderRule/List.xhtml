@@ -108,6 +108,22 @@
                 </h:form>
 
             </p:dialog>
+            <script>
+                function preparePreview(index,formName) {
+                    var $jasonText;
+                    if(index == '1'){
+                        $jasonText = $("#"+formName+"\\:safetyReport")[0];
+                    }else if(index == '2'){
+                        $jasonText = $("#"+formName+"\\:performanceReport")[0];
+                    }
+                    if ('localStorage' in window) {
+                        localStorage.setItem("hc-apm-form-preview", $jasonText.innerText || ''); // # for test/dev perpose
+                        localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
+                    }
+                  
+                }
+
+            </script>
             </div>
         </div>
         

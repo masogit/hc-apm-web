@@ -32,6 +32,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.pure.Report;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.Optional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -52,8 +53,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	private String defaultReport;
 	private TableDefinitionRepository templateDao;
         
-        private String safetyReportJson;
-        private String performanceReportJson;
+//        private String safetyReportJson;
+//        private String performanceReportJson;
 
 	@Override
 	protected void init() {
@@ -108,13 +109,31 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		return items;
 	}
 	
+	public void onSelect(){
+		if(selected != null && selected.getId() != null){
+			selected = dao.findById(selected.getId());
+		}
+	}
+	
 	public List<TableDefinition> getTableDefinition(){
 		List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
 		tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
+		//tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
 		if(this.selected != null && this.selected.getAssetGroup() != null) {
 			tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
 		}
+		return templateDao.findBySearchFilter(tempFilter);
+	}
+	
+	public List<TableDefinition> getTableDefinitionForES(){
+		List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
+		tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
+		tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNull, null));
+//		if(this.selected != null && this.selected.getAssetGroup() != null) {
+//			tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator., selected.getAssetGroup()));
+//		}
 		return templateDao.findBySearchFilter(tempFilter);
 	}
 
@@ -146,15 +165,25 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 //		por.setPerformanceReport(defaultReport);
 		por.setPeriod(1);//默认一个月
 	}
+	
+	public void resetNewObject() {
+		if(selected.getId() == null) {
+			selected = null;
+		}
+	}
 
 	public String getUserName(Integer userId) {
 		if (userId == null) {
+			return null;
+		}
+		if(userId <= 0) {
 			return null;
 		}
 		UserAccount user = userAccountRepository.findById(userId);
 		if (user == null) {
 			return null;
 		}
+		
 		return user.getName();
 	}
 
@@ -302,6 +331,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         selected.setCreatedDate(new Date());
         selected.setUid(UUID.randomUUID().toString().replace("-", ""));
         selected.setOwnerId(user.getId());
+        selected.setApproveUserId(null);
         applyChange();
 	}
 	
@@ -395,7 +425,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 	}
 
 	public Integer getPeriod(){
-		if(selected.getPeriod() != null){
+		if(selected.getPeriod() != null && selected.getPeriod() > 0){
 			return selected.getPeriod();
 		}else{
 			List<Integer> itemIds = new ArrayList<Integer>();
@@ -410,21 +440,34 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 			if(itemIds.size() > 0){
 				 period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(),itemIds);
 			}
+			if(period <= 0) {
+				period = 1;
+			}
 			return period;
 		}
 	}
         
-        public void onSchemaChange(String type){
-            if("safetyReport".equals(type)){
-                TableDefinition schema = templateDao.findById(selected.getSafetyReport());
-                safetyReportJson = schema==null? null:schema.getSchema();
-            }else if("performanceReport".equals(type)){
-                TableDefinition schema = templateDao.findById(selected.getPerformanceReport());
-                performanceReportJson = schema==null? null:schema.getSchema();
-            }
-            
+//        public void onSchemaChange(String type){
+//            if("safetyReport".equals(type)){
+//                TableDefinition schema = templateDao.findById(selected.getSafetyReport());
+//                safetyReportJson = schema==null? null:schema.getSchema();
+//            }else if("performanceReport".equals(type)){
+//                TableDefinition schema = templateDao.findById(selected.getPerformanceReport());
+//                performanceReportJson = schema==null? null:schema.getSchema();
+//            }
+//            
+//        }
+
+    public String getJsonValueById(String id) {
+        if (!Strings.isNullOrEmpty(id)) {
+            TableDefinition schema = templateDao.findById(id);
+            return schema == null ? null : schema.getSchema();
+        } else {
+            return null;
         }
-	
+    }
+        
+        
 	public void initSaveAs(){
 		selected.setPeriod(null);
 //		selected.setId(null);
@@ -451,21 +494,21 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 		this.filterPmRuleLevel = filterPmRuleLevel;
 	}
 
-    public String getSafetyReportJson() {
-        return safetyReportJson;
-    }
-
-    public String getPerformanceReportJson() {
-        return performanceReportJson;
-    }
-    
-    public void setSafetyReportJson(String safetyReportJson) {
-        this.safetyReportJson = safetyReportJson;
-    }
-
-    public void setPerformanceReportJson(String performanceReportJson) {
-        this.performanceReportJson = performanceReportJson;
-    }
+//    public String getSafetyReportJson() {
+//        return safetyReportJson;
+//    }
+//
+//    public String getPerformanceReportJson() {
+//        return performanceReportJson;
+//    }
+//    
+//    public void setSafetyReportJson(String safetyReportJson) {
+//        this.safetyReportJson = safetyReportJson;
+//    }
+//
+//    public void setPerformanceReportJson(String performanceReportJson) {
+//        this.performanceReportJson = performanceReportJson;
+//    }
 
 	/*
 	 * @Override public void onBeforeNewObject(PmOrderRule object) { }
