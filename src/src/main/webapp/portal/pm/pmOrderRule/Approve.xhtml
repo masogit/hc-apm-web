@@ -40,7 +40,7 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.period}</label>
                             <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0" 
-                            required="true" requiredMessage="超出范围（只能是1到120）！"  />
+                            required="false" requiredMessage="超出范围（只能是1到120）！"  />
                            <!--  <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
                         <h:panelGroup >
