@@ -165,6 +165,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 //		por.setPerformanceReport(defaultReport);
 		por.setPeriod(1);//默认一个月
 	}
+	
+	public void resetNewObject() {
+		if(selected.getId() == null) {
+			selected = null;
+		}
+	}
 
 	public String getUserName(Integer userId) {
 		if (userId == null) {
