@@ -21,7 +21,6 @@ import webapp.framework.web.WebUtil;
  *
  * @author 212579464
  */
-@Named
 @ManagedBean
 @ViewScoped
 public class TieFacesController extends TieWebSheetBean{
@@ -41,6 +40,11 @@ public class TieFacesController extends TieWebSheetBean{
         loadWebSheet(stream,context);        
     }
 
+    public void saveTable(){
+//        List<QrCodeTemplateElement> list = (List<QrCodeTemplateElement>)context.get("templateElementList");
+        int s=0;
+    }
+    
     public QrCodeTemplate getThisTemplate() {
         return thisTemplate;
     }

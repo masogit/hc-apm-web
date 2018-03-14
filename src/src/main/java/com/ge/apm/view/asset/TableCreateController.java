@@ -72,6 +72,7 @@ public class TableCreateController {
         selectedTableDefinition.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
         selectedTableDefinition.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
+        selectedTableDefinition.setTableType(TableDefinition.TableDefinitionType.JSON.toString());
     }
 
     @Transactional
