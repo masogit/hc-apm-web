@@ -27,6 +27,8 @@ public class TableDefinition implements Serializable{
     
     public enum TableDefinitionStatus { Draft, Released } 
     
+    public enum TableDefinitionType { JSON, EXCEL } 
+    
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -52,6 +54,10 @@ public class TableDefinition implements Serializable{
     //描述
     @Column(name = "description")
     private String description;
+    
+     //类型
+    @Column(name = "table_type")
+    private String tableType;
     
     
 //    //基本id
@@ -161,7 +167,14 @@ public class TableDefinition implements Serializable{
     public void setStatus(String status) {
         this.status = status;
     }
-    
+
+    public String getTableType() {
+        return tableType;
+    }
+
+    public void setTableType(String tableType) {
+        this.tableType = tableType;
+    }
     
     @Override
     public int hashCode() {

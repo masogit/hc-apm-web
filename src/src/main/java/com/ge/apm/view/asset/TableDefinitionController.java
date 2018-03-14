@@ -27,6 +27,8 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     private TableDefinitionService templateService; 
     
     private UaaService uaaService;
+    
+    private String createType="JSON";
 
     @Override
     protected void init() {
@@ -77,11 +79,23 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     }
 
     public void deleteTemplate(){
-        templateService.deleteTemplateById(selected.getId());
+        if(selected.getTableType()==null || selected.getTableType().equals(TableDefinition.TableDefinitionType.JSON.toString())){
+            templateService.deleteTemplateById(selected.getId());
+        }else{
+            
+        }
     }
     
     public String getEditUrl(){
-        return "createTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
+        if(selected.getTableType()==null || selected.getTableType().equals(TableDefinition.TableDefinitionType.JSON.toString())){
+            return "createTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
+        }else{
+            return "createExcelTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
+        }
+    }
+    
+    public String getCreateUrl(){
+        return "JSON".equals(createType)? "createTable.xhtml?faces-redirect=true":"createExcelTable.xhtml?faces-redirect=true";
     }
 
     public void cancel() {
@@ -101,5 +115,13 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
 
 
     //geter and setter
+
+    public String getCreateType() {
+        return createType;
+    }
+
+    public void setCreateType(String createType) {
+        this.createType = createType;
+    }
 
 }
