@@ -95,6 +95,13 @@ public class SmallAssetPerformanceController extends GenericCRUDUUIDController<S
 
     @Override
     public void save() {
+    	if(this.selected.hashCode()==0){
+			if(service.checkExists(this.selected)){
+				FacesMessage message = new FacesMessage("错误", "项目名称和日期唯一，请勿重复添加！");
+				this.selected=null;
+				return;
+			}
+		}
     	boolean pass=service.checkData(this.selected);
     	if(pass){
     		super.save();

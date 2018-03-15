@@ -61,6 +61,16 @@ public class SmallAssetPerformanceService {
 	
 	@Autowired
 	private SmallAssetPerformanceReportRepository reportDao;
+	
+	public boolean checkExists(SmallAssetPerformance detail){
+		Integer result=smallAssetPerformanceDao.findExistsByProjectNameAndHappenDate(detail.getProjectName(), detail.getHappenDate(),detail.getHospitalUID());
+		if(result!=null && result==1){
+			return true;
+		}
+		else{
+			return false;
+		}
+	}
 
 	public boolean checkData(SmallAssetPerformance detail) {
 		boolean pass=true;
@@ -108,6 +118,17 @@ public class SmallAssetPerformanceService {
 
 		return listAssetInfo;
 	}
+	
+	private void saveSmallAssetPerformance(SmallAssetPerformance newDetail){
+		SmallAssetPerformance dbDetail=smallAssetPerformanceDao.findByProjectNameAndHappenDate(newDetail.getProjectName(), newDetail.getHappenDate(),newDetail.getHospitalUID());
+		if(dbDetail!=null){
+			newDetail.setId(dbDetail.getId());
+			smallAssetPerformanceDao.save(newDetail);
+		}
+		else{
+			smallAssetPerformanceDao.save(newDetail);
+		}
+	}
 
 	public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -143,9 +164,11 @@ public class SmallAssetPerformanceService {
 				detail.setAmount(row.getCell(header.get("HEADER_AMOUNT")) == null ? null : row.getCell(header.get("HEADER_AMOUNT")).getNumericCellValue());
 				detail.setHappenDate(row.getCell(header.get("HEADER_HAPPENDATE")) == null ? null : row.getCell(header.get("HEADER_HAPPENDATE")).getDateCellValue());
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
+				
 				boolean pass=checkData(detail);
 				if(pass){
-					smallAssetPerformanceDao.save(detail);
+//					smallAssetPerformanceDao.save(detail);
+					saveSmallAssetPerformance(detail);
 					insertReportData(detail);
 				}
 				else{
@@ -163,7 +186,7 @@ public class SmallAssetPerformanceService {
 	
 	public void insertReportData(SmallAssetPerformance detail){
 		//no update action, so delete it.
-//		deleteReportData(detail);
+		deleteReportData(detail);
 		List<SmallAssetPerformanceConfig> listConfig=configDao.findConfigByProjectNameAndHospitalUID(detail.getProjectName(), detail.getHospitalUID());
 		if(listConfig!=null && listConfig.size()>0){
 			String assetName="";

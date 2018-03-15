@@ -225,7 +225,7 @@ public class SmallAssetPerformance implements Serializable {
 				result+="格式错误；";
 			}
 			else if (this.status.contains(UploadFileErrorTypeEnum.CONFIG_NOT_EXISTS + ",")) {
-				result += "配置文件不存在；";
+				result += "项目未配置；";
 			}
 			else if (this.status.contains(UploadFileErrorTypeEnum.CONFIG_WRONG + ",")) {
 				result += "配置文件错误；";

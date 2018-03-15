@@ -46,7 +46,7 @@ public class SmallAssetPerformanceConfigService {
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
 		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getHospitalUID());
-		if(result==1){
+		if(result!=null && result==1){
 			return true;
 		}
 		else{
@@ -134,26 +134,17 @@ public class SmallAssetPerformanceConfigService {
 		return listAssetInfo;
 	}
 	
-	private void saveSmallAssetPerformanceConfig(SmallAssetPerformanceConfig detail){
-		System.out.println("xxx find config");
-		System.out.println(detail.getProjectName());
-		System.out.println(detail.getAssetName());
-		System.out.println(detail.getHospitalUID());
-		
-		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getHospitalUID());
+	private void saveSmallAssetPerformanceConfig(SmallAssetPerformanceConfig newDetail){
+		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getHospitalUID());
 		if(dbDetail!=null){
-			System.out.println("xxx dbDetail is not null");
-			updateSmallAssetPerformanceConfig(dbDetail,detail);
+			newDetail.setId(dbDetail.getId());
+			checkData(newDetail,dbDetail.getId(),false);
+			smallAssetPerformanceConfigDao.save(newDetail);
 		}
 		else{
-			System.out.println("xxx dbDetail is null");
-			smallAssetPerformanceConfigDao.save(detail);
+			checkData(newDetail,null,false);
+			smallAssetPerformanceConfigDao.save(newDetail);
 		}
-	}
-	
-	private void updateSmallAssetPerformanceConfig(SmallAssetPerformanceConfig dbDetail,SmallAssetPerformanceConfig newDetail){
-		newDetail.setId(dbDetail.getId());
-		smallAssetPerformanceConfigDao.save(newDetail);
 	}
 
 	public List<SmallAssetPerformanceConfig> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
@@ -186,7 +177,7 @@ public class SmallAssetPerformanceConfigService {
 				detail.setAssetName(row.getCell(header.get("HEADER_ASSETNAME")) == null ? null : row.getCell(header.get("HEADER_ASSETNAME")).getStringCellValue());
 				detail.setRate(row.getCell(header.get("HEADER_RATE")) == null ? null : row.getCell(header.get("HEADER_RATE")).getNumericCellValue());
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
-				checkData(detail,null,false);
+//				checkData(detail,null,false);
 //				smallAssetPerformanceConfigDao.save(detail);
 				saveSmallAssetPerformanceConfig(detail);
 			} catch (Exception e) {
