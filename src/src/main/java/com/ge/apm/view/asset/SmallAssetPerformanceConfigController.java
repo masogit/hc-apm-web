@@ -91,10 +91,15 @@ public class SmallAssetPerformanceConfigController extends GenericCRUDUUIDContro
 
     @Override
     public void save() {
-    	if(!service.checkConfigExists(this.selected)){
-    		service.checkData(this.selected,this.selected.getId(),false);
-        	super.save();
+    	if(this.selected.hashCode()==0){
+    		if(service.checkConfigExists(this.selected)){
+    			FacesMessage message = new FacesMessage("错误", "项目名称和设备名称唯一，请勿重复添加！");
+    			this.selected=null;
+    			return;
+    		}
     	}
+    	service.checkData(this.selected,this.selected.getId(),false);
+    	super.save();
         this.selected=null;
     }
     
