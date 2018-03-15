@@ -23,6 +23,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o where o.qrCode = ?1")
     public AssetInfo getByQrCode(String qrCode);
+    
+    @Query("select o from AssetInfo o where o.name = ?1 and o.hospitalUID = ?2")
+    public List<AssetInfo> getAssetInfoByNameAndHospitalUID(String name, String hospitalUID);
 
     @Modifying
     @Query("update AssetInfo ai set ai.lastPmDate = now() where id = ?1 and siteId = ?2")
