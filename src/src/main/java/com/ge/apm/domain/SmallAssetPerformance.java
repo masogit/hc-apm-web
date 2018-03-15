@@ -239,7 +239,6 @@ public class SmallAssetPerformance implements Serializable {
 	}
 
 	public void setStatusDisplay(UploadFileErrorTypeEnum type, boolean pass) {
-		System.out.println("xxx setStatusDisplay" + type+" "+pass);
 		if(pass){
 			if(this.status!=null){
 				this.status=this.status.replaceAll(type+",", "");
