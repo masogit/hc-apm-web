@@ -41,7 +41,7 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.period}(月)</label>
                             <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="0" maxValue="120" decimalPlaces="0" 
-                            required="true" requiredMessage="超出范围（只能是1到120）！"  />
+                            required="false" requiredMessage="超出范围（只能是1到120）！"  />
                            <!--  <p: id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
                         <h:panelGroup >
@@ -98,7 +98,7 @@
                     &nbsp;&nbsp;
 
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" 
-                    onclick="PF('PmOrderRuleEditDialog').hide()" update = ":PmOrderRuleListForm:datalist"/>
+                    onclick="PF('PmOrderRuleEditDialog').hide()" update = ":PmOrderRuleListForm" actionListener="#{pmOrderRuleController.resetNewObject()}"/>
                     &nbsp;&nbsp;
                 </h:panelGroup>
             </h:form>
