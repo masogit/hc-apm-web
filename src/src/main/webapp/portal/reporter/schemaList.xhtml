@@ -37,6 +37,9 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="类型" >
+                            <h:outputText value="#{empty item.tableType ? 'JSON':'EXCEL'}"/>
+                        </p:column>
                         <p:column headerText="说明" >
                             <h:outputText value="#{item.description}"/>
                         </p:column>

@@ -578,13 +578,9 @@
                             <h:outputText id="installDate" value="#{reportItem.createdDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </h:outputText>
-                            <p:link value="编辑" target="_blank" outcome="/portal/reporter/EditReport.xhtml?faces-redirect=true">
-                                <f:param name="reportId" value="#{reportItem.id}" />
-                            </p:link>
-                            <p:link value="查看" target="_blank" outcome="/portal/reporter/ViewReport.xhtml?faces-redirect=true">
-                                <f:param name="reportId" value="#{reportItem.id}" />
-                            </p:link>
-                            <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList"/>
+                            <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                            <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                            <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                         </p:dataList>
                     </p:fieldset>
                     <h:panelGroup>
@@ -616,16 +612,16 @@
 
         <script type="text/javascript">
             function handleComplete(xhr, status, args) {
-                if(args.ClinicalDeptName){
+                if (args.ClinicalDeptName) {
                     $('#ItemEditDlgForm\\:clinicalDeptName').addClass("ui-state-error");
                 }
-                if(args.IsGeneratePmOrder){
+                if (args.IsGeneratePmOrder) {
                     $('#ItemEditDlgForm\\:IsGeneratePmOrder').addClass("ui-state-error");
                 }
-                if(args.SerialNum){
+                if (args.SerialNum) {
                     $('#ItemEditDlgForm\\:serialNum').addClass("ui-state-error");
                 }
-                
+
             }
         </script>
 

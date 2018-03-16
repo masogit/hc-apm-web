@@ -10,6 +10,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.TableDefinitionService;
+import com.ge.apm.service.asset.TieFacesService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.io.IOException;
@@ -32,7 +33,8 @@ import webapp.framework.web.WebUtil;
 @ViewScoped
 public class ExcelTableCreateController extends TieWebSheetBean {
 
-    private UploadedFile templateFile;
+    private UploadedFile uploadedFile;
+    private StreamedContent savedFile;
 
     private TableDefinitionService tableService;
 
@@ -51,7 +53,6 @@ public class ExcelTableCreateController extends TieWebSheetBean {
         blobService = WebUtil.getBean(BlobFileService.class);
         tableService = WebUtil.getBean(TableDefinitionService.class);
         tableFields = new HashMap<>();
-        tableFields.put("XY", 60);
 
         String templateId = WebUtil.getRequestParameter("id");
         if (Strings.isNullOrEmpty(templateId)) {
@@ -60,11 +61,11 @@ public class ExcelTableCreateController extends TieWebSheetBean {
         } else {
             //修改
             selectedTableDefinition = templateDao.findById(templateId);
-            if(null == selectedTableDefinition){
+            if (null == selectedTableDefinition) {
                 WebUtil.addErrorMessage("fail to load this template");
-            }else{
-                StreamedContent file = blobService.getBlobObjectByStorageId(selectedTableDefinition.getSchema());
-                loadWebSheetByStream(file.getStream());
+            } else {
+                savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getSchema());
+                loadWebSheetByStream(savedFile.getStream());
             }
         }
     }
@@ -80,60 +81,68 @@ public class ExcelTableCreateController extends TieWebSheetBean {
     }
 
     public void saveTemplate() {
-        if (templateFile != null) {
-            V2_BlobObject blobObject = blobService.uploadFile(templateFile);
-            if (null != blobObject) {
-                blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
-                blobObject.setBoSubType("Excel");
-                selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
-                selectedTableDefinition = templateDao.save(selectedTableDefinition);
-                blobObject.setBoUuid(selectedTableDefinition.getId());
-                blobService.saveBlobObject(blobObject);
-                WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        if (Strings.isNullOrEmpty(selectedTableDefinition.getSchema())) {
+            //新建
+            if (uploadedFile != null) {
+                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+                if (null != blobObject) {
+                    blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                    blobObject.setBoSubType("Excel");
+                    selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
+                    selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    blobObject.setBoUuid(selectedTableDefinition.getId());
+                    blobService.saveBlobObject(blobObject);
+                    WebUtil.addSuccessMessage(selectedTableDefinition.getName() + "保存成功");
+                }
+            } else {
+                WebUtil.addErrorMessage("模版文件未上传");
             }
         } else {
-            WebUtil.addErrorMessage("fail to save template");
+            //修改
+            if (uploadedFile != null) {
+                //Eexcel 模版有变动
+                tableService.updateExcelTemplate(selectedTableDefinition, uploadedFile);
+            } else {
+                selectedTableDefinition = templateDao.save(selectedTableDefinition);
+            }
         }
 
+        
     }
 
     public void cancelUpload() {
-        this.templateFile = null;
+        this.uploadedFile = null;
     }
 
     public void uploadDataFile(FileUploadEvent event) {
-        this.templateFile = event.getFile();
+        this.uploadedFile = event.getFile();
+        selectedTableDefinition.setName(uploadedFile.getFileName().substring(0, uploadedFile.getFileName().lastIndexOf(".") < 0
+                ? uploadedFile.getFileName().length() : uploadedFile.getFileName().lastIndexOf(".")));
+        this.savedFile = null;
     }
 
     public void finishUpload() {
         try {
-            loadWebSheetByStream(templateFile.getInputstream());
+            loadWebSheetByStream(uploadedFile.getInputstream());
         } catch (IOException ex) {
             WebUtil.addErrorMessage(ex, "读取模版失败");
         }
     }
-    
-    public void testSubmit(){
-        tableFields = context.get("fields");
-        int i=3;
+
+    public void testSubmit() {
+
+        int i = 3;
     }
-    
-    
-    private void loadWebSheetByStream(InputStream inputStream){
+
+    private void loadWebSheetByStream(InputStream inputStream) {
         try {
+            this.setTieCommandAliasList(TieFacesService.commonAliasList());
+            tableFields.clear();
             context.put("fields", tableFields);
             loadWebSheet(inputStream, context);
         } catch (Exception e) {
             WebUtil.addErrorMessage(e, "读取模版失败");
         }
-    }
-
-    public UploadedFile getTemplateFile() {
-        return templateFile;
-    }
-
-    public void setTemplateFile(UploadedFile templateFile) {
-        this.templateFile = templateFile;
     }
 
     public TableDefinition getSelectedTableDefinition() {
@@ -151,5 +160,21 @@ public class ExcelTableCreateController extends TieWebSheetBean {
     public void setTableFields(Map<String, Object> tableFields) {
         this.tableFields = tableFields;
     }
-    
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+
+    public StreamedContent getSavedFile() {
+        return savedFile;
+    }
+
+    public void setSavedFile(StreamedContent savedFile) {
+        this.savedFile = savedFile;
+    }
+
 }

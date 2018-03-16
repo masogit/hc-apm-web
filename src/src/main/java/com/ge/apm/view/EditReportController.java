@@ -34,13 +34,11 @@ public class EditReportController {
 
     private TableDefinitionService tableService;
     
-    private UnstructuredDataCollectionRepository udcDao;
     
-    UnstructuredDataCollection report;
+    private UnstructuredDataCollection report;
     @PostConstruct
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
-        udcDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         String reportId = WebUtil.getRequestParameter("reportId");
         
         report = tableService.getReportById(reportId);
@@ -57,26 +55,16 @@ public class EditReportController {
     }
 
     public void save() {
-        
-        List<UnstructuredData> dataList = report.getData();
         tableValue.putAll(tableService.getRuleResultData(tableValue,table));
-        
-        tableValue.entrySet().forEach(item -> {
-            UnstructuredData dataItem = dataList.stream().filter(eachData -> eachData.getKey().equals((String)item.getKey())).findFirst().orElse(null);
-            if(null == dataItem){
-                dataItem = new UnstructuredData();
-                dataItem.setCollectionId(report.getId());
-                dataItem.setKey(item.getKey());
-                dataItem.setValue(item.getValue());
-                dataList.add(dataItem);
-            }else{
-                dataItem.setValue(item.getValue());
-            }
-        });
-        report.setData(dataList);
-        report.setCreatedDate(new Date());
-        udcDao.save(report);
+        tableService.saveTableDate(report,tableValue);
         WebUtil.addSuccessMessage("已保存");
+    }
+    
+    public void submit(){
+        tableValue.putAll(tableService.getRuleResultData(tableValue,table));
+        tableService.saveTableDate(report,tableValue);
+        tableService.submitReport(report);
+         WebUtil.addSuccessMessage("已提交");
     }
 
     public Map<String, Object> getTableValue() {
@@ -93,6 +81,10 @@ public class EditReportController {
 
     public void setTable(TableSchema table) {
         this.table = table;
+    }
+
+    public UnstructuredDataCollection getReport() {
+        return report;
     }
 
 }

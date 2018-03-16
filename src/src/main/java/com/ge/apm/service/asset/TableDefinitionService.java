@@ -9,17 +9,23 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UnstructuredData;
 import com.ge.apm.domain.UnstructuredDataCollection;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import org.primefaces.model.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -33,6 +39,8 @@ public class TableDefinitionService {
     private TableDefinitionRepository templateDao;
     @Autowired
     private UnstructuredDataCollectionRepository udcDao;
+    @Autowired
+    private BlobFileService blobService;
 
     public Integer getCountByTemplate(String templateId) {
         return udcDao.getCountByTemplate(templateId);
@@ -66,8 +74,8 @@ public class TableDefinitionService {
             return true;
         }
     }
-    
-    public Boolean hasDuplicatedKey(TableSchema table){
+
+    public Boolean hasDuplicatedKey(TableSchema table) {
         List<String> keyList = getItemKeyList(table);
         return keyList.size() != keyList.stream().distinct().collect(Collectors.toList()).size();
     }
@@ -97,6 +105,89 @@ public class TableDefinitionService {
     public Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         return TableResultReportService.getRuleResultData(tableValue, table);
     }
+
+    @Transactional
+    public void updateExcelTemplate(TableDefinition selectedTableDefinition, UploadedFile uploadedFile) {
+        V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+        if (getCountByTemplate(selectedTableDefinition.getId()) > 0) {
+            //模版下有记录
+            TableDefinition newTemplate = new TableDefinition();
+            newTemplate.setName(selectedTableDefinition.getName());
+            newTemplate.setAssetGroup(selectedTableDefinition.getAssetGroup());
+            newTemplate.setBaseId(Strings.isNullOrEmpty(selectedTableDefinition.getBaseId()) ? selectedTableDefinition.getId() : selectedTableDefinition.getBaseId());
+            newTemplate.setDescription(selectedTableDefinition.getDescription());
+            newTemplate.setTenantUID(selectedTableDefinition.getTenantUID());
+            newTemplate.setInstitutionUID(selectedTableDefinition.getInstitutionUID());
+            newTemplate.setHospitalUID(selectedTableDefinition.getHospitalUID());
+            newTemplate.setSiteUID(selectedTableDefinition.getSiteUID());
+            newTemplate.setCreatedDate(new Date());
+            newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+            newTemplate.setStatus(selectedTableDefinition.getStatus());
+            newTemplate.setTableType(selectedTableDefinition.getTableType());
+            newTemplate.setSchema(blobObject.getObjectStorageId());
+            templateDao.save(newTemplate);
+            selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
+            selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+            selectedTableDefinition.setLastModifiedDate(new Date());
+            templateDao.save(selectedTableDefinition);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+            blobObject.setBoSubType("Excel");
+            blobObject.setBoUuid(selectedTableDefinition.getId());
+            blobService.saveBlobObject(blobObject);
+        } else {
+            //模版下无记录
+            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getSchema())) {
+                selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
+                selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+                selectedTableDefinition.setLastModifiedDate(new Date());
+                templateDao.save(selectedTableDefinition);
+                blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                blobObject.setBoSubType("Excel");
+                blobObject.setBoUuid(selectedTableDefinition.getId());
+                blobService.saveBlobObject(blobObject);
+            } else {
+                WebUtil.addErrorMessage("更新失败");
+            };
+        }
+
+    }
     
+    public void saveTableDate(UnstructuredDataCollection report,Map<String, Object> tableValue) {
+        List<UnstructuredData> dataList = report.getData();
+        Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item->item));
+        tableValue.entrySet().forEach(item -> {
+            UnstructuredData dataItem = dataMap.get(item.getKey());
+            if(null == dataItem){
+                dataItem = new UnstructuredData();
+                dataItem.setCollectionId(report.getId());
+                dataItem.setKey(item.getKey());
+                dataItem.setValue(item.getValue());
+                dataList.add(dataItem);
+            }else{
+                dataItem.setValue(item.getValue());
+            }
+        });
+        report.setData(dataList);
+        report.setCreatedDate(new Date());
+        udcDao.save(report);
+    }
     
+    public void submitReport(UnstructuredDataCollection report){
+        report.setStatus(UnstructuredDataCollection.Status.Archived.toString());
+        udcDao.save(report);
+    }
+
+    public void deleteReport(String reportId){
+        UnstructuredDataCollection report = udcDao.findById(reportId);
+        if(null!= report){
+            deleteReport(report);
+        }
+    }
+    public void deleteReport(UnstructuredDataCollection report){
+        if(UnstructuredDataCollection.Status.Archived.toString().equals(report.getStatus())){
+            WebUtil.addErrorMessage("已归档报告不能删除");
+        }else{
+            udcDao.delete(report);
+        }
+    }
 }
