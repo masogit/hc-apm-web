@@ -447,7 +447,7 @@
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">是否对质保到期进行提醒</label>
-                                <p:selectOneRadio id="test" value="#{assetInfoController.selected.warranty}">
+                                <p:selectOneRadio value="#{assetInfoController.selected.warranty}">
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('warranty')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneRadio>
                             </h:panelGroup>
