@@ -444,12 +444,13 @@
                                     <f:selectItem itemLabel="是" itemValue="true"/>
                                     <f:selectItem itemLabel="否" itemValue="false"/>
                                 </p:selectOneMenu>
-                                <!--<p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetInfoController.isGeneratePmOrder}" disabled="#{not empty assetInfoController.selected.uid}"/>-->
-
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup >
                                 <label class="label">是否对质保到期进行提醒</label>
-                                <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoController.selected.warranty}"/>
+                                <p:selectOneRadio value="#{assetInfoController.selected.warranty}">
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                   	<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                </p:selectOneRadio>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
