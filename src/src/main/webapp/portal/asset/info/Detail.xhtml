@@ -314,7 +314,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.salvageValue}</label>
-                                    <p:inputText id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
+                                    <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.lifecycle}</label>
