@@ -16,6 +16,10 @@ import static javax.persistence.FetchType.EAGER;
 @Entity
 @Table(name = "unstructured_data_collection", uniqueConstraints = @UniqueConstraint(columnNames = {"bo_type", "bo_id", "bo_uuid"}))
 public class UnstructuredDataCollection implements Serializable {
+    
+    public enum Status {
+        Draft, Archived
+    }
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(generator = "uuid")
@@ -39,6 +43,9 @@ public class UnstructuredDataCollection implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     private Date createdDate;
+    
+    @Column(name = "status")
+    private String status = Status.Draft.toString();
     
     public static long getSerialVersionUID() {
         return serialVersionUID;
@@ -99,6 +106,15 @@ public class UnstructuredDataCollection implements Serializable {
     public void setCreatedDate(Date createdDate) {
         this.createdDate = createdDate;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+    
     
     @Override
     public int hashCode() {

@@ -57,7 +57,7 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
-        
+        searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, TableDefinition.TableDefinitionStatus.Expired.toString()));
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 

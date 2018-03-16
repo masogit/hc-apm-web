@@ -37,7 +37,9 @@ public class TieFacesController extends TieWebSheetBean{
         context.put("templateElementList", templateElementList);
         
         InputStream stream = this.getClass().getClassLoader().getResourceAsStream("tiefaces/tiefaces.xlsx");
-        loadWebSheet(stream,context);        
+        loadWebSheet(stream,context);   
+        Object ff =this.getSheetConfigMap();
+        int d=0;
     }
 
     public void saveTable(){
