@@ -3,6 +3,9 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -87,7 +90,10 @@ public class AssetTagService {
                 assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
             }
 
-            return assetDao.findBySearchFilter(assetFilters);
+            //if there are 10,000 records displayed in pick list, the dropdown filter will not work due to large data set.
+            Pageable pageable = new PageRequest(0, 5000);
+            Page page = assetDao.findBySearchFilter(assetFilters, pageable);
+            return page.getContent();
         }else{
             return new ArrayList<AssetInfo>();
         }
