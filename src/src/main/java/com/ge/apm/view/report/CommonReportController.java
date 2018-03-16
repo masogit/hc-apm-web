@@ -1,4 +1,4 @@
-package com.ge.apm.view;
+package com.ge.apm.view.report;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -9,7 +9,7 @@ import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.service.asset.TableDefinitionService;
+import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;

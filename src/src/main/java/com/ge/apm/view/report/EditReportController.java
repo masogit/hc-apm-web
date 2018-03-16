@@ -1,4 +1,4 @@
-package com.ge.apm.view;
+package com.ge.apm.view.report;
 
 import com.ge.apm.domain.pure.TableSchema;
 import javax.annotation.PostConstruct;
@@ -8,7 +8,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
-import com.ge.apm.service.asset.TableDefinitionService;
+import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;

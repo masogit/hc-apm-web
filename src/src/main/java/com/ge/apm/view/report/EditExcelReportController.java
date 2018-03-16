@@ -3,15 +3,15 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ge.apm.view.asset;
+package com.ge.apm.view.report;
 
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.TableDefinitionService;
-import com.ge.apm.service.asset.TieFacesService;
+import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.report.TieFacesService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;

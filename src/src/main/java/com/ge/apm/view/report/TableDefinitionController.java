@@ -1,4 +1,4 @@
-package com.ge.apm.view.asset;
+package com.ge.apm.view.report;
 
 import com.ge.apm.dao.TableDefinitionRepository;
 import java.util.List;
@@ -9,7 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.service.asset.TableDefinitionService;
+import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;

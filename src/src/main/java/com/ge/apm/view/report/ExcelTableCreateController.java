@@ -3,14 +3,14 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ge.apm.view.asset;
+package com.ge.apm.view.report;
 
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.asset.TableDefinitionService;
-import com.ge.apm.service.asset.TieFacesService;
+import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.report.TieFacesService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.io.IOException;

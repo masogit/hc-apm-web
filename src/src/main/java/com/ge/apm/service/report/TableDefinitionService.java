@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ge.apm.service.asset;
+package com.ge.apm.service.report;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.TableDefinitionRepository;
@@ -14,6 +14,7 @@ import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
