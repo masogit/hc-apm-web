@@ -11,6 +11,8 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -18,8 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -29,6 +31,7 @@ import java.util.*;
 @Component
 @Scope("prototype")
 public class AssetFileImportService {
+    private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -136,6 +139,8 @@ public class AssetFileImportService {
 //        return result;
 //    }
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
+
+        LocalDateTime startTime = LocalDateTime.now();
 
         Date now = new Date();
 
@@ -283,6 +288,10 @@ public class AssetFileImportService {
             }
         }
 
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for getAssetMapFromTemplate: {} seconds", duration.getSeconds());
+
         return result;
     }
 
@@ -324,6 +333,9 @@ public class AssetFileImportService {
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum, Boolean isGeneratePmOrder) {
+
+        LocalDateTime startTime = LocalDateTime.now();
+
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -491,6 +503,10 @@ public class AssetFileImportService {
 
         });
 
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for importData: {} seconds", duration.getSeconds());
+
     }
 
     private Boolean isAvailableQrcode(String qrcode, Map<String, Object> item) {
@@ -611,6 +627,8 @@ public class AssetFileImportService {
 
     public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
 
+        LocalDateTime startTime = LocalDateTime.now();
+
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -657,6 +675,11 @@ public class AssetFileImportService {
             }
 
         });
+
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for checkData: {} seconds", duration.getSeconds());
+
         return result.isEmpty();
     }
 
