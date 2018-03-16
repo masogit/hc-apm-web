@@ -1413,5 +1413,8 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'Low', '过低', 'Normal', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'DeltaException', '过低', 'Normal', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'MuException', '过低', 'Normal', NULL, '-1');
+insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('warranty','true','是','Yes','-1');
+insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('warranty','false','否','No','-1');
+
 
 
