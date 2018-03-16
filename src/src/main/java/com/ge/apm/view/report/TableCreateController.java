@@ -1,4 +1,4 @@
-package com.ge.apm.view.asset;
+package com.ge.apm.view.report;
 
 import com.ge.apm.domain.pure.TableSchema;
 import javax.annotation.PostConstruct;
@@ -10,7 +10,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableOption;
-import com.ge.apm.service.asset.TableDefinitionService;
+import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
