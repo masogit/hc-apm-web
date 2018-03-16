@@ -105,8 +105,42 @@ public class WorkflowConfig implements Serializable {
     
     @Column(name = "warranty_remind_times")
     private Integer warrantyRemindTimes;//维保提醒次数
-    
-	public Integer getAutoAckDays() {
+
+
+    @Column(name = "is_pm_take_order_enabled")
+    private Boolean isPmTakeOrderEnabled; //是否允许抢单
+
+    @Column(name = "is_pm_manual_enabled")
+    private Boolean isPmManualEnabled; //是否人工派工
+
+    @Column(name = "is_pm_auto_enabled")
+    private Boolean isPmAutoEnabled; //是否自动派工
+
+    public Boolean getIsPmTakeOrderEnabled() {
+        return isPmTakeOrderEnabled;
+    }
+
+    public void setIsPmTakeOrderEnabled(Boolean isPmTakeOrderEnabled) {
+        this.isPmTakeOrderEnabled = isPmTakeOrderEnabled;
+    }
+
+    public Boolean getIsPmManualEnabled() {
+        return isPmManualEnabled;
+    }
+
+    public void setIsPmManualEnabled(Boolean isPmManualEnabled) {
+        this.isPmManualEnabled = isPmManualEnabled;
+    }
+
+    public Boolean getIsPmAutoEnabled() {
+        return isPmAutoEnabled;
+    }
+
+    public void setIsPmAutoEnabled(Boolean isPmAutoEnabled) {
+        this.isPmAutoEnabled = isPmAutoEnabled;
+    }
+
+    public Integer getAutoAckDays() {
 		return autoAckDays;
 	}
 

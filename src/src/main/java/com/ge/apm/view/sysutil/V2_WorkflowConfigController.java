@@ -249,19 +249,23 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     public void applyChange() {
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
-    	if(isManual != null && isManual){
+		Boolean isPmManual = selected.getIsPmManualEnabled();
+		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
+
+    	if((isManual != null && isManual) || (isPmManual != null && isPmTakeOrder)){
     		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
     			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
        		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedDispather"));
        		 	return;
     		}
     	}
-    	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
+    	if((isManual != null && isTakeOrder != null && !isManual && !isTakeOrder)
+				|| (isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder)){
     		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
     		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
     		 return;
     	}
-    	onBeforeSave(selected);
+    	//onBeforeSave(selected);
     	super.save();
     }
 	
