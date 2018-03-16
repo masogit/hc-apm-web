@@ -366,11 +366,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                  List<Integer> tagGroupAssets = getTagGroupAssets();
                  if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
                      searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                 }else{
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*3+4*5+"));
                  }
                  //没有打过标签的设备
                  tagGroupAssets = getNoTagGroupAssets();
                  if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
                      searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                 }else{
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*3+4*5+"));
                  }
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
