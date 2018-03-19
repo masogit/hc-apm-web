@@ -13,11 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component
-//@Scope("prototype")
+@Scope("prototype")
 public class ExcelTemplateExport extends TieWebSheetBean {
     private static final Logger logger = LoggerFactory.getLogger(ExcelTemplateExport.class);
     private static final long serialVersionUID = 1L;
-    public static final String EXCEL_TEMPLATE = "portal/asset/assetImport/APM_Asset_Template.xlsx";
+    public static final String EXCEL_TEMPLATE = "/portal/asset/assetImport/APM_Asset_Template.xlsx";
 
 
     @Autowired
