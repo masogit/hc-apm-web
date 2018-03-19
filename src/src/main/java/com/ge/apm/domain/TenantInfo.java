@@ -99,6 +99,9 @@ public class TenantInfo implements Serializable {
     @Column(name = "type")
     private Integer type = 0;//0、普通租户，1、代理商租户
 
+    @Column(name = "is_insulate")
+    private Boolean isInsulate;
+
     public Integer getType() {
 		return type;
 	}
@@ -108,6 +111,7 @@ public class TenantInfo implements Serializable {
 	}
 
 	public TenantInfo() {
+        isInsulate = false;
         isEnabled = true;
         wfAutoStep2 = false;
         wfAutoStep3 = false;
@@ -289,6 +293,14 @@ public class TenantInfo implements Serializable {
 
     public void setPasswordLifeTime(Integer passwordLifeTime) {
         this.passwordLifeTime = passwordLifeTime;
+    }
+
+    public Boolean getInsulate() {
+        return isInsulate;
+    }
+
+    public void setInsulate(Boolean insulate) {
+        isInsulate = insulate;
     }
 
     @Override
