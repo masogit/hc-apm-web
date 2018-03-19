@@ -9,7 +9,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SharedAssetReqType;
-import com.ge.apm.domain.SharedAssetReqTypeRepository;
+import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;

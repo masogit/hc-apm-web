@@ -6,6 +6,7 @@
 package com.ge.apm.domain;
 
 
+import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
@@ -31,7 +32,7 @@ public class SharedAssetRequest implements Serializable{
     
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "uid",columnDefinition = "CHAR(32)")
+    @Column(name = "id",columnDefinition = "CHAR(32)")
     private String id;
     
     @Column(name = "applicant")//借用申请人
@@ -372,6 +373,7 @@ public class SharedAssetRequest implements Serializable{
     
     @Transient
     private List<SharedAssetReqType> sartList;//借用申请明细，优化保存机制
+    
     @Transient
     SharedAssetReqTypeRepository apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
     

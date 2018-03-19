@@ -3,10 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ge.apm.domain;
+package com.ge.apm.dao;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import webapp.framework.dao.GenericRepositoryUUID;
+import com.ge.apm.domain.SharedAssetReqType;
 
 import java.util.List;
 
