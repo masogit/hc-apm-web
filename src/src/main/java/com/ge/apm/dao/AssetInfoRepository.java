@@ -6,6 +6,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -23,6 +24,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o where o.qrCode = ?1")
     public AssetInfo getByQrCode(String qrCode);
+    
+    @Query("select o from AssetInfo o where o.name = ?1 and o.hospitalUID = ?2")
+    public List<AssetInfo> getAssetInfoByNameAndHospitalUID(String name, String hospitalUID);
 
     @Modifying
     @Query("update AssetInfo ai set ai.lastPmDate = now() where id = ?1 and siteId = ?2")
@@ -85,5 +89,18 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and ai.uid in ?2")
 	public List<AssetInfo> findByTenantUidAndUidIn(String tenantUid, List<String> uids);
+
+    public List<AssetInfo> findByDepartNumAndSiteUID(String num,String siteUID);
+    public List<AssetInfo> findByFinancingNumAndSiteUID(String num,String siteUID);
+    public List<AssetInfo> findByQrCodeAndSiteUID(String qrCode,String siteUID);
+
+    @Modifying
+    @Transactional
+    @Query("update AssetInfo ai set ai.swapTypeState = :swapTypeState where ai.id = :id")
+    public void updateAssetInfoSwapTypeState(@Param("swapTypeState")String swapTypeState, @Param("id")Integer id);
+    public List<AssetInfo> findByClinicalDeptUIDIn(List<String> clinicalDeptUIDs);
+
+    @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
+    public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum ,@Param("financingNum") String financingNum ,@Param("qrCode") String qrCode, @Param("siteUID") String siteUID );
 
 }

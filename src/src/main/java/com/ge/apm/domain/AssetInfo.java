@@ -422,6 +422,13 @@ public class AssetInfo implements Serializable {
     @Column(name = "ge_device_type")
     private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
 
+    @Column(name = "shared_asset_type")//调剂设备uid
+    private String sharedAssetTypeUid;
+    @Column(name = "swap_type")//调剂设备uid
+    private String swapTypeUid;
+    @Column(name = "swap_type_state")//调剂设备状态（"0"：正常，"1"：借用中）
+    private String swapTypeState;
+
     public Integer getAssetUsage() {
         return assetUsage;
     }
@@ -565,7 +572,31 @@ public class AssetInfo implements Serializable {
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
     }
-    
+
+    public String getSharedAssetTypeUid() {
+        return sharedAssetTypeUid;
+    }
+
+    public void setSharedAssetTypeUid(String sharedAssetTypeUid) {
+        this.sharedAssetTypeUid = sharedAssetTypeUid;
+    }
+
+    public String getSwapTypeUid() {
+        return swapTypeUid;
+    }
+
+    public void setSwapTypeUid(String swapTypeUid) {
+        this.swapTypeUid = swapTypeUid;
+    }
+
+    public String getSwapTypeState() {
+        return swapTypeState;
+    }
+
+    public void setSwapTypeState(String swapTypeState) {
+        this.swapTypeState = swapTypeState;
+    }
+
     public AssetInfo() {
     }
 

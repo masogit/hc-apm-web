@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+     <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+        
+        <style type="text/css">      
+        .ui-chkbox .ui-chkbox-box .ui-icon-check {
+            color: gray!important;
+        }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="设备计费情况"/>
+                </div>
+                <div class="ui-g-12 card">
+            <h:form id="IouListForm">
+                
+                <p:dataTable id="datalist" value="#{sharedAssetReqDetailForQueryController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{sharedAssetReqDetailForQueryController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.chargingBeginTime}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                    rows="20" emptyMessage="#{msg.noRecordFound}" 
+                    rowsPerPageTemplate="20,40,60,90">
+                    
+<!--                    <p:ajax event="rowSelect" update="" 
+                            listener="#{sharedAssetReqDetailForQueryController.onSelectE}" 
+                            oncomplete="openSwapTypeViewWindow(xhr, status, args)" />-->
+                    
+<!--                    <p:ajax event="rowSelect" listener="#{sharedAssetReqTypeController.onChanged}"  update=""/>
+                    <p:ajax event="rowSelect" listener="#{sharedAssetReqDetailV2Controller.onChanged}"  update=""/>-->
+                    <p:ajax event="filter" listener="#{sharedAssetReqDetailForQueryController.onFilter}" update=""/>
+                    <!--sharedId-->
+                    <p:column headerText="借用科室" sortBy="#{item.borrowId}" filterBy="#{item.clinicalDeptUid}" filterMatchMode="LIKE">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+<!--                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.borrowId)}"/>-->
+                             <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+                     <p:column headerText="归还科室" sortBy="#{item.returnId}" filterBy="#{item.clinicalDeptForReturnUid}" filterMatchMode="LIKE">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevelForReturn()}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+<!--                        <h:outputText value="#{sharedAssetReqDetailForQueryController.getclinicalDeptName(item.returnId)}"/>-->
+                            <h:outputText value="#{item.clinicalDeptForReturnName}"/>
+                    </p:column>
+                    <p:column headerText="设备名称" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetName}"/>
+                        </p:column>
+                        <p:column headerText="设备编号" sortBy="#{item.assetNumber}" filterBy="#{item.assetNumber}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.assetNumber}"/>
+                        </p:column>
+                        <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" filterBy="#{item.chargingBeginTime}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.chargingBeginTime}"/>
+                        </p:column>
+                        <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}" filterBy="#{item.chargingEndTime}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.chargingEndTime}"/>
+                        </p:column>
+                        <p:column headerText="单价" sortBy="#{item.unitPrice}" filterBy="#{item.unitPrice}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.unitPrice}"/>
+                        </p:column>
+                        <p:column headerText="计价方式" sortBy="#{item.unit}" filterBy="#{item.unit}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.unit}"/>
+                        </p:column>
+                        <p:column headerText="费用" sortBy="#{item.cost}" filterBy="#{item.cost}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}"/>
+                            <h:outputText value="" rendered="#{item.chargingEndTime eq null}"/>
+                        </p:column>
+                        <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.remark}"/>
+                        </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            </div>
+                </div>
+        </div>
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+        
+
+            function openSwapTypeViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+
+</ui:composition>
+    </html>

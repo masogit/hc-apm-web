@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="IouAssetDetailEditDlg" widgetVar="IouAssetDetailEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetReqDetailV2Controller.CRUDActionName} #{msg.IouAssetDetail}">
+            <h:form id="IouAssetDetailEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetReqDetailV2Controller.selected != null}">
+                        
+                        
+                        
+                        <h:panelGroup>
+                            <label class="label">申请数</label>
+                            <p:inputText id="applyQty" value="#{sharedAssetReqDetailV2Controller.selected.applyQty}" />
+                            
+                        </h:panelGroup>
+                        
+                        
+                        
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetReqDetailV2Controller.save}" value="#{msg.Save}" oncomplete="handleSubmit(args, 'IouAssetDetailEditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('IouAssetDetailEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+    
+     
+</html>
