@@ -5,8 +5,11 @@
  */
 package com.ge.apm.domain;
 
+import com.alibaba.fastjson.JSON;
+
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -501,25 +504,25 @@ public class SharedAssetReqDetail implements Serializable{
 //        accessories ="[" + json + "]";
 //        System.out.println(accessories);
 //    }
-//    public void setAccessoryList(List<SharedAssetTypeAccesssory> accessoryList){
-//        this.accessoryList = accessoryList;
-//        accessories = JSON.toJSONString(accessoryList);
-//        System.out.println(accessories);
-//    }
+    public void setAccessoryList(List<SharedAssetTypeAccesssory> accessoryList){
+        this.accessoryList = accessoryList;
+        accessories = JSON.toJSONString(accessoryList);
+        System.out.println(accessories);
+    }
 //
-//    public List<SharedAssetTypeAccesssory> getAccessoryList(){
-//        if(accessoryList!=null) return accessoryList;
-//
-//        if (accessories==null){
-//            accessoryList = new ArrayList<>();
-//        }
-//        else{
-//            accessoryList = JSON.parseArray(accessories, SharedAssetTypeAccesssory.class);
-//        }
-////        System.out.println(111+accessories);
-////        System.out.println(accessoryList.get(0).getName());
-//        return accessoryList;
-//    }
+    public List<SharedAssetTypeAccesssory> getAccessoryList(){
+        if(accessoryList!=null) return accessoryList;
+
+        if (accessories==null){
+            accessoryList = new ArrayList<>();
+        }
+        else{
+            accessoryList = JSON.parseArray(accessories, SharedAssetTypeAccesssory.class);
+        }
+//        System.out.println(111+accessories);
+//        System.out.println(accessoryList.get(0).getName());
+        return accessoryList;
+    }
     
 //     public String[] getAccessoryList(){
 //         String[] array = new String[100];
