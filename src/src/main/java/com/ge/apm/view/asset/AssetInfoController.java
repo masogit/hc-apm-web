@@ -19,8 +19,10 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -67,6 +69,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Brand brand;
 
     private StreamedContent zipFile;
+
+    private StreamedContent excelFile;
 
     private UserAccount owner;
     private UserAccount owner2;
@@ -126,6 +130,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean needShowAssetApproval;
 
     private OrgInfo fileterOrg;
+
+    private ExcelTemplateExport export;
 
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
@@ -192,6 +198,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
+
+        export = WebUtil.getBean(ExcelTemplateExport.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -1609,6 +1617,28 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setFileterOrg(OrgInfo fileterOrg) {
         this.fileterOrg = fileterOrg;
+    }
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
+    }
+
+    public void exportExcel() {
+
+        Map<String, Object> context = new HashMap<>();
+
+        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
+        context.put("assetList", assetList);
+
+        export.exportExcel(context);
+        excelFile = export.getExportFile();
+
+        logger.debug("export start");
+
     }
 
 }
