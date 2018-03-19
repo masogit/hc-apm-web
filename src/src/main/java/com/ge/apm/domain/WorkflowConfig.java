@@ -116,6 +116,9 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_pm_auto_enabled")
     private Boolean isPmAutoEnabled; //是否自动派工
 
+    @Column(name = "dept_for_shared_asset")
+    private String deptForSharedAsset;
+
     public Boolean getIsPmTakeOrderEnabled() {
         return isPmTakeOrderEnabled;
     }
@@ -409,6 +412,14 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmSimplify(Boolean pmSimplify) {
         this.pmSimplify = pmSimplify;
+    }
+
+    public String getDeptForSharedAsset() {
+        return deptForSharedAsset;
+    }
+
+    public void setDeptForSharedAsset(String deptForSharedAsset) {
+        this.deptForSharedAsset = deptForSharedAsset;
     }
 
     @Override

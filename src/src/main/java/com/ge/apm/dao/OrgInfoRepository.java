@@ -52,4 +52,6 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);
 
+    OrgInfo findByUid(String uid);
+
 }
