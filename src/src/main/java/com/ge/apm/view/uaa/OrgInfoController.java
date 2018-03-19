@@ -48,8 +48,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String orgName;
     private String orgNameEn;
     private String retrieval;
+    private UserAccount loginUser;
 
     private UserCommonService userCommonService;
+
+    private TenantInfoRepository tenantInfoDao;
     @Override
     protected void init() {
         filterBySite = false;
@@ -60,8 +63,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 		assetInfoRepository  = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository  = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         findPerson();
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
         buildOrdTree();
     }
@@ -104,7 +108,12 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return userList;
     }
     public void buildOrdTree(){
-        orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+        TenantInfo tempTenantInfo = tenantInfoDao.findByuid(loginUser.getTenantUID());
+        if((tempTenantInfo.getInsulate() == null || tempTenantInfo.getInsulate()) && !UserContextService.isSuperAdmin()){
+            orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
+        }else{
+            orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+        }
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
            // this.selectedNode.setExpanded(true);
@@ -117,7 +126,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
           orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
           TreeNodeUtil.expandTreeNode(orgTree);
       }else{//列出所有机构
- orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+          //orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+          this.buildOrdTree();
       }
 
 
@@ -404,7 +414,7 @@ return true;
     }
 
     public boolean getIsCreateInstitutionDisabled(){
-        return selected.getId()==null;
+        return !UserContextService.isSuperAdmin();
     }
     
     public boolean getIsCreateHospitalDisabled(){

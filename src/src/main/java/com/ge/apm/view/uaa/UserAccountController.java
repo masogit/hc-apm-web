@@ -72,6 +72,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private UserCommonService userCommonService;
 
+    private UserAccount loginUser;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -82,7 +84,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
 
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        loginUser = UserContextService.getCurrentUserAccount();
 
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         setTenantUid(loginUser.getTenantUID());
@@ -105,13 +107,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         searchFilters.clear();
         this.tenantUid = tenantUid;
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        selectedTenant = tenantDao.findByuid(tenantUid);
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+        TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
+        //判断租户是否设置院区隔离，还有登陆用户是否是superAdmin
+        if((tempTenantInfo.getInsulate() == null || tempTenantInfo.getInsulate()) && !UserContextService.isSuperAdmin()){
+            selectedTenant = tempTenantInfo;
+            orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
+        }else{
+            selectedTenant = tenantDao.findByuid(tenantUid);
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+        }
+
         TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
         if (null != selectedUserOrg) {
             selectedUserOrg.setSelected(true);
