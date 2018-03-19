@@ -24,7 +24,7 @@ public class SharedAssetReqDetail implements Serializable{
     
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "uid",columnDefinition = "CHAR(32)")
+    @Column(name = "id",columnDefinition = "CHAR(32)")
     private String id;
     
     @Column(name = "shared_id")

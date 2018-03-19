@@ -8,6 +8,7 @@ package com.ge.apm.view;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
+import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import com.ge.apm.dao.SharedAssetRequestRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
