@@ -42,19 +42,19 @@
 <!--<p:menuitem id="um905" value="调剂设备json测试" outcome="/portal/SharedAssetTypeAcc/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>-->
                 <p:menuitem id="um900" value="调剂设备配置" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
             </p:submenu>
-            <p:submenu id="um074" label="调剂中心" icon="fa fa-folder-open-o"
-                       rendered="#{userContextService.hasRole('SuperAdmin') }">
+            <!--<p:submenu id="um074" label="调剂中心" icon="fa fa-folder-open-o"-->
+                       <!--rendered="#{userContextService.hasRole('SuperAdmin') }">-->
 
-                <p:menuitem id="um187" value="调剂设备配置" outcome="/portal/SwapType/List.xhtml" />
-                <p:menuitem id="um187111" value="调剂fastjson测试" outcome="/portal/testJson/List.xhtml" />
-                <p:menuitem id="um188" value="借用申请" outcome="/portal/BorrowApply/List.xhtml" />
-                <p:menuitem id="um1881" value="归还申请" outcome="/portal/ReturnApply/List.xhtml" />
-                <p:menuitem id="um189" value="借用受理" outcome="/portal/BorrowAcceptance/List.xhtml" />
-                <p:menuitem id="um1891" value="归还受理" outcome="/portal/ReturnAcceptance/List.xhtml" />
+                <!--<p:menuitem id="um187" value="调剂设备配置" outcome="/portal/SwapType/List.xhtml" />-->
+                <!--<p:menuitem id="um187111" value="调剂fastjson测试" outcome="/portal/testJson/List.xhtml" />-->
+                <!--<p:menuitem id="um188" value="借用申请" outcome="/portal/BorrowApply/List.xhtml" />-->
+                <!--<p:menuitem id="um1881" value="归还申请" outcome="/portal/ReturnApply/List.xhtml" />-->
+                <!--<p:menuitem id="um189" value="借用受理" outcome="/portal/BorrowAcceptance/List.xhtml" />-->
+                <!--<p:menuitem id="um1891" value="归还受理" outcome="/portal/ReturnAcceptance/List.xhtml" />-->
 
-                <p:menuitem id="um191" value="采购清单" outcome="/portal/assetPurchaseList/List.xhtml" />
+                <!--<p:menuitem id="um191" value="采购清单" outcome="/portal/assetPurchaseList/List.xhtml" />-->
 
-            </p:submenu>
+            <!--</p:submenu>-->
 
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff')}">
                 <p:menuitem  value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
