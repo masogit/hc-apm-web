@@ -47,13 +47,5 @@ public class ExcelTemplateExport extends TieWebSheetBean {
         //prepare export
         this.doExport();
 
-//        //write to disk
-//        try (InputStream is = this.getExportFile().getStream();
-//             FileOutputStream os = new FileOutputStream(EXPORT_FILE_FULL_PATH)) {
-//            new File(EXPORT_FILE_FULL_PATH).createNewFile();
-//            IOUtils.copy(is, os);
-//        } catch (IOException e) {
-//            logger.error("Fail to export results", e);
-//        }
     }
 }

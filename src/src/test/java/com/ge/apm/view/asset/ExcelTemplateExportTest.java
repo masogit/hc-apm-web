@@ -30,7 +30,7 @@ import static org.junit.Assert.assertNotNull;
 @TestExecutionListeners(listeners = {FacesContextTestExecutionListener.class}, mergeMode = TestExecutionListeners.MergeMode.MERGE_WITH_DEFAULTS)
 public class ExcelTemplateExportTest implements ServletContextAware {
     private static final Logger logger = LoggerFactory.getLogger(ExcelTemplateExportTest.class);
-    public static final String EXCEL_TEMPLATE = "portal/asset/assetImport/APM_Asset_Template.xlsx";
+    public static final String EXCEL_TEMPLATE = "portal/asset/assetImport/APM_Asset_TieFaces_Template.xlsx";
 
     ServletContext servletContext;
 
@@ -51,18 +51,9 @@ public class ExcelTemplateExportTest implements ServletContextAware {
 
         export.exportExcel(context);
 
-
-
         assertNotNull(export.getExportFile());
 
         logger.info(export.getExportFile().getName());
-//
-//        try (InputStream is = export.getExportFile().getStream()) {
-//
-//            is.read();
-//        } catch (IOException e) {
-//            logger.error("Fail to export results", e);
-//        }
 
     }
 
