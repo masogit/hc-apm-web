@@ -194,6 +194,15 @@ public class WebUtil implements ApplicationContextAware {
         FacesContext.getCurrentInstance().addMessage(null, facesMsg);
     }
 
+    public static void addWarnMessage(String msg) {
+        addWarnMessage(msg, "xx");
+    }
+
+    public static void addWarnMessage(String msg, String detailMessage) {
+        FacesMessage facesMsg = new FacesMessage(FacesMessage.SEVERITY_WARN, msg, detailMessage);
+        FacesContext.getCurrentInstance().addMessage(null, facesMsg);
+    }
+
     public static void addSuccessMessageKey(String msgKey, Object... obj) {
         addSuccessMessageKey(String.format(getMessage(msgKey), obj));
     }
