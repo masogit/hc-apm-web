@@ -17,7 +17,7 @@ import java.util.Map;
 public class ExcelTemplateExport extends TieWebSheetBean {
     private static final Logger logger = LoggerFactory.getLogger(ExcelTemplateExport.class);
     private static final long serialVersionUID = 1L;
-    public static final String EXCEL_TEMPLATE = "/portal/asset/assetImport/APM_Asset_Template.xlsx";
+    public static final String EXCEL_TEMPLATE = "/portal/asset/assetImport/APM_Asset_TieFaces_Template.xlsx";
 
 
     @Autowired
@@ -47,13 +47,5 @@ public class ExcelTemplateExport extends TieWebSheetBean {
         //prepare export
         this.doExport();
 
-//        //write to disk
-//        try (InputStream is = this.getExportFile().getStream();
-//             FileOutputStream os = new FileOutputStream(EXPORT_FILE_FULL_PATH)) {
-//            new File(EXPORT_FILE_FULL_PATH).createNewFile();
-//            IOUtils.copy(is, os);
-//        } catch (IOException e) {
-//            logger.error("Fail to export results", e);
-//        }
     }
 }
