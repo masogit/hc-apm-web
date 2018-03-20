@@ -238,11 +238,15 @@ public class WorkOrderExportService {
             workOrderMap.put("解决方案", workOrder.getPatActions());
             workOrderMap.put("交付前检测", workOrder.getPatTests());
             workOrderMap.put("备注", workOrder.getComment());
+            workOrderMap.put("二维码", assetInfo.getQrCode());
+            workOrderMap.put("设备分类", assetInfo.getAssetGroup() != null ? FieldValueMessageController.fieldValue("assetGroup",assetInfo.getAssetGroup().toString()) : "");
+            workOrderMap.put("医疗器械分类", assetInfo.getFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType",assetInfo.getFunctionGroup().toString()) : "");
+            workOrderMap.put("医疗器械子分类", assetInfo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(assetInfo.getFunctionGroup().toString(),assetInfo.getAssetCode68().toString()) : "");
+            workOrderMap.put("设备型号", assetInfo.getFunctionType());
+
             //added columns for pdf export
             workOrderMap.put("联系电话", (userAccountDao.getById(serviceRequest.getRequestorId()) != null) ? userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone():null);
-            workOrderMap.put("设备型号", assetInfo.getFunctionType());
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
-            workOrderMap.put("二维码", assetInfo.getQrCode());
 			workOrderMap.put("当前位置", serviceRequest.getAssetLocation() == null ? assetInfo.getLocationName()
 					: serviceRequest.getAssetLocation());
 			workOrderMap.put("报修状态", getPdfStatus(serviceRequest.getStatus()));
