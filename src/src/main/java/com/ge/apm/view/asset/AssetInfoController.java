@@ -38,6 +38,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import org.primefaces.event.data.FilterEvent;
 
 @ManagedBean
 @ViewScoped
@@ -337,6 +338,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             return res;
         }
     }
+    
+    @Override
+    public void onFilter(FilterEvent event){
+        super.onFilter(event);
+        this.selectedMap.clear();
+    }
 
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
 
@@ -353,8 +360,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
-        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
-        zipFile = qrCodeService.exportQrCodeList(qrCodeList);
+//        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
+//        zipFile = qrCodeService.exportQrCodeList(qrCodeList);
+        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()));
     }
 
     public void onSelectAllOfPage() {
@@ -1375,6 +1383,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
 
+        this.selectedMap.clear();
         if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
             if (deptOrg.getOrgType() == 4) {
