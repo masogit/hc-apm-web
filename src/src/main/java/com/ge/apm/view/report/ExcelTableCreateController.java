@@ -47,6 +47,8 @@ public class ExcelTableCreateController extends TieWebSheetBean {
     private TableDefinitionRepository templateDao;
     private HashMap<String, Object> context = new HashMap<String, Object>();
 
+    private V2_BlobObject uploadedFileObject;
+    
     @Override
     public void initialLoad() {
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
@@ -84,14 +86,14 @@ public class ExcelTableCreateController extends TieWebSheetBean {
         if (Strings.isNullOrEmpty(selectedTableDefinition.getSchema())) {
             //新建
             if (uploadedFile != null) {
-                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
-                if (null != blobObject) {
-                    blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
-                    blobObject.setBoSubType("Excel");
-                    selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
+//                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+                if (null != uploadedFileObject) {
+                    uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                    uploadedFileObject.setBoSubType("Excel");
+                    selectedTableDefinition.setSchema(uploadedFileObject.getObjectStorageId());
                     selectedTableDefinition = templateDao.save(selectedTableDefinition);
-                    blobObject.setBoUuid(selectedTableDefinition.getId());
-                    blobService.saveBlobObject(blobObject);
+                    uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
+                    blobService.saveBlobObject(uploadedFileObject);
                     WebUtil.addSuccessMessage(selectedTableDefinition.getName() + "保存成功");
                 }
             } else {
@@ -107,31 +109,32 @@ public class ExcelTableCreateController extends TieWebSheetBean {
             }
         }
 
-        
     }
 
     public void cancelUpload() {
         this.uploadedFile = null;
+        if(null != uploadedFileObject){
+            blobService.deleteBlobFile(uploadedFileObject);
+        }
     }
 
     public void uploadDataFile(FileUploadEvent event) {
         this.uploadedFile = event.getFile();
+        uploadedFileObject = blobService.uploadFile(uploadedFile);
         selectedTableDefinition.setName(uploadedFile.getFileName().substring(0, uploadedFile.getFileName().lastIndexOf(".") < 0
                 ? uploadedFile.getFileName().length() : uploadedFile.getFileName().lastIndexOf(".")));
         this.savedFile = null;
     }
 
     public void finishUpload() {
-        try {
-            loadWebSheetByStream(uploadedFile.getInputstream());
-        } catch (IOException ex) {
-            WebUtil.addErrorMessage(ex, "读取模版失败");
+        if(null != uploadedFileObject){
+            StreamedContent savedUploadedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
+            loadWebSheetByStream(savedUploadedFile.getStream());
         }
     }
 
     public void testSubmit() {
 
-        int i = 3;
     }
 
     private void loadWebSheetByStream(InputStream inputStream) {
