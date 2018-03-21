@@ -196,6 +196,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
         }else if (queryIndex == -3) {
             List<String> stateList = new ArrayList<String>();
+            stateList.add("7");
             stateList.add("8");
             stateList.add("9");
             stateList.add("10");
@@ -205,7 +206,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else if(queryIndex == -1){
             if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")){//分配页面初始List
                 List<String> stateList = new ArrayList<String>();
-                stateList.add("0");
                 stateList.add("1");
                 stateList.add("2");
                 stateList.add("3");
@@ -231,8 +231,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
             }else if(p.equalsIgnoreCase("/portal/ReturnAcceptanceV2/List.xhtml")){
                 List<String> stateList = new ArrayList<String>();
+                stateList.add("7");
                 stateList.add("8");
-                stateList.add("9");
                 searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
             }
         }else {
@@ -278,12 +278,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         object.setState(1);
                 
         if(p.equalsIgnoreCase("/portal/BorrowApplyV2/Edit.xhtml")){
-            //借用待提交
+            //借用待受理
             object.setState(1);
             object.setBehavior(1);
         }else if(p.equalsIgnoreCase("/portal/ReturnApplyV2/Edit.xhtml")){
-            //归还待提交
-            object.setState(8);
+            //归还待受理
+            object.setState(7);
             object.setBehavior(2);
         }
 
@@ -368,9 +368,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
     }
     
-    public void searchList(int state) {
-        dao.findByState(state);
-    }
+//    public void searchList(int state) {
+//        dao.findByState(state);
+//    }
   
     public Date getNexDate(Date date){
         int n = 1;
@@ -402,9 +402,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void onSelectE() throws IOException, ParseException {
         
         String pageName = "";
-        if(selected.getState() == 9){
+        if(selected.getState() == 8){
             pageName = "Edit_1";
-        }else if(selected.getState() == 8){
+        }else if(selected.getState() == 7){
             pageName = "Edit";
         }else if(selected.getState() == 12){
             pageName = "Edit_2";
@@ -1302,7 +1302,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int sta = selected.getState();
        int state = 12;//12归还待确认—确认—>6借用完成
        
-       if(sta == 10){//借用待确认状态
+       if(sta == 9){//借用待确认状态
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可确认归还！");
@@ -1327,9 +1327,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void AcceptR() {
        String uid = selected.getId();
        int sta = selected.getState();
-       int state = 9;//2归还待交付状态
+       int state = 8;//2归还待交付状态
        
-       if(sta  == 8){//归还待受理状态
+       if(sta  == 7){//归还待受理状态
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可受理！");
@@ -1348,6 +1348,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            WebUtil.addErrorMessage("当前状态不可搁置！");
            return;
        }
+    }
+
+    public void ShelveR() {
+        String uid = selected.getId();
+        int sta = selected.getState();
+        int state = 11;//归还搁置状态
+
+        if(sta == 7){//待受理状态
+            dao.updateState(uid, state);
+        }else {
+            WebUtil.addErrorMessage("当前状态不可搁置！");
+            return;
+        }
     }
     
     public void deliver() {
@@ -1423,9 +1436,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void deliverR() {
        String uid = selected.getId();
        int sta = selected.getState();
-       int state = 10;//完成交付
+       int state = 9;//完成交付
        
-       if(sta == 9){//借用待交付
+       if(sta == 8){//借用待交付
           //处理多用户申请
            String msg = "";
            List<AssetInfo> infoList = selected.getInfoList();
@@ -1601,7 +1614,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void refersR() {
        String uid = selected.getId();
        int sta = selected.getState();
-              int state = 11;//11为取消借用
+              int state = 10;//11为取消归还
        if(sta == 7 ||sta == 8){
 
            dao.updateState(uid, state);
@@ -1676,8 +1689,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int state = 0;
        
        if(1==0){//判断是否部分归还(还未做，暂用1==0代替判断条件)
-           state = 8;//4为待归还状态
-       }else{
            state = 5;//5为部分归还状态
        }
        
