@@ -27,24 +27,78 @@ public class AssetInfoFormatter {
         return assetInfo.getAssetUsage();
     }
 
+    public String getAssetUsageAsString() {
+
+        if (assetInfo.getAssetUsage() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAssetUsage(), importService.assetUsageList);
+
+        return value;
+    }
+
     public Integer getCapitalSource() {
         return assetInfo.getCapitalSource();
+    }
+
+    public String getCapitalSourceAsString() {
+
+        if (assetInfo.getCapitalSource() == null) return null;
+
+        String value = findMatchValue(assetInfo.getCapitalSource(), importService.capitalSourceList);
+
+        return value;
     }
 
     public Integer getRiskGrade() {
         return assetInfo.getRiskGrade();
     }
 
+    public String getRiskGradeAsString() {
+
+        if (assetInfo.getRiskGrade() == null) return null;
+
+        String value = findMatchValue(assetInfo.getRiskGrade(), importService.riskGradeList);
+
+        return value;
+    }
+
     public Integer getMeasureGrade() {
         return assetInfo.getMeasureGrade();
+    }
+
+    public String getMeasureGradeAsString() {
+
+        if (assetInfo.getMeasureGrade() == null) return null;
+
+        String value = findMatchValue(assetInfo.getMeasureGrade(), importService.measureGradeList);
+
+        return value;
     }
 
     public Integer getEmergencyEquipment() {
         return assetInfo.getEmergencyEquipment();
     }
 
+    public String getEmergencyEquipmentAsString() {
+
+        if (assetInfo.getEmergencyEquipment() == null) return null;
+
+        String value = findMatchValue(assetInfo.getEmergencyEquipment(), importService.emergencyEquipmentList);
+
+        return value;
+    }
+
     public Integer getImportEquipment() {
         return assetInfo.getImportEquipment();
+    }
+
+    public String getImportEquipmentAsString() {
+
+        if (assetInfo.getImportEquipment() == null) return null;
+
+        String value = findMatchValue(assetInfo.getImportEquipment(), importService.importEquipmentList);
+
+        return value;
     }
 
     public Integer getAssetOwnerId3() {
@@ -63,12 +117,30 @@ public class AssetInfoFormatter {
         return assetInfo.getMeasuringItemCategory();
     }
 
+    public String getMeasuringItemCategoryAsString() {
+
+        if (assetInfo.getMeasuringItemCategory() == null) return null;
+
+        String value = findMatchValue(assetInfo.getMeasuringItemCategory(), importService.measuringItemCategoryList);
+
+        return value;
+    }
+
     public Integer getUsageStatus() {
         return assetInfo.getUsageStatus();
     }
 
     public Integer getAccountingCategory() {
         return assetInfo.getAccountingCategory();
+    }
+
+    public String getAccountingCategoryAsString() {
+
+        if (assetInfo.getAccountingCategory() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAccountingCategory(), importService.accountingCategoryList);
+
+        return value;
     }
 
     public Integer getDeviceStatus() {
@@ -224,7 +296,7 @@ public class AssetInfoFormatter {
     public String getAssetGroupAsString() {
         if (assetInfo.getAssetGroup() == null) return null;
 
-        String value = findMatchValue(assetInfo.getAssetCode68(), importService.assetGroup);
+        String value = findMatchValue(assetInfo.getAssetGroup(), importService.assetGroup);
 
         return value;
     }
@@ -251,6 +323,15 @@ public class AssetInfoFormatter {
 
     public Integer getStatus() {
         return assetInfo.getStatus();
+    }
+
+    public String getStatusAsString() {
+
+        if (assetInfo.getStatus() == null) return null;
+
+        String value = findMatchValue(assetInfo.getStatus(), importService.assetStatusList);
+
+        return value;
     }
 
     public Date getManufactDate() {
@@ -505,10 +586,15 @@ public class AssetInfoFormatter {
     }
 
     private String findMatchValue(Integer item, List<I18nMessage> msgList) {
-        I18nMessage msg = msgList.stream().filter(t -> t.getMsgKey().equals(item)).findAny().orElse(null);
-        if (msg == null) return null;
 
-        return msg.getValueZh();
+        String msgKey = String.valueOf(item);
+        for (I18nMessage msg: msgList) {
+            if (msg.getMsgKey().equals(msgKey)) {
+                return msg.getValueZh();
+            }
+        }
+
+        return null;
     }
 
     public Map<String, Object> buildExcelColumnKeyValueMap() {
@@ -566,6 +652,16 @@ public class AssetInfoFormatter {
         map.put("使用责任人", this.getClinicalOwnerName());
         map.put("备注", this.getComments());
 
+
+        map.put("用途分类", this.getAssetUsageAsString());
+        map.put("资金来源", this.getCapitalSourceAsString());
+        map.put("风险等级", this.getRiskGradeAsString());
+        map.put("计量等级", this.getMeasureGradeAsString());
+        map.put("计量项目类别", this.getMeasuringItemCategoryAsString());
+        map.put("是否急救设备", this.getEmergencyEquipmentAsString());
+        map.put("是否进口设备", this.getImportEquipmentAsString());
+        map.put("当前状态", this.getStatusAsString());
+        map.put("核算类别", this.getAccountingCategoryAsString());
 
         return map;
 
