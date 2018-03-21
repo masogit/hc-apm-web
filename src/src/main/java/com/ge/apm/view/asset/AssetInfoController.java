@@ -16,6 +16,7 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -29,8 +30,6 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -38,7 +37,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import org.primefaces.event.data.FilterEvent;
 
 @ManagedBean
 @ViewScoped
@@ -128,6 +126,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private OrgInfo fileterOrg;
 
+    private WorkflowConfigRepository wfCfigDao;
+
+    private SharedAssetTypeRepository  swapDao;
+    List<String> orgUids;
+    List<String> swapUids;
+
+    private Integer queryIndex = -1;
+
+    public Integer getQueryIndex() {
+        return queryIndex;
+    }
+
+    public void setQueryIndex(Integer queryIndex) {
+        this.queryIndex = queryIndex;
+    }
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -180,6 +194,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
+        wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+        swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -196,6 +212,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
+
+        orgUids = wfCfigDao.findDeptForSharedAsset();
+        swapUids = swapDao.findAllUid();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         this.measuring = WebUtil.getRequestParameter("measuring");
@@ -326,7 +345,29 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         selected = null;
 
+        if (queryIndex == 1) {
+            //正常可借用
+            searchFilters = new ArrayList<SearchFilter>();
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
+            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
+        } else if(queryIndex == 2){
+            //正常已借出
+            searchFilters = new ArrayList<SearchFilter>();
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
+            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
+        }else if(queryIndex == 3){
+            //故障不可借用
+            searchFilters = new ArrayList<SearchFilter>();
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 1));
+            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
+        }
+
         if (assetId == null) {
+            if (searchFilters == null) {
+                 searchFilters = new ArrayList<SearchFilter>();
+            }
             setUserSearchFilters();
         }
         if (this.searchFilters == null) {
@@ -1564,6 +1605,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         }
 
+    }
+
+    public void searchList(Integer buttonIndex) {
+       queryIndex = buttonIndex;
+        this.searchFilters = null;
+        this.selected = null;
     }
 
     public boolean isChecked() {
