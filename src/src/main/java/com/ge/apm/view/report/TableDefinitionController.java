@@ -23,18 +23,18 @@ import webapp.framework.web.WebUtil;
 public class TableDefinitionController extends GenericCRUDUUIDController<TableDefinition> {
 
     private TableDefinitionRepository dao;
-    
-    private TableDefinitionService templateService; 
-    
+
+    private TableDefinitionService templateService;
+
     private UaaService uaaService;
-    
-    private String createType="JSON";
+
+    private String createType = "JSON";
 
     @Override
     protected void init() {
 
         dao = WebUtil.getBean(TableDefinitionRepository.class);
-        templateService =  WebUtil.getBean(TableDefinitionService.class);
+        templateService = WebUtil.getBean(TableDefinitionService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -71,51 +71,43 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     public List<TableDefinition> getItemList() {
         return dao.findBySearchFilter(searchFilters);
     }
-    
-    public void setToUsing(String id , Boolean isUsing){
+
+    public void setToUsing(String id, Boolean isUsing) {
         TableDefinition selectedSchema = dao.findById(id);
-        selectedSchema.setStatus(isUsing?TableDefinition.TableDefinitionStatus.Draft.toString():TableDefinition.TableDefinitionStatus.Released.toString());
+        selectedSchema.setStatus(isUsing ? TableDefinition.TableDefinitionStatus.Draft.toString() : TableDefinition.TableDefinitionStatus.Released.toString());
         dao.save(selectedSchema);
     }
 
-    public void deleteTemplate(){
-        if(selected.getTableType()==null || selected.getTableType().equals(TableDefinition.TableDefinitionType.JSON.toString())){
-            templateService.deleteTemplateById(selected.getId());
-        }else{
-            
-        }
+    public void deleteTemplate() {
+        templateService.deleteTemplate(selected);
     }
-    
-    public String getEditUrl(){
-        if(selected.getTableType()==null || selected.getTableType().equals(TableDefinition.TableDefinitionType.JSON.toString())){
+
+    public String getEditUrl() {
+        if (selected.getTableType() == null || selected.getTableType().equals(TableDefinition.TableDefinitionType.JSON.toString())) {
             return "createTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
-        }else{
+        } else {
             return "createExcelTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
         }
     }
-    
-    public String getCreateUrl(){
-        return "JSON".equals(createType)? "createTable.xhtml?faces-redirect=true":"createExcelTable.xhtml?faces-redirect=true";
+
+    public String getCreateUrl() {
+        return "JSON".equals(createType) ? "createTable.xhtml?faces-redirect=true" : "createExcelTable.xhtml?faces-redirect=true";
     }
 
     public void cancel() {
         this.selected = null;
     }
-    
-    public void onSchemaSelected(){
-        
-    }
 
+    public void onSchemaSelected() {
+
+    }
 
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
     }
 
-
-
     //geter and setter
-
     public String getCreateType() {
         return createType;
     }
