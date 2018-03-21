@@ -21,13 +21,7 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import webapp.framework.util.TimeUtil;
@@ -45,6 +39,8 @@ public class ExcelDocument {
     ExcelType documentType;
 
     Workbook workBook;
+
+    final CellStyle DEFAULT_CELL_STYLE_DATE;
 
     public static ExcelType parseTypeByFileName(String path) {
         if (path.endsWith(".xls")) {
@@ -67,6 +63,10 @@ public class ExcelDocument {
         } else if (type.equals(ExcelType.XLSX)) {
             workBook = new XSSFWorkbook(input);
         }
+
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
+        CreationHelper createHelper = workBook.getCreationHelper();
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/d/yyyy"));
 
         input.close();
     }
@@ -444,9 +444,19 @@ public class ExcelDocument {
                 continue;
             }
             Object value = data.get(key);
-            if (null == dataRow.getCell(index)) {
-                dataRow.createCell(index);
+
+            Cell cell = dataRow.getCell(index);
+            if (null == cell) {
+                cell = dataRow.createCell(index);
             }
+            if (value instanceof  Date) {
+                cell.setCellType(CellType.NUMERIC);
+                cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
+            } else if (value instanceof Double) {
+                cell.setCellType(CellType.NUMERIC);
+            }
+
+
             writeCellData(dataRow.getCell(index), value);
         }
     }
