@@ -85,13 +85,15 @@ public class TableDefinitionService {
         return templateDao.findById(templateId);
     }
 
-    public void deleteTemplateById(String id) {
-        if (getCountByTemplate(id) > 0) {
+    public void deleteTemplate(TableDefinition tableDefinition) {
+        if (getCountByTemplate(tableDefinition.getId()) > 0) {
             WebUtil.addErrorMessage("模版使用中,不能删除");
         } else {
-            templateDao.delete(id);
+            if (null != tableDefinition.getTableType() && tableDefinition.getTableType().equals(TableDefinition.TableDefinitionType.EXCEL.toString())) {
+                blobService.deleteBlobFilesByStorageId(tableDefinition.getSchema());
+            }
+            templateDao.delete(tableDefinition);
         }
-
     }
 
     public UnstructuredDataCollection getReportById(String reportId) {
@@ -152,19 +154,19 @@ public class TableDefinitionService {
         }
 
     }
-    
-    public void saveTableDate(UnstructuredDataCollection report,Map<String, Object> tableValue) {
+
+    public void saveTableDate(UnstructuredDataCollection report, Map<String, Object> tableValue) {
         List<UnstructuredData> dataList = report.getData();
-        Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item->item));
+        Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item -> item));
         tableValue.entrySet().forEach(item -> {
             UnstructuredData dataItem = dataMap.get(item.getKey());
-            if(null == dataItem){
+            if (null == dataItem) {
                 dataItem = new UnstructuredData();
                 dataItem.setCollectionId(report.getId());
                 dataItem.setKey(item.getKey());
                 dataItem.setValue(item.getValue());
                 dataList.add(dataItem);
-            }else{
+            } else {
                 dataItem.setValue(item.getValue());
             }
         });
@@ -172,22 +174,23 @@ public class TableDefinitionService {
         report.setCreatedDate(new Date());
         udcDao.save(report);
     }
-    
-    public void submitReport(UnstructuredDataCollection report){
+
+    public void submitReport(UnstructuredDataCollection report) {
         report.setStatus(UnstructuredDataCollection.Status.Archived.toString());
         udcDao.save(report);
     }
 
-    public void deleteReport(String reportId){
+    public void deleteReport(String reportId) {
         UnstructuredDataCollection report = udcDao.findById(reportId);
-        if(null!= report){
+        if (null != report) {
             deleteReport(report);
         }
     }
-    public void deleteReport(UnstructuredDataCollection report){
-        if(UnstructuredDataCollection.Status.Archived.toString().equals(report.getStatus())){
+
+    public void deleteReport(UnstructuredDataCollection report) {
+        if (UnstructuredDataCollection.Status.Archived.toString().equals(report.getStatus())) {
             WebUtil.addErrorMessage("已归档报告不能删除");
-        }else{
+        } else {
             udcDao.delete(report);
         }
     }
