@@ -1429,5 +1429,11 @@ INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetRe
 INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 12, '归还已完成', -1);
 
 
-
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '1', '待派工', 'Assign', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '2', '待接单', 'ToAccepted', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '3', '已计划', 'Planned', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '4', '待审核', 'ToApproved', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '5', '待关单', 'ToClosed', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '6', '已关单', 'Closed', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '7', '待抢单', 'toGrap', NULL, '-1');
 
