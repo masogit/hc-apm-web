@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="650" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
+        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset id="basic" legend="公共配置">
@@ -39,13 +39,8 @@
                                     <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-
-                    <p:fieldset id="wo" legend="工单配置">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">#{msg.dispatchUserName}*</label>
+                                <label class="label">#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="dispatchUserId" value="#{v2_WorkflowConfigController.selected.dispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -60,9 +55,14 @@
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset id="wo" legend="工单配置">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutDispatch}</label>
-                                <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.timeoutAccept}</label>
@@ -77,18 +77,6 @@
                                 <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">系统自动验收(天)</label>
-                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
-                            </h:panelGroup >
-                            <h:panelGroup >
-                                <label class = "label">工单完工不需要验收?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
-                            </h:panelGroup >
-                            <h:panelGroup >
-                                <label class = "label">工单完工自动关单?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}"/>
-                            </h:panelGroup >
-                            <h:panelGroup rendered="true">
                                 <label class = "label">是否自动派工?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}"/>
                             </h:panelGroup >
@@ -100,6 +88,19 @@
                                 <label class = "label">是否人工派工?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}"/>
                             </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">系统自动验收(天)</label>
+                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup >
+                            <h:panelGroup >
+                                <label class = "label">工单完工不需要验收?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
+                            </h:panelGroup >
+                            <h:panelGroup >
+                                <label class = "label">工单完工自动关单?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}"/>
+                            </h:panelGroup >
+
                             <h:panelGroup rendered="true">
                                 <label class = "label">不允许临时账号?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
