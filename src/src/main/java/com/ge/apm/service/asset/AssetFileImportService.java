@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -686,6 +690,32 @@ public class AssetFileImportService {
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
         return "v2.0".equalsIgnoreCase(inputVersion);
+    }
+
+    /**
+     * export asset based on the asset import excel template
+     * @param assetList
+     * @return
+     * @throws IOException
+     */
+    public ExcelDocument exportAsset(List<AssetInfo> assetList) throws IOException {
+
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+        String[] columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
+
+        int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
+        for (AssetInfo assetInfo: assetList) {
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap();
+
+            doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
+
+            ++startRow;
+        }
+
+        return doc;
+
     }
 
 }

@@ -5,6 +5,8 @@ import com.ge.apm.domain.Brand;
 import com.ge.apm.domain.OrgInfo;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class AssetInfoFormatter {
 
@@ -444,5 +446,29 @@ public class AssetInfoFormatter {
 
     public Integer getGeDeviceType() {
         return assetInfo.getGeDeviceType();
+    }
+
+    public Map<String, Object> buildExcelColumnKeyValueMap() {
+
+        Map<String, Object> map = new HashMap<>();
+
+        map.put("设备名称", this.getName());
+        map.put("设备编号", this.getDepartNum());
+        map.put("资产编号", this.getFinancingNum());
+        map.put("设备别名", this.getAliasName());
+        map.put("维修负责人", this.getAssetOwnerName());
+        map.put("维修负责人2", this.getAssetOwnerName2());
+        map.put("维修负责人3", this.getAssetOwnerName3());
+        map.put("使用科室", this.getClinicalDeptName());
+        map.put("制造商", this.getManufacture());
+        map.put("品牌/制造商简称", this.getMakerShortName());
+        map.put("设备标准名称", this.getDeviceName());
+        map.put("注册证号", this.getRegistrationNo());
+        map.put("供应商", this.getVendor());
+
+
+
+        return map;
+
     }
 }
