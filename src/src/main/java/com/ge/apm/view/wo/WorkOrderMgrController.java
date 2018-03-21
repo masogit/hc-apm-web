@@ -48,6 +48,7 @@ import javax.faces.bean.ViewScoped;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -133,7 +134,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-        queryIndex = 0;
+        
+        String str = WebUtil.getRequestParameter("str");
+        if(Strings.isNullOrEmpty(str)){
+            queryIndex = 0;
+        }else{
+            queryIndex = Integer.valueOf(str);
+            searchList(queryIndex);
+        }
         this.filterBySite = false;
         this.filterByHospital = false;
 
