@@ -89,7 +89,7 @@ public class SharedAssetRequest implements Serializable{
     private Date invalidTime;//申请失效日期
     
     @Column(name = "state")//状态
-    private String state;
+    private int state;
     
     @Column(name = "remark")//备注
     private String remark;
@@ -239,11 +239,11 @@ public class SharedAssetRequest implements Serializable{
         this.invalidTime = invalidTime;
     }
 
-    public String getState() {
+    public int getState() {
         return state;
     }
 
-    public void setState(String state) {
+    public void setState(int state) {
         this.state = state;
     }
 
