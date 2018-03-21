@@ -2,12 +2,6 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SharedAssetReqDetailRepository;
-import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.SharedAssetRequestRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetReqDetail;
@@ -18,18 +12,24 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import org.primefaces.context.RequestContext;
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 @ManagedBean
 @ViewScoped
@@ -74,11 +74,11 @@ public class SharedAssetRequestController extends GenericCRUDUUIDController<Shar
     }
     @Override
     public void save(){
-        this.selected.setState("0");
+        this.selected.setState(0);
         super.save();
     }
     public void confirm(){
-        this.selected.setState("1");
+        this.selected.setState(1);
         if(!detailDao.findBySharedId(this.selected.getId()).isEmpty()){
             List<SharedAssetReqDetail> detail = detailDao.findBySharedId(this.selected.getId());
             for(SharedAssetReqDetail details:detail){
@@ -94,10 +94,10 @@ public class SharedAssetRequestController extends GenericCRUDUUIDController<Shar
         return dao;
     }
     public void onRowEdit() throws IOException {
-        String state =this.selected.getState();
+        int state =this.selected.getState();
        
         System.out.println(state);
-        if(!"6".equals(state)){
+        if(state != 6){
         String url = "actionName=Edit&selectedid="
                 + selected.getId();
         url = "Edit.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);

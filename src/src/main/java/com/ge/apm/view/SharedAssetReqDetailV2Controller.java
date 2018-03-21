@@ -5,32 +5,27 @@
  */
 package com.ge.apm.view;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SharedAssetReqDetailRepository;
-import com.ge.apm.dao.SharedAssetReqTypeRepository;
-import com.ge.apm.dao.SharedAssetRequestRepository;
+import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 /**
  *
@@ -317,9 +312,9 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
                 
                 
                 if(x==ListAll.size()){
-                    iouVo.setState("8");//全部归还
+                    iouVo.setState(8);//全部归还
                 }else{
-                    iouVo.setState("5");//部分归还
+                    iouVo.setState(5);//部分归还
                 }
                 iouDao.save(iouVo);
                 
