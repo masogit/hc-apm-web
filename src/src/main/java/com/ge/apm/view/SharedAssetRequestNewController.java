@@ -77,12 +77,12 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     @Override
     public void save(){
-        this.selected.setState("0");
+        this.selected.setState(0);
         super.save();
     }
     public void confirm(String type){
         if("借用".equals(type)){
-        this.selected.setState("6");
+        this.selected.setState(6);
         if(!detailDao.findBySharedId(this.selected.getId()).isEmpty()){
             List<SharedAssetReqDetail> detail = detailDao.findBySharedId(this.selected.getId());
             for(SharedAssetReqDetail details:detail){
@@ -93,12 +93,12 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
         super.save();
         }
         else{
-            this.selected.setState("12");
+            this.selected.setState(12);
             super.save();
         }
     }
     public void cancel(){
-        this.selected.setState(null);
+        this.selected.setState(0);
         super.save();
     }
 
