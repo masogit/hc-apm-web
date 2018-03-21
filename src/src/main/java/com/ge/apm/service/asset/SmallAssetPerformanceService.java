@@ -196,7 +196,7 @@ public class SmallAssetPerformanceService {
 			SmallAssetPerformanceReport report=null;
 			for(SmallAssetPerformanceConfig obj : listConfig){
 				assetName=obj.getAssetName();
-				listAssetInfo=assetInfoDao.getAssetInfoByNameAndHospitalUID(assetName, detail.getHospitalUID());
+				listAssetInfo=assetInfoDao.getAssetInfoByNameAndHospitalUID(assetName, detail.getSiteUID());
 				if(listAssetInfo!=null && listAssetInfo.size()>0){
 					count=listAssetInfo.size();
 					for(AssetInfo assetInfo: listAssetInfo){
