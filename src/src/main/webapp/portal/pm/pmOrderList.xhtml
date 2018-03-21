@@ -14,7 +14,7 @@
 
                        <!-- <p:commandButton value="一键保养"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-2)}" disabled="#{v2PmOrderController.queryIndex==-2}" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"/>-->
 
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"/>
+                        <p:commandButton value="待办"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"/>
 
                         <p:commandButton value="创建保养" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('Guest')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm pmTab:PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
 
@@ -82,7 +82,14 @@
                         <p:column headerText="保养编号" sortBy="#{item.pmNum}" filterBy="#{item.pmNum}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.pmNum}"/>
                         </p:column>
-                        <p:column headerText="当前处理步骤"  filterMatchMode="LIKE">
+                        <p:column headerText="当前处理步骤"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="true">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmSteps').subList(0,6)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+
                             <h:outputText value="#{item.currentStepName}"/>
                         </p:column>
 
@@ -144,7 +151,6 @@
 
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('transferOrderDialog').show()">
                                 </p:commandButton>
-
 
                                 <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="批量关单"  update="@(.closePmDialogClassBatch)" rendered="#{v2PmOrderController.queryIndex==6}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">
                                 </p:commandButton>
