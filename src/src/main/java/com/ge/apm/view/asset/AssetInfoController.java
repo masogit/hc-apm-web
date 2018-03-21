@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -16,13 +17,12 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -31,8 +31,6 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -49,6 +47,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
+    AssetFileImportService importService;
 
     private UserAccountRepository userDao;
 
@@ -200,6 +199,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
 
         export = WebUtil.getBean(ExcelTemplateExport.class);
+        importService = WebUtil.getBean(AssetFileImportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -1627,17 +1627,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.excelFile = excelFile;
     }
 
-    public void exportExcel() {
-
-        Map<String, Object> context = new HashMap<>();
+    public void exportExcel() throws IOException {
 
         List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
-        context.put("assetList", assetList);
 
-        export.exportExcel(context);
-        excelFile = export.getExportFile();
+        ExcelDocument doc = importService.exportAsset(assetList);
 
-        logger.debug("export start");
+        DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
+        streamedContent.setName("AssetInfo_export.xlsx");
+
+        excelFile = streamedContent;
 
     }
 
