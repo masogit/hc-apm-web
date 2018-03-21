@@ -184,7 +184,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //       setSearchFilter();
        
        setUserSearchFilters();
-        
+       
         if (queryIndex == -2) {
             List<String> stateList = new ArrayList<String>();
             stateList.add("1");
@@ -283,7 +283,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             object.setBehavior(1);
         }else if(p.equalsIgnoreCase("/portal/ReturnApplyV2/Edit.xhtml")){
             //归还待提交
-            object.setState(1);
+            object.setState(8);
             object.setBehavior(2);
         }
 
@@ -402,11 +402,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void onSelectE() throws IOException, ParseException {
         
         String pageName = "";
-        if("9".equals(selected.getState())){
+        if(selected.getState() == 9){
             pageName = "Edit_1";
-        }else if("8".equals(selected.getState())){
+        }else if(selected.getState() == 8){
             pageName = "Edit";
-        }else if("12".equals(selected.getState())){
+        }else if(selected.getState() == 12){
             pageName = "Edit_2";
         }
         selected.setMsgEndTime(this.getTime("归还"));
@@ -421,11 +421,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void onSelectC() throws IOException, ParseException {
         
         String pageName = "";
-        if("2".equals(selected.getState())){
+        if(selected.getState() == 2){
             pageName = "Edit_1";
-        }else if("1".equals(selected.getState())||"5".equals(selected.getState())){
+        }else if(selected.getState() == 1||selected.getState() == 5){
             pageName = "Edit";
-        }else if("6".equals(selected.getState())){
+        }else if(selected.getState() == 6){
             pageName = "Edit_2";
         }
         selected.setMsgAccepter(this.selected.getApplicant());
@@ -1255,7 +1255,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        this.save();
        String uid = selected.getId();
        int sta = selected.getState();
-       int state;
+       int state = 0;
        
        if(sta == 7){
            state = 8;
@@ -1272,7 +1272,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 4;//4为取消借用
-       if(sta == 0||sta == 1||sta == 2||sta ==5 ){
+       if(sta == 0||sta == 1||sta ==2|| sta == 5){
            dao.updateState(uid, state);
 
            String iouId = uid;
@@ -1316,7 +1316,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int sta = selected.getState();
        int state = 2;//2借用待交付状态
        
-       if(sta == 1||sta ==5){//借用待受理状态/借用搁置状态
+       if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可受理！");
@@ -1329,7 +1329,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int sta = selected.getState();
        int state = 9;//2归还待交付状态
        
-       if(sta == 8){//归还待受理状态
+       if(sta  == 8){//归还待受理状态
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可受理！");
@@ -1602,7 +1602,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        String uid = selected.getId();
        int sta = selected.getState();
               int state = 11;//11为取消借用
-       if(sta == 7||sta == 8){
+       if(sta == 7 ||sta == 8){
 
            dao.updateState(uid, state);
             String iouId = uid;
@@ -1641,6 +1641,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
     }
     
+    
     public void submmit() {
        String uid = selected.getId();
        int sta = selected.getState();
@@ -1672,7 +1673,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void submmit2() {
        String uid = selected.getId();
        int sta = selected.getState();
-       int state;
+       int state = 0;
        
        if(1==0){//判断是否部分归还(还未做，暂用1==0代替判断条件)
            state = 8;//4为待归还状态
@@ -1708,14 +1709,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     public void refers2() {
        String uid = selected.getId();
        int sta = selected.getState();
-       int state;
+       int state = 0;
        if(1==0){//判断是否有部分已经归还(还未做，暂用1==0代替判断条件)
            state = 4;//4为待归还状态
        }else{
-           state = 4;//5为部分归还状态
+           state = 5;//5为部分归还状态
 
        }
-           if(sta == 6 || sta ==7){
+           if(sta == 6||sta == 7){
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可取消归还！");
@@ -1728,7 +1729,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 6;
-       if(sta == 4 || sta ==5){
+       if(sta == 4||sta == 5){
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可申请归还！");
