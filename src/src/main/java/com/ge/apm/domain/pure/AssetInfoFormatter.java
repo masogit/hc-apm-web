@@ -647,6 +647,7 @@ public class AssetInfoFormatter {
 
         map.put("维护商", this.getMaitanance());
         map.put("维护商电话", this.getMaitananceTel());
+        map.put("二维码", this.getQrCode());
         map.put("安装位置编码", this.getLocationCode());
         map.put("安装位置", this.getLocationName());
         map.put("使用责任人", this.getClinicalOwnerName());
