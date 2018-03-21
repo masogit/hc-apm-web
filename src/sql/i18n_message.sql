@@ -1414,6 +1414,20 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'DeltaException', '过低', 'Normal', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'MuException', '过低', 'Normal', NULL, '-1');
 
+--调剂中心
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 1, '借用待受理', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 2, '借用待交付', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 3, '借用待确认', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 4, '借用已取消', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 5, '借用已搁置', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 6, '借用已完成', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 7, '归还待受理', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 8, '归还待交付', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 9, '归还待确认', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 10, '归还已取消', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 11, '归还已搁置', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 12, '归还已完成', -1);
+
 
 
 
