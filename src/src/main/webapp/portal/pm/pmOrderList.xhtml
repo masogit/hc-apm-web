@@ -46,7 +46,7 @@
 
 
                         <p:column width="36" rendered="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6}">
-                            <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}"   class="selectCheckBox">
+                            <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}" rendered="#{item.simplify ne true}"  class="selectCheckBox">
                                 <p:ajax listener="#{v2PmOrderController.onItemSelected}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton)"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
