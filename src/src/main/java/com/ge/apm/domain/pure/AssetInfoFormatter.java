@@ -2,18 +2,25 @@ package com.ge.apm.domain.pure;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Brand;
+import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.asset.AssetFileImportService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UserContextService;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AssetInfoFormatter {
 
     private AssetInfo assetInfo;
+    private AssetFileImportService importService;
 
-    public AssetInfoFormatter(AssetInfo assetInfo) {
+    public AssetInfoFormatter(AssetInfo assetInfo, AssetFileImportService importService) {
         this.assetInfo = assetInfo;
+        this.importService = importService;
     }
 
     public Integer getAssetUsage() {
@@ -136,6 +143,16 @@ public class AssetInfoFormatter {
         return assetInfo.getFunctionGroup();
     }
 
+    public String getFunctionGroupAsString() {
+
+        if (assetInfo.getFunctionGroup() == null) return null;
+
+        String value = findMatchValue(assetInfo.getFunctionGroup(), importService.assetFunctionTypes);
+
+        return value;
+
+    }
+
     public String getFunctionType() {
         return assetInfo.getFunctionType();
     }
@@ -202,6 +219,14 @@ public class AssetInfoFormatter {
 
     public Integer getAssetGroup() {
         return assetInfo.getAssetGroup();
+    }
+
+    public String getAssetGroupAsString() {
+        if (assetInfo.getAssetGroup() == null) return null;
+
+        String value = findMatchValue(assetInfo.getAssetCode68(), importService.assetGroup);
+
+        return value;
     }
 
     public Integer getAssetDeptId() {
@@ -282,6 +307,15 @@ public class AssetInfoFormatter {
 
     public Integer getDepreciationMethod() {
         return assetInfo.getDepreciationMethod();
+    }
+
+    public String getDepreciationMethodAsString() {
+
+        if (assetInfo.getDepreciationMethod() == null) return null;
+
+        String value = findMatchValue(assetInfo.getDepreciationMethod(), importService.depreciationMethod);
+
+        return value;
     }
 
     public Double getLifecycleInYear() {
@@ -388,6 +422,19 @@ public class AssetInfoFormatter {
         return assetInfo.getAssetCode68();
     }
 
+    public String getAssetCode68AsString() {
+        if (assetInfo.getAssetCode68() == null) return null;
+
+        if (assetInfo.getFunctionGroup() == null) return null;
+
+        List<I18nMessage> msgList = FieldValueMessageController.getFieldValueList(String.valueOf(assetInfo.getFunctionGroup()), UserContextService.getCurrentUserAccount().getSiteId());
+
+        String value = findMatchValue(assetInfo.getAssetCode68(), msgList);
+
+        return value;
+
+    }
+
     public String getClinicalDeptUID() {
         return assetInfo.getClinicalDeptUID();
     }
@@ -424,6 +471,15 @@ public class AssetInfoFormatter {
         return assetInfo.getRepairForm();
     }
 
+    public String getRepairFormAsString() {
+
+        if (assetInfo.getRepairForm() == null) return null;
+
+        String value = findMatchValue(assetInfo.getRepairForm(), importService.repairFormList);
+
+        return value;
+    }
+
     public String getCreatedBy() {
         return assetInfo.getCreatedBy();
     }
@@ -448,6 +504,13 @@ public class AssetInfoFormatter {
         return assetInfo.getGeDeviceType();
     }
 
+    private String findMatchValue(Integer item, List<I18nMessage> msgList) {
+        I18nMessage msg = msgList.stream().filter(t -> t.getMsgKey().equals(item)).findAny().orElse(null);
+        if (msg == null) return null;
+
+        return msg.getValueZh();
+    }
+
     public Map<String, Object> buildExcelColumnKeyValueMap() {
 
         Map<String, Object> map = new HashMap<>();
@@ -466,6 +529,42 @@ public class AssetInfoFormatter {
         map.put("注册证号", this.getRegistrationNo());
         map.put("供应商", this.getVendor());
 
+        map.put("医疗器械分类", this.getFunctionGroupAsString());
+        map.put("医疗器械子分类", this.getAssetCode68AsString());
+
+        map.put("设备分类", this.getAssetGroupAsString());
+
+        map.put("功能等级", this.getFunctionGrade());
+        map.put("维修类型", this.getRepairFormAsString());
+        map.put("设备型号", this.getFunctionType());
+        map.put("制造商序列号", this.getSerialNum());
+        map.put("SystemID/厂商报修ID", this.getSystemId());
+        map.put("条码", this.getBarcode());
+        map.put("2010国家编码", this.getNationalStandardCode());
+        map.put("IT系统编号", this.getModalityId());
+        map.put("采购价格", this.getPurchasePrice());
+        map.put("最终残值", this.getSalvageValue());
+        map.put("使用年限", this.getLifecycleInYear());
+
+        map.put("折旧算法", this.getDepreciationMethodAsString());
+
+        map.put("出厂日期", this.getManufactDate());
+        map.put("采购日期", this.getPurchaseDate());
+        map.put("到货日期", this.getArriveDate());
+        map.put("启用日期", this.getInstallDate());
+        map.put("质保日期", this.getFactoryWarrantyDate());
+        map.put("维保截止日期", this.getWarrantyDate());
+        map.put("报废日期", this.getTerminateDate());
+        map.put("上次维护日期", this.getLastPmDate());
+        map.put("上次计量日期", this.getLastMeteringDate());
+        map.put("上次质检日期", this.getLastQaDate());
+
+        map.put("维护商", this.getMaitanance());
+        map.put("维护商电话", this.getMaitananceTel());
+        map.put("安装位置编码", this.getLocationCode());
+        map.put("安装位置", this.getLocationName());
+        map.put("使用责任人", this.getClinicalOwnerName());
+        map.put("备注", this.getComments());
 
 
         return map;
