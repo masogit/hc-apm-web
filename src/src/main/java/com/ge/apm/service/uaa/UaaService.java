@@ -788,6 +788,15 @@ TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
 
         return rootNode;
     }
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(String parentOrgId, String userUid) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+//        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
+
+        TreeNode rootNode = buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoFullList);
+
+        return rootNode;
+    }
 
     public TreeNode buildOrgTreeByParentIdWithClinicalDeptsSelected(List<OrgInfo> orgInfoFullList, List<OrgInfo> orgInfoSelectableList) {
 

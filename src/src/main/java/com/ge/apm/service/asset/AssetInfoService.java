@@ -120,6 +120,19 @@ public class AssetInfoService {
 
         return dropdownList;
     }
+    public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevelForReturn() {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(user.getSiteUID(), user.getUid());
+
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+
+        List<SelectItem> dropdownList = new ArrayList<>();
+        if (rootNode != null) {
+            traverse(rootNode, dropdownList);
+        }
+
+        return dropdownList;
+    }
 
     private void traverse(TreeNode node, List<SelectItem> itemList) {
 
