@@ -430,9 +430,6 @@ public class ExcelDocument {
     }
 
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
-        Sheet sheet = workBook.getSheet(sheetName);
-        //Row dataRow = sheet.getRow(dataRowNum - 1);
-        Row dataRow = sheet.createRow(dataRowNum - 1);
 
         for (int index = 0; index < rowKey.length; index++) {
             String key = rowKey[index];
@@ -441,12 +438,7 @@ public class ExcelDocument {
             }
             Object value = data.get(key);
 
-            Cell cell = dataRow.getCell(index);
-            if (null == cell) {
-                cell = dataRow.createCell(index);
-            }
-
-            writeCellData(cell, value);
+            writeCellData(sheetName, dataRowNum, index + 1, value);
         }
     }
 
