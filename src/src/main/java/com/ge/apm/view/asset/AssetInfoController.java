@@ -132,6 +132,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private ExcelTemplateExport export;
 
+    private UserContextService userContextService;
+
     protected void setSelectedByUrlParam(String encodeUrl, String paramName) {
         setSelected(Integer.parseInt((String) UrlEncryptController.getValueFromMap(encodeUrl, paramName)));
 
@@ -181,7 +183,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -1629,9 +1631,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void exportExcel() throws IOException {
 
+        //非设备科的人导出的时候，导出部分数据
+        boolean allColumns = false;
+        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
+            allColumns = true;
+        }
+
         List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
 
-        ExcelDocument doc = importService.exportAsset(assetList);
+        ExcelDocument doc = importService.exportAsset(assetList, allColumns);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
         streamedContent.setName("AssetInfo_export.xlsx");
