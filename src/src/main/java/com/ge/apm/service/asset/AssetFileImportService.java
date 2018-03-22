@@ -37,6 +37,8 @@ import java.util.*;
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.0";
+
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
 //    private static final String SHEET_USER = "User List";
@@ -689,7 +691,7 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v2.0".equalsIgnoreCase(inputVersion);
+        return EXCEL_ASSET_TEMPLATE_VERSION.equalsIgnoreCase(inputVersion);
     }
 
     /**
