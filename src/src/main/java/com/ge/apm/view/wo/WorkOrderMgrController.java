@@ -157,6 +157,93 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao;
     }
 
+    
+    /*
+     * select
+        *
+    from
+        v2_work_order v2_workord0_ 
+    left outer join
+        v2_service_request v2_service1_ 
+            on v2_workord0_.sr_id=v2_service1_.id cross 
+    join
+        v2_service_request v2_service2_ cross 
+    join
+        asset_info assetinfo4_ 
+    where
+        v2_workord0_.sr_id=v2_service2_.id 
+        and v2_workord0_.asset_id=assetinfo4_.id         
+        and v2_workord0_.status=1                           //1*
+        and (
+            v2_workord0_.current_step_id in (
+                2 , 3
+            )
+        )                                                   //1*
+        and (
+            v2_workord0_.site_uid in (
+                ?
+            )                                                //1*2+
+            or v2_workord0_.tenant_uid in (
+                ?
+            )                                                //1*2+
+            or v2_workord0_.institution_uid in (
+                ?
+            )                                                //1*2+
+            or v2_workord0_.hospital_uid in (
+                ?
+            )                                                 //1*2+
+            or v2_service2_.requestor_id=2342                 //1*2+
+            or v2_service2_.from_dept_uid in (
+                ?
+            )                                                 //1*2+
+            or v2_workord0_.current_person_id=2342            //1*2+
+        ) 
+        and (
+            (
+                v2_workord0_.dispatch_mode in (
+                    2 , 3
+                )                                             //1*3+4*
+            ) 
+            and v2_workord0_.current_person_id<>?             //1*3+4*
+            and (
+                assetinfo4_.asset_owner_id=?                  //1*3+4*6+
+                or assetinfo4_.asset_owner_id2=?              //1*3+4*6+
+                or assetinfo4_.asset_owner_id3=?              //1*3+4*6+
+                or (
+                    assetinfo4_.asset_owner_id2 is null
+                )                                             //1*3+4*6+owner1*
+                and (
+                    assetinfo4_.asset_owner_id3 is null
+                )                                             //1*3+4*6+owner1*
+                or (
+                    assetinfo4_.asset_owner_id is null
+                )                                             //1*3+4*6+owner2*
+                and (
+                    assetinfo4_.asset_owner_id3 is null
+                )                                             //1*3+4*6+owner2*
+                or (
+                    assetinfo4_.asset_owner_id is null
+                )                                             //1*3+4*6+owner3*
+                and (
+                    assetinfo4_.asset_owner_id2 is null
+                )                                             //1*3+4*6+owner3*
+            ) 
+            and (
+                v2_workord0_.asset_id in (
+                    ?
+                )                                             //1*3+4*5+
+                or v2_workord0_.asset_id in (                 //1*3+4*5+
+                    ?
+                )
+            ) 
+            or v2_workord0_.current_person_id=2342             //1*3+7*
+            and (
+                v2_workord0_.dispatch_mode<>4                  //1*3+7*8+
+                or v2_workord0_.current_step_id<>2             //1*3+7*8+
+            )
+        ) 
+
+     */
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
@@ -206,7 +293,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner2*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
+            //去除派工模式4且待派工的单子
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4, "1*3+7*8+"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 2, "1*3+7*8+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             List<Integer> tagGroupAssets = getTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
@@ -260,6 +350,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
+    
+    
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
