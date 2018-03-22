@@ -491,6 +491,15 @@ public class ExcelDocument {
 
     }
 
+    public void removeRow(String sheetName, int rowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow != null) {
+            sheet.removeRow(dataRow);
+        }
+
+    }
+
     public void clearRowsData(String sheetName, Integer startRow, Integer endRow) {
         Sheet sheet = workBook.getSheet(sheetName);
         for (int i = endRow; i >= startRow; i--) {
