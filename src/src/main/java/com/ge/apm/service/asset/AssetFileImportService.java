@@ -163,6 +163,12 @@ public class AssetFileImportService {
                 boolean isNewAsset = true; //flag an asset is new or existing.
 
                 AssetInfo asset = new AssetInfo();
+
+                String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
+                if (!StringUtils.isEmpty(uuid)) {
+                    asset.setUid(uuid);
+                }
+
                 String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
@@ -594,21 +600,28 @@ public class AssetFileImportService {
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
-        if (!StringUtils.isEmpty(asset.getQrCode())) {
-            assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+
+        if (!StringUtils.isEmpty(asset.getUid())) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
         } else {
-            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
 
-            if (!StringUtils.isEmpty(asset.getDepartNum())) {
-                assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-            }
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
-            if (!StringUtils.isEmpty(asset.getFinancingNum())) {
-                assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+            if (!StringUtils.isEmpty(asset.getQrCode())) {
+                assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+            } else {
+                assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
+
+                if (!StringUtils.isEmpty(asset.getDepartNum())) {
+                    assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+                }
+
+                if (!StringUtils.isEmpty(asset.getFinancingNum())) {
+                    assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+                }
             }
         }
 
