@@ -56,6 +56,7 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="AssetInfoListForm">
+                    <p:remoteCommand name="outputMsg" actionListener="#{assetInfoController.showMsg}" update=":growl"/>
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" resizeMode="expand"
                                  selectionMode="single" selection="#{assetInfoController.selected}" scrollable="true" scrollWidth="98%"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -436,6 +437,7 @@
                         e.preventDefault();
                     }
                 });
+                outputMsg();
             }
             var newWin;
             function prepareAssetViewWindow() {
