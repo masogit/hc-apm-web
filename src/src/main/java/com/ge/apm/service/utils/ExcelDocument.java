@@ -5,18 +5,6 @@
  */
 package com.ge.apm.service.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
@@ -24,7 +12,10 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import webapp.framework.util.TimeUtil;
+
+import java.io.*;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  *
@@ -41,6 +32,7 @@ public class ExcelDocument {
     Workbook workBook;
 
     final CellStyle DEFAULT_CELL_STYLE_DATE;
+    final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
 
     public static ExcelType parseTypeByFileName(String path) {
         if (path.endsWith(".xls")) {
@@ -64,9 +56,13 @@ public class ExcelDocument {
             workBook = new XSSFWorkbook(input);
         }
 
-        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
         CreationHelper createHelper = workBook.getCreationHelper();
+
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
         DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/d/yyyy"));
+
+        DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
 
         input.close();
     }
@@ -454,6 +450,7 @@ public class ExcelDocument {
                 cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
             } else if (value instanceof Double) {
                 cell.setCellType(CellType.NUMERIC);
+                cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
             }
 
 
