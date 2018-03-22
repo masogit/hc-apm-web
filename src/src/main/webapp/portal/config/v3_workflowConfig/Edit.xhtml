@@ -43,10 +43,10 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="wo" legend="工单配置">
+                    <p:fieldset id="wo" legend="维修工单配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">工单#{msg.dispatchUserName}</label>
+                                <label class="label">维修#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="dispatchUserId" value="#{v2_WorkflowConfigController.selected.dispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -54,7 +54,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">工单#{msg.dispatchUserName}2</label>
+                                <label class="label">维修#{msg.dispatchUserName}2</label>
                                 <p:selectOneMenu id="dispatchUserId2" value="#{v2_WorkflowConfigController.selected.dispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
