@@ -634,6 +634,11 @@ public class AssetInfoFormatter {
             map.put("最终残值", this.getSalvageValue());
             map.put("使用年限", this.getLifecycleInYear());
             map.put("折旧算法", this.getDepreciationMethodAsString());
+        } else {
+            map.put("采购价格", null);
+            map.put("最终残值", null);
+            map.put("使用年限", null);
+            map.put("折旧算法", null);
         }
 
         map.put("出厂日期", this.getManufactDate());
