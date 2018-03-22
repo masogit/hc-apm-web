@@ -242,6 +242,25 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setDispatchUserName2(null);
 		}
+
+		//pm
+		if (selected.getPmDispatchUserId() != null) {
+			UserAccount pmDispather1 = uaDao.getById(config.getPmDispatchUserId());
+			if (pmDispather1 != null) {
+				selected.setPmDispatchUserName(pmDispather1.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName(null);
+		}
+		if (selected.getPmDispatchUserId2() != null) {
+			UserAccount pmDispather2 = uaDao.getById(config.getPmDispatchUserId2());
+			if (pmDispather2 != null) {
+				selected.setPmDispatchUserName2(pmDispather2.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName2(null);
+		}
+
 		dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
