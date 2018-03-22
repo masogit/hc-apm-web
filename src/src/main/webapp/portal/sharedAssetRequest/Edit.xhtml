@@ -154,7 +154,7 @@
                            </p:dataTable>
                      </p:fieldset>
 <!--                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestNewController.save}" value="#{msg.Save}" action="List?faces-redirect=true"/>-->
-                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认借用" rendered="#{sharedAssetRequestNewController.selected.state == null}" >
+                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认借用" rendered="#{sharedAssetRequestNewController.selected.state == 0}" >
                        <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                      </p:commandButton>
 <!--                     <p:commandButton id="confirmcancel" validateClient="true" actionListener="#{sharedAssetRequestNewController.cancel()}" action="List?faces-redirect=true" value="取消借用" rendered="#{sharedAssetRequestNewController.selected.state == '1'}" >
