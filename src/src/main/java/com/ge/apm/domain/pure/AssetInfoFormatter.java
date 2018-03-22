@@ -597,7 +597,7 @@ public class AssetInfoFormatter {
         return null;
     }
 
-    public Map<String, Object> buildExcelColumnKeyValueMap() {
+    public Map<String, Object> buildExcelColumnKeyValueMap(boolean allColumns) {
 
         Map<String, Object> map = new HashMap<>();
 
@@ -628,11 +628,13 @@ public class AssetInfoFormatter {
         map.put("条码", this.getBarcode());
         map.put("2010国家编码", this.getNationalStandardCode());
         map.put("IT系统编号", this.getModalityId());
-        map.put("采购价格", this.getPurchasePrice());
-        map.put("最终残值", this.getSalvageValue());
-        map.put("使用年限", this.getLifecycleInYear());
 
-        map.put("折旧算法", this.getDepreciationMethodAsString());
+        if (allColumns) {
+            map.put("采购价格", this.getPurchasePrice());
+            map.put("最终残值", this.getSalvageValue());
+            map.put("使用年限", this.getLifecycleInYear());
+            map.put("折旧算法", this.getDepreciationMethodAsString());
+        }
 
         map.put("出厂日期", this.getManufactDate());
         map.put("采购日期", this.getPurchaseDate());
@@ -663,6 +665,8 @@ public class AssetInfoFormatter {
         map.put("是否进口设备", this.getImportEquipmentAsString());
         map.put("当前状态", this.getStatusAsString());
         map.put("核算类别", this.getAccountingCategoryAsString());
+
+        map.put("UUID", this.getUid());
 
         return map;
 

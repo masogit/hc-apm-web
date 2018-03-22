@@ -445,16 +445,8 @@ public class ExcelDocument {
             if (null == cell) {
                 cell = dataRow.createCell(index);
             }
-            if (value instanceof  Date) {
-                cell.setCellType(CellType.NUMERIC);
-                cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
-            } else if (value instanceof Double) {
-                cell.setCellType(CellType.NUMERIC);
-                cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
-            }
 
-
-            writeCellData(dataRow.getCell(index), value);
+            writeCellData(cell, value);
         }
     }
 
@@ -474,6 +466,8 @@ public class ExcelDocument {
         }
         if (data instanceof Date) {
             cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
+
             cell.setCellValue((Date) data);
         }
         if (data instanceof Integer) {
@@ -482,8 +476,26 @@ public class ExcelDocument {
         }
         if (data instanceof Double) {
             cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+
             cell.setCellValue((Double) data);
         }
+
+    }
+
+    public void writeCellData(String sheetName, int rowNum, int colNum, Object value) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
 
     }
 
