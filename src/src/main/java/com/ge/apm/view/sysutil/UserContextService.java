@@ -293,6 +293,15 @@ public class UserContextService implements Serializable {
     
     private Boolean needAssetApproval = null;
     
+    private Boolean needInstorageCheck = null;
+    
+    public Boolean needInstorageCheck(){
+        if (needInstorageCheck == null) {
+            getUserPrivilege();
+        }
+        return needInstorageCheck;
+    }
+    
     public Boolean needAssetApproval(){
         if (needAssetApproval == null) {
             getUserPrivilege();
@@ -315,6 +324,17 @@ public class UserContextService implements Serializable {
     }
 
     private void getUserPrivilege() {
+        List<WorkflowConfig> wcList = getSiteConfigurations();
+        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+        isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
+        
+        needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
+        
+        needInstorageCheck = wcList.stream().anyMatch(item -> null!=item.getNeedInstorageCheck() && item.getNeedInstorageCheck());
+    }
+    
+    private List<WorkflowConfig> getSiteConfigurations(){
         UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         orgList.add(userAccount.getTenantUID());
@@ -322,12 +342,7 @@ public class UserContextService implements Serializable {
         orgList.add(userAccount.getHospitalUID());
         orgList.add(userAccount.getSiteUID());
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
-        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
-                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
-        isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
-        
-        needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
+        return wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
     }
 
 }
