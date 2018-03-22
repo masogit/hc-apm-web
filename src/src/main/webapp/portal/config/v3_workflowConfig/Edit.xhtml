@@ -39,8 +39,14 @@
                                     <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset id="wo" legend="维修工单配置">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
-                                <label class="label">#{msg.dispatchUserName}</label>
+                                <label class="label">维修#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="dispatchUserId" value="#{v2_WorkflowConfigController.selected.dispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -48,18 +54,13 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">#{msg.dispatchUserName}2</label>
+                                <label class="label">维修#{msg.dispatchUserName}2</label>
                                 <p:selectOneMenu id="dispatchUserId2" value="#{v2_WorkflowConfigController.selected.dispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
-                        </p:panelGrid>
-                    </p:fieldset>
-
-                    <p:fieldset id="wo" legend="工单配置">
-                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutDispatch}</label>
                                 <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
@@ -77,6 +78,10 @@
                                 <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
+                                <label class = "label">系统自动验收(天)</label>
+                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup >
+                            <h:panelGroup rendered="true">
                                 <label class = "label">是否自动派工?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}"/>
                             </h:panelGroup >
@@ -87,10 +92,6 @@
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否人工派工?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}"/>
-                            </h:panelGroup >
-                            <h:panelGroup rendered="true">
-                                <label class = "label">系统自动验收(天)</label>
-                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup >
                             <h:panelGroup >
                                 <label class = "label">工单完工不需要验收?</label>
@@ -110,6 +111,22 @@
 
                     <p:fieldset id="pm" legend="保养配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
+                            <h:panelGroup >
+                                <label class="label">保养#{msg.dispatchUserName}</label>
+                                <p:selectOneMenu id="pmDispatchUserId" value="#{v2_WorkflowConfigController.selected.pmDispatchUserId}"
+                                                 required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">保养#{msg.dispatchUserName}2</label>
+                                <p:selectOneMenu id="pmDispatchUserId2" value="#{v2_WorkflowConfigController.selected.pmDispatchUserId2}"
+                                                 required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                             <h:panelGroup rendered="true">
                                 <label class = "label">二级简化保养?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.pmSimplify}"/>
@@ -127,8 +144,12 @@
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isPmManualEnabled}"/>
                             </h:panelGroup >
                             <h:panelGroup>
-                                <label class="label">#{msg.pmReminderTime}</label>
+                                <label class="label">保养提醒提前天数</label>
                                 <p:inputNumber id="pmReminderTime" value="#{v2_WorkflowConfigController.selected.pmReminderTime}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">保养提醒次数</label>
+                                <p:inputNumber id="pmReminderTimes" value="#{v2_WorkflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -143,7 +164,7 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
-                                <label class = "label">维保提醒时间(天)</label>
+                                <label class = "label">维保提醒提前天数</label>
                                 <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">

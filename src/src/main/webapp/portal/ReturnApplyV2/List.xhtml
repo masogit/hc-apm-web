@@ -63,7 +63,7 @@
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
                     </p:column>
-                    <p:column headerText="归还状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
+                    <p:column headerText="归还状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ">
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
