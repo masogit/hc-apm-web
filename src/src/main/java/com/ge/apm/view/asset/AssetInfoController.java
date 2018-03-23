@@ -131,8 +131,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private OrgInfo fileterOrg;
 
-    private ExcelTemplateExport export;
-
     private UserContextService userContextService;
 
     private WorkflowConfigRepository wfCfigDao;
@@ -219,7 +217,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
 
-        export = WebUtil.getBean(ExcelTemplateExport.class);
         importService = WebUtil.getBean(AssetFileImportService.class);
 
         this.filterBySite = false;
