@@ -98,6 +98,7 @@
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.AcceptR}"  update="IouEditForm" action="List?faces-redirect=true" value="确认受理" icon="ui-icon-check" />
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.ShelveR}" action="List?faces-redirect=true" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 7}"/>
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
                               
                 </h:panelGroup>

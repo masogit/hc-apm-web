@@ -15,8 +15,8 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
     @Modifying
     @Transactional
     @Query("update SharedAssetRequest a set a.state = :state where a.id = :id")
-    public void updateState(@Param("id") String id, @Param("state") String state);
-    public List<SharedAssetRequest> findByState(String state);
+    public void updateState(@Param("id") String id, @Param("state") int state);
+    public List<SharedAssetRequest> findByState(int state);
     
     @Query(value = "select dept_for_shared_asset from workflow_config where site_uid =?1",nativeQuery = true)
     public List<String> findDeptForSharedAsset(String UID);
@@ -24,10 +24,10 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
     @Query(value = "select clinical_dept_uid from asset_info where clinical_dept_uid =?1",nativeQuery = true)
     public List<String> findSharedDeptForAssetInfo(String UID);
     
-    @Query(value = "select uid from shared_asset_request where state in('6','12')",nativeQuery = true)
+    @Query(value = "select id from shared_asset_request where state in(6,12)",nativeQuery = true)
     public List<String> findSharedIdforQuery();
     
-    @Query(value = "select uid from shared_asset_request where clinical_dept_uid = ?1 and state in('6','12')",nativeQuery = true)
+    @Query(value = "select id from shared_asset_request where clinical_dept_uid = ?1 and state in(6,12)",nativeQuery = true)
     public List<String> findSharedIdByOrgUidforQuery(String orgUid);
     
     @Query("select o from SharedAssetRequest o where o.id = :id")

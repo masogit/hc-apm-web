@@ -24,9 +24,11 @@
                 <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/List.xhtml?terminate=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.hasAnyRole('AssetHead') or userContextService.isAssetApprover())}"/>
-
-                
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um090" value="小设备绩效导入" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um091" value="小设备绩效报表" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um092" value="小设备绩效配置" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+
             </p:submenu>
 
             <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o"
@@ -59,7 +61,7 @@
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff')}">
                 <p:menuitem  value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem  value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                <p:menuitem  value="#{msg.AssetFinishInstallMgmt}" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                <p:menuitem  value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.needInstorageCheck()}"/>
                 <!--<p:menuitem id="um086" value="采购申请" outcome="/portal/asset/ApplicationList.xhtml" rendered="#{userContextService.hasRole('AssetHead')}"/>-->
             </p:submenu>
             <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">

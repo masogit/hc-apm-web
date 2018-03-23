@@ -7,10 +7,10 @@
 	<p:dataTable id="datalist" value="#{smallAssetPerformanceController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 		selection="#{smallAssetPerformanceController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
-		paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
 
-		<p:ajax event="rowSelect" update="deleteButton" />
+		<!--<p:ajax event="rowSelect" update="deleteButton" />-->
 		<p:ajax event="filter" listener="#{smallAssetPerformanceController.onFilter}" />
 
 		<p:column headerText="科室" filterBy="#{item.department}" filterMatchMode="LIKE">
@@ -47,16 +47,16 @@
 		</p:column>
 
 		<f:facet name="{Toolbar}">
-			<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+			<!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
 				actionListener="#{smallAssetPerformanceController.prepareCreate}" update=":smallAssetPerformanceTab:smallAssetPerformanceEditDlg"
 				oncomplete="PF('smallAssetPerformanceEditDialog').show()" />
-			<!-- <p:commandButton id="editButton" actionListener="#{smallAssetPerformanceController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+			<p:commandButton id="editButton" actionListener="#{smallAssetPerformanceController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
 				update=":smallAssetPerformanceTab:smallAssetPerformanceEditDlg" oncomplete="PF('smallAssetPerformanceEditDialog').show()"
-				disabled="#{empty smallAssetPerformanceController.selected.id}" /> -->
+				disabled="#{empty smallAssetPerformanceController.selected.id}" />
 			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{smallAssetPerformanceController.delete}"
 				update=":smallAssetPerformanceTab:smallAssetPerformanceListForm:datalist" disabled="#{empty smallAssetPerformanceController.selected.id}">
 				<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
-			</p:commandButton>
+			</p:commandButton>-->
 		</f:facet>
 	</p:dataTable>
 </h:form>

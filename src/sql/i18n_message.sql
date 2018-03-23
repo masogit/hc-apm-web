@@ -512,7 +512,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetGroup', '12', '生命体征监护类', 'assetType12', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetGroup', '13', '其他类', 'assetType13', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '1', '报修', 'Create', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '1', '已报修', 'Create', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '2', '待派工', 'Assign', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '3', '待接单', 'Accept', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '4', '维修中', 'Repair', NULL, '-1');
@@ -1414,6 +1414,26 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'DeltaException', '过低', 'Normal', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('TableReportResult', 'MuException', '过低', 'Normal', NULL, '-1');
 
+--调剂中心
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetBorrowStatus', 1, '借用待受理', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetBorrowStatus', 2, '借用待交付', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetBorrowStatus', 3, '借用待确认', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetBorrowStatus', 4, '借用已取消', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetBorrowStatus', 5, '借用已搁置', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetBorrowStatus', 6, '借用已完成', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 7, '归还待受理', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 8, '归还待交付', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 9, '归还待确认', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 10, '归还已取消', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 11, '归还已搁置', -1);
+INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetReturnStatus', 12, '归还已完成', -1);
 
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '1', '待派工', 'Assign', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '2', '待接单', 'ToAccepted', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '3', '已计划', 'Planned', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '4', '待审核', 'ToApproved', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '5', '待关单', 'ToClosed', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '6', '已关单', 'Closed', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '7', '待抢单', 'toGrap', NULL, '-1');
 

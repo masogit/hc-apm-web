@@ -78,9 +78,6 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "auto_close")
     private Boolean autoClose;// 自动关单
     
-    @Column(name = "pm_reminder_time")
-    private Integer pmReminderTime;//保养提醒时间，单位‘天’
-    
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
     
@@ -100,12 +97,18 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
 
-    @Column(name="pm_simplify")
-    private Boolean pmSimplify; // 简化保养
+
     
     @Column(name = "warranty_remind_times")
     private Integer warrantyRemindTimes;//维保提醒次数
 
+    @Column(name = "dept_for_shared_asset")
+    private String deptForSharedAsset;
+
+
+    /****for pm *****/
+    @Column(name="pm_simplify")
+    private Boolean pmSimplify; // 简化保养
 
     @Column(name = "is_pm_take_order_enabled")
     private Boolean isPmTakeOrderEnabled; //是否允许抢单
@@ -116,8 +119,66 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "is_pm_auto_enabled")
     private Boolean isPmAutoEnabled; //是否自动派工
 
-    @Column(name = "dept_for_shared_asset")
-    private String deptForSharedAsset;
+    @Column(name = "pm_dispatch_user_id")
+    private Integer pmDispatchUserId;
+
+    @Column(name = "pm_dispatch_user_name")
+    private String pmDispatchUserName;
+
+    @Column(name = "pm_dispatch_user_id2")
+    private Integer pmDispatchUserId2;
+
+    @Column(name = "pm_dispatch_user_name2")
+    private String pmDispatchUserName2;
+
+    @Column(name = "pm_reminder_time")
+    private Integer pmReminderTime;//计划开始时间之前提醒时间，单位'天'
+
+    @Column(name = "pm_reminder_times")
+    private Integer pmReminderTimes;//提醒次数
+    
+    @Column(name = "need_instorage_check")
+    private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
+
+    public Integer getPmReminderTimes() {
+        return pmReminderTimes;
+    }
+
+    public void setPmReminderTimes(Integer pmReminderTimes) {
+        this.pmReminderTimes = pmReminderTimes;
+    }
+
+    public Integer getPmDispatchUserId() {
+        return pmDispatchUserId;
+    }
+
+    public void setPmDispatchUserId(Integer pmDispatchUserId) {
+        this.pmDispatchUserId = pmDispatchUserId;
+    }
+
+    public String getPmDispatchUserName() {
+        return pmDispatchUserName;
+    }
+
+    public void setPmDispatchUserName(String pmDispatchUserName) {
+        this.pmDispatchUserName = pmDispatchUserName;
+    }
+
+    public Integer getPmDispatchUserId2() {
+        return pmDispatchUserId2;
+    }
+
+    public void setPmDispatchUserId2(Integer pmDispatchUserId2) {
+        this.pmDispatchUserId2 = pmDispatchUserId2;
+    }
+
+    public String getPmDispatchUserName2() {
+        return pmDispatchUserName2;
+    }
+
+    public void setPmDispatchUserName2(String pmDispatchUserName2) {
+        this.pmDispatchUserName2 = pmDispatchUserName2;
+    }
 
     public Boolean getIsPmTakeOrderEnabled() {
         return isPmTakeOrderEnabled;
@@ -421,6 +482,15 @@ public class WorkflowConfig implements Serializable {
     public void setDeptForSharedAsset(String deptForSharedAsset) {
         this.deptForSharedAsset = deptForSharedAsset;
     }
+
+    public Boolean getNeedInstorageCheck() {
+        return needInstorageCheck;
+    }
+
+    public void setNeedInstorageCheck(Boolean needInstorageCheck) {
+        this.needInstorageCheck = needInstorageCheck;
+    }
+    
 
     @Override
     public int hashCode() {
