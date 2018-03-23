@@ -5,5 +5,6 @@ public enum UploadFileErrorTypeEnum {
 	RATE_WRONG,
 	CONFIG_NOT_EXISTS,
 	CONFIG_WRONG,
-	FORMAT_ERROR
+	FORMAT_ERROR,
+	OTHER_ERROR
 }
