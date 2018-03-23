@@ -34,10 +34,10 @@
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                 <p:inputText id="clinicalDept"  value="#{assetArrivedItemsController.fileterDeptOrg.name}"  readonly="true"/>
                             </f:facet>
-                            <h:outputText value="#{assetArrivedItemsController.getOrgInfoByUid(item.clinicalDeptUID)}"/>
+                            <h:outputText value="#{assetArrivedItemsController.getOrgNameByUid(item.clinicalDeptUID)}"/>
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}" visible="false" exportable="true">
-                            <h:outputText value="#{assetArrivedItemsController.getOrgInfoByUid(item.clinicalDeptUID)}"/>
+                            <h:outputText value="#{assetArrivedItemsController.getOrgNameByUid(item.clinicalDeptUID)}"/>
                         </p:column>
                         <p:column headerText="#{msg.creatorUID}" sortBy="#{item.arrivalList.creatorUID}" filterBy="#{item.arrivalList.creator.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.creator.name}"/>

@@ -148,9 +148,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         return statusList;
     }
 
-    public OrgInfo getOrgInfoByUid(String orgUid) {
-        if (Strings.isNullOrEmpty(orgUid)) {
-            return aiService.getOrgInfoByUid(orgUid);
+    public String getOrgNameByUid(String orgUid) {
+        if (!Strings.isNullOrEmpty(orgUid)) {
+            OrgInfo org = aiService.getOrgInfoByUid(orgUid);
+            return org==null? null:org.getName();
         }else {
             return null;
         }
