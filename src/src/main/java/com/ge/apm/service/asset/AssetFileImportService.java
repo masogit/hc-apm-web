@@ -87,8 +87,8 @@ public class AssetFileImportService {
     private QrCodeService qrCodeService;
     @Autowired
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
-    @Autowired
-    private UserContextService userContextService;
+    
+    private UserContextService userContextService=WebUtil.getBean(UserContextService.class);
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
