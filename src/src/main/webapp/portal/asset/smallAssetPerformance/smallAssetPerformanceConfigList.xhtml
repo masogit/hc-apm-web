@@ -28,14 +28,14 @@
 		<p:column headerText="占比" sortBy="#{item.rate}" >
             <h:outputText value="#{item.rate}" />
 		</p:column>
-		<p:column headerText="校验结果" filterBy="#{item.status}" filterMatchMode="EQ">
+		<p:column headerText="校验结果" filterBy="#{item.statusCode}" filterMatchMode="EQ">
 			<f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                     <f:selectItems value="#{fieldMsg.getFieldValueList('measuringStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
                 </p:selectOneMenu>
             </f:facet>
-			<h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.status)}" />
+			<h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.statusCode)}" />
 		</p:column>
 		<p:column headerText="备注">
 			<h:outputText value="#{item.statusDisplay}" />

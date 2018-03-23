@@ -6,7 +6,7 @@
 <div class="ui-g">
 	<div class="ui-g-12 card">
 		<h:form enctype="multipart/form-data">
-			<p:fieldset legend="批量导入 小设备绩效配置" id="uploaderContainer">
+			<p:fieldset legend="批量导入 设备绩效配置" id="uploaderContainer">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<p:fileUpload fileUploadListener="#{smallAssetPerformanceConfigController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false"
 						auto="true" invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
@@ -19,7 +19,7 @@
 					<p>
 						1. <a href="APM_SmallAssetPerformanceConfig_Template.xls" title="download">#{msg.downloadTemplateFile}</a>
 					</p>
-					<p>2. 文件中填入要导入的计量数据</p>
+					<p>2. 文件中填入要导入的计量数据，其中[项目名称]和[设备名称]必填</p>
 					<p>3. 上传文件进行导入</p>
 				</h:panelGroup>
 			</p:fieldset>

@@ -6,6 +6,7 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -17,6 +18,7 @@ import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
@@ -46,6 +48,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private static final long serialVersionUID = -1L;
 
     AssetInfoRepository dao = null;
+    AssetFileImportService importService;
 
     private UserAccountRepository userDao;
 
@@ -66,6 +69,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Brand brand;
 
     private StreamedContent zipFile;
+
+    private StreamedContent excelFile;
 
     private UserAccount owner;
     private UserAccount owner2;
@@ -125,6 +130,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Boolean needShowAssetApproval;
 
     private OrgInfo fileterOrg;
+
+    private ExcelTemplateExport export;
+
+    private UserContextService userContextService;
 
     private WorkflowConfigRepository wfCfigDao;
 
@@ -193,7 +202,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         userDao = WebUtil.getBean(UserAccountRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        userContextService = WebUtil.getBean(UserContextService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
         wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
@@ -211,6 +220,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
+
+        export = WebUtil.getBean(ExcelTemplateExport.class);
+        importService = WebUtil.getBean(AssetFileImportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -666,7 +678,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public void showMsg() {
+    public void showMsg(){
         String pageMsg = WebUtil.getGrowlMsg();
         if (!Strings.isNullOrEmpty(pageMsg)) {
             WebUtil.addErrorMessage(pageMsg);
@@ -1682,6 +1694,31 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void setFileterOrg(OrgInfo fileterOrg) {
         this.fileterOrg = fileterOrg;
     }
+
+    public StreamedContent getExcelFile() {
+        return excelFile;
+    }
+
+    public void setExcelFile(StreamedContent excelFile) {
+        this.excelFile = excelFile;
+    }
+
+    public void exportExcel() throws IOException {
+
+        //非设备科的人导出的时候，导出部分数据
+        boolean allColumns = false;
+        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
+            allColumns = true;
+        }
+
+        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
+
+        ExcelDocument doc = importService.exportAsset(assetList, allColumns);
+
+        DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
+        streamedContent.setName("AssetInfo_export.xlsx");
+
+        excelFile = streamedContent;
 
     public String getExportQrCodeTemplateId() {
         return exportQrCodeTemplateId;
