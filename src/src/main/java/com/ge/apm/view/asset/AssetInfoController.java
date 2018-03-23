@@ -1723,6 +1723,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         streamedContent.setName("AssetInfo_export.xlsx");
 
         excelFile = streamedContent;
+    }
 
     public String getExportQrCodeTemplateId() {
         return exportQrCodeTemplateId;
