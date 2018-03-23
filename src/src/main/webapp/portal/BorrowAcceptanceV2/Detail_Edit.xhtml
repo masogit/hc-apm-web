@@ -1,0 +1,45 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                >
+<ui:define name="content">
+    
+               <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="采购清单-到货"/>
+                </div>
+                
+                        <h:form id="PurchaseApplicationForm1">
+                            <div class="ui-g-12 card ">
+       
+                                
+                                
+                                <div class="ui-g">
+                                    <div class="ui-g-2"> <p:outputLabel value="附件:"/></div>
+                                    <div class="ui-g-4"> 
+                                        
+                                        
+                                        
+                                        <p:selectManyCheckbox id="grid" value="#{sharedAssetReqDetailV2Controller.selectedAccessory.name}" layout="grid" columns="3">
+                                            <f:selectItems value="#{sharedAssetTypeController.getAccessoriesById('64f679c7de644916a6ddfe2a5ff7a362').accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />
+                                        </p:selectManyCheckbox>
+                                        
+                                        
+                                    </div>
+                                    
+                                </div>
+                                
+                                
+
+                                <h:panelGroup>
+                                   <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{sharedAssetReqDetailV2Controller.save()}" action="List?faces-redirect=true" validateClient="true" update=":growl" style="float:left"/>
+                                   <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="List?faces-redirect=true" immediate="true"  style="float:left"/>
+                                </h:panelGroup>
+                            </div>
+                        </h:form>
+           
+    
+</ui:define>
+</ui:composition>

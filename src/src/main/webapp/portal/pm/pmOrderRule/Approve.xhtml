@@ -13,14 +13,10 @@
 				text-align: left;
 			}
 		</style>
-        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog"  height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{pmOrderRuleController.CRUDActionName} #{msg.PmOrderRule}">
+        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" onHide="#{pmOrderRuleController.onSelect()}"  height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
             <h:form id="PmOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
-<!--                         <h:panelGroup >
-                            <label class ="label">#{msg.name}</label>
-                            <p:inputText id="name" value="#{pmOrderRuleController.selected.name}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
-                        </h:panelGroup> -->
                         <h:panelGroup >
                             <label class ="label">#{msg.assetName} *</label>
                             <p:inputText id="assetName" value="#{pmOrderRuleController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
@@ -43,7 +39,9 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.period}</label>
-                            <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/>
+                            <p:inputNumber id="period" value="#{pmOrderRuleController.selected.period}" minValue="1" maxValue="120" decimalPlaces="0" 
+                            required="false" requiredMessage="超出范围（只能是1到120）！"  />
+                           <!--  <p:inputText id="period"  value="#{pmOrderRuleController.selected.period}" required="false" requiredMessage="#{msg.period} #{msg.ValidationRequire}"/> -->
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.feedbackComment}</label>
@@ -62,47 +60,29 @@
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
-		                   			<p:ajax  update="report" />
+		                   			<p:ajax update="report" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
+	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
 	                       </p:selectOneMenu>
-	                        <h:inputHidden id="safetyReport" value="#{pmOrderRuleController.selected.safetyReport}" />
+	                        <h:outputText style="display:none" id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}" />
 	                        &nbsp;&nbsp;
-	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+	                   <p:commandButton rendered="#{not empty pmOrderRuleController.selected.safetyReport}"  immediate="true" value="预览" onclick="preparePreview(1,'PmOrderRuleApproveForm');" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                        </h:panelGroup>
-	                   
-	                  <h:panelGroup>
+                       
+                       <h:panelGroup>
 	                		<label class ="label">#{msg.performanceReport}</label>
-	                     <p:selectOneMenu value="#{pmOrderRuleController.selected.performanceReport}"  >
+	                     <p:selectOneMenu  value="#{pmOrderRuleController.selected.performanceReport}"  >
 	                     		<p:ajax  update="report" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.schema}"/>
+                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
                        	</p:selectOneMenu>
+                                        <h:outputText style="display:none" id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
                        	 &nbsp;&nbsp;
-                       	  <h:inputHidden id="performanceReport" value="#{pmOrderRuleController.selected.performanceReport}" />
-                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}" immediate="true" value="预览" onclick="preparePreview(2);"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                     	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2,'PmOrderRuleApproveForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
+                       
                    </p:panelGrid>
 					 &nbsp;&nbsp;
-                    
-                  <!--  <p:panelGrid columns="3"  styleClass="ui-panelgrid-blank form-group" >
-	                   <label class ="label" >#{msg.safetyReport}</label>
-	                   <p:commandButton immediate="true" value="预览" onclick="preparePreview(1);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
-	                    <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
-                    </p:panelGrid>
-                  	<p:scrollPanel style="height:80px">
-                  		<p:inputTextarea id="safetyReport" cols="100" scrollHeight="20"  rows="20" autoResize="true" value="#{pmOrderRuleController.selected.safetyReport}"/>
-                   	</p:scrollPanel>
-                    <br/>
-                    
-                   <p:panelGrid columns="3"  styleClass="ui-panelgrid-blank form-group">
-	                     <label class ="label">#{msg.performanceReport}</label>
-	                     <p:commandButton immediate="true" value="预览" onclick="preparePreview(2);" oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
-	                     <a href="HC-APM.pdf" target="_Blank" title="download">帮助</a>
-                    </p:panelGrid>
-                    <p:scrollPanel style="height:80px">
-                    	<p:inputTextarea id="performanceReport" cols="100"  scrollHeight="50"  rows="50" value="#{pmOrderRuleController.selected.performanceReport}"/>
-                   	</p:scrollPanel> -->
 
                      <p:scrollPanel  style="height:150px">
                         <p:selectManyCheckbox id="grid2" value="#{pmOrderRuleController.ids}" layout="pageDirection" columns="1"   styleClass="checkboxGroup"
@@ -115,7 +95,8 @@
                     update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" icon="ui-icon-check" 
                     oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
                     &nbsp;&nbsp;
-                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()"/>
+                   <!--  immediate="true"  -->
+                    <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()" update = ":PmOrderRuleListForm:datalist"/>
                       &nbsp;&nbsp;
                       <!-- and pmOrderRuleController.selected.id != null -->
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="审核" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" 

@@ -661,10 +661,15 @@ TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
         if (orgUidSet.contains(siteUid)) {
             return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
         } else {
-            orgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUid));
-            orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
-            return orgInfoDao.findBySearchFilter(orgInfoFilters);
+            return getClinicalDeptListBySiteUID(siteUid);
         }
+    }
+    
+    public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
+        List<SearchFilter> orgFilters = new ArrayList<>();
+        orgFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUID));
+        orgFilters.add(new SearchFilter("orgType", SearchFilter.Operator.EQ, 4));
+        return orgInfoDao.findBySearchFilter(orgFilters);
     }
 
     public TreeNode getOrgFullTreeByTenant(String tenantUid) {
@@ -780,6 +785,15 @@ TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
         List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
 
         TreeNode rootNode = buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoSelectableList);
+
+        return rootNode;
+    }
+    public TreeNode getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(String parentOrgId, String userUid) {
+
+        List<OrgInfo> orgInfoFullList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(parentOrgId);
+//        List<OrgInfo> orgInfoSelectableList = getUserAccessibleSiteListWithClinicalDept(userUid);
+
+        TreeNode rootNode = buildOrgTreeByParentIdWithClinicalDeptsSelected(orgInfoFullList, orgInfoFullList);
 
         return rootNode;
     }

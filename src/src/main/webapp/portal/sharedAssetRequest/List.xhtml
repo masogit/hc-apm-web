@@ -1,0 +1,80 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+                <p align="center">
+                    <b>借还维护</b>
+                </p>
+            <h:form id="SharedAssetRequestListForm">
+                <p:dataTable id="datalist" value="#{sharedAssetRequestNewController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{sharedAssetRequestNewController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <p:ajax event="rowSelect" update="createButton  deleteButton" listener="#{sharedAssetRequestNewController.onRowEdit()}" oncomplete="openViewWindow(xhr, status, args)"/>
+                    <p:ajax event="filter" listener="#{sharedAssetRequestNewController.onFilter}" update="createButton  deleteButton"/>
+                    
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+<!--                    <p:column headerText="类型" sortBy="#{item.type}" filterBy="#{item.type}" filterMatchMode="LIKE">
+                        <h:outputText value="#{sharedAssetTypeController.getSharedAssetType(item.type)}"/>
+                    </p:column>-->
+<!--                    <p:column headerText="状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
+                        <h:outputText value="归还已完成" rendered="#{item.state eq 12}"/>
+                        <h:outputText value="借用已完成" rendered="#{item.state eq 6}"/>
+                    </p:column>-->
+                    <p:column headerText="创建日期" sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="GTE">
+                        <f:facet name="filter">
+                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                        </f:facet>
+                        <h:outputText value="#{item.createDate}">
+                            <f:convertDateTime pattern="yyyy/MM/dd "/>
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="SharedAssetRequest_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}"/>
+<!--                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestNewController.prepareEdit}"   disabled="#{empty sharedAssetRequestNewController.selected}"/>-->
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestNewController.prepareDelete}"  disabled="#{empty sharedAssetRequestNewController.selected}"/>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            </div>
+        </div>
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+
+            function openViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+
+</ui:composition>

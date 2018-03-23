@@ -34,7 +34,6 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     
     @Query("select o from OrgInfo o,UserOrgInfo u where o.uid=u.orgUid and u.userUid=?1")
     public List<OrgInfo> getByUser(String userUid);
-
     @Query(value = "select name from org_info where id=?1",nativeQuery = true)
     public String getDepName(int id);
     
@@ -51,5 +50,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> findBySiteUIDAndOrgTypeOrderByNameAsc(String siteUID, Integer orgType);
 
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);
+
+    OrgInfo findByUid(String uid);
 
 }
