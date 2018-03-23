@@ -175,7 +175,7 @@ formData.setAssignee(approvaler);
 			PmOrderActionForm formData = new PmOrderActionForm();
 			formData.setActionType("assign");
 			formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTimeBatch));
-			formData.setAssignee(item.getCurrentPersonId());
+			formData.setAssignee(currentPersonIdBatch);
 			formData.setStepId(item.getCurrentStepId());
             formData.setPmOrderId(item.getId());
 			formDataList.add(formData);
