@@ -69,8 +69,6 @@ public class AssetInstallationService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private V2_PmOrderService pmService;
-    @Autowired
-    private UserContextService userContextService;
 
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
@@ -87,6 +85,7 @@ public class AssetInstallationService {
         String token = UserContextService.getAccessToken();
         String res = installApiService.submitArrivalListItem(token, itemId, isFinish);
 
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if (res.contains("successfully")) {
             if (isFinish) {
                 ArrivalListItem temp = itemDao.findById(itemId);
