@@ -55,7 +55,7 @@ public class ExcelParser {
         return result;
     }
 
-	public static Date getCellDateValue(HSSFRow row, int columIndex, SimpleDateFormat sdf) {
+	public static Date getCellDateValue(HSSFRow row, int columIndex, SimpleDateFormat sdf) throws Exception {
         HSSFCell cell = row.getCell(columIndex);
         String value = "";
         if (cell != null) {
@@ -68,26 +68,37 @@ public class ExcelParser {
                 }
             } catch (Exception e) {
                 // TODO: handle exception
-            	LOGGER.error("获取日期错误：" + e.getMessage());
+            	try {
+					return cell.getDateCellValue();
+				} catch (Exception e2) {
+					// TODO: handle exception
+					throw new Exception("获取日期错误：" + e2.getMessage());
+				}
+            	
             }
         }
         return null;
     }
 
-    public static String getCellStringValue(HSSFRow row, int columIndex) {
+    public static String getCellStringValue(HSSFRow row, int columIndex) throws Exception {
         HSSFCell cell = row.getCell(columIndex);
         if (cell != null) {
             try {
                 return cell.getStringCellValue();
             } catch (Exception e) {
                 // TODO: handle exception
-            	LOGGER.error("获取字符串错误：" + e.getMessage());
+            	try {
+					return String.valueOf(cell.getNumericCellValue());
+				} catch (Exception e2) {
+					// TODO: handle exception
+					throw new Exception("获取文本错误：" + e2.getMessage());
+				}
             }
         }
         return "";
     }
 
-    public static Double getCellNumberValue(HSSFRow row, int columIndex) {
+    public static Double getCellNumberValue(HSSFRow row, int columIndex) throws Exception {
         HSSFCell cell = row.getCell(columIndex);
         if (cell != null) {
             try {
@@ -98,7 +109,7 @@ public class ExcelParser {
             		return Double.valueOf(cell.getStringCellValue());
 				} catch (Exception e2) {
 					// TODO: handle exception
-					LOGGER.error("获取数字错误：" + e2.getMessage());
+					throw new Exception("获取数字错误：" + e2.getMessage());
 				}
             }
         }
