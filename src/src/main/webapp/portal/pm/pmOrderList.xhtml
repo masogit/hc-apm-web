@@ -86,7 +86,7 @@
                             <f:facet name="filter" >
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="#{v2PmOrderController.queryIndex==-1}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmSteps').subList(0,5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmSteps').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
                             </f:facet>
 
