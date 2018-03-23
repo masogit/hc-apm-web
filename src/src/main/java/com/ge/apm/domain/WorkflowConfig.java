@@ -136,6 +136,9 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name = "pm_reminder_times")
     private Integer pmReminderTimes;//提醒次数
+    
+    @Column(name = "need_instorage_check")
+    private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
 
     public Integer getPmReminderTimes() {
         return pmReminderTimes;
@@ -479,6 +482,15 @@ public class WorkflowConfig implements Serializable {
     public void setDeptForSharedAsset(String deptForSharedAsset) {
         this.deptForSharedAsset = deptForSharedAsset;
     }
+
+    public Boolean getNeedInstorageCheck() {
+        return needInstorageCheck;
+    }
+
+    public void setNeedInstorageCheck(Boolean needInstorageCheck) {
+        this.needInstorageCheck = needInstorageCheck;
+    }
+    
 
     @Override
     public int hashCode() {

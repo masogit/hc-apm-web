@@ -81,6 +81,8 @@ public class AssetFileImportService {
     private QrCodeService qrCodeService;
     @Autowired
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    @Autowired
+    private UserContextService userContextService;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -174,6 +176,12 @@ public class AssetFileImportService {
 
                 String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
                 asset.setFinancingNum(financingNum);
+                
+                if(userContextService.needAssetApproval()){
+                    asset.setUsageStatus(2);
+                }else{
+                    asset.setUsageStatus(3);
+                }
 
                 //load asset if it is already existed in db, then update the record
                 List<AssetInfo> assetList = getAssetInfos(asset);
