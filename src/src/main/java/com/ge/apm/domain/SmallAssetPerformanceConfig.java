@@ -60,9 +60,15 @@ public class SmallAssetPerformanceConfig implements Serializable {
     
     @Column(name = "status")
     private String status;
+    
+    @Column(name = "status_code")
+    private String statusCode;
 
     @Transient
     private String statusDisplay;
+    
+    @Transient
+    private String otherErrorMessage;
 
     public String getId() {
         return id;
@@ -162,6 +168,8 @@ public class SmallAssetPerformanceConfig implements Serializable {
 				result+="占比总和错误；";
 			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
 				result+="设备名称不存在；";
+			}else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+				result+=this.otherErrorMessage;
 			}
 			else{
 				result+=this.status;
@@ -184,20 +192,49 @@ public class SmallAssetPerformanceConfig implements Serializable {
 				this.status += type + ",";
 			}
 		}
+		if(StringUtils.isEmpty(this.status)){
+			this.statusCode="1";
+		}
+		else{
+			this.statusCode="2";
+		}
 	}
+	
+	public void setStatusDisplay(UploadFileErrorTypeEnum type,String otherErrorMessage) {
+		if (this.status == null) {
+			this.status = type + ",";
+		} else if(this.status.indexOf(type+",")<0){
+			this.status += type + ",";
+		}
+		this.otherErrorMessage=otherErrorMessage;
+	}
+	
 
 	public String getStatus() {
-		if (StringUtils.isEmpty(this.status)) {
-			return "1";
-		}
-		return "2";
+		return this.status;
 	}
 
 	private void setStatus(String status) {
 		this.status = status;
 	}
 
-    @Override
+    public String getOtherErrorMessage() {
+		return otherErrorMessage;
+	}
+
+	private void setOtherErrorMessage(String otherErrorMessage) {
+		this.otherErrorMessage = otherErrorMessage;
+	}
+
+	public String getStatusCode() {
+		return statusCode;
+	}
+
+	public void setStatusCode(String statusCode) {
+		this.statusCode = statusCode;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -219,6 +256,6 @@ public class SmallAssetPerformanceConfig implements Serializable {
 
     @Override
     public String toString() {
-        return "com.ge.apm.domain.SmallAssetPerformanceConfig[ id=" + id + " ]";
-    }
+		return "com.ge.apm.domain.SmallAssetPerformanceConfig[ id=" + id + " ]";
+	}
 }

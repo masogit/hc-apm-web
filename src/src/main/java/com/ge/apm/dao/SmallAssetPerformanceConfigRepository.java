@@ -16,13 +16,13 @@ import webapp.framework.dao.SearchFilter;
  */
 public interface SmallAssetPerformanceConfigRepository extends GenericRepositoryUUID<SmallAssetPerformanceConfig> {
 
-	@Query("select o from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.hospitalUID = ?2")
-	public List<SmallAssetPerformanceConfig> findConfigByProjectNameAndHospitalUID(String projectName, String hospitalUID);
+	@Query("select o from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.siteUID = ?2")
+	public List<SmallAssetPerformanceConfig> findConfigByProjectNameAndSiteUID(String projectName, String siteUID);
 	
-	@Query("select o from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.assetName = ?2 and o.hospitalUID = ?3")
-	public SmallAssetPerformanceConfig findByProjectNameAndAssetName(String projectName, String assetName,String hospitalUID);
+	@Query("select o from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.assetName = ?2 and o.siteUID = ?3")
+	public SmallAssetPerformanceConfig findByProjectNameAndAssetName(String projectName, String assetName,String siteUID);
 
-	@Query("select 1 from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.assetName = ?2 and o.hospitalUID = ?3")
-	public Integer findExistsByProjectNameAndAssetName(String projectName, String assetName,String hospitalUID);
+	@Query("select 1 from SmallAssetPerformanceConfig o where o.projectName = ?1 and o.assetName = ?2 and o.siteUID = ?3")
+	public Integer findExistsByProjectNameAndAssetName(String projectName, String assetName,String siteUID);
 
 }
