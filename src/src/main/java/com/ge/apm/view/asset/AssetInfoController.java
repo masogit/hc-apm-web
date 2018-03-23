@@ -135,10 +135,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private UserContextService userContextService;
 
-    private ExcelTemplateExport export;
-
-    private UserContextService userContextService;
-
     private WorkflowConfigRepository wfCfigDao;
 
     private SharedAssetTypeRepository swapDao;
