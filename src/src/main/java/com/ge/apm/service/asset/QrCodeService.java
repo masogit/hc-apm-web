@@ -163,7 +163,7 @@ public class QrCodeService {
         return qrcodeLib == null ? null : Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getSiteUID()))
                 .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getHospitalUID()))
                         .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getInstitutionUID()))
-                                .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getTenantUID())).orElse(templateService.getDefaultTemplate()))));
+                                .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getTenantUID())).orElse(null))));
     }
 
     public String getQrCodeImageBase64(String qrCode) {
@@ -291,11 +291,11 @@ public class QrCodeService {
     public StreamedContent exportQrCodeListByAssets(List<AssetInfo> assetList, String templateId) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream();
         ZipOutputStream out = new ZipOutputStream(bout);
-        QrCodeTemplate template = templateDao.findById(templateId);
+        QrCodeTemplate template = Strings.isNullOrEmpty(templateId)? null:templateDao.findById(templateId);
         assetList.forEach(item -> {
             if (!Strings.isNullOrEmpty(item.getQrCode())) {
                 try {
-                    BufferedImage image= template == null? getQrCodeImage(item.getQrCode()):getQrCodeImage(item.getQrCode(), null, template);
+                    BufferedImage image =  getQrCodeImage(item.getQrCode(), null, template);
                     out.putNextEntry(new ZipEntry(Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat(item.getName()).concat(item.getQrCode()).concat(".jpg")));
                     ImageIO.write(image, "JPG", out);
                     out.closeEntry();
