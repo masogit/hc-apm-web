@@ -21,6 +21,7 @@ import com.google.common.base.Strings;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
@@ -42,7 +43,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     private Date varArrivalDateTo = null;
     private String arrivalFormatTime = null;
-    
+
     private OrgInfo fileterDeptOrg;
 
     @Override
@@ -75,10 +76,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         if (!this.hasFilterOnField("arrivalList.processType")) {
             searchFilters.add(new SearchFilter("arrivalList.processType", SearchFilter.Operator.EQ, "Normal"));
         }
-        
-        if(null != fileterDeptOrg){
+
+        if (null != fileterDeptOrg) {
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterDeptOrg.getUid(), "1*"));
-        }else{
+        } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -136,19 +137,23 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         selected = getDAO().findById(id);
 
     }
-    
-    public List<I18nMessage> getInstallStatusList(){
+
+    public List<I18nMessage> getInstallStatusList() {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
         List<I18nMessage> statusList = FieldValueMessageController.getFieldValueList("arrivalListItemStatus", siteId);
-        if(!userContextService.needInstorageCheck()){
+        if (!userContextService.needInstorageCheck()) {
             return statusList.stream().filter(item -> !ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getMsgKey())).collect(Collectors.toList());
         }
         return statusList;
     }
 
     public OrgInfo getOrgInfoByUid(String orgUid) {
-        return aiService.getOrgInfoByUid(orgUid);
+        if (Strings.isNullOrEmpty(orgUid)) {
+            return aiService.getOrgInfoByUid(orgUid);
+        }else {
+            return null;
+        }
     }
 
     public UserAccount getUserAccountByUid(String uid) {
@@ -171,13 +176,13 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
             OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
             if (deptOrg.getOrgType() == 4) {
-                fileterDeptOrg =deptOrg;
+                fileterDeptOrg = deptOrg;
                 return;
             }
         }
         fileterDeptOrg = null;
     }
-    
+
     public String getArrivalFormatTime() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
         if (varArrivalDateTo == null) {
@@ -206,5 +211,5 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
     public void setFileterDeptOrg(OrgInfo fileterDeptOrg) {
         this.fileterDeptOrg = fileterDeptOrg;
     }
-    
+
 }
