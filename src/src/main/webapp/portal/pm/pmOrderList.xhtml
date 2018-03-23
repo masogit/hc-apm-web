@@ -18,7 +18,7 @@
 
                         <p:commandButton value="创建保养" rendered="#{userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin') or userContextService.hasRole('Guest')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm pmTab:PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
 
-                                                <p:commandButton value="待派工"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"/>
+                                                <p:commandButton value="待派工"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or  userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"/>
 
                                                 <p:commandButton value="待接单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"  />
 
@@ -83,10 +83,10 @@
                             <h:outputText value="#{item.pmNum}"/>
                         </p:column>
                         <p:column headerText="当前处理步骤"  filterBy="#{item.currentStepName}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="true">
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.stepFileter}"  rendered="#{v2PmOrderController.queryIndex==-1}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmSteps').subList(0,6)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmSteps').subList(0,5)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
                             </f:facet>
 
