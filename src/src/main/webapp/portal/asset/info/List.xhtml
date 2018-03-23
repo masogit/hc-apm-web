@@ -444,8 +444,7 @@
                         <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId)}" />
                     </h:panelGrid>
                 </h:panelGroup>
-                <p:commandButton  value="确定" action="#{tableDefinitionController.getCreateUrl()}"/>
-                <p:commandButton id="exportButton" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
+                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                                 <p:fileDownload value="#{assetInfoController.zipFile}" />
                 </p:commandButton>
