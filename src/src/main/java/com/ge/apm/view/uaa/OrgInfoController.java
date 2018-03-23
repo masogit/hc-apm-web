@@ -32,6 +32,7 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.QrCodeLib;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -52,7 +53,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     private UserCommonService userCommonService;
 
-    private TenantInfoRepository tenantInfoDao;
     @Override
     protected void init() {
         filterBySite = false;
@@ -63,7 +63,6 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 		assetInfoRepository  = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository  = WebUtil.getBean(OrgInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
-        tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         findPerson();
         loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
@@ -108,8 +107,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return userList;
     }
     public void buildOrdTree(){
-        TenantInfo tempTenantInfo = tenantInfoDao.findByuid(loginUser.getTenantUID());
-        if((tempTenantInfo.getInsulate() == null || tempTenantInfo.getInsulate()) && !UserContextService.isSuperAdmin()){
+
+        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContext.getRoles().contains("LocalITAdmin")){
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
             orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
@@ -184,7 +184,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         org.setParentUID(selected.getUid());
 
         org.setSiteId(selected.getSiteId());
-        org.setHospitalId(selected.getHospitalId());
+        org.setHospitalId(selected.getId());
 
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -208,7 +208,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         org.setParentUID(selected.getUid());
 
         org.setSiteId(selected.getSiteId());
-        org.setHospitalId(selected.getHospitalId());
+        org.setHospitalId(selected.getId());
 
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -232,7 +232,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         org.setParentUID(selected.getUid());
 
         org.setSiteId(selected.getSiteId());
-        org.setHospitalId(selected.getHospitalId());
+        org.setHospitalId(selected.getId());
 
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));

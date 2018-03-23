@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.UserContext;
 
 /**
  *
@@ -115,7 +116,7 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
     public boolean isCanOperate(UserAccount cua, String siteUID){
         boolean flag = false;
 
-        if(UserContextService.isSuperAdmin()){
+        if(!UserContext.getRoles().contains("LocalITAdmin")){
             return true;
         }
         OrgInfo tempOrgInfo = orgInfoDao.getByUid(siteUID);
@@ -139,7 +140,7 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
     public boolean isCanOperate(UserAccount cua, OrgInfo oi){
         boolean flag = false;
 
-        if(UserContextService.isSuperAdmin()){
+        if(!UserContext.getRoles().contains("LocalITAdmin")){
             return true;
         }
 
