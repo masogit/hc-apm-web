@@ -88,7 +88,7 @@
                     </h:panelGroup>
                     
                      <h:panelGroup >
-                       <h:outputText style="color:red; font-size:18px" value="该设备可以外修,报修电话:4008128188" rendered="#{workOrderMgrController.selectedAsset.ibStatus eq 1 and (workOrderMgrController.selectedAsset.repairForm eq 2 or workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
+                       <h:outputText style="color:red; font-size:18px" value="该设备可以外修,报修电话:4008128188" rendered="#{!workOrderMgrController.canCreateSr() or (workOrderMgrController.selectedAsset.ibStatus eq 1 and workOrderMgrController.selectedAsset.repairForm eq 3)}"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>

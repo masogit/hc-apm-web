@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.ge.apm.service.asset;
+package com.ge.apm.service.report;
 
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;

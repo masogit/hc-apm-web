@@ -242,6 +242,25 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setDispatchUserName2(null);
 		}
+
+		//pm
+		if (selected.getPmDispatchUserId() != null) {
+			UserAccount pmDispather1 = uaDao.getById(config.getPmDispatchUserId());
+			if (pmDispather1 != null) {
+				selected.setPmDispatchUserName(pmDispather1.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName(null);
+		}
+		if (selected.getPmDispatchUserId2() != null) {
+			UserAccount pmDispather2 = uaDao.getById(config.getPmDispatchUserId2());
+			if (pmDispather2 != null) {
+				selected.setPmDispatchUserName2(pmDispather2.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName2(null);
+		}
+
 		dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
@@ -249,19 +268,23 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     public void applyChange() {
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
-    	if(isManual != null && isManual){
+		Boolean isPmManual = selected.getIsPmManualEnabled();
+		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
+
+    	if((isManual != null && isManual) || (isPmManual != null && isPmTakeOrder)){
     		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
     			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
        		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedDispather"));
        		 	return;
     		}
     	}
-    	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
+    	if((isManual != null && isTakeOrder != null && !isManual && !isTakeOrder)
+				|| (isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder)){
     		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
     		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
     		 return;
     	}
-    	onBeforeSave(selected);
+    	//onBeforeSave(selected);
     	super.save();
     }
 	

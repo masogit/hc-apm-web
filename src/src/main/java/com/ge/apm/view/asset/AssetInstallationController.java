@@ -105,25 +105,13 @@ public class AssetInstallationController {
     }
 
     private Boolean isAvailableQrcode(String qrcode) {
-        if (Strings.isNullOrEmpty(qrcode)) {
+        String qrCodeStatus = qrCodeService.isAvailableQrcode(qrcode,arrivalListItem.getArrivalList().getSiteUID());
+        if("Normal".equals(qrCodeStatus)){
             return true;
-        }
-
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
-        if (qrCodeLib == null) {
-            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
+        }else{
+            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage(qrCodeStatus));
             return false;
         }
-        if (!qrCodeLib.getSiteUID().equals(arrivalListItem.getArrivalList().getSiteUID())) {
-            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-            return false;
-        }
-        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
-            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-            return false;
-        }
-
-        return true;
     }
 
     public String finishInstall() {
