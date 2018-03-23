@@ -24,10 +24,19 @@ public class PmOrderActionForm {
 	Integer ruleLevel;
 	String desc;
 String comments;
+String pmOrderId;
 
 
 //V2_WorkOrder_Coworker[] coworkes //optional
 
+
+	public String getPmOrderId() {
+		return pmOrderId;
+	}
+
+	public void setPmOrderId(String pmOrderId) {
+		this.pmOrderId = pmOrderId;
+	}
 
 	public String getComments() {
 		return comments;

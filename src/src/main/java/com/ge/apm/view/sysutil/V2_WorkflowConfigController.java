@@ -147,12 +147,37 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return oi.getName();
 	}
 	
-	public String getOrgNameByUId(String uid){
+	public String getInsNameByUId(String uid){
 		OrgInfo oi =  orgInfoRepository.getByUid(uid);
 		if(oi == null){
 			return null;
 		}
-		return oi.getName();
+		if(oi.getOrgLevel() == 1){
+			return oi.getName();
+		}
+		return null;
+	}
+
+	public String getHospitalNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		if(oi.getOrgLevel() == 2){
+			return oi.getName();
+		}
+		return null;
+	}
+
+	public String getSiteNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		if(oi.getOrgLevel() == 3){
+			return oi.getName();
+		}
+		return null;
 	}
 	
 	public String getTenantName(String tenantUID){
@@ -242,6 +267,25 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setDispatchUserName2(null);
 		}
+
+		//pm
+		if (selected.getPmDispatchUserId() != null) {
+			UserAccount pmDispather1 = uaDao.getById(config.getPmDispatchUserId());
+			if (pmDispather1 != null) {
+				selected.setPmDispatchUserName(pmDispather1.getName());
+			}
+		}else{
+			selected.setDispatchUserName(null);
+		}
+		if (selected.getPmDispatchUserId2() != null) {
+			UserAccount pmDispather2 = uaDao.getById(config.getPmDispatchUserId2());
+			if (pmDispather2 != null) {
+				selected.setPmDispatchUserName2(pmDispather2.getName());
+			}
+		}else{
+			selected.setDispatchUserName2(null);
+		}
+
 		dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	

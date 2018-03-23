@@ -23,7 +23,7 @@ public class SharedAssetType implements Serializable{
     
     private static final long serialVersionUID = 1L;
     @Id
-    @Column(name = "uid",columnDefinition = "CHAR(32)")
+    @Column(name = "id",columnDefinition = "CHAR(32)")
     private String id;//主键
     
     @Column(name = "swap_name")

@@ -69,6 +69,8 @@ public class AssetInstallationService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private V2_PmOrderService pmService;
+    @Autowired
+    private UserContextService userContextService;
 
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
@@ -106,6 +108,10 @@ public class AssetInstallationService {
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });
                 blobDao.save(assetPicList);
+                if(!userContextService.needInstorageCheck()){
+                    temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
+                    itemDao.save(temp);
+                }
             }
             return true;
         } else {

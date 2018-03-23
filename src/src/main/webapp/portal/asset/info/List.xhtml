@@ -56,6 +56,7 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="AssetInfoListForm">
+                    <p:remoteCommand name="outputMsg" actionListener="#{assetInfoController.showMsg}" update=":growl"/>
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" resizeMode="expand"
                                  selectionMode="single" selection="#{assetInfoController.selected}" scrollable="true" scrollWidth="98%"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -66,7 +67,8 @@
                                  rowsPerPageTemplate="20,40,90,200">
 
                         <p:ajax  event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton editButton viewButton deleteButton "/>
-                        <p:ajax event="filter" listener="#{assetInfoController.onFilter}"/>
+                        <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc2();"/>
+                        <p:ajax event="page" oncomplete="rc2();" />
 
                         <p:column width="36">
                             <p:selectBooleanCheckbox value="#{assetInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
@@ -436,6 +438,7 @@
                         e.preventDefault();
                     }
                 });
+                outputMsg();
             }
             var newWin;
             function prepareAssetViewWindow() {

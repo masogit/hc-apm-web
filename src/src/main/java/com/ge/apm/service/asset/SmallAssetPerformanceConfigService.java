@@ -69,7 +69,7 @@ public class SmallAssetPerformanceConfigService {
 	private boolean checkOneConfig(SmallAssetPerformanceConfig detail,String id){
 		boolean pass=true;
 		//check asset exists
-		List<AssetInfo> listAssetInfo = this.getAssetInfoByNameAndHospitalUID(detail.getAssetName(), detail.getHospitalUID());
+		List<AssetInfo> listAssetInfo = this.getAssetInfoByNameAndHospitalUID(detail.getAssetName(), detail.getSiteUID());
 		if (listAssetInfo != null && listAssetInfo.size() > 0) {
 			detail.setStatusDisplay(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS,true);
 		} else {
@@ -124,11 +124,11 @@ public class SmallAssetPerformanceConfigService {
 		smallAssetPerformanceConfigDao.save(list);
 	}
 
-	private List<AssetInfo> getAssetInfoByNameAndHospitalUID(String name, String hospitalUID) {
+	private List<AssetInfo> getAssetInfoByNameAndHospitalUID(String name, String siteUID) {
 		List<AssetInfo> listAssetInfo = null;
 
 		if (!StringHelper.isNullOrEmptyString(name)) {
-			listAssetInfo = assetInfoDao.getAssetInfoByNameAndHospitalUID(name, hospitalUID);
+			listAssetInfo = assetInfoDao.getAssetInfoByNameAndHospitalUID(name, siteUID);
 		}
 
 		return listAssetInfo;
