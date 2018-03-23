@@ -22,6 +22,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.jsf.FacesContextUtils;
 
 import com.ge.apm.domain.UserAccount;
+import javax.servlet.http.HttpSession;
 
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.service.DbResourcesUtil;
@@ -276,5 +277,18 @@ public class WebUtil implements ApplicationContextAware {
     	return UserContext.getCurrentLoginUser(request);
     }
     
+    public static void putGrowlMsg(String msg){
+        HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        HttpSession session = request.getSession();
+        session.setAttribute("growlMsg", msg);
+    }
+    
+    public static String getGrowlMsg(){
+        HttpServletRequest request = (HttpServletRequest)FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        HttpSession session = request.getSession();
+        String growlMsg = (String)session.getAttribute("growlMsg");
+        session.removeAttribute("growlMsg");
+        return growlMsg;
+    }
     
 }

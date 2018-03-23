@@ -40,7 +40,7 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
 
     private OrgInfo fileterDeptOrg;
     private OrgInfo fileterSiteOrg;
-
+    
     @Override
     protected void init() {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -110,6 +110,13 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         return dao.find();
     }
 
+    
+    public void showMsg(){
+        String pageMsg = WebUtil.getGrowlMsg();
+        if(!Strings.isNullOrEmpty(pageMsg)){
+            WebUtil.addErrorMessage(pageMsg);
+        }
+    }
 //    public List<TenantInfo> getSiteList() {
 //
 //        List<TenantInfo> res = new ArrayList();

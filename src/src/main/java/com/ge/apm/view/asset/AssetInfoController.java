@@ -652,13 +652,24 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         Boolean isNew = selected.hashCode() == 0;
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
-        if (isGeneratePmOrder != null && isGeneratePmOrder && isNew && !Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
-            pmService.createPMrequest(selected.getUid(), null);
+        if (isGeneratePmOrder != null && isGeneratePmOrder && isNew) {
+            if(Strings.isNullOrEmpty(selected.getClinicalDeptUID())){
+                WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
+            }else{
+                pmService.createPMrequest(selected.getUid(), null);
+            }
         }
         if (resultStatus) {
             return getListPageLink();
         } else {
             return "";
+        }
+    }
+    
+    public void showMsg(){
+        String pageMsg = WebUtil.getGrowlMsg();
+        if(!Strings.isNullOrEmpty(pageMsg)){
+            WebUtil.addErrorMessage(pageMsg);
         }
     }
 

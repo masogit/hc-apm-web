@@ -171,6 +171,10 @@
                                 <label class = "label">维保提醒次数</label>
                                 <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">到货安装是否需要核对入库</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}"/>
+                            </h:panelGroup >
 
                         </p:panelGrid>
                     </p:fieldset>
