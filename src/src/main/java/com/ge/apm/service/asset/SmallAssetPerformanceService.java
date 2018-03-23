@@ -4,14 +4,13 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -32,6 +31,7 @@ import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.SmallAssetPerformanceReport;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.utils.ExcelParser;
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -63,7 +63,7 @@ public class SmallAssetPerformanceService {
 	private SmallAssetPerformanceReportRepository reportDao;
 	
 	public boolean checkExists(SmallAssetPerformance detail){
-		Integer result=smallAssetPerformanceDao.findExistsByProjectNameAndHappenDate(detail.getProjectName(), detail.getHappenDate(),detail.getHospitalUID());
+		Integer result=smallAssetPerformanceDao.findExistsByProjectNameAndHappenDate(detail.getProjectName(), detail.getHappenDate(),detail.getSiteUID());
 		if(result!=null && result==1){
 			return true;
 		}
@@ -81,7 +81,7 @@ public class SmallAssetPerformanceService {
 	}
 	private boolean checkConfigExists(SmallAssetPerformance detail){
 		boolean pass=true;
-		List<SmallAssetPerformanceConfig> listConfig = this.getConfigByProjectNameAndHospitalUID(detail.getProjectName(), detail.getHospitalUID());
+		List<SmallAssetPerformanceConfig> listConfig = this.getConfigByProjectNameAndSiteUID(detail.getProjectName(), detail.getSiteUID());
 		if (listConfig != null && listConfig.size() > 0) {
 			detail.setStatusDisplay(UploadFileErrorTypeEnum.CONFIG_NOT_EXISTS,true);
 			if(checkConfigRight(listConfig)){
@@ -101,7 +101,7 @@ public class SmallAssetPerformanceService {
 	private boolean checkConfigRight(List<SmallAssetPerformanceConfig> listConfig){
 		boolean pass=true;
 		for(SmallAssetPerformanceConfig config : listConfig){
-			if(!config.getStatus().equals("1")){
+			if(!config.getStatusCode().equals("1")){
 				pass=false;
 				break;
 			}
@@ -109,18 +109,18 @@ public class SmallAssetPerformanceService {
 		return pass;
 	}
 
-	private List<SmallAssetPerformanceConfig> getConfigByProjectNameAndHospitalUID(String projectName, String hospitalUID) {
+	private List<SmallAssetPerformanceConfig> getConfigByProjectNameAndSiteUID(String projectName, String SiteUID) {
 		List<SmallAssetPerformanceConfig> listAssetInfo = null;
 
 		if (!StringHelper.isNullOrEmptyString(projectName)) {
-			listAssetInfo = configDao.findConfigByProjectNameAndHospitalUID(projectName, hospitalUID);
+			listAssetInfo = configDao.findConfigByProjectNameAndSiteUID(projectName, SiteUID);
 		}
 
 		return listAssetInfo;
 	}
 	
 	private void saveSmallAssetPerformance(SmallAssetPerformance newDetail){
-		SmallAssetPerformance dbDetail=smallAssetPerformanceDao.findByProjectNameAndHappenDate(newDetail.getProjectName(), newDetail.getHappenDate(),newDetail.getHospitalUID());
+		SmallAssetPerformance dbDetail=smallAssetPerformanceDao.findByProjectNameAndHappenDate(newDetail.getProjectName(), newDetail.getHappenDate(),newDetail.getSiteUID());
 		if(dbDetail!=null){
 			newDetail.setId(dbDetail.getId());
 			smallAssetPerformanceDao.save(newDetail);
@@ -131,22 +131,53 @@ public class SmallAssetPerformanceService {
 	}
 
 	public List<SmallAssetPerformance> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
-		// SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 		List<SmallAssetPerformance> importFailedDataList = new ArrayList<>();
 		HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
 		HSSFSheet sheet = workbook.getSheetAt(0);
 		if (sheet == null) {
 			return null;
 		}
-		Map<String, Integer> header = findHeader(sheet);
+		List<String> headers = new ArrayList<>();
+		headers.add(HEADER_DEPARTMENT);
+		headers.add(HEADER_COSTTYPE);
+		headers.add(HEADER_CODE);
+		headers.add(HEADER_PROJECTNAME);
+		headers.add(HEADER_PROJECTNUMBER);
+		headers.add(HEADER_STANDARD);
+		headers.add(HEADER_QUANTITY);
+		headers.add(HEADER_AMOUNT);
+		headers.add(HEADER_HAPPENDATE);
+		Map<String, Integer> header = ExcelParser.findHeader(sheet,headers);
 		if (header.isEmpty()) {
 			return null;
 		}
+		String department;
+		String costtype;
+		String code;
+		String projectname;
+		String projectnumber;
+		double standard;
+		double quantity;
+		double amount;
+		Date happendate;
+		
+		int departmentIndex=header.get(HEADER_DEPARTMENT);
+		int costtypeIndex=header.get(HEADER_COSTTYPE);
+		int codeIndex=header.get(HEADER_CODE);
+		int projectnameIndex=header.get(HEADER_PROJECTNAME);
+		int projectnumberIndex=header.get(HEADER_PROJECTNUMBER);
+		int standardIndex=header.get(HEADER_STANDARD);
+		int quantityIndex=header.get(HEADER_QUANTITY);
+		int amountIndex=header.get(HEADER_AMOUNT);
+		int happendateIndex=header.get(HEADER_HAPPENDATE);
+
 		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
 			HSSFRow row = sheet.getRow(j);
-			if (row == null || row.getCell(header.get("HEADER_PROJECTNAME")) == null || row.getCell(header.get("HEADER_PROJECTNAME")).getStringCellValue().trim() == "") {
+			if (row == null) {
 				continue;
 			}
+			boolean pass=true;
 			SmallAssetPerformance detail = new SmallAssetPerformance();
 			try {
 				detail.setExcelIdex(j + 1);
@@ -154,19 +185,42 @@ public class SmallAssetPerformanceService {
 				detail.setInstitutionUID(user.getInstitutionUID());
 				detail.setHospitalUID(user.getHospitalUID());
 				detail.setSiteUID(user.getSiteUID());
-				detail.setDepartment(row.getCell(header.get("HEADER_DEPARTMENT")) == null ? null : row.getCell(header.get("HEADER_DEPARTMENT")).getStringCellValue());
-				detail.setCostType(row.getCell(header.get("HEADER_COSTTYPE")) == null ? null : row.getCell(header.get("HEADER_COSTTYPE")).getStringCellValue());
-				detail.setCode(row.getCell(header.get("HEADER_CODE")) == null ? null : row.getCell(header.get("HEADER_CODE")).getStringCellValue());
-				detail.setProjectName(row.getCell(header.get("HEADER_PROJECTNAME")) == null ? null : row.getCell(header.get("HEADER_PROJECTNAME")).getStringCellValue());
-				detail.setProjectNumber(row.getCell(header.get("HEADER_PROJECTNUMBER")) == null ? null : row.getCell(header.get("HEADER_PROJECTNUMBER")).getStringCellValue());
-				detail.setStandard(row.getCell(header.get("HEADER_STANDARD")) == null ? null : row.getCell(header.get("HEADER_STANDARD")).getNumericCellValue());
-				detail.setQuantity(row.getCell(header.get("HEADER_QUANTITY")) == null ? null : row.getCell(header.get("HEADER_QUANTITY")).getNumericCellValue());
-				detail.setAmount(row.getCell(header.get("HEADER_AMOUNT")) == null ? null : row.getCell(header.get("HEADER_AMOUNT")).getNumericCellValue());
-				detail.setHappenDate(row.getCell(header.get("HEADER_HAPPENDATE")) == null ? null : row.getCell(header.get("HEADER_HAPPENDATE")).getDateCellValue());
+				department=ExcelParser.getCellStringValue(row, departmentIndex);
+				costtype=ExcelParser.getCellStringValue(row, costtypeIndex);
+				code=ExcelParser.getCellStringValue(row, codeIndex);
+				projectname=ExcelParser.getCellStringValue(row, projectnameIndex);
+				projectnumber=ExcelParser.getCellStringValue(row, projectnumberIndex);
+				standard=ExcelParser.getCellNumberValue(row, standardIndex);
+				quantity=ExcelParser.getCellNumberValue(row, quantityIndex);
+				amount=ExcelParser.getCellNumberValue(row, amountIndex);
+				happendate=ExcelParser.getCellDateValue(row, happendateIndex,sdf);
+				if(StringUtils.isEmpty(projectname)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"项目名称不能为空；");
+					pass=false;
+				}
+				if(happendate==null){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"日期不能为空；");
+					pass=false;
+				}
+				if(StringUtils.isNotEmpty(projectname) && (happendate != null)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
+				}
+				if(!pass){
+					importFailedDataList.add(detail);
+					continue;
+				}
+				detail.setDepartment(department);
+				detail.setCostType(costtype);
+				detail.setCode(code);
+				detail.setProjectName(projectname);
+				detail.setProjectNumber(projectnumber);
+				detail.setStandard(standard);
+				detail.setQuantity(quantity);
+				detail.setAmount(amount);
+				detail.setHappenDate(happendate);
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
-				
-				boolean pass=checkData(detail);
-				if(pass){
+
+				if(checkData(detail)){
 //					smallAssetPerformanceDao.save(detail);
 					saveSmallAssetPerformance(detail);
 					insertReportData(detail);
@@ -187,7 +241,7 @@ public class SmallAssetPerformanceService {
 	public void insertReportData(SmallAssetPerformance detail){
 		//no update action, so delete it.
 		deleteReportData(detail);
-		List<SmallAssetPerformanceConfig> listConfig=configDao.findConfigByProjectNameAndHospitalUID(detail.getProjectName(), detail.getHospitalUID());
+		List<SmallAssetPerformanceConfig> listConfig=configDao.findConfigByProjectNameAndSiteUID(detail.getProjectName(), detail.getSiteUID());
 		if(listConfig!=null && listConfig.size()>0){
 			String assetName="";
 			List<AssetInfo> listAssetInfo=null;
@@ -196,7 +250,7 @@ public class SmallAssetPerformanceService {
 			SmallAssetPerformanceReport report=null;
 			for(SmallAssetPerformanceConfig obj : listConfig){
 				assetName=obj.getAssetName();
-				listAssetInfo=assetInfoDao.getAssetInfoByNameAndHospitalUID(assetName, detail.getSiteUID());
+				listAssetInfo=assetInfoDao.getAssetInfoByNameAndSiteUID(assetName, detail.getSiteUID());
 				if(listAssetInfo!=null && listAssetInfo.size()>0){
 					count=listAssetInfo.size();
 					for(AssetInfo assetInfo: listAssetInfo){
@@ -231,83 +285,4 @@ public class SmallAssetPerformanceService {
 			reportDao.delete(listReports);
 		}
 	}
-
-	private Map<String, Integer> findHeader(HSSFSheet sheet) {
-		Map<String, Integer> header = new HashMap<>();
-		for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
-			HSSFRow row = sheet.getRow(i);
-			if (row == null) {
-				continue;
-			}
-			boolean hasDepartment = false;
-			boolean hasCostType = false;
-			boolean hasCode = false;
-			boolean hasProjectName = false;
-			boolean hasProjectNumber = false;
-			boolean hasStandard = false;
-			boolean hasQuantity = false;
-			boolean hasAmount = false;
-			boolean hasHappenDate = false;
-
-			for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
-				HSSFCell cell = row.getCell(j);
-				if (cell == null) {
-					continue;
-				}
-				try {
-
-					switch (cell.getStringCellValue()) {
-					case HEADER_DEPARTMENT:
-						hasDepartment = true;
-						header.put("HEADER_DEPARTMENT", j);
-						break;
-					case HEADER_COSTTYPE:
-						hasCostType = true;
-						header.put("HEADER_COSTTYPE", j);
-						break;
-					case HEADER_CODE:
-						hasCode = true;
-						header.put("HEADER_CODE", j);
-						break;
-					case HEADER_PROJECTNAME:
-						hasProjectName = true;
-						header.put("HEADER_PROJECTNAME", j);
-						break;
-					case HEADER_PROJECTNUMBER:
-						hasProjectNumber = true;
-						header.put("HEADER_PROJECTNUMBER", j);
-						break;
-					case HEADER_STANDARD:
-						hasStandard = true;
-						header.put("HEADER_STANDARD", j);
-						break;
-					case HEADER_QUANTITY:
-						hasQuantity = true;
-						header.put("HEADER_QUANTITY", j);
-						break;
-					case HEADER_AMOUNT:
-						hasAmount = true;
-						header.put("HEADER_AMOUNT", j);
-						break;
-					case HEADER_HAPPENDATE:
-						hasHappenDate = true;
-						header.put("HEADER_HAPPENDATE", j);
-						break;
-					default:
-						break;
-					}
-				} catch (Exception e) {
-					LOGGER.debug(e.getMessage());
-					continue;
-				}
-			}
-			if (hasDepartment && hasCostType && hasCode && hasProjectName && hasProjectNumber && hasStandard && hasQuantity && hasAmount && hasHappenDate) {
-				header.put("HEADER_ROW", i);
-				break;
-			}
-		}
-
-		return header;
-	}
-
 }

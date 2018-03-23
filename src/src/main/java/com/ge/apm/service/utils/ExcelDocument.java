@@ -5,32 +5,17 @@
  */
 package com.ge.apm.service.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.DateUtil;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import webapp.framework.util.TimeUtil;
+
+import java.io.*;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  *
@@ -45,6 +30,9 @@ public class ExcelDocument {
     ExcelType documentType;
 
     Workbook workBook;
+
+    final CellStyle DEFAULT_CELL_STYLE_DATE;
+    final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
 
     public static ExcelType parseTypeByFileName(String path) {
         if (path.endsWith(".xls")) {
@@ -67,6 +55,14 @@ public class ExcelDocument {
         } else if (type.equals(ExcelType.XLSX)) {
             workBook = new XSSFWorkbook(input);
         }
+
+        CreationHelper createHelper = workBook.getCreationHelper();
+
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/d/yyyy"));
+
+        DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
 
         input.close();
     }
@@ -434,9 +430,6 @@ public class ExcelDocument {
     }
 
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
-        Sheet sheet = workBook.getSheet(sheetName);
-        //Row dataRow = sheet.getRow(dataRowNum - 1);
-        Row dataRow = sheet.createRow(dataRowNum - 1);
 
         for (int index = 0; index < rowKey.length; index++) {
             String key = rowKey[index];
@@ -444,10 +437,8 @@ public class ExcelDocument {
                 continue;
             }
             Object value = data.get(key);
-            if (null == dataRow.getCell(index)) {
-                dataRow.createCell(index);
-            }
-            writeCellData(dataRow.getCell(index), value);
+
+            writeCellData(sheetName, dataRowNum, index + 1, value);
         }
     }
 
@@ -467,6 +458,8 @@ public class ExcelDocument {
         }
         if (data instanceof Date) {
             cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
+
             cell.setCellValue((Date) data);
         }
         if (data instanceof Integer) {
@@ -475,7 +468,50 @@ public class ExcelDocument {
         }
         if (data instanceof Double) {
             cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+
             cell.setCellValue((Double) data);
+        }
+
+    }
+
+    public void writeCellData(String sheetName, int rowNum, int colNum, Object value) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
+
+    }
+
+    public void removeRow(String sheetName, int rowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow != null) {
+            sheet.removeRow(dataRow);
+        }
+
+    }
+
+    public void clearRow(String sheetName, int rowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow != null) {
+            int firstCellNum = dataRow.getFirstCellNum();
+            int lastCellNum = dataRow.getLastCellNum();
+            for (int col = firstCellNum; col < lastCellNum; col++) {
+                Cell cell = dataRow.getCell(col);
+                if (cell.getCellTypeEnum() != CellType.BLANK) {
+                    cell.setCellType(CellType.BLANK);
+                }
+            }
         }
 
     }

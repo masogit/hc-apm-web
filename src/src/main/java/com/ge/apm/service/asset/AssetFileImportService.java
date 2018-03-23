@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -20,6 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -32,6 +36,8 @@ import java.util.*;
 @Scope("prototype")
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
+
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.1";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -49,21 +55,21 @@ public class AssetFileImportService {
     private Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     private String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
     private String orgUid = UserContextService.getCurrentUserAccount().getSiteUID();
-    private List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
-    private List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
-    private List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
-    private List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
-    private List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
-    private List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
-    private List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
-    private List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
-    private List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
-    private List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
+    public List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
+    public List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
+    public List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
+    public List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
+    public List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
+    public List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
+    public List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
+    public List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
+    public List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
+    public List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
 //    private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
-    private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
-    private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
-    private List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
-    private List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
+    public List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
+    public List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
+    public List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
+    public List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -159,6 +165,12 @@ public class AssetFileImportService {
                 boolean isNewAsset = true; //flag an asset is new or existing.
 
                 AssetInfo asset = new AssetInfo();
+
+                String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
+                if (!StringUtils.isEmpty(uuid)) {
+                    asset.setUid(uuid);
+                }
+
                 String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
@@ -596,21 +608,28 @@ public class AssetFileImportService {
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
 
         List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
-        if (!StringUtils.isEmpty(asset.getQrCode())) {
-            assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+
+        if (!StringUtils.isEmpty(asset.getUid())) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
         } else {
-            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
 
-            if (!StringUtils.isEmpty(asset.getDepartNum())) {
-                assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-            }
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
-            if (!StringUtils.isEmpty(asset.getFinancingNum())) {
-                assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+            if (!StringUtils.isEmpty(asset.getQrCode())) {
+                assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+            } else {
+                assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
+
+                if (!StringUtils.isEmpty(asset.getDepartNum())) {
+                    assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+                }
+
+                if (!StringUtils.isEmpty(asset.getFinancingNum())) {
+                    assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+                }
             }
         }
 
@@ -693,7 +712,38 @@ public class AssetFileImportService {
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v2.0".equalsIgnoreCase(inputVersion);
+        return EXCEL_ASSET_TEMPLATE_VERSION.equalsIgnoreCase(inputVersion);
+    }
+
+    /**
+     * export asset based on the asset import excel template
+     * @param assetList
+     * @return
+     * @throws IOException
+     */
+    public ExcelDocument exportAsset(List<AssetInfo> assetList, boolean allColumns) throws IOException {
+
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+        //fix template version
+        doc.writeCellData(AssetFileImportService.SHEET_ASSET, 2, 3, AssetFileImportService.EXCEL_ASSET_TEMPLATE_VERSION);
+        //remove fake data row
+        doc.clearRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_DATA_ROW);
+
+        String[] columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
+
+        int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
+        for (AssetInfo assetInfo: assetList) {
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, this);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(allColumns);
+
+            doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
+
+            ++startRow;
+        }
+
+        return doc;
+
     }
 
 }

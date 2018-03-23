@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
@@ -24,6 +24,7 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SmallAssetPerformanceConfig;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.utils.ExcelParser;
 
 /**
  * Created by 212605082 on 2017/11/7.
@@ -45,7 +46,7 @@ public class SmallAssetPerformanceConfigService {
 	private SmallAssetPerformanceConfigRepository smallAssetPerformanceConfigDao;
 
 	public boolean checkConfigExists(SmallAssetPerformanceConfig detail){
-		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getHospitalUID());
+		Integer result=smallAssetPerformanceConfigDao.findExistsByProjectNameAndAssetName(detail.getProjectName(), detail.getAssetName(),detail.getSiteUID());
 		if(result!=null && result==1){
 			return true;
 		}
@@ -69,7 +70,7 @@ public class SmallAssetPerformanceConfigService {
 	private boolean checkOneConfig(SmallAssetPerformanceConfig detail,String id){
 		boolean pass=true;
 		//check asset exists
-		List<AssetInfo> listAssetInfo = this.getAssetInfoByNameAndHospitalUID(detail.getAssetName(), detail.getSiteUID());
+		List<AssetInfo> listAssetInfo = this.getAssetInfoByNameAndSiteUID(detail.getAssetName(), detail.getSiteUID());
 		if (listAssetInfo != null && listAssetInfo.size() > 0) {
 			detail.setStatusDisplay(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS,true);
 		} else {
@@ -82,9 +83,9 @@ public class SmallAssetPerformanceConfigService {
 	public boolean checkListConfig(SmallAssetPerformanceConfig detail,String id,boolean deleteAction){
 		boolean pass=true;
 		//check configList rate
-		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndHospitalUID(detail.getProjectName(), detail.getHospitalUID());
+		List<SmallAssetPerformanceConfig> listDetails=smallAssetPerformanceConfigDao.findConfigByProjectNameAndSiteUID(detail.getProjectName(), detail.getSiteUID());
+		double rate=0;
 		if(listDetails!=null && listDetails.size()>0){
-			double rate=0;
 			for(SmallAssetPerformanceConfig config: listDetails){
 				if(config.getProjectName().equals(detail.getProjectName())){
 					if(config.getRate()!=null){
@@ -98,18 +99,18 @@ public class SmallAssetPerformanceConfigService {
 					}
 				}
 			}
-			if(!deleteAction){
-				rate+=detail.getRate();
-			}
-			if(rate!=1){
-				updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,false);
-				detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,false);
-				pass=false;
-			}
-			else{
-				updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,true);
-				detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,true);
-			}
+		}
+		if(!deleteAction){
+			rate+=detail.getRate();
+		}
+		if(rate!=1){
+			updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,false);
+			detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,false);
+			pass=false;
+		}
+		else{
+			updateOtherConfigList(listDetails,detail,UploadFileErrorTypeEnum.RATE_WRONG,true);
+			detail.setStatusDisplay(UploadFileErrorTypeEnum.RATE_WRONG,true);
 		}
 		return pass;
 	}
@@ -124,18 +125,18 @@ public class SmallAssetPerformanceConfigService {
 		smallAssetPerformanceConfigDao.save(list);
 	}
 
-	private List<AssetInfo> getAssetInfoByNameAndHospitalUID(String name, String siteUID) {
+	private List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID) {
 		List<AssetInfo> listAssetInfo = null;
 
 		if (!StringHelper.isNullOrEmptyString(name)) {
-			listAssetInfo = assetInfoDao.getAssetInfoByNameAndHospitalUID(name, siteUID);
+			listAssetInfo = assetInfoDao.getAssetInfoByNameAndSiteUID(name, siteUID);
 		}
 
 		return listAssetInfo;
 	}
 	
 	private void saveSmallAssetPerformanceConfig(SmallAssetPerformanceConfig newDetail){
-		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getHospitalUID());
+		SmallAssetPerformanceConfig dbDetail=smallAssetPerformanceConfigDao.findByProjectNameAndAssetName(newDetail.getProjectName(), newDetail.getAssetName(),newDetail.getSiteUID());
 		if(dbDetail!=null){
 			newDetail.setId(dbDetail.getId());
 			checkData(newDetail,dbDetail.getId(),false);
@@ -155,27 +156,64 @@ public class SmallAssetPerformanceConfigService {
 		if (sheet == null) {
 			return null;
 		}
-		Map<String, Integer> header = findHeader(sheet);
+		List<String> headers = new ArrayList<>();
+        headers.add(HEADER_PROJECTNAME);
+        headers.add(HEADER_PROJECTNUMBER);
+        headers.add(HEADER_DEPARTMENT);
+        headers.add(HEADER_ASSETNAME);
+        headers.add(HEADER_RATE);
+		Map<String, Integer> header = ExcelParser.findHeader(sheet,headers);
 		if (header.isEmpty()) {
 			return null;
 		}
+		String projectName;
+		String projectNumber;
+		String department;
+		String assetName;
+		double rate;
+		int projectNameIndex=header.get(HEADER_PROJECTNAME);
+		int projectNubmerIndex=header.get(HEADER_PROJECTNUMBER);
+		int departmentIndex=header.get(HEADER_DEPARTMENT);
+		int assetNameIndex=header.get(HEADER_ASSETNAME);
+		int rateIndex=header.get(HEADER_RATE);
 		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
 			HSSFRow row = sheet.getRow(j);
-			if (row == null || row.getCell(header.get("HEADER_PROJECTNAME")) == null || row.getCell(header.get("HEADER_PROJECTNAME")).getStringCellValue().trim() == "") {
+			if (row == null) {
 				continue;
 			}
-			SmallAssetPerformanceConfig detail = new SmallAssetPerformanceConfig();
+			boolean pass=true;
+			SmallAssetPerformanceConfig detail = new SmallAssetPerformanceConfig();			
 			try {
 				detail.setExcelIdex(j + 1);
 				detail.setTenantUID(user.getTenantUID());
 				detail.setInstitutionUID(user.getInstitutionUID());
 				detail.setHospitalUID(user.getHospitalUID());
 				detail.setSiteUID(user.getSiteUID());
-				detail.setProjectName(row.getCell(header.get("HEADER_PROJECTNAME")) == null ? null : row.getCell(header.get("HEADER_PROJECTNAME")).getStringCellValue());
-				detail.setProjectNumber(row.getCell(header.get("HEADER_PROJECTNUMBER")) == null ? null : row.getCell(header.get("HEADER_PROJECTNUMBER")).getStringCellValue());
-				detail.setDepartment(row.getCell(header.get("HEADER_DEPARTMENT")) == null ? null : row.getCell(header.get("HEADER_DEPARTMENT")).getStringCellValue());
-				detail.setAssetName(row.getCell(header.get("HEADER_ASSETNAME")) == null ? null : row.getCell(header.get("HEADER_ASSETNAME")).getStringCellValue());
-				detail.setRate(row.getCell(header.get("HEADER_RATE")) == null ? null : row.getCell(header.get("HEADER_RATE")).getNumericCellValue());
+				projectName=ExcelParser.getCellStringValue(row, projectNameIndex);
+				projectNumber=ExcelParser.getCellStringValue(row, projectNubmerIndex);
+				department=ExcelParser.getCellStringValue(row, departmentIndex);
+				assetName=ExcelParser.getCellStringValue(row, assetNameIndex);
+				rate=ExcelParser.getCellNumberValue(row, rateIndex);
+				if(StringUtils.isEmpty(projectName)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"项目名称不能为空；");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(assetName)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"设备名称不能为空；");
+					pass=false;
+				}
+				if(StringUtils.isNotEmpty(projectName)&&StringUtils.isNotEmpty(assetName)){
+					detail.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,true);
+				}
+				if(!pass){
+					importFailedDataList.add(detail);
+					continue;
+				}
+				detail.setProjectName(projectName);
+				detail.setProjectNumber(projectNumber);
+				detail.setDepartment(department);
+				detail.setAssetName(assetName);
+				detail.setRate(rate);
 				detail.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,true);
 //				checkData(detail,null,false);
 //				smallAssetPerformanceConfigDao.save(detail);
@@ -189,63 +227,4 @@ public class SmallAssetPerformanceConfigService {
 		}
 		return importFailedDataList;
 	}
-
-	private Map<String, Integer> findHeader(HSSFSheet sheet) {
-		Map<String, Integer> header = new HashMap<>();
-		for (int i = sheet.getFirstRowNum(); i <= sheet.getLastRowNum(); i++) {
-			HSSFRow row = sheet.getRow(i);
-			if (row == null) {
-				continue;
-			}
-			boolean hasProjectName = false;
-			boolean hasProjectNumber = false;
-			boolean hasDepartment = false;
-			boolean hasAssetName = false;
-			boolean hasRate = false;
-
-			for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
-				HSSFCell cell = row.getCell(j);
-				if (cell == null) {
-					continue;
-				}
-				try {
-
-					switch (cell.getStringCellValue()) {
-					case HEADER_PROJECTNAME:
-						hasProjectName = true;
-						header.put("HEADER_PROJECTNAME", j);
-						break;
-					case HEADER_PROJECTNUMBER:
-						hasProjectNumber = true;
-						header.put("HEADER_PROJECTNUMBER", j);
-						break;
-					case HEADER_DEPARTMENT:
-						hasDepartment = true;
-						header.put("HEADER_DEPARTMENT", j);
-						break;
-					case HEADER_ASSETNAME:
-						hasAssetName = true;
-						header.put("HEADER_ASSETNAME", j);
-						break;
-					case HEADER_RATE:
-						hasRate = true;
-						header.put("HEADER_RATE", j);
-						break;
-					default:
-						break;
-					}
-				} catch (Exception e) {
-					LOGGER.debug(e.getMessage());
-					continue;
-				}
-			}
-			if (hasProjectName && hasProjectNumber && hasDepartment && hasAssetName && hasRate) {
-				header.put("HEADER_ROW", i);
-				break;
-			}
-		}
-
-		return header;
-	}
-
 }
