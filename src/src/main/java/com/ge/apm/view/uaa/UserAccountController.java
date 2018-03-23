@@ -45,6 +45,7 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -108,8 +109,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.tenantUid = tenantUid;
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
-        //判断租户是否设置院区隔离，还有登陆用户是否是superAdmin
-        if((tempTenantInfo.getInsulate() == null || tempTenantInfo.getInsulate()) && !UserContextService.isSuperAdmin()){
+        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContext.getRoles().contains("LocalITAdmin")){
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
@@ -215,6 +216,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
         allRoles = uaaService.getSysRoleNames();
+        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContext.getRoles().contains("LocalITAdmin")){
+            allRoles.remove("后台运营管理");
+        }
 
         assignedRoles = new ArrayList<String>();
         for (UserRole userRole : selected.getUserRoleList()) {
