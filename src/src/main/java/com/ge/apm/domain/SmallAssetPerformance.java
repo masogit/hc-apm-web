@@ -81,6 +81,9 @@ public class SmallAssetPerformance implements Serializable {
 
 	@Transient
 	private String statusDisplay;
+	
+	@Transient
+	private String otherErrorMessage;
 
 	public String getId() {
 		return id;
@@ -229,6 +232,8 @@ public class SmallAssetPerformance implements Serializable {
 			}
 			else if (this.status.contains(UploadFileErrorTypeEnum.CONFIG_WRONG + ",")) {
 				result += "配置文件错误；";
+			}else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+				result+=this.otherErrorMessage;
 			}
 			else{
 				result += this.status;
@@ -252,16 +257,31 @@ public class SmallAssetPerformance implements Serializable {
 			}
 		}
 	}
+	
+	public void setStatusDisplay(UploadFileErrorTypeEnum type,String otherErrorMessage) {
+		if (this.status == null) {
+			this.status = type + ",";
+		} else if(this.status.indexOf(type+",")<0){
+			this.status += type + ",";
+		}
+		this.otherErrorMessage=otherErrorMessage;
+	}
 
 	public String getStatus() {
-		if (StringUtils.isEmpty(this.status)) {
-			return "1";
-		}
-		return "2";
+		return this.status;
 	}
 
 	private void setStatus(String status) {
 		this.status = status;
+	}
+
+	
+	public String getOtherErrorMessage() {
+		return otherErrorMessage;
+	}
+
+	public void setOtherErrorMessage(String otherErrorMessage) {
+		this.otherErrorMessage = otherErrorMessage;
 	}
 
 	@Override
