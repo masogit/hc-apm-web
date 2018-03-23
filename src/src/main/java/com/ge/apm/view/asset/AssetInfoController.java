@@ -135,11 +135,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private WorkflowConfigRepository wfCfigDao;
 
-    private SharedAssetTypeRepository  swapDao;
+    private SharedAssetTypeRepository swapDao;
     List<String> orgUids;
     List<String> swapUids;
 
     private Integer queryIndex = -1;
+
+    private String exportQrCodeTemplateId;
 
     public Integer getQueryIndex() {
         return queryIndex;
@@ -360,13 +362,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
             searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
-        } else if(queryIndex == 2){
+        } else if (queryIndex == 2) {
             //正常已借出
             searchFilters = new ArrayList<SearchFilter>();
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
             searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
-        }else if(queryIndex == 3){
+        } else if (queryIndex == 3) {
             //故障不可借用
             searchFilters = new ArrayList<SearchFilter>();
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 1));
@@ -375,7 +377,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         if (assetId == null) {
             if (searchFilters == null) {
-                 searchFilters = new ArrayList<SearchFilter>();
+                searchFilters = new ArrayList<SearchFilter>();
             }
             setUserSearchFilters();
         }
@@ -390,7 +392,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     @Override
-    public void onFilter(FilterEvent event){
+    public void onFilter(FilterEvent event) {
         super.onFilter(event);
         this.selectedMap.clear();
     }
@@ -410,9 +412,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
-//        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(AssetInfo::getQrCode).collect(Collectors.toList());
-//        zipFile = qrCodeService.exportQrCodeList(qrCodeList);
-        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()));
+        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()),exportQrCodeTemplateId);
     }
 
     public void onSelectAllOfPage() {
@@ -662,9 +662,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
         if (isGeneratePmOrder != null && isGeneratePmOrder && isNew) {
-            if(Strings.isNullOrEmpty(selected.getClinicalDeptUID())){
+            if (Strings.isNullOrEmpty(selected.getClinicalDeptUID())) {
                 WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
-            }else{
+            } else {
                 pmService.createPMrequest(selected.getUid(), null);
             }
         }
@@ -677,7 +677,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void showMsg(){
         String pageMsg = WebUtil.getGrowlMsg();
-        if(!Strings.isNullOrEmpty(pageMsg)){
+        if (!Strings.isNullOrEmpty(pageMsg)) {
             WebUtil.addErrorMessage(pageMsg);
         }
     }
@@ -1628,7 +1628,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void searchList(Integer buttonIndex) {
-       queryIndex = buttonIndex;
+        queryIndex = buttonIndex;
         this.searchFilters = null;
         this.selected = null;
     }
@@ -1659,6 +1659,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         List<PmScheduleData> pmsList = pmSchDao.getPmScheduleList(this.selected.getUid(), type);
         return pmsList;
+    }
+
+    public List<QrCodeTemplate> getQrCodeTemplates() {
+        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
+        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
     }
 
     //获取外修工单
@@ -1711,7 +1716,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         streamedContent.setName("AssetInfo_export.xlsx");
 
         excelFile = streamedContent;
+    }
 
+    public String getExportQrCodeTemplateId() {
+        return exportQrCodeTemplateId;
+    }
+
+    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
+        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
 }
