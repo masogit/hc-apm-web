@@ -500,6 +500,22 @@ public class ExcelDocument {
 
     }
 
+    public void clearRow(String sheetName, int rowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow != null) {
+            int firstCellNum = dataRow.getFirstCellNum();
+            int lastCellNum = dataRow.getLastCellNum();
+            for (int col = firstCellNum; col < lastCellNum; col++) {
+                Cell cell = dataRow.getCell(col);
+                if (cell.getCellTypeEnum() != CellType.BLANK) {
+                    cell.setCellType(CellType.BLANK);
+                }
+            }
+        }
+
+    }
+
     public void clearRowsData(String sheetName, Integer startRow, Integer endRow) {
         Sheet sheet = workBook.getSheet(sheetName);
         for (int i = endRow; i >= startRow; i--) {
