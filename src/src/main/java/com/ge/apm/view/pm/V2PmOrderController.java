@@ -15,6 +15,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import org.apache.commons.collections4.map.HashedMap;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -567,6 +568,7 @@ public void batchDefineQualify(){
         }
     }
     public void searchList(Integer buttonIndex) {
+        this.selectedMap = new HashedMap<>();
         queryIndex = buttonIndex;
         this.searchFilters = null;
         this.stepFileter = null;
