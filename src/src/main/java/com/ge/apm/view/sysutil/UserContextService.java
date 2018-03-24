@@ -347,7 +347,7 @@ public class UserContextService implements Serializable {
                 || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
 
         isPmDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getPmDispatchUserId()).orElse(0).equals(userAccount.getId())
-                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+                || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
 
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
         
