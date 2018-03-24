@@ -22,7 +22,7 @@
 
                                                 <p:commandButton value="待接单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"  />
 
-                        <p:commandButton value="抢单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"  />
+                        <p:commandButton value="待抢单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"  />
 
                         <!--<p:commandButton value="待验收"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(5)}" disabled="#{v2PmOrderController.queryIndex==5}" rendered="true"/>-->
                         <p:commandButton value="已计划"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetStaff') or userContextService.hasRole('ITAdmin')  or userContextService.hasRole('Guest')}"  />
@@ -49,11 +49,11 @@
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}" class="selectCheckBox">
                                 <p:ajax listener="#{v2PmOrderController.onItemSelected}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton)"/>
                             </p:selectBooleanCheckbox>
-                            <f:facet name="header">
+                            <!--<f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
                                     <p:ajax  listener="#{v2PmOrderController.onSelectAllOfPage}" update="@(.selectCheckBox) @(.batch-terminated) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton)"/>
                                 </p:selectBooleanCheckbox>
-                            </f:facet>
+                            </f:facet>-->
                         </p:column>
 
 
@@ -152,7 +152,7 @@
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('transferOrderDialog').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="批量关单"  update="@(.closePmDialogClassBatch)" rendered="#{v2PmOrderController.queryIndex==6}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">
+                                <p:commandButton  icon="ui-icon-assessment" actionListener="#{v2PmOrderController.prepareAct(item.id)}" class="btn btn-sm btn-gray batch-terminated" title="批量关单"  rendered="#{v2PmOrderController.queryIndex==6}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('closePmDialogBatch').show()">
                                 </p:commandButton>
 
                             </ui:fragment>
@@ -244,11 +244,6 @@
     <p:dialog id="closePmDialogBatch" class="closePmDialogClassBatch" widgetVar="closePmDialogBatch" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="批量关单">
         <h:form id="closePmDialogFormBatch" >
             <h:panelGroup id="display31" >
-                <!--<p:selectOneRadio id="console"  value="#{v2PmOrderController.qualityCheckingBatch}">
-                    <p:ajax listener="#{v2PmOrderController.batchDefineQualify()}"></p:ajax>
-                    <f:selectItem itemLabel="合格" itemValue="1"  />
-                  &lt;!&ndash;  <f:selectItem itemLabel="不合格" itemValue="2" />&ndash;&gt;
-                </p:selectOneRadio>-->
                 <br/>
                 <p:dataGrid id="pictureListBatch" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
                     <f:facet name="header">附件上传</f:facet>
@@ -265,8 +260,6 @@
                 <h:panelGroup>
                     <!--<p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>-->
                     <p:commandButton rendered="#{v2PmOrderController.isChecked() eq true}" validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认批量关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialogBatch');"/>
-
-                    <!--<p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>-->
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialogBatch').hide()"/>
                 </h:panelGroup>
             </h:panelGroup>
