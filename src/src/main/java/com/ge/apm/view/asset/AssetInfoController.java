@@ -1714,6 +1714,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (!assetUids.isEmpty()) {
             assetList = assetList.stream().filter(assetInfo -> {
                 Boolean exists = this.selectedMap.get(assetInfo.getUid());
+                if (exists == null) {
+                    return false;
+                }
                 return exists.booleanValue();
             }).collect(Collectors.toList());
         }
