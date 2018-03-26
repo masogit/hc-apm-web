@@ -65,7 +65,7 @@
                             </p:commandLink>
                             <!--<p:commandLink actionListener="#{assetArrivedItemsController.prepareTransOrder(item.id)}" update=":transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"  rendered="#{item.installStatus eq 'new'}" style="padding-right: 10px">转单</p:commandLink>-->
                             
-                            <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{item.installStatus=='new'?'安装':item.installStatus=='instorage'?'已入库':'已退货'}
+                            <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}
                                 <f:param name="itemId" value="#{item.id}" />
                             </p:link >
                         </p:column>

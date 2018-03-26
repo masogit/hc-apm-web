@@ -37,6 +37,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import java.io.InputStream;
+import java.io.ByteArrayInputStream;
 
 /**
  *
@@ -63,6 +65,8 @@ public class CompareImportController {
     private QrCodeService qrCodeService;
     
     private AssetInfoRepository assetDao;
+    
+    private byte[] fileContents;
 
     @PostConstruct
     protected void init() {
@@ -75,6 +79,7 @@ public class CompareImportController {
 
     public void uploadDataFile(FileUploadEvent event) {
         this.file = event.getFile();
+        fileContents = file.getContents();
     }
 
     public void cancelUpload() {
@@ -87,7 +92,8 @@ public class CompareImportController {
     public void finishUpload() {
         ExcelDocument doc = null;
         try {
-            doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
+            InputStream in = new ByteArrayInputStream(fileContents);
+            doc = new ExcelDocument(in, ExcelDocument.parseTypeByFileName(file.getFileName()));
             importAssetMap = ciService.getAssetMapFromTemplate(doc);
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");

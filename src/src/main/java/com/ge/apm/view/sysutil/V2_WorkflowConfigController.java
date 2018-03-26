@@ -275,7 +275,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				selected.setPmDispatchUserName(pmDispather1.getName());
 			}
 		}else{
-			selected.setDispatchUserName(null);
+			selected.setPmDispatchUserName(null);
 		}
 		if (selected.getPmDispatchUserId2() != null) {
 			UserAccount pmDispather2 = uaDao.getById(config.getPmDispatchUserId2());
@@ -283,7 +283,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				selected.setPmDispatchUserName2(pmDispather2.getName());
 			}
 		}else{
-			selected.setDispatchUserName2(null);
+			selected.setPmDispatchUserName2(null);
 		}
 
 		dao.deleteBySiteUID(selected.getSiteUID());
@@ -296,19 +296,34 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		Boolean isPmManual = selected.getIsPmManualEnabled();
 		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
 
-    	if((isManual != null && isManual) || (isPmManual != null && isPmTakeOrder)){
+    	if(isManual != null && isManual){
     		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
     			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-       		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedDispather"));
+       		 	WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
        		 	return;
     		}
     	}
-    	if((isManual != null && isTakeOrder != null && !isManual && !isTakeOrder)
-				|| (isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder)){
+    	if(isPmManual != null && isPmManual){
+			if(selected.getPmDispatchUserId() == null && selected.getPmDispatchUserId2() == null){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("PmNeedDispather"));
+				return;
+			}
+		}
+
+
+    	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
     		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-    		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
+    		 WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
     		 return;
     	}
+
+    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
+			return;
+		}
+
     	//onBeforeSave(selected);
     	super.save();
     }

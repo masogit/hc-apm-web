@@ -512,7 +512,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetGroup', '12', '生命体征监护类', 'assetType12', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetGroup', '13', '其他类', 'assetType13', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '1', '已报修', 'Create', NULL, '-1');
+-- INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '1', '已报修', 'Create', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '2', '待派工', 'Assign', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '3', '待接单', 'Accept', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('woSteps', '4', '维修中', 'Repair', NULL, '-1');
@@ -1432,8 +1432,17 @@ INSERT INTO i18n_message (msg_type, msg_key, value_zh, site_id) VALUES ('assetRe
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '1', '待派工', 'Assign', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '2', '待接单', 'ToAccepted', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '3', '已计划', 'Planned', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '4', '待审核', 'ToApproved', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '5', '待关单', 'ToClosed', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '6', '已关单', 'Closed', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmSteps', '7', '待抢单', 'toGrap', NULL, '-1');
+
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('maintenanceType', '1', '日常维护', 'general maintenance', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('maintenanceType', '2', '周期维护', 'period maintenance', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('executable', '1', '可执行', 'can execute', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('executable', '2', '不可执行', 'cannot execute', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoNeedDispather', '维修配置中允许派工时派工人不能为空!', 'Dispather should not be null when wo dispath-mode is manul', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmNeedDispather', '保养配置总允许派工时派工人不能为空!', 'Dispather should not be null when dispath-mode is manul', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoManualAndGrapMsg', '维修配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for wo manual or grap mode! ', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmManualAndGrapMsg', '保养配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for pm manual or grap mode! ', NULL, '-1');
 
