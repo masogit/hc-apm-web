@@ -219,11 +219,15 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     public void getQueryAssetsList() {
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
             sourceAssets = assetTagService.getAssetList(queryAsset);
+
+            sourceAssets = new ArrayList(sourceAssets);
+            sourceAssets.removeAll(targetAssets);
+            /*
             targetAssets.forEach((item)->{
                 if(sourceAssets.contains(item)){
                     sourceAssets.remove(item);
                 }
-            });
+            });*/
         }else{
             sourceAssets = new ArrayList<AssetInfo>();
         }

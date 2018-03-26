@@ -15,6 +15,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import org.apache.commons.collections4.map.HashedMap;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -31,6 +32,7 @@ import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 /**
  *v
@@ -414,9 +416,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
 
         if (queryIndex == -1) {
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
 			Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
 			currentPagePmOrders = result.getContent();
-			this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
 			return result;
         }
          if (queryIndex == 2) { //待派工  Assign
@@ -567,6 +569,7 @@ public void batchDefineQualify(){
         }
     }
     public void searchList(Integer buttonIndex) {
+        this.selectedMap = new HashedMap<>();
         queryIndex = buttonIndex;
         this.searchFilters = null;
         this.stepFileter = null;
