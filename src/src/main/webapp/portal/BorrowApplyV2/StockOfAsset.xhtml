@@ -33,11 +33,11 @@
                     </h:panelGrid>
                 </h:form>
                 <h:form id="AssetInfoListForm">
-                    <h:panelGrid id="searchPanel" columns="4">
-                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist searchPanel " actionListener="#{assetInfoController.searchList(-1)}" rendered="true" />
-                        <p:commandButton value="正常可借用"  process="@this" update="datalist searchPanel " actionListener="#{assetInfoController.searchList(1)}"  rendered="true" />
-                        <p:commandButton value="正常已借出"  process="@this" update="datalist searchPanel " actionListener="#{assetInfoController.searchList(2)}"  rendered="true"/>
-                        <p:commandButton value="故障不可借用"  process="@this" update="datalist searchPanel " actionListener="#{assetInfoController.searchList(3)}"  rendered="true"/>
+                    <h:panelGrid id="searchPanel2" columns="4">
+                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist searchPanel2 " actionListener="#{assetInfoController.searchList(-1)}" rendered="true" />
+                        <p:commandButton value="正常可借用"  process="@this" update="datalist searchPanel2 " actionListener="#{assetInfoController.searchList(1)}"  rendered="true" />
+                        <p:commandButton value="正常已借出"  process="@this" update="datalist searchPanel2 " actionListener="#{assetInfoController.searchList(2)}"  rendered="true"/>
+                        <p:commandButton value="故障不可借用"  process="@this" update="datalist searchPanel2 " actionListener="#{assetInfoController.searchList(3)}"  rendered="true"/>
                        
                     </h:panelGrid>
                     
