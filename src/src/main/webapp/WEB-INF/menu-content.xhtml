@@ -55,7 +55,7 @@
 
             <!--</p:submenu>-->
 
-            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff')}">
+            <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead')}">
                 <p:menuitem  value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem  value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
                 <p:menuitem  value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.needInstorageCheck()}"/>
