@@ -296,7 +296,7 @@ public class QrCodeService {
             if (!Strings.isNullOrEmpty(item.getQrCode())) {
                 try {
                     BufferedImage image =  getQrCodeImage(item.getQrCode(), null, template);
-                    out.putNextEntry(new ZipEntry(Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat(item.getName()).concat(item.getQrCode()).concat(".jpg")));
+                    out.putNextEntry(new ZipEntry(Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat("_").concat(item.getName()).concat("_").concat(item.getQrCode()).concat(".jpg")));
                     ImageIO.write(image, "JPG", out);
                     out.closeEntry();
                 } catch (Exception e) {
