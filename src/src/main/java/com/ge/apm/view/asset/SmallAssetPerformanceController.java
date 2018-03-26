@@ -139,4 +139,10 @@ public class SmallAssetPerformanceController extends GenericCRUDUUIDController<S
 	public void setImportFailedDataList(List<SmallAssetPerformance> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
+	
+	@Override
+	protected String getActionMessage(String actionName) {
+		// TODO Auto-generated method stub
+		return "设备绩效数据"+" "+WebUtil.getMessage(actionName);
+	}
 }
