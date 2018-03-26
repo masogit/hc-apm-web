@@ -1710,6 +1710,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
 
+        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        if (!assetUids.isEmpty()) {
+            assetList = assetList.stream().filter(assetInfo -> {
+                Boolean exists = this.selectedMap.get(assetInfo.getUid());
+                return exists.booleanValue();
+            }).collect(Collectors.toList());
+        }
+
         ExcelDocument doc = importService.exportAsset(assetList, allColumns);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
