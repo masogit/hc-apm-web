@@ -1724,6 +1724,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         ExcelDocument doc = importService.exportAsset(assetList, allColumns);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
+        streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         streamedContent.setName("AssetInfo_export.xlsx");
 
         excelFile = streamedContent;
