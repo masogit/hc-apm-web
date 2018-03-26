@@ -371,6 +371,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            if(orgUidList ==null || orgUidList.isEmpty()){
+                orgUidList = Arrays.asList("");
+            }
             tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
         }
         return tagNoGroupAssets;
