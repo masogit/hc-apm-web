@@ -47,7 +47,7 @@
                             <h:outputText value="#{empty item['arrivalListItem']? '未匹配': fieldMsg.fieldValue('arrivalListItemStatus',item['arrivalListItem'].installStatus)}"/>
                         </p:column>
                         <p:column headerText="操作" >
-                            <p:commandLink  value="入库" actionListener="#{compareImportController.instorage(item['arrivalListItem'])}" update="assetTable"
+                            <p:commandLink  value="入库" actionListener="#{compareImportController.instorage(item['arrivalListItem'])}" update="assetTable :ItemViewForm"
                                             rendered="#{not empty item['arrivalListItem']}" disabled="#{item['arrivalListItem'].installStatus ne 'finished'}"/>
                             
                         </p:column>
