@@ -729,7 +729,7 @@ public class AssetFileImportService {
      * @return
      * @throws IOException
      */
-    public ExcelDocument exportAsset(List<AssetInfo> assetList, boolean allColumns) throws IOException {
+    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> orgInfoList, boolean allColumns) throws IOException {
 
         InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
@@ -749,6 +749,19 @@ public class AssetFileImportService {
 
             ++startRow;
         }
+
+        //export org info list
+        for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
+            doc.clearRow(AssetFileImportService.SHEET_ORG, startRow);
+        }
+
+        startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW;
+        for (OrgInfo orgInfo: orgInfoList) {
+            doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, orgInfo.getName());
+
+            ++startRow;
+        }
+        doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, "#");
 
         return doc;
 
