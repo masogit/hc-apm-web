@@ -131,8 +131,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private OrgInfo fileterOrg;
 
-    private ExcelTemplateExport export;
-
     private UserContextService userContextService;
 
     private WorkflowConfigRepository wfCfigDao;
@@ -221,7 +219,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
 
-        export = WebUtil.getBean(ExcelTemplateExport.class);
         importService = WebUtil.getBean(AssetFileImportService.class);
 
         this.filterBySite = false;
@@ -1712,10 +1709,24 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
+        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
-        ExcelDocument doc = importService.exportAsset(assetList, allColumns);
+        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+        if (!assetUids.isEmpty()) {
+            assetList = assetList.stream().filter(assetInfo -> {
+                Boolean exists = this.selectedMap.get(assetInfo.getUid());
+                if (exists == null) {
+                    return false;
+                }
+                return exists.booleanValue();
+            }).collect(Collectors.toList());
+        }
+
+        ExcelDocument doc = importService.exportAsset(assetList, orgList, allColumns);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
+        streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
         streamedContent.setName("AssetInfo_export.xlsx");
 
         excelFile = streamedContent;
