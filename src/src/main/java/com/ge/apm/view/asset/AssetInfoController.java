@@ -24,6 +24,8 @@ import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -142,6 +144,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Integer queryIndex = -1;
 
     private String exportQrCodeTemplateId;
+
+    private Sort lastPageSort; //download use
 
     public Integer getQueryIndex() {
         return queryIndex;
@@ -354,6 +358,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+        lastPageSort = pageRequest.getSort(); //download use
+
         selected = null;
 
         if (queryIndex == 1) {
@@ -1708,7 +1714,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             allColumns = true;
         }
 
-        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters);
+        Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
+
+        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
+
         List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
