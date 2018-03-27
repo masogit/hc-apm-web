@@ -159,6 +159,7 @@ public class AssetInstallationController {
 
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
             if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
+                arrivalListItem.setQrCode(null);
                 isValidate = false;
             }
         }
