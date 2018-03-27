@@ -2,6 +2,8 @@ package com.ge.apm.service.uaa;
 
 import java.util.*;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
@@ -10,20 +12,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.InspectionChecklistRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.SysRoleRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.dao.UserRoleRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.InspectionChecklist;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.UserRole;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import java.util.stream.Collectors;
@@ -46,6 +34,9 @@ public class UaaService {
     
     @Autowired
     OrgInfoRepository orgInfoDao;
+
+    @Autowired
+    WorkflowConfigRepository wfcfigDao;
 
     private void loadSysRoles(){
         if(sysRoles!=null) return;
@@ -441,7 +432,9 @@ TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
     @Transactional
     public void setDefaultScope(UserAccount user) {
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
-        if (ownnedOrg.getOrgType() == 4) {
+        List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
+
+        if (ownnedOrg.getOrgType() == 4 && workflowConfigs.size() == 0) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
             UserOrgInfo userOrg = new UserOrgInfo();
             userOrg.setUserUid(user.getUid());

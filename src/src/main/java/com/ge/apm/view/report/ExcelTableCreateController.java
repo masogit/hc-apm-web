@@ -66,7 +66,7 @@ public class ExcelTableCreateController extends TieWebSheetBean {
             if (null == selectedTableDefinition) {
                 WebUtil.addErrorMessage("fail to load this template");
             } else {
-                savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getSchema());
+                savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
                 loadWebSheetByStream(savedFile.getStream());
             }
         }
@@ -79,11 +79,10 @@ public class ExcelTableCreateController extends TieWebSheetBean {
         selectedTableDefinition.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
         selectedTableDefinition.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
-        selectedTableDefinition.setTableType(TableDefinition.TableDefinitionType.EXCEL.toString());
     }
 
     public void saveTemplate() {
-        if (Strings.isNullOrEmpty(selectedTableDefinition.getSchema())) {
+        if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
             //新建
             if (uploadedFile != null) {
 //                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
