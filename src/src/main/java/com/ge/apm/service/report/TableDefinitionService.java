@@ -89,7 +89,7 @@ public class TableDefinitionService {
         if (getCountByTemplate(tableDefinition.getId()) > 0) {
             WebUtil.addErrorMessage("模版使用中,不能删除");
         } else {
-            if (null != tableDefinition.getTableType() && tableDefinition.getTableType().equals(TableDefinition.TableDefinitionType.EXCEL.toString())) {
+            if (null != tableDefinition.getExcelStorageId()) {
                 blobService.deleteBlobFilesByStorageId(tableDefinition.getSchema());
             }
             templateDao.delete(tableDefinition);
@@ -126,8 +126,8 @@ public class TableDefinitionService {
             newTemplate.setCreatedDate(new Date());
             newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             newTemplate.setStatus(selectedTableDefinition.getStatus());
-            newTemplate.setTableType(selectedTableDefinition.getTableType());
-            newTemplate.setSchema(blobObject.getObjectStorageId());
+            newTemplate.setExcelStorageId(blobObject.getObjectStorageId());
+            newTemplate.setSchema(selectedTableDefinition.getSchema());
             templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
@@ -139,8 +139,8 @@ public class TableDefinitionService {
             blobService.saveBlobObject(blobObject);
         } else {
             //模版下无记录
-            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getSchema())) {
-                selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
+            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
+                selectedTableDefinition.setExcelStorageId(blobObject.getObjectStorageId());
                 selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
                 selectedTableDefinition.setLastModifiedDate(new Date());
                 templateDao.save(selectedTableDefinition);

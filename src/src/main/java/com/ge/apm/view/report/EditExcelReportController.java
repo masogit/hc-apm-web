@@ -60,7 +60,7 @@ public class EditExcelReportController extends TieWebSheetBean {
                 tableValue.put(item.getKey(),item.getValueSerialized());
             }
         });
-        StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getSchema());
+        StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
             context.put("fields", tableValue);

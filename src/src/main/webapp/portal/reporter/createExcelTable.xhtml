@@ -19,7 +19,7 @@
                         <p:commandButton value="导入模版"  process="@this" update=":importExcelForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty excelTableCreateController.uploadedFile}"/>
                         <h:outputText value="#{excelTableCreateController.uploadedFile.fileName}" />
                         <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{excelTableCreateController.cancelUpload}" update=":importExcelForm :uploadDialogForm :previewForm" rendered="#{not empty excelTableCreateController.uploadedFile}"/>
-                        <p:link href="#{fileDownloadService.getFileUrl(excelTableCreateController.selectedTableDefinition.schema)}" rendered="#{not empty excelTableCreateController.savedFile and empty excelTableCreateController.uploadedFile}">#{excelTableCreateController.savedFile.name}</p:link>
+                        <p:link href="#{fileDownloadService.getFileUrl(excelTableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty excelTableCreateController.savedFile and empty excelTableCreateController.uploadedFile}">#{excelTableCreateController.savedFile.name}</p:link>
                     </h:panelGroup>
                 </h:form>
 

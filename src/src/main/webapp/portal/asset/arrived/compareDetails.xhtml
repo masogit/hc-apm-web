@@ -17,87 +17,121 @@
                     <h:outputText value="资产建档数据" class="ui-g-3"/>
                     <p:commandLink value="全部更新" class="ui-g-1" update=":ItemViewForm " actionListener="#{compareImportController.updateField('All')}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
+                <div class="ui-g">
+                    <h:outputText value="#{msg.departNum}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['设备编号']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].departNum}" class="ui-g-3"/>
+                    <h:outputText id="departNum" value="#{compareImportController.selectedAsset.departNum}" class="ui-g-3"/>
+                    <p:commandLink value="更新" class="ui-g-1" update="departNum @this" actionListener="#{compareImportController.updateField('departNum')}" 
+                                   disabled="#{compareImportController.selectedItem['设备编号'] eq compareImportController.selectedAsset.departNum or empty compareImportController.selectedItem['设备编号'] and empty compareImportController.selectedAsset.departNum}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
                 <div class="ui-g" >
                     <h:outputText value="#{msg.name}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['设备名称']}" class="ui-g-3"/>
                     <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].arrivalList.assetName}" class="ui-g-3"/>
                     <h:outputText id="selectedAssetName" value="#{compareImportController.selectedAsset.name}" class="ui-g-3" />
                     <p:commandLink value="更新" class="ui-g-1" update="selectedAssetName @this" actionListener="#{compareImportController.updateField('name')}" 
-                                   disabled="#{compareImportController.selectedItem['设备名称'] eq compareImportController.selectedAsset.name}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                                   disabled="#{compareImportController.selectedItem['设备名称'] eq compareImportController.selectedAsset.name or empty compareImportController.selectedItem['设备名称'] and empty compareImportController.selectedAsset.name}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
                 <div class="ui-g">
                     <h:outputText value="#{msg.functionType}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['设备型号']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['规格型号']}" class="ui-g-3"/>
                     <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].arrivalList.functionType}" class="ui-g-3"/>
                     <h:outputText id="functionType" value="#{compareImportController.selectedAsset.functionType}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="functionType @this" actionListener="#{compareImportController.updateField('functionType')}" 
-                                   disabled="#{compareImportController.selectedItem['设备型号'] eq compareImportController.selectedAsset.functionType}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                                   disabled="#{compareImportController.selectedItem['规格型号'] eq compareImportController.selectedAsset.functionType or empty compareImportController.selectedItem['规格型号'] and empty compareImportController.selectedAsset.functionType}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
+                <div class="ui-g">
+                    <h:outputText value="#{msg.purchasePrice}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['单价']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].purchasePrice}" class="ui-g-3"/>
+                    <h:outputText id="purchasePrice" value="#{compareImportController.selectedAsset.purchasePrice}" class="ui-g-3"/>
+                    <p:commandLink value="更新" class="ui-g-1" update="purchasePrice @this" actionListener="#{compareImportController.updateField('purchasePrice')}" 
+                                   disabled="#{compareImportController.compareDouble('单价',compareImportController.selectedAsset.purchasePrice)}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
+                <div class="ui-g">
+                    <h:outputText value="#{msg.manufacture}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['生产厂家']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].arrivalList.manufacture}" class="ui-g-3"/>
+                    <h:outputText id="manufacture" value="#{compareImportController.selectedAsset.manufacture}" class="ui-g-3"/>
+                    <p:commandLink value="更新" class="ui-g-1" update="manufacture @this" actionListener="#{compareImportController.updateField('manufacture')}" 
+                                   disabled="#{compareImportController.selectedItem['生产厂家'] eq compareImportController.selectedAsset.manufacture or empty compareImportController.selectedItem['生产厂家'] and empty compareImportController.selectedAsset.manufacture}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
+                
+                <div class="ui-g">
+                    <h:outputText value="#{msg.vendor}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['供货单位名称']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].arrivalList.vendor}" class="ui-g-3"/>
+                    <h:outputText id="vendor" value="#{compareImportController.selectedAsset.vendor}" class="ui-g-3"/>
+                    <p:commandLink value="更新" class="ui-g-1" update="vendor @this" actionListener="#{compareImportController.updateField('vendor')}" 
+                                   disabled="#{compareImportController.selectedItem['供货单位名称'] eq compareImportController.selectedAsset.vendor or empty compareImportController.selectedItem['供货单位名称'] and empty compareImportController.selectedAsset.vendor}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
+                <div class="ui-g">
+                    <h:outputText value="#{msg.clinicalDeptName}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['使用单位']}" class="ui-g-3"/>
+                    <h:outputText value="#{orgTreeController.getOrgInfoByUID(compareImportController.selectedItem['arrivalListItem'].clinicalDeptUID)}" class="ui-g-3"/>
+                    <h:outputText id="clinicalDeptName" value="#{compareImportController.selectedAsset.clinicalDeptName}" class="ui-g-3"/>
+                    <p:commandLink value="更新" class="ui-g-1" update="clinicalDeptName @this" actionListener="#{compareImportController.updateField('clinicalDeptName')}" 
+                                   disabled="#{compareImportController.selectedItem['使用单位'] eq compareImportController.selectedAsset.clinicalDeptName or empty compareImportController.selectedItem['使用单位'] and empty compareImportController.selectedAsset.clinicalDeptName}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
                 <div class="ui-g">
                     <h:outputText value="#{msg.serialNum}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['制造商序列号']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['出厂编号']}" class="ui-g-3"/>
                     <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].serialNum}" class="ui-g-3"/>
                     <h:outputText id="serialNum" value="#{compareImportController.selectedAsset.serialNum}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="serialNum @this" actionListener="#{compareImportController.updateField('serialNum')}" 
-                                   disabled="#{compareImportController.selectedItem['制造商序列号'] eq compareImportController.selectedAsset.serialNum}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                                   disabled="#{compareImportController.selectedItem['出厂编号'] eq compareImportController.selectedAsset.serialNum or empty compareImportController.selectedItem['出厂编号'] and empty  compareImportController.selectedAsset.serialNum}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
                 <div class="ui-g">
+                    <h:outputText value="#{msg.installDate}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['使用日期']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].installDate}" class="ui-g-3">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                    </h:outputText>
+                    <h:outputText id="installDate" value="#{compareImportController.selectedAsset.installDate}" class="ui-g-3">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                    </h:outputText>
+                    <p:commandLink value="更新" class="ui-g-1" update="installDate @this" actionListener="#{compareImportController.updateField('installDate')}" 
+                                   disabled="#{compareImportController.getDateValue(compareImportController.selectedItem['使用日期']) eq compareImportController.selectedAsset.installDate}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
+                <div class="ui-g">
+                    <h:outputText value="#{msg.terminateDate}" class="ui-g-2"/>
+                    <h:outputText value="#{compareImportController.selectedItem['报损日期']}" class="ui-g-3"/>
+                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].terminateDate}" class="ui-g-3">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                    </h:outputText>
+                    <h:outputText id="terminateDate" value="#{compareImportController.selectedAsset.terminateDate}" class="ui-g-3">
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                    </h:outputText>
+                    <p:commandLink value="更新" class="ui-g-1" update="terminateDate @this" actionListener="#{compareImportController.updateField('terminateDate')}" 
+                                   disabled="#{compareImportController.getDateValue(compareImportController.selectedItem['报损日期']) eq compareImportController.selectedAsset.terminateDate}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
+                </div>
+<!--                <div class="ui-g">
                     <h:outputText value="#{msg.aliasName}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['设备别名']}" class="ui-g-3"/>
                     <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].aliasName}" class="ui-g-3"/>
                     <h:outputText id="aliasName" value="#{compareImportController.selectedAsset.aliasName}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="aliasName @this" actionListener="#{compareImportController.updateField('aliasName')}" 
                                    disabled="#{compareImportController.selectedItem['设备别名'] eq compareImportController.selectedAsset.aliasName}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.departNum}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['设备编号（院方）']}" class="ui-g-3"/>
-                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].departNum}" class="ui-g-3"/>
-                    <h:outputText id="departNum" value="#{compareImportController.selectedAsset.departNum}" class="ui-g-3"/>
-                    <p:commandLink value="更新" class="ui-g-1" update="departNum @this" actionListener="#{compareImportController.updateField('departNum')}" 
-                                   disabled="#{compareImportController.selectedItem['设备编号（院方）'] eq compareImportController.selectedAsset.departNum}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
+                </div>-->
+                
+<!--                <div class="ui-g">
                     <h:outputText value="#{msg.assetGroup}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['设备分类']}" class="ui-g-3"/>
                     <h:outputText value="#{fieldMsg.fieldValue('assetGroup',compareImportController.selectedItem['arrivalListItem'].arrivalList.assetGroup)}" class="ui-g-3"/>
                     <h:outputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup',compareImportController.selectedAsset.assetGroup)}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="assetGroup @this" actionListener="#{compareImportController.updateField('assetGroup')}" 
                                    disabled="#{compareImportController.selectedItem['设备分类'] eq fieldMsg.fieldValue('assetGroup',compareImportController.selectedAsset.assetGroup)}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.clinicalDeptName}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['使用科室']}" class="ui-g-3"/>
-                    <h:outputText value="#{orgTreeController.getOrgInfoByUID(compareImportController.selectedItem['arrivalListItem'].clinicalDeptUID)}" class="ui-g-3"/>
-                    <h:outputText id="clinicalDeptName" value="#{compareImportController.selectedAsset.clinicalDeptName}" class="ui-g-3"/>
-                    <p:commandLink value="更新" class="ui-g-1" update="clinicalDeptName @this" actionListener="#{compareImportController.updateField('clinicalDeptName')}" 
-                                   disabled="#{compareImportController.selectedItem['使用科室'] eq compareImportController.selectedAsset.clinicalDeptName}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
+                </div>-->
+<!--                <div class="ui-g">
                     <h:outputText value="#{msg.nationalStandardCode}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['2010国家编码']}" class="ui-g-3"/>
                     <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].nationalStandardCode}" class="ui-g-3"/>
                     <h:outputText id="nationalStandardCode" value="#{compareImportController.selectedAsset.nationalStandardCode}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="nationalStandardCode @this" actionListener="#{compareImportController.updateField('nationalStandardCode')}" 
                                    disabled="#{compareImportController.selectedItem['2010国家编码'] eq compareImportController.selectedAsset.nationalStandardCode}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.vendor}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['供应商']}" class="ui-g-3"/>
-                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].arrivalList.vendor}" class="ui-g-3"/>
-                    <h:outputText id="vendor" value="#{compareImportController.selectedAsset.vendor}" class="ui-g-3"/>
-                    <p:commandLink value="更新" class="ui-g-1" update="vendor @this" actionListener="#{compareImportController.updateField('vendor')}" 
-                                   disabled="#{compareImportController.selectedItem['供应商'] eq compareImportController.selectedAsset.vendor}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.manufacture}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['制造商']}" class="ui-g-3"/>
-                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].arrivalList.manufacture}" class="ui-g-3"/>
-                    <h:outputText id="manufacture" value="#{compareImportController.selectedAsset.manufacture}" class="ui-g-3"/>
-                    <p:commandLink value="更新" class="ui-g-1" update="manufacture @this" actionListener="#{compareImportController.updateField('manufacture')}" 
-                                   disabled="#{compareImportController.selectedItem['制造商'] eq compareImportController.selectedAsset.manufacture}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
+                </div>-->
+<!--                <div class="ui-g">
                     <h:outputText value="#{msg.warrantyDate}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['维保截止日期']}" class="ui-g-3"/>
                     <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].warrantyDate}" class="ui-g-3">
@@ -337,30 +371,8 @@
                     <p:commandLink value="更新" class="ui-g-1" update="arriveDate @this" actionListener="#{compareImportController.updateField('arriveDate')}" 
                                    disabled="#{compareImportController.getDateValue(compareImportController.selectedItem['到货日期']) eq compareImportController.selectedAsset.arriveDate}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.installDate}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['启用日期']}" class="ui-g-3"/>
-                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].installDate}" class="ui-g-3">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                    </h:outputText>
-                    <h:outputText id="installDate" value="#{compareImportController.selectedAsset.installDate}" class="ui-g-3">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                    </h:outputText>
-                    <p:commandLink value="更新" class="ui-g-1" update="installDate @this" actionListener="#{compareImportController.updateField('installDate')}" 
-                                   disabled="#{compareImportController.getDateValue(compareImportController.selectedItem['启用日期']) eq compareImportController.selectedAsset.installDate}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.terminateDate}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['报废日期']}" class="ui-g-3"/>
-                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].terminateDate}" class="ui-g-3">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                    </h:outputText>
-                    <h:outputText id="terminateDate" value="#{compareImportController.selectedAsset.terminateDate}" class="ui-g-3">
-                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                    </h:outputText>
-                    <p:commandLink value="更新" class="ui-g-1" update="terminateDate @this" actionListener="#{compareImportController.updateField('terminateDate')}" 
-                                   disabled="#{compareImportController.getDateValue(compareImportController.selectedItem['报废日期']) eq compareImportController.selectedAsset.terminateDate}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
+                
+                
                 <div class="ui-g">
                     <h:outputText value="#{msg.factoryWarrantyDate}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['质保日期']}" class="ui-g-3"/>
@@ -373,14 +385,7 @@
                     <p:commandLink value="更新" class="ui-g-1" update="factoryWarrantyDate @this" actionListener="#{compareImportController.updateField('factoryWarrantyDate')}" 
                                    disabled="#{compareImportController.getDateValue(compareImportController.selectedItem['质保日期']) eq compareImportController.selectedAsset.factoryWarrantyDate}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
                 </div>
-                <div class="ui-g">
-                    <h:outputText value="#{msg.purchasePrice}" class="ui-g-2"/>
-                    <h:outputText value="#{compareImportController.selectedItem['采购价格(元)']}" class="ui-g-3"/>
-                    <h:outputText value="#{compareImportController.selectedItem['arrivalListItem'].purchasePrice}" class="ui-g-3"/>
-                    <h:outputText id="purchasePrice" value="#{compareImportController.selectedAsset.purchasePrice}" class="ui-g-3"/>
-                    <p:commandLink value="更新" class="ui-g-1" update="purchasePrice @this" actionListener="#{compareImportController.updateField('purchasePrice')}" 
-                                   disabled="#{compareImportController.compareDouble('采购价格(元)',compareImportController.selectedAsset.purchasePrice)}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
+                
                 <div class="ui-g">
                     <h:outputText value="#{msg.salvageValue}" class="ui-g-2"/>
                     <h:outputText value="#{compareImportController.selectedItem['最终残值(元)']}" class="ui-g-3"/>
@@ -420,7 +425,7 @@
                     <h:outputText id="comments" value="#{compareImportController.selectedAsset.comments}" class="ui-g-3"/>
                     <p:commandLink value="更新" class="ui-g-1" update="comments @this" actionListener="#{compareImportController.updateField('comments')}" 
                                    disabled="#{compareImportController.selectedItem['备注'] eq compareImportController.selectedAsset.comments}" rendered="#{compareImportController.selectedItem['arrivalListItem'].installStatus eq 'finished'}"/>
-                </div>
+                </div>-->
             </p:fieldset>
         </h:form>
 
