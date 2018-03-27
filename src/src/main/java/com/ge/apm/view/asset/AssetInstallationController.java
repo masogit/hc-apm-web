@@ -17,6 +17,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import javaslang.Tuple2;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -162,6 +163,12 @@ public class AssetInstallationController {
                 arrivalListItem.setQrCode(null);
                 isValidate = false;
             }
+        }
+        
+        Tuple2<Boolean,String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
+        if(!isvalidDeptNum._1){
+            isValidate = false;
+            WebUtil.addErrorMessage(isvalidDeptNum._2);
         }
 
         if (!isValidate) {
