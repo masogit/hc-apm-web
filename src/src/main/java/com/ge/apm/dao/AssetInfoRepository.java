@@ -1,15 +1,15 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.AssetFileAttachment;
-import com.ge.apm.domain.AssetInfo;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.ge.apm.domain.AssetInfo;
+
 import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.SearchFilter;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -102,5 +102,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
     public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum ,@Param("financingNum") String financingNum ,@Param("qrCode") String qrCode, @Param("siteUID") String siteUID );
+    
+    @Query(value="select o.* from asset_info o limit 1", nativeQuery = true)
+	public AssetInfo findTestRecord();
 
 }
