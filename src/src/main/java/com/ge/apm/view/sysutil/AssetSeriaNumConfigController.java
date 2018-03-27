@@ -72,7 +72,7 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	}
 	
 	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgType(parentUID,orgType);
+		return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
 	}
 
 	public List<OrgInfo> getInstitutionList() {
