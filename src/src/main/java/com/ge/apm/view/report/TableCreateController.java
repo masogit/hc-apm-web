@@ -102,7 +102,7 @@ public class TableCreateController extends TieWebSheetBean{
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
             tableFields.clear();
-            context.put("fields", tableFields);
+            context.put("X", tableFields);
             loadWebSheet(inputStream, context);
         } catch (Exception e) {
             WebUtil.addErrorMessage(e, "读取模版失败");
@@ -344,7 +344,7 @@ public class TableCreateController extends TieWebSheetBean{
     }
 
     public void testSubmit() {
-
+        System.out.println("====================submit" + tableFields);
     }
     
     //getter and setter
