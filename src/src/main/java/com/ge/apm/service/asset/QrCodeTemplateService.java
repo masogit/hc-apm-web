@@ -100,7 +100,7 @@ public class QrCodeTemplateService {
 
     public List<QrCodeTemplate> getTemplateByUser(UserAccount user) {
         List<SearchFilter> templateFilter = new ArrayList<>();
-        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
         templateFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         templateFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         templateFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
