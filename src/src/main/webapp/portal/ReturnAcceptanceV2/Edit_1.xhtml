@@ -42,7 +42,8 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请日期</label>
-                            <p:inputText id="applyTime" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />
+                            <p:calendar id="applyTime"  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.applyTime}" mindate="#{sharedAssetRequestV2Controller.selected.applyTime}" maxdate="#{sharedAssetRequestV2Controller.selected.applyTime}" readonlyInput="true" showOn="button"/>
+                            <!--<p:inputText id="applyTime" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>备注</label>
@@ -77,7 +78,7 @@
                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                         lazy="true" rowKey="#{item.swapName.hashCode()}" 
                        sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
-                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
                         rowsPerPageTemplate="20,40,60,90">
@@ -97,12 +98,12 @@
                     <p:column headerText="备注" sortBy="#{item.remark}" >
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
-                     <f:facet name="{Toolbar}">
-                       <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>
-                        </p:commandButton>
-                       
-                    </f:facet>
+                     <!--<f:facet name="{Toolbar}">-->
+                       <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">-->
+                            <!--<p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>-->
+                        <!--</p:commandButton>-->
+                       <!---->
+                    <!--</f:facet>-->
                 </p:dataTable>
                 </p:fieldset>
                 

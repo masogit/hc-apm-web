@@ -84,12 +84,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public String getApplyTimeFormatTime() {
-//        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
-//        if (varApplyTimeTo == null) {
-//            return applyTimeFormatTime;
-//        } else {
-//            return "~" + sdf.format(varApplyTimeTo);
-//        }
+
             return applyTimeFormatTime;
     }
 
@@ -310,8 +305,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //        c.setTime(today);
 //        c.add(Calendar.DAY_OF_MONTH, 1);// 今天+1天
 //        c.add(Calendar.);
-//        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
-//        ft.format(today);
+        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+        ft.format(today);
         object.setInvalidTime(today);
         
         
@@ -371,11 +366,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //        }
 
     }
-    
-//    public void searchList(int state) {
-//        dao.findByState(state);
-//    }
-  
+
     public Date getNexDate(Date date){
         int n = 1;
         SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");  
@@ -446,8 +437,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
         if(userOrg.getOrgType()==4){
-//            userOrg.getName();
-//            userOrg.getUid();
             List<SharedAssetReqDetail> detailList = asdDao.getAssetUid(assetId,userOrg.getUid());
             if(detailList.size()!=1){
                 WebUtil.addErrorMessage("找不到借用详情！");
@@ -505,7 +494,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
                
                 else{
-    //            if("1".equals(infoVo.getSwapTypeState())){
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
                             if(applySwapType.getSharedAssetTypeId().equals(infoVo.getSharedAssetTypeUid())){
@@ -519,10 +507,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                             WebUtil.addErrorMessage("该设备当前使用科室与申请科室不一致，使用科室是:"+ClinicalDeptName+"        ,借用人是:"+selected.getApplicant()+"           ,计费开始时间是:"+detail_list.get(0).getChargingBeginTime());
                                             return;
                                         }
-//                                        else{
-//                                        assetDetaiVo.setChargingBeginTime(detail_list.get(0).getChargingBeginTime());
-//                                        assetDetaiVo.setAccessories(detail_list.get(0).getAccessories());
-//                                        }
                                     }else{
                                         WebUtil.addErrorMessage("获取该设备借用信息有误！");
                                         return; 
@@ -535,13 +519,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     detail_list.get(0).setFinancingNum(infoVo.getFinancingNum());
                                     detail_list.get(0).setClinicalDeptForReturnUid(this.selected.getClinicalDeptUid());
                                     detail_list.get(0).setClinicalDeptForReturnName(this.selected.getClinicalDeptName());
-//                                    assetDetaiVo.setSharedId(Uid);
-//                                    assetDetaiVo.setAssetInfoId(infoVo.getUid());
-//                                    assetDetaiVo.setAssetName(infoVo.getName());
-//                                    assetDetaiVo.setAssetNumber(infoVo.getDepartNum());
-//    //                                assetDetaiVo.setState("1");//0：待归还 1：已归还
-//                                    assetDetaiVo.setBorrowDealUid(UserContextService.getCurrentUserAccount().getUid());//受理人
-//                                    assetDetaiVo.setFinancingNum(infoVo.getFinancingNum());//资产编号
                                     String swaptypeid = applySwapType.getSharedAssetTypeId();
                                     SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
                                     if(times==null){
@@ -571,12 +548,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     }
                                     else{
                                         endsTime = times;
-//                                        assetDetaiVo.setChargingEndTime(times);
                                         detail_list.get(0).setChargingEndTime(times);
                                     }
-//                                        assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
-//                                        assetDetaiVo.setUnitPrice(swapTypeVo.getUnitPrice());//单价
-//                                        assetDetaiVo.setUnit(swapTypeVo.getUnit());//单位
                                           detail_list.get(0).setChargingType(swapTypeVo.getChargingType());
                                           detail_list.get(0).setUnitPrice(swapTypeVo.getUnitPrice());
                                           detail_list.get(0).setUnit(swapTypeVo.getUnit());
@@ -677,10 +650,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                             sardList.add(detail_list.get(0));
                                             selectedSard = detail_list.get(0);
                                         }
-                                     
-    //                                infoVo.setSwapTypeState("0");
+
                                     //更改使用科室
-    //                                info.setClinicalDeptUID(UserContextService.getCurrentUserAccount().getSiteUID());
 
                                     if(userOrg.getOrgType()==4){
                                         infoVo.setClinicalDeptName(userOrg.getName());
@@ -702,18 +673,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     return;
                                 }
                             }
-//                            else{
-//                                
-//                            }
                         }
                         WebUtil.addWarnMessage("该设备不属于归还申请的设备类型！");
                         return;
                     }
                 }
-    //            else{
-    //                WebUtil.addErrorMessage("该设备当前状态无法归还！");
-    //                return;
-    //            }
             }else{
 
                 WebUtil.addWarnMessage("录入信息不符，请核对后录入！");
@@ -934,21 +898,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         selectedSard = assetDetaiVo;
                                     }
                                         
-                                    
-    //                                infoVo.setSwapTypeState("1");
+
                                     //更改使用科室
                                     
                                     OrgInfo findByUid = orgInfoDao.findByUid(this.selected.getClinicalDeptUid());
                                     infoVo.setClinicalDeptId(findByUid.getId());
                                     infoVo.setClinicalDeptName(this.selected.getClinicalDeptName());
                                     infoVo.setClinicalDeptUID(this.selected.getClinicalDeptUid());
-    //                                String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-    //                                OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-    //                                if(userOrg.getOrgType()==4){
-    //                                    infoVo.setClinicalDeptName(userOrg.getName());
-    //                                    infoVo.setClinicalDeptUID(userOrg.getUid());
-    //                                }
-    
+
                                     //asiDao.save(infoVo);
                                     
                                     assetInfoList.add(infoVo);
@@ -963,10 +920,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     return;
                                 }
                             }
-//                            else{
-//                                WebUtil.addErrorMessage("该设备不属于借用申请的设备类型！");
-//                                return;
-//                            }
                         }
                         WebUtil.addWarnMessage("该设备不属于借用申请的设备类型！");
                         return;
@@ -1046,9 +999,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     }
     //录入设备修改
-     public void saveSard(String type){
-         List<SharedAssetReqDetail> sardList = selected.getSardList();
-         List<SharedAssetTypeAccesssory> accessoryList = selectedSard.getAccessoryList();
+    public void saveSard(String type){
+        List<SharedAssetReqDetail> sardList = selected.getSardList();
+        List<SharedAssetTypeAccesssory> accessoryList = selectedSard.getAccessoryList();
          
         for (int j = 0; j < accessoryList.size(); j++) {
             SharedAssetTypeAccesssory sharedAssetTypeAccesssory = accessoryList.get(j);
@@ -1087,142 +1040,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
  
         }
      
-         selectedSard.setAccessoryList(accessoryList); 
-     }
-//    public void getAssetInfoM(Date times,String accepter) throws ParseException{//查询并插入借用设备信息
-//        
-//            String applyAssetInfo = selected.getApplyAssetInfo();
-//            String Uid = selected.getId();
-//            List<SharedAssetReqType> applySwapTypeList  = apdDao.findSwapTypeId(Uid);
-//            String departNum = applyAssetInfo;//设备编号
-//            String financingNum = applyAssetInfo;//资产编号
-//            String qrCode = applyAssetInfo;//二维码
-//            AssetInfo infoVo = new AssetInfo();
-//            List<AssetInfo> infoList = asiDao.findSwapTypeInfo(departNum,financingNum,qrCode,this.selected.getSiteUID());
-//            List<String> depts = dao.findDeptForSharedAsset(this.selected.getSiteUID());
-//            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-//            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-//            if(infoList.size()==1){
-//                infoVo = infoList.get(0);
-//                String ClinicalDeptUID = infoVo.getClinicalDeptUID();
-//                if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
-//                    WebUtil.addErrorMessage("该设备不属于调剂设备类型！");
-//                    return;
-//                }else if(infoVo.getStatus()!= 1){
-//                    WebUtil.addErrorMessage("该设备故障，不可借用！");
-//                    return; 
-//                }
-//                //在asset_info中判断是否属于 调剂中心科室
-//                else if(!depts.contains(ClinicalDeptUID)){
-//                    WebUtil.addErrorMessage("该设备当前不可借用！");
-//                    return; 
-//                }
-//                else if(!depts.contains(userOrg.getUid())){
-//                    WebUtil.addErrorMessage("当前角色非调剂中心人员，请核实后操作！");
-//                    return; 
-//                }
-//                else{
-//                                        SharedAssetReqDetail assetDetaiVo = new SharedAssetReqDetail();
-//                                        assetDetaiVo.setSharedId(Uid);
-//                                        assetDetaiVo.setAssetInfoId(infoVo.getUid());
-//                                        assetDetaiVo.setAssetName(infoVo.getName());
-//                                        assetDetaiVo.setAssetNumber(infoVo.getDepartNum());
-//                                        assetDetaiVo.setClinicalDeptUid(selected.getClinicalDeptUid());
-//                                        assetDetaiVo.setClinicalDeptName(selected.getClinicalDeptName());
-//        //                                assetDetaiVo.setState("0");//0：待归还 1：已归还
-//                                        assetDetaiVo.setBorrowDealUid(UserContextService.getCurrentUserAccount().getUid());//受理人
-//                                        assetDetaiVo.setFinancingNum(infoVo.getFinancingNum());//资产编号
-//                                        String swaptypeid = infoVo.getSharedAssetTypeUid();
-//                                        SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
-//                                        assetDetaiVo.setSharedAssetTypeId(swaptypeid);
-//                                        //时间往后推
-//                                        if(times==null&&"".equals(accepter)){
-//                                            assetDetaiVo.setAccepter(acceptman);
-//                                            Calendar calendar = Calendar.getInstance();
-//                                            Date date = new Date();
-//                                            calendar.setTime(date);
-//                                            int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-//                                            int month = calendar.get(Calendar.MONTH) + 1;
-//                                            String year =  format(date).substring(0, 4);
-//                                            int day = calendar.get(Calendar.DAY_OF_MONTH);
-//                                            int minute = calendar.get(Calendar.MINUTE);
-//                                            if(minute>=0&&minute<30){
-//                                                String startTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-//                                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                                Date beginTime = dateFormat.parse(startTime);
-//                                                assetDetaiVo.setChargingBeginTime(beginTime);
-//                                            }
-//                                            else{
-//                                                int hours = hour+1;
-//                                                String startTime = year+"-"+month+"-"+day+" "+hours+":"+"00:00";
-//                                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                                Date beginTime = dateFormat.parse(startTime);
-//                                                assetDetaiVo.setChargingBeginTime(beginTime);
-//                                            }
-//                                        }
-//                                        else if(times!=null&&!"".equals(accepter)){
-//                                            assetDetaiVo.setChargingBeginTime(times);
-//                                            assetDetaiVo.setAccepter(accepter);
-//                                        }
-//                                        else if(times==null&&!"".equals(accepter)){
-//                                            assetDetaiVo.setAccepter(accepter);
-//                                            Calendar calendar = Calendar.getInstance();
-//                                            Date date = new Date();
-//                                            calendar.setTime(date);
-//                                            int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-//                                            int month = calendar.get(Calendar.MONTH) + 1;
-//                                            String year =  format(date).substring(0, 4);
-//                                            int day = calendar.get(Calendar.DAY_OF_MONTH);
-//                                            int minute = calendar.get(Calendar.MINUTE);
-//                                            if(minute>=0&&minute<30){
-//                                                String startTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-//                                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                                Date beginTime = dateFormat.parse(startTime);
-//                                                assetDetaiVo.setChargingBeginTime(beginTime);
-//                                            }
-//                                            else{
-//                                                int hours = hour+1;
-//                                                String startTime = year+"-"+month+"-"+day+" "+hours+":"+"00:00";
-//                                                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//                                                Date beginTime = dateFormat.parse(startTime);
-//                                                assetDetaiVo.setChargingBeginTime(beginTime);
-//                                            }
-//                                        }
-//                                        else{
-//                                            assetDetaiVo.setChargingBeginTime(times);
-//                                            assetDetaiVo.setAccepter(acceptman);
-//                                        }
-//                                        
-//                                    //附件状态默认全选
-//                                    for(SharedAssetTypeAccesssory item:swapTypeVo.getAccessoryList()){
-//                                        item.setBorrowStatus(true); 
-//                                    }
-//                                    assetDetaiVo.setAccessoryList(swapTypeVo.getAccessoryList());
-//                                    assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
-//                                    assetDetaiVo.setUnitPrice(swapTypeVo.getUnitPrice());//单价
-//                                    assetDetaiVo.setCreateDate(new Date());
-//                                    assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
-//                                    asdDao.save(assetDetaiVo);
-//
-//    //                                infoVo.setSwapTypeState("1");
-//                                    //更改使用科室
-//                                    infoVo.setClinicalDeptName(this.selected.getClinicalDeptName());
-//                                    infoVo.setClinicalDeptUID(this.selected.getClinicalDeptUid());
-//    //                                String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-//    //                                OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-//    //                                if(userOrg.getOrgType()==4){
-//    //                                    infoVo.setClinicalDeptName(userOrg.getName());
-//    //                                    infoVo.setClinicalDeptUID(userOrg.getUid());
-//    //                                }
-//                                    asiDao.save(infoVo);
-//                                    WebUtil.addSuccessMessage("录入成功！");
-//                }
-//            }else{
-//                WebUtil.addErrorMessage("录入信息不符，请核对后录入！");
-//                return;
-//            }
-//    }
-//    
+        selectedSard.setAccessoryList(accessoryList);
+    }
+
     
     public void searchList(Integer buttonIndex) {
         queryIndex = buttonIndex;
@@ -1634,17 +1454,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     infoVo = asiDao.findByUid(assetInfoId);
                     infoVo.setSwapTypeState("1");
                     asiDao.save(infoVo);//将AssetInfo的借用状态还原
-                    //                    String assetDatailUid = dtl.getId();//更改借用设备的状态
-//                    
-//                    List<IouAssetDetail> oldAsset = asdDao.findByAssetInfoAndUid(assetInfoId);
-//                    if(oldAsset.size()>0){
-//                        for(IouAssetDetail dtll : oldAsset){
-//                            if(assetDatailUid.equals(dtll.getId())){
-//                                dtll.setState("0");
-//                                asdDao.save(dtll);
-//                            }
-//                        }
-//                    }
+
                 }
             }
             asdDao.delete(ListAll);
