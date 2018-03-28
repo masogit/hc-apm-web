@@ -81,7 +81,8 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        picList = aiService.getPicList(arrivalListItem.getId());
+        picList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
+        picList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
     }
 

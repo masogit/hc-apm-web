@@ -343,7 +343,7 @@
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
                                     <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
-                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList0" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList0" icon="ui-icon-clear"   rendered="#{fileitem.boType ne 'ArrivalList'}"  title="#{msg.Delete}" class="popupIconButton" process="@this">
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>   
                                 </h:panelGrid>
