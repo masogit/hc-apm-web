@@ -23,6 +23,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
@@ -81,6 +82,19 @@ public class InventoryOrder implements Serializable {
     @Transient
     @JsonProperty
     private String clinicalDeptLabel = "";
+
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    @Size(max = 32)
+    private String tenantUID;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
 
     public String getId() {
         return id;
@@ -161,6 +175,38 @@ public class InventoryOrder implements Serializable {
     public void setAssigneeOrg(String assigneeOrg) {
         this.assigneeOrg = assigneeOrg;
     }
+    
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
+    }
 
     public String getName() {
         if (this.planStartTime != null && this.planStartTime != null) {
@@ -177,8 +223,15 @@ public class InventoryOrder implements Serializable {
     public String getClinicalDeptLabel() {
         if(StringUtils.isNotEmpty(this.assigneeOrg)) {
             List<Map> clinicalDeptList = JSON.parseArray(this.assigneeOrg, Map.class);
+            int i=0;
             for (Map map : clinicalDeptList) {
-                this.clinicalDeptLabel += map.get("orgName") + " ";
+//                this.clinicalDeptLabel += map.get("orgName") + " ";
+            	this.clinicalDeptLabel += map.get("orgName") + " ";
+            	if(i==2){
+            		this.clinicalDeptLabel +=" 等...";
+            		break;
+            	}
+            	i++;
             }
         }
         return this.clinicalDeptLabel;

@@ -70,6 +70,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNames(String tenantUID);
+    
+    @Query(value = "select o.* from asset_info o where o.inventory_owner_id = ?1 and o.site_uid = ?2", nativeQuery = true)
+    public AssetInfo findByInventoryOwnerId(String inventoryOwnerId,String siteUID);
 
 	@Modifying
 	@Transactional
@@ -105,5 +108,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     
     @Query(value="select o.* from asset_info o limit 1", nativeQuery = true)
 	public AssetInfo findTestRecord();
+    
+    @Modifying
+    @Query("update AssetInfo ai set ai.inventoryStatus=?2 where ai.id in ?1")
+    void updateInventoryStatusAndIdIn(List<Integer> assetIds, Integer ORDER_STATUS_DONE_FINISHED);
 
 }

@@ -1,0 +1,63 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="盘点工单列表" />
+			</div>
+			<div class="ui-g-12 card">
+				<h:form id="inventoryOrderDetailAssetInfoListForm">
+					<p:dataTable id="datalist" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+						selection="#{inventoryOrderDetailAssetInfoController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+						paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+						<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController.onFilter}" />
+						<p:column headerText="设备名" filterBy="#{item.name}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.name}" />
+						</p:column>
+						<p:column headerText="设备二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.qrCode}" />
+						</p:column>
+						<p:column headerText="设备编号" filterBy="#{item.departNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.departNum}" />
+						</p:column>
+						<p:column headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.functionType}" />
+						</p:column>
+						<p:column headerText="设备财产号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.financingNum}" />
+						</p:column>
+						<p:column headerText="使用科室" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.clinicalDeptName}" />
+						</p:column>
+						<p:column headerText="资产状态" filterBy="#{item.status}" filterMatchMode="EQ">
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+									<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+									<f:selectItem itemLabel="正常" itemValue="1" />
+									<f:selectItem itemLabel="停机" itemValue="2" />
+									<f:selectItem itemLabel="限制功能使用" itemValue="3" />
+									<f:selectItem itemLabel="待报废" itemValue="4" />
+									<f:selectItem itemLabel="停用" itemValue="5" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText
+								value="#{item.status==1?'正常':item.status==2?'停机':item.status==3?'限制功能使用':item.status==4?'待报废':'停用'}" />
+						</p:column>
+						<p:column headerText="设备位置" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+							<h:outputText value="#{item.clinicalDeptName}" />
+						</p:column>
+
+						<f:facet name="{Toolbar}">
+							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+								<p:dataExporter type="xls" target="datalist" fileName="SmallAssetPerformanceConfigFailed_export" />
+							</p:commandButton>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

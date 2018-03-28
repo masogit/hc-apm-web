@@ -1,20 +1,26 @@
 package com.ge.apm.view.pm;
 
-import java.io.InputStream;
 import java.io.Serializable;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import org.tiefaces.components.websheet.TieWebSheetBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrder;
+import com.ge.apm.domain.InventoryOrderDetail;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.pm.InventoryOrderService;
+import com.ge.apm.view.sysutil.UserContextService;
 
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
@@ -22,29 +28,55 @@ import webapp.framework.web.mvc.ServerEventInterface;
  */
 @ManagedBean
 @ViewScoped
-public class InventoryOrderController extends TieWebSheetBean {
+public class InventoryOrderController extends GenericCRUDUUIDController<InventoryOrder> implements Serializable, ServerEventInterface{
 
-	private InventoryOrderService service;
-	public InventoryOrderController() {
-
-	}
+	private InventoryOrderService inventoryOrderService;
+	private UserAccount currentUser;
+	private InventoryOrderRepository dao;
 
 	@Override
-	public void initialLoad() {
-		service = WebUtil.getBean(InventoryOrderService.class);
-		System.out.println("xxx service");
-		System.out.println(service);
-		List<InventoryOrder> listInventoryOrder = service.findSomeTestRecords();
-		System.out.println("listInventoryOrder");
-		System.out.println(listInventoryOrder.toString());
-		HashMap<String, Object> context = new HashMap<String, Object>();
-		context.put("listInventoryOrder", listInventoryOrder);
-		try {
-			InputStream stream = this.getClass().getClassLoader().getResourceAsStream("inventoryOrder.xlsx");
-			loadWebSheet(stream, context);
-		} catch (Exception e) {
-			// TODO: handle exception
-			WebUtil.addErrorMessage(e, "读取模版失败");
-		}
-	}
+    protected void init() {
+        inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
+        dao = WebUtil.getBean(InventoryOrderRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+    }
+
+    @Override
+    protected GenericRepositoryUUID<InventoryOrder> getDAO() {
+        return dao;
+    }
+
+    @Override
+    protected Page<InventoryOrder> loadData(PageRequest pageRequest) {
+    	List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+        if(currentUser.getOrgLevel() != 0){
+            if(currentUser.getOrgLevel() == 1){
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+            }else if(currentUser.getOrgLevel() == 2){
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+            }else{
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+            }
+        }
+        return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+
+    }
+
+    @Override
+    public void onBeforeNewObject(InventoryOrder object) {
+        super.onBeforeNewObject(object);
+        object.setTenantUID(currentUser.getTenantUID());
+        object.setInstitutionUID(currentUser.getInstitutionUID());
+        object.setHospitalUID(currentUser.getHospitalUID());
+        object.setSiteUID(currentUser.getSiteUID());
+    }
+	
 }
