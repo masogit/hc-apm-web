@@ -81,7 +81,8 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        picList = aiService.getPicList(arrivalListItem.getId());
+        picList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
+        picList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
     }
 
@@ -106,10 +107,10 @@ public class AssetInstallationController {
     }
 
     private Boolean isAvailableQrcode(String qrcode) {
-        String qrCodeStatus = qrCodeService.isAvailableQrcode(qrcode,arrivalListItem.getArrivalList().getSiteUID());
-        if("Normal".equals(qrCodeStatus)){
+        String qrCodeStatus = qrCodeService.isAvailableQrcode(qrcode, arrivalListItem.getArrivalList().getSiteUID());
+        if ("Normal".equals(qrCodeStatus)) {
             return true;
-        }else{
+        } else {
             WebUtil.addErrorMessage("错误:" + WebUtil.getMessage(qrCodeStatus));
             return false;
         }
@@ -164,9 +165,9 @@ public class AssetInstallationController {
                 isValidate = false;
             }
         }
-        
-        Tuple2<Boolean,String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
-        if(!isvalidDeptNum._1){
+
+        Tuple2<Boolean, String> isvalidDeptNum = aiService.isValidDeptNum(arrivalListItem);
+        if (!isvalidDeptNum._1) {
             isValidate = false;
             WebUtil.addErrorMessage(isvalidDeptNum._2);
         }
@@ -200,7 +201,8 @@ public class AssetInstallationController {
     }
 
     public List<V2_BlobObject> getAckPicList(String type) {
-        return picList == null ? null : picList.stream().filter(item -> type.equals(item.getBoSubType())).collect(Collectors.toList());
+        return picList == null ? null : picList.stream().filter(item -> V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType()) && "asset".equals(type) || type.equals(item.getBoSubType()))
+                .collect(Collectors.toList());
     }
 
     public String returnAction() {

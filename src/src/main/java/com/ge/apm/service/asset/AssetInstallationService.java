@@ -100,6 +100,7 @@ public class AssetInstallationService {
                 }
                 List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(itemId)).orElse(new ArrayList<V2_BlobObject>())
                         .stream().filter(item -> "asset".equals(item.getBoSubType())).collect(Collectors.toList());
+                assetPicList.addAll(getPicList(temp.getArrivalListId()));
                 assetPicList.forEach(item -> {
                     item.setId(null);
                     item.setBoUuid(newAsset.getUid());

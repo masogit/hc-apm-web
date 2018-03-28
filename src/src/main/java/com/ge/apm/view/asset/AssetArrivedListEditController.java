@@ -16,8 +16,10 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
@@ -33,6 +35,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -74,6 +77,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
 
+    private List<V2_BlobObject> picList;
+    
+    private BlobFileService blobService;
+
     @Override
     protected void init() {
 
@@ -86,6 +93,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
@@ -94,7 +102,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
+                String copyFrom = (String) UrlEncryptController.getValueFromMap(encodeStr, "copyFrom");
                 prepareCreate();
+                if (!Strings.isNullOrEmpty(copyFrom)) {
+                    copyFiledsValueById(copyFrom);
+                }
+
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -106,11 +119,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
             }
-            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
-                initEasyInstallItem();
-                this.changeFunctionGroup();
-
-            }
+            initEasyInstallItem();
+            this.changeFunctionGroup();
+            picList = aiService.getPicList(selected.getId());
+//            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
+//                initEasyInstallItem();
+//                this.changeFunctionGroup();
+//
+//            }
             prepareEdit();
         }
     }
@@ -355,12 +371,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
         if (easyInstallItem.getWarrantyYear() != null) {
-                Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
-                Calendar calender = Calendar.getInstance();
-                calender.setTime(new Date());
-                calender.add(Calendar.MONTH, monthLong);
-                easyInstallItem.setFactoryWarrantyDate(calender.getTime());
-            }
+            Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
+            Calendar calender = Calendar.getInstance();
+            calender.setTime(new Date());
+            calender.add(Calendar.MONTH, monthLong);
+            easyInstallItem.setFactoryWarrantyDate(calender.getTime());
+        }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
             item.setMaitanance(easyInstallItem.getMaitanance());
@@ -406,6 +422,48 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
     }
 
+    private void copyFiledsValueById(String copyFrom) {
+        ArrivalList srcList = dao.findById(copyFrom);
+        if (null != srcList) {
+            selected.setHospitalUID(srcList.getHospitalUID());
+            selected.setName(srcList.getName());
+            selected.setAssetName(srcList.getName());
+            selected.setAssetGroup(srcList.getAssetGroup());
+            selected.setArrivalDate(srcList.getArrivalDate());
+            selected.setFunctionType(srcList.getFunctionType());
+            selected.setManufacture(srcList.getManufacture());
+            selected.setOrigin(srcList.getOrigin());
+            selected.setInvoiceNum(srcList.getInvoiceNum());
+            selected.setContractNum(srcList.getContractNum());
+            selected.setContractPrice(srcList.getContractPrice());
+            selected.setVendor(srcList.getVendor());
+            selected.setAgent(srcList.getAgent());
+            selected.setTenantUID(srcList.getTenantUID());
+            selected.setInstitutionUID(srcList.getInstitutionUID());
+            selected.setHospitalUID(srcList.getHospitalUID());
+            selected.setSiteUID(srcList.getSiteUID());
+        }
+
+    }
+
+    public void removeAttachmentById(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
+
+    public void handleFileUpload(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picList.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
+            blobObject.setBoUuid(selected.getId());
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
     public List<String> completeGbName(String prefix) {
         return gbCodeService.completeGbName(prefix);
     }
@@ -415,6 +473,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     //geter and setter
+    public List<V2_BlobObject> getPicList() {
+        return picList;
+    }
+
+    public void setPicList(List<V2_BlobObject> picList) {
+        this.picList = picList;
+    }
+
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
     }
