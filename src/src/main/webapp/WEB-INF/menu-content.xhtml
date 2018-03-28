@@ -56,9 +56,9 @@
             <!--</p:submenu>-->
 
             <p:submenu label="#{msg.arrivalInstallation}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead')}">
-                <p:menuitem  value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                <p:menuitem  value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                <p:menuitem  value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasRole('AssetStaff') and userContextService.needInstorageCheck()}"/>
+                <p:menuitem  value="#{msg.AssetArrivalListMgmt}" outcome="/portal/asset/arrived/arrivalList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead')}"/>
+                <p:menuitem  value="#{msg.AssetArrivalListItemMgmt}" outcome="/portal/asset/arrived/arrivalItemsList.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead')}"/>
+                <p:menuitem  value="核对入库" outcome="/portal/asset/arrived/compareImport.xhtml" rendered="#{userContextService.hasAnyRole('AssetStaff,AssetHead') and userContextService.needInstorageCheck()}"/>
                 <!--<p:menuitem id="um086" value="采购申请" outcome="/portal/asset/ApplicationList.xhtml" rendered="#{userContextService.hasRole('AssetHead')}"/>-->
             </p:submenu>
             <p:submenu id="um09" label="#{msg.WorkOrderMgmt}" icon="fa fa-wrench" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
