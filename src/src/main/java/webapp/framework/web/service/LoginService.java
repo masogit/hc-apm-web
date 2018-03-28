@@ -86,7 +86,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 		sessionAuthenticationStrategy = ctx.getBean(SessionAuthenticationStrategy.class);
 		securityContextRepository = ctx.getBean(SecurityContextRepository.class);
 		messageUtil = ctx.getBean(MessageUtil.class);
-                msUtil = ctx.getBean(MicroServiceUtil.class);
+		msUtil = ctx.getBean(MicroServiceUtil.class);
 	}
 
 	public void setSessionExpired(String value) {
@@ -206,11 +206,12 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 				messageUtil.error("security_error");
 				return;
 			}
-                        try{
-                            sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
-                        }
-                        catch(Exception ex){
-                        }
+			try{
+				sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+			}
+			catch(Exception ex){
+
+			}
 			// below : do the same thing as in
 			// AbstractAuthenticationProcessingFilter.successfulAuthentication(),
 			// except for the redirection to the login success URL that is
@@ -228,9 +229,9 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 //			}
 			afterLogin();
 
-                        updateLoginStatus(userName, true);
-                        String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
-                        request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+			updateLoginStatus(userName, true);
+			String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
+			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
 			// redirects to the home page
 			/*
 			 * FacesContext context = FacesContext.getCurrentInstance();
@@ -274,19 +275,18 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 			logger.error("can't find user by loginName:{}", userName);
 			return;
 		}
-                if(!user.getIsActive()){
-                    messageUtil.error("AccountNotActivated");
-                    return;
-                }
-                if(user.getIsLocked()!=null && user.getIsLocked().booleanValue()==true){
-                    messageUtil.error("AccountLocked");
-                    return;
-                }
-
+/*		if(!user.getIsActive()){
+			messageUtil.error("AccountNotActivated");
+			return;
+		}*/
+		if(user.getIsLocked()!=null && user.getIsLocked().booleanValue()==true){
+			messageUtil.error("AccountLocked");
+			return;
+		}
 		if (loginStatus) {
 			user.setLastLoginTime(new Date());
 			user.setPasswordErrorCount(0);
-                        user.setIsLocked(false);
+			user.setIsLocked(false);
 			userAccountDao.save(user);
 		} else {
 			Integer errorTimes = user.getPasswordErrorCount();
@@ -298,16 +298,15 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 			errorTimes = ai.get();
 			if (errorTimes >= PASSWORD_ERROR_TIME_LIMIT) {
 				user.setIsLocked(true);
-                                user.setLockTime(new Date());
-        			userAccountDao.save(user);
+				user.setLockTime(new Date());
+				userAccountDao.save(user);
 				logger.error("user:{} is locked because of password error times reach the limit !", userName);
 				messageUtil.error("AccountLocked");
 				return;
 			}
 			user.setPasswordErrorCount(errorTimes);
 			userAccountDao.save(user);
-
-                        messageUtil.error("security_bad_credentials");
+			messageUtil.error("security_bad_credentials");
 		}
 	}
 }
