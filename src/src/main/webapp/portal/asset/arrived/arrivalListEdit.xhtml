@@ -96,10 +96,10 @@
                                     <label class="label">#{msg.arrivalListAgent}</label>
                                     <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
                                 </h:panelGroup>
-                                <h:panelGroup>
+<!--                                <h:panelGroup>
                                     <label class="label">#{msg.arrivalListClassCode}</label>
                                     <p:inputText value="#{assetArrivedListEditController.selected.classCode}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
-                                </h:panelGroup>
+                                </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">#{msg.ArrivalProcessType}</label>
                                     <p:selectOneMenu  value="#{assetArrivedListEditController.selected.processType}" required="true" requiredMessage="#{msg.ArrivalProcessType}#{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.selected.status ne '1'}" >

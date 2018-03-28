@@ -123,7 +123,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgType(parentUID,orgType);
+		return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
 	}
 	
 	public List<UserInfo> getUserList() {

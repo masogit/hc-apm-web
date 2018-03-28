@@ -63,7 +63,7 @@ public class EditExcelReportController extends TieWebSheetBean {
         StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
-            context.put("fields", tableValue);
+            context.put("X", tableValue);
             loadWebSheet(excelFile.getStream(), context);
         } catch (Exception e) {
             WebUtil.addErrorMessage(e, "读取模版失败");
