@@ -435,10 +435,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
              searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
              searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
              searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
-
-
-//fa033ecac866445e9d3f6368ff3c78ab	308bbfe756cd4b548395c96c8a0c635d	d99101ffda2944228cba0330d605814a	cc6584af445740c0b7249043b05fcc4b
-
          } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -541,6 +537,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
         if(isChecked()==false){
         pmOrderService.closePM(selectedPmOrder,picList);
         }else{
+            picList.stream().forEach(item->{
+            item.setId(null);
+            });
             pmOrderService.closePMBatch(currentPagePmOrders,selectedMap,picList);
         }
     cancel();
