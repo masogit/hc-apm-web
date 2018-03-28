@@ -49,6 +49,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private UserCommonService ucService;
+	private UserCommonService userCommonService;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -57,6 +58,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		ucService = WebUtil.getBean(UserCommonService.class);
+		userCommonService = WebUtil.getBean(UserCommonService.class);
 		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
 		initDispatchUserList();
 	}
@@ -179,7 +181,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 		return null;
 	}
-	
+
 	public String getTenantName(String tenantUID){
 		return tenantInfoRepository.findByuid(tenantUID).getName();
 	}
@@ -286,7 +288,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			selected.setPmDispatchUserName2(null);
 		}
 
-		dao.deleteBySiteUID(selected.getSiteUID());
+		//dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
 	@Transactional
@@ -324,10 +326,26 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			return;
 		}
 
-    	//onBeforeSave(selected);
-    	super.save();
+        onBeforeSave(selected);
+
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+            return;
+        }
+
+        dao.deleteBySiteUID(selected.getSiteUID());
+        super.save();
     }
-	
+
+	@Override
+	public void delete() {
+		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+			return;
+		}
+		super.delete();
+	}
+
 	@Override
 	public void prepareEdit(){
 		if(selected != null){

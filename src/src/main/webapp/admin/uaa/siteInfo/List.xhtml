@@ -76,6 +76,17 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                    <p:column headerText="院区隔离" filterBy="#{item.insulate}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()">
+                                <f:converter converterId="javax.faces.Boolean" />
+                                <f:selectItem itemLabel="#{msg.All}" itemValue="" />
+                                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true" />
+                                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{item.insulate? msg.True2Yes : msg.False2No }"/>
+                    </p:column>
                     <f:facet name="{Toolbar}">
                         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tenantInfoController.prepareCreate}" update=":SiteInfoEditDlg" oncomplete="PF('SiteInfoEditDialog').show()"/>
                         <p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{tenantInfoController.prepareView}" update=":SiteInfoViewDlg" oncomplete="PF('SiteInfoViewDialog').show()" disabled="#{empty tenantInfoController.selected}"/>

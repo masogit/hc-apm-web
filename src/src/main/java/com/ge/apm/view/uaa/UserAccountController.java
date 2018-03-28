@@ -8,6 +8,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
 
+import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
@@ -44,6 +45,7 @@ import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -69,6 +71,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private OrgInfo selectedUserOrg;
 
+    private UserCommonService userCommonService;
+
+    private UserAccount loginUser;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -77,8 +83,9 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         uaaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(UserAccountRepository.class);
         orgInfoDao = WebUtil.getBean(OrgInfoRepository.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
 
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        loginUser = UserContextService.getCurrentUserAccount();
 
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         setTenantUid(loginUser.getTenantUID());
@@ -101,13 +108,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         searchFilters.clear();
         this.tenantUid = tenantUid;
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
-        selectedTenant = tenantDao.findByuid(tenantUid);
-        OrgInfo rootOrg = new OrgInfo();
-        rootOrg.setId(-1);
-        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
-        orgTree = new DefaultTreeNode("root", null, null);
-        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-        rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+        TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
+        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContext.getRoles().contains("LocalITAdmin")){
+            selectedTenant = tempTenantInfo;
+            orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
+        }else{
+            selectedTenant = tenantDao.findByuid(tenantUid);
+            OrgInfo rootOrg = new OrgInfo();
+            rootOrg.setId(-1);
+            rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+            orgTree = new DefaultTreeNode("root", null, null);
+            TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+        }
+
         TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
         if (null != selectedUserOrg) {
             selectedUserOrg.setSelected(true);
@@ -201,6 +216,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
         allRoles = uaaService.getSysRoleNames();
+        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContext.getRoles().contains("LocalITAdmin")){
+            allRoles.remove("后台运营管理");
+        }
 
         assignedRoles = new ArrayList<String>();
         for (UserRole userRole : selected.getUserRoleList()) {
@@ -289,6 +308,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void deleteSelectedUser() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         if (canDelete()) {
             super.delete();
         }
@@ -365,7 +391,26 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     }
 
+    @Override
+    public void save() {
+        if (selectedUserOrg != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedUserOrg.getSiteUID())){
+                return;
+            }
+        }
+
+        super.save();
+    }
+
     public void resetPassword() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         selected.setPlainPassword(PasswordUtil.DEFAULT_PWD);
         try {
             selected.entryptPassword();
@@ -376,6 +421,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void lockAccount() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         selected.setIsActive(false);
         selected.setIsLocked(true);
         selected.setLockTime(TimeUtil.timeNow().toDate());
@@ -383,6 +435,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     public void unlockAccount() {
+        if (this.selected.getSiteUID() != null) {
+            //判断操作权限
+            if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), this.selected.getSiteUID())){
+                return;
+            }
+        }
+
         selected.setIsActive(true);
         selected.setIsLocked(false);
         selected.setPasswordErrorCount(0);
