@@ -457,7 +457,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 
             //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, "1*3+4*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,4), "1*3+4*"));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,3), "1*3+4*"));
+
+
             //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,4), "1*3+4*"));
 
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));
