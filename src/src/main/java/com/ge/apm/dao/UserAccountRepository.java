@@ -119,4 +119,7 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     List<UserAccount> findByOrgInfoUID(String orgUid);
 
     UserAccount findByTenantUIDAndName(String tenantUid, String name);
+
+    @Query(value= "update tenant_info set is_enabled = true where uid = ?1",nativeQuery=true)
+    public void updateMembersStatus(String tenantUid);
 }

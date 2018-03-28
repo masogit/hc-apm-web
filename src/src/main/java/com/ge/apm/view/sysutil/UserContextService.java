@@ -367,4 +367,13 @@ public class UserContextService implements Serializable {
         return wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
     }
 
+    public String isActive(){
+        UserAccount currentUser = getLoginUser();
+        if(!currentUser.getIsActive() && currentUser.getId() != 0){
+            return "1";//need active
+        }else {
+            return "0";
+        }
+    }
+
 }
