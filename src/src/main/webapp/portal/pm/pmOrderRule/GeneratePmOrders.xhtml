@@ -59,6 +59,12 @@
 		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(generatePmOrdersController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
 		                      </p:selectOneMenu>
 		                 </h:panelGroup>
+						   <h:panelGroup >
+							   <label class ="label">#{msg.brand}</label>
+							   <p:inputText  value="#{generatePmOrdersController.queryAsset.brand}"  disabled="#{generatePmOrdersController.level == null}">
+								   <p:ajax  listener="#{generatePmOrdersController.addFilter()}" update="AssetsPickList PmOrderRule"  />
+							   </p:inputText>
+						   </h:panelGroup>
 		                 <h:panelGroup>
                                 <label class="label">预计完成时间</label>
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}" 

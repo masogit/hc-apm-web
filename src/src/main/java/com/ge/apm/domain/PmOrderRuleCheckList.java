@@ -31,15 +31,65 @@ public class PmOrderRuleCheckList {
     private String ruleUID;//pm_order_rule.uid
     
     @Column(name = "remark")
-	private String remark;//备注
+	private String remark;//项目内容
     
     @Column(name = "item_id")
     private Integer itemId;
     
     @Column(name = "uid")
     private String uid;
-    
-    @PrePersist
+
+	@Column(name = "maintenance_type")
+	private Integer maintenanceType = 2;//项目类型（日常维护、周期维护）
+
+	@Column(name = "executable")
+	private Integer executable = 1;//评估（可执行、不可执行）
+
+	@Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+	private String tenantUID;
+
+	@Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+	private String institutionUID;
+
+	@Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+	private String hospitalUID;
+
+	@Column(name = "site_uid", columnDefinition = "CHAR(32)")
+	private String siteUID;
+
+	public String getTenantUID() {
+		return tenantUID;
+	}
+
+	public void setTenantUID(String tenantUID) {
+		this.tenantUID = tenantUID;
+	}
+
+	public String getInstitutionUID() {
+		return institutionUID;
+	}
+
+	public void setInstitutionUID(String institutionUID) {
+		this.institutionUID = institutionUID;
+	}
+
+	public String getHospitalUID() {
+		return hospitalUID;
+	}
+
+	public void setHospitalUID(String hospitalUID) {
+		this.hospitalUID = hospitalUID;
+	}
+
+	public String getSiteUID() {
+		return siteUID;
+	}
+
+	public void setSiteUID(String siteUID) {
+		this.siteUID = siteUID;
+	}
+
+	@PrePersist
     public void initializeUid() {
         if(uid==null)
             uid = UUID.randomUUID().toString().replace("-", "");
@@ -90,8 +140,23 @@ public class PmOrderRuleCheckList {
 		this.name = name;
 	}
 
-	
-    @Override
+	public Integer getMaintenanceType() {
+		return maintenanceType;
+	}
+
+	public void setMaintenanceType(Integer maintenanceType) {
+		this.maintenanceType = maintenanceType;
+	}
+
+	public Integer getExecutable() {
+		return executable;
+	}
+
+	public void setExecutable(Integer executable) {
+		this.executable = executable;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);
@@ -100,11 +165,11 @@ public class PmOrderRuleCheckList {
 
     @Override
     public boolean equals(Object object) {
-        if (!(object instanceof PmOrderRule)) {
+        if (!(object instanceof PmOrderRuleCheckList)) {
             return false;
         }
         PmOrderRuleCheckList other = (PmOrderRuleCheckList) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
             return false;
         }
         return true;
