@@ -109,8 +109,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     public void buildOrdTree(){
 
-        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
-        if(UserContext.getRoles().contains("LocalITAdmin")){
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContextService.isOnlyLocalITAdmin()){
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
             orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
@@ -416,7 +416,7 @@ return true;
     }
 
     public boolean getIsCreateInstitutionDisabled(){
-        return !UserContextService.isSuperAdmin();
+        return UserContextService.isOnlyLocalITAdmin();
     }
     
     public boolean getIsCreateHospitalDisabled(){
