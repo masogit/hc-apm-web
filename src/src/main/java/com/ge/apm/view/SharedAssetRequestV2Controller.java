@@ -306,9 +306,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //        today.setHours(0);
 //        today.setMinutes(0);
 //        today.setSeconds(0);
-        Calendar c = Calendar.getInstance();  
-        c.setTime(today);  
-        c.add(Calendar.DAY_OF_MONTH, 1);// 今天+1天
+//        Calendar c = Calendar.getInstance();
+//        c.setTime(today);
+//        c.add(Calendar.DAY_OF_MONTH, 1);// 今天+1天
 //        c.add(Calendar.);
 //        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
 //        ft.format(today);
@@ -363,9 +363,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")||p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){
-            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-        }
+
+        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+//        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")||p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){
+//            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        }
+
     }
     
 //    public void searchList(int state) {
@@ -955,7 +959,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     WebUtil.addSuccessMessage("录入成功！");
                                     return;
                                 }else{
-                                    WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName()+"’ 申请数量已满！");
+                                    WebUtil.addWarnMessage("该设备类型 ‘"+applySwapType.getSwapName()+"’ 预计借用数量已满！");
                                     return;
                                 }
                             }
