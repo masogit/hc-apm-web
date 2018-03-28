@@ -124,9 +124,9 @@ public class AssetCreateService {
             return false;
         }
         assetDepreciationService.saveAssetDerpeciation(assetInfo);
-        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
-            pmService.createPMrequest(assetInfo.getUid(), null);
-        }
+//        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+//            pmService.createPMrequest(assetInfo.getUid(), null);
+//        }
         return true;
     }
 
