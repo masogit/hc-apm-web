@@ -133,6 +133,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         if (null != queryAsset.getClinicalDeptId()) {
             assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
         }
+		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
+			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
+		}
 		if(level != null) {
 			List<String> uids = null;
 			if(level == 1) {
