@@ -27,7 +27,9 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">归还申请数</label>
-                            <p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />
+                            <!--<p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
+                            <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
+                                           decimalPlaces="0" minValue="0"/>
                         </h:panelGroup>
                         <h:panelGroup>
                         </h:panelGroup>
@@ -37,7 +39,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}" update="display,:IouApplyDetailEditDlg, :IouEditForm:datalistDetail, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'IouApplyDetailEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}" update=":IouEditForm:datalistDetail" icon="ui-icon-check" oncomplete="PF('IouApplyDetailEditDialog').hide()"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('IouApplyDetailEditDialog').hide()"/>
                 </h:panelGroup>
