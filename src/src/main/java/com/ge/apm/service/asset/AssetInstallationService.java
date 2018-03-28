@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javaslang.Tuple2;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -76,11 +78,10 @@ public class AssetInstallationService {
         return res.contains("successfully");
     }
 
-    public List<ArrivalListItem> getListItem(String arrivalListId)
-    {
-    	return itemDao.findByArrivalListId(arrivalListId);
+    public List<ArrivalListItem> getListItem(String arrivalListId) {
+        return itemDao.findByArrivalListId(arrivalListId);
     }
-    
+
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {
         String token = UserContextService.getAccessToken();
         String res = installApiService.submitArrivalListItem(token, itemId, isFinish);
@@ -107,7 +108,7 @@ public class AssetInstallationService {
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });
                 blobDao.save(assetPicList);
-                if(!userContextService.needInstorageCheck()){
+                if (!userContextService.needInstorageCheck()) {
                     temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
                     itemDao.save(temp);
                 }
@@ -166,6 +167,39 @@ public class AssetInstallationService {
     public QrCodeLib getNewQrcode(String tenantUid, String siteUid) {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(tenantUid, siteUid, 1);
         return qrcodeLib;
+    }
+
+    public Tuple2<Boolean,String>isValidDeptNum(ArrivalListItem item) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if(!userContextService.needInstorageCheck()){
+            return new Tuple2(true,"");
+        }
+        
+        if (Strings.isNullOrEmpty(item.getDepartNum())) {
+            return new Tuple2(false,"设备编号为空");
+        }
+        List<SearchFilter> departNumFilters = new ArrayList<>();
+        departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
+        departNumFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(departNumFilters);
+        if(null!=assetList && assetList.size()>0){
+            return new Tuple2(false,"设备编号已经使用");
+        }
+        departNumFilters.clear();
+        departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
+        departNumFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
+        List<ArrivalListItem> itemList = itemDao.findBySearchFilter(departNumFilters);
+        if(null == itemList || itemList.isEmpty()){
+            return new Tuple2(true,"");
+        }
+        
+        if(itemList.size()>1){
+            return new Tuple2(false,"设备编号已被分配");
+        }
+        if(itemList.get(0).getId().equals(item.getId())){
+            return new Tuple2(true,"");
+        }
+        return new Tuple2(false,"设备编号已被分配");
     }
 
 }

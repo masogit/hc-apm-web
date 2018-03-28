@@ -28,8 +28,8 @@
 
             </p:submenu>
 
-            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o"
-                       rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt')}">
+            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="false" >
+                       <!--rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt')}">-->
                 <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
                 <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
@@ -72,8 +72,9 @@
                 <p:menuitem id="um11" value="#{msg.MyWorkOrder}" rendered="false" outcome="/portal/wo/myWoList.xhtml"/>
                 <p:menuitem id="um085" value="#{msg.AssetTagMsgSubscriber}" outcome="/portal/asset/assetTag/TagSubscribeList.xhtml"/>
                 <p:menuitem id="um200" value="维修工单报表" outcome="/portal/wo/woExport/woReportMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
-                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/userWorkList.xhtml" rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>
-                <p:menuitem id="um202" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml"/>
+                <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/userWorkList.xhtml" rendered="false"/>
+                            <!--rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>-->
+                <p:menuitem id="um202" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="false"/>
             </p:submenu>
             <p:submenu id="um15" label="#{msg.DeviceMonitor}" icon="fa fa-bell-o"
                        rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}">
@@ -108,7 +109,7 @@
                 <p:menuitem id="um28" value="#{msg.DeviceMetrologyMgmt}" rendered="true" outcome="/portal/measuring/measuringAssetInfoList.xhtml"/>
                 <p:menuitem id="um29" value="#{msg.DeviceAdverseEventMgmt}" rendered="false" outcome="/empty"/>
                 <p:menuitem id="um30" value="#{msg.DeviceMedicalAccidentMgmt}" rendered="false" style="color: orange;" outcome="/empty"/>
-                <p:menuitem id="um301" value="#{msg.ChecklistAdmin}" outcome="/portal/insp/checkListList.xhtml"/>
+                <p:menuitem id="um301" value="#{msg.ChecklistAdmin}" outcome="/portal/insp/checkListList.xhtml" rendered="false"/>
                 <p:menuitem id="um302" value="#{msg.PmOrderRuleItem}" outcome="/portal/pm/pmOrderRuleItem/List.xhtml"/>
                 <p:menuitem id="um303" value="#{msg.PmOrderRule}" outcome="/portal/pm/pmOrderRule/List.xhtml"/>
                 <!-- <p:menuitem id="um304" value="#{msg.RelRuleAsset}" outcome="/portal/pm/pmOrderRule/RelRuleAsset.xhtml"/> -->
