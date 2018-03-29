@@ -14,18 +14,18 @@
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <!--<h3 style="margin-top:0px"></h3>   <a href='http://www.baidu.com'>用户协议</a>   -->
                     <p:link href="http://www.baidu.com" value="查看用户协议" target="_new"/>
-                    <p:selectManyCheckbox id="basic" value="#{userActivationHistoryController.items}">
-                        <p:ajax update="ActiveForm" listener="#{userActivationHistoryController.updateAgree()}"/>
+                    <p:selectManyCheckbox id="basic" value="#{userAccountController.items}">
+                        <p:ajax update="ActiveForm" listener="#{userAccountController.updateAgree()}"/>
                         <f:selectItem itemLabel="我已阅读相关用户协议并确认激活账号" itemValue="1" />
                     </p:selectManyCheckbox>
                 </p:panelGrid>
             </p:fieldset>
 
-            <p:commandButton value="激活" actionListener="#{userActivationHistoryController.confirmActivation()}" icon="ui-icon-home"
-                             oncomplete="handleSubmit(args, 'ActiveDlg');" disabled="#{!userActivationHistoryController.agree}"/>
+            <p:commandButton value="激活" actionListener="#{userAccountController.confirmActivation()}" icon="ui-icon-home"
+                             oncomplete="handleSubmit(args, 'ActiveDlg');" disabled="#{!userAccountController.agree}"/>
             &nbsp;&nbsp;
             <!--action="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"-->
-            <p:commandButton value="#{msg.Logout}" actionListener="#{userActivationHistoryController.logout()}" icon="ui-icon-power-settings-new"/>
+            <p:commandButton value="#{msg.Logout}" actionListener="#{userAccountController.logout()}" icon="ui-icon-power-settings-new"/>
         </h:form>
     </p:dialog>
 

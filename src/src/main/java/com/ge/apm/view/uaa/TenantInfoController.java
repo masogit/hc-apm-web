@@ -1,6 +1,8 @@
 package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.OrgInfoRepository;
+
+import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -94,6 +96,12 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
     }
 
     @Override
+    public void onBeforeNewObject(TenantInfo tenant) {
+        tenant.setIsEnabled(false);
+        super.onBeforeNewObject(tenant);
+    }
+
+    @Override
     protected boolean onPersistException(Exception ex, TenantInfo site){
         if(ex.getClass().equals(DataIntegrityViolationException.class)){
             DataIntegrityViolationException exFkey = (DataIntegrityViolationException) ex;
@@ -106,6 +114,16 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
         }
                 
         return false;
+    }
+
+    public void onBeforeSave(TenantInfo tenantInfo) {
+        if(tenantInfo.getIsEnabled() && tenantInfo.getActiveTime() == null){
+            tenantInfo.setActiveTime(new Date());
+        }
+        if(!tenantInfo.getIsEnabled() && tenantInfo.getActiveTime() != null){
+            tenantInfo.setActiveTime(null);
+        }
+
     }
     
 }

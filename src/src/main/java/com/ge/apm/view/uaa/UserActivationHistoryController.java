@@ -31,16 +31,16 @@ import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
-@ManagedBean(name = "userActivationHistoryController")
-@ViewScoped
-public class UserActivationHistoryController extends JpaCRUDController<UserActivationHistory> {
-    public static final int ACTIVATION_ROLE = 10;
+//@ManagedBean(name = "userActivationHistoryController")
+//@ViewScoped
+public class UserActivationHistoryController{
+ /*   public static final int ACTIVATION_ROLE = 10;
 
     OrgInfoRepository orgInfoRepository = null;
 
     UaaService uaaService;
 
-    UserActivationHistoryRepository userActivationHistoryRepository;
+//    UserActivationHistoryRepository userActivationHistoryRepository;
 
     UserAccountRepository userAccountRepository;
 
@@ -70,9 +70,9 @@ public class UserActivationHistoryController extends JpaCRUDController<UserActiv
     @Override
     protected Page<UserActivationHistory> loadData(PageRequest pageRequest) {
         return userActivationHistoryRepository.findAll(pageRequest);
-    }
+    }*/
 
-    @Transactional
+    /*@Transactional
     public void confirmActivation(){
         if(loginUser.getIsActive()){
             System.out.println("already active !");
@@ -106,9 +106,9 @@ public class UserActivationHistoryController extends JpaCRUDController<UserActiv
     }
 
     public void logout(){
-        /*String context = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        *//*String context = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
         String logoutUrl = FacesContext().getExternalContext().getRequestContextPath()+ "/logout.xhtml?uid="+loginUser.getId();
-        return logoutUrl;*/
+        return logoutUrl;*//*
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if(auth != null){
             ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
@@ -142,5 +142,5 @@ public class UserActivationHistoryController extends JpaCRUDController<UserActiv
 
     public void setAgree(Boolean agree) {
         this.agree = agree;
-    }
+    }*/
 }

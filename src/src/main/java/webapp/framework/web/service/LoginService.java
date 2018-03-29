@@ -206,6 +206,9 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 				messageUtil.error("security_error");
 				return;
 			}
+
+
+
 			try{
 				sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
 			}
