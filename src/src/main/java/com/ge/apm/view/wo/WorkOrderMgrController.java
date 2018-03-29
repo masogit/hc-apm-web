@@ -134,11 +134,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-        
+
         String str = WebUtil.getRequestParameter("str");
-        if(Strings.isNullOrEmpty(str)){
+        if (Strings.isNullOrEmpty(str)) {
             queryIndex = 0;
-        }else{
+        } else {
             queryIndex = Integer.valueOf(str);
             searchList(queryIndex);
         }
@@ -157,7 +157,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao;
     }
 
-    
     /*
      * select
         *
@@ -305,13 +304,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             List<Integer> tagGroupAssets = getTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
-            }else{
+            } else {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
             }
             tagGroupAssets = getNoTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
-            }else{
+            } else {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
             }
 
@@ -338,10 +337,20 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(),"1*2+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 8) { //已关单
+            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+                if(userContextService.hasRole("AssetStaff")){
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+                }
+            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
+            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
@@ -374,7 +383,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
-            if(orgUidList ==null || orgUidList.isEmpty()){
+            if (orgUidList == null || orgUidList.isEmpty()) {
                 orgUidList = Arrays.asList("");
             }
             tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
