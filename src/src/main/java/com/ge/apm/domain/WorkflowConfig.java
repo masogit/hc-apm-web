@@ -140,9 +140,6 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "need_instorage_check")
     private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
 
-    @Column(name = "clinical_uid")
-    private String clinicalUID ;//调剂中心科室uid
-
     public Integer getPmReminderTimes() {
         return pmReminderTimes;
     }
@@ -492,14 +489,6 @@ public class WorkflowConfig implements Serializable {
 
     public void setNeedInstorageCheck(Boolean needInstorageCheck) {
         this.needInstorageCheck = needInstorageCheck;
-    }
-
-    public String getClinicalUID() {
-        return clinicalUID;
-    }
-
-    public void setClinicalUID(String clinicalUID) {
-        this.clinicalUID = clinicalUID;
     }
 
     @Override
