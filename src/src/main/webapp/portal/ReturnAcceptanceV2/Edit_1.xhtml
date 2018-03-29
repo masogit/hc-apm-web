@@ -110,7 +110,7 @@
                 <p:fieldset id="fSet1" legend="录入归还设备" style="margin-bottom:20px">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected.state eq 8}" >
                         <h:panelGroup >
-                            <label class='label'>批量输入</label>
+                            <label class='label'>计费结束时间</label>
                             <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="      归还结束时间" value="#{sharedAssetRequestV2Controller.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                         </h:panelGroup>
                         <h:panelGroup >
