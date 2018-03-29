@@ -146,12 +146,13 @@
           range: Object,
           dept: String,
           type: String,
+          hospital: String,
           data: Array,
           total: Object,
           scales: Object,
           _queryUrl: {
             type: String,
-            computed: '_getQueryUrl(range, sortBy, dept, type)'
+            computed: '_getQueryUrl(range, sortBy, dept, type, hospital)'
           },
           benchmarkSuffix: {
             value: '_bm',
@@ -779,16 +780,16 @@
           options['sort'] = value;
           location.hash = '#' + URI().query(options).query();
         },
-        _getQueryUrl: function(range, sortBy, dept, type) {
+        _getQueryUrl: function(range, sortBy, dept, type, hospital) {
           var DATE_FORMAT = WebUtils.constants.DATE_FORMAT;
 
           var from = moment(range.from).format(DATE_FORMAT);
           var to = moment(range.to).format(DATE_FORMAT);
-
           return URI(this.resolveApiUrl('/api/list')).query({
             'from': from,
             'to': to,
             'orderby': sortBy,
+            'hospital': hospital,
             'type': type || undefined,
             'dept': dept || undefined
           }).toString();

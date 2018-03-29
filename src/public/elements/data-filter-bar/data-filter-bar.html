@@ -39,6 +39,22 @@
             </px-dropdown-content>
           </px-dropdown>
         </div>
+        <div class="u-mh+ u-mb flex--item flex flex--row flex--middle">
+            <label class="flex--item" for="device-filter">院区</label>
+            <px-dropdown
+              id="dept-filter"
+              class="flex--item u-mh+"
+              display-value="{{hospitalName}}"
+              selected-key="{{hospital}}">
+              <px-dropdown-content
+                class="px-dropdown-content"
+                max-cont-character-width="10"
+                extend-dropdown="true"
+                extend-dropdown-by="15"
+                items="[[hospitalOpts]]">
+              </px-dropdown-content>
+            </px-dropdown>
+          </div>
       </template>
       <div class="u-mh+ u-mb flex--item flex flex--row flex--middle">
         <label class="flex--item" for="device-filter">设备类型</label>
@@ -87,7 +103,11 @@
           type: {
             type: String,
             notify: true
-          },          
+          },
+          hospital: {
+            type: String,
+            notify: true,
+          },
           user: Object,
           // private properties
           isHead: {
@@ -95,9 +115,11 @@
             computed: '_chargeIsHead(user)'
           },
           typeOpts: Array,
-          deptOpts: Array,         
+          deptOpts: Array,
+          hospitalOpts: Array,
           deptName: String,
           typeName: String,
+          hospitalName: String,
           _queryUrl: {
             type: String,
             computed: '_getQueryUrl()'
@@ -114,7 +136,8 @@
         },
         observers: [
           'saveOptsInURI("type", type)',
-          'saveOptsInURI("dept", dept)'
+          'saveOptsInURI("dept", dept)',
+          'saveOptsInURI("hospital", hospital)'
         ],
         behaviors: [
           ContextBehavior,
@@ -131,6 +154,7 @@
           }
           if (queries.dept) this.dept = queries.dept;
           if (queries.type) this.type = queries.type;
+          if (queries.hospital) this.hospital = queries.hospital;
         },
         ready: function() {
           var _this = this;
@@ -151,7 +175,7 @@
                 }
               })
               : [];
-            
+
             list = [defaultVal].concat(list);
             _this.deptOpts = list;
             if (!_this.dept) {
@@ -159,7 +183,34 @@
               _this.deptName = defaultVal.val;
             } else {
               _this.deptName = _this.getName(_this.dept, list);
-            }              
+            }
+          });
+
+          var list = [
+            { key: 1, val: '医院1' },
+            { key: 2, val: '医院2' },
+            { key: 3, val: '医院3' },
+          ];
+          //this.fetchPage(this.resolveApiUrl('/api/all_hospital'))
+          Promise.resolve(list) // todo
+          .then(function(response) {
+            var list = Array.isArray(response)
+              ? response.map(function(n, index) {
+                return {
+                  key: n.key,
+                  val: n.val,
+                }
+              })
+              : [];
+            var defaultVal = { key: 0, val: '默认院区' };
+            list.unshift(defaultVal);
+            _this.hospitalOpts = list;
+            if (!_this.hospital) {
+              _this.hospital = defaultVal.key;
+              _this.hospitalName = defaultVal.val;
+            } else {
+              _this.hospitalName = _this.getName(_this.hospital, list);
+            }
           });
 
           this.fetchPage(this._getQueryUrl()).then(function(res) {
