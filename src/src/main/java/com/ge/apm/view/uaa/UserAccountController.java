@@ -611,17 +611,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setIsActive(true);
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
-        /*UserActivationHistory history = new UserActivationHistory();
-        Date now = new Date();
-        history.setActiveTime(now);
-        history.setCreateTime(now);
-        history.setLastModifyTime(now);
-        history.setUserId(loginUser.getId());
-        history.setTenantUID(loginUser.getTenantUID());
-        history.setInstitutionUID(loginUser.getInstitutionUID());
-        history.setHospitalUID(loginUser.getHospitalUID());
-        history.setSiteUID(loginUser.getSiteUID());
-        dao.save(history);*/
         List<UserRole> roles = loginUser.getUserRoleList();
         roles.stream().filter(role -> role.getRoleId() == ACTIVATION_ROLE);
         if(CollectionUtils.isNotEmpty(roles)){
