@@ -7,6 +7,7 @@ const URLs = {
 
   AllDepartments: '/api/org/all',
   AllAssetTypes: '/api/msg?type=assetGroup',
+  AllHospitals: '/api/all_hospitals',// todo, use real api url
 
   AssetBrowser_Assets: '/api/assets',
 
@@ -79,6 +80,7 @@ const FailureAnalysis = {
       to: formatDate(to),
       type: filterBy.assettype === 'all_asset_type' ? type : filterBy.assettype,
       dept: filterBy.dept === 'all_dept' ? dept : filterBy.dept,
+      hospital: filterBy.hospital === 'default_hospital' ? '' : filterBy.hospital,
       supplier: supplier,
       asset: asset,
     }
@@ -136,6 +138,7 @@ function mapParamsToQuery(params, type) {
   let assetType = filterBy.assettype === 'all_asset_type' ? '' : filterBy.assettype
   let dept = filterBy.dept === 'all_dept' ? '' : filterBy.dept
   let supplier = filterBy.supplier === 'all_supplier' ? '' : filterBy.supplier
+  let hospital = filterBy.hospital === 'default_hospital' ? '' : filterBy.hospital
   return {
     from: formatDate(params.period.from),
     to: formatDate(params.period.to),
@@ -143,6 +146,7 @@ function mapParamsToQuery(params, type) {
     orderby: DataTypeMapping[params.dataType],
     type: assetType,
     dept: dept,
+    hospital,
     start: pag.skip || 0,
     limit: pag.top,
     supplier: supplier,

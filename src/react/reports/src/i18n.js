@@ -21,8 +21,9 @@ i18n
       }
     },
     backend: {
-      // loadPath: '/assets/locales/{{lng}}/{{ns}}.json'// dev
-      loadPath: '/geapm/react/reports/assets/locales/{{lng}}/{{ns}}.json' // dew watch
+      loadPath: process.env === 'development' ?
+        '/assets/locales/{{lng}}/{{ns}}.json':
+        '/geapm/react/reports/assets/locales/{{lng}}/{{ns}}.json' // dew watch
     },
     interpolation: {
       escapeValue: false, // not needed for react
