@@ -33,7 +33,7 @@
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" />
                         <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" />
-                        <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true"/>
+                        <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet grid" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true"/>
                         <p:commandButton value="归还已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(11)}"  rendered="true"/>
 
                         <p:commandButton value="归还已完成"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(12)}"  rendered="true"/>
@@ -101,13 +101,13 @@
                     </f:facet>
                 </p:dataTable>
                 <p:overlayPanel widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
-                    <h:panelGrid columns="2">
+                    <h:panelGrid id="grid" columns="2">
                         <p:outputLabel for="cal1" />
                         <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{sharedAssetRequestV2Controller.applyTimeFrom}"
-                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间" readonly="true"/>
                         <p:outputLabel for="cal2"/>
                         <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
-                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间" readonly="true"/>
                     </h:panelGrid>
                     <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                     <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
