@@ -174,6 +174,11 @@ public class UserAccount implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+
+    @Column(name = "active_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date activeTime;
     
     @PrePersist
     public void initializeUid() {
@@ -556,4 +561,11 @@ public class UserAccount implements Serializable {
         }
     }
 
+    public Date getActiveTime() {
+        return activeTime;
+    }
+
+    public void setActiveTime(Date activeTime) {
+        this.activeTime = activeTime;
+    }
 }

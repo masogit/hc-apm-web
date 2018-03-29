@@ -2,28 +2,32 @@ package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+
+import java.util.Date;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.ExternalContext;
+import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseId;
 import javax.faces.event.ValueChangeEvent;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import com.ge.apm.service.common.UserCommonService;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.dao.BiomedGroupUserRepository;
 import com.ge.apm.dao.V2_WorkOrderRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.TenantInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
-import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -37,10 +41,6 @@ import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.BiomedGroupUser;
-import com.ge.apm.domain.V2_WorkOrder;
-import com.ge.apm.domain.WorkflowConfig;
 import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -57,6 +57,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private static final long serialVersionUID = -1L;
 
     public static final String DEFAULT_USER_ROLE = "临床科室人员";
+    public static final int ACTIVATION_ROLE = 10;
 
     UserAccountRepository dao = null;
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -75,6 +76,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private UserAccount loginUser;
 
+    private TenantInfoRepository tenantInfoRepository;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -89,6 +92,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         setTenantUid(loginUser.getTenantUID());
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
@@ -370,23 +374,28 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if (loginName == null) {
             return;
         }
-
         loginName = loginName.replace(" ", "");
         user.setLoginName(loginName);
-
         if (selectedUserOrg != null) {
             user.setOrgInfoId(selectedUserOrg.getId());
             user.setOrgInfoUID(selectedUserOrg.getUid());
-
             user.setSiteId(selectedUserOrg.getSiteId());
             //user.setHospitalId(selectedUserOrg.getHospitalId());
             user.setHospitalId(orgInfoDao.getByUid(selectedUserOrg.getSiteUID()).getId());
-
             user.setTenantUID(selectedUserOrg.getTenantUID());
             user.setInstitutionUID(selectedUserOrg.getInstitutionUID());
             user.setHospitalUID(selectedUserOrg.getHospitalUID());
             user.setSiteUID(selectedUserOrg.getSiteUID());
             user.setOrgLevel(selectedUserOrg.getOrgLevel());
+        }
+        if(!user.getIsActive()){
+            TenantInfo tenant = tenantInfoRepository.findByuid(user.getTenantUID());
+            if(tenant.getIsEnabled()){
+                user.setIsActive(true);
+                user.setActiveTime(new Date());
+            }else{
+                user.setIsActive(false);
+        }
         }
 
     }
@@ -427,8 +436,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
-        selected.setIsActive(false);
+        //selected.setIsActive(false);
         selected.setIsLocked(true);
         selected.setLockTime(TimeUtil.timeNow().toDate());
         dao.save(selected);
@@ -441,8 +449,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 return;
             }
         }
-
-        selected.setIsActive(true);
+        //selected.setIsActive(true);
         selected.setIsLocked(false);
         selected.setPasswordErrorCount(0);
         dao.save(selected);
@@ -588,6 +595,84 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
         }
 
+    }
+
+    private Boolean agree = false;
+
+    private List<String> items;
+
+    @Transactional
+    public void confirmActivation(){
+        if(loginUser.getIsActive()){
+            System.out.println("already active !");
+            WebUtil.addSuccessMessage("激活成功！");
+            return;
+        }
+        loginUser.setIsActive(true);
+        loginUser.setActiveTime(new Date());
+        dao.save(loginUser);
+        /*UserActivationHistory history = new UserActivationHistory();
+        Date now = new Date();
+        history.setActiveTime(now);
+        history.setCreateTime(now);
+        history.setLastModifyTime(now);
+        history.setUserId(loginUser.getId());
+        history.setTenantUID(loginUser.getTenantUID());
+        history.setInstitutionUID(loginUser.getInstitutionUID());
+        history.setHospitalUID(loginUser.getHospitalUID());
+        history.setSiteUID(loginUser.getSiteUID());
+        dao.save(history);*/
+        List<UserRole> roles = loginUser.getUserRoleList();
+        roles.stream().filter(role -> role.getRoleId() == ACTIVATION_ROLE);
+        if(CollectionUtils.isNotEmpty(roles)){
+            TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
+            if(tenant.getIsEnabled() == null || (tenant.getIsEnabled() != null && !tenant.getIsEnabled())){
+                tenant.setIsEnabled(true);
+                tenant.setActiveTime(new Date());
+                tenantInfoRepository.save(tenant);
+                dao.updateMembersStatus(loginUser.getTenantUID());
+            }
+        }
+        WebUtil.addSuccessMessage("激活成功！");
+    }
+
+    public void logout(){
+        /*String context = FacesContext.getCurrentInstance().getExternalContext().getRequestContextPath();
+        String logoutUrl = FacesContext().getExternalContext().getRequestContextPath()+ "/logout.xhtml?uid="+loginUser.getId();
+        return logoutUrl;*/
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if(auth != null){
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+            HttpServletResponse response = (HttpServletResponse) ctx.getResponse();
+            new SecurityContextLogoutHandler().logout(request, response, auth);
+        }
+        WebUtil.redirectTo("/login.xhtml");
+    }
+
+    public void updateAgree(){
+        if(CollectionUtils.isNotEmpty(items)){
+            String str = items.get(0);
+            agree = Integer.parseInt(str) == 1 ? true : false;
+        }else{
+            agree = false;
+        }
+    }
+
+    public List<String> getItems() {
+        return items;
+    }
+
+    public void setItems(List<String> items) {
+        this.items = items;
+    }
+
+    public Boolean getAgree() {
+        return agree;
+    }
+
+    public void setAgree(Boolean agree) {
+        this.agree = agree;
     }
 
 }

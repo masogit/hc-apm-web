@@ -7,6 +7,6 @@ import webapp.framework.dao.GenericRepository;
 
 import java.util.List;
 
-public interface UserActivationHistoryRepository extends GenericRepository<UserActivationHistory> {
+/*public interface UserActivationHistoryRepository extends GenericRepository<UserActivationHistory> {
 
-}
+}*/
