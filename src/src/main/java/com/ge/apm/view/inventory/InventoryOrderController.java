@@ -1,4 +1,4 @@
-package com.ge.apm.view.pm;
+package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.pm.InventoryOrderService;
+import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
