@@ -65,11 +65,11 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "state")
     private String state;//状态 0待归还 1已归还
     
-    @Column(name = "charging_begin_time")
+    @Column(name = "charging_begin_time", columnDefinition = "TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP) 
     private Date chargingBeginTime;//计费开始时间
     
-    @Column(name = "charging_end_time")
+    @Column(name = "charging_end_time", columnDefinition = "TIMESTAMP")
     @Temporal(TemporalType.TIMESTAMP) 
     private Date chargingEndTime;//计费结束时间
     
