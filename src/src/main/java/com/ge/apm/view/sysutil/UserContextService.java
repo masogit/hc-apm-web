@@ -296,14 +296,6 @@ public class UserContextService implements Serializable {
     
     private Boolean needInstorageCheck = null;
 
-    public Boolean getPmDispatcher() {
-        return isPmDispatcher;
-    }
-
-    public void setPmDispatcher(Boolean pmDispatcher) {
-        isPmDispatcher = pmDispatcher;
-    }
-
     public Boolean needInstorageCheck(){
         if (needInstorageCheck == null) {
             getUserPrivilege();
