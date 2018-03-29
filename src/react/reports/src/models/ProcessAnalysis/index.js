@@ -15,6 +15,7 @@ export default {
     filterBy: {
       assettype: 'all_asset_type',
       dept: 'all_dept',
+      hospital: 'default_hospital',
     },
     period: {
       from: moment(new Date().getFullYear(), 'YYYY'),
@@ -180,7 +181,7 @@ export default {
 
 /* Copy/Paste from Process Analysis sagas */
 function mapParamsBrief(params) {
-  let { filterBy: { assettype, dept }, period, pagination, dataType } = params
+  let { filterBy: { assettype, dept, hospital }, period, pagination, dataType } = params
   return {
     from: _format(period.from),
     to: _format(period.to),
@@ -189,12 +190,13 @@ function mapParamsBrief(params) {
     groupby: GroupByMap[params.display],
     type: assettype === 'all_asset_type' ? undefined : assettype ,
     dept: dept === 'all_dept' ? undefined : dept,
+    hospital: hospital === 'default_hospital' ? undefined : hospital,
     orderby: DataTypeMap[dataType]
   }
 }
 
 function mapParamsDetail(params) {
-  let { filterBy: { assettype, dept }, period, pagination, dataType } = params
+  let { filterBy: { assettype, dept, hospital }, period, pagination, dataType } = params
   return {
     from: _format(period.from),
     to: _format(period.to),
@@ -202,23 +204,25 @@ function mapParamsDetail(params) {
     limit: pagination.right.top,
     type: assettype === 'all_asset_type' ? undefined : assettype ,
     dept: dept === 'all_dept' ? undefined : dept,
+    hospital: hospital === 'default_hospital' ? undefined : hospital,
     orderby: DataTypeMap[dataType]
   }
 }
 
 function mapParamsGross(params) {
-  let { filterBy: { assettype, dept }, period } = params
+  let { filterBy: { assettype, dept, hospital }, period } = params
   return {
     from: _format(period.from),
     to: _format(period.to),
     typeId: assettype === 'all_asset_type' ? undefined : assettype ,
-    deptId: dept === 'all_dept' ? undefined : dept
+    deptId: dept === 'all_dept' ? undefined : dept,
+    hospital: hospital === 'default_hospital' ? undefined : hospital,
   }
 }
 
 function mapParamsPhase(params, phase) {
   let {
-    filterBy: { assettype, dept },
+    filterBy: { assettype, dept, hospital },
     period, dataType,
     distributionEttr, distributionResponse
   } = params
@@ -234,6 +238,7 @@ function mapParamsPhase(params, phase) {
     to: _format(period.to),
     typeId: assettype === 'all_asset_type' ? undefined : assettype ,
     deptId: dept === 'all_dept' ? undefined : dept,
+    hospital: hospital === 'default_hospital' ? undefined : hospital,
     t1: distribution[1],
     t2: distribution[2],
     tmax: distribution[3],

@@ -1,4 +1,4 @@
-import { Orgs, AssetTypes } from './common'
+import { Orgs, AssetTypes, Hospitals } from './common'
 import { Assets } from './assetBrowser'
 import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
 import { StaffPerf } from './staffPerf'
@@ -28,6 +28,11 @@ export default function (mock) {
   mock.onGet(URLs.AllDepartments).reply(function (config) {
     info(config.url)
     return [200, Orgs]
+  })
+
+  mock.onGet(URLs.AllHospitals).reply(function (config) {
+    info(config.url)
+    return [200, Hospitals]
   })
 
   mock.onGet(URLs.AssetBrowser_Assets).reply(function (config) {
