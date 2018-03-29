@@ -177,7 +177,7 @@
                             </h:panelGroup >
                             <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.siteUID != null}">
                                 <label class="label">调剂中心</label>
-                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.clinicalUID}">
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.getDispatherClinical()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
