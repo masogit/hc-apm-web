@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -189,6 +190,15 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         public List<UserAccount> getAssetCreateApproverlList(){
             return ucService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
         }
+
+   	public List<OrgInfo> getDispatherClinical(){
+		OrgInfo org = orgInfoRepository.findByUid(selected.getSiteUID());
+		if(org.getOrgLevel() != 3){
+			return null;
+		}
+		return orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+	}
+
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
