@@ -18,7 +18,7 @@
 						<p:ajax event="filter" listener="#{inventoryOrderController.onFilter}" />
 
 						<p:column headerText="盘点科室" filterBy="#{item.assigneeOrg}" filterMatchMode="LIKE">
-							<a href="inventoryOrderDetail.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
+							<a href="inventoryOrderDetailAssetInfo.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
 						</p:column>
 						<p:column headerText="计划开始时间" filterBy="#{item.planStartTime}" filterMatchMode="GTE">
 							<f:facet name="filter">
@@ -65,7 +65,7 @@
 						</p:column>
 						<f:facet name="{Toolbar}">
 							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-								<p:dataExporter type="xls" target="datalist" fileName="SmallAssetPerformanceConfigFailed_export" />
+								<p:dataExporter type="xls" target="datalist" fileName="InventoryOrderDetailAssetInfo_export" />
 							</p:commandButton>
 						</f:facet>
 					</p:dataTable>

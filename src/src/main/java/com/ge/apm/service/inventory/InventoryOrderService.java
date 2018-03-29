@@ -1,4 +1,4 @@
-package com.ge.apm.service.pm;
+package com.ge.apm.service.inventory;
 
 import java.text.SimpleDateFormat;
 import java.time.Instant;
@@ -535,16 +535,16 @@ public class InventoryOrderService {
 	        }).collect(Collectors.toList());
 	    }
 
-	    public Page<AssetInfo> getInventoryAssetList(String orderId, String clinicalDeptUID, Integer status, Integer page, Integer pageSize) {
-	        PageRequest pageRequest = new PageRequest(page, pageSize);
-	        return inventoryOrderDetailDao.getInventoryAssetList(orderId, clinicalDeptUID, status, pageRequest);
-	    }
-	    
-	    public List<AssetInfo> getInventoryAssetList(String orderId, String clinicalDeptUID, Integer status) {
-	        return inventoryOrderDetailDao.getInventoryAssetList(orderId, clinicalDeptUID, status);
-	    }
-	    
-	    public List<AssetInfo> getInventoryAssetList(String orderId, String clinicalDeptUID) {
-	        return inventoryOrderDetailDao.getInventoryAssetList(orderId, clinicalDeptUID);
-	    }
+//	    public Page<AssetInfo> getInventoryAssetList(String orderId, String clinicalDeptUID, Integer status, Integer page, Integer pageSize) {
+//	        PageRequest pageRequest = new PageRequest(page, pageSize);
+//	        return inventoryOrderDetailDao.getInventoryAssetList(orderId, clinicalDeptUID, status, pageRequest);
+//	    }
+//	    
+//	    public List<AssetInfo> getInventoryAssetList(String orderId, String clinicalDeptUID, Integer status) {
+//	        return inventoryOrderDetailDao.getInventoryAssetList(orderId, clinicalDeptUID, status);
+//	    }
+//	    
+//	    public List<AssetInfo> getInventoryAssetList(String orderId, String clinicalDeptUID) {
+//	        return inventoryOrderDetailDao.getInventoryAssetList(orderId, clinicalDeptUID);
+//	    }
 }

@@ -46,13 +46,33 @@
 							<h:outputText
 								value="#{item.status==1?'正常':item.status==2?'停机':item.status==3?'限制功能使用':item.status==4?'待报废':'停用'}" />
 						</p:column>
+						<!-- <p:column headerText="是否在用" filterBy="#{item.isValid}" filterMatchMode="EQ">
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+									<f:converter converterId="javax.faces.Boolean"/>
+									<f:selectItem itemLabel="在用" itemValue="true" noSelectionOption="false" />
+									<f:selectItem itemLabel="停用" itemValue="false" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{item.isValid?'在用':'停用'}" />
+						</p:column>
+						<p:column headerText="是否删除" filterBy="#{item.isDeleted}" filterMatchMode="EQ">
+							<f:facet name="filter">
+								<p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+									<f:converter converterId="javax.faces.Boolean"/>
+									<f:selectItem itemLabel="在用" itemValue="false" noSelectionOption="false" />
+									<f:selectItem itemLabel="已删除" itemValue="true" />
+								</p:selectOneMenu>
+							</f:facet>
+							<h:outputText value="#{item.isDeleted?'已删除':'在用'}" />
+						</p:column> -->
 						<p:column headerText="设备位置" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
 							<h:outputText value="#{item.clinicalDeptName}" />
 						</p:column>
 
 						<f:facet name="{Toolbar}">
 							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-								<p:dataExporter type="xls" target="datalist" fileName="SmallAssetPerformanceConfigFailed_export" />
+								<p:dataExporter type="xls" target="datalist" fileName="InventoryOrderDetailAssetInfo_export" />
 							</p:commandButton>
 						</f:facet>
 					</p:dataTable>
