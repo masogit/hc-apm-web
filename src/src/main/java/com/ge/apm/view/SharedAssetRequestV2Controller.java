@@ -228,6 +228,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 List<String> stateList = new ArrayList<String>();
                 stateList.add("7");
                 stateList.add("8");
+                stateList.add("11");
                 searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
             }
         }else {
@@ -318,38 +319,38 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             searchFilters = new ArrayList<SearchFilter>();
         }
         
-        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-        //申请日期过滤
-        if (applyTimeFormatTime != null ) {
-            String[] split = applyTimeFormatTime.split("~");
-            if (split.length == 1) {
-                try {
-                    Date dateFrom = sdf.parse(split[0] + " 00:00:00");
-                    searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
-                } catch (ParseException ex) {
-                    Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
-                }
-            } else {
-                if (split[0].equals("")) {
-                    try {
-                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
-                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
-                    } catch (ParseException ex) {
-                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                } else {
-                    try {
-                        Date dateFrom = sdf.parse(split[0] + " 00:00:00");
-                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
-                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
-                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
-                    } catch (ParseException ex) {
-                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-                }
-            }
-                    
-        }
+//        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+//        //申请日期过滤
+//        if (applyTimeFormatTime != null ) {
+//            String[] split = applyTimeFormatTime.split("~");
+//            if (split.length == 1) {
+//                try {
+//                    Date dateFrom = sdf.parse(split[0] + " 00:00:00");
+//                    searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
+//                } catch (ParseException ex) {
+//                    Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            } else {
+//                if (split[0].equals("")) {
+//                    try {
+//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
+//                    } catch (ParseException ex) {
+//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                } else {
+//                    try {
+//                        Date dateFrom = sdf.parse(split[0] + " 00:00:00");
+//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
+//                    } catch (ParseException ex) {
+//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }
+//            }
+//
+//        }
        
         
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -399,9 +400,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         String pageName = "";
         if(selected.getState() == 8){
             pageName = "Edit_1";
-        }else if(selected.getState() == 7){
+        }else if(selected.getState() == 7 || selected.getState() == 11){
             pageName = "Edit";
-        }else if(selected.getState() == 12){
+        }else if(selected.getState() == 12 || selected.getState() == 9 || selected.getState() == 10){
             pageName = "Edit_2";
         }
         selected.setMsgEndTime(this.getTime("归还"));
@@ -420,7 +421,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             pageName = "Edit_1";
         }else if(selected.getState() == 1||selected.getState() == 5){
             pageName = "Edit";
-        }else if(selected.getState() == 6){
+        }else if(selected.getState() == 6 || selected.getState() == 3 || selected.getState() == 4){
             pageName = "Edit_2";
         }
         selected.setMsgAccepter(this.selected.getApplicant());
@@ -784,8 +785,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                     return; 
                 }
                 else{
-    //            }
-    //            if("0".equals(infoVo.getSwapTypeState())){//判断是否调剂设备
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
 
@@ -1153,7 +1152,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        int sta = selected.getState();
        int state = 8;//2归还待交付状态
        
-       if(sta  == 7){//归还待受理状态
+       if(sta  == 7 || sta == 11){//归还待受理状态
            dao.updateState(uid, state);
        }else {
            WebUtil.addErrorMessage("当前状态不可受理！");
