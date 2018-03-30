@@ -4,7 +4,7 @@
 	<ui:define name="content">
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
-				<p:outputLabel class="pageTitle" value="盘点工单列表" />
+				<p:outputLabel class="pageTitle" value="盘点工单" />
 			</div>
 
 			<div class="ui-g-12 card">
@@ -18,7 +18,7 @@
 						<p:ajax event="filter" listener="#{inventoryOrderController.onFilter}" />
 
 						<p:column headerText="盘点科室" filterBy="#{item.assigneeOrg}" filterMatchMode="LIKE">
-							<a href="inventoryOrderDetailAssetInfo.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
+							<a href="inventoryOrderDetailAssetInfoMain.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
 						</p:column>
 						<p:column headerText="计划开始时间" filterBy="#{item.planStartTime}" filterMatchMode="GTE">
 							<f:facet name="filter">
