@@ -8,8 +8,10 @@ import java.util.List;
 import javax.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.QueryHints;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 
 public interface UserAccountRepository extends GenericRepository<UserAccount> {
@@ -120,6 +122,9 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     UserAccount findByTenantUIDAndName(String tenantUid, String name);
 
-    @Query(value= "update tenant_info set is_enabled = true where uid = ?1",nativeQuery=true)
+    @Transactional
+    @Modifying
+    @Query(value= "update user_account set active_time= now(),is_active=true where tenant_uid = ?1",nativeQuery=true)
+    //@Query("update UserAccount  set isActive = true ,activeTime = now() where tenantUID = ?1")
     public void updateMembersStatus(String tenantUid);
 }
