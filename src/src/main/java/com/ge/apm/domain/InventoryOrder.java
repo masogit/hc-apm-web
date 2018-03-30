@@ -226,7 +226,7 @@ public class InventoryOrder implements Serializable {
             int i=0;
             for (Map map : clinicalDeptList) {
 //                this.clinicalDeptLabel += map.get("orgName") + " ";
-            	this.clinicalDeptLabel += map.get("orgName") + " ";
+            	this.clinicalDeptLabel += map.get("orgName") + "\n";
             	if(i==2){
             		this.clinicalDeptLabel +=" 等...";
             		break;

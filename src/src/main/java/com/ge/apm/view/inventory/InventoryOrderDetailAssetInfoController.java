@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -20,11 +21,9 @@ import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
@@ -37,17 +36,18 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class InventoryOrderDetailAssetInfoController extends GenericCRUDController<AssetInfo> implements Serializable, ServerEventInterface {
 
-	private InventoryOrderService inventoryOrderService;
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
 	private static final String UID = "uid";
+	private static final String ORG_NAME = "orgName";
 	private String orderId;
 	private List<String> listClinicalDeptUID;
+	private List<String> listClinicalDeptName;
+	private int activeTabId=0;
 
 	@Override
 	protected void init() {
-		inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -79,23 +79,31 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 			}
 		}
 		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listClinicalDeptUID));
-		searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-		searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+		searchFilters.add(new SearchFilter("inventoryStatus", SearchFilter.Operator.EQ, activeTabId));
 		System.out.println("xxx");
-		System.out.println(pageRequest.getPageNumber());
-		System.out.println(pageRequest.getPageSize());
-		Page<AssetInfo> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
-		if (pageAssetInfo == null) {
-			System.out.println("xxx pageAssetInfo is null");
-		} else {
-			System.out.println("xxx pageAssetInfo size=" + pageAssetInfo.getSize());
+		System.out.println(searchFilters.toString());
+		for(SearchFilter filter:searchFilters){
+			System.out.println(filter.fieldName);
+			System.out.println(filter.operator);
+			System.out.println(filter.value);
 		}
+//		changeSearchFilter(searchFilters);
+		Page<AssetInfo> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+		for(AssetInfo info:pageAssetInfo){
+			System.out.println(info.getId());
+		}
+		System.out.println("xxx result size");
+		System.out.println(pageAssetInfo.getSize());
+		System.out.println(pageAssetInfo.getNumber());
+		System.out.println(pageAssetInfo.getTotalElements());
+		System.out.println(pageAssetInfo.getContent().size());
 		return pageAssetInfo;
 	}
 
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
-
+		System.out.println("xxx onServerEvent");
+		System.out.println(eventName);
 	}
 
 	@Override
@@ -106,32 +114,43 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		object.setHospitalUID(currentUser.getHospitalUID());
 		object.setSiteUID(currentUser.getSiteUID());
 	}
-
-	// private List<AssetInfo> getInventoryAsset(String orderId){
-	// List<AssetInfo> listResult=new ArrayList<AssetInfo>();
-	// if(StringUtils.isEmpty(orderId)){
-	// return listResult;
-	// }
-	// InventoryOrder order=inventoryOrderRepository.findById(orderId);
-	// String assignee_org=order.getAssigneeOrg();
-	// JSONArray array=new JSONArray(assignee_org);
-	// JSONObject obj=null;
-	// String clinicalDeptUID="";
-	// List<AssetInfo> listAssetInfo;
-	// for(int i=0;i<array.length();++i){
-	// obj=array.getJSONObject(i);
-	// clinicalDeptUID=obj.getString(UID);
-	// listAssetInfo=inventoryOrderService.getInventoryAssetList(orderId,
-	// clinicalDeptUID);
-	// if(listAssetInfo!=null && listAssetInfo.size()>0){
-	// listResult.addAll(listAssetInfo);
-	// }
-	// }
-	// return listResult;
-	// }
+	
+//	public void onTabChanged(TabChangeEvent event) {
+//        String tabId = event.getTab().getId();
+//        if("tab0".equals(tabId))
+//            activeTabId = 0;
+//        else if("tab1".equals(tabId))
+//            activeTabId = 1;
+//        else if("tab2".equals(tabId))
+//            activeTabId = 2;
+//        else if("tab3".equals(tabId))
+//            activeTabId = 3;
+//        else
+//            activeTabId = 0;
+//        
+//        System.out.println("tab event:"+activeTabId);
+//    }
+	
+//	private void changeSearchFilter(List<SearchFilter> listFilter){
+//		for(SearchFilter filter: listFilter){
+//			if(filter.fieldName.equals(INVENTORY_STATUS)){
+//				System.out.println("xxx");
+//				System.out.println(filter.getSqlParamName());
+//				System.out.println(filter.getConditionSql());
+//				System.out.println(filter.value);
+//				if(((String)filter.value).equals("3")){
+//					System.out.println("add filter");
+//					listFilter.remove(filter);
+//					listFilter.add(new SearchFilter(HAS_INVENTORY_ISSUE,SearchFilter.Operator.EQ,true));
+//					break;
+//				}
+//			}
+//		}
+//	}
 
 	private void getInventoryClinicalDeptUID(String orderId) {
 		listClinicalDeptUID = new ArrayList<String>();
+		listClinicalDeptName = new ArrayList<String>();
 		if (StringUtils.isEmpty(orderId)) {
 			return;
 		}
@@ -140,12 +159,36 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		JSONArray array = new JSONArray(assignee_org);
 		JSONObject obj = null;
 		String clinicalDeptUID = "";
+		String temp="";
 		List<AssetInfo> listAssetInfo;
 		for (int i = 0; i < array.length(); ++i) {
 			obj = array.getJSONObject(i);
 			clinicalDeptUID = obj.getString(UID);
+			temp=obj.getString(ORG_NAME);
+			temp=temp.substring(temp.lastIndexOf(" ")+1,temp.length());
+			if(!listClinicalDeptName.contains(temp)){
+				listClinicalDeptName.add(temp);
+			}
 			listClinicalDeptUID.add(clinicalDeptUID);
 		}
 	}
+
+	public List<String> getListClinicalDeptName() {
+		return listClinicalDeptName;
+	}
+
+	public void setListClinicalDeptName(List<String> listClinicalDeptName) {
+		this.listClinicalDeptName = listClinicalDeptName;
+	}
+
+	public String getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(String orderId) {
+		this.orderId = orderId;
+	}
+	
+	
 
 }
