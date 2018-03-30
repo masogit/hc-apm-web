@@ -35,6 +35,8 @@ import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
@@ -615,15 +617,16 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginUser.setActiveTime(new Date());
         dao.save(loginUser);
         List<UserRole> roles = loginUser.getUserRoleList();
-        roles.stream().filter(role -> role.getRoleId() == ACTIVATION_ROLE);
+        roles = roles.stream().filter(role -> role.getRoleId() == ACTIVATION_ROLE).collect(Collectors.toList());
         if(CollectionUtils.isNotEmpty(roles)){
             TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
-            if(tenant.getIsEnabled() == null || (tenant.getIsEnabled() != null && !tenant.getIsEnabled())){
-                tenant.setIsEnabled(true);
-                tenant.setActiveTime(new Date());
-                tenantInfoRepository.save(tenant);
-                dao.updateMembersStatus(loginUser.getTenantUID());
-            }
+            tenant.setIsEnabled(true);
+            tenant.setActiveTime(new Date());
+            tenantInfoRepository.save(tenant);
+            dao.updateMembersStatus(loginUser.getTenantUID());
+/*            if(tenant.getIsEnabled() == null || (tenant.getIsEnabled() != null && !tenant.getIsEnabled())){
+
+            }*/
         }
         WebUtil.addSuccessMessage("激活成功！");
     }
