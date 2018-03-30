@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.primefaces.event.TabChangeEvent;
+import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -21,11 +23,13 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.github.davidmoten.guavamini.Lists;
 
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
+import webapp.framework.web.mvc.GenericDataTableModel;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
@@ -43,10 +47,17 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 	private String orderId;
 	private List<String> listClinicalDeptUID;
 	private List<String> listClinicalDeptName;
-	private int activeTabId = 0;
+	private int inventoryStatus = 0;
+	private boolean initBln=true;
+	private int initIndex=0;
+	private List<Integer> listStatus;
 
 	@Override
 	protected void init() {
+		listStatus=new ArrayList<Integer>();
+		listStatus.add(0);
+		listStatus.add(1);
+		listStatus.add(2);
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
@@ -63,9 +74,16 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 
 	@Override
 	protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+		if(initBln){
+			inventoryStatus=listStatus.get(initIndex);
+			initIndex++;
+		}
+		if(initIndex==listStatus.size())
+			initBln=false;
+		
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
-			searchFilters = new ArrayList<>();
+			searchFilters = new ArrayList<SearchFilter>();
 		}
 		searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
 		if (currentUser.getOrgLevel() != 0) {
@@ -78,7 +96,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 			}
 		}
 		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listClinicalDeptUID));
-		searchFilters.add(new SearchFilter("inventoryStatus", SearchFilter.Operator.EQ, activeTabId));
+		searchFilters.add(new SearchFilter("inventoryStatus", SearchFilter.Operator.EQ, inventoryStatus));
 		Page<AssetInfo> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
 		return pageAssetInfo;
 	}
@@ -94,6 +112,21 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		object.setInstitutionUID(currentUser.getInstitutionUID());
 		object.setHospitalUID(currentUser.getHospitalUID());
 		object.setSiteUID(currentUser.getSiteUID());
+	}
+
+	public void onTabChanged(TabChangeEvent event) {
+		String tabName = event.getTab().getId();
+		if ("tab0".equals(tabName))
+			inventoryStatus = 0;
+		else if ("tab1".equals(tabName)) {
+			inventoryStatus = 1;
+		} else if ("tab2".equals(tabName)) {
+			inventoryStatus = 2;
+		} else if ("tab3".equals(tabName))
+			inventoryStatus = 3;
+		else
+			inventoryStatus = 0;
+		
 	}
 
 	private void getInventoryClinicalDeptUID(String orderId) {
