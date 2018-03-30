@@ -116,7 +116,7 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
     public boolean isCanOperate(UserAccount cua, String siteUID){
         boolean flag = false;
 
-        if(!UserContext.getRoles().contains("LocalITAdmin")){
+        if(!UserContextService.isOnlyLocalITAdmin()){
             return true;
         }
         OrgInfo tempOrgInfo = orgInfoDao.getByUid(siteUID);
@@ -140,7 +140,7 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
     public boolean isCanOperate(UserAccount cua, OrgInfo oi){
         boolean flag = false;
 
-        if(!UserContext.getRoles().contains("LocalITAdmin")){
+        if(!UserContextService.isOnlyLocalITAdmin()){
             return true;
         }
 

@@ -113,8 +113,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.tenantUid = tenantUid;
         TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
         TenantInfo tempTenantInfo = tenantDao.findByuid(loginUser.getTenantUID());
-        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
-        if(UserContext.getRoles().contains("LocalITAdmin")){
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContextService.isOnlyLocalITAdmin()){
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
         }else{
@@ -219,10 +219,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
-        allRoles = uaaService.getSysRoleNames();
-        //判断租户是否设置院区隔离，还有登陆用户是否是LocalITAdmin(本地后台运营管理)
-        if(UserContext.getRoles().contains("LocalITAdmin")){
-            allRoles.remove("后台运营管理");
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContextService.isOnlyLocalITAdmin()){
+            List<String> disableRoleList = new ArrayList<>();
+            disableRoleList.add("ITAdmin");
+            allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
+        }else{
+            allRoles = uaaService.getSysRoleNames();
         }
 
         assignedRoles = new ArrayList<String>();
