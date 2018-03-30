@@ -34,7 +34,7 @@ import webapp.framework.web.WebUtil;
  */
 @ManagedBean
 @ViewScoped
-public class TableCreateController extends TieWebSheetBean{
+public class TableCreateController extends TieWebSheetBean {
 
     private TableDefinitionRepository templateDao;
     private TableDefinitionService templateService;
@@ -50,10 +50,9 @@ public class TableCreateController extends TieWebSheetBean{
     private Map<String, Object> tableValue;
 
     private Boolean isStringEditable = false;
-    
+
     //for Excel
     private UploadedFile uploadedFile;
-    private StreamedContent savedFile;
     private BlobFileService blobService;
     private Map<String, Object> tableFields;
     private HashMap<String, Object> context = new HashMap<String, Object>();
@@ -66,7 +65,7 @@ public class TableCreateController extends TieWebSheetBean{
         templateService = WebUtil.getBean(TableDefinitionService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         tableFields = new HashMap<>();
-        
+
         String templateId = WebUtil.getRequestParameter("id");
         if (Strings.isNullOrEmpty(templateId)) {
             CreateTemplate();
@@ -80,10 +79,14 @@ public class TableCreateController extends TieWebSheetBean{
             } else {
                 tableString = selectedTableDefinition.getSchema();
             }
-            
+
             if (null != selectedTableDefinition.getExcelStorageId()) {
-                savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
-                loadWebSheetByStream(savedFile.getStream());
+                try {
+                    StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
+                    loadWebSheetByStream(savedFile.getStream());
+                } catch (Exception e) {
+                    WebUtil.addErrorMessage("Excel模版加载失败");
+                }
             }
         }
 
@@ -97,7 +100,7 @@ public class TableCreateController extends TieWebSheetBean{
         selectedTableDefinition.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
     }
-    
+
     private void loadWebSheetByStream(InputStream inputStream) {
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
@@ -118,20 +121,20 @@ public class TableCreateController extends TieWebSheetBean{
             tableString = JSONObject.toJSONString(table);
             selectedTableDefinition.setSchema(tableString);
             templateDao.save(selectedTableDefinition);
-            WebUtil.addSuccessMessage("已保存");
+            WebUtil.addSuccessMessage("JSON已保存");
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
                 selectedTableDefinition.setSchema(tableString);
                 selectedTableDefinition.setName(table.getTitle());
                 templateDao.save(selectedTableDefinition);
-                WebUtil.addSuccessMessage("已保存");
+                WebUtil.addSuccessMessage("JSON已保存");
             } else {
-                WebUtil.addErrorMessage("字段有变动,不能保存");
+                WebUtil.addErrorMessage("字段有变动,JSON不能保存");
             }
 
         }
-        
+
         //for excel
         if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
             //新建
@@ -144,20 +147,21 @@ public class TableCreateController extends TieWebSheetBean{
                     selectedTableDefinition = templateDao.save(selectedTableDefinition);
                     uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
                     blobService.saveBlobObject(uploadedFileObject);
-                    WebUtil.addSuccessMessage(selectedTableDefinition.getName() + "保存成功");
+                    WebUtil.addSuccessMessage("Excel已保存");
                 }
-            } else {
-                WebUtil.addErrorMessage("模版文件未上传");
             }
         } else {
             //修改
             if (uploadedFile != null) {
                 //Eexcel 模版有变动
-                templateService.updateExcelTemplate(selectedTableDefinition, uploadedFile);
+                templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
+                WebUtil.addSuccessMessage("Excel已保存");
             } else {
                 selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                WebUtil.addSuccessMessage("Excel已保存");
             }
         }
+
     }
 
     public void onTitleChange() {
@@ -261,7 +265,7 @@ public class TableCreateController extends TieWebSheetBean{
                 editTableItem.setOptions(new ArrayList<TableOption>());
             }
         }
-        if(null != editTableItem.getExp()){
+        if (null != editTableItem.getExp()) {
             editTableItem.getExp().clear();
         }
 
@@ -320,30 +324,38 @@ public class TableCreateController extends TieWebSheetBean{
             editTableItem.setResKey(editTableItem.getKey().concat("_res"));
         }
     }
-    
+
     public void cancelUpload() {
         this.uploadedFile = null;
-        if(null != uploadedFileObject){
+        if (null != uploadedFileObject) {
             blobService.deleteBlobFile(uploadedFileObject);
+            uploadedFileObject = null;
+        }
+        if (null != selectedTableDefinition.getExcelStorageId()) {
+            try {
+                StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
+                loadWebSheetByStream(savedFile.getStream());
+            } catch (Exception e) {
+                WebUtil.addErrorMessage("Excel模版加载失败");
+            }
         }
     }
 
     public void uploadDataFile(FileUploadEvent event) {
         this.uploadedFile = event.getFile();
         uploadedFileObject = blobService.uploadFile(uploadedFile);
-        this.savedFile = null;
     }
 
     public void finishUpload() {
-        if(null != uploadedFileObject){
-            savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
+        if (null != uploadedFileObject) {
+            StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
             loadWebSheetByStream(savedFile.getStream());
         }
     }
 
     public void testSubmit() {
     }
-    
+
     //getter and setter
     public TableSchema getTable() {
         return table;
@@ -408,7 +420,7 @@ public class TableCreateController extends TieWebSheetBean{
     public void setIsStringEditable(Boolean isStringEditable) {
         this.isStringEditable = isStringEditable;
     }
-    
+
     public Map<String, Object> getTableFields() {
         return tableFields;
     }
@@ -423,14 +435,6 @@ public class TableCreateController extends TieWebSheetBean{
 
     public void setUploadedFile(UploadedFile uploadedFile) {
         this.uploadedFile = uploadedFile;
-    }
-
-    public StreamedContent getSavedFile() {
-        return savedFile;
-    }
-
-    public void setSavedFile(StreamedContent savedFile) {
-        this.savedFile = savedFile;
     }
 
 }

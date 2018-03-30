@@ -112,8 +112,7 @@ public class TableDefinitionService {
     }
 
     @Transactional
-    public void updateExcelTemplate(TableDefinition selectedTableDefinition, UploadedFile uploadedFile) {
-        V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+    public void updateExcelTemplate(TableDefinition selectedTableDefinition, V2_BlobObject blobObject) {
         if (getCountByTemplate(selectedTableDefinition.getId()) > 0) {
             //模版下有记录
             TableDefinition newTemplate = new TableDefinition();
@@ -141,6 +140,7 @@ public class TableDefinitionService {
             blobService.saveBlobObject(blobObject);
         } else {
             //模版下无记录
+            
             if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
                 selectedTableDefinition.setExcelStorageId(blobObject.getObjectStorageId());
                 selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
