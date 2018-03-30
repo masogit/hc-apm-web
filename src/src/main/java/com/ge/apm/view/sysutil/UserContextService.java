@@ -371,7 +371,7 @@ public class UserContextService implements Serializable {
     public static boolean isOnlyLocalITAdmin() {
 
         if(UserContext.getRoles().contains("LocalITAdmin")){
-            if(UserContext.getRoles().contains("LocalITAdmin") || isSuperAdmin()){
+            if(UserContext.getRoles().contains("ITAdmin") || isSuperAdmin()){
                 return false;
             }else{
                 return true;

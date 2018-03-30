@@ -97,6 +97,23 @@ public class UaaService {
 
         return roleList;
     }
+
+    //（disableList中是需要从roleList中移除的roleNamme）
+    public List<String> getSysRoleNamesByDisableList(List<String> disableRoleList){
+        loadSysRoles();
+
+        List<String> roleList = new ArrayList<String>();
+
+        for(Map.Entry<String, SysRole> item: sysRoles.entrySet()){
+            for (String roleName: disableRoleList) {
+                if(!roleName.equals(item.getKey())){
+                    roleList.add(item.getValue().getRoleDesc());
+                }
+            }
+        }
+
+        return roleList;
+    }
     
     @Transactional
     public UserAccount loadUserWithUserRoles(int userId){
