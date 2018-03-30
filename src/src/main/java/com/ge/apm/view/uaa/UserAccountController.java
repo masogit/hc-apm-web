@@ -219,10 +219,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
-        allRoles = uaaService.getSysRoleNames();
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
-            allRoles.remove("后台运营管理");
+            List<String> disableRoleList = new ArrayList<>();
+            disableRoleList.add("ITAdmin");
+            allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
+        }else{
+            allRoles = uaaService.getSysRoleNames();
         }
 
         assignedRoles = new ArrayList<String>();
