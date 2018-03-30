@@ -182,6 +182,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
         if (queryIndex == -2) {
             List<String> stateList = new ArrayList<String>();
+            stateList.add("0");
             stateList.add("1");
             stateList.add("2");
             stateList.add("3");
@@ -197,10 +198,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             stateList.add("10");
             stateList.add("11");
             stateList.add("12");
+            stateList.add("13");
             searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
         }else if(queryIndex == -1){
             if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")){//分配页面初始List
                 List<String> stateList = new ArrayList<String>();
+                stateList.add("0");
                 stateList.add("1");
                 stateList.add("2");
                 stateList.add("3");
@@ -216,6 +219,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 stateList.add("10");
                 stateList.add("11");
                 stateList.add("12");
+                stateList.add("13");
                 searchFilters.add(new SearchFilter("state", SearchFilter.Operator.IN,stateList));
             }else if(p.equalsIgnoreCase("/portal/BorrowAcceptanceV2/List.xhtml")){
                 List<String> stateList = new ArrayList<String>();
@@ -283,7 +287,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             object.setBehavior(2);
         }
 
-        object.setCreateDate(new Date());
+        //object.setCreateDate(new Date());
         object.setApplyTime(new Date());
         object.setClinicalDeptUid(UserContextService.getCurrentUserAccount().getSiteUID());
         object.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
@@ -298,7 +302,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             object.setClinicalDeptUid(userOrg.getUid());
         }
        
-        Date today = getNexDate(new Date()); 
+        //Date today = getNexDate(new Date());
 //        today.setHours(0);
 //        today.setMinutes(0);
 //        today.setSeconds(0);
@@ -306,9 +310,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //        c.setTime(today);
 //        c.add(Calendar.DAY_OF_MONTH, 1);// 今天+1天
 //        c.add(Calendar.);
-        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
-        ft.format(today);
-        object.setInvalidTime(today);
+//        SimpleDateFormat ft = new SimpleDateFormat ("yyyy-MM-dd hh:mm:ss");
+//        ft.format(today);
+//        object.setInvalidTime(today);
         
         
     }
@@ -352,7 +356,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //
 //        }
        
-        
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -367,7 +370,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //        }
 
     }
-
+    
     public Date getNexDate(Date date){
         int n = 1;
         SimpleDateFormat df=new SimpleDateFormat("yyyy-MM-dd");  
@@ -402,7 +405,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             pageName = "Edit_1";
         }else if(selected.getState() == 7 || selected.getState() == 11){
             pageName = "Edit";
-        }else if(selected.getState() == 12 || selected.getState() == 9 || selected.getState() == 10){
+        }else if(selected.getState() == 12 || selected.getState() == 9 || selected.getState() == 10 || selected.getState() == 13){
             pageName = "Edit_2";
         }
         selected.setMsgEndTime(this.getTime("归还"));
@@ -421,7 +424,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             pageName = "Edit_1";
         }else if(selected.getState() == 1||selected.getState() == 5){
             pageName = "Edit";
-        }else if(selected.getState() == 6 || selected.getState() == 3 || selected.getState() == 4){
+        }else if(selected.getState() == 6 || selected.getState() == 3 || selected.getState() == 4 || selected.getState() == 0){
             pageName = "Edit_2";
         }
         selected.setMsgAccepter(this.selected.getApplicant());
@@ -651,7 +654,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                             sardList.add(detail_list.get(0));
                                             selectedSard = detail_list.get(0);
                                         }
-
+                                     
                                     //更改使用科室
 
                                     if(userOrg.getOrgType()==4){
@@ -897,7 +900,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         selectedSard = assetDetaiVo;
                                     }
                                         
-
+                                    
                                     //更改使用科室
                                     
                                     OrgInfo findByUid = orgInfoDao.findByUid(this.selected.getClinicalDeptUid());
@@ -1064,6 +1067,18 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            } else {
                 String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
                 selected.setClinicalDeptName(name);
+                selected.setApplyTime(new Date());
+                selected.setCreateDate(new Date());
+
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(new Date());
+                cal.set(Calendar.HOUR_OF_DAY, 0);
+                cal.set(Calendar.MINUTE, 0);
+                cal.set(Calendar.SECOND, 0);
+                cal.set(Calendar.MILLISECOND, 0);
+                cal.add(Calendar.DAY_OF_MONTH, 1);
+                selected.setInvalidTime(cal.getTime());
+
                 dao.save(selected);
                 apdDao.save(selected.getSartList());
                 String url = "List.xhtml?faces-redirect=true";
@@ -1438,7 +1453,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        String uid = selected.getId();
        int sta = selected.getState();
               int state = 10;//11为取消归还
-       if(sta == 7 ||sta == 8){
+       if(sta == 7 ||sta == 8 || sta == 11){
 
            dao.updateState(uid, state);
             String iouId = uid;

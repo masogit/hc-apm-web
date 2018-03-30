@@ -20,19 +20,23 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"/>
+                            <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请科室</label>
-                            <p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}"/>
+                            <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>虚拟网电话</label>
-                            <p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}"/>
+                            <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>创建日期</label>
-                            <p:inputText id="createDate" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.createDate}"/>
+                            <!--<p:inputText id="createDate" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>备注</label>

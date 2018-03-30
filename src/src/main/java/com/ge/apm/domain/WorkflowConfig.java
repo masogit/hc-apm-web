@@ -91,7 +91,7 @@ public class WorkflowConfig implements Serializable {
     private String siteUID;
     
     //扫码建档审核人UID, null 表示不需要审核
-    @Column(name="asset_approver",columnDefinition = "CHAR(32)")
+    @Column(name="asset_approver" ,columnDefinition = "CHAR(32)")
     private String assetApprover;
     
     @Column(name = "warranty_remind_days")
@@ -102,7 +102,7 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "warranty_remind_times")
     private Integer warrantyRemindTimes;//维保提醒次数
 
-    @Column(name = "dept_for_shared_asset")
+    @Column(name = "dept_for_shared_asset",columnDefinition = "CHAR(32)")
     private String deptForSharedAsset;
 
 
