@@ -53,9 +53,11 @@ public class TableDefinitionService {
 
     public List<String> getItemKeyList(TableSchema table) {
         List<String> keyList = new ArrayList();
-        table.getGroups().forEach(item -> {
-            keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
-        });
+        if (table.getGroups() != null) {
+            table.getGroups().forEach(item -> {
+                keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
+            });
+        }
         return keyList;
     }
 

@@ -331,20 +331,17 @@ public class TableCreateController extends TieWebSheetBean{
     public void uploadDataFile(FileUploadEvent event) {
         this.uploadedFile = event.getFile();
         uploadedFileObject = blobService.uploadFile(uploadedFile);
-        selectedTableDefinition.setName(uploadedFile.getFileName().substring(0, uploadedFile.getFileName().lastIndexOf(".") < 0
-                ? uploadedFile.getFileName().length() : uploadedFile.getFileName().lastIndexOf(".")));
         this.savedFile = null;
     }
 
     public void finishUpload() {
         if(null != uploadedFileObject){
-            StreamedContent savedUploadedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
-            loadWebSheetByStream(savedUploadedFile.getStream());
+            savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
+            loadWebSheetByStream(savedFile.getStream());
         }
     }
 
     public void testSubmit() {
-        System.out.println("====================submit" + tableFields);
     }
     
     //getter and setter
