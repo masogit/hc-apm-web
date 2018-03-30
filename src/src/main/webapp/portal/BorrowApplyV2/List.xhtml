@@ -78,15 +78,15 @@
                            <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{sharedAssetRequestV2Controller.applyTimeFormatTime}"/>
                         </f:facet>
                         <h:outputText value="#{item.applyTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
                     
-                    <p:column headerText="申请失效日期" sortBy="#{item.invalidTime}">
-                        <h:outputText value="#{item.invalidTime}">
-                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
-                        </h:outputText>
-                    </p:column>
+                    <!--<p:column headerText="申请失效日期" sortBy="#{item.invalidTime}">-->
+                        <!--<h:outputText value="#{item.invalidTime}">-->
+                            <!--<f:convertDateTime pattern="yyyy/MM/dd HH:mm" />-->
+                        <!--</h:outputText>-->
+                    <!--</p:column>-->
                     <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
