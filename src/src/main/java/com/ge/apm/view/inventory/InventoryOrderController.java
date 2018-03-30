@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryOrder;
-import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -30,13 +29,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class InventoryOrderController extends GenericCRUDUUIDController<InventoryOrder> implements Serializable, ServerEventInterface{
 
-	private InventoryOrderService inventoryOrderService;
 	private UserAccount currentUser;
 	private InventoryOrderRepository dao;
 
 	@Override
     protected void init() {
-        inventoryOrderService = WebUtil.getBean(InventoryOrderService.class);
         dao = WebUtil.getBean(InventoryOrderRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
     }
