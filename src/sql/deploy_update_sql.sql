@@ -79,3 +79,6 @@ update unstructured_data_collection uc set schema_id=(select safety_report from 
 update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-performance-report';
 
 --end for v1.9.1 change
+
+--v2.1
+INSERT INTO sys_role (id, name, role_desc) VALUES (8, 'SharedAssetMgmt', '设备调剂管理人员');
