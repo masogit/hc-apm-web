@@ -4,14 +4,17 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:form id="inventoryOrderDetailAssetInfo2ListForm">
-	<p:dataTable id="datalist" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList2" selectionMode="single"
+	<p:dataTable id="datalist2" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList2" selectionMode="single"
 		selection="#{inventoryOrderDetailAssetInfoController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController.onFilter}" />
-		<p:column headerText="设备名" filterBy="#{item.name}" filterMatchMode="LIKE">
+		<p:column headerText="设备名" filterBy="#{item.name}" filterMatchMode="LIKE" exportable="false">
 			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.id}" target="_Blank"><h:outputText value="#{item.name}" /></a>
+		</p:column>
+		<p:column headerText="设备名" exportable="true" visible="false">
+			<h:outputText value="#{item.name}" />
 		</p:column>
 		<p:column headerText="使用科室" filterBy="#{item.clinicalDeptName}" filterMatchMode="EQ">
 			<f:facet name="filter">
@@ -53,7 +56,7 @@
 
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-				<p:dataExporter type="xls" target="datalist" fileName="InventoryOrderDetailAssetInfo2_export" />
+				<p:dataExporter type="xls" target="datalist2" fileName="InventoryOrderDetailAssetInfo2_export" />
 			</p:commandButton>
 		</f:facet>
 	</p:dataTable>
