@@ -100,12 +100,6 @@
                                 <h:outputText  value="#{fieldMsg.fieldValue(assetInstallationController.arrivalListItem.functionGroup, assetInstallationController.arrivalListItem.assetCode68)}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.manufactDate}</label>
-                                <h:outputText  value="#{assetInstallationController.arrivalListItem.manufactDate}">
-                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                </h:outputText>
-                            </h:panelGroup>
-                            <h:panelGroup>
                                 <label class="label">#{msg.purchaseDate}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.purchaseDate}">
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
@@ -225,18 +219,6 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <p:spacer />
-                            <!--                            <h:panelGroup >
-                                                            <label class="label">#{msg.financingNum}</label>
-                                                            <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
-                                                                <p:ajax process="@this" update="#{empty assetInstallationController.arrivalListItem.financingNum? '':'@(.financingNum)'}"/>
-                                                            </p:inputText>
-                                                            <p:commandButton validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 3}" 
-                                                                             update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
-                                                        </h:panelGroup>-->
-                            <!--                            <h:panelGroup>
-                                                            <label class="label">#{msg.serialNum}</label>
-                                                            <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" />
-                                                        </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.currentPersonUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.currentPersonUID).name}" />
@@ -286,6 +268,11 @@
                                 <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                                 <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                        <label class="label">#{msg.manufactDate}</label>
+                                        <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.manufactDate}" 
+                                                    maxdate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
+                                    </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:selectOneMenu id="assetOwnerName" value="#{assetInstallationController.arrivalListItem.assetOwnerUID}" >
