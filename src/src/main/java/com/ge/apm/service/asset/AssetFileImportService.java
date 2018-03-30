@@ -676,13 +676,22 @@ public class AssetFileImportService {
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
-                String qrCode = newAsset.getQrCode();
-                if (isAvailableQrcode(qrCode, item)) {
-                    item.put("status", ImportStatus.New);
-                } else {
+
+                if (!StringUtils.isEmpty(newAsset.getUid())) {
+                    //检查是否输入非法UUID
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 非法UUID！");
+
+                } else {
+                    String qrCode = newAsset.getQrCode();
+                    if (isAvailableQrcode(qrCode, item)) {
+                        item.put("status", ImportStatus.New);
+                    } else {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
+                    }
                 }
 
             } else if (assetList.size() > 1) {
