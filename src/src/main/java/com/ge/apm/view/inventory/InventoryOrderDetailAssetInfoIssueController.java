@@ -17,11 +17,9 @@ import org.springframework.data.domain.PageRequest;
 import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.InventoryIssueRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
-import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryIssue;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -80,22 +78,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		}
 		searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId));
 		searchFilters.add(new SearchFilter("isSolved", SearchFilter.Operator.EQ, false));
-		System.out.println("xxx");
-		System.out.println(searchFilters.toString());
-		for(SearchFilter filter:searchFilters){
-			System.out.println(filter.fieldName);
-			System.out.println(filter.operator);
-			System.out.println(filter.value);
-		}
 		Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
-		for(InventoryIssue info:pageAssetInfo){
-			System.out.println(info.getId());
-		}
-		System.out.println("xxx result size");
-		System.out.println(pageAssetInfo.getSize());
-		System.out.println(pageAssetInfo.getNumber());
-		System.out.println(pageAssetInfo.getTotalElements());
-		System.out.println(pageAssetInfo.getContent().size());
 		return pageAssetInfo;
 	}
 
@@ -113,23 +96,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		object.setSiteUID(currentUser.getSiteUID());
 	}
 
-	// private void changeSearchFilter(List<SearchFilter> listFilter){
-	// for(SearchFilter filter: listFilter){
-	// if(filter.fieldName.equals(INVENTORY_STATUS)){
-	// System.out.println("xxx");
-	// System.out.println(filter.getSqlParamName());
-	// System.out.println(filter.getConditionSql());
-	// System.out.println(filter.value);
-	// if(((String)filter.value).equals("3")){
-	// System.out.println("add filter");
-	// listFilter.remove(filter);
-	// listFilter.add(new
-	// SearchFilter(HAS_INVENTORY_ISSUE,SearchFilter.Operator.EQ,true));
-	// break;
-	// }
-	// }
-	// }
-	// }
 
 	private void getInventoryClinicalDeptUID(String orderId) {
 		listAssetId = new ArrayList<Integer>();
