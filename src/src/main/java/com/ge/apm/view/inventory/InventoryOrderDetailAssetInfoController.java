@@ -43,7 +43,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 	private String orderId;
 	private List<String> listClinicalDeptUID;
 	private List<String> listClinicalDeptName;
-	private int activeTabId=0;
+	private int activeTabId = 0;
 
 	@Override
 	protected void init() {
@@ -85,8 +85,6 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 
 	@Override
 	public void onServerEvent(String eventName, Object eventObject) {
-		System.out.println("xxx onServerEvent");
-		System.out.println(eventName);
 	}
 
 	@Override
@@ -97,7 +95,6 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		object.setHospitalUID(currentUser.getHospitalUID());
 		object.setSiteUID(currentUser.getSiteUID());
 	}
-	
 
 	private void getInventoryClinicalDeptUID(String orderId) {
 		listClinicalDeptUID = new ArrayList<String>();
@@ -110,13 +107,13 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		JSONArray array = new JSONArray(assignee_org);
 		JSONObject obj = null;
 		String clinicalDeptUID = "";
-		String temp="";
+		String temp = "";
 		for (int i = 0; i < array.length(); ++i) {
 			obj = array.getJSONObject(i);
 			clinicalDeptUID = obj.getString(UID);
-			temp=obj.getString(ORG_NAME);
-			temp=temp.substring(temp.lastIndexOf(" ")+1,temp.length());
-			if(!listClinicalDeptName.contains(temp)){
+			temp = obj.getString(ORG_NAME);
+			temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length());
+			if (!listClinicalDeptName.contains(temp)) {
 				listClinicalDeptName.add(temp);
 			}
 			listClinicalDeptUID.add(clinicalDeptUID);
@@ -138,7 +135,5 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 	public void setOrderId(String orderId) {
 		this.orderId = orderId;
 	}
-	
-	
 
 }
