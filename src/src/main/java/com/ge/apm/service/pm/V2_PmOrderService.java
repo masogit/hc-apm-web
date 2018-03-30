@@ -115,11 +115,14 @@ formData.setAssignee(approvaler);
         srApi.createPmRequest(token,formData);
     }
     
+    //创建一次性保养
     public void createPMrequest(String assetUID, Date planTime) {
         PmOrderActionForm formData = new PmOrderActionForm();
         if (null != planTime) {
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         }
+        //一次性
+        formData.setPmType(2);
         createPMrequestApi(assetUID, formData);
     }
     
