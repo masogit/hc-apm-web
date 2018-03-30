@@ -94,7 +94,7 @@ public class UserAccount implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean isActive ;
     
     @Column(name = "org_level")
     private Integer orgLevel;
@@ -190,7 +190,7 @@ public class UserAccount implements Serializable {
         isSuperAdmin = false;
         isSiteAdmin = false;
         isLocalAdmin = false;
-        isActive = true;
+        isActive = false;
         isOnline = false;
     }
 

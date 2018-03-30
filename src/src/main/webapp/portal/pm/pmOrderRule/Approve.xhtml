@@ -96,16 +96,16 @@
                             <label class="label">增加检查项</label>
                             <p:dataTable id="addCheckList" class="addCheckList" value="#{pmOrderRuleController.checkItemLists}" var="item" widgetVar="addCheckList" lazy="false" paginator="false"
                                          rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
-                                <p:column headerText="名字">
+                                <p:column headerText="#{msg.name}">
                                     <h:outputText value="#{item.name}" />
                                 </p:column>
-                                <p:column headerText="周期">
+                                <p:column headerText="#{msg.period}">
                                     <h:outputText value="#{item.period}" />
                                 </p:column>
-                                <p:column headerText="注意事项">
+                                <!--<p:column headerText="注意事项">
                                     <h:outputText value="#{item.remark}"  style="word-wrap: break-word;"/>
-                                </p:column>
-                                <p:column headerText="注意事项">
+                                </p:column>-->
+                                <p:column headerText="项目内容 ：">
                                     <h:outputText value="#{item.remark}"  style="word-wrap: break-word;"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Actions}">
