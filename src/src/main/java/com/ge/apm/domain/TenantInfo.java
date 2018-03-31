@@ -111,7 +111,7 @@ public class TenantInfo implements Serializable {
 
 	public TenantInfo() {
         isInsulate = false;
-        isEnabled = true;
+        isEnabled = false;
         wfAutoStep2 = false;
         wfAutoStep3 = false;
         wfAutoStep4 = false;

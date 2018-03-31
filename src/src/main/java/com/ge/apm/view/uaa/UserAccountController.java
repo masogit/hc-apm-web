@@ -624,9 +624,6 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             tenant.setActiveTime(new Date());
             tenantInfoRepository.save(tenant);
             dao.updateMembersStatus(loginUser.getTenantUID());
-/*            if(tenant.getIsEnabled() == null || (tenant.getIsEnabled() != null && !tenant.getIsEnabled())){
-
-            }*/
         }
         WebUtil.addSuccessMessage("激活成功！");
     }
