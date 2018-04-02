@@ -1,8 +1,6 @@
 package com.ge.apm.view.inventory;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -12,7 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 
 import webapp.framework.dao.GenericRepository;
@@ -27,14 +25,13 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ViewScoped
 public class InventoryAssetInfoController extends GenericCRUDController<AssetInfo> implements Serializable, ServerEventInterface {
 
-	private InventoryOrderDetailAssetInfoRepository dao;
+	private AssetInfoRepository dao;
 	private Integer assetInfoID;
 	private AssetInfo assetInfo;
-	private List<AssetInfo> listAssetInfo;
 
 	@Override
 	protected void init() {
-		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
+		dao = WebUtil.getBean(AssetInfoRepository.class);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		assetInfoID = Integer.valueOf(request.getParameter("assetInfoID"));
 	}
@@ -64,18 +61,6 @@ public class InventoryAssetInfoController extends GenericCRUDController<AssetInf
 
 	public void setAssetInfo(AssetInfo assetInfo) {
 		this.assetInfo = assetInfo;
-	}
-
-	public List<AssetInfo> getListAssetInfo() {
-		if (listAssetInfo == null) {
-			listAssetInfo = new ArrayList<AssetInfo>();
-			listAssetInfo.add(getAssetInfo());
-		}
-		return listAssetInfo;
-	}
-
-	public void setListAssetInfo(List<AssetInfo> listAssetInfo) {
-		this.listAssetInfo = listAssetInfo;
 	}
 
 }
