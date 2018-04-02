@@ -3,6 +3,7 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.AssetFileAttachment;
 import com.ge.apm.domain.AssetInfo;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -105,4 +106,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
     public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum ,@Param("financingNum") String financingNum ,@Param("qrCode") String qrCode, @Param("siteUID") String siteUID );
 
+    
+   // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
+
+//    @Query("select count(1) as totalTimes, ai.assetOwnerId,ai.assetOwnerId2,ai.assetOwnerId3 from AssetInfo ai where ai.assetOwnerId=:assetOwnerId and ai.siteUID=:siteUID "
+//            + "group by ai.assetOwnerId2,ai.assetOwnerId3,ai.assetOwnerId ordey by totalTimes desc")
+    @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
+            + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
+    public List<Object[]> findAssetOwnerComposition(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
 }
