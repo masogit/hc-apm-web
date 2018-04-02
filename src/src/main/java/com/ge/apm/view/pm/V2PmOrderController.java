@@ -416,7 +416,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(queryIndex==-2){
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
-
         if (queryIndex == -1) {
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
 			Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -424,7 +423,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 			return result;
         }
          if (queryIndex == 2) { //待派工  Assign
-
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
@@ -443,19 +441,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }else if(queryIndex == 31){//抢单 dispatch 2是人工派工或抢单模式 3 抢单模式 4是人工派工
 			 //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
           /*  searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList("Assign","Accept")));*/
-             List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
+             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
+          List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
              searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
              searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
              searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
              searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
              searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
-
-
              searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Assign","1*5+"));
              searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Accept","1*5+6*"));
              searchFilters.add(new SearchFilter("currentPersonId",SearchFilter.Operator.NE,UserContextService.getCurrentUserAccount().getUid(),"1*5+6*"));
-
-
             //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, "1*3+4*"));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,3), "1*3+4*"));
 
