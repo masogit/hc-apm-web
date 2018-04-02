@@ -10,34 +10,34 @@
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController.onFilter}" />
-		<p:column headerText="设备名" filterBy="#{item.name}" filterMatchMode="LIKE" exportable="false">
-			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.id}" target="_Blank"><h:outputText value="#{item.name}" /></a>
+		<p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
+			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
 		</p:column>
 		<p:column headerText="设备名" exportable="true" visible="false">
-			<h:outputText value="#{item.name}" />
+			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="使用科室" filterBy="#{item.clinicalDeptName}" filterMatchMode="EQ">
+		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
 					<f:selectItems value="#{inventoryOrderDetailAssetInfoController.listClinicalDeptName}" />
 				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.clinicalDeptName}" />
+			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
-		<p:column headerText="设备二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.qrCode}" />
+		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>
-		<p:column headerText="设备编号" filterBy="#{item.departNum}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.departNum}" />
+		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.departNum}" />
 		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.functionType}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.functionType}" />
+		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.functionType}" />
 		</p:column>
-		<p:column headerText="设备财产号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.financingNum}" />
+		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.financingNum}" />
 		</p:column>
-		<p:column headerText="资产状态" filterBy="#{item.status}" filterMatchMode="EQ">
+		<p:column headerText="资产状态" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
 			<f:facet name="filter">
 				<p:selectOneMenu onchange="PF('varDataList2').filter()" autoWidth="false" style="max-width: 150px;">
 					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -48,12 +48,22 @@
 					<f:selectItem itemLabel="停用" itemValue="5" />
 				</p:selectOneMenu>
 			</f:facet>
-			<h:outputText value="#{item.status==1?'正常':item.status==2?'停机':item.status==3?'限制功能使用':item.status==4?'待报废':'停用'}" />
+			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':item.assetInfo.status==5?'停用':item.assetInfo.status}" />
 		</p:column>
-		<p:column headerText="设备位置" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.clinicalDeptName}" />
+		<p:column headerText="设备位置" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
-
+		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.lastModifiedBy}" />
+		</p:column>
+		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+			<f:facet name="filter">
+				<p:inputText id="filterLastModifiedDate" widgetVar="varFilterLastModifiedDate" />
+			</f:facet>
+			<h:outputText value="#{item.lastModifiedDate}">
+				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+			</h:outputText>
+		</p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist2" fileName="InventoryOrderDetailAssetInfo2_export" />
@@ -61,5 +71,18 @@
 		</f:facet>
 	</p:dataTable>
 </h:form>
-
+<p:overlayPanel widgetVar="panelFilterLastModifiedDate" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2:filterLastModifiedDate" dismissable="false">
+	<h:panelGrid columns="2">
+		<p:outputLabel value="#{msg.From}" />
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+			mask="true" size="12" locale="zh" />
+		<p:outputLabel value="#{msg.To}" />
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+			mask="true" size="12" locale="zh" />
+	</h:panelGrid>
+	<p:commandButton
+		onclick="setDateFilter('varDataList2','varFilterLastModifiedDate','varStartTimeFrom_LastModifiedDate','varStartTimeTo_LastModifiedDate'); PF('panelFilterLastModifiedDate').hide();"
+		title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+	<p:commandButton onclick="PF('panelFilterLastModifiedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+</p:overlayPanel>
 </html>

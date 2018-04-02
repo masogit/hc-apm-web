@@ -9,27 +9,21 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.TabChangeEvent;
-import org.primefaces.event.data.FilterEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.InventoryOrder;
+import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.github.davidmoten.guavamini.Lists;
 
-import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.GenericCRUDController;
-import webapp.framework.web.mvc.GenericDataTableModel;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
 
 /**
@@ -37,15 +31,11 @@ import webapp.framework.web.mvc.ServerEventInterface;
  */
 @ManagedBean
 @ViewScoped
-public class InventoryOrderDetailAssetInfoController extends GenericCRUDController<AssetInfo> implements Serializable, ServerEventInterface {
+public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDController<InventoryOrderDetail> implements Serializable, ServerEventInterface {
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
-	private InventoryOrderRepository inventoryOrderRepository;
-	private static final String UID = "uid";
-	private static final String ORG_NAME = "orgName";
 	private String orderId;
-	private List<String> listClinicalDeptUID;
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
 	private boolean initBln=true;
@@ -59,27 +49,24 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		listStatus.add(1);
 		listStatus.add(2);
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
-		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		getInventoryClinicalDeptUID(orderId);
 	}
 
 	@Override
-	protected GenericRepository<AssetInfo> getDAO() {
+	protected GenericRepositoryUUID<InventoryOrderDetail> getDAO() {
 		// TODO Auto-generated method stub
 		return dao;
 	}
 
 	@Override
-	protected Page<AssetInfo> loadData(PageRequest pageRequest) {
+	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
+		//before
 		if(initBln){
 			inventoryStatus=listStatus.get(initIndex);
 			initIndex++;
 		}
-		if(initIndex==listStatus.size())
-			initBln=false;
 		
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
@@ -95,9 +82,17 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
 			}
 		}
-		searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, listClinicalDeptUID));
-		searchFilters.add(new SearchFilter("inventoryStatus", SearchFilter.Operator.EQ, inventoryStatus));
-		Page<AssetInfo> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+		searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId));
+		searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus));
+		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+		getClinicalDeptNames(pageAssetInfo);
+		//after
+		if(initBln){
+			if(initIndex==listStatus.size()){
+				initBln=false;
+				inventoryStatus=0;
+			}
+		}
 		return pageAssetInfo;
 	}
 
@@ -106,7 +101,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 	}
 
 	@Override
-	public void onBeforeNewObject(AssetInfo object) {
+	public void onBeforeNewObject(InventoryOrderDetail object) {
 		super.onBeforeNewObject(object);
 		object.setTenantUID(currentUser.getTenantUID());
 		object.setInstitutionUID(currentUser.getInstitutionUID());
@@ -129,28 +124,47 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDControll
 		
 	}
 
-	private void getInventoryClinicalDeptUID(String orderId) {
-		listClinicalDeptUID = new ArrayList<String>();
-		listClinicalDeptName = new ArrayList<String>();
-		if (StringUtils.isEmpty(orderId)) {
-			return;
+//	private void getInventoryClinicalDeptUID(String orderId) {
+//		listClinicalDeptUID = new ArrayList<String>();
+//		listClinicalDeptName = new ArrayList<String>();
+//		if (StringUtils.isEmpty(orderId)) {
+//			return;
+//		}
+//		InventoryOrder order = inventoryOrderRepository.findById(orderId);
+//		String assignee_org = order.getAssigneeOrg();
+//		JSONArray array = new JSONArray(assignee_org);
+//		JSONObject obj = null;
+//		String clinicalDeptUID = "";
+//		String temp = "";
+//		for (int i = 0; i < array.length(); ++i) {
+//			obj = array.getJSONObject(i);
+//			clinicalDeptUID = obj.getString(UID);
+//			temp = obj.getString(ORG_NAME);
+//			temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length());
+//			if (!listClinicalDeptName.contains(temp)) {
+//				listClinicalDeptName.add(temp);
+//			}
+//			listClinicalDeptUID.add(clinicalDeptUID);
+//		}
+//	}
+	
+	private void getClinicalDeptNames(Page<InventoryOrderDetail> pageInventoryOrderDetail){
+		
+		if(listClinicalDeptName==null){
+			listClinicalDeptName = new ArrayList<String>();
 		}
-		InventoryOrder order = inventoryOrderRepository.findById(orderId);
-		String assignee_org = order.getAssigneeOrg();
-		JSONArray array = new JSONArray(assignee_org);
-		JSONObject obj = null;
-		String clinicalDeptUID = "";
-		String temp = "";
-		for (int i = 0; i < array.length(); ++i) {
-			obj = array.getJSONObject(i);
-			clinicalDeptUID = obj.getString(UID);
-			temp = obj.getString(ORG_NAME);
-			temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length());
-			if (!listClinicalDeptName.contains(temp)) {
-				listClinicalDeptName.add(temp);
+		if(initBln){
+			String name="";
+			for(InventoryOrderDetail detail: pageInventoryOrderDetail){
+				name=detail.getAssetInfo().getClinicalDeptName();
+				if(StringUtils.isNotEmpty(name)){
+					if(!listClinicalDeptName.contains(name)){
+						listClinicalDeptName.add(name);
+					}
+				}
 			}
-			listClinicalDeptUID.add(clinicalDeptUID);
 		}
+		
 	}
 
 	public List<String> getListClinicalDeptName() {
