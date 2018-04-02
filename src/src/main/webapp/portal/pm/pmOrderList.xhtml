@@ -193,6 +193,16 @@
                                 <f:selectItem itemLabel="3级规则" itemValue="3" />
                             </p:selectOneMenu>
                         </h:panelGroup>
+gaolei
+
+                        <h:panelGroup>
+                            <label class="label">保养类型</label>
+                            <p:selectOneMenu  value="#{v2PmOrderController.pmType}" required="true" requiredMessage="保养级别 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="一次性" itemValue="2" />
+                                <f:selectItem itemLabel="重测" itemValue="3" />
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                     </p:panelGrid>
 
                 </p:fieldset>

@@ -97,6 +97,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Map<String, Boolean> selectedMap;
 	private Boolean isSelectedCurrentPage = false;
 	private List<V2_PmOrder> currentPagePmOrders;
+	private Integer pmType;
 
 	public boolean isChecked() {
 		Map<String, Boolean> map = this.selectedMap;
@@ -209,6 +210,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
+            formData.setPmType(pmType);
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
             cancel();
         }
@@ -1018,7 +1020,15 @@ public void batchDefineQualify(){
         this.currentPersonIdBatch = currentPersonIdBatch;
     }
 
-    public String getQualityCheckingBatch() {
+	public Integer getPmType() {
+		return pmType;
+	}
+
+	public void setPmType(Integer pmType) {
+		this.pmType = pmType;
+	}
+
+	public String getQualityCheckingBatch() {
         return qualityCheckingBatch;
     }
 
