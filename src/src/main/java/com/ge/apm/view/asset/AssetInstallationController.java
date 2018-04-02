@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javaslang.Tuple2;
 import javax.annotation.PostConstruct;
@@ -356,6 +357,25 @@ public class AssetInstallationController {
         asset.setSystemId(arrivalListItem.getSystemId());
         return qrCodeService.getQrCodeImageBase64(asset);
     }
+    
+    public void onAssetOwnerNameChange(){
+        UserAccount owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+        List<Object[]> ownerComposition = assetDao.findAssetOwnerComposition(owner1.getId(),arrivalListItem.getArrivalList().getSiteUID());
+        if(ownerComposition!=null && !ownerComposition.isEmpty()){
+            Object[] composition = ownerComposition.get(0);
+            Integer assetOwnerId2 = (Integer)composition[2];
+            if(assetOwnerId2!= null && Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID2())){
+                UserAccount owner2 = aiService.getUserAccountById(assetOwnerId2);
+                arrivalListItem.setAssetOwnerUID2(owner2==null? null: owner2.getUid());
+            }
+            Integer assetOwnerId3 =(Integer) composition[3];
+            if(assetOwnerId3!= null && Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID3())){
+                UserAccount owner3 = aiService.getUserAccountById(assetOwnerId3);
+                arrivalListItem.setAssetOwnerUID2(owner3==null? null: owner3.getUid());
+            }
+        }
+    }
+    
 
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();

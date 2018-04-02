@@ -147,6 +147,9 @@ public class AssetInstallationService {
     public UserAccount getUserAccountByUid(String userUid) {
         return userDao.getByUid(userUid);
     }
+    public UserAccount getUserAccountById(Integer userId) {
+        return userDao.getById(userId);
+    }
 
     public List<UserAccount> getWorkerList() {
         return ucService.getWorkerList(0);

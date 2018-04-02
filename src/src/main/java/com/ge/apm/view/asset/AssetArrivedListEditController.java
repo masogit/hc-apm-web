@@ -142,7 +142,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         object.setCreatorUID(user.getUid());
         object.setStatus(1);
         object.setProcessType(ArrivalList.ProcessType.Normal.toString());
+        object.setAgent(user.getName());
+        object.setArrivalDate(new Date());
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
+        
     }
 
     public void applyChange() {
