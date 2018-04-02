@@ -671,7 +671,8 @@ public class AssetFileImportService {
             }
         });
 
-        importAssetMap.values().forEach(item -> {
+        int row = 1;
+        for (Map<String, Object> item: importAssetMap.values()) {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
@@ -681,7 +682,7 @@ public class AssetFileImportService {
                     //检查是否输入非法UUID
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误: 非法UUID！");
+                    AssetRow.addErrMessage(item, String.format("第%d行错误: 非法UUID！", row));
 
                 } else {
                     String qrCode = newAsset.getQrCode();
@@ -707,7 +708,7 @@ public class AssetFileImportService {
                 if (!assetInfo.getTenantUID().equals(tenantUID)) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误: 该资产属于其他租户，不允许导入！");
+                    AssetRow.addErrMessage(item, String.format("第%d行错误: 该资产属于其他租户，不允许导入！", row));
                 }
 
             }
@@ -718,7 +719,8 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
-        });
+            ++row;
+        }
 
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
