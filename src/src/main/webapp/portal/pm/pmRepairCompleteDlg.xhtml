@@ -83,12 +83,9 @@
                                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and (item.approved? false:true)}"/>
                                          <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="accessList @(.cmd1)" actionListener="#{v2PmOrderController.removeWoDetail(item.id,1)}"   rendered="#{item.id ne '000' and (item.approved?false:true)}">
                                              <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-
                                          </p:commandButton>
                                         <h:outputText value="已审核" rendered="#{item.id ne '000' and (item.approved?true:false)}" />
                                     </p:column>
-
-
                                 </p:dataTable>
                             </h:panelGroup>
                             <h:panelGroup>
