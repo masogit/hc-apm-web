@@ -28,9 +28,7 @@
                             <h:panelGroup>
 
                                 <label class="label">#{msg.manhours}*</label>
-                                <p:inputText value="#{v2PmOrderController.selectedPmOrder.manHours}" required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}"/>
-
-
+                                <p:inputText value="#{v2PmOrderController.selectedPmOrder.manHours}" required="true" requiredMessage="工时(小时)" minValue="0" maxValue="999" #{msg.ValidationRequire}"/>gaolei
                             </h:panelGroup>
 
                         </p:panelGrid>
