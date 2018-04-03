@@ -143,10 +143,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     public void resetNewObject() {
         if (selected.getId() == null) {
             selected = null;
+            if (checkItemLists != null) {
+                checkItemLists.clear();
+            }
         }
-        if (checkItemLists != null) {
-            checkItemLists.clear();
-        }
+
 
     }
 
@@ -174,6 +175,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                 onBeforeSave(selected);
             }
             getName();
+            //selected.setPeriod(getPeriod());
             dao.save(selected);
             if (CollectionUtils.isNotEmpty(checkItemLists)) {
                 checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
@@ -375,16 +377,18 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             return selected.getPeriod();
         } else {
             List<Integer> itemIds = new ArrayList<Integer>();
-            if (!ids.isEmpty()) {
-                Iterator it = ids.iterator();
+            checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
+            if (!checkItemLists.isEmpty()) {
+                Iterator it = checkItemLists.iterator();
                 while (it.hasNext()) {
-                    Object o = it.next();
-                    itemIds.add(Integer.parseInt((String) o));
+                    PmOrderRuleCheckList o = (PmOrderRuleCheckList)it.next();
+                    itemIds.add(o.getPeriod());
                 }
             }
             Integer period = 1;
             if (itemIds.size() > 0) {
-                period = pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(), itemIds);
+                Collections.sort(itemIds);
+                period =  itemIds.get(0);//pmOrderRuleItemRepository.fetchMinPeriod(user.getTenantUID(), itemIds);
             }
             if (period <= 0) {
                 period = 1;

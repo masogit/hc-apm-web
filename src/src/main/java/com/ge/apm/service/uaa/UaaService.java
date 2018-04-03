@@ -148,6 +148,9 @@ public class UaaService {
         if(newRoleNames.contains("临时报修帐号")){
             activeTemporaryUser(userAccount.getId());
         }
+        if(newRoleNames.isEmpty()){
+            newRoleNames.add("临床科室人员");
+        }
         for(String newRoleName: newRoleNames){
             SysRole role = sysRoleDao.getByRoleDesc(newRoleName);
             if (role==null){
