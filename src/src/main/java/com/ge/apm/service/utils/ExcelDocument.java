@@ -59,7 +59,7 @@ public class ExcelDocument {
         CreationHelper createHelper = workBook.getCreationHelper();
 
         DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
-        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/d/yyyy"));
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/dd/yyyy"));
 
         DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
         DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
