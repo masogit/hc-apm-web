@@ -125,7 +125,13 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     public void filterNode(){
       if(!StringUtils.isEmpty(retrieval)) {
-          orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+          //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+          if(UserContextService.isOnlyLocalITAdmin()){
+              orgTree = uaaService.getFilterOrgTreeByYuanQu(loginUser.getSiteUID(), retrieval);
+          }else{
+              orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+          }
+
           TreeNodeUtil.expandTreeNode(orgTree);
       }else{//列出所有机构
           //orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());

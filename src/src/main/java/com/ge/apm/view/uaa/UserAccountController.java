@@ -225,6 +225,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         if(UserContextService.isOnlyLocalITAdmin()){
             List<String> disableRoleList = new ArrayList<>();
             disableRoleList.add("ITAdmin");
+            disableRoleList.add("ActivationPerson");
             allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
         }else{
             allRoles = uaaService.getSysRoleNames();
