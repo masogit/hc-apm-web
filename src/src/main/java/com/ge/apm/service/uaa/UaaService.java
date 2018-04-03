@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import org.apache.commons.collections.map.HashedMap;
 import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
@@ -106,12 +107,16 @@ public class UaaService {
 
         List<String> roleList = new ArrayList<String>();
 
-        for(Map.Entry<String, SysRole> item: sysRoles.entrySet()){
-            for (String roleName: disableRoleList) {
-                if(!roleName.equals(item.getKey())){
-                    roleList.add(item.getValue().getRoleDesc());
-                }
+        Map<String, SysRole> tempRole = new HashedMap(sysRoles);
+
+        for (String roleName: disableRoleList) {
+            if(tempRole.containsKey(roleName)){
+                tempRole.remove(roleName);
             }
+        }
+
+        for(Map.Entry<String, SysRole> item: tempRole.entrySet()){
+            roleList.add(item.getValue().getRoleDesc());
         }
 
         return roleList;
