@@ -39,6 +39,8 @@
                         <br/>
 
                         <p:commandButton validateClient="true" actionListener="#{profileController.saveProfile}" value="#{msg.Save}" update=":growl" icon="ui-icon-check"/>
+                        <!--&nbsp;&nbsp;-->
+                        <p:commandButton validateClient="true" actionListener="#{userAccountController.activeTenant()}" value="激活租户" icon="ui-icon-check" rendered="#{userAccountController.hasAuthority()}" disabled="#{userAccountController.needActive()}" update=":growl display"/>
                     </p:fieldset>
                 </h:form>
 
