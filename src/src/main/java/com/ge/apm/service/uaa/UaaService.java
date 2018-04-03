@@ -302,7 +302,8 @@ public class UaaService {
             TreeNode node = nodeItem.getValue();
             OrgInfo org = (OrgInfo)node.getData();
             //租户必须作为根节点先加入
-            if(org.getOrgType()==0){
+            //if(org.getOrgType()==0){
+            if(org.getUid().equals(rootUID)){
                 TreeNode node1 = new DefaultTreeNode("org", org, null);
                 node.setRowKey("org_"+org.getId());
                 treeNodeMap.put(org.getUid(),node1);
@@ -365,12 +366,12 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
             return;
         }
         OrgInfo orgInfo = (OrgInfo) treeNode.getData();
-       if( orgInfo.getOrgType()>0){
-if(orgInfo.getName().contains("曙光东院")){
-    System.out.println();
-}
-TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
-           treeNodeMap.put(orgInfo.getUid(), treeNode1);
+       if( orgInfo != null && orgInfo.getOrgType()>0){
+        /*if(orgInfo.getName().contains("曙光东院")){
+            System.out.println();
+        }*/
+            TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
+                   treeNodeMap.put(orgInfo.getUid(), treeNode1);
 
            buidUpFromNodeYuanQu(treeNodeMap, treeNode.getParent());
        }
@@ -389,21 +390,24 @@ TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
 
     //一旦找到 设备科 就将其包括之上的父节点都加到treeMapG for building the filltered tree.
     public void buidUpFromNode(Map<String,TreeNode> treeNodeMap, TreeNode treeNode){
-      OrgInfo orgInfo =(OrgInfo)treeNode.getData();
-      if(orgInfo.getParentUID()!=null){
-          TreeNode node = new DefaultTreeNode("org", orgInfo, null);
-          node.setRowKey("org_"+orgInfo.getId());
-          treeNodeMap.put(orgInfo.getUid(),node);
-         TreeNode parentNode = (TreeNode)treeMapG.get(orgInfo.getParentUID());
-          buidUpFromNode(treeNodeMap,parentNode);
-      }
-}
+        if(treeNode != null){
+            OrgInfo orgInfo =(OrgInfo)treeNode.getData();
+            if(orgInfo.getParentUID()!=null){
+                TreeNode node = new DefaultTreeNode("org", orgInfo, null);
+                node.setRowKey("org_"+orgInfo.getId());
+                treeNodeMap.put(orgInfo.getUid(),node);
+                TreeNode parentNode = (TreeNode)treeMapG.get(orgInfo.getParentUID());
+                buidUpFromNode(treeNodeMap,parentNode);
+            }
+        }
+
+    }
     public Map<String,TreeNode> treeNodeMap = new  LinkedHashMap<>();
     //full of the tree for this org
     public TreeNode getOrgTreeBySite(String siteUID){
         List<OrgInfo> orgList = null;
         orgList = orgInfoDao.getBySiteUIDOrHospitalUIDOrInstitutionUIDOrTanantUID(siteUID);
-        TreeNode root  = new DefaultTreeNode("root", null, null);;
+        TreeNode root  = new DefaultTreeNode("root", null, null);
         
         Map<String, TreeNode> treeMap = new LinkedHashMap<>();
         for(OrgInfo org: orgList){
@@ -427,9 +431,15 @@ TreeNode treeNode1 = new DefaultTreeNode("org", orgInfo, null);
             root.getChildren().add(treeMap.get(siteUID));
         }
         xtreeMap = treeMap;
+        if(!root.getChildren().isEmpty()){
+            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
+            rootUID = temp.getUid();
+        }
         return root;
     }
+
     public  Map<String, TreeNode> xtreeMap;
+    public String rootUID;
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
         List<OrgInfo> orgList = null;
         orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
