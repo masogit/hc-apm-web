@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+     <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+               
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="调剂设备"/>
+                </div>
+                <div class="ui-g-12 card">
+            <h:form id="SwapTypeListForm">
+                <p:dataTable id="datalist" value="#{sharedAssetTypeController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{sharedAssetTypeController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.unitPrice}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                    rows="20" emptyMessage="#{msg.noRecordFound}" 
+                    rowsPerPageTemplate="20,40,60,90">
+                   
+<!--                    <p:ajax event="rowSelect" update="createButton editButton deleteButton" 
+                            listener="#{sharedAssetTypeController.onSelectSwapType}" 
+                            oncomplete="openSwapTypeViewWindow(xhr, status, args)" />-->
+                           
+                    <p:ajax event="rowSelect" listener="#{sharedAssetTypeController.onChanged}"  update="createButton editButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{sharedAssetTypeController.onFilter}" update="createButton editButton deleteButton"/>
+
+                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" filterBy="#{item.swapName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.swapName}"/>
+                    </p:column>
+                    <p:column headerText="单价" sortBy="#{item.unitPrice}" filterBy="#{item.unitPrice}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.unitPrice}"/>
+                    </p:column>
+                    <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.chargingType}"/>
+                    </p:column>
+                    <p:column headerText="创建人" sortBy="#{item.createBy}" filterBy="#{item.createBy}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.createBy}"/>
+                    </p:column>
+                    <p:column headerText="创建时间" sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.createDate}"/>
+                    </p:column>
+                    <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+   
+                       <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="SwapType_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.getViewPageA('Edit','Edit')}" action="#{urlEncryptController.encodeUrlParam(sharedAssetTypeController.operation)}"  disabled="#{empty sharedAssetTypeController.selected}"/>
+                         
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.delete}" update="datalist" disabled="#{empty sharedAssetTypeController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                       
+                       </f:facet>
+                </p:dataTable>
+            </h:form>
+            </div>
+            </div>
+        </div>
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+
+            function openSwapTypeViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+
+</ui:composition>
+    </html>

@@ -110,6 +110,14 @@ public abstract class GenericCRUDUUIDController<E> implements Serializable {
         return dateTimeFields.get(fieldName)!=null;
     }
     
+    protected void addDateTimeFields(String fieldName){
+        if(dateTimeFields==null){
+            isDateTimeField(fieldName);
+        }
+        dateTimeFields.put(fieldName, Boolean.TRUE);
+    }
+    
+    
     protected void getFilterMatchModes(DataTable table){
         if(filterMatchModes==null){
             filterMatchModes = new HashMap<String, String>();

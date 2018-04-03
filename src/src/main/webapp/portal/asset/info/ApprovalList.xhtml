@@ -49,12 +49,10 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
-                                </p:selectOneMenu>
+                        <p:column headerText="#{msg.clinicalDeptName}">
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:inputText id="clinicalDept"  value="#{assetInfoApprovalController.fileterOrg.name}"  readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
@@ -88,5 +86,17 @@
             </div>
         </div>
 
+        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoApprovalListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
+            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(userContextService.loginUser.siteUID)}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{assetInfoApprovalController.onClinicalDeptFilter}" update=":AssetInfoApprovalListForm:datalist :idVarPanelDeptOrg " oncomplete="PF('varPanelDeptOrg').hide();"/>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
+        </p:overlayPanel>
     </ui:define>
 </ui:composition>

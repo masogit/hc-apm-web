@@ -1,20 +1,17 @@
-package com.ge.apm.view;
+package com.ge.apm.view.report;
 
-import com.ge.apm.domain.pure.TableSchema;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import webapp.framework.web.WebUtil;
 
@@ -39,8 +36,11 @@ public class CommonReportController {
 
     private UnstructuredDataCollectionRepository reportDao;
 
+    private TableDefinitionService tableService;
+
     @PostConstruct
     protected void init() {
+        tableService = WebUtil.getBean(TableDefinitionService.class);
         tableDao = WebUtil.getBean(TableDefinitionRepository.class);
         reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -55,21 +55,46 @@ public class CommonReportController {
         List<String> orgUids = Arrays.asList(site.getSiteUID(), site.getHospitalUID(), site.getInstitutionUID(), site.getTenantUID());
         return tableDao.getBySiteUIDIn(orgUids);
     }
-    
-    public void deleteReporter(String boUid){
-        reportDao.delete(boUid);
+
+    public void deleteReporter(String id) {
+        if (null != id) {
+            tableService.deleteReport(id);
+        }
     }
-    public void addReporter(String boUid){
+
+    public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
         newReport.setSchemaId(reportUid);
         reportDao.save(newReport);
     }
 
-    public String getTemplateName(String templateId){
+    public String getTemplateName(String templateId) {
         return Optional.ofNullable(tableDao.findById(templateId)).orElse(new TableDefinition()).getName();
     }
-    
+
+    public TableDefinition getTemplateById(String templateId) {
+        return Optional.ofNullable(tableDao.findById(templateId)).orElse(new TableDefinition());
+    }
+
+    public String getEditLinkUrl(UnstructuredDataCollection report) {
+        TableDefinition table = tableDao.findById(report.getSchemaId());
+        if (null != table.getExcelStorageId()) {
+            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+        }else{
+            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+        }
+    }
+
+    public String getViewLinkUrl(UnstructuredDataCollection report) {
+        TableDefinition table = tableDao.findById(report.getSchemaId());
+         if (null != table.getExcelStorageId()) {
+            return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+        }else{
+            return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+        }
+    }
+
     public String getReportUid() {
         return reportUid;
     }

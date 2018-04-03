@@ -103,11 +103,11 @@ public class UserDetailsServiceImpl implements UserDetailsService {
      */
     protected UserAccount obtainAccount(String login) {
         UserAccount user = accountRepository.getByLoginName(login);
-        
-        if(!user.getIsActive()) 
+        return user;
+/*        if(!user.getIsActive())
             return null;
         else
-            return user;
+            return user;*/
     }
 
     /**

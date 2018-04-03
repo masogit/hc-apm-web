@@ -66,10 +66,10 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "vendor")
-    private String vendor;//供应商名称
+    private String vendor;//供应商名称 =Supplier.name
 
     @Column(name = "supplier_id")
-    private Integer supplierId; //供应商Id
+    private Integer supplierId; //供应商Id =Supplier.id
 
     @Size(max = 64)
     @Column(name = "maitanance")
@@ -365,7 +365,7 @@ public class AssetInfo implements Serializable {
     @Column(name = "usage_status")
     private Integer usageStatus;
 
-    //计量状态[1:已检,2:待检,3:过期]
+    //核算类别[1:医用电子仪器,2:光学仪器及内窥镜,3:医用机械设备,4:电子产品及通讯设备,5:仪器仪表计量标准器具,6:其他设备]
     @Column(name = "accounting_category")
     private Integer accountingCategory;
 
@@ -418,6 +418,16 @@ public class AssetInfo implements Serializable {
     
     @Column(name="ib_status")
     private Integer ibStatus;
+    
+    @Column(name = "ge_device_type")
+    private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
+
+    @Column(name = "shared_asset_type")//调剂设备uid
+    private String sharedAssetTypeUid;
+    @Column(name = "swap_type")//调剂设备uid
+    private String swapTypeUid;
+    @Column(name = "swap_type_state")//调剂设备状态（"0"：正常，"1"：借用中）
+    private String swapTypeState;
 
     public Integer getAssetUsage() {
         return assetUsage;
@@ -562,7 +572,31 @@ public class AssetInfo implements Serializable {
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
     }
-    
+
+    public String getSharedAssetTypeUid() {
+        return sharedAssetTypeUid;
+    }
+
+    public void setSharedAssetTypeUid(String sharedAssetTypeUid) {
+        this.sharedAssetTypeUid = sharedAssetTypeUid;
+    }
+
+    public String getSwapTypeUid() {
+        return swapTypeUid;
+    }
+
+    public void setSwapTypeUid(String swapTypeUid) {
+        this.swapTypeUid = swapTypeUid;
+    }
+
+    public String getSwapTypeState() {
+        return swapTypeState;
+    }
+
+    public void setSwapTypeState(String swapTypeState) {
+        this.swapTypeState = swapTypeState;
+    }
+
     public AssetInfo() {
     }
 
@@ -1285,8 +1319,15 @@ public class AssetInfo implements Serializable {
     public void setIbStatus(Integer ibStatus) {
         this.ibStatus = ibStatus;
     }
-    
 
+    public Integer getGeDeviceType() {
+        return geDeviceType;
+    }
+
+    public void setGeDeviceType(Integer geDeviceType) {
+        this.geDeviceType = geDeviceType;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

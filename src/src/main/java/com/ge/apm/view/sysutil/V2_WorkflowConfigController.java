@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,6 +50,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private UserCommonService ucService;
+	private UserCommonService userCommonService;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -57,6 +59,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		ucService = WebUtil.getBean(UserCommonService.class);
+		userCommonService = WebUtil.getBean(UserCommonService.class);
 		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
 		initDispatchUserList();
 	}
@@ -123,7 +126,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgType(parentUID,orgType);
+		return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
 	}
 	
 	public List<UserInfo> getUserList() {
@@ -147,14 +150,39 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return oi.getName();
 	}
 	
-	public String getOrgNameByUId(String uid){
+	public String getInsNameByUId(String uid){
 		OrgInfo oi =  orgInfoRepository.getByUid(uid);
 		if(oi == null){
 			return null;
 		}
-		return oi.getName();
+		if(oi.getOrgLevel() == 1){
+			return oi.getName();
+		}
+		return null;
 	}
-	
+
+	public String getHospitalNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		if(oi.getOrgLevel() == 2){
+			return oi.getName();
+		}
+		return null;
+	}
+
+	public String getSiteNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		if(oi.getOrgLevel() == 3){
+			return oi.getName();
+		}
+		return null;
+	}
+
 	public String getTenantName(String tenantUID){
 		return tenantInfoRepository.findByuid(tenantUID).getName();
 	}
@@ -162,6 +190,15 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         public List<UserAccount> getAssetCreateApproverlList(){
             return ucService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
         }
+
+   	public List<OrgInfo> getDispatherClinical(){
+		OrgInfo org = orgInfoRepository.findByUid(selected.getSiteUID());
+		if(org.getOrgLevel() != 3){
+			return null;
+		}
+		return orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+	}
+
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
@@ -242,29 +279,83 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setDispatchUserName2(null);
 		}
-		dao.deleteBySiteUID(selected.getSiteUID());
+
+		//pm
+		if (selected.getPmDispatchUserId() != null) {
+			UserAccount pmDispather1 = uaDao.getById(config.getPmDispatchUserId());
+			if (pmDispather1 != null) {
+				selected.setPmDispatchUserName(pmDispather1.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName(null);
+		}
+		if (selected.getPmDispatchUserId2() != null) {
+			UserAccount pmDispather2 = uaDao.getById(config.getPmDispatchUserId2());
+			if (pmDispather2 != null) {
+				selected.setPmDispatchUserName2(pmDispather2.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName2(null);
+		}
+
+		//dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
 	@Transactional
     public void applyChange() {
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
+		Boolean isPmManual = selected.getIsPmManualEnabled();
+		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
+
     	if(isManual != null && isManual){
     		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
     			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-       		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedDispather"));
+       		 	WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
        		 	return;
     		}
     	}
+    	if(isPmManual != null && isPmManual){
+			if(selected.getPmDispatchUserId() == null && selected.getPmDispatchUserId2() == null){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("PmNeedDispather"));
+				return;
+			}
+		}
+
+
     	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
     		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-    		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
+    		 WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
     		 return;
     	}
-    	onBeforeSave(selected);
-    	super.save();
+
+    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
+			return;
+		}
+
+        onBeforeSave(selected);
+
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+            return;
+        }
+
+        dao.deleteBySiteUID(selected.getSiteUID());
+        super.save();
     }
-	
+
+	@Override
+	public void delete() {
+		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+			return;
+		}
+		super.delete();
+	}
+
 	@Override
 	public void prepareEdit(){
 		if(selected != null){

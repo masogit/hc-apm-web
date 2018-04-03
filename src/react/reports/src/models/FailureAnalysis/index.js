@@ -14,6 +14,7 @@ export default {
     filterBy: {
       assettype: 'all_asset_type',
       dept: 'all_dept',
+      hospital: 'default_hospital',
       supplier: 'all_supplier', // currently no dropdown on UI
     },
     period: {

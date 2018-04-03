@@ -81,12 +81,12 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm:datalist" disabled="#{v2PmOrderController.selectedAsset.ibStatus eq 1 and v2PmOrderController.selectedAsset.repairForm eq 2}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm:datalist" disabled="#{!v2PmOrderController.canCreateSr()}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancelsr()}" immediate="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>
 
                     <h:panelGroup >
-                        <h:outputText style="color:red; font-size:18px" value="该设备可以外修,报修电话:4008128188" rendered="#{v2PmOrderController.selectedAsset.ibStatus eq 1 and (v2PmOrderController.selectedAsset.repairForm eq 2 or v2PmOrderController.selectedAsset.repairForm eq 3)}"/>
+                        <h:outputText style="color:red; font-size:18px" value="该设备可以外修,报修电话:4008128188" rendered="#{!v2PmOrderController.canCreateSr() or (v2PmOrderController.selectedAsset.ibStatus eq 1 and v2PmOrderController.selectedAsset.repairForm eq 3)}"/>
                     </h:panelGroup>
                 </p:fieldset>
             </h:form>

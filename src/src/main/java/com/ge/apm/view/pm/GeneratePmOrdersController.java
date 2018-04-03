@@ -133,6 +133,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         if (null != queryAsset.getClinicalDeptId()) {
             assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
         }
+		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
+			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
+		}
 		if(level != null) {
 			List<String> uids = null;
 			if(level == 1) {
@@ -222,11 +225,17 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	 */
 
 	public void generatePmOrders() {
+		if (targetAssets.isEmpty()) {
+			WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
+			return;
+		}
 		List<AssetRuleModel> models = new ArrayList<AssetRuleModel>();
 		targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
-		for (AssetInfo ai : targetAssets) {
+		if(targetAssets.size() == 1) {
+			AssetInfo ai = targetAssets.get(0);
 			if(ai.getClinicalDeptId() == null) {
-				continue;
+				WebUtil.addErrorMessage("没有使用科室，无法生成保养工单！");
+				return;
 			}
 			PmOrderRule rule = null;
 			if (level == RULE_STATUS_LEVLE_1) {
@@ -237,18 +246,23 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 				rule = pmOrderRuleRepository.findPmOrderRuleLevel3(ai.getUid());
 			}
 			if (rule == null) {
-				LOGGER.error("not find pmOrderRule by assetUid : {},level : {}", ai.getUid(), level);
-				continue;
+				WebUtil.addErrorMessage("找不到该设备该级别的保养规则！");
+				return;
 			}
-			int period = rule.getPeriod();
+			Integer period = rule.getPeriod();
 /*			if (ai.getLastPmDate() != null && TimeUtils.getDays(ai.getLastPmDate()) < period) {
 				LOGGER.warn("during period !");
 				continue;
 			}*/
+			if(period == null) {
+				period = 1;
+//				WebUtil.addErrorMessage("该设备该级别的保养规则周期不能为空！");
+//				return;
+			}
 			boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level);
 			if(isExists) {
-				LOGGER.warn("open pm exists !");
-				continue;
+				WebUtil.addErrorMessage("保养工单已存在！");
+				return;
 			}
 			AssetRuleModel model = new AssetRuleModel();
 			model.setUid(ai.getUid());
@@ -256,12 +270,46 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 			model.setPeriod(period);
 			model.setPlanTime(planTime);
 			models.add(model);
+		
+		}else {
+			for (AssetInfo ai : targetAssets) {
+				if(ai.getClinicalDeptId() == null) {
+					continue;
+				}
+				PmOrderRule rule = null;
+				if (level == RULE_STATUS_LEVLE_1) {
+					rule = pmOrderRuleRepository.findPmOrderRuleLevel1(ai.getUid());
+				} else if (level == RULE_STATUS_LEVLE_2) {
+					rule = pmOrderRuleRepository.findPmOrderRuleLevel2(ai.getUid());
+				} else if (level == RULE_STATUS_LEVLE_3) {
+					rule = pmOrderRuleRepository.findPmOrderRuleLevel3(ai.getUid());
+				}
+				if (rule == null) {
+					LOGGER.error("not find pmOrderRule by assetUid : {},level : {}", ai.getUid(), level);
+					continue;
+				}
+				int period = rule.getPeriod();
+				boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level);
+				if(isExists) {
+					LOGGER.warn("open pm exists !");
+					continue;
+				}
+				AssetRuleModel model = new AssetRuleModel();
+				model.setUid(ai.getUid());
+				model.setLevel(level);
+				model.setPeriod(period);
+				model.setPlanTime(planTime);
+				models.add(model);
+			}
+			if (CollectionUtils.isEmpty(models)) {
+				WebUtil.addErrorMessage("无可生成保养工单的资产！");
+				LOGGER.warn("no assets need to generate pm orders !");
+				return;
+			}
 		}
-		if (CollectionUtils.isEmpty(models)) {
-			WebUtil.addErrorMessage("该批资产已存在正在执行的保养工单！");
-			LOGGER.warn("no assets need to generate pm orders !");
-			return;
-		}
+		
+	
+
 		AssetRuleModelList model = new AssetRuleModelList();
 		model.setModels(models);
 		String token = UserContextService.getAccessToken();
@@ -269,8 +317,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-		WebUtil.addSuccessMessage("保养工单批量生成成功！");
-		targetAssets.clear();
+		WebUtil.addSuccessMessage("保养工单生成成功！");
+		//targetAssets.clear();
 	}
 
 	/*

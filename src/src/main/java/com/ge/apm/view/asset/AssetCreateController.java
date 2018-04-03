@@ -148,6 +148,14 @@ public class AssetCreateController {
             newAsset.setAssetOwnerName(owner.getName());
             newAsset.setAssetOwnerTel(owner.getTelephone());
         }
+        
+        if(!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())){
+            UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
+            if(null != submitter){
+                newAsset.setCreatedBy(submitter.getUid());
+            }
+        }
+        newAsset.setCreatedDate(createRequest.getSubmitDate());
         return newAsset;
     }
 
@@ -172,6 +180,9 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
         Boolean res = acService.CreateAeest(assetInfo, isGeneratePmOrder);
+        if(isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+            WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
+        }
         if (res) {
             acService.createAttachments(assetInfo, selectedPictures);
             acService.updateQrLib(assetInfo.getQrCode(), 3);

@@ -54,6 +54,11 @@
                             <h:outputText value="#{item.width} * #{item.height}">
                             </h:outputText>
                         </p:column>
+                        <p:column headerText="启用时间"  >
+                            <h:outputText value="#{item.usingDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+                            </h:outputText>
+                        </p:column>
                         <p:column headerText="#{msg.status}">
                             <h:outputText value="未启用"  rendered="#{not item.isUsing}"/>
                             <h:outputText value="使用中"  rendered="#{item.isUsing}"/>

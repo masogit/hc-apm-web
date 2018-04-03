@@ -36,10 +36,10 @@
                                         </p:scrollPanel>
                                     </p:overlayPanel>
                                 </h:panelGroup>
-                                <h:panelGroup>
+<!--                                <h:panelGroup>
                                     <label class="label">#{msg.arrivalListName}</label>
                                     <p:inputText value="#{assetArrivedListEditController.selected.name}" required="false" requiredMessage="#{msg.arrivalListName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
-                                </h:panelGroup>
+                                </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">#{msg.assetName}*</label>
                                     <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.selected.status ne '1'}"  />
@@ -96,10 +96,10 @@
                                     <label class="label">#{msg.arrivalListAgent}</label>
                                     <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
                                 </h:panelGroup>
-                                <h:panelGroup>
+<!--                                <h:panelGroup>
                                     <label class="label">#{msg.arrivalListClassCode}</label>
                                     <p:inputText value="#{assetArrivedListEditController.selected.classCode}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
-                                </h:panelGroup>
+                                </h:panelGroup>-->
                                 <h:panelGroup>
                                     <label class="label">#{msg.ArrivalProcessType}</label>
                                     <p:selectOneMenu  value="#{assetArrivedListEditController.selected.processType}" required="true" requiredMessage="#{msg.ArrivalProcessType}#{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.selected.status ne '1'}" >
@@ -110,7 +110,7 @@
 
 
                             </p:panelGrid>
-                            <p:fieldset legend="分配安装" rendered="#{assetArrivedListEditController.selected.processType eq 'Easy' and assetArrivedListEditController.selected.status eq 2}">
+                            <p:fieldset legend="设备信息" rendered="#{assetArrivedListEditController.selected.status eq 2}">
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup>
                                         <label class="label">设备国标码</label>
@@ -152,10 +152,10 @@
                                         </p:selectOneMenu>
                                     </h:panelGroup>
 
-                                    <h:panelGroup>
+<!--                                    <h:panelGroup>
                                         <label class="label">#{msg.manufactDate}</label>
                                         <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.manufactDate}" maxdate="#{assetArrivedListEditController.easyInstallItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
-                                    </h:panelGroup>
+                                    </h:panelGroup>-->
                                     <h:panelGroup>
                                         <label class="label">#{msg.purchaseDate}</label>
                                         <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.purchaseDate}" maxdate="#{assetArrivedListEditController.easyInstallItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
@@ -173,8 +173,6 @@
                                         <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.terminateDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                                     </h:panelGroup>
 
-                                </p:panelGrid>
-                                <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup>
                                         <label class="label">#{msg.purchasePrice}</label>
                                         <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
@@ -262,13 +260,29 @@
                                     </h:panelGroup>
 
                                 </p:panelGrid>
+                                <p:fieldset legend="设备图片">
+                        <p:dataGrid id="pictureList0" var="fileitem" value="#{assetArrivedListEditController.getPicList()}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                            <f:facet name="header">#{msg.addPic}</f:facet>
+                            <p:panel  style="text-align:center">
+                                <h:panelGrid columns="1" style="width:100%" >
+                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+                                    <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList0" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>   
+                                </h:panelGrid>
+                            </p:panel>
+                        </p:dataGrid>
+                        <p:fileUpload id="asset" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                                      multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    </p:fieldset>
                                 <h:panelGroup>
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":easyInstallDialogForm :growl"/>
-                                    <p:commandButton value="分配安装(#{assetArrivedListEditController.getNewInstallAssetList().size()})" actionListener="#{assetArrivedListEditController.prepareEasyInstall()}" oncomplete="PF('easyInstallDialog').show()" update=":easyInstallDialogForm"/>
                                 </h:panelGroup>
                             </p:fieldset>
 
-                            <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}"  sortBy="#{item.itemNum}" value="#{assetArrivedListEditController.arrivalItemList}" var="item">
+                            <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}" selection="#{assetArrivedItemsController.selected}" 
+                                         selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" value="#{assetArrivedListEditController.arrivalItemList}" var="item">
+                                <p:ajax event="rowSelect" update=":ItemDetailViewForm" />
                                 <p:column headerText="#{msg.arrivalListItemNum}" >
                                     <h:outputText value="#{item.itemNum}"/>
                                 </p:column>
@@ -294,12 +308,13 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                                 </p:column>
                                 <p:column width="90" >
-                                    <p:commandLink actionListener="#{assetArrivedItemsController.setSelected(item.id)}" update=":ItemDetailViewForm" >详细
-                                    </p:commandLink>
+                                    <p:link  outcome="ItemEdit" value="安装" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedListEditController.selected.processType eq 'Easy'}" >
+                                        <f:param name="itemId" value="#{item.id}" />
+                                    </p:link>
                                     <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedListEditController.selected.processType ne 'Easy'}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                                     </p:commandLink>
-                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{(assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new') and assetArrivedListEditController.selected.processType ne 'Easy'}">#{item.installStatus=='new'?'安装':item.installStatus=='instorage'?'已入库':'已退货'}
+                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{(assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new') and assetArrivedListEditController.selected.processType ne 'Easy'}">安装
                                         <f:param name="itemId" value="#{item.id}" />
                                     </p:link >
                                 </p:column>

@@ -17,7 +17,7 @@
         <h:form id="BatchCreateForm">
 <!--              <p:tabView>
                 <p:tab > -->
-                   <p:panelGrid columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                   <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                           <h:panelGroup >
 		                     <label class ="label">#{msg.assetName}</label>
 	                         <p:inputText  value="#{relRuleAssetController.queryAsset.name}"  required="false">
@@ -52,8 +52,15 @@
 		                              <f:selectItems value="#{assetInfoService.getClinicalDeptList(relRuleAssetController.siteUid)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
 		                      </p:selectOneMenu>
 		                 </h:panelGroup>
+                       <h:panelGroup >
+                           <label class ="label">#{msg.brand}</label>
+                           <p:inputText  value="#{relRuleAssetController.queryAsset.brand}"  disabled="false">
+                               <p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList PmOrderRule"  />
+                           </p:inputText>
+                       </h:panelGroup>
+
 		                  <h:panelGroup >
-                                <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上四个条件)</label>
+                                <label class="label">保养规则(该过滤条件不会单独生效，需要配合以上条件)</label>
                                 <p:selectOneRadio id="deviceStatus" value="#{relRuleAssetController.queryAsset.ruleStatus}" >
                                 		<p:ajax  listener="#{relRuleAssetController.addFilter()}" update="AssetsPickList" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('ruleStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -64,7 +71,7 @@
                     <p:pickList id="AssetsPickList" value="#{relRuleAssetController.availableAssets}" var="item"
                                 itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
                                 showSourceFilter="true" showTargetFilter="true" filterMatchMode="contains" converter="assetInfoConverter"
-                                required="true" requiredMessage="已选设备 #{msg.ValidationRequire}">
+                                required="false" requiredMessage="已选设备 #{msg.ValidationRequire}">
                         <f:facet name="sourceCaption">待选设备</f:facet>
                         <f:facet name="targetCaption">已选设备</f:facet>
                         <p:ajax event="transfer" listener="#{relRuleAssetController.onAssetsTransfer}" />
@@ -107,7 +114,8 @@
                         
                         	<h:panelGroup >
 			                   <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" 
-			            		icon="ui-icon-check" update="BatchCreateForm,:growl" action = "RelRuleAsset"/>
+			            		icon="ui-icon-check" update=":growl" />
+			            		<!-- action = "RelRuleAsset" -->
 			             </h:panelGroup>
                         <center>
 

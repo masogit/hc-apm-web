@@ -308,19 +308,19 @@
                                 </h:panelGroup>
                                 <h:panelGroup></h:panelGroup>
 
-                                <h:panelGroup >
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.purchasePrice}</label>
                                     <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.salvageValue}</label>
-                                    <p:inputText id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
+                                    <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.lifecycle}</label>
                                     <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.depreciationMethod}</label>
                                     <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
                                 </h:panelGroup>
@@ -345,11 +345,13 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                     </p:inputText>
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">是否对质保到期进行提醒</label>
-                                    <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoController.selected.warranty}"  disabled="true"/>
-                                </h:panelGroup>
-
+								<h:panelGroup >
+	                                <label class="label">是否对质保到期进行提醒</label>
+		                            <p:selectOneRadio value="#{assetInfoController.selected.warranty}" disabled="true">
+	                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                   		<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+	                                </p:selectOneRadio>
+	                            </h:panelGroup>
 
                             </p:panelGrid>
                         </div>

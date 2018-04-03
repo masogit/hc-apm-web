@@ -37,6 +37,7 @@ public class ArrivalListItem implements Serializable {
     public static final String INSTALL_STATUS_NEW = "new";
     public static final String INSTALL_STATUS_INSTORAGE = "instorage";
     public static final String INSTALL_STATUS_REJECT = "rejected";
+    public static final String INSTALL_STATUS_FINISHED = "finished";
     
     @Id
     @GeneratedValue(generator = "uuid")
@@ -60,7 +61,7 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "financing_num")
     private String financingNum;
     
-    //主机序列号
+    //制造商序列号
     @Size(max = 64)
     @Column(name = "serial_num")
     private String serialNum;
@@ -182,9 +183,9 @@ public class ArrivalListItem implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date purchaseDate;//采购日期
 
-    @Column(name = "arrive_date")
-    @Temporal(TemporalType.DATE)
-    private Date arriveDate;//到货日期
+//    @Column(name = "arrive_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date arriveDate;//到货日期
 
     @Column(name = "install_date")
     @Temporal(TemporalType.DATE)
@@ -310,6 +311,9 @@ public class ArrivalListItem implements Serializable {
     
     @Column(name = "warranty_year")
     private Double warrantyYear;
+    
+    @Column(name = "is_generate_pmorder")
+    private Boolean isGeneratePmOrder;
     
     public String getId() {
         return id;
@@ -535,12 +539,12 @@ public class ArrivalListItem implements Serializable {
         this.purchaseDate = purchaseDate;
     }
 
-    public Date getArriveDate() {
-        return arriveDate;
+    public Boolean getIsGeneratePmOrder() {
+        return isGeneratePmOrder;
     }
 
-    public void setArriveDate(Date arriveDate) {
-        this.arriveDate = arriveDate;
+    public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
+        this.isGeneratePmOrder = isGeneratePmOrder;
     }
 
     public Date getInstallDate() {

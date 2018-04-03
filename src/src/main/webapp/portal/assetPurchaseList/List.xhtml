@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+         <div class="ui-g">
+
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="采购清单"/>
+                </div>
+                <div class="ui-g-12 card">
+                     <h:form id="AssetPurchaseListListForm">
+                         <p:dataTable id="datalist" value="#{assetPurchaseListController.lazyModel}" var="item" widgetVar="varDataList"
+                             selectionMode="single" selection="#{assetPurchaseListController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                             rows="20" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="20,40,60,90">
+                             <p:ajax event="rowSelect" update="createButton editButton deleteButton" listener="#{assetPurchaseListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" />
+                             <p:ajax event="filter" listener="#{assetPurchaseListController.onFilter}" update="createButton editButton deleteButton"/>
+                             <p:column headerText="操作">
+                                 <p:commandButton  title="到货" class="ui-button" action="#{assetPurchaseListController.getReachEditPage(item.id)}" rendered="#{item.reachState != 3}"/>
+                                 <h:outputText value="" rendered="#{item.reachState eq 3}"/>
+         <!--                        <p:commandButton  class="btn btn-sm btn-gray" title="详单" action="#{urlEncryptController.encodeUrlParam('reachDetail?actionName=Create')}" />-->
+                             </p:column>
+                             <p:column headerText="#{msg.assetType}" sortBy="#{item.assetType}" filterBy="#{item.assetType}" filterMatchMode="EQ">
+                                 <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetType)}"/>
+                                 <f:facet name="filter">
+                                         <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                             <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                         </p:selectOneMenu>
+                                 </f:facet>
+                             </p:column>
+                             <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUid}" filterMatchMode="EQ">
+                                 <f:facet name="filter">
+                                         <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                             <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                                         </p:selectOneMenu>
+                                 </f:facet>
+                                 <h:outputText value="#{item.clinicalDeptName}"/>
+                             </p:column>
+                             <p:column headerText="采购数量" sortBy="#{item.purchaseQty}" filterBy="#{item.purchaseQty}" filterMatchMode="EQ">
+                                 <h:outputText value="#{item.purchaseQty}"/>
+                             </p:column>
+                             <p:column headerText="到货数量" sortBy="#{item.reachQty}" filterBy="#{item.reachQty}" filterMatchMode="EQ">
+                                 <h:outputText value="#{item.reachQty}"/>
+                             </p:column>
+                             <p:column headerText="到货状态" sortBy="#{item.reachState}" filterBy="#{item.reachState}" filterMatchMode="EQ">
+                                 <h:outputText value="未到货" rendered="#{item.reachState eq 1}"></h:outputText> 
+                                 <h:outputText value="部分到货" rendered="#{item.reachState eq '2'}"></h:outputText>
+                                 <h:outputText value="全部到货" rendered="#{item.reachState eq '3'}"></h:outputText>
+                                 <f:facet name="filter">
+                                         <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                             <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                             <f:selectItem itemLabel="未到货" itemValue="1" />
+                                             <f:selectItem itemLabel="部分到货" itemValue="2" />
+                                             <f:selectItem itemLabel="全部到货" itemValue="3" />
+                                         </p:selectOneMenu>
+                                 </f:facet>
+                             </p:column>
+         <!--                    <p:column headerText="是否到货详单" sortBy="#{item.reachDetailState}" filterBy="#{item.reachDetailState}" filterMatchMode="LIKE">
+                                 <h:outputText value="#{item.reachDetailState}" />
+                             </p:column>-->
+                             <p:column headerText="到货详单日期" sortBy="#{item.reachDetailDate}" filterBy="#{item.reachDetailDate}" filterMatchMode="GTE">
+                                 <f:facet name="filter">
+                                     <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                                 </f:facet>
+                                 <h:outputText value="#{item.reachDetailDate}">
+                                     <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                                 </h:outputText>
+                             </p:column>
+                             <f:facet name="{Toolbar}">
+                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                     <p:dataExporter type="xls" target="datalist" fileName="AssetPurchaseList_export"/>
+                                 </p:commandButton>
+                                 <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
+         <!--                        <p:commandButton id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetPurchaseListController.prepareView}" update=":AssetPurchaseListViewDlg" oncomplete="PF('AssetPurchaseListViewDialog').show()" disabled="#{empty assetPurchaseListController.selected}"/>-->
+                                 <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{assetPurchaseListController.getViewPageA('Edit','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetPurchaseListController.operation)}" disabled="#{empty assetPurchaseListController.selected}"/>
+                                 <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetPurchaseListController.delete()}"  update="datalist" disabled="#{empty assetPurchaseListController.selected}"/>
+                             </f:facet>
+                         </p:dataTable>
+                     </h:form>
+                 </div>
+         </div>
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+</ui:composition>
+</html>

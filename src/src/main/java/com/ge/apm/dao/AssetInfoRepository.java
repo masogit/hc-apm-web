@@ -3,9 +3,11 @@ package com.ge.apm.dao;
 import com.ge.apm.domain.AssetFileAttachment;
 import com.ge.apm.domain.AssetInfo;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
@@ -23,6 +25,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o where o.qrCode = ?1")
     public AssetInfo getByQrCode(String qrCode);
+    
+    @Query("select o from AssetInfo o where o.name = ?1 and o.siteUID = ?2 and o.isDeleted = false and o.isValid = true and o.status in (1,2,3)")
+    public List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID);
 
     @Modifying
     @Query("update AssetInfo ai set ai.lastPmDate = now() where id = ?1 and siteId = ?2")
@@ -57,9 +62,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
 	public List<AssetInfo> findByTenantUID(String tenantUID);
 
-    public AssetInfo findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
+    @Query("select a from AssetInfo a where a.isDeleted = false and a.financingNum = ?1 and a.tenantUID=?2 order by a.id desc ")
+    public List<AssetInfo> findByFinancingNumAndTenantUID(String financingNum, String tenantUID);
 
-    public AssetInfo findBySerialNumAndTenantUID(String serialNum, String tenantUID);
+    @Query("select a from AssetInfo a where a.isDeleted = false and a.serialNum = ?1 and a.tenantUID=?2 order by a.id desc ")
+    public List<AssetInfo> findBySerialNumAndTenantUID(String serialNum, String tenantUID);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and a.name like concat('%',?2,'%') order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
@@ -86,4 +93,25 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and ai.uid in ?2")
 	public List<AssetInfo> findByTenantUidAndUidIn(String tenantUid, List<String> uids);
 
+    public List<AssetInfo> findByDepartNumAndSiteUID(String num,String siteUID);
+    public List<AssetInfo> findByFinancingNumAndSiteUID(String num,String siteUID);
+    public List<AssetInfo> findByQrCodeAndSiteUID(String qrCode,String siteUID);
+
+    @Modifying
+    @Transactional
+    @Query("update AssetInfo ai set ai.swapTypeState = :swapTypeState where ai.id = :id")
+    public void updateAssetInfoSwapTypeState(@Param("swapTypeState")String swapTypeState, @Param("id")Integer id);
+    public List<AssetInfo> findByClinicalDeptUIDIn(List<String> clinicalDeptUIDs);
+
+    @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
+    public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum ,@Param("financingNum") String financingNum ,@Param("qrCode") String qrCode, @Param("siteUID") String siteUID );
+
+    
+   // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
+
+//    @Query("select count(1) as totalTimes, ai.assetOwnerId,ai.assetOwnerId2,ai.assetOwnerId3 from AssetInfo ai where ai.assetOwnerId=:assetOwnerId and ai.siteUID=:siteUID "
+//            + "group by ai.assetOwnerId2,ai.assetOwnerId3,ai.assetOwnerId ordey by totalTimes desc")
+    @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
+            + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
+    public List<Object[]> findAssetOwnerComposition(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
 }
