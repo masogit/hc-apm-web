@@ -339,6 +339,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private void initEasyInstallItem() {
         easyInstallItem = getNewInstallAssetList().stream().findAny().orElse(new ArrivalListItem());
+        if(easyInstallItem.getArrivalList().getContractPrice()!=null){
+            easyInstallItem.setPurchasePrice(easyInstallItem.getArrivalList().getContractPrice()/easyInstallItem.getArrivalList().getQuantity());
+        }
+        easyInstallItem.setPurchasePrice(Double.MAX_VALUE);
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
 
@@ -430,7 +434,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if (null != srcList) {
             selected.setHospitalUID(srcList.getHospitalUID());
             selected.setName(srcList.getName());
-            selected.setAssetName(srcList.getName());
+            selected.setAssetName(srcList.getAssetName());
             selected.setAssetGroup(srcList.getAssetGroup());
             selected.setArrivalDate(srcList.getArrivalDate());
             selected.setFunctionType(srcList.getFunctionType());
