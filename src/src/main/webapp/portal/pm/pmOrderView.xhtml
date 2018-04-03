@@ -44,6 +44,19 @@
                             <label class="label">当前处理步骤</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.currentStepName}"></p:outputLabel>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">工时</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.manHours}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计划时间</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.planTime}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际完成时间</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.endTime}"></p:outputLabel>
+                        </h:panelGroup>
+
                     </p:panelGrid>
 
 
