@@ -364,21 +364,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         if (queryIndex == 1) {
             //正常可借用
-            searchFilters = new ArrayList<SearchFilter>();
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
-        } else if (queryIndex == 2) {
+        } else if(queryIndex == 2){
             //正常已借出
-            searchFilters = new ArrayList<SearchFilter>();
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
-        } else if (queryIndex == 3) {
+        }else if(queryIndex == 3){
             //故障不可借用
-            searchFilters = new ArrayList<SearchFilter>();
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 1));
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
 
         if (assetId == null) {

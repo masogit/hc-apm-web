@@ -8,6 +8,7 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
+import org.primefaces.ultima.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -21,7 +22,10 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -613,7 +617,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                                     }
                                                     else{
                                                          detail_list.get(0).setCountQty(0);
-                                                         detail_list.get(0).setCost(0);
+                                                         detail_list.get(0).setCost(null);
                                                     }
                                                 }
                                             else    //不同年
@@ -623,7 +627,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                                }
                                                 else{
                                                     detail_list.get(0).setCountQty(0);
-                                                    detail_list.get(0).setCost(0);
+                                                    detail_list.get(0).setCost(null);
                                                 }
                                             }
                                         }
