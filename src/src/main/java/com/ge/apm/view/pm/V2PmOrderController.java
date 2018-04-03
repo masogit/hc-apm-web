@@ -15,6 +15,7 @@ import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import org.apache.commons.collections4.map.HashedMap;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -31,6 +32,7 @@ import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 /**
  *v
@@ -50,6 +52,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date startTime;
     private Date endTime;
     private Date planTime;
+    private Date planTimeForBatch;
+    private String currentPersonIdBatch;
+    private String qualityCheckingBatch;
+	Boolean terminate;
     private UaaService uaaService;
     private UserContextService userContextService;
     private AssetFaultTypeService assetFaultTypeService;
@@ -89,17 +95,40 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String pmOrderId;
     private String filterPlanTime;
     private Map<String, Boolean> selectedMap;
+	private Boolean isSelectedCurrentPage = false;
+	private List<V2_PmOrder> currentPagePmOrders;
+	private Integer pmType;
 
+	public boolean isChecked() {
+		Map<String, Boolean> map = this.selectedMap;
+		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+			if (entry.getValue()) {
+				return true;
+			}
 
-   /* public boolean isOneClick(){
-        return selectedPmOrder.getSimplify()
-        if(==true){
-            retur
+		}
+		return false;
+	}
+
+    //是否允许内修
+
+    public Boolean canCreateSr(){
+        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() !=1){
+            if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
+                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 22){
+                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
+                }
+
+                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 3){
+                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
+                }
+                return false;
+            }
         }
-    }*/
+        return true;
+    }
     public void prepareAproval(String woid) {
         prepareAct(woid);
-        selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
 
@@ -128,10 +157,33 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return Collections.emptyList();
         }
     }
-    public void reassignWorkOrder(){
-        pmOrderService.reassignWorkOrder(selectedPmOrder, selectedPmOrder.getCurrentPersonId(), comments);
-       // cancel();
+    public List<UserAccount> findRepairPersonBatch(){
+        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+        currentPagePmOrders.stream().forEach(item->{
+            if(selectedMap.containsKey(item.getId()) && selectedMap.get(item.getId()) == true){
+                //pmListTmp保存了所要提交的批量pmOrder
+                pmListTmp.add(item);
+            }
+        });
+        if(pmListTmp.size()>0){ //如果是批量操作
+            return pmOrderService.getWorkerList(pmListTmp.get(0).getAssetId());
+        }
+
+        if(this.selectedPmOrder!=null)
+            return pmOrderService.getWorkerList(selectedPmOrder.getAssetId());
+        else
+            return new ArrayList<UserAccount>();
     }
+
+    public void reassignWorkOrder(){
+        if(isChecked()==false) {//非批量
+            pmOrderService.reassignWorkOrder(selectedPmOrder, selectedPmOrder.getCurrentPersonId(), comments);
+        }else{//批量派工
+            pmOrderService.reassignWorkOrderBatch(currentPagePmOrders,selectedMap,currentPersonIdBatch,comments);
+        }
+        cancel();
+    }
+
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
@@ -158,6 +210,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             }
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
+            formData.setPmType(pmType);
             pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
             cancel();
         }
@@ -242,7 +295,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
-
+		terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+		this.selectedMap = new HashMap();
          //如果当前人员只是 临床科室主任或者 只是临床科室人员...
         if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") &&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))){
             queryIndex= 8;
@@ -271,16 +325,46 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         cancel();
     }*/
     public void dispatchWorkOrder() {
-        Date planTime =selectedPmOrder.getPlanTime();
-        pmOrderService.dispatchWorkOrder(selectedPmOrder,planTime);
-        cancel();
+        if(isChecked()==false) {
+            Date planTime = selectedPmOrder.getPlanTime();
+            pmOrderService.dispatchWorkOrder(selectedPmOrder, planTime);
+            cancel();
+        }else{//批量派工
+            pmOrderService. dispatchWorkOrderBatch(currentPagePmOrders,selectedMap,currentPersonIdBatch,planTimeForBatch);
+            cancel();
+
+        }
     }
+
     public List<UserAccount> getWorkerList() {
         if(this.selectedPmOrder!=null)
-        return pmOrderService.getWorkerList(selectedPmOrder.getAssetId());
+            return pmOrderService.getWorkerList(selectedPmOrder.getAssetId());
         else
             return new ArrayList<UserAccount>();
     }
+
+
+    public List<UserAccount> getWorkerListBatch() {
+        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+        currentPagePmOrders.stream().forEach(item->{
+            if(selectedMap.containsKey(item.getId()) && selectedMap.get(item.getId()) == true){
+                //pmListTmp保存了所要提交的批量pmOrder
+                pmListTmp.add(item);
+            }
+        });
+            if(pmListTmp.size()>0){ //如果是批量操作
+            return pmOrderService.getWorkerList(pmListTmp.get(0).getAssetId());
+        }
+
+        if(this.selectedPmOrder!=null)
+            return pmOrderService.getWorkerList(selectedPmOrder.getAssetId());
+        else
+            return new ArrayList<UserAccount>();
+    }
+
+
+
+
     public List<UserAccount> getApproveList() {
         if(this.selectedPmOrder!=null)
             return pmOrderService.getApproveList(selectedPmOrder.getAssetUid());
@@ -293,10 +377,28 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return dao;
     }
     public void acceptWorkOrder() {
+        if(isChecked()==false) //如果是false说明不是批量的操作
+        {
         Date planTime =selectedPmOrder.getPlanTime();
-        pmOrderService.acceptWorkOrder(selectedPmOrder, esTime,planTime);
-        cancel();
+        pmOrderService.acceptWorkOrder(selectedPmOrder,planTime);
+        }else{ //批量操作
+            pmOrderService.acceptWorkOrderBatch(currentPagePmOrders,selectedMap,planTimeForBatch);
+		}
+		cancel();
     }
+
+    private List<Integer> tagNoGroupAssets;
+    private List<Integer> getNoTagGroupAssets() {
+        if (tagNoGroupAssets == null) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            if(orgUidList ==null || orgUidList.isEmpty()){
+                orgUidList = Arrays.asList("");
+            }
+            tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
+        }
+        return tagNoGroupAssets;
+    }
+    //获取当前登陆人可看到的设备, 这个人需要在标签组里面
     private List<Integer> getTagGroupAssets() {
         if (tagGroupAssets == null) {
             tagGroupAssets = dao.getAssetsByTagGroup(UserContextService.getCurrentUserAccount().getId());
@@ -316,30 +418,68 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(queryIndex==-2){
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }
-
         if (queryIndex == -1) {
-            return dao.findBySearchFilter(searchFilters,pageRequest);
+            searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
+			Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+			currentPagePmOrders = result.getContent();
+			return result;
         }
          if (queryIndex == 2) { //待派工  Assign
-			 List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-        } else if (queryIndex == 3) {//待接单
+             List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
+             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
 			 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
 			 //someone could only access siteA,but assigned with asset on SiteB, therefore "OR" is added saying that one also could see the asset that is assigned to him.
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
-        }else if(queryIndex == 31){//抢单
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Assign"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
+        }else if(queryIndex == 31){//抢单 dispatch 2是人工派工或抢单模式 3 抢单模式 4是人工派工
+			 //抢单tab中 ,已经派的单但是未被接单人接的单子也要显示出来 (已经派的单状态是Accept，所以也要加进来)
+          /*  searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList("Assign","Accept")));*/
+             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
+          List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
+             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
+             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
+             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
+             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
+             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
+             searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Assign","1*5+"));
+             searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Accept","1*5+6*"));
+             searchFilters.add(new SearchFilter("currentPersonId",SearchFilter.Operator.NE,UserContextService.getCurrentUserAccount().getUid(),"1*5+6*"));
+            //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, "1*3+4*"));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,3), "1*3+4*"));
+
+
+            //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,4), "1*3+4*"));
+
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));
+
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-            if (!getTagGroupAssets().isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets()));
-            }
+        //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过设备的标签
+                 //打过标签的设备(该标签都和组绑定过)
+                 List<Integer> tagGroupAssets = getTagGroupAssets();
+                 if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                 }else{
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*3+4*5+"));
+                 }
+                 //没有打过标签的设备
+                 tagGroupAssets = getNoTagGroupAssets();
+                 if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                 }else{
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*3+4*5+"));
+                 }
+
+
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
         }
         else if (queryIndex == 6) { //待关单
@@ -363,16 +503,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
-
-
         }
          else if (queryIndex == 7) { //已关单
-             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ,true ));
-             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+             if (!userContextService.hasRole("AssetHead") && !userContextService.isPmDispatcher()) {
+                 searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                 searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+
+             }
+             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
          }
         this.selected = null;
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+		Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+
+		currentPagePmOrders = result.getContent();
+		this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+
+
+		return result;
     }
     public void onSelectPmOrder(){
         accessoryList = getWorkOrderDetail(selected.getId());
@@ -388,8 +536,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return pmOrderService.getWorkOrderCoworker(woId);
     }
 public void closePM(V2_PmOrder selectedPmOrder){
+        if(isChecked()==false){
         pmOrderService.closePM(selectedPmOrder,picList);
-        cancel();
+        }else{
+            picList.stream().forEach(item->{
+            item.setId(null);
+            });
+            pmOrderService.closePMBatch(currentPagePmOrders,selectedMap,picList);
+        }
+    cancel();
+}
+
+public void batchDefineQualify(){
+    List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+    currentPagePmOrders.stream().forEach(item->{
+        if(selectedMap.containsKey(item.getId()) && selectedMap.get(item.getId()) == true){
+            //pmListTmp保存了所要提交的批量pmOrder
+            item.setQualityChecking(qualityCheckingBatch);
+            pmListTmp.add(item);
+        }
+    });
+    System.out.println();
 }
 
     public void approvePMorder(){
@@ -406,7 +573,18 @@ public void closePM(V2_PmOrder selectedPmOrder){
         coWorkerList = getWorkOrderCoworker(woid);
        picList = new ArrayList<V2_BlobObject>();
    }
-    @Override
+
+    //
+	public void onSelectAllOfPage() {
+		for (V2_PmOrder item : currentPagePmOrders) {
+			selectedMap.put(item.getId(), this.isSelectedCurrentPage);
+		}
+    }
+	public void onItemSelected() {
+		isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+        selectedPmOrder=null;//
+	}
+   /* @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
@@ -419,8 +597,23 @@ public void closePM(V2_PmOrder selectedPmOrder){
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
+    }*/
+    @Override
+    public void setSearchFilter() {
+        if (this.searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
+        if (!this.hasFilterOnField("assetInfo.siteUID")) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
     }
     public void searchList(Integer buttonIndex) {
+        this.selectedMap = new HashedMap<>();
         queryIndex = buttonIndex;
         this.searchFilters = null;
         this.stepFileter = null;
@@ -429,15 +622,18 @@ public void closePM(V2_PmOrder selectedPmOrder){
     public void cancel() {
         this.selectedAsset = null;
         planTime=null;
+        planTimeForBatch =null;
         selectedPmOrder=null;
         assetName=null;
         endTime=null;
         ruleLevel=null;
         dptName=null;
         picList=null;
+        planTimeForBatch=null;
         comments=null;
     }
     public void prepareAct(String woid) {
+        if(woid!=null)
         selectedPmOrder = dao.findById(woid);
         /*if(selectedPmOrder.getAssetInfo()!=null)
          currentStatus = selectedPmOrder.getAssetInfo().getStatus();*/
@@ -534,31 +730,7 @@ public void closePM(V2_PmOrder selectedPmOrder){
         itemDetail = null;
         coWorkerDetail = null;
     }
-    public void setPlanTimeFilter() {
-        /*if (filterPlanTime == null || !"1".equals(filterPlanTime)) {
-            return;
-        }
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
-        }
-        //1周内所有未完成
-        Date startTime = new Date();
-        Calendar c = Calendar.getInstance();
-        c.setTime(startTime);
-        c.add(Calendar.DAY_OF_WEEK, 1);
-        varPlanTimeTo = c.getTime();
-        searchFilters.add(new SearchFilter("planTime", SearchFilter.Operator.LTE, varPlanTimeTo));
-        searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, false));
-        filterPlanTime = null;
-        filterIsFinished = "false";*/
-        if (searchFilters == null) {
-            searchFilters = new ArrayList<SearchFilter>();
-        }
-        if(pmOrderId != null){
-            searchFilters.add(new SearchFilter("id", SearchFilter.Operator.EQ, pmOrderId));
-        }
-    }
-    public boolean x2(){
+    public boolean accessoryListEmpty(){
         if(accessoryList==null){
             return true;
         }
@@ -814,5 +986,53 @@ public void closePM(V2_PmOrder selectedPmOrder){
 
     public void setApprovedDetails(List<V2_WorkOrder_Detail> approvedDetails) {
         this.approvedDetails = approvedDetails;
+    }
+
+	public Boolean getIsSelectedCurrentPage() {
+		return isSelectedCurrentPage;
+	}
+
+	public void setIsSelectedCurrentPage(Boolean selectedCurrentPage) {
+		isSelectedCurrentPage = selectedCurrentPage;
+	}
+
+	public Boolean getTerminate() {
+		return terminate;
+	}
+
+	public void setTerminate(Boolean terminate) {
+		this.terminate = terminate;
+	}
+
+    public Date getPlanTimeForBatch() {
+        return planTimeForBatch;
+    }
+
+    public void setPlanTimeForBatch(Date planTimeForBatch) {
+        this.planTimeForBatch = planTimeForBatch;
+    }
+
+    public String getCurrentPersonIdBatch() {
+        return currentPersonIdBatch;
+    }
+
+    public void setCurrentPersonIdBatch(String currentPersonIdBatch) {
+        this.currentPersonIdBatch = currentPersonIdBatch;
+    }
+
+	public Integer getPmType() {
+		return pmType;
+	}
+
+	public void setPmType(Integer pmType) {
+		this.pmType = pmType;
+	}
+
+	public String getQualityCheckingBatch() {
+        return qualityCheckingBatch;
+    }
+
+    public void setQualityCheckingBatch(String qualityCheckingBatch) {
+        this.qualityCheckingBatch = qualityCheckingBatch;
     }
 }

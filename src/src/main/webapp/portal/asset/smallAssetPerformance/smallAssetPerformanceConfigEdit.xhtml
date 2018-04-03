@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="smallAssetPerformanceConfigEditDlg" widgetVar="smallAssetPerformanceConfigEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="设备绩效配置">
+            <h:form id="smallAssetPerformanceConfigEditForm">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{smallAssetPerformanceConfigController.selected != null}">
+
+                    <h:panelGroup >
+                        <label class="label" >项目名称</label>
+                        <p:inputText value="#{smallAssetPerformanceConfigController.selected.projectName}" required="true" requiredMessage="项目名称不能为空"/>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <label class="label">项目编号</label>
+                        <p:inputText value="#{smallAssetPerformanceConfigController.selected.projectNumber}"/>
+                    </h:panelGroup>
+                     <h:panelGroup >
+                        <label class="label">科室名称</label>
+                        <p:inputText value="#{smallAssetPerformanceConfigController.selected.department}"/>
+                    </h:panelGroup>
+                     <h:panelGroup >
+                        <label class="label">设备名称</label>
+                        <p:inputText value="#{smallAssetPerformanceConfigController.selected.assetName}" required="true" requiredMessage="设备名称不能为空"/>
+                    </h:panelGroup>
+                     <h:panelGroup >
+                        <label class="label">占比</label>
+                        <p:inputNumber value="#{smallAssetPerformanceConfigController.selected.rate}" required="true" minValue="0.00" maxValue="1.00" requiredMessage="占比不能为空"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceConfigController.save}" update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigEditDlg, :smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'smallAssetPerformanceConfigEditDialog');"/>
+
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('smallAssetPerformanceConfigEditDialog').hide()"/>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+
+</html>

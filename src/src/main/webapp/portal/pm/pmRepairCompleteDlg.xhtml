@@ -75,6 +75,10 @@
                                         <p:commandLink process="@this"  actionListener="#{v2PmOrderController.accessoryArrival(item.id)}" class="arrivalItem" rendered="#{item.id ne '000' and !item.arrived}" update="accessList">未到货</p:commandLink>
                                     </p:column>
 
+                                    <p:column headerText="发票号">
+                                        <h:outputText value="#{item.invoiceNum}" />
+                                    </p:column>
+
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}"  oncomplete="PF('pmmoreAccDialogDlg').show()" update="@(.pmmoreAccDialogDlgCls)" rendered="#{item.id eq '000'}" />
                                         <!-- <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}"  oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}"/>-->
@@ -131,7 +135,7 @@
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
 
 
-                        <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1 or v2PmOrderController.x2()}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
+                        <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1 or v2PmOrderController.accessoryListEmpty()}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>

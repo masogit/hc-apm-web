@@ -11,6 +11,9 @@ import java.util.List;
 
 public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> {
 
+	@Query(value="select id from AssetInfo a where (a.tenantUID in ?1 or a.institutionUID in ?1 or a.hospitalUID in ?1 or a.siteUID in ?1 or a.clinicalDeptUID in ?1) and "
+			+ " id not in (select tr.assetId from AssetTagRule tr, AssetTagBiomedGroup tg, BiomedGroupUser tu where tr.tagId=tg.tagId and tg.biomedGroupId=tu.groupId)")
+	public List<Integer> getAssetsByNoTagGroup(Collection<String> c);
 
 	@Query(value = "select * from v2_pm_order  where asset_uid =?1  order by created_date desc limit 4", nativeQuery = true)
 	public List<V2_PmOrder> getPmOrdersForAsset(String assetUid);

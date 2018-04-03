@@ -11,13 +11,16 @@ import com.ge.apm.dao.QrCodeTemplateRepository;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.dao.SearchFilter;
 
 /**
  *
@@ -27,13 +30,15 @@ import org.springframework.stereotype.Component;
 public class QrCodeTemplateService {
 
     @Autowired
-    QrCodeLibRepository qrCodeLibDao;
+    private QrCodeLibRepository qrCodeLibDao;
     @Autowired
-    QrCodeTemplateRepository templateDao;
+    private QrCodeTemplateRepository templateDao;
     @Autowired
-    QrCodeTemplateElementRepository elementDao;
+    private QrCodeTemplateElementRepository elementDao;
     @Autowired
-    QrCodeService qrCodeService;
+    private QrCodeService qrCodeService;
+    @Autowired
+    private UaaService uaaService;
 
     public QrCodeTemplate getDefaultTemplate() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -87,11 +92,21 @@ public class QrCodeTemplateService {
         return elementDao.findByTemplateId(id);
     }
 
-
     public Map<String, Object> generateDefaultTemplate() {
         List<QrCodeTemplateElement> list = getDefaultTemplateElements();
         QrCodeTemplateElement qrcodeElement = list.stream().filter(item -> item.getType().equals(QrCodeTemplateElement.QrCodeElementType.QrCode)).findAny().orElse(null);
         return ImmutableMap.of("template", getDefaultTemplate(), "elementList", getDefaultTemplateElements(), "qrcodeElement", qrcodeElement);
+    }
+
+    public List<QrCodeTemplate> getTemplateByUser(UserAccount user) {
+        List<SearchFilter> templateFilter = new ArrayList<>();
+        List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+        templateFilter.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        templateFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        templateFilter.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        templateFilter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+        return templateDao.findBySearchFilter(templateFilter);
     }
 
 }

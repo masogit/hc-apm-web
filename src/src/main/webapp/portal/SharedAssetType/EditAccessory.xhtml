@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="SharedAssetTypeAccesssoryEditDlg" widgetVar="SharedAssetTypeAccesssoryEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetTypeController.CRUDActionName} #{msg.SharedAssetTypeAccesssory}">
+            <h:form id="SharedAssetTypeAccesssoryEditForm">
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetTypeController.selected != null}">
+                        <h:panelGroup styleClass="md-inputfield">
+                            <p:inputText id="name" value="#{sharedAssetTypeController.selectedAccessory.name}" />
+                            <label>#{msg.name}</label>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetTypeController.save}" value="#{msg.Save}" update="display,:SharedAssetTypeAccesssoryEditDlg, :SwapTypeEditForm:dataAccessory, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'SharedAssetTypeAccesssoryEditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetTypeAccesssoryEditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+
+    </ui:composition>
+</html>

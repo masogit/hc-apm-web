@@ -46,9 +46,12 @@
 
 <h:body styleClass="main-body #{guestPreferences.compact ? 'layout-compact' : null}">
     <ui:include src="./google-analytics.xhtml"/>
-    <p:growl id="growl" autoUpdate="true" showDetail="false" showSummary="true"/>
+
+    <p:growl id="growl" autoUpdate="true" showDetail="false" showSummary="true"
+             rendered="#{sharedAssetRequestV2Controller.selected.state != 8 and sharedAssetRequestV2Controller.selected.state != 2}"/>
     <div class="layout-wrapper #{guestPreferences.menuLayout}">
         <ui:include src="./menu.xhtml"/>
+        <ui:include src="/authorization.xhtml"/>
         <div class="layout-main">
             <ui:insert name="elements"/>
             <ui:insert name="content"/>

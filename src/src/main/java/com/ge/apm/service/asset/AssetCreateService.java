@@ -124,9 +124,9 @@ public class AssetCreateService {
             return false;
         }
         assetDepreciationService.saveAssetDerpeciation(assetInfo);
-        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
-            pmService.createPMrequest(assetInfo.getUid(), null);
-        }
+//        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+//            pmService.createPMrequest(assetInfo.getUid(), null);
+//        }
         return true;
     }
 
@@ -259,6 +259,10 @@ public class AssetCreateService {
         siteUidList.addAll(Arrays.asList(user.getTenantUID(),user.getInstitutionUID(),user.getHospitalUID(),user.getSiteUID()));
         List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(siteUidList.stream().distinct().collect(Collectors.toList()));
         return wcList.stream().anyMatch(item-> !Strings.isNullOrEmpty(item.getAssetApprover()));
+    }
+    
+    public UserAccount getUserByWechatId(String wechatId){
+        return userDao.getByWeChatId(wechatId);
     }
 
 }

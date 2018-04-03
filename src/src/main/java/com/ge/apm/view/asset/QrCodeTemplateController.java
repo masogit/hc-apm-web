@@ -24,6 +24,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -115,9 +116,10 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
             templateFilters.add(new SearchFilter("isUsing", SearchFilter.Operator.EQ, true));
             templateFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, usingTemplate.getSiteUID()));
             List<QrCodeTemplate> usingList = dao.findBySearchFilter(templateFilters);
-            usingList.forEach(item -> item.setIsUsing(false));
+            usingList.forEach(item ->item.setIsUsing(false));
             dao.save(usingList);
             usingTemplate.setIsUsing(true);
+            usingTemplate.setUsingDate(new Date());
             dao.save(usingTemplate);
         } else {
             usingTemplate.setIsUsing(false);

@@ -13,6 +13,7 @@ import org.joda.time.DateTime;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TubeConfigRepository;
@@ -23,6 +24,7 @@ import com.ge.apm.domain.TubeConfig;
 import com.ge.apm.domain.TubeData;
 import com.ge.apm.domain.UserAccount;
 
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
@@ -43,6 +45,8 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
 	private OrgInfoRepository orgInfoRepository;
 	private Map<String,AssetInfo> assetMap;
 	private Map<String,TubeConfig> configMap;
+	private String queryCondition;
+	private String query;
 	
     @Override
     protected void init() {
@@ -61,6 +65,70 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
     protected TubeDataRepository getDAO() {
         return dao;
     }
+    
+	public String getQueryCondition() {
+		return queryCondition;
+	}
+
+	public void setQueryCondition(String queryCondition) {
+		this.queryCondition = queryCondition;
+	}
+	
+	public String getQuery() {
+		return query;
+	}
+
+	public void setQuery(String query) {
+		this.query = query;
+	}
+
+	public List<String> getAssetInfoByFilter() {
+		if(!StringUtils.isEmpty(queryCondition)) {
+			List<SearchFilter> searchAssetFilters = new ArrayList<SearchFilter>();//getFilter(user.getSiteUID());
+			searchAssetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+			searchAssetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+			searchAssetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			//searchAssetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			//searchAssetFilters.add(new SearchFilter("serialNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			//searchAssetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			searchAssetFilters.add(new SearchFilter("systemId", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
+			List<AssetInfo> assetInfos = assetInfoRepository.findBySearchFilter(searchAssetFilters);
+			List<String> uids = new ArrayList<String>();
+			if(CollectionUtils.isNotEmpty(assetInfos)) {
+				assetInfos.forEach((asset) -> uids.add(asset.getUid()));
+			}
+			return uids;
+		}
+		return null;
+	}
+	
+	public List<SearchFilter> getFilter(String siteUID) {
+		List<SearchFilter> filter = new ArrayList<SearchFilter>();
+		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
+		if (orgInfo.getOrgType() == 3) {// 院区
+			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else if (orgInfo.getOrgType() == 2) {// 医院
+			filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else if (orgInfo.getOrgType() == 1) {// 集团
+			filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		} else {// 租户
+			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
+		}
+		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		return filter;
+	}
+	
+    public void setOneSearchStr() {
+		queryCondition = null;
+    }
+    
+    public void setQueryNull() {
+		query = null;
+    }
 
     @Override
     protected Page<TubeData> loadData(PageRequest pageRequest) {
@@ -68,7 +136,27 @@ public class TubeDataController extends JpaCRUDController<TubeData> {
     	configMap.clear();
     	String tenantUid = user.getTenantUID();
     	PageRequest pr = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize());
-    	Page<TubeData> datas = dao.findByCondition(tenantUid,pr);
+    	List<String> queryUids = getAssetInfoByFilter();
+    	Page<TubeData> datas = null;
+    	if(queryUids == null) {
+    		if(StringUtils.isEmpty(query)) {
+    			datas = dao.findByCondition(tenantUid,pr);
+    		}else {
+    			datas = dao.findByConditionBySeriaNum(tenantUid,query,pr);
+    		}
+    	}else {
+    		if(StringUtils.isEmpty(query)) {
+    			datas = dao.findByConditionWithUids(tenantUid,queryUids,pr);
+    		}else {
+    			datas = dao.findByConditionWithUidsAndSeriaNum(tenantUid,queryUids,query,pr);
+    		}
+    	}
+    	
+/*    	if(CollectionUtils.isEmpty(queryUids)) {
+    		datas = dao.findByCondition(tenantUid,pr);
+    	}else{
+    		datas = dao.findByConditionWithUids(tenantUid,queryUids,pr);
+    	}*/
     	if(datas.getTotalElements() > 0) {
     		List<TubeData> elements = datas.getContent();
     		List<String> uids = new ArrayList<String>();

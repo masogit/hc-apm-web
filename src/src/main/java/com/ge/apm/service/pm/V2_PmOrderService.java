@@ -88,6 +88,9 @@ public class V2_PmOrderService {
             WebUtil.addSuccessMessage("关单成功");
         }
     }
+
+
+
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
@@ -112,11 +115,14 @@ formData.setAssignee(approvaler);
         srApi.createPmRequest(token,formData);
     }
     
+    //创建一次性保养
     public void createPMrequest(String assetUID, Date planTime) {
         PmOrderActionForm formData = new PmOrderActionForm();
         if (null != planTime) {
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         }
+        //一次性
+        formData.setPmType(2);
         createPMrequestApi(assetUID, formData);
     }
     
@@ -155,22 +161,69 @@ formData.setAssignee(approvaler);
 
 
     }
-    public void approveAction(V2_PmOrder selectedPmOrder, Boolean agree,String comments) {
-        selectedPmOrder.setCurrentStepId(selectedPmOrder.getCurrentStepId());
+
+	public void dispatchWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,Date planTimeBatch){
+		String token = UserContextService.getAccessToken();
+		List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+		pmList.stream().forEach(item->{
+			if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+				//确保批量接单后，批量接单按钮是灰色
+				hmPmOrder.put(item.getId(),false);
+				//pmListTmp保存了所要提交的批量pmOrder
+				pmListTmp.add(item);
+			}
+		});
+		ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+		pmListTmp.stream().forEach(item->{
+			PmOrderActionForm formData = new PmOrderActionForm();
+			formData.setActionType("assign");
+			formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTimeBatch));
+			formData.setAssignee(currentPersonIdBatch);
+			formData.setStepId(item.getCurrentStepId());
+            formData.setPmOrderId(item.getId());
+			formDataList.add(formData);
+		});
+		String res = srApi.invokePmOrderActionBatch(token,formDataList,"assign");
+		if (res==null || !res.equalsIgnoreCase("Ok")) {
+			WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"派单");
+		}else{
+			WebUtil.addSuccessMessage("批量派单成功");
+		}
+
+	}
+
+    public void closePMBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,List<V2_BlobObject> picList ){
         String token = UserContextService.getAccessToken();
-        PmOrderActionForm formData = new PmOrderActionForm();
-       // formData.setStepId("approval");
-        formData.setStepId(selectedPmOrder.getCurrentStepId());
-        String res = srApi.invokePmOrderAction(token,formData,agree?"approvalPass":"approvalReject",selectedPmOrder.getId());
+        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+        pmList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                //确保批量接单后，批量接单按钮是灰色
+                hmPmOrder.put(item.getId(),false);
+                //pmListTmp保存了所要提交的批量pmOrder
+                pmListTmp.add(item);
+            }
+        });
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        pmListTmp.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setAttachments(picList);
+            formData.setPmOrderId(item.getId());
+            formData.setActionType("close");
+            formData.setStepId(item.getCurrentStepId());
+            formData.setPmOrderId(item.getId());
+            //批量关单的都是合格pm，所以设置为1
+            formData.setQualityChecking("1");
+            formDataList.add(formData);
+        });
+        String res = srApi.invokePmOrderActionBatch(token,formDataList,"close");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }else{
-            WebUtil.addSuccessMessage("审批成功");
+            WebUtil.addSuccessMessage("批量关单成功");
         }
     }
 
     public void dispatchWorkOrder(V2_PmOrder selectedPmOrder,Date planTime) {
-        V2_PmOrder tmpwo=woDao.findById(selectedPmOrder.getId());
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("assign");
@@ -186,6 +239,40 @@ formData.setAssignee(approvaler);
         }
         selectedPmOrder.setCurrentStepId("accept");
 
+    }
+    public void reassignWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,String currentPersonIdBatch,String comments){
+        String token = UserContextService.getAccessToken();
+        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+        pmList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                //确保批量接单后，批量接单按钮是灰色
+                hmPmOrder.put(item.getId(),false);
+                //pmListTmp保存了所要提交的批量pmOrder
+                pmListTmp.add(item);
+            }
+        });
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        pmListTmp.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setActionType("reAssign");
+            formData.setStepId(item.getCurrentStepId());
+            formData.setAssignee(currentPersonIdBatch);
+            formData.setPmOrderId(item.getId());
+            formData.setDesc(comments);
+            formDataList.add(formData);
+            String res = srApi.invokePmOrderAction(token,formData,"reAssign",item.getId());
+            if (res==null || !res.contains("OK")) {
+                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+            }
+
+
+        });
+        String res = srApi.invokePmOrderActionBatch(token,formDataList,"assign");
+        if (res==null || !res.equalsIgnoreCase("Ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+        }else{
+            WebUtil.addSuccessMessage("批量转单成功");
+        }
     }
 
 public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
@@ -218,7 +305,7 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        if(selectedPmOrder.getSimplify()==true){
+        if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
             formData.setActionType("simplify");
         }else{
             formData.setActionType("repair");
@@ -243,11 +330,8 @@ formData.setAttachments(attachment);
 
     public void reassignWorkOrder(V2_PmOrder selectedPmOrder, String assigneeId,String comments) {
         String token = UserContextService.getAccessToken();
-
-
         PmOrderActionForm formData = new PmOrderActionForm();
         formData.setActionType("reAssign");
-      //  UserAccount userAccount = userDao.getById(Integer.parseInt(assigneeId));
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         formData.setAssignee(assigneeId);
         formData.setDesc(comments);
@@ -285,7 +369,7 @@ formData.setAttachments(attachment);
         return srDao.findByAssetId(id);
     }
 
-    public void acceptWorkOrder(V2_PmOrder selectedPmOrder, Date estimatedCloseTime,Date planTime) {
+    public void acceptWorkOrder(V2_PmOrder selectedPmOrder,Date planTime) {
         //V2_WorkOrder tmpwo=woDao.findById(selectedWorkOrder.getId());
 
         String token = UserContextService.getAccessToken();
@@ -302,6 +386,37 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
         selectedPmOrder.setCurrentStepId("repair");
     }
 
+    public void acceptWorkOrderBatch(List<V2_PmOrder> pmList,Map<String,Boolean> hmPmOrder,Date planTimeBatch) {
+        String token = UserContextService.getAccessToken();
+        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+        pmList.stream().forEach(item->{
+           if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                //确保批量接单后，批量接单按钮是灰色
+               hmPmOrder.put(item.getId(),false);
+               //pmListTmp保存了所要提交的批量pmOrder
+               pmListTmp.add(item);
+            }
+        });
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        pmListTmp.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setActionType("accept");
+            formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTimeBatch));
+            formData.setStepId(item.getCurrentStepId());//Accept
+            formData.setPmOrderId(item.getId());
+            formDataList.add(formData);
+        });
+        String res = srApi.invokePmOrderActionBatch(token,formDataList,"accept");
+        if (res==null || !res.equalsIgnoreCase("Ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"接单");
+        }else{
+            WebUtil.addSuccessMessage("批量接单成功");
+            for(V2_PmOrder item:pmListTmp){
+                item.setCurrentStepId("repair");
+            }
+        }
+
+    }
 
     public List<UserAccount> getWorkerList(Integer assetId) {
         List<UserAccount> workerList = ucService.getWorkerList(assetId);
@@ -316,38 +431,6 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
     public AssetInfo getAssetInfo(Integer assetId){
         return assetDao.findById(assetId);
     }
-
-
-
-//Type：0-我的/1-同一group的/2-同院区的/3-其它院区的
-/*public Page<V2_PmOrder> getWorkOrderListToPickup(int type,PageRequest pr, UserAccount ua) {
-    Page<V2_PmOrder> pages = null;
-
-    if (type == 0 || type == 1) {
-        switch(type) {
-            case 0: pages = woDao.fetchAvailableWorkOrderByUser(ua.getId(), pr);break;
-            case 1: pages = woDao.fetchAvailableSameGroupWorkOrderByUser(ua.getId(),pr);
-        }
-        return pages;
-    }
-    Integer orgLevel = ua.getOrgLevel();
-    if (orgLevel == null || orgLevel == 0)
-        orgLevel = 3;
-    List<SearchFilter> searchFilters = new ArrayList<>();
-    switch (orgLevel) {
-        case 1: searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, ua.getInstitutionUID()));break;
-        case 2: searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, ua.getHospitalUID()));break;
-        case 3: searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, ua.getSiteUID()));
-    }
-
-    searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-    searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3));
-
-    return woDao.findBySearchFilter(searchFilters, pr);
-}*/
-  /*  public List<V2_PmOrderCoworker> getWorkOrderCoworker(String woId) {
-        return workOrderCoworkerRepository.findByWoId(woId);
-    }*/
 
     public UserAccountRepository getUserDao() {
         return userDao;

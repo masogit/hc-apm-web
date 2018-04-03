@@ -43,6 +43,10 @@
                             <label class="label">序列号</label>
                             <p:inputText value="#{workOrderMgrController.itemDetail.serialNum}"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">发票号</label>
+                            <p:inputText value="#{workOrderMgrController.itemDetail.invoiceNum}"/>
+                        </h:panelGroup>
                         <p:column headerText="到货">
                             <p:selectBooleanButton   value="#{workOrderMgrController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货" disabled="#{workOrderMgrController.itemDetail.arrived}"/>
                         </p:column>

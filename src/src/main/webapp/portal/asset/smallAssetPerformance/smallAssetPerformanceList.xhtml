@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:form id="smallAssetPerformanceListForm">
+	<p:dataTable id="datalist" value="#{smallAssetPerformanceController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+		selection="#{smallAssetPerformanceController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+
+		<!--<p:ajax event="rowSelect" update="deleteButton" />-->
+		<p:ajax event="filter" listener="#{smallAssetPerformanceController.onFilter}" />
+
+		<p:column headerText="科室" filterBy="#{item.department}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.department}" />
+		</p:column>
+		<p:column headerText="费别" filterBy="#{item.costType}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.costType}" />
+		</p:column>
+		<p:column headerText="编码" filterBy="#{item.code}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.code}" />
+		</p:column>
+		<p:column headerText="项目名称" filterBy="#{item.projectName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.projectName}" />
+		</p:column>
+		<p:column headerText="项目编号" filterBy="#{item.projectNumber}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.projectNumber}" />
+		</p:column>
+		<p:column headerText="一类标准" sortBy="#{item.standard}">
+			<h:outputText value="#{item.standard}" />
+		</p:column>
+		<p:column headerText="数量" sortBy="#{item.quantity}">
+			<h:outputText value="#{item.quantity}" />
+		</p:column>
+		<p:column headerText="金额" sortBy="#{item.amount}">
+			<h:outputText value="#{item.amount}" />
+		</p:column>
+		<p:column headerText="日期" sortBy="#{item.happenDate}" filterBy="#{item.happenDate}" filterMatchMode="GTE">
+			<f:facet name="filter">
+                <p:inputText id="filterHappenDate" widgetVar="varFilterHappenDate" />
+            </f:facet>
+            <h:outputText value="#{item.happenDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+		</p:column>
+
+		<f:facet name="{Toolbar}">
+			<!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+				actionListener="#{smallAssetPerformanceController.prepareCreate}" update=":smallAssetPerformanceTab:smallAssetPerformanceEditDlg"
+				oncomplete="PF('smallAssetPerformanceEditDialog').show()" />
+			<p:commandButton id="editButton" actionListener="#{smallAssetPerformanceController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+				update=":smallAssetPerformanceTab:smallAssetPerformanceEditDlg" oncomplete="PF('smallAssetPerformanceEditDialog').show()"
+				disabled="#{empty smallAssetPerformanceController.selected.id}" />
+			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{smallAssetPerformanceController.delete}"
+				update=":smallAssetPerformanceTab:smallAssetPerformanceListForm:datalist" disabled="#{empty smallAssetPerformanceController.selected.id}">
+				<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+			</p:commandButton>-->
+		</f:facet>
+	</p:dataTable>
+</h:form>
+<p:overlayPanel widgetVar="panelFilterHappenDate" for=":smallAssetPerformanceTab:smallAssetPerformanceListForm:datalist:filterHappenDate" dismissable="false">
+    <h:panelGrid columns="2">
+        <p:outputLabel value="#{msg.From}"/>
+        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeFrom_HappenDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+        <p:outputLabel value="#{msg.To}"/>
+        <p:calendar timeZone="GMT+8"  widgetVar="varStartTimeTo_HappenDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+    </h:panelGrid>
+    <p:commandButton onclick="setDateFilter('varDataList','varFilterHappenDate','varStartTimeFrom_HappenDate','varStartTimeTo_HappenDate'); PF('panelFilterHappenDate').hide();" title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+    <p:commandButton onclick="PF('panelFilterHappenDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+</p:overlayPanel>
+<ui:include src="smallAssetPerformanceEdit.xhtml" />
+
+</html>

@@ -13,7 +13,7 @@ import styles from './index.scss'
 const isHead = IsHead()
 
 export default
-@connect(({filters, depts, assets, steps }) => ({filters, depts, assets, steps}))
+@connect(({filters, depts, assets, steps, hospitals }) => ({filters, depts, assets, steps, hospitals}))
 class ScanDetails extends React.PureComponent {
   onFilterChange = (e) => this.props.dispatch({
     type: 'ScanDetails_filters/field/set',
@@ -21,17 +21,28 @@ class ScanDetails extends React.PureComponent {
   })
 
   render() {
-    const { filters, depts, assets, steps } = this.props
+    const { filters, depts, assets, hospitals = [], steps } = this.props
     const filterOptions = [
       { type: 'range', key: 'range', value: filters.range }
     ]
-    if (isHead) filterOptions.push({
-      type: 'select',
-        key: 'dept',
-        value: filters.dept,
-        options: depts,
-        placeholder: '全部科室'
-    })
+    if (isHead) {
+      filterOptions.push(
+        {
+          type: 'select',
+            key: 'dept',
+            value: filters.dept,
+            options: depts,
+            placeholder: '全部科室'
+        },
+        {
+          type: 'select',
+            key: 'hospital',
+            value: filters.hospital,
+            options: hospitals,
+            placeholder: '默认院区'
+        },
+      )
+    }
     return (
       <div className={styles['scan-details']}>
         <FilterBar options={filterOptions} onChange={this.onFilterChange}/>

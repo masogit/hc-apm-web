@@ -1,3 +1,9 @@
+export const Hospitals = [
+  { id: 1, name: '某医院' },
+  { id: 2, name: '某某医院' },
+  { id: 3, name: '某某某医院' },
+]
+
 export const AssetTypes = {
   "1": "CT类",
   "2": "磁共振MRI类",

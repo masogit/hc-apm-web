@@ -48,6 +48,7 @@ import javax.faces.bean.ViewScoped;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.TimeUtil;
@@ -133,7 +134,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-        queryIndex = 0;
+
+        String str = WebUtil.getRequestParameter("str");
+        if (Strings.isNullOrEmpty(str)) {
+            queryIndex = 0;
+        } else {
+            queryIndex = Integer.valueOf(str);
+            searchList(queryIndex);
+        }
         this.filterBySite = false;
         this.filterByHospital = false;
 
@@ -149,6 +157,92 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao;
     }
 
+    /*
+     * select
+        *
+    from
+        v2_work_order v2_workord0_ 
+    left outer join
+        v2_service_request v2_service1_ 
+            on v2_workord0_.sr_id=v2_service1_.id cross 
+    join
+        v2_service_request v2_service2_ cross 
+    join
+        asset_info assetinfo4_ 
+    where
+        v2_workord0_.sr_id=v2_service2_.id 
+        and v2_workord0_.asset_id=assetinfo4_.id         
+        and v2_workord0_.status=1                           //1*
+        and (
+            v2_workord0_.current_step_id in (
+                2 , 3
+            )
+        )                                                   //1*
+        and (
+            v2_workord0_.site_uid in (
+                ?
+            )                                                //1*2+
+            or v2_workord0_.tenant_uid in (
+                ?
+            )                                                //1*2+
+            or v2_workord0_.institution_uid in (
+                ?
+            )                                                //1*2+
+            or v2_workord0_.hospital_uid in (
+                ?
+            )                                                 //1*2+
+            or v2_service2_.requestor_id=2342                 //1*2+
+            or v2_service2_.from_dept_uid in (
+                ?
+            )                                                 //1*2+
+            or v2_workord0_.current_person_id=2342            //1*2+
+        ) 
+        and (
+            (
+                v2_workord0_.dispatch_mode in (
+                    2 , 3
+                )                                             //1*3+4*
+            ) 
+            and v2_workord0_.current_person_id<>?             //1*3+4*
+            and (
+                assetinfo4_.asset_owner_id=?                  //1*3+4*6+
+                or assetinfo4_.asset_owner_id2=?              //1*3+4*6+
+                or assetinfo4_.asset_owner_id3=?              //1*3+4*6+
+                or (
+                    assetinfo4_.asset_owner_id2 is null
+                )                                             //1*3+4*6+owner1*
+                and (
+                    assetinfo4_.asset_owner_id3 is null
+                )                                             //1*3+4*6+owner1*
+                or (
+                    assetinfo4_.asset_owner_id is null
+                )                                             //1*3+4*6+owner2*
+                and (
+                    assetinfo4_.asset_owner_id3 is null
+                )                                             //1*3+4*6+owner2*
+                or (
+                    assetinfo4_.asset_owner_id is null
+                )                                             //1*3+4*6+owner3*
+                and (
+                    assetinfo4_.asset_owner_id2 is null
+                )                                             //1*3+4*6+owner3*
+            ) 
+            and (
+                v2_workord0_.asset_id in (
+                    ?
+                )                                             //1*3+4*5+
+                or v2_workord0_.asset_id in (                 //1*3+4*5+
+                    ?
+                )
+            ) 
+            or v2_workord0_.current_person_id=2342             //1*3+7*
+            and (
+                v2_workord0_.dispatch_mode<>4                  //1*3+7*8+
+                or v2_workord0_.current_step_id<>2             //1*3+7*8+
+            )
+        ) 
+
+     */
     @Override
     protected Page<V2_WorkOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
@@ -178,7 +272,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
-            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
+            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
@@ -188,7 +282,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+B*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
@@ -198,11 +294,24 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner2*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            if (!getTagGroupAssets().isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getTagGroupAssets(), "1*3+4*5+"));
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, getNoTagGroupAssets(), "1*3+4*5+"));
+            //去除派工模式4且待派工的单子
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 4, "1*3+7*8+"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*8+"));
+            //当前责任人是自己且已经派工的单子
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+9*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
+            List<Integer> tagGroupAssets = getTagGroupAssets();
+            if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
+            } else {
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
+            }
+            tagGroupAssets = getNoTagGroupAssets();
+            if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
+            } else {
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
             }
 
         } else if (queryIndex == 4) { //维修中
@@ -228,9 +337,20 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 8) { //已关单
+            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+                if(userContextService.hasRole("AssetStaff")){
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+                }
+            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
+            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
@@ -263,6 +383,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            if (orgUidList == null || orgUidList.isEmpty()) {
+                orgUidList = Arrays.asList("");
+            }
             tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
         }
         return tagNoGroupAssets;
@@ -337,8 +460,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         confirmedDownTime = null;
         needConfirmTime = false;
     }
-    
-    public void prepareNewWorkOrder(String woid){
+
+    public void prepareNewWorkOrder(String woid) {
         prepareAct(woid);
         picList = new ArrayList<V2_BlobObject>();
     }
@@ -360,7 +483,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void prepareCompleteOrder(String woid) {
         selectedWorkOrder = dao.findById(woid);
-       /* if(selectedWorkOrder.getOtherExpense()==0){
+        /* if(selectedWorkOrder.getOtherExpense()==0){
             selectedWorkOrder.setOtherExpense(null);
         }
         if(selectedWorkOrder.getManHours()==0){
@@ -417,7 +540,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void createWorkOrder() {
         selectedWorkOrder.setComment(comments);
-        woService.reCreateWorkOrder(selectedWorkOrder, comments, selectedWorkOrder.getIntExtType(),picList);
+        woService.reCreateWorkOrder(selectedWorkOrder, comments, selectedWorkOrder.getIntExtType(), picList);
         cancel();
     }
 
@@ -668,11 +791,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     public List<V2_BlobObject> getPicListByBoType(String boType) {
         if (picList != null) {
             return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
-        }else{
+        } else {
             return null;
         }
     }
-    
+
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
             approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
@@ -680,9 +803,22 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
         }
     }
-    
-    public void accessoryArrival(String itemId){
+
+    public void accessoryArrival(String itemId) {
         accessoryList.stream().filter(item -> itemId.equals(item.getId())).forEach(item -> item.setArrived(true));
+    }
+
+    //是否允许内修
+    public Boolean canCreateSr() {
+        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
+            if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
+                if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
+                    return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
+                }
+                return false;
+            }
+        }
+        return true;
     }
 
     //getter and setter
@@ -925,4 +1061,3 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
 }
-

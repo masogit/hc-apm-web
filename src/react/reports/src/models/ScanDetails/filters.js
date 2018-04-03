@@ -12,6 +12,7 @@ export default {
       to: ranges.oneYear.end.format('YYYY-MM-DD')
     },
     dept: orgId,
+    hospital: undefined,
     cursor: {}
   },
   effects: {

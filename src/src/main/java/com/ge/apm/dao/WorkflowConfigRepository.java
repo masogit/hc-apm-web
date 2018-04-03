@@ -30,4 +30,9 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
 	 @Transactional
 	public void deleteBySiteUID(String siteUID);
 
+    public List<WorkflowConfig> findByDeptForSharedAsset(String orgUid);
+
+    @Query(value="select distinct dept_for_shared_asset from workflow_config WHERE dept_for_shared_asset IS NOT NULL",nativeQuery = true)
+    public List<String> findDeptForSharedAsset();
+
 }

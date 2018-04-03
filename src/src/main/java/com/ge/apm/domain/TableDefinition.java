@@ -6,6 +6,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -16,6 +17,10 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Type;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
 
 /**
  *
@@ -23,53 +28,65 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "table_definition")
-public class TableDefinition implements Serializable{
-    
-    public enum TableDefinitionStatus { Draft, Released } 
-    
+public class TableDefinition implements Serializable {
+
+    public enum TableDefinitionStatus {
+        Draft, Released, Expired
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;
-    
+
     //模版名称
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
-    
+
     //jason 值
     @Column(name = "schema")
-    @Type(type="text") 
+    @Type(type = "text")
     private String schema;
-    
+
     //分类
     @Column(name = "asset_group")
     private Integer assetGroup;
-    
+
     //描述
     @Column(name = "description")
     private String description;
-    
-    
-//    //基本id
-//    @Column(name = "base_id", columnDefinition = "CHAR(32)")
-//    private String baseId;
-//    
-//    //版本号
-//    @Column(name = "version_num")
-//    private Integer versionNum;
-//    
-//    // 1:old 2:using
-//    @Basic(optional = false)
-//    @NotNull
-    
+
+    //Excel 模版Id
+    @Column(name = "excel_storage_Id")
+    private String excelStorageId;
+
+    //基本id
+    @Column(name = "base_id", columnDefinition = "CHAR(32)")
+    private String baseId;
+
+    @CreatedBy
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @CreatedDate
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @LastModifiedBy
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @LastModifiedDate
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+
     @Column(name = "status")
     private String status;
-    
-    
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -161,8 +178,56 @@ public class TableDefinition implements Serializable{
     public void setStatus(String status) {
         this.status = status;
     }
+
+    public String getExcelStorageId() {
+        return excelStorageId;
+    }
+
+    public void setExcelStorageId(String excelStorageId) {
+        this.excelStorageId = excelStorageId;
+    }
+
+    public String getBaseId() {
+        return baseId;
+    }
+
+    public void setBaseId(String baseId) {
+        this.baseId = baseId;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
     
-    
+
     @Override
     public int hashCode() {
         Integer hash = 0;
