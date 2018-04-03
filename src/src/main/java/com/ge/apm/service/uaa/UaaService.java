@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.hibernate.Hibernate;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.primefaces.ultima.domain.User;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -30,6 +31,7 @@ public class UaaService {
     public static final String ROOT = "default";
     public static final String ORG = "org";
     public static final String ASSET = "asset";
+    public static final String TEMPORARY_ACCOUNT = "";
     private static Map<String, SysRole> sysRoles;
     
     @Autowired
@@ -136,10 +138,16 @@ public class UaaService {
 
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
-        userRoleDao.deleteByUserAccount(userAccount);
+        userRoleDao.deleteByUserAccount(userAccount.getId());
         
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
+        if((!newRoleNames.contains("临时报修帐号")) && (userAccount.getUserRoleNames().contains("临时报修帐号"))){
+            deactiveTemporaryUser(userAccount.getId());
+        }
+        if(newRoleNames.contains("临时报修帐号")){
+            activeTemporaryUser(userAccount.getId());
+        }
         for(String newRoleName: newRoleNames){
             SysRole role = sysRoleDao.getByRoleDesc(newRoleName);
             if (role==null){
@@ -152,6 +160,17 @@ public class UaaService {
                 userRoleDao.save(userRole);
             }
         }
+    }
+
+    @Transactional
+    public void activeTemporaryUser(Integer userId){
+        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
+        userDao.activeSingleUser(userId);
+    }
+
+    public void deactiveTemporaryUser(Integer userId){
+        UserAccountRepository userDao = WebUtil.getBean(UserAccountRepository.class);
+        userDao.deactiveTemporaryUser(userId);
     }
     
     public List<OrgInfo> getHospitalListBySiteId(int siteId){

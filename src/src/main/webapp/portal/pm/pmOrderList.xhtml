@@ -193,8 +193,6 @@
                                 <f:selectItem itemLabel="3级规则" itemValue="3" />
                             </p:selectOneMenu>
                         </h:panelGroup>
-gaolei
-
                         <h:panelGroup>
                             <label class="label">保养类型</label>
                             <p:selectOneMenu  value="#{v2PmOrderController.pmType}" required="true" requiredMessage="保养级别 #{msg.ValidationRequire}">
@@ -324,7 +322,7 @@ gaolei
                     <p:panelGrid  columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">保养人*</label>
-                            <p:selectOneMenu  value="#{v2PmOrderController.selectedPmOrder.currentPersonId}" required="true" requiredMessage="#{msg.intExtType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu  value="#{v2PmOrderController.selectedPmOrder.currentPersonId}" required="true" requiredMessage="保养人 #{msg.ValidationRequire}">
                                 <f:selectItems value="#{v2PmOrderController.getWorkerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
