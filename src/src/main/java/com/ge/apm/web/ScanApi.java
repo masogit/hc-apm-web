@@ -50,11 +50,16 @@ public class ScanApi {
                                                              @Past @RequestParam(name = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") DateTime from,
                                                              @Past @RequestParam(name = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") DateTime to,
                                                              @Min(1) @RequestParam(name = "type", required = false) Integer type,
+                                                             @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                              @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                              @Min(1) @RequestParam(name = "asset", required = false) Integer asset) {
     UserAccount user = UserContext.getCurrentLoginUser();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     Map<Integer, String> types = Observable.from(commonService.findFields(user.getSiteId(), "assetGroup").entrySet()).filter(e -> Option.of(Ints.tryParse(e.getKey())).isDefined()).toMap(e -> Ints.tryParse(e.getKey()), Map.Entry::getValue).toBlocking().single();
-    return serializeBrief(request, types, commonService.findParts(), scanService.brief(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), type, dept, asset));
+    return serializeBrief(request, types, commonService.findParts(), scanService.brief(user.getSiteId(), hospitalId, from.toDate(), to.toDate(), type, dept, asset));
   }
 
   private ResponseEntity<Map<String, Object>> serializeBrief(HttpServletRequest request, Map<Integer, String> types, Map<Integer, String> parts, Observable<Tuple3<Integer, Integer, Integer>> report) {
