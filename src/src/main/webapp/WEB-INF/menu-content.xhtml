@@ -25,6 +25,7 @@
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.hasAnyRole('AssetHead') or userContextService.isAssetApprover())}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+				<p:menuitem id="um088" value="盘点工单" outcome="/portal/inventory/inventoryOrder.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
 
             </p:submenu>
 
