@@ -14,6 +14,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
+import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -200,6 +201,7 @@ public class QrCodeService {
             FieldsMap.put("modalityId", WebUtil.getMessage("modalityId"));       //院内IT系统编号  AssetInfo.modalityId
             FieldsMap.put("makerShortName", WebUtil.getMessage("makerShortName"));       //品牌/制造商简称  AssetInfo.makerShortName
             FieldsMap.put("systemId", WebUtil.getMessage("systemId"));           //SystemID/厂商报修ID  AssetInfo.systemId
+            FieldsMap.put("installDate", WebUtil.getMessage("installDate"));           //启用日期  AssetInfo.installDate
 
         }
         return FieldsMap;
@@ -284,6 +286,9 @@ public class QrCodeService {
                         break;
                     case "systemId":
                         item.setTextShowValue(item.getTextValue().concat(asset.getSystemId() == null ? "" : asset.getSystemId()));
+                        break;
+                    case "installDate":
+                        item.setTextShowValue(item.getTextValue().concat(asset.getInstallDate() == null ? "" : TimeUtils.getStrDate(asset.getInstallDate(), "yyyy-MM-dd")));
                         break;
                 }
             }
