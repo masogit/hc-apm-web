@@ -72,6 +72,10 @@ public class AssetInstallationController {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
+        
+//        String encodeStr = WebUtil.getRequestParameter("str");
+//        String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
+        
         String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
 //        currentQrCode = arrivalListItem.getQrCode();
