@@ -16,6 +16,7 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
+import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import java.text.SimpleDateFormat;
@@ -163,6 +164,10 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
 
     public List<V2_BlobObject> getAckPicList(String type) {
         return picList == null ? null : picList.stream().filter(item -> type.equals(item.getBoSubType())).collect(Collectors.toList());
+    }
+    
+    public String getInstallUrl(String itemId,String srcPage){
+        return UrlEncryptController.encodeUrlParam("ItemEdit?faces-redirect=true&src=".concat(srcPage).concat("&itemId=").concat(itemId));
     }
 
     public ArrivalListItem getSelectedItem() {

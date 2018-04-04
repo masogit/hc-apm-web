@@ -60,6 +60,7 @@ public class AssetInstallationController {
     private String gbCodeName;
     private GbCode selectedGb;
     private TreeNode gbTree;
+    private String src = "";
 //    private String currentQrCode;
 
     @PostConstruct
@@ -73,12 +74,11 @@ public class AssetInstallationController {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         
-//        String encodeStr = WebUtil.getRequestParameter("str");
-//        String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
-        
-        String itemId = WebUtil.getRequestParameter("itemId");
+        String encodeStr = WebUtil.getRequestParameter("str");
+        String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
+        src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
+//        String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
-//        currentQrCode = arrivalListItem.getQrCode();
         if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
         }
@@ -211,11 +211,16 @@ public class AssetInstallationController {
     }
 
     public String returnAction() {
-        if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
+        if("List".equals(src)){
             return "arrivalItemsList?faces-redirect=true";
-        } else {
+        }else{
             return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + arrivalListItem.getArrivalListId());
         }
+//        if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
+//            return "arrivalItemsList?faces-redirect=true";
+//        } else {
+//            return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Edit&listId=" + arrivalListItem.getArrivalListId());
+//        }
     }
 
     public void updateItem() {

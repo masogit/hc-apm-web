@@ -84,13 +84,13 @@
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.arrivalListContractPrice}</label>
-                                    <p:inputNumber  maxValue="99999999"  decimalPlaces="4" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                    <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.vendor}</label>
                                     <p:selectOneMenu id="vendor" value="#{assetArrivedListEditController.supplier}" converter="supplierConverter" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" autoWidth="false">
                                         <p:ajax  listener="#{assetArrivedListEditController.onSupplierChange()}" process="@parent"/>
-                                        <f:selectItem itemLabel=""/>
+                                        <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                         <f:selectItems value="#{supplierController.supplierList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                     </p:selectOneMenu>
                                 </h:panelGroup>
@@ -355,9 +355,11 @@
                                     <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID) and assetArrivedListEditController.selected.processType ne 'Easy'}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                                     </p:commandLink>
-                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{(assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new') and assetArrivedListEditController.selected.processType ne 'Easy'}">安装
+<!--                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{(assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new') and assetArrivedListEditController.selected.processType ne 'Easy'}">安装
                                         <f:param name="itemId" value="#{item.id}" />
-                                    </p:link >
+                                    </p:link >-->
+                                    <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}
+                            </p:commandLink >
                                 </p:column>
 
                             </p:dataTable>
