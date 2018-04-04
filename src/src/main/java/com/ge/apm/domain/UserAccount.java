@@ -30,6 +30,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -368,6 +370,9 @@ public class UserAccount implements Serializable {
 
     public String getUserRoleNames() {
         String roleNames = "";
+        if(CollectionUtils.isEmpty(userRoleList)){
+            return roleNames;
+        }
         for(UserRole userRole: userRoleList){
             roleNames = roleNames + userRole.getRole().getRoleDesc()+ " ";
         }
