@@ -13,7 +13,7 @@
 				text-align: left;
 			}
 		</style>
-        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" onHide="#{pmOrderRuleController.onSelect()}" width="750" height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
+        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" width="750" height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
             <h:form id="PmOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
