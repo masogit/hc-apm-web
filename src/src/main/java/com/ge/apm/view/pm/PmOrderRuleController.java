@@ -90,6 +90,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void onSelect() {
         this.selected = null;
+        this.checkItemLists.clear();
         /*if (selected != null && selected.getId() != null) {
             Integer selectedId = selected.getId();
             selected = null;
@@ -411,9 +412,11 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
 
     public void initSaveAs() {
+        Integer newId = selected.getId();
+        selected = null;
+        selected = dao.findById(newId);
         selected.setPeriod(null);
         initCheckItemLists();
-
     }
 
     public String getFilterPmRuleLevel() {
@@ -437,6 +440,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void prepareCreate() {
         try {
+            this.selected = null;
+            this.checkItemLists = null;
             super.prepareCreate();
             initCheckItemLists();
         } catch (Exception e) {
@@ -446,7 +451,12 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     }
 
     public void prepareEdit() {
+//        this.selected = null;
+//        this.checkItemLists = null;
         super.prepareEdit();
+        Integer newId = selected.getId();
+        selected = null;
+        selected = dao.findById(newId);
         initCheckItemLists();
     }
 
