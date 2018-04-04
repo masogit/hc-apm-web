@@ -184,7 +184,7 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">保养级别</label>
+                            <label class="label">保养级别*</label>
                             <p:selectOneMenu  value="#{v2PmOrderController.ruleLevel}" required="true" requiredMessage="保养级别 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="2级规则" itemValue="2" />
@@ -192,7 +192,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">保养类型</label>
+                            <label class="label">保养类型*</label>
                             <p:selectOneMenu  value="#{v2PmOrderController.pmType}" required="true" requiredMessage="保养类型 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="一次性" itemValue="2" />
