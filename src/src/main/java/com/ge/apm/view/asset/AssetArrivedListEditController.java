@@ -342,7 +342,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         if(selected.getContractPrice()!=null){
             easyInstallItem.setPurchasePrice(selected.getContractPrice()/selected.getQuantity());
         }
-        easyInstallItem.setPurchasePrice(Double.MAX_VALUE);
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
 
@@ -409,6 +408,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setAccountingCategory(easyInstallItem.getAccountingCategory());
         });
         itemDao.save(saveList);
+        WebUtil.addSuccessMessage("已保存");
     }
 
     public List<ArrivalListItem> getNewInstallAssetList() {
@@ -485,6 +485,18 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return aiService.getOrgInfoByUid(orgUid);
     }
 
+    public Integer getInstalledCount(){
+        if(arrivalItemList !=null){
+            return arrivalItemList.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus()) ||
+                    ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
+        }else{
+            return 0;
+        }
+    }
+    
+    public void saveArrivalList(){
+        this.save();
+    }
     //geter and setter
 
     

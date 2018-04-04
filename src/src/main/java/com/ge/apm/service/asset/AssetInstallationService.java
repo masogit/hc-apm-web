@@ -193,7 +193,7 @@ public class AssetInstallationService {
         }
 
         if (Strings.isNullOrEmpty(item.getDepartNum())) {
-            return new Tuple2(false, "设备编号为空");
+            return new Tuple2(false, "设备编号不可为空");
         }
         List<SearchFilter> departNumFilters = new ArrayList<>();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));

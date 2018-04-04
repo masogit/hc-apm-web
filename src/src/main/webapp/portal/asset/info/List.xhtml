@@ -440,14 +440,16 @@
                         <f:selectItems value="#{assetInfoController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                     </p:selectOneMenu>
                     <h:panelGrid columns="1" style="width:100%" id="preview">
+                        <h:panelGroup rendered="#{not empty assetInfoController.exportQrCodeTemplateId}">
                         <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId)}" />
+                        </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>
                 <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                                 <p:fileDownload value="#{assetInfoController.zipFile}" />
                 </p:commandButton>
-                <p:commandButton  immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
+                <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>
         </p:dialog>
 

@@ -126,7 +126,12 @@ public class QrCodeService {
     }
 
     public BufferedImage getQrCodeImage(String qrCode, AssetInfo asset) {
-        QrCodeTemplate template = getTemplateByQrCode(qrCode);
+        QrCodeTemplate template = null;
+        if(asset!=null){
+            template =getTemplateByQrCode(asset.getQrCode());
+        }else if(!Strings.isNullOrEmpty(qrCode)){
+            template = getTemplateByQrCode(qrCode);
+        }
         return getQrCodeImage(qrCode, asset, template);
     }
 
