@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养对话框">
+        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养完成">
             <h:form id="pmrepairCompleteDialogForm" class="pmrepairCompleteDialogFormcls" >
                 <h:panelGroup  id="display5" style="height:500px">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -28,7 +28,7 @@
                             <h:panelGroup>
 
                                 <label class="label">#{msg.manhours}*</label>
-                                <p:inputText value="#{v2PmOrderController.selectedPmOrder.manHours}" required="true" requiredMessage="工时(小时)" minValue="0" maxValue="999" #{msg.ValidationRequire}"/>gaolei
+                                <p:inputText value="#{v2PmOrderController.selectedPmOrder.manHours}" required="true"  minValue="0" maxValue="999" requiredMessage="工时(小时)#{msg.ValidationRequire}"/>
                             </h:panelGroup>
 
                         </p:panelGrid>
