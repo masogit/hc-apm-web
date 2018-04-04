@@ -167,8 +167,7 @@ public class V2_PmOrder  implements Serializable {
     @Column(name="clinical_dept_id")
     private String clinicalDeptId;
     @Column(name="quality_checking")
-    private String qualityChecking;
-
+    private String qualityChecking; //默认是合格
     @Column(name="approval_status")
     private String approvalStatus;
 
