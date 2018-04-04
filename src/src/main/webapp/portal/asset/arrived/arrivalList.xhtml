@@ -65,7 +65,7 @@
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
-                            <p:commandButton id="exportPdfButton" title="导出选中记录到PDF" icon="ui-icon-arrowstop-1-s" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportSelectedToPdf()}" update="datalist" disabled="#{empty assetArrivedListController.selected}">
+                            <p:commandButton id="exportPdfButton" title="导出选中记录到PDF" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportSelectedToPdf()}" update="datalist" disabled="#{empty assetArrivedListController.selected}">
                                 <p:fileDownload value="#{assetArrivedListController.exportPdf}" />
                             </p:commandButton>
                             
