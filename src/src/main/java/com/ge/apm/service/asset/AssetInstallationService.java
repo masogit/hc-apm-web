@@ -99,13 +99,25 @@ public class AssetInstallationService {
                     pmService.createPMrequest(newAsset.getUid(), null);
                 }
                 List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(itemId)).orElse(new ArrayList<V2_BlobObject>())
-                        .stream().filter(item -> "asset".equals(item.getBoSubType())).collect(Collectors.toList());
+                        .stream().filter(item -> item.getBoSubType().contains("asset")).collect(Collectors.toList());
                 assetPicList.addAll(getPicList(temp.getArrivalListId()));
                 assetPicList.forEach(item -> {
                     item.setId(null);
                     item.setBoUuid(newAsset.getUid());
                     item.setBoId(newAsset.getId());
-                    item.setBoSubType("1");
+                    switch (item.getBoSubType()) {
+                        case "asset":
+                            item.setBoSubType("1");
+                            break;
+                        case "asset2":
+                            item.setBoSubType("2");
+                            break;
+                        case "asset3":
+                            item.setBoSubType("3");
+                            break;
+                        default:
+                    }
+
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });
                 blobDao.save(assetPicList);
@@ -147,6 +159,7 @@ public class AssetInstallationService {
     public UserAccount getUserAccountByUid(String userUid) {
         return userDao.getByUid(userUid);
     }
+
     public UserAccount getUserAccountById(Integer userId) {
         return userDao.getById(userId);
     }
@@ -173,37 +186,37 @@ public class AssetInstallationService {
         return qrcodeLib;
     }
 
-    public Tuple2<Boolean,String>isValidDeptNum(ArrivalListItem item) {
+    public Tuple2<Boolean, String> isValidDeptNum(ArrivalListItem item) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        if(!userContextService.needInstorageCheck()){
-            return new Tuple2(true,"");
+        if (!userContextService.needInstorageCheck()) {
+            return new Tuple2(true, "");
         }
-        
+
         if (Strings.isNullOrEmpty(item.getDepartNum())) {
-            return new Tuple2(false,"设备编号为空");
+            return new Tuple2(false, "设备编号为空");
         }
         List<SearchFilter> departNumFilters = new ArrayList<>();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
         departNumFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
         List<AssetInfo> assetList = assetDao.findBySearchFilter(departNumFilters);
-        if(null!=assetList && assetList.size()>0){
-            return new Tuple2(false,"设备编号已经使用");
+        if (null != assetList && assetList.size() > 0) {
+            return new Tuple2(false, "设备编号已经使用");
         }
         departNumFilters.clear();
         departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
         departNumFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
         List<ArrivalListItem> itemList = itemDao.findBySearchFilter(departNumFilters);
-        if(null == itemList || itemList.isEmpty()){
-            return new Tuple2(true,"");
+        if (null == itemList || itemList.isEmpty()) {
+            return new Tuple2(true, "");
         }
-        
-        if(itemList.size()>1){
-            return new Tuple2(false,"设备编号已被分配");
+
+        if (itemList.size() > 1) {
+            return new Tuple2(false, "设备编号已被分配");
         }
-        if(itemList.get(0).getId().equals(item.getId())){
-            return new Tuple2(true,"");
+        if (itemList.get(0).getId().equals(item.getId())) {
+            return new Tuple2(true, "");
         }
-        return new Tuple2(false,"设备编号已被分配");
+        return new Tuple2(false, "设备编号已被分配");
     }
 
 }
