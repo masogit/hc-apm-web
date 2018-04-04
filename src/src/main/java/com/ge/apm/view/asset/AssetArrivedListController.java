@@ -110,6 +110,10 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     }
 
     public String createAction() {
+        return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create");
+    }
+    
+    public String saveAsAction() {
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create".concat(selected==null?"":"&copyFrom=".concat(selected.getId())));
     }
 

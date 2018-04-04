@@ -77,7 +77,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private GbCodeService gbCodeService;
     private TreeNode gbTree;
 
-    private List<V2_BlobObject> picList;
+    private List<V2_BlobObject> attachList;
     
     private BlobFileService blobService;
 
@@ -121,7 +121,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
-            picList = aiService.getPicList(selected.getId());
+            attachList = aiService.getPicList(selected.getId());
 //            if (ArrivalList.ProcessType.Easy.toString().equals(selected.getProcessType())) {
 //                initEasyInstallItem();
 //                this.changeFunctionGroup();
@@ -454,20 +454,27 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
-        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
     public void handleFileUpload(FileUploadEvent event) {
         V2_BlobObject blobObject = blobService.uploadFile(event);
+        String type = event.getComponent().getId();
+        type = type.substring(type.indexOf("type") + 4);
         if (null != blobObject) {
-            picList.add(blobObject);
+            attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalList);
             blobObject.setBoUuid(selected.getId());
+            blobObject.setBoSubType(type);
             blobService.saveBlobObject(blobObject);
             WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
         } else {
             WebUtil.addErrorMessage("fail to upload file");
         }
+    }
+    
+    public List<V2_BlobObject> getAttachList(String type){
+        return attachList==null? null :attachList.stream().filter(item -> item.getBoSubType()==null || item.getBoSubType().equals(type) ).collect(Collectors.toList());
     }
 
     public List<String> completeGbName(String prefix) {
@@ -479,14 +486,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     //geter and setter
-    public List<V2_BlobObject> getPicList() {
-        return picList;
-    }
 
-    public void setPicList(List<V2_BlobObject> picList) {
-        this.picList = picList;
-    }
-
+    
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
     }

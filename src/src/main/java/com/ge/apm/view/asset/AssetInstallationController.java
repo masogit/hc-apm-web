@@ -48,7 +48,7 @@ public class AssetInstallationController {
     private QrCodeService qrCodeService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
-    private List<V2_BlobObject> picList;
+    private List<V2_BlobObject> attachList;
 
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
@@ -82,8 +82,8 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
-        picList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
-        picList.addAll(aiService.getPicList(arrivalListItem.getId()));
+        attachList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
+        attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
     }
 
@@ -198,11 +198,11 @@ public class AssetInstallationController {
 
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
-        picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+        attachList.removeAll(attachList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
 
-    public List<V2_BlobObject> getAckPicList(String type) {
-        return picList == null ? null : picList.stream().filter(item -> V2_BlobObject.BO_TYPE_ArrivalList.equals(item.getBoType()) && "asset".equals(type) || type.equals(item.getBoSubType()))
+    public List<V2_BlobObject> getAttachList(String type) {
+        return attachList == null ? null : attachList.stream().filter(item ->  type.equals(item.getBoSubType()))
                 .collect(Collectors.toList());
     }
 
@@ -245,13 +245,10 @@ public class AssetInstallationController {
 
     public void handleFileUpload(FileUploadEvent event) {
         String typeName = event.getComponent().getClientId();
-        typeName = typeName.contains("business") ? "business" : typeName;
-        typeName = typeName.contains("clinical") ? "clinical" : typeName;
-        typeName = typeName.contains("technical") ? "technical" : typeName;
-        typeName = typeName.contains("asset") ? "asset" : typeName;
+        typeName = typeName.substring(typeName.indexOf("type") + 4);
         V2_BlobObject blobObject = blobService.uploadFile(event);
         if (null != blobObject) {
-            picList.add(blobObject);
+            attachList.add(blobObject);
             blobObject.setBoType(V2_BlobObject.BO_TYPE_ArrivalListItem);
             blobObject.setBoUuid(arrivalListItem.getId());
             blobObject.setBoSubType(typeName);
@@ -371,7 +368,7 @@ public class AssetInstallationController {
             Integer assetOwnerId3 =(Integer) composition[3];
             if(assetOwnerId3!= null && Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID3())){
                 UserAccount owner3 = aiService.getUserAccountById(assetOwnerId3);
-                arrivalListItem.setAssetOwnerUID2(owner3==null? null: owner3.getUid());
+                arrivalListItem.setAssetOwnerUID3(owner3==null? null: owner3.getUid());
             }
         }
     }
@@ -391,14 +388,6 @@ public class AssetInstallationController {
 
     public void setArrivalListItem(ArrivalListItem arrivalListItem) {
         this.arrivalListItem = arrivalListItem;
-    }
-
-    public List<V2_BlobObject> getPicList() {
-        return picList;
-    }
-
-    public void setPicList(List<V2_BlobObject> picList) {
-        this.picList = picList;
     }
 
     public List<I18nMessage> getCode68List() {
