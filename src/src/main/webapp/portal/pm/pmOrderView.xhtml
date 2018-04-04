@@ -50,11 +50,15 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计划时间</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.planTime}"></p:outputLabel>
+                            <p:outputLabel value="#{v2PmOrderController.selected.planTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">实际完成时间</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.endTime}"></p:outputLabel>
+                            <p:outputLabel value="#{v2PmOrderController.selected.endTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </p:outputLabel>
                         </h:panelGroup>
 
                     </p:panelGrid>
@@ -70,12 +74,12 @@
                         </p:column>
                         <p:column headerText="#{msg.startTime}">
                             <h:outputText value="#{stepItem.startTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.endTime}">
                             <h:outputText value="#{stepItem.endTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.description}">
