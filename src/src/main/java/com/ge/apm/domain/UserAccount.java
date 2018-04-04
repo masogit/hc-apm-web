@@ -2,26 +2,30 @@
  */
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ge.apm.service.utils.Digests;
+import static javax.persistence.ConstraintMode.NO_CONSTRAINT;
+
 import java.io.Serializable;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -30,9 +34,14 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ge.apm.service.utils.Digests;
 
 /**
  *
@@ -144,6 +153,27 @@ public class UserAccount implements Serializable {
     @Transient
     private boolean isUnbunding;
     
+    @Transient
+    private OrgInfo orgInfo;
+    
+    @Transient
+    private String tenantName;
+    
+    @Transient
+    private String institutionName;
+    
+    @Transient
+    private String hospitalName;
+    
+    @Transient
+    private String siteName;
+    
+    @Transient
+    private String departName;
+    
+    @Transient
+    private String orgFullName;
+    
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
     private List<UserRole> userRoleList;
@@ -174,6 +204,18 @@ public class UserAccount implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+    
+    @Transient
+    private Integer excelIdex;
+    
+    @Transient
+    private String statusDisplay;
+    
+    @Transient
+    private String otherErrorMessage;
+    
+    @Transient
+    private String status;
     
     @PrePersist
     public void initializeUid() {
@@ -363,10 +405,11 @@ public class UserAccount implements Serializable {
 
     public String getUserRoleNames() {
         String roleNames = "";
-        for(UserRole userRole: userRoleList){
-            roleNames = roleNames + userRole.getRole().getRoleDesc()+ " ";
+        if(userRoleList!=null){
+        	for(UserRole userRole: userRoleList){
+                roleNames = roleNames + userRole.getRole().getRoleDesc()+ " ";
+            }
         }
-        
         return roleNames;
     }
     
@@ -464,7 +507,15 @@ public class UserAccount implements Serializable {
         this.wechatNickname = wechatNickname;
     }
 
-    public void entryptPassword() throws NoSuchAlgorithmException {
+    public OrgInfo getOrgInfo() {
+		return orgInfo;
+	}
+
+	public void setOrgInfo(OrgInfo orgInfo) {
+		this.orgInfo = orgInfo;
+	}
+
+	public void entryptPassword() throws NoSuchAlgorithmException {
         byte[] salt = Digests.generateSalt(SALT_SIZE);
         setPwdSalt(Digests.encodeHex(salt));
             
@@ -512,8 +563,168 @@ public class UserAccount implements Serializable {
 	public void setIsUnbunding(boolean isUnbunding) {
 		this.isUnbunding = isUnbunding;
 	}
+	
+	public Integer getExcelIdex() {
+        return excelIdex;
+    }
 
-    public String loadOrgTableColumn() {
+    public void setExcelIdex(Integer excelIdex) {
+        this.excelIdex = excelIdex;
+    }
+    
+    public String getOtherErrorMessage() {
+		return otherErrorMessage;
+	}
+
+	private void setOtherErrorMessage(String otherErrorMessage) {
+		this.otherErrorMessage = otherErrorMessage;
+	}
+	
+	public String getStatus() {
+		return this.status;
+	}
+
+	private void setStatus(String status) {
+		this.status = status;
+	}
+	
+	public String getStatusDisplay() {
+		if (this.status != null) {
+			String result="";
+			if (this.status.contains(UploadFileErrorTypeEnum.FORMAT_ERROR + ",")) {
+				result+="格式错误；";
+			} else if (this.status.contains(UploadFileErrorTypeEnum.RATE_WRONG + ",")) {
+				result+="占比总和错误；";
+			} else if (this.status.contains(UploadFileErrorTypeEnum.ASSET_NOT_EXISTS + ",")) {
+				result+="设备名称不存在；";
+			}else if (this.status.contains(UploadFileErrorTypeEnum.OTHER_ERROR + ",")) {
+				result+=this.otherErrorMessage;
+			}
+			else{
+				result+=this.status;
+			}
+			return result;
+		}
+		return statusDisplay;
+	}
+
+	public void setStatusDisplay(UploadFileErrorTypeEnum type, boolean pass) {
+		if(pass){
+			if(this.status!=null){
+				this.status=this.status.replaceAll(type+",", "");
+			}
+		}
+		else{
+			if (this.status == null) {
+				this.status = type + ",";
+			} else if(this.status.indexOf(type+",")<0){
+				this.status += type + ",";
+			}
+		}
+	}
+	
+	public void setStatusDisplay(UploadFileErrorTypeEnum type,String otherErrorMessage) {
+		if (this.status == null) {
+			this.status = type + ",";
+		} else if(this.status.indexOf(type+",")<0){
+			this.status += type + ",";
+		}
+		this.otherErrorMessage=otherErrorMessage;
+	}
+	
+	public String getOrgFullName() {
+    	OrgInfo org=this.orgInfo;
+    	if(this.orgInfo==null)
+    		return "";
+    	String name=org.getName();
+    	setOrgFullName();
+    	name=StringUtils.isEmpty(getSiteName())?name:getSiteName()+"/"+name;
+    	name=StringUtils.isEmpty(getHospitalName())?name:getHospitalName()+"/"+name;
+    	name=StringUtils.isEmpty(getInstitutionName())?name:getInstitutionName()+"/"+name;
+    	name=StringUtils.isEmpty(getTenantName())?name:getTenantName()+"/"+name;
+    	this.orgFullName=name;
+        return this.orgFullName;
+    }
+    
+    public void setOrgFullName(String orgFullName) {
+		this.orgFullName = orgFullName;
+	}
+    
+    private void setOrgFullName(){
+    	if(StringUtils.isNotEmpty(this.orgFullName)){
+    		return;
+    	}
+    	OrgInfo org = this.orgInfo;
+    	if(this.orgInfo==null){
+    		return;
+    	}
+    	OrgInfo parentOrg=org.getParentOrg();
+    	while (parentOrg!= null) {
+            if(parentOrg.getOrgType()==0){
+            	setTenantName(parentOrg.getName());
+            }
+            else if(parentOrg.getOrgType()==1){
+            	setInstitutionName(parentOrg.getName());
+            }
+            else if(parentOrg.getOrgType()==2){
+            	setHospitalName(parentOrg.getName());
+            }
+            else if(parentOrg.getOrgType()==3){
+            	setSiteName(parentOrg.getName());
+            }
+            else if(parentOrg.getOrgType()==4){
+            	setDepartName(parentOrg.getName());
+            }
+            parentOrg=parentOrg.getParentOrg();
+        }
+    }
+
+	public String getTenantName() {
+		setOrgFullName();
+		return tenantName;
+	}
+
+	public void setTenantName(String tenantName) {
+		this.tenantName = tenantName;
+	}
+
+	public String getInstitutionName() {
+		setOrgFullName();
+		return institutionName;
+	}
+
+	public void setInstitutionName(String institutionName) {
+		this.institutionName = institutionName;
+	}
+
+	public String getHospitalName() {
+		setOrgFullName();
+		return hospitalName;
+	}
+
+	public void setHospitalName(String hospitalName) {
+		this.hospitalName = hospitalName;
+	}
+
+	public String getSiteName() {
+		setOrgFullName();
+		return siteName;
+	}
+
+	public void setSiteName(String siteName) {
+		this.siteName = siteName;
+	}
+
+    public String getDepartName() {
+    	setOrgFullName();
+		return departName;
+	}
+
+	public void setDepartName(String departName) {
+		this.departName = departName;
+	}
+
+	public String loadOrgTableColumn() {
         switch (this.getOrgLevel() == null ? 3 : this.getOrgLevel()) {
             case 1:
                 return "INSTITUTION_UID";
