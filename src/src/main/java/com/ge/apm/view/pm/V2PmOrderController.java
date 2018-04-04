@@ -200,7 +200,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void savePM(){
           PmOrderActionForm formData = new PmOrderActionForm();
-        if(Strings.isNullOrEmpty(dptName)){
+        if (selectedAsset.getStatus() == 4) {
+            WebUtil.addErrorMessage("所选设备待报废,不能保养");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+        }
+        if(Strings.isNullOrEmpty(selectedAsset.getClinicalDeptUID())){
             WebUtil.addErrorMessage("没有使用科室的资产不能创建保养工单");
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("validationFailed", true);
@@ -635,6 +640,8 @@ public void batchDefineQualify(){
     public void prepareAct(String woid) {
         if(woid!=null)
         selectedPmOrder = dao.findById(woid);
+        //关单时 默认设置为合格
+        selectedPmOrder.setQualityChecking("1");
         /*if(selectedPmOrder.getAssetInfo()!=null)
          currentStatus = selectedPmOrder.getAssetInfo().getStatus();*/
         confirmedUpDate = null;
@@ -723,8 +730,11 @@ public void batchDefineQualify(){
             UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
+        }else{
+            UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
+            coWorkerDetail.setCowokerUserName(coWorker.getName());
         }
-       // cancelWorkdetail();
+     //   cancelWorkdetail();
     }
     public void cancelWorkdetail() {
         itemDetail = null;
