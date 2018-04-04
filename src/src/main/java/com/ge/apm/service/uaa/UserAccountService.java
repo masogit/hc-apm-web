@@ -349,7 +349,6 @@ public class UserAccountService {
 					importFailedDataList.add(newUser);
 				}
 			} catch (Exception e) {
-				e.printStackTrace();
 				logger.error(e.getMessage());
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,false);
 				importFailedDataList.add(newUser);
