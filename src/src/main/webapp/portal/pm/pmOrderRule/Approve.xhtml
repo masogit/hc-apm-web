@@ -124,7 +124,7 @@
                     oncomplete="handleSubmit(args, 'PmOrderRuleApproveDialog');"/>
                     &nbsp;&nbsp;
                    <!--  immediate="true"  -->
-                    <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()" update = ":PmOrderRuleListForm:datalist"/>
+                    <p:commandButton value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('PmOrderRuleApproveDialog').hide()"  update = ":PmOrderRuleListForm:datalist"/>
                       &nbsp;&nbsp;
                       <!-- and pmOrderRuleController.selected.id != null -->
                     <p:commandButton validateClient="true" actionListener="#{pmOrderRuleController.approve()}" value="审核" update="display,:PmOrderRuleApproveDlg, :PmOrderRuleListForm:datalist, :growl" 

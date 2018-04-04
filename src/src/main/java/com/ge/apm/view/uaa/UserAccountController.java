@@ -401,9 +401,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 user.setActiveTime(new Date());
             }else{
                 user.setIsActive(false);
+            }
         }
+        if(user.getIsLocked()){
+            lockAccount();
+        }else{
+            unlockAccount();
         }
-
     }
 
     @Override
@@ -513,7 +517,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Transactional
-    private void updateUserScope() {
+    public void updateUserScope() {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
         List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
         userOrgDao.delete(orgList);
@@ -610,7 +614,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void confirmActivation(){
         if(loginUser.getIsActive()){
-            System.out.println("already active !");
+            //System.out.println("already active !");
             WebUtil.addSuccessMessage("激活成功！");
             return;
         }
@@ -626,6 +630,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             tenantInfoRepository.save(tenant);
             dao.updateMembersStatus(loginUser.getTenantUID());
         }
+
         WebUtil.addSuccessMessage("激活成功！");
     }
 
