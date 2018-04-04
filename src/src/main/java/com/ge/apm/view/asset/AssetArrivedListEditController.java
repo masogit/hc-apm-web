@@ -97,6 +97,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         TreeNode subTree = uaaService.getOrgTreeByParentIdWithSelectedChildren(UserContextService.getCurrentUserAccount().getSiteUID(), UserContextService.getCurrentUserAccount().getUid());
         orgTree = new DefaultTreeNode("org", null, null);
         orgTree.getChildren().add(subTree);
+        attachList = new ArrayList();
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
