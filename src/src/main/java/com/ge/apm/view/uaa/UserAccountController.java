@@ -10,6 +10,7 @@ import javax.faces.event.ValueChangeEvent;
 
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -113,15 +114,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedUserOrg.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedUserOrg);
         }
-
-//        TreeNodeUtil.expandTreeNode(selectedUserOrg);
-//        selectedOrg = null;
     }
-
-    public TenantInfo getSelectedTenant() {
-        return selectedTenant;
-    }
-
+    
     public String getOrgFullNameByUid(String orgUid) {
         OrgInfo org = orgInfoDao.getByUid(orgUid);
         return org == null ? "" : getOrgFullName(org);
@@ -138,6 +132,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         return name;
+    }
+
+    public TenantInfo getSelectedTenant() {
+        return selectedTenant;
     }
 
     @Override
@@ -161,8 +159,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
             }
         }
-
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        for(UserAccount user: pageUserAccount){
+        	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
+        }
+        return pageUserAccount;
     }
 
     @Override
