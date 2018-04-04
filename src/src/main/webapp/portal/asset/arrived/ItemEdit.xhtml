@@ -325,7 +325,45 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset legend="设备图片">
+                    <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup >
+                                <p:dataList id="pictureList" value="#{assetInstallationController.getAttachList('asset')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+
+                                    #{fileitem.objectName}
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="typeasset" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <p:dataList id="contractList" value="#{assetInstallationController.getAttachList('asset2')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
+                                    #{fileitem.objectName}
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="typeasset2" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <p:dataList id="manualList" value="#{assetInstallationController.getAttachList('asset3')}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
+                                    #{fileitem.objectName},
+                                    <p:commandButton actionListener="#{assetInstallationController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" disabled="#{fileitem.boType eq 'ArrivalList'}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="typeasset3" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+<!--                    <p:fieldset legend="设备图片">
                         <p:dataGrid id="pictureList0" var="fileitem" value="#{assetInstallationController.getAckPicList('asset')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.addPic}</f:facet>
                             <p:panel  style="text-align:center">
@@ -339,13 +377,13 @@
                         </p:dataGrid>
                         <p:fileUpload id="asset" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-                    </p:fieldset>
+                    </p:fieldset>-->
                     <p:fieldset legend="#{msg.AssetArrivalListAckInfo}">
                         <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
                         <p:selectOneRadio value="#{assetInstallationController.arrivalListItem.businessAckStatus}">
                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneRadio>
-                        <p:dataGrid id="pictureList1" var="fileitem" value="#{assetInstallationController.getAckPicList('business')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataGrid id="pictureList1" var="fileitem" value="#{assetInstallationController.getAttachList('business')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.addPic}</f:facet>
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
@@ -358,14 +396,14 @@
                             </p:panel>
 
                         </p:dataGrid>
-                        <p:fileUpload id="business" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                        <p:fileUpload id="typebusiness" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="10000000"  update="pictureList1" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                         <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.clinicalAckStatus}">
                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneRadio>
-                        <p:dataGrid id="pictureList2" var="fileitem" value="#{assetInstallationController.getAckPicList('clinical')}" emptyMessage="#{msg.noRecordFound}" columns="5" layout="grid">
+                        <p:dataGrid id="pictureList2" var="fileitem" value="#{assetInstallationController.getAttachList('clinical')}" emptyMessage="#{msg.noRecordFound}" columns="5" layout="grid">
                             <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
@@ -378,14 +416,14 @@
                             </p:panel>
 
                         </p:dataGrid>
-                        <p:fileUpload id="clinical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                        <p:fileUpload id="typeclinical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="10000000"  update="pictureList2" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                         <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
                         <p:selectOneRadio  value="#{assetInstallationController.arrivalListItem.technicalAckStatus}">
                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListAckStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                         </p:selectOneRadio>
-                        <p:dataGrid id="pictureList3" var="fileitem" value="#{assetInstallationController.getAckPicList('technical')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataGrid id="pictureList3" var="fileitem" value="#{assetInstallationController.getAttachList('technical')}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
                             <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
                             <p:panel  style="text-align:center">
                                 <h:panelGrid columns="1" style="width:100%" >
@@ -398,7 +436,7 @@
                             </p:panel>
 
                         </p:dataGrid>
-                        <p:fileUpload id="technical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
+                        <p:fileUpload id="typetechnical" fileUploadListener="#{assetInstallationController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
                                       multiple="true"  sizeLimit="10000000"  update="pictureList3" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
 
