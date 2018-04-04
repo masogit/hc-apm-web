@@ -135,11 +135,11 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
 
-        String str = WebUtil.getRequestParameter("str");
-        if (Strings.isNullOrEmpty(str)) {
+        String query = WebUtil.getRequestParameter("query");
+        if (Strings.isNullOrEmpty(query)) {
             queryIndex = 0;
         } else {
-            queryIndex = Integer.valueOf(str);
+            queryIndex = Integer.valueOf(query);
             searchList(queryIndex);
         }
         this.filterBySite = false;
