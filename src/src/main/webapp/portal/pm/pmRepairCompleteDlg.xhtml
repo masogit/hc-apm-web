@@ -99,7 +99,7 @@
                                     </p:column>
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"  actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail('new')}" update="@(.pmcoworkerDlgClass) pmTab:pmcoworkerDlgForm" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id eq '000'}"/>
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail(item.id)}" update="@(.pmcoworkerDlgClass)" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail(item.id)}" update="@(.pmcoworkerDlgClass)"  oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.removeWoDetail(item.id,2)}" update="@(.pmcoworkerList) pmTab:pmrepairCompleteDialogForm:pmcoworkerList" rendered="#{item.id ne '000'}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                         </p:commandButton>

@@ -730,8 +730,11 @@ public void batchDefineQualify(){
             UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
             coWorkerDetail.setCowokerUserName(coWorker.getName());
             coWorkerList.add(coWorkerDetail);
+        }else{
+            UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
+            coWorkerDetail.setCowokerUserName(coWorker.getName());
         }
-       // cancelWorkdetail();
+     //   cancelWorkdetail();
     }
     public void cancelWorkdetail() {
         itemDetail = null;
