@@ -295,7 +295,7 @@ public class QrCodeService {
         assetList.forEach(item -> {
             if (!Strings.isNullOrEmpty(item.getQrCode())) {
                 try {
-                    BufferedImage image =  getQrCodeImage(item.getQrCode(), null, template);
+                    BufferedImage image =  getQrCodeImage(item.getQrCode(), null, template==null?getTemplateByQrCode(item.getQrCode()) :template);
                     out.putNextEntry(new ZipEntry(Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat("_").concat(item.getName()).concat("_").concat(item.getQrCode()).concat(".jpg")));
                     ImageIO.write(image, "JPG", out);
                     out.closeEntry();
