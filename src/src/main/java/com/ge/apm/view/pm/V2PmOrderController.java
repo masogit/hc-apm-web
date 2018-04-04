@@ -656,10 +656,11 @@ public void batchDefineQualify(){
        /* if(planTime==null){
             WebUtil.addErrorMessage("计划完成时间"+WebUtil.getMessage("ValidationRequire"));
         }*/
-        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000") ||  item.getApproved()==null).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
+
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         cancel();
     }
