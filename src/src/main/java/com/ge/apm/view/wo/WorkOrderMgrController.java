@@ -341,15 +341,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else if (queryIndex == 8) { //已关单
             if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
                 if(userContextService.hasRole("AssetStaff")){
-                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
                 }
             }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
             if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
-                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
