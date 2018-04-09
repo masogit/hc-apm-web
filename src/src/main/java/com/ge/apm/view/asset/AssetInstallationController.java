@@ -135,7 +135,6 @@ public class AssetInstallationController {
         }
         if (Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("clinicalDeptName") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
             RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
             isValidate = false;
         }
@@ -144,9 +143,14 @@ public class AssetInstallationController {
             RequestContext.getCurrentInstance().addCallbackParam("IsGeneratePmOrder", true);
             isValidate = false;
         }
+        if (arrivalListItem.getWorkHours() == null) {
+            WebUtil.addErrorMessage("安装工时" + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("workHours", true);
+            isValidate = false;
+        }
         if (Strings.isNullOrEmpty(arrivalListItem.getSerialNum())) {
             WebUtil.addErrorMessage(WebUtil.getMessage("serialNum") + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("SerialNum", true);
+            RequestContext.getCurrentInstance().addCallbackParam("serialNum", true);
             isValidate = false;
         }
         if (arrivalListItem.getArrivalList().getProcessType().equals(ArrivalList.ProcessType.Normal.toString())) {
