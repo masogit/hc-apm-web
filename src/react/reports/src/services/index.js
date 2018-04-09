@@ -5,8 +5,9 @@ import { ReasonConv, BriefConv, BriefAssetConv } from '#/utils/converters'
 
 const URLs = {
 
-  AllDepartments: '/api/org/all',
+  AllDepartments: '/api/org/dept',
   AllAssetTypes: '/api/msg?type=assetGroup',
+  AllHospitals: '/api/org/allOrg',
 
   AssetBrowser_Assets: '/api/assets',
 
@@ -73,12 +74,13 @@ const FailureAnalysis = {
     }
   },
   getReasons(state, { type, asset, supplier, dept }) {
-    let { period: { from, to }, filterBy } = state
+    let { period: { from, to }, filterBy, hospital } = state
     let params = {
       from: formatDate(from),
       to: formatDate(to),
       type: filterBy.assettype === 'all_asset_type' ? type : filterBy.assettype,
       dept: filterBy.dept === 'all_dept' ? dept : filterBy.dept,
+      hospital: hospital,
       supplier: supplier,
       asset: asset,
     }
@@ -143,6 +145,7 @@ function mapParamsToQuery(params, type) {
     orderby: DataTypeMapping[params.dataType],
     type: assetType,
     dept: dept,
+    hospital: params.hospital,
     start: pag.skip || 0,
     limit: pag.top,
     supplier: supplier,

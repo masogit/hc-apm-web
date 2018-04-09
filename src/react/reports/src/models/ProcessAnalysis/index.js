@@ -103,7 +103,7 @@ export default {
     },
     *['get/briefs'](action, { put, select, call }) {
       try {
-        let store = yield select(state => state[REPORT_NAME])
+        let store = yield select(state => ({ ...state[REPORT_NAME], hospital: state.depts.selectedHospital }))
         let params = mapParamsBrief(store)
         if (action.data && action.data.type === 'ProcessAnalysis/page/change') {
           params.start = params.limit * (action.data.pageNumber - 1)
@@ -122,7 +122,7 @@ export default {
     },
     *['get/details'](action, { put, select, call }) {
       try {
-        let store = yield select(state => state[REPORT_NAME])
+        let store = yield select(state => ({ ...state[REPORT_NAME], hospital: state.depts.selectedHospital }))
         let params = mapParamsDetail(store)
         if (action.data && action.data.type === 'ProcessAnalysis/page/change') {
           params.start = params.limit * (action.data.pageNumber - 1)
@@ -142,7 +142,7 @@ export default {
     },
     *['get/gross'](action, { put, select, call }) {
       try {
-        let store = yield select(state => state[REPORT_NAME])
+        let store = yield select(state => ({ ...state[REPORT_NAME], hospital: state.depts.selectedHospital }))
         let params = mapParamsGross(store)
         let gross = yield call(API.getGross, params)
         EventBus.dispatch('process-analysis-gross-data', this, gross)
@@ -152,7 +152,7 @@ export default {
     },
     *['get/phase'](action, { select, call }) {
       try {
-        let store = yield select(state => state[REPORT_NAME])
+        let store = yield select(state => ({ ...state[REPORT_NAME], hospital: state.depts.selectedHospital }))
         let params = mapParamsPhase(store, action.data)
         let phase = yield call(API.getPhase, params)
         phase.phase = params.phase
@@ -173,14 +173,24 @@ export default {
         })
       },
       { type: 'watcher' }
-    ]
+    ],
+    deptWatcher: [
+      function*({ takeLatest, put }) {
+        yield takeLatest(act => act.type === 'depts/update/depts'
+        , function*(action) {
+          yield put({ type: 'update/filter', data: { type: 'dept', data: { key: 'all_dept'}} })
+          yield put({ type: 'get/all' })
+        })
+      },
+      { type: 'watcher' }
+    ],
   }
 
 }
 
 /* Copy/Paste from Process Analysis sagas */
 function mapParamsBrief(params) {
-  let { filterBy: { assettype, dept }, period, pagination, dataType } = params
+  let { filterBy: { assettype, dept }, period, pagination, dataType, hospital } = params
   return {
     from: _format(period.from),
     to: _format(period.to),
@@ -189,12 +199,13 @@ function mapParamsBrief(params) {
     groupby: GroupByMap[params.display],
     type: assettype === 'all_asset_type' ? undefined : assettype ,
     dept: dept === 'all_dept' ? undefined : dept,
+    hospital,
     orderby: DataTypeMap[dataType]
   }
 }
 
 function mapParamsDetail(params) {
-  let { filterBy: { assettype, dept }, period, pagination, dataType } = params
+  let { filterBy: { assettype, dept }, period, pagination, dataType, hospital } = params
   return {
     from: _format(period.from),
     to: _format(period.to),
@@ -202,17 +213,19 @@ function mapParamsDetail(params) {
     limit: pagination.right.top,
     type: assettype === 'all_asset_type' ? undefined : assettype ,
     dept: dept === 'all_dept' ? undefined : dept,
+    hospital,
     orderby: DataTypeMap[dataType]
   }
 }
 
 function mapParamsGross(params) {
-  let { filterBy: { assettype, dept }, period } = params
+  let { filterBy: { assettype, dept }, period, hospital } = params
   return {
     from: _format(period.from),
     to: _format(period.to),
     typeId: assettype === 'all_asset_type' ? undefined : assettype ,
-    deptId: dept === 'all_dept' ? undefined : dept
+    deptId: dept === 'all_dept' ? undefined : dept,
+    hospital,
   }
 }
 
@@ -220,7 +233,8 @@ function mapParamsPhase(params, phase) {
   let {
     filterBy: { assettype, dept },
     period, dataType,
-    distributionEttr, distributionResponse
+    distributionEttr, distributionResponse,
+    hospital,
   } = params
   dataType = phase || dataType
   let distribution
@@ -234,6 +248,7 @@ function mapParamsPhase(params, phase) {
     to: _format(period.to),
     typeId: assettype === 'all_asset_type' ? undefined : assettype ,
     deptId: dept === 'all_dept' ? undefined : dept,
+    hospital: hospital,
     t1: distribution[1],
     t2: distribution[2],
     tmax: distribution[3],

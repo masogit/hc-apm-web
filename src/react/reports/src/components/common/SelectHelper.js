@@ -13,7 +13,7 @@ export default function selectHelper(defaultKey: string, options: Array<Option>,
   // and defaultValue only rendered once
   // so do this trick at initial phrase
   let defaultValue = find(options, {key: defaultKey}) || options[0]
-  if (defaultValue.key === defaultValue.label) {
+  if (defaultValue === undefined || defaultValue.key === defaultValue.label) {
     return null
   }
   return (

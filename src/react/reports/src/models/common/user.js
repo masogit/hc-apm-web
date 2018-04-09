@@ -4,6 +4,7 @@ import { IsHead, getOrgId } from '#/utils'
 let info = {
   id: '###', // for debug,
   isHead: false,
+  hospitalId: '9',
 }
 
 const userInfoEl = document.querySelector('#user-context')

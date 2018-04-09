@@ -90,7 +90,7 @@ export default {
 
     *['get/reasons'](action, { call, select }) {
       try {
-        let params = yield select(state => state.FailureAnalysis)
+        let params = yield select(state => ({ ...state.FailureAnalysis, hospital: state.depts.selectedHospital }))
         let reasons = yield call(API.getReasons, params, action.data)
         EventBus.dispatch('failure-analysis-reason-data', reasons)
       } catch (e) {
@@ -102,7 +102,7 @@ export default {
       let type = action.data.chart
       let targetPage = action.data.value
       try {
-        let params = yield select(state => state.FailureAnalysis)
+        let params = yield select(state => ({ ...state.FailureAnalysis, hospital: state.depts.selectedHospital }))
         params = cloneDeep(params)
         let pag = params.pagination[type]
         if (targetPage) {
@@ -147,7 +147,17 @@ export default {
         })
       },
       { type: 'watcher' }
-    ]
+    ],
+    deptWatcher: [
+      function*({ takeLatest, put }) {
+        yield takeLatest(act => act.type === 'depts/update/depts'
+        , function*(action) {
+          yield put({ type: 'update/filter', data: { type: 'dept', data: { key: 'all_dept'}} })
+          yield put({ type: 'get/all' })
+        })
+      },
+      { type: 'watcher' }
+    ],
   }
 
 }
