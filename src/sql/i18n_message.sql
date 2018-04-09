@@ -811,6 +811,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'NeedSite', '院区不能为空!', 'site should not be null !', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'GuestAccountCheckedWarning', '临时报修账号角色不能与其他角色同时存在!', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'GuestAccountNeedToUnCheckWarning', '临时报修账号角色不能与其他角色同时存在!', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'InvalidDateInputFormat', '请输入正确的日期!', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceScanhd', '设备扫描量（次）', 'Scan #', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceScanlg', '扫描次数', 'Scan', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceExpohd', '设备曝光量（次）', 'Exposure #', NULL, '-1');
