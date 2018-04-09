@@ -29,6 +29,14 @@
                             <p:outputLabel value="#{v2PmOrderController.selected.ruleLevel}"></p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">保养类型</label>
+                            <p:outputLabel value="#{fieldMsg.fieldValue('pmType',v2PmOrderController.selected.pmType)}"></p:outputLabel>
+                        </h:panelGroup>
+                       <!-- <h:panelGroup>
+                            <label class="label">保养类型</label>
+                            <p:outputLabel value="#{v2PmOrderController.acquirePmType(v2PmOrderController.selected)}"></p:outputLabel>
+                        </h:panelGroup>-->
+                        <h:panelGroup>
                             <label class="label">使用科室</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
                         </h:panelGroup>
@@ -82,9 +90,14 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
+
+
+
                         <p:column headerText="#{msg.description}">
                             <h:outputText value="#{stepItem.comments}" />
                         </p:column>
+
+
 
                     </p:dataTable>
 

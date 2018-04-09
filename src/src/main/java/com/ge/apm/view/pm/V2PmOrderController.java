@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -98,6 +99,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 	private Boolean isSelectedCurrentPage = false;
 	private List<V2_PmOrder> currentPagePmOrders;
 	private Integer pmType;
+	private I18nMessageRepository i18nMessageRepository;
 
 	public boolean isChecked() {
 		Map<String, Boolean> map = this.selectedMap;
@@ -110,7 +112,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return false;
 	}
 
-    //是否允许内修
 
     public Boolean canCreateSr(){
         if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() !=1){
@@ -300,6 +301,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
 		terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 		this.selectedMap = new HashMap();
          //如果当前人员只是 临床科室主任或者 只是临床科室人员...

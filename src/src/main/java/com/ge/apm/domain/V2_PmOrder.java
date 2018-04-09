@@ -65,7 +65,8 @@ public class V2_PmOrder  implements Serializable {
     @Size(max = 256)
     @Column(name = "comments")
     private String comments;
-
+    @Column(name="pm_type")
+    private Integer pmType;
     @Column(name = "asset_id")
     @Basic(optional = false)
     @NotNull
@@ -532,5 +533,13 @@ public class V2_PmOrder  implements Serializable {
 
     public void setSimplify(Boolean simplify) {
         this.simplify = simplify;
+    }
+
+    public Integer getPmType() {
+        return pmType;
+    }
+
+    public void setPmType(Integer pmType) {
+        this.pmType = pmType;
     }
 }
