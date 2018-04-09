@@ -162,6 +162,7 @@ public class InventoryIssue implements Serializable {
 
 	public String getInventoryCheckListItems() {
 		String temp="";
+		inventoryCheckListItems="";
 		if(inventoryCheckLists!=null && inventoryCheckLists.size()>0){
 			for(InventoryCheckList obj: inventoryCheckLists){
 				temp=obj.getItem();
@@ -169,7 +170,9 @@ public class InventoryIssue implements Serializable {
 					inventoryCheckListItems+=temp+",";
 				}
 			}
-			inventoryCheckListItems=inventoryCheckListItems.substring(0, inventoryCheckListItems.length()-1);
+			if(inventoryCheckListItems.length()>0){
+				inventoryCheckListItems=inventoryCheckListItems.substring(0, inventoryCheckListItems.length()-1);
+			}
 		}
 		return inventoryCheckListItems;
 	}
