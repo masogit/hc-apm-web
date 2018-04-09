@@ -66,6 +66,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private UserAccount clinicalOwner;
 
+    private OrgInfo clinicalDept;
+
     private Supplier supplier;
 
     private Brand brand;
@@ -164,6 +166,10 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         if (null != selected.getClinicalOwnerId()) {
             clinicalOwner = userDao.findById(selected.getClinicalOwnerId());
+        }
+
+        if (null != selected.getClinicalDeptId()) {
+            clinicalDept = orgDao.findById(selected.getClinicalDeptId());
         }
 
         if (null != selected.getSupplierId()) {
@@ -750,10 +756,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptChange() {
+        if (this.clinicalDept == null) {
+            selected.setClinicalDeptId(null);
+        } else {
+            selected.setClinicalDeptId(this.clinicalDept.getId());
+        }
+
         this.clinicalOwner = null;
         selected.setClinicalOwnerId(null);
         selected.setClinicalOwnerName(null);
         selected.setClinicalOwnerTel(null);
+
 
         if (null != selected.getClinicalDeptId()) {
             OrgInfo org = orgDao.findById(selected.getClinicalDeptId());
@@ -1032,6 +1045,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setClinicalOwner(UserAccount clinicalOwner) {
         this.clinicalOwner = clinicalOwner;
+    }
+
+    public OrgInfo getClinicalDept() {
+        return clinicalDept;
+    }
+
+    public void setClinicalDept(OrgInfo clinicalDept) {
+        this.clinicalDept = clinicalDept;
     }
 
     public Supplier getSupplier() {

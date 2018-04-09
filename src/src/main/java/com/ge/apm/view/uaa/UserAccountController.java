@@ -1,7 +1,6 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 
 import java.util.Date;
 import java.util.List;
@@ -24,10 +23,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.dao.BiomedGroupUserRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,8 +36,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
 import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -80,6 +73,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private TenantInfoRepository tenantInfoRepository;
 
+    private JsonTemplateRepository jsonTemplateRepository;
+
+    private String protocol;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -95,7 +92,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         setTenantUid(loginUser.getTenantUID());
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-
+        jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
+        protocol = jsonTemplateRepository.findByType(3);
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -374,6 +372,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
+
     public void onBeforeSave(UserAccount user) {
         //remove space charactors.
         String loginName = user.getLoginName();
@@ -404,9 +403,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
         if(user.getIsLocked()){
-            lockAccount();
+            //lockAccount();
+            selected.setIsLocked(true);
+            selected.setLockTime(TimeUtil.timeNow().toDate());
         }else{
-            unlockAccount();
+            //unlockAccount();
+            selected.setIsLocked(false);
+            selected.setPasswordErrorCount(0);
         }
     }
 
@@ -677,6 +680,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }else{
             agree = false;
         }
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public List<String> getItems() {
