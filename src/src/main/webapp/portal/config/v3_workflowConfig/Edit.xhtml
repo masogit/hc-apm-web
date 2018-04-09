@@ -182,6 +182,13 @@
                                     <f:selectItems value="#{v2_WorkflowConfigController.getDispatherClinical()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">设备编码选择</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetCodeConfig}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                         <!-- <p:spacer/> -->

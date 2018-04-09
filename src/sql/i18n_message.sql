@@ -1452,3 +1452,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmType', '1', '周期', 'Cycle', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmType', '2', '一次性', 'Disposable', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmType', '3', '重测', 'ReSurvey', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetCodeConfig', 'DFQ', '资产编号,设备编号,二维码合一', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetCodeConfig', 'DF', '资产编号,设备编号合一', '', NULL, '-1');

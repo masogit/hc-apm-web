@@ -215,20 +215,22 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" />
+                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum">
+                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)"/>
+                                </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
-                                    <p:ajax process="@this" update="#{empty assetInstallationController.arrivalListItem.financingNum? '':'@(.financingNum)'}"/>
+                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="#{empty assetInstallationController.arrivalListItem.financingNum? '':'@(.financingNum)'}"/>
                                 </p:inputText>
                                 <p:commandButton validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 3}" 
                                                  update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                             </h:panelGroup>
-                            <h:panelGroup id="qrCode">
+                            <h:panelGroup id="qrCode" class="financingNum">
                                 <label class="label">#{msg.qrCode}</label>
                                 <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}"/>
-                                <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
+                                <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                                 <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
                             </h:panelGroup>
                             <h:panelGroup>

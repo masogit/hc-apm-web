@@ -322,7 +322,9 @@
                             </p:fieldset>
 
                             <p:dataTable id="itemList" rendered="#{not empty assetArrivedListEditController.arrivalItemList}" selection="#{assetArrivedItemsController.selected}" 
-                                         selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" value="#{assetArrivedListEditController.arrivalItemList}" var="item">
+                                         selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15"  value="#{assetArrivedListEditController.arrivalItemList}" var="item">
                                 <p:ajax event="rowSelect" update=":ItemDetailViewForm" />
                                 <p:column headerText="#{msg.arrivalListItemNum}" >
                                     <h:outputText value="#{item.itemNum}"/>

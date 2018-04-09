@@ -17,6 +17,8 @@ import javax.persistence.Table;
 @Table(name = "workflow_config")
 public class WorkflowConfig implements Serializable {
 
+    public enum AssetCodeConfigType { DFQ , DF} 
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -94,9 +96,12 @@ public class WorkflowConfig implements Serializable {
     @Column(name="asset_approver" ,columnDefinition = "CHAR(32)")
     private String assetApprover;
     
+    //设备编码组合  [null:不需要, DFQ:资产编号,设备编号,二维码 ,DF:资产编号,设备编号]
+    @Column(name="asset_code_config")
+    private String assetCodeConfig;
+    
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
-
 
     
     @Column(name = "warranty_remind_times")
@@ -491,6 +496,14 @@ public class WorkflowConfig implements Serializable {
         this.needInstorageCheck = needInstorageCheck;
     }
 
+    public String getAssetCodeConfig() {
+        return assetCodeConfig;
+    }
+
+    public void setAssetCodeConfig(String assetCodeConfig) {
+        this.assetCodeConfig = assetCodeConfig;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;
