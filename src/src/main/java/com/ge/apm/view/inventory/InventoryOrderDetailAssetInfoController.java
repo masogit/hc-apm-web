@@ -15,7 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
-import com.ge.apm.dao.InventoryOrderRepository;
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -154,17 +154,23 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 			listClinicalDeptName = new ArrayList<String>();
 		}
 		if(initBln){
-			String name="";
-			for(InventoryOrderDetail detail: pageInventoryOrderDetail){
-				name=detail.getAssetInfo().getClinicalDeptName();
-				if(StringUtils.isNotEmpty(name)){
-					if(!listClinicalDeptName.contains(name)){
-						listClinicalDeptName.add(name);
-					}
-				}
-			}
-		}
-		
+            String name="";
+            AssetInfo assetInfo=null;
+            for(InventoryOrderDetail detail: pageInventoryOrderDetail){
+                assetInfo=detail.getAssetInfo();
+                if(assetInfo!=null){
+                    name=assetInfo.getClinicalDeptName();
+                }
+                else{
+                    name=detail.getOrgName();
+                }
+                if(StringUtils.isNotEmpty(name)){
+                    if(!listClinicalDeptName.contains(name)){
+                        listClinicalDeptName.add(name);
+                    }
+                }
+            }
+        }
 	}
 
 	public List<String> getListClinicalDeptName() {
