@@ -11,59 +11,40 @@
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController.onFilter}" />
 		<p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
-			<a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
-		</p:column>
-		<p:column headerText="设备名" exportable="true" visible="false">
-			<h:outputText value="#{item.assetInfo.name}" />
-		</p:column>
-		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="EQ">
-			<f:facet name="filter">
-				<p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
-					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-					<f:selectItems value="#{inventoryOrderDetailAssetInfoController.listClinicalDeptName}" />
-				</p:selectOneMenu>
-			</f:facet>
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
-		</p:column>
-		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.qrCode}" />
-		</p:column>
-		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.departNum}" />
-		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.functionType}" />
-		</p:column>
-		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.financingNum}" />
-		</p:column>
-		<p:column headerText="资产状态" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
-			<f:facet name="filter">
-				<p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
-					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-					<f:selectItem itemLabel="正常" itemValue="1" />
-					<f:selectItem itemLabel="停机" itemValue="2" />
-					<f:selectItem itemLabel="限制功能使用" itemValue="3" />
-					<f:selectItem itemLabel="待报废" itemValue="4" />
-					<f:selectItem itemLabel="停用" itemValue="5" />
-				</p:selectOneMenu>
-			</f:facet>
-			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':item.assetInfo.status==5?'停用':item.assetInfo.status}" />
-		</p:column>
-		<p:column headerText="设备位置" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
-		</p:column>
-		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.lastModifiedBy}" />
-		</p:column>
-		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
-			<f:facet name="filter">
-				<p:inputText id="filterLastModifiedDate" widgetVar="varFilterLastModifiedDate" />
-			</f:facet>
-			<h:outputText value="#{item.lastModifiedDate}">
-				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
-			</h:outputText>
-		</p:column>
+            <a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
+        </p:column>
+        <p:column headerText="设备名" exportable="true" visible="false">
+            <h:outputText value="#{item.assetInfo.name}" />
+        </p:column>
+        <p:column headerText="设备二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.qrCode}" />
+        </p:column>
+        <p:column headerText="设备类型" filterBy="#{item.assetGroupName}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetGroupName}" />
+        </p:column>
+        <p:column headerText="使用科室" filterBy="#{item.orgName}" filterMatchMode="EQ">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController.listClinicalDeptName}" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{item.orgName}" />
+        </p:column>
+        <p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.comment}" />
+        </p:column>
+        <p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.lastModifiedBy}" />
+        </p:column>
+        <p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+            <f:facet name="filter">
+                <p:inputText id="filterLastModifiedDate" widgetVar="varFilterLastModifiedDate" />
+            </f:facet>
+            <h:outputText value="#{item.lastModifiedDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+        </p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist3" fileName="InventoryOrderDetailAssetInfo3_export" />
