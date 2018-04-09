@@ -28,12 +28,13 @@ function mapState2Props(state) {
     assetTypes,
     depts,
   } = state
-  return { filterBy, period, name, departments: depts, assetTypes }
+  return { filterBy, period, name, assetTypes, departments: depts.depts, hospital: depts.selectedHospital, hospitals: depts.hospitals }
 }
 function mapDispatch2Props(dispatch) {
   return {
     onFilterChange: (type) => (data) => dispatch({ type: 'FailureAnalysis/update/filter', data: { type, data }}),
-    onPeriodChange: (data) => dispatch({ type: 'FailureAnalysis/update/period', data })
+    onPeriodChange: (data) => dispatch({ type: 'FailureAnalysis/update/period', data }),
+    onHospitalChange: (data) => dispatch({ type: 'depts/update/selectedHospital', payload: data.key }),
   }
 }
 
@@ -65,8 +66,13 @@ export class Header extends PureComponent {
     ].concat(assetTypes.map(d => ({ key: String(d.id), label: d.name})))
   }
 
+  _filtersHospital() {
+    let { t, hospitals = [] } = this.props
+    return hospitals.map(d => ({ key: String(d.id), label: d.name}))
+  }
+
   render() {
-    let { period, filterBy, onFilterChange, onPeriodChange } = this.props
+    let { period, filterBy, hospital, onFilterChange, onPeriodChange, onHospitalChange } = this.props
     return (<nav id="header" className="header level">
 
       <div className="nav-left">
@@ -85,6 +91,9 @@ export class Header extends PureComponent {
         </div>
         <div className="nav-item">
           { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
+        </div>
+        <div className="nav-item">
+          { SelectHelper(hospital, this._filtersHospital(), onHospitalChange) }
         </div>
       </div>
     </nav>)
