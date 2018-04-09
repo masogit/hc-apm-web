@@ -52,6 +52,12 @@
 		<p:column headerText="设备位置" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
+		<p:column headerText="问题描述">
+			<h:outputText value="#{item.comment}" />
+		</p:column>
+		<p:column headerText="未通过项">
+			<h:outputText value="#{item.inventoryCheckListItems}" />
+		</p:column>
 
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
