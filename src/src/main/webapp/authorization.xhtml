@@ -8,23 +8,68 @@
 
 <ui:composition>
 
-    <p:dialog id="ActiveDlg" widgetVar="ActiveDlg" width="450" height="220" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="欢迎登陆APM管理平台！" closable="false">
+    <p:dialog id="ActiveDlg" widgetVar="ActiveDlg" width="650" height="480" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="欢迎登陆APM管理平台！" closable="false">
         <h:form id = "ActiveForm">
-            <p:fieldset id="changePassword" legend="用户首次登陆激活" style="margin-top:20px;">
+            <p:fieldset id="changePassword" legend="用户首次登陆激活" >
+                <!--<p:inputTextarea readonly="true" cols="10" rows="5">
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+                    请您务必审慎阅读、充分理解协议中相关条款内容，特别是粗体标注的内容。您一旦注册豆瓣，即视为您已了解并完全同意本协议各项内容，包括豆瓣对使用协议随时所做的任何修改。如您不同意本协议及/或随时对其的修改，请您立即停止注册及使用豆瓣所提供的全部服务。
+
+                </p:inputTextarea>-->
+                <!--<h:outputText value="#{userAccountController.protocol}"/>-->
+                <p:scrollPanel style="width:580px;height:300px" mode="native">
+                    <!--<p>#{userAccountController.protocol}</p>-->
+                            <p>第一步 台湾通行证及签注办理</p>
+                            <p></p>
+                            <p>重点提醒:目前上海办理台湾通行证只能在民生路1500号上海出入境管理局（2号线科技馆站）</p>
+                            <p>营业时间：周一至周六 9:00-17:00</p>
+                            <p>领证的话可以在任何区县办理出入境手续的派出所代理点，或者办理快递</p>
+                            <p></p>
+                            <p>流程：</p>
+                            <p>1.先排队拍照，收费柜台在照相室内，25元6张，台湾的照片是要露出耳朵的，摄像师会提醒你的；</p>
+                            <p>2.填表《大陆居民往来台湾通行证》，收费50元(通行证小本子30元+单次签注20元)，在领证的时候支付；</p>
+                            <p>3.需要提前准备的证件及复印件：身份证原件及正反面复印件、户口本原件及首页户主及本人所在页的复印件；</p>
+                            <p>4.把1-3项准备完毕的资料拿去预检台，工作人员会对你的材料进行初步审核，如齐全会给你叫号单，等叫号；</p>
+                            <p>5.受理台的工作人员5分钟就帮你搞定，第一次办理的话15个工作日左右，可以在你家附近指定的派出所领取，  如果懒惰的话，直接办理快递也行；</p>
+                            <p></p>
+                            <p>虽然人多，但是叫号窗口也很多，速度非常快，真正慢的是排队拍照和排队复印，所以能准备的复印材料尽量都提前备好。</p>
+                        <p></p>
+                        <p></p>
+                        <p>第二步 入台证办理</p>
+                        <p></p>
+                        <p>与港澳通行证所不同的是，台湾通行证及签注是不能直接使用去台湾的，必须办理入台证，而目前入台证只能通过一些指定的旅行社办理，单证费用在1000RMB，我是在携程上预订的</p><p>PACKAGE（含税机票+入台证），共3301RMB，价格还算合理。</p>
+                    <p></p>
+                    <p>入台证所需材料：</p>
+                    <p></p>
+                    <p>1.两寸照片(2张)，背后不得写名字和出生日期，我曾被申请表上的提示误导过，但是旅行社要求是空白的；</p>
+                    <p>2.《大陆地区人民来台观光申请书》（1份），表格是繁体的，可以用简体填写；</p>
+                    <p>3.整本户口本复印件，一直复印到空白页；</p>
+                    <p>4.行程表（1份）；</p>
+                    <p>5.紧急联络人表（1份），并提供该人身份证、户口整本复印件（建议是你户口本上的人，那就省得再复印）；</p>
+                    <p>6.至少5万元的存款证明（1份），需定存冻结到你回来；</p>
+                    <p>7.在职证明（1份），单位抬头纸打印并加盖公章，或者你名下的房产证复印件（1份）（任选其一）；</p>
+                    <p></p>
+                    <p>材料齐全后，需8个工作日办理完成入台证。</p>
+                    <p></p>
+                    <p>有了入台证，你就可以出发啦～～～</p>
+                </p:scrollPanel>
                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <!--<h3 style="margin-top:0px"></h3>   <a href='http://www.baidu.com'>用户协议</a>   -->
-                    <p:link href="http://www.baidu.com" value="查看用户协议" target="_new"/>
+                    <!--<p:link href="http://www.baidu.com" value="查看用户协议" target="_new"/>-->
                     <p:selectManyCheckbox id="basic" value="#{userAccountController.items}">
                         <p:ajax update="ActiveForm" listener="#{userAccountController.updateAgree()}"/>
                         <f:selectItem itemLabel="我已阅读相关用户协议并确认激活账号" itemValue="1" />
                     </p:selectManyCheckbox>
                 </p:panelGrid>
             </p:fieldset>
-
             <p:commandButton value="激活" actionListener="#{userAccountController.confirmActivation()}" icon="ui-icon-home"
                              oncomplete="handleSubmit(args, 'ActiveDlg');" disabled="#{!userAccountController.agree}"/>
             &nbsp;&nbsp;
-            <!--action="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"-->
             <p:commandButton value="#{msg.Logout}" actionListener="#{userAccountController.logout()}" icon="ui-icon-power-settings-new"/>
         </h:form>
 

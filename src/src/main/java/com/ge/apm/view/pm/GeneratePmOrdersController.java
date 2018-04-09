@@ -317,7 +317,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-		WebUtil.addSuccessMessage("保养工单生成成功！");
+		//WebUtil.addSuccessMessage("保养工单生成成功！");
+		WebUtil.addSuccessMessage("正在生成保养工单，请稍候！");
 		//targetAssets.clear();
 	}
 

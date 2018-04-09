@@ -59,13 +59,13 @@
 							<h:outputText value="2010国家编码" />
 							<h:outputText value="#{item.nationalStandardCode}" />
 							<h:outputText value="维修类型" />
-							<h:outputText value="#{fieldMsg.fieldValue('assetCategory', item.assetCategory)}" />
+							<h:outputText value="#{fieldMsg.fieldValue('repairForm', item.repairForm)}" />
 							<h:outputText value="用途分类" />
 							<h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}" />
 							<h:outputText value="功能等级" />
 							<h:outputText value="#{item.functionGrade}" />
 							<h:outputText value="医疗器械分类" />
-							<h:outputText value="#{item.functionGroup}" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetFunctionType', item.functionGroup)}" />
 							<h:outputText value="资金来源" />
 							<h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}" />
 							<h:outputText value="风险等级" />
@@ -121,7 +121,7 @@
 							<h:outputText value="使用年限" />
 							<h:outputText value="#{item.lifecycle}" />
 							<h:outputText value="折旧算法" />
-							<h:outputText value="#{fieldMsg.fieldValue('depreciationMethod', item.depreciationMethod)}" />
+							<h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList', item.depreciationMethod)}" />
 						</p:panelGrid>
 					</p:carousel>
 				</h:form>
