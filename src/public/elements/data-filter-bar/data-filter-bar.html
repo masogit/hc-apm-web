@@ -169,10 +169,10 @@
           var defaultVal = { key: 0, val: '全部'};
           // setup data from location hash
           var queries = this.restoreOptsFromURI();
-
+          this.hospital = String(document.querySelector('#user-context #hospitalId').value)
           this.setDefaultProps(queries);
 
-          this.fetchPage(this.resolveApiUrl('/api/org/dept?orgId=' + document.querySelector('#user-context #hospitalId').value))
+          this.fetchPage(this.resolveApiUrl('/api/org/dept?orgId=' + this.hospital))
           .then(function(response) {
             var list = Array.isArray(response.orgInfos)
               ? response.orgInfos.map(function(n, index) {
@@ -203,8 +203,6 @@
                 }
               })
               : [];
-            // var defaultVal = { key: 0, val: '默认院区' };
-            // list.unshift(defaultVal);
             _this.hospitalOpts = list;
             if (!_this.hospital) {
               _this.hospital = defaultVal.key;
@@ -243,7 +241,8 @@
           return options;
         },
         saveOptsInURI: function(name, val) {
-          if (val === undefined) return;
+          if (val === undefined || val === 0) return;
+          console.log(val);
           var options = URI().query(URI().fragment()).query(true);
           options[name] = val;
           location.hash = '#' + URI().query(options).query();
@@ -262,7 +261,7 @@
               : [];
             _this.set('deptOpts', list);
             _this.set('deptName', '全部');
-            _this.set('dept', '');
+            _this.set('dept', 0);
           });
         },
       });

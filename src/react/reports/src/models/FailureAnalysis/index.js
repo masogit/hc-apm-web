@@ -150,7 +150,7 @@ export default {
     ],
     deptWatcher: [
       function*({ takeLatest, put }) {
-        yield takeLatest(act => act.type === 'depts/update/depts'
+        yield takeLatest(act => act.type === 'depts/update/depts' && location.href.indexOf(REPORT_NAME) > -1
         , function*(action) {
           yield put({ type: 'update/filter', data: { type: 'dept', data: { key: 'all_dept'}} })
           yield put({ type: 'get/all' })
