@@ -44,6 +44,7 @@ export default {
           to,
           groupby,
           dept,
+          hospital: state.depts.selectedHospital,
           type,
           supplier,
           rltgrp,
