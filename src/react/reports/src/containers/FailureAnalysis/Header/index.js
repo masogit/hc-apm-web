@@ -90,10 +90,10 @@ export class Header extends PureComponent {
           { SelectHelper(filterBy['assettype'], this._filtersAssetType(), onFilterChange('assettype')) }
         </div>
         <div className="nav-item">
-          { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
+          { SelectHelper(hospital, this._filtersHospital(), onHospitalChange) }
         </div>
         <div className="nav-item">
-          { SelectHelper(hospital, this._filtersHospital(), onHospitalChange) }
+          { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
         </div>
       </div>
     </nav>)
