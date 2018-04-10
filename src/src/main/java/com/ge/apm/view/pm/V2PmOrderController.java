@@ -549,6 +549,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
             picList.stream().forEach(item->{
             item.setId(null);
             });
+            currentPagePmOrders.stream().forEach(item->{
+                item.setQualityChecking("1");
+            });
             pmOrderService.closePMBatch(currentPagePmOrders,selectedMap,picList);
         }
     cancel();
@@ -640,10 +643,11 @@ public void batchDefineQualify(){
         comments=null;
     }
     public void prepareAct(String woid) {
-        if(woid!=null)
-        selectedPmOrder = dao.findById(woid);
-        //关单时 默认设置为合格
-        selectedPmOrder.setQualityChecking("1");
+        if(woid!=null &&  !woid.isEmpty()) {
+            selectedPmOrder = dao.findById(woid);
+            //关单时 默认设置为合格
+            selectedPmOrder.setQualityChecking("1");
+        }
         /*if(selectedPmOrder.getAssetInfo()!=null)
          currentStatus = selectedPmOrder.getAssetInfo().getStatus();*/
         confirmedUpDate = null;
