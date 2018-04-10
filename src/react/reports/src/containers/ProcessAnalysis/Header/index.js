@@ -28,7 +28,7 @@ function mapState2Props(state) {
     assetTypes,
     depts,
   } = state
-  return { filterBy, orderBy, period, departments: depts.depts, hospitals: depts.hospitals, assetTypes }
+  return { filterBy, orderBy, period, departments: depts.depts, hospital: depts.selectedHospital, hospitals: depts.hospitals, assetTypes }
 }
 function mapDispatch2Props(dispatch) {
   return {
@@ -71,7 +71,7 @@ export class Header extends PureComponent {
     return hospitals.map(d => ({ key: String(d.id), label: d.name}))
   }
   render() {
-    let { period, filterBy,
+    let { period, filterBy, hospital,
       onFilterChange, onPeriodChange, onHospitalChange
     } = this.props
     return (<nav id="header" className="header level">
@@ -91,7 +91,7 @@ export class Header extends PureComponent {
           { SelectHelper(filterBy['assettype'], this._filtersAssetType(), onFilterChange('assettype')) }
         </div>
         <div className="nav-item">
-          { SelectHelper(filterBy['hostpital'], this._filtersHospital(), onHospitalChange) }
+          { SelectHelper(hospital, this._filtersHospital(), onHospitalChange) }
         </div>
         <div className="nav-item">
           { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }

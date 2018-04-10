@@ -7,7 +7,7 @@ let info = {
   hospitalId: '9',
 }
 
-const userInfoEl = document.querySelector('#user-context')
+const userInfoEl = document.getElementById('user-context')
 if (userInfoEl) {
   const children = Array.from(userInfoEl.children)
   info = children.reduce((prev, cur) => {
