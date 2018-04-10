@@ -34,7 +34,7 @@ public class UaaService {
     public static final String ASSET = "asset";
     public static final String TEMPORARY_ACCOUNT = "";
     private static Map<String, SysRole> sysRoles;
-    
+    public static final String TEMP_STAFF = "仅报修权限账号";
     @Autowired
     OrgInfoRepository orgInfoDao;
 
@@ -147,10 +147,10 @@ public class UaaService {
         
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
-        if((!newRoleNames.contains("临时报修帐号")) && (userAccount.getUserRoleNames().contains("临时报修帐号"))){
+        if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
             deactiveTemporaryUser(userAccount.getId());
         }
-        if(newRoleNames.contains("临时报修帐号")){
+        if(newRoleNames.contains(TEMP_STAFF)){
             activeTemporaryUser(userAccount.getId());
         }
         if(newRoleNames.isEmpty()){
