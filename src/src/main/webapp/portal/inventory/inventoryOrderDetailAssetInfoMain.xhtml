@@ -10,7 +10,7 @@
 
 			<div class="ui-g-12 card ">
 				<p:tabView id="inventoryOrderDetailAssetInfoTab" activeIndex="0">
-					<p:ajax event="tabChange" listener="#{inventoryOrderDetailAssetInfoController.onTabChanged}" />
+					<p:ajax event="tabChange"/>
 					<p:tab title="未盘点" id="tab0">
 						<ui:include src="inventoryOrderDetailAssetInfo.xhtml" />
 					</p:tab>
