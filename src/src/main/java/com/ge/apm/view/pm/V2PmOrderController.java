@@ -113,21 +113,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 	}
 
 
-    public Boolean canCreateSr(){
-        if(selectedAsset!= null && selectedAsset.getIbStatus()!= null && selectedAsset.getIbStatus() !=1){
-            if(selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm()==2){
-                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 22){
-                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
-                }
-
-                if(null != selectedAsset.getGeDeviceType() && selectedAsset.getGeDeviceType() == 3){
-                    return selectedAsset.getWarrantyDate() != null && selectedAsset.getWarrantyDate().before(new Date());
-                }
-                return false;
-            }
-        }
-        return true;
-    }
+	public Boolean canCreateSr() {
+		if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
+			if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
+				if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
+					return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
+				}
+				return false;
+			}
+		}
+		return true;
+	}
     public void prepareAproval(String woid) {
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
@@ -549,6 +545,9 @@ public void closePM(V2_PmOrder selectedPmOrder){
             picList.stream().forEach(item->{
             item.setId(null);
             });
+            currentPagePmOrders.stream().forEach(item->{
+                item.setQualityChecking("1");
+            });
             pmOrderService.closePMBatch(currentPagePmOrders,selectedMap,picList);
         }
     cancel();
@@ -640,10 +639,11 @@ public void batchDefineQualify(){
         comments=null;
     }
     public void prepareAct(String woid) {
-        if(woid!=null)
-        selectedPmOrder = dao.findById(woid);
-        //关单时 默认设置为合格
-        selectedPmOrder.setQualityChecking("1");
+        if(woid!=null &&  !woid.isEmpty()) {
+            selectedPmOrder = dao.findById(woid);
+            //关单时 默认设置为合格
+            selectedPmOrder.setQualityChecking("1");
+        }
         /*if(selectedPmOrder.getAssetInfo()!=null)
          currentStatus = selectedPmOrder.getAssetInfo().getStatus();*/
         confirmedUpDate = null;
@@ -658,7 +658,7 @@ public void batchDefineQualify(){
        /* if(planTime==null){
             WebUtil.addErrorMessage("计划完成时间"+WebUtil.getMessage("ValidationRequire"));
         }*/
-        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000") ||  item.getApproved()==null).collect(Collectors.toList()));
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));

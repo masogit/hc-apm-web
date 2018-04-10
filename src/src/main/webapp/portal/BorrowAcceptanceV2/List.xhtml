@@ -67,7 +67,13 @@
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
                     </p:column>
-                    <p:column headerText="借用状态" sortBy="#{item.state}" filterMatchMode="LIKE">
+                    <p:column headerText="借用状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('assetBorrowStatus',item.state)}"/>
                          
 <!--                        <h:outputText value="借用待受理" rendered="#{item.state eq '1'}"></h:outputText> 

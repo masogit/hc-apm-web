@@ -8,7 +8,6 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
-import org.primefaces.ultima.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -22,10 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -487,7 +483,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1){
+                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
                     WebUtil.addWarnMessage("该设备故障，不可借用！");
                     return; 
                 }
@@ -778,7 +774,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1){
+                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
                     WebUtil.addWarnMessage("该设备故障，不可借用！");
                     return; 
                 }
@@ -1343,25 +1339,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            return;
        }
     }
-    public int getSwapQty(){
-        String Uid = this.selectedSart.getSharedAssetTypeId();
-        if(null == Uid||Uid.equalsIgnoreCase("")){
-            return 0;
-        }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            System.out.println(UserContextService.getCurrentUserAccount().getSiteUID());
-            System.out.println(userOrg.getUid());
-            objectList = swapDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
-           if(objectList == null){
-                return 0; 
-            }
-            else{
-                return objectList.size();
-            }
-        }
-    }
+
     public int getSwapQty(String TypeUid,String Uid){
       
         SharedAssetRequest shared = new SharedAssetRequest();
@@ -1382,7 +1360,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return objectList.size();
         }
     }
-    
+    public int getSwapQty(){
+        String Uid = this.selectedSart.getSharedAssetTypeId();
+        if(null == Uid||Uid.equalsIgnoreCase("")){
+            return 0;
+        }else{
+            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
+            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
+            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
+            System.out.println(UserContextService.getCurrentUserAccount().getSiteUID());
+            System.out.println(userOrg.getUid());
+            objectList = swapDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
+            if(objectList == null){
+                return 0;
+            }
+            else{
+                return objectList.size();
+            }
+        }
+    }
     
     //
     private String filterState = null;
@@ -1426,6 +1422,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void saveSart(){
+        if (selectedSart.getApplyQty() == 0){
+            String message = "wrong" ;
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("message", message);
+
+            WebUtil.addWarnMessage("申请数必须大于0！");
+            return;
+        }
         selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
         selectedSart.setSwapName(swapName);

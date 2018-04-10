@@ -58,7 +58,7 @@
 		</p:column>
 		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
 			<f:facet name="filter">
-				<p:inputText id="filterLastModifiedDate" widgetVar="varFilterLastModifiedDate" />
+				<p:inputText id="filterLastModifiedDate2" widgetVar="varFilterLastModifiedDate2" />
 			</f:facet>
 			<h:outputText value="#{item.lastModifiedDate}">
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -71,18 +71,18 @@
 		</f:facet>
 	</p:dataTable>
 </h:form>
-<p:overlayPanel widgetVar="panelFilterLastModifiedDate" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2:filterLastModifiedDate" dismissable="false">
+<p:overlayPanel widgetVar="panelFilterLastModifiedDate2" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo2ListForm:datalist2:filterLastModifiedDate2" dismissable="false">
 	<h:panelGrid columns="2">
 		<p:outputLabel value="#{msg.From}" />
-		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDate2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
 			mask="true" size="12" locale="zh" />
 		<p:outputLabel value="#{msg.To}" />
-		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDate" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDate2" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
 			mask="true" size="12" locale="zh" />
 	</h:panelGrid>
 	<p:commandButton
-		onclick="setDateFilter('varDataList2','varFilterLastModifiedDate','varStartTimeFrom_LastModifiedDate','varStartTimeTo_LastModifiedDate'); PF('panelFilterLastModifiedDate').hide();"
+		onclick="setDateFilter('varDataList2','varFilterLastModifiedDate2','varStartTimeFrom_LastModifiedDate2','varStartTimeTo_LastModifiedDate2'); PF('panelFilterLastModifiedDate2').hide();"
 		title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
-	<p:commandButton onclick="PF('panelFilterLastModifiedDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+	<p:commandButton onclick="PF('panelFilterLastModifiedDate2').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
 </p:overlayPanel>
 </html>
