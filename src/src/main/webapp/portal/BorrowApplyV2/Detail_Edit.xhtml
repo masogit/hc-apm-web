@@ -41,14 +41,23 @@
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}"
-                                     update=" :SharedAssetRequestBorrowEditForm:datalistDetail" icon="ui-icon-check" oncomplete="PF('SharedAssetReqTypeEditDialog').hide()"/>
+                                     update=" :SharedAssetRequestBorrowEditForm:datalistDetail" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
+                    <script>
+
+                        function openSwapTypeViewWindow(xhr, status, args) {
+                            var message = args.message;
+                            if (message == "wrong") {
+
+                            } else {
+                                PF('SharedAssetReqTypeEditDialog').hide();
+                            }
+                        }
+
+                    </script>
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
     </ui:composition>
-    
-     
 </html>
