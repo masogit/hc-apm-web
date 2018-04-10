@@ -29,16 +29,16 @@ class ScanDetails extends React.PureComponent {
       filterOptions.push(
         {
           type: 'select',
+          key: 'hospital',
+          value: depts.selectedHospital,
+          options: depts.hospitals,
+        },
+        {
+          type: 'select',
           key: 'dept',
           value: filters.dept,
           options: depts.depts,
           placeholder: '全部科室'
-        },
-        {
-          type: 'select',
-          key: 'hospital',
-          value: depts.selectedHospital,
-          options: depts.hospitals,
         },
       )
     }

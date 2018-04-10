@@ -23,23 +23,7 @@
         </px-rangepicker>
       </div>
       <template is="dom-if" if="[[isHead]]">
-        <div class="u-mh+ u-mb flex--item flex flex--row flex--middle" style="padding-left: 1em;">
-          <label class="flex--item" for="device-filter">科室</label>
-          <px-dropdown
-            id="dept-filter"
-            class="flex--item u-mh+"
-            display-value="{{deptName}}"
-            selected-key="{{dept}}">
-            <px-dropdown-content
-              class="px-dropdown-content"
-              max-cont-character-width="10"
-              extend-dropdown="true"
-              extend-dropdown-by="15"
-              items="{{deptOpts}}">
-            </px-dropdown-content>
-          </px-dropdown>
-        </div>
-        <div class="u-mh+ u-mb flex--item flex flex--row flex--middle">
+        <div class="u-mh+ u-mb flex--item flex flex--row flex--middle" style="padding-left:1em;">
             <label class="flex--item" for="device-filter">院区</label>
             <px-dropdown
               id="dept-filter"
@@ -55,6 +39,22 @@
               </px-dropdown-content>
             </px-dropdown>
           </div>
+        <div class="u-mh+ u-mb flex--item flex flex--row flex--middle">
+          <label class="flex--item" for="device-filter">科室</label>
+          <px-dropdown
+            id="dept-filter"
+            class="flex--item u-mh+"
+            display-value="{{deptName}}"
+            selected-key="{{dept}}">
+            <px-dropdown-content
+              class="px-dropdown-content"
+              max-cont-character-width="10"
+              extend-dropdown="true"
+              extend-dropdown-by="15"
+              items="{{deptOpts}}">
+            </px-dropdown-content>
+          </px-dropdown>
+        </div>
       </template>
       <div class="u-mh+ u-mb flex--item flex flex--row flex--middle">
         <label class="flex--item" for="device-filter">设备类型</label>
