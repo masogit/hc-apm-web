@@ -39,15 +39,9 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	private List<String> listClinicalDeptName;
 	private int inventoryStatus = 0;
 	private boolean initBln=true;
-	private int initIndex=0;
-	private List<Integer> listStatus;
 
 	@Override
 	protected void init() {
-		listStatus=new ArrayList<Integer>();
-		listStatus.add(0);
-		listStatus.add(1);
-		listStatus.add(2);
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
@@ -63,11 +57,6 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 	@Override
 	protected Page<InventoryOrderDetail> loadData(PageRequest pageRequest) {
 		//before
-		if(initBln){
-			inventoryStatus=listStatus.get(initIndex);
-			initIndex++;
-		}
-		
 		List<SearchFilter> searchFilters = this.searchFilters;
 		if (searchFilters == null) {
 			searchFilters = new ArrayList<SearchFilter>();
@@ -87,12 +76,6 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
 		getClinicalDeptNames(pageAssetInfo);
 		//after
-		if(initBln){
-			if(initIndex==listStatus.size()){
-				initBln=false;
-				inventoryStatus=0;
-			}
-		}
 		return pageAssetInfo;
 	}
 
@@ -108,45 +91,6 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		object.setHospitalUID(currentUser.getHospitalUID());
 		object.setSiteUID(currentUser.getSiteUID());
 	}
-
-	public void onTabChanged(TabChangeEvent event) {
-		String tabName = event.getTab().getId();
-		if ("tab0".equals(tabName))
-			inventoryStatus = 0;
-		else if ("tab1".equals(tabName)) {
-			inventoryStatus = 1;
-		} else if ("tab2".equals(tabName)) {
-			inventoryStatus = 2;
-		} else if ("tab3".equals(tabName))
-			inventoryStatus = 3;
-		else
-			inventoryStatus = 0;
-		
-	}
-
-//	private void getInventoryClinicalDeptUID(String orderId) {
-//		listClinicalDeptUID = new ArrayList<String>();
-//		listClinicalDeptName = new ArrayList<String>();
-//		if (StringUtils.isEmpty(orderId)) {
-//			return;
-//		}
-//		InventoryOrder order = inventoryOrderRepository.findById(orderId);
-//		String assignee_org = order.getAssigneeOrg();
-//		JSONArray array = new JSONArray(assignee_org);
-//		JSONObject obj = null;
-//		String clinicalDeptUID = "";
-//		String temp = "";
-//		for (int i = 0; i < array.length(); ++i) {
-//			obj = array.getJSONObject(i);
-//			clinicalDeptUID = obj.getString(UID);
-//			temp = obj.getString(ORG_NAME);
-//			temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length());
-//			if (!listClinicalDeptName.contains(temp)) {
-//				listClinicalDeptName.add(temp);
-//			}
-//			listClinicalDeptUID.add(clinicalDeptUID);
-//		}
-//	}
 	
 	private void getClinicalDeptNames(Page<InventoryOrderDetail> pageInventoryOrderDetail){
 		
@@ -170,6 +114,7 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
                     }
                 }
             }
+            initBln=false;
         }
 	}
 
