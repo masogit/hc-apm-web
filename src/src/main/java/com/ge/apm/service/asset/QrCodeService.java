@@ -378,6 +378,9 @@ public class QrCodeService {
      */
     public String isAvailableQrcode(String qrcode, String siteUid) {
         WorkflowConfig config = configService.findConfigBySite(siteUid);
+        if(Strings.isNullOrEmpty(qrcode)){
+            return "Normal";
+        }
         if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
             QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode);
             if (qrCodeLib == null) {
@@ -428,6 +431,8 @@ public class QrCodeService {
         qrCodeLib.setSiteUID(siteUid);
         qrCodeLib.setStatus(1);
         qrCodeLib.setIssueDate(new Date());
+        qrCodeLib.setSiteId(org.getSiteId());
+        qrCodeLib.setHospitalId(org.getId());
         qrCodeLibDao.save(qrCodeLib);
         return true;
     }
