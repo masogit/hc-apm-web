@@ -76,7 +76,7 @@ public class PinyinUtil {
         }
     }
 
-    public String getShortPinyin(String str){
+    public static String getShortPinyin(String str){
         try {
             return PinyinHelper.getShortPinyin(str);
         } catch (PinyinException ex) {
