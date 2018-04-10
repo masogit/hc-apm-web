@@ -4,12 +4,12 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:form id="inventoryOrderDetailAssetInfo3ListForm">
-	<p:dataTable id="datalist3" value="#{inventoryOrderDetailAssetInfoController.lazyModel}" var="item" widgetVar="varDataList3" selectionMode="single"
-		selection="#{inventoryOrderDetailAssetInfoController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+	<p:dataTable id="datalist3" value="#{inventoryOrderDetailAssetInfoController3.lazyModel}" var="item" widgetVar="varDataList3" selectionMode="single"
+		selection="#{inventoryOrderDetailAssetInfoController3.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
-		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController.onFilter}" />
+		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController3.onFilter}" />
 		<!-- <p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
             <a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
         </p:column>
@@ -26,7 +26,7 @@
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController.listClinicalDeptName}" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController3.listClinicalDeptName}" />
                 </p:selectOneMenu>
             </f:facet>
             <h:outputText value="#{item.orgName}" />
