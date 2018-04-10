@@ -1,17 +1,26 @@
 package com.ge.apm.domain;
 
+import java.io.Serializable;
+import java.util.Date;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.Size;
+
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
-
-import javax.persistence.*;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
 
 /**
  * Created by 212605082 on 2018/3/7.
  */
 @Entity
-@Table(name = "small_asset_performance_config")
+@Table(name = "asset_ad")
 public class AssetAD implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -59,6 +68,14 @@ public class AssetAD implements Serializable {
     
     @Transient
     private String otherErrorMessage;
+    
+    @Column(name = "start_date")
+	@Temporal(TemporalType.DATE)
+	private Date startDate;
+    
+    @Column(name = "end_date")
+	@Temporal(TemporalType.DATE)
+	private Date endDate;
 
     public String getId() {
         return id;
@@ -209,6 +226,24 @@ public class AssetAD implements Serializable {
 	public void setContent(String content) {
 		this.content = content;
 	}
+	
+	
+
+	public Date getStartDate() {
+		return startDate;
+	}
+
+	public void setStartDate(Date startDate) {
+		this.startDate = startDate;
+	}
+
+	public Date getEndDate() {
+		return endDate;
+	}
+
+	public void setEndDate(Date endDate) {
+		this.endDate = endDate;
+	}
 
 	@Override
     public int hashCode() {
@@ -232,6 +267,6 @@ public class AssetAD implements Serializable {
 
     @Override
     public String toString() {
-		return "com.ge.apm.domain.SmallAssetPerformanceConfig[ id=" + id + " ]";
+		return "com.ge.apm.domain.AssetAD[ id=" + id + " ]";
 	}
 }

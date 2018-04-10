@@ -40,10 +40,10 @@ public class AssetADController extends GenericCRUDUUIDController<AssetAD> implem
     private UserAccount currentUser;
     private UploadedFile file;
     private List<AssetAD> importFailedDataList;
-    private AssetAD assetAD;
     
     @Override
     protected void init() {
+    	System.out.println("AssetADController init");
         dao = WebUtil.getBean(AssetADRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -120,14 +120,6 @@ public class AssetADController extends GenericCRUDUUIDController<AssetAD> implem
 
 	public void setImportFailedDataList(List<AssetAD> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
-	}
-
-	public AssetAD getAssetAD() {
-		return assetAD;
-	}
-
-	public void setAssetAD(AssetAD assetAD) {
-		this.assetAD = assetAD;
 	}
 	
 	
