@@ -448,38 +448,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
           /*  searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList("Assign","Accept")));*/
              searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4));
           List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
-             searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
-             searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
-             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
-             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
-             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*6+"));
-             searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Assign","1*5+"));
-             searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Accept","1*5+6*"));
-             searchFilters.add(new SearchFilter("currentPersonId",SearchFilter.Operator.NE,UserContextService.getCurrentUserAccount().getUid(),"1*5+6*"));
-            //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, "1*3+4*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,3), "1*3+4*"));
+             searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Assign","1*3+"));
+             searchFilters.add(new SearchFilter("currentStepId",SearchFilter.Operator.EQ ,"Accept","1*3+7*"));
+             searchFilters.add(new SearchFilter("currentPersonId",SearchFilter.Operator.NE,UserContextService.getCurrentUserAccount().getUid(),"1*3+7*"));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,3)));
 
+            /*searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));*/
 
-            //searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2,4), "1*3+4*"));
-
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getUid(), "1*3+4*"));
-
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*2+"));
         //用户必须对其可视范围内的设备都可见,包括打过标签的设备(如果该设备的标签和组绑定了，并且当前用户没有在该组内，那是看不到的)和没有打过设备的标签
                  //打过标签的设备(该标签都和组绑定过)
                  List<Integer> tagGroupAssets = getTagGroupAssets();
                  if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
-                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*4+"));
                  }else{
-                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*3+4*5+"));
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*4+"));
                  }
                  //没有打过标签的设备
                  tagGroupAssets = getNoTagGroupAssets();
                  if(tagGroupAssets!=null && !tagGroupAssets.isEmpty()){
-                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*3+4*5+"));
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets,"1*4+"));
                  }else{
-                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*3+4*5+"));
+                     searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0),"1*4+"));
                  }
 
 
