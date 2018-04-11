@@ -351,17 +351,10 @@
                                     <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.installStatus)}"/>
                                 </p:column>
                                 <p:column width="90" >
-<!--                                    <p:link  outcome="ItemEdit" value="安装" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedListEditController.selected.processType eq 'Easy'}" >
-                                        <f:param name="itemId" value="#{item.id}" />
-                                    </p:link>-->
-                                    <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update="itemList" >接单
+                                    <p:commandLink actionListener="#{assetArrivedListEditController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update="itemList" >接单
                                         <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                                     </p:commandLink>
-<!--                                    <p:link   outcome="ItemEdit"  disabled="#{item.installStatus ne 'new'}" target="_Blank" rendered="#{(assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new') and assetArrivedListEditController.selected.processType ne 'Easy'}">安装
-                                        <f:param name="itemId" value="#{item.id}" />
-                                    </p:link >-->
-                                    <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}">#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}
-                            </p:commandLink >
+                                    <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                                 </p:column>
 
                             </p:dataTable>
