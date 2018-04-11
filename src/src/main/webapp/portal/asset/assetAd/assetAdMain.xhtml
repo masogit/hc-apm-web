@@ -9,14 +9,14 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="设备广告信息管理"/>
+                <p:outputLabel class="pageTitle" value="设备广告"/>
             </div>
 
             <div class="ui-g-12 card ">
-                <p:tabView id="assetADTab">
+                <p:tabView id="assetAdTab">
                     <p:ajax event="tabChange"/>
                     <p:tab title="查询" id="showList">
-                        <ui:include src="assetADList.xhtml"/>
+                        <ui:include src="assetAdList.xhtml"/>
                     </p:tab>
                 </p:tabView>
             </div>

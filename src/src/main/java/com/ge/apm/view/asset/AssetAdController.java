@@ -11,15 +11,17 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import com.ge.apm.dao.AssetADRepository;
+import com.ge.apm.dao.AssetAdRepository;
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.domain.AssetAD;
+import com.ge.apm.domain.AssetAd;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.AssetAdService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -33,29 +35,32 @@ import webapp.framework.web.mvc.ServerEventInterface;
  */
 @ManagedBean
 @ViewScoped
-public class AssetADController extends GenericCRUDUUIDController<AssetAD> implements Serializable, ServerEventInterface {
+public class AssetAdController extends GenericCRUDUUIDController<AssetAd> implements Serializable, ServerEventInterface {
 
-    private AssetADRepository dao;
+	private static final long serialVersionUID = 1L;
+	private AssetAdRepository dao;
+    private AssetAdService service;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
     private UploadedFile file;
-    private List<AssetAD> importFailedDataList;
+    private List<AssetAd> importFailedDataList;
+    private String content;
     
     @Override
     protected void init() {
-    	System.out.println("AssetADController init");
-        dao = WebUtil.getBean(AssetADRepository.class);
+        dao = WebUtil.getBean(AssetAdRepository.class);
+        service = WebUtil.getBean(AssetAdService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
     @Override
-    protected GenericRepositoryUUID<AssetAD> getDAO() {
+    protected GenericRepositoryUUID<AssetAd> getDAO() {
         return dao;
     }
 
     @Override
-    protected Page<AssetAD> loadData(PageRequest pageRequest) {
+    protected Page<AssetAd> loadData(PageRequest pageRequest) {
     	List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
@@ -79,7 +84,7 @@ public class AssetADController extends GenericCRUDUUIDController<AssetAD> implem
     }
 
     @Override
-    public void onBeforeNewObject(AssetAD object) {
+    public void onBeforeNewObject(AssetAd object) {
         super.onBeforeNewObject(object);
         object.setTenantUID(currentUser.getTenantUID());
         object.setInstitutionUID(currentUser.getInstitutionUID());
@@ -89,8 +94,15 @@ public class AssetADController extends GenericCRUDUUIDController<AssetAD> implem
 
     @Override
     public void save() {
-    	super.save();
-        this.selected=null;
+    	String systemId=this.selected.getSystemId();
+    	if(StringUtils.isNotEmpty(systemId) && service.checkSystemIdExists(systemId)){
+    		super.save();
+    		this.selected=null;
+    	}
+    	else{
+    		FacesMessage message = new FacesMessage("SystemID输入有误");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+    	}
     }
     
     @Override
@@ -114,13 +126,23 @@ public class AssetADController extends GenericCRUDUUIDController<AssetAD> implem
         this.file = file;
     }
 
-	public List<AssetAD> getImportFailedDataList() {
+	public List<AssetAd> getImportFailedDataList() {
 		return importFailedDataList;
 	}
 
-	public void setImportFailedDataList(List<AssetAD> importFailedDataList) {
+	public void setImportFailedDataList(List<AssetAd> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
 	
+	public void setContent(String id){
+		content=dao.getContentById(id);
+	}
+	
+	public String getContent(){
+		if(StringUtils.isNotEmpty(content)){
+			return content;
+		}
+		return "";
+	}
 	
 }
