@@ -107,7 +107,7 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-            org.setHospitalId(currentOrg.getHospitalId());
+            org.setHospitalId(currentOrg.getId());
             org.setParentOrg(currentOrg);
             org.setSiteId(currentOrg.getSiteId());
 
