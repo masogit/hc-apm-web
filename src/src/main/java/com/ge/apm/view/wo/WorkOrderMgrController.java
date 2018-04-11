@@ -340,7 +340,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 8) { //已关单
             if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
-                if(userContextService.hasRole("AssetStaff")){
+                if (userContextService.hasRole("AssetStaff")) {
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
                     searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
                 }
@@ -708,12 +708,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void addCoWokerItem() {
-        if (!coWorkerList.contains(coWorkerDetail)) {
-            UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
-            coWorkerDetail.setCowokerUserName(coWorker.getName());
-            coWorkerList.add(coWorkerDetail);
+        if (coWorkerList.contains(coWorkerDetail)) {
+            coWorkerList.remove(coWorkerDetail);
         }
-//        coWorkerDao.save(coWorkerDetail);
+        UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
+        coWorkerDetail.setCowokerUserName(coWorker.getName());
+        coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
 
