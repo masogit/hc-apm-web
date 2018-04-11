@@ -419,6 +419,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             return new ArrayList();
         }
     }
+    
+    public void takeWorkOrder(String itemId) {
+        ArrivalListItem item = itemDao.findById(itemId);
+        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+        aiService.reAssignWorkOrder(item);
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+//        cancel();
+    }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();

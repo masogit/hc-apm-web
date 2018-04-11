@@ -368,7 +368,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //download use
 
-
         if (searchFilters == null) {
             searchFilters = new ArrayList<SearchFilter>();
         }
@@ -378,38 +377,37 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         selected = null;
         List<Integer> stus = new ArrayList<>();
-        stus.add(1);stus.add(3);
+        stus.add(1);
+        stus.add(3);
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String p=request.getServletPath();
-        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
+        String p = request.getServletPath();
+        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
             searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
-        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
+        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
-
 
         if (queryIndex == 1) {
             //正常可借用
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
-        } else if(queryIndex == 2){
+        } else if (queryIndex == 2) {
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
-        }else if(queryIndex == 3){
+        } else if (queryIndex == 3) {
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
         }
-
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
             Page<AssetInfo> res = dao.findBySearchFilter(this.searchFilters, pageRequest);
             currentPageAssets = res.getContent();
-            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+//            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
             return res;
         }
     }
@@ -435,7 +433,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void exportQrCode() throws Exception {
         List<AssetInfo> exportList = getExportList();
-        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()),exportQrCodeTemplateId);
+        zipFile = qrCodeService.exportQrCodeListByAssets(exportList.stream().filter(item -> !Strings.isNullOrEmpty(item.getQrCode())).collect(Collectors.toList()), exportQrCodeTemplateId);
     }
 
     public void onSelectAllOfPage() {
@@ -445,7 +443,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onItemSelected() {
-        isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+//        isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
     }
 
     public List<AssetInfo> getExportList() {
@@ -698,7 +696,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public void showMsg(){
+    public void showMsg() {
         String pageMsg = WebUtil.getGrowlMsg();
         if (!Strings.isNullOrEmpty(pageMsg)) {
             WebUtil.addErrorMessage(pageMsg);
@@ -783,7 +781,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         selected.setClinicalOwnerId(null);
         selected.setClinicalOwnerName(null);
         selected.setClinicalOwnerTel(null);
-
 
         if (null != selected.getClinicalDeptId()) {
             OrgInfo org = orgDao.findById(selected.getClinicalDeptId());
@@ -1595,7 +1592,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean getIsSelectedCurrentPage() {
-        return isSelectedCurrentPage;
+        if (null == currentPageAssets) {
+            return false;
+        } else {
+            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+            return isSelectedCurrentPage;
+        }
     }
 
     public void setIsSelectedCurrentPage(Boolean isSelectedCurrentPage) {
