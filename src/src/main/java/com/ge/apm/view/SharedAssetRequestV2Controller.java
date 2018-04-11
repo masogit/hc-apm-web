@@ -8,6 +8,7 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -415,11 +416,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+        requestContext.addCallbackParam("pageName", pageName);
     }
     
     public void onSelectC() throws IOException, ParseException {
         
         String pageName = "";
+        selected.getSartList();
         if(selected.getState() == 2){
             pageName = "Edit_1";
         }else if(selected.getState() == 1||selected.getState() == 5){
@@ -435,6 +438,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+        requestContext.addCallbackParam("pageName", pageName);
+
     }
     
     public String queryBorrowInfo(String assetId){
@@ -1064,28 +1069,28 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 
                WebUtil.addWarnMessage("请先添加申请明细，再进行提交！");
                return;
-           } else {
-                String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
-                selected.setClinicalDeptName(name);
-                selected.setApplyTime(new Date());
-                selected.setCreateDate(new Date());
+       } else {
+            String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
+            selected.setClinicalDeptName(name);
+            selected.setApplyTime(new Date());
+            selected.setCreateDate(new Date());
 
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                cal.add(Calendar.DAY_OF_MONTH, 1);
-                selected.setInvalidTime(cal.getTime());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            selected.setInvalidTime(cal.getTime());
 
-                dao.save(selected);
-                apdDao.save(selected.getSartList());
-                String url = "List.xhtml?faces-redirect=true";
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("url", url);
-                return;
-           }
+            dao.save(selected);
+            apdDao.save(selected.getSartList());
+            String url = "List.xhtml?faces-redirect=true";
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("url", url);
+            return;
+       }
        
     }
     
@@ -1153,13 +1158,29 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 2;//2借用待交付状态
-       
-       if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
-           dao.updateState(uid, state);
-       }else {
-           WebUtil.addErrorMessage("当前状态不可受理！");
-           return;
-       }
+
+       List<SharedAssetReqType> sartList = selected.getSartList();
+        for (SharedAssetReqType sart : sartList) {
+            if (sart.getExceptQty() == 0){
+                String url = "norespond" ;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("url", url);
+
+                WebUtil.addWarnMessage("设备 '"+sart.getSwapName()+"' 的预计借用数必须大于0！");
+                return;
+            }
+        }
+        if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
+            dao.updateState(uid, state);
+            apdDao.save(sartList);
+            String url = "List.xhtml?faces-redirect=true";
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("url", url);
+            return;
+        }else {
+            WebUtil.addErrorMessage("当前状态不可受理！");
+            return;
+        }
     }
     
     public void AcceptR() {
@@ -1489,7 +1510,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
        
     }
-    
+    public void onRowEditSart(RowEditEvent event){
+        SharedAssetReqType sart = (SharedAssetReqType) event.getObject();
+        List<SharedAssetReqType> sartList = selected.getSartList();
+        for (SharedAssetReqType sharedAssetReqType : sartList) {
+            if (sharedAssetReqType.getId() == sart.getId()){
+                sharedAssetReqType.setExceptQty(sart.getExceptQty());
+            }
+        }
+
+    }
     
     public void submmit() {
        String uid = selected.getId();
