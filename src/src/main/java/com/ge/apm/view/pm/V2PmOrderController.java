@@ -112,7 +112,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return false;
 	}
 
-
+private String qaStatus="0";
+	public void onQaStatusChange(){
+       /*if(qaStatus.equalsIgnoreCase("1")){
+		qaStatus=  "1";
+       }else{
+           qaStatus="0";
+       }*/
+    }
 	public Boolean canCreateSr() {
 		if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
 			if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
@@ -249,6 +256,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 				dptName = selectedAsset.getLocationName();
 			}
 		}
+        pmOrderService.closePM(selectedPmOrder,picList);
     }
     public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
@@ -551,7 +559,6 @@ public void batchDefineQualify(){
             pmListTmp.add(item);
         }
     });
-    System.out.println();
 }
 
     public void approvePMorder(){
@@ -1036,5 +1043,13 @@ public void batchDefineQualify(){
 
     public void setQualityCheckingBatch(String qualityCheckingBatch) {
         this.qualityCheckingBatch = qualityCheckingBatch;
+    }
+
+    public String getQaStatus() {
+        return qaStatus;
+    }
+
+    public void setQaStatus(String qaStatus) {
+        this.qaStatus = qaStatus;
     }
 }
