@@ -218,14 +218,14 @@
             <h:form id="closePmDialogForm" >
                 <h:panelGroup id="display3" >
                    <!-- <p:selectOneRadio id="console"  value="#{v2PmOrderController.selectedPmOrder.qualityChecking}">-->
-                    <p:selectOneRadio id="console"  value="1">
+                    <!--<p:selectOneRadio id="console"  value="1">
                         <f:selectItem itemLabel="合格" itemValue="1" />
                         <f:selectItem itemLabel="不合格" itemValue="2" />
-                    </p:selectOneRadio>
-                   <!-- <p:selectOneRadio id="console" class="baoxiu" value="#{v2PmOrderController.qaStatus}" >
-                        <p:ajax  listener="#{v2PmOrderController.onQaStatusChange()}"  update="@(.baoxiu)" />
-                        <f:selectItems value="#{fieldMsg.getFieldValueList('qaStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
                     </p:selectOneRadio>-->
+                    <p:selectOneRadio id="console"  value="#{v2PmOrderController.qaStatus}" >
+                        <p:ajax  update="@(.toRepairButton)" />
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('qaStatus')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
+                    </p:selectOneRadio>
                     <br/>
                     <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
                         <f:facet name="header">附件上传</f:facet>
@@ -243,7 +243,7 @@
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
                        <!-- <p:commandButton rendered="#{v2PmOrderController.isChecked() eq true}" validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认批量关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>-->
 
-                        <p:commandButton immediate="true" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" rendered="#{v2PmOrderController.selectedPmOrder.assetInfo.status ne 4}" disabled="#{v2PmOrderController.qaStatus.equals('1')}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
+                        <p:commandButton immediate="true" class="toRepairButton" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" rendered="#{v2PmOrderController.selectedPmOrder.assetInfo.status ne 4}" disabled="#{v2PmOrderController.qaStatus.equals('0')}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
