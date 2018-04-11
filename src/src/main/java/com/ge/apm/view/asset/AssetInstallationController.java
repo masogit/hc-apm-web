@@ -347,7 +347,7 @@ public class AssetInstallationController {
             WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             financingNum = "";
         }
-        if (financingNum != null && (StringUtils.isEmpty(this.arrivalListItem.getFinancingNum()) || this.arrivalListItem.getFinancingNum().length() <= 3)) {
+        if (financingNum != null && (StringUtils.isEmpty(this.arrivalListItem.getFinancingNum()) || this.arrivalListItem.getFinancingNum().length() <= 4)) {
             this.arrivalListItem.setFinancingNum(financingNum);
         }
         onDepartNumChange("financingNum");
