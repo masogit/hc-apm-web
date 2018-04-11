@@ -34,6 +34,8 @@ import webapp.framework.web.mvc.ServerEventInterface;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
@@ -366,32 +368,42 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //download use
 
+
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        if (assetId == null) {
+            setUserSearchFilters();
+        }
+
         selected = null;
         List<Integer> stus = new ArrayList<>();
         stus.add(1);stus.add(3);
+
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        String p=request.getServletPath();
+        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
+            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
+        }
+        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
+        }
+
 
         if (queryIndex == 1) {
             //正常可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         } else if(queryIndex == 2){
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }else if(queryIndex == 3){
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
 
-        if (assetId == null) {
-            if (searchFilters == null) {
-                searchFilters = new ArrayList<SearchFilter>();
-            }
-            setUserSearchFilters();
-        }
+
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
