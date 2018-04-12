@@ -28,8 +28,8 @@ export default {
     },
     *['data/get']({ payload }, { select, put, call }) {
       const query = yield select(state => {
-        const { ScanDetails_filters, assets } = state
-        const { range, dept, cursor, hospital } = ScanDetails_filters
+        const { ScanDetails_filters, assets, depts } = state
+        const { range, dept, cursor } = ScanDetails_filters
         const { from, to } = range
         const { type, part } = cursor
         const { index } = state.assets
@@ -37,7 +37,7 @@ export default {
           from,
           to,
           dept,
-          hospital,
+          hospital: depts.selectedHospital,
           type,
           part,
           start: index * PAGE_SIZE,
