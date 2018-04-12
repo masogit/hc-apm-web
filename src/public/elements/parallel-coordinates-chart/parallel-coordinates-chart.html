@@ -144,9 +144,15 @@
           from: String,
           to: String,
           range: Object,
-          dept: String,
+          dept: {
+            type: String,
+            notify: true,
+          },
           type: String,
-          hospital: String,
+          hospital: {
+            type: String,
+            notify: true,
+          },
           data: Array,
           total: Object,
           scales: Object,
@@ -162,7 +168,8 @@
         observers: [
           '_replot(width, height, data)',
           'saveOptionsInHistory(sortBy)',
-          '_loadData(range, dept, type, sortBy, pageStart, pageSize)'
+          '_resetDept(hospital)',
+          '_loadData(range, dept, hospital, type, sortBy, pageStart, pageSize)'
         ],
         listeners: {
           'iron-resize': '_onResize'
@@ -813,6 +820,9 @@
           this.set('width', rect.width);
           this.set('height', rect.height);
         },
+        _resetDept: function() {
+          this.set('dept', '');
+        }
       });
     });
   </script>
