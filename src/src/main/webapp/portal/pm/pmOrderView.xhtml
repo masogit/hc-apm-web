@@ -68,10 +68,7 @@
                                 <f:convertDateTime pattern="yyyy-MM-dd"/>
                             </p:outputLabel>
                         </h:panelGroup>
-
                     </p:panelGrid>
-
-
 
                     <p:dataTable value="#{v2PmOrderController.aquirePmOrderStep()}" var="stepItem">
                         <p:column headerText="#{msg.stepName}">
@@ -90,15 +87,9 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-
-
-
                         <p:column headerText="#{msg.description}">
                             <h:outputText value="#{stepItem.comments}" />
                         </p:column>
-
-
-
                     </p:dataTable>
 
                     <h:panelGroup>
@@ -168,20 +159,22 @@
                                 <p:graphicImage   url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/>
                                 <p:link  href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}"  update="pictureList"   process="@this"> 下载文件
                                 </p:link>
-
                             </h:panelGrid>
-
                         </p:panel>
-
                     </p:dataGrid>
-                   <!-- <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>-->
 
-
-
+                    <h:panelGroup >
+                        <label class="label">审批通知消息</label>
+                        <p:dataList value="#{v2PmOrderController.getServiceRequestMessageList(v2PmOrderController.selected.id)}" var="msgItem" rendered="#{not empty v2PmOrderController.getServiceRequestMessageList(v2PmOrderController.selected.id)}">
+                            <h:outputText value="#{msgItem.sendTime}" >
+                                <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
+                            </h:outputText>
+                            <h:outputText value="#{msgItem.senderUserName}"  style="padding-left: 10px"/>
+                            <h:outputText value="#{msgItem.message}"  style="padding-left: 10px"/>
+                        </p:dataList>
+                    </h:panelGroup>
                 </p:fieldset>
             </h:form>
-
         </div>
     </ui:composition>
 </html>

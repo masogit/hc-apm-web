@@ -20,6 +20,7 @@ import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -101,6 +102,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 	private Integer pmType;
 	private I18nMessageRepository i18nMessageRepository;
 
+    public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
+        return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
+    }
 	public boolean isChecked() {
 		Map<String, Boolean> map = this.selectedMap;
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
@@ -112,6 +116,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return false;
 	}
 
+     //审批
+	private boolean approveNotes(){
+       return approvedDetails.isEmpty();
+    }
 private String qaStatus="0";
 	public void onQaStatusChange(){
        /*if(qaStatus.equalsIgnoreCase("1")){
@@ -1052,4 +1060,7 @@ public void batchDefineQualify(){
     public void setQaStatus(String qaStatus) {
         this.qaStatus = qaStatus;
     }
+
+
+
 }

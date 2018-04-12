@@ -27,6 +27,8 @@ import java.util.*;
 @Component
 public class V2_PmOrderService {
     @Autowired
+    private ServiceRequestMsgRepository msgDao;
+    @Autowired
     protected RestTemplate template;
     @Autowired
     private BiomedGroupRepository groupDao;
@@ -438,6 +440,10 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
 
     public void setUserDao(UserAccountRepository userDao) {
         this.userDao = userDao;
+    }
+
+    public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
+        return msgDao.findBySrIdOrderBySendTime(id);
     }
 }
 
