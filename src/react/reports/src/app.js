@@ -66,7 +66,6 @@ const app = dva({
 app.model(user)
 app.model(assetTypes)
 app.model(depts)
-app.model(hospitals)
 /** Asset Browser */
 app.model(assetBrowser)
 /* Asset Perf */
