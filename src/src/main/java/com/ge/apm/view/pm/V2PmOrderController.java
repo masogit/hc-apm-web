@@ -116,10 +116,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return false;
 	}
 
-     //审批
-	private boolean approveNotes(){
-       return approvedDetails.isEmpty();
-    }
+
+
 private String qaStatus="0";
 	public void onQaStatusChange(){
        /*if(qaStatus.equalsIgnoreCase("1")){
@@ -568,7 +566,12 @@ public void batchDefineQualify(){
         }
     });
 }
+    //审批
+    public boolean approveNotes(){
+        //如果发现有一个是true的  就返回false，否则 全是false 返回true
+        return   !selectedMap.entrySet().stream().anyMatch(item-> item.getValue());
 
+    }
     public void approvePMorder(){
         if(selectedPmOrder!=null)
             approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
