@@ -424,14 +424,15 @@ public class AssetInstallationController {
                     switch (fieldName) {
                         case "financingNum":
                             num = arrivalListItem.getFinancingNum();
+                            arrivalListItem.setFinancingNum(num);
+                            arrivalListItem.setDepartNum(num);
                             break;
                         case "departNum":
                             num = arrivalListItem.getDepartNum();
+                            arrivalListItem.setFinancingNum(num);
+                            arrivalListItem.setDepartNum(num);
                             break;
-                        default:
                     }
-                    arrivalListItem.setFinancingNum(num);
-                    arrivalListItem.setDepartNum(num);
                     break;
                 default:
             }
