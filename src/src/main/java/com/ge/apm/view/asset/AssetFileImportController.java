@@ -6,6 +6,7 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetSeriaNumConfigRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetFileImportService;
@@ -28,6 +29,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -46,6 +48,8 @@ public class AssetFileImportController {
     private AssetFileImportService aiService;
     private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
     private UaaService uaaService;
+
+    private OrgInfoRepository orgDao;
 
     private Boolean isImported = false;
     private Boolean hasExportData = false;
@@ -66,11 +70,14 @@ public class AssetFileImportController {
         aiService = WebUtil.getBean(AssetFileImportService.class);
         assetSeriaNumConfigRepository = WebUtil.getBean(AssetSeriaNumConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
 
         autoGenerateFinancingNum = configuredCount > 0L;
+
+        selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
 
         initOrgTree();
 
@@ -179,7 +186,14 @@ public class AssetFileImportController {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
-        selectedOrg = orgInfo;
+        if (orgInfo == null || orgInfo.getId() == -1) {
+
+            selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        } else {
+            selectedOrg = orgInfo;
+        }
+
+        aiService.setSelectedOrgToImport(selectedOrg);
 
     }
 
