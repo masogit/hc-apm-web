@@ -96,7 +96,7 @@ public class OrgService {
         List<Map<String,Object>> orgInfoMapList = new ArrayList<>();
         for (OrgInfo oi : tempOrgInfoList) {
           orgMap = new HashedMap();
-          orgMap.put("id", oi.getSiteId());
+          orgMap.put("id", oi.getId());
           orgMap.put("parent_id", oi.getHospitalId());
           orgMap.put("site_id", oi.getSiteId());
           orgMap.put("hospital_id", oi.getHospitalId());
