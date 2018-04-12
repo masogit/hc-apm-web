@@ -124,7 +124,7 @@
                         <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     </p:fieldset>
-                    <p:fieldset legend="相关报告" >
+                   <!-- <p:fieldset legend="相关报告" >
                         <h:panelGroup id="addReport">
                             <p:selectOneMenu value="#{commonReportController.reportUid}">
                                 <p:ajax update="addReport" />
@@ -143,7 +143,7 @@
                             <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                             <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                         </p:dataList>
-                    </p:fieldset>
+                    </p:fieldset>-->
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
                         <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
