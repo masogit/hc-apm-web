@@ -9,9 +9,7 @@
     <p:dialog class="pmapproveDialogCls" id="pmapproveDialog" widgetVar="pmapproveDialog" modal="true"  resizable="true" draggable="true" width="1000" appendTo="@(body)" header="审批" height="430">
         <h:form id="pmapproveDialogForm" class="pmapproveDialogForm1">
             <h:panelGroup id="display3" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
-
                 <p:fieldset legend="备件审批" >
-
                     <p:dataTable  id="accessList123" value="#{v2PmOrderController.approvedDetails}" var="item" paginator="false"
                                   rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                         <p:column >
@@ -58,7 +56,7 @@
                 </p:fieldset>
                 <h:panelGroup>
                     <label class="label">备注</label>
-                    <p:inputTextarea value="#{v2PmOrderController.comments}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
+                    <p:inputTextarea value="#{v2PmOrderController.comments}" required="#{v2PmOrderController.approveNotes}" rows="2"  cols="40"  queryDelay="750" minQueryLength="4" maxlength="100"/>
                 </h:panelGroup>
                 <br/>
                 <h:panelGroup>
