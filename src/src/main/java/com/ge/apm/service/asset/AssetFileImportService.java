@@ -90,6 +90,8 @@ public class AssetFileImportService {
     
     private UserContextService userContextService=WebUtil.getBean(UserContextService.class);
 
+    private OrgInfo selectedOrgToImport;
+
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
@@ -778,4 +780,7 @@ public class AssetFileImportService {
 
     }
 
+    public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
+        this.selectedOrgToImport = selectedOrgToImport;
+    }
 }
