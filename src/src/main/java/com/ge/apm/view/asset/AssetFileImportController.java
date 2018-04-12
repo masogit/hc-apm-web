@@ -6,7 +6,10 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.AssetSeriaNumConfigRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetFileImportService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,9 +26,8 @@ import javax.faces.context.FacesContext;
 
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.*;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -43,6 +45,7 @@ public class AssetFileImportController {
 
     private AssetFileImportService aiService;
     private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
+    private UaaService uaaService;
 
     private Boolean isImported = false;
     private Boolean hasExportData = false;
@@ -54,15 +57,22 @@ public class AssetFileImportController {
 
     private StreamedContent exportFile;
 
+    private TreeNode orgTree;
+    private TreeNode selectedNode;
+    private OrgInfo selectedOrg;
+
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetFileImportService.class);
         assetSeriaNumConfigRepository = WebUtil.getBean(AssetSeriaNumConfigRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
 
         autoGenerateFinancingNum = configuredCount > 0L;
+
+        initOrgTree();
 
     }
 
@@ -148,6 +158,31 @@ public class AssetFileImportController {
         }
     }
 
+    public void initOrgTree() {
+        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
+
+        OrgInfo rootOrg = new OrgInfo();
+        rootOrg.setId(-1);
+        rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+        orgTree = new DefaultTreeNode("root", null, null);
+        TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+        if (null != treeNode) {
+            rootNode.getChildren().add(treeNode);
+        }
+        rootNode.setExpanded(true);
+
+    }
+
+    public void onSelectTreeNode(NodeSelectEvent event) {
+        TreeNode node = event.getTreeNode();
+        OrgInfo orgInfo = (OrgInfo) node.getData();
+
+        selectedOrg = orgInfo;
+
+    }
+
     //Getter and Setter
     public Map<String, Map<String, Object>> getImportOrgMap() {
         return importOrgMap;
@@ -204,5 +239,28 @@ public class AssetFileImportController {
     public void setIsGeneratePmOrder(Boolean isGeneratePmOrder) {
         this.isGeneratePmOrder = isGeneratePmOrder;
     }
-    
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public TreeNode getOrgTree() {
+        return orgTree;
+    }
+
+    public void setOrgTree(TreeNode orgTree) {
+        this.orgTree = orgTree;
+    }
+
+    public TreeNode getSelectedNode() {
+        return selectedNode;
+    }
+
+    public void setSelectedNode(TreeNode selectedNode) {
+        this.selectedNode = selectedNode;
+    }
 }

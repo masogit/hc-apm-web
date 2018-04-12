@@ -33,6 +33,26 @@
                                 <!--<p><a href="APM_Asset_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a></p>-->
 
                             </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class="label">#{msg.hospitalId}</label><!--所属医院-->
+                                <p:inputText id="selectedUserOrgName" value="#{assetFileImportController.selectedOrg==null?'':assetFileImportController.selectedOrg.name}" readonly="true" />
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetFileImportController.orgTree}" selection="#{assetFileImportController.selectedNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":importForm:selectedUserOrgName" listener="#{assetFileImportController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+
                         </p:panelGrid>
                     </p:fieldset>
                 </h:form>
