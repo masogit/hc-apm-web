@@ -184,7 +184,6 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     
     public void getAssetInfo(Date times,Date timesa,String accepter,String ClinicalUid) throws ParseException{//查询并插入借用设备信息
-        
         List<SharedAssetReqDetail> sardList = selected.getSardList();
         Date endsTime = null;
         List<AssetInfo> assetInfoList = selected.getInfoList();
@@ -255,7 +254,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                             assetDetaiVo.setClinicalDeptForReturnName(ClinicalName);
                                             endsTime = timesa;
                                             if( "1".equals(this.selected.getType())){
-                                               
+                                               assetDetaiVo.setChargingType("维修借用");
                                              }
                                     
                                             else if("次".equals(swapTypeVo.getChargingType())){
@@ -395,7 +394,9 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         item.setBorrowStatus(true); 
                                     }
                                     assetDetaiVo.setAccessoryList(swapTypeVo.getAccessoryList());
-                                    assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
+                                    if( !"1".equals(this.selected.getType())){
+                                        assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
+                                    }
                                     assetDetaiVo.setUnitPrice(swapTypeVo.getUnitPrice());//单价
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
@@ -486,19 +487,22 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     public void prepareEditSard(){
         selectedBorrowAccessoryList = new ArrayList<String>();
-        for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
-            if(item.getBorrowStatus() !=null&&item.getBorrowStatus()){
-                selectedBorrowAccessoryList.add(item.getName());
+        if(this.selectedSard.getAccessoryList()!=null){
+            for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
+                if(item.getBorrowStatus() !=null&&item.getBorrowStatus()){
+                    selectedBorrowAccessoryList.add(item.getName());
+                }
             }
-        }
-        selectedReturnAccessoryList = new ArrayList<String>();
-        for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
-            if(selectedReturnAccessoryList!=null){
-                if(item.getReturnStatus() !=null&&item.getReturnStatus()){
-                    selectedReturnAccessoryList.add(item.getName());
+            selectedReturnAccessoryList = new ArrayList<String>();
+            for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
+                if(selectedReturnAccessoryList!=null){
+                    if(item.getReturnStatus() !=null&&item.getReturnStatus()){
+                        selectedReturnAccessoryList.add(item.getName());
+                    }
                 }
             }
         }
+        
     }
     public void deliverR() {
            String msg = "";
