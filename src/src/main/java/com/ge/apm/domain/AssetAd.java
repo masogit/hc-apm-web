@@ -37,6 +37,9 @@ public class AssetAd implements Serializable {
 
 	@Column(name = "comment")
 	private String comment;
+	
+	@Column(name="index")
+	private Integer index;
 
 	@Column(name = "content",columnDefinition="text")
 	private String content;
@@ -238,6 +241,14 @@ public class AssetAd implements Serializable {
 
 	public void setEndDate(Date endDate) {
 		this.endDate = endDate;
+	}
+
+	public Integer getIndex() {
+		return index;
+	}
+
+	public void setIndex(Integer index) {
+		this.index = index;
 	}
 
 	@Override
