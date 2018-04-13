@@ -101,10 +101,20 @@
                 
                 <h:panelGroup id="display">
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.AcceptR}"  update="IouEditForm" action="List?faces-redirect=true" value="确认受理" icon="ui-icon-check" />
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.ShelveR}" action="List?faces-redirect=true" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 7}"/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.AcceptR}"  update="IouEditForm" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="确认受理" icon="ui-icon-check" />
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.ShelveR}" oncomplete="openSwapTypeViewWindow3(xhr, status, args)" value="搁置受理" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 7}"/>
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
-                              
+                    <script>
+                        function openSwapTypeViewWindow3(xhr, status, args) {
+                            var url = args.url;
+                            if (url == "norespond") {
+
+                            } else {
+                                this.location.href = url;
+                            }
+                        }
+
+                    </script>
                 </h:panelGroup>
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>
