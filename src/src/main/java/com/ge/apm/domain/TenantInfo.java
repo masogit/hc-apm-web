@@ -99,6 +99,12 @@ public class TenantInfo implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date activeTime;
 
+    @Column(name = "active_user_id")
+    private Integer activeUserId;
+
+    @Column(name = "active_type")
+    private Integer activeType;//0 means super admin ,1 means by tenant user
+
     public Integer getType() {
 		return type;
 	}
@@ -335,4 +341,19 @@ public class TenantInfo implements Serializable {
         this.activeTime = activeTime;
     }
 
+    public Integer getActiveUserId() {
+        return activeUserId;
+    }
+
+    public void setActiveUserId(Integer activeUserId) {
+        this.activeUserId = activeUserId;
+    }
+
+    public Integer getActiveType() {
+        return activeType;
+    }
+
+    public void setActiveType(Integer activeType) {
+        this.activeType = activeType;
+    }
 }
