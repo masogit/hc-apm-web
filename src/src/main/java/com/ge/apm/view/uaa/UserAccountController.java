@@ -651,13 +651,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         WebUtil.addSuccessMessage("激活成功！");
     }*/
 
-/*    public boolean needActive(){
+    public boolean needActive(){
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         if(tenant != null && tenant.getIsEnabled() == false){
             return false;
         }
         return true;
-    }*/
+    }
 
     public boolean hasAuthority(){
         return loginUser.getUserRoleNames().contains("系统激活专用") ? true : false;
