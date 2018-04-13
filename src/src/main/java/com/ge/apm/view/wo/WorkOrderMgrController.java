@@ -296,8 +296,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
             //去除派工模式4且待派工的单子
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 4, "1*3+7*8+"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*8+"));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 4, "1*3+7*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*"));
             //当前责任人是自己且已经派工的单子
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+9*"));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));

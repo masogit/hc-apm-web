@@ -631,6 +631,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
             tenant.setIsEnabled(true);
             tenant.setActiveTime(new Date());
+            tenant.setActiveUserId(loginUser.getId());
+            tenant.setActiveType(1);
             tenantInfoRepository.save(tenant);
             dao.updateMembersStatus(loginUser.getTenantUID());
         }
@@ -638,23 +640,25 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         WebUtil.addSuccessMessage("激活成功！");
     }
 
-    @Transactional
+/*    @Transactional
     public void activeTenant(){
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenant.setIsEnabled(true);
         tenant.setActiveTime(new Date());
+        tenant.setActiveUserId(loginUser.getId());
+        tenant.setActiveType(1);
         tenantInfoRepository.save(tenant);
         dao.updateMembersStatus(loginUser.getTenantUID());
         WebUtil.addSuccessMessage("激活成功！");
-    }
+    }*/
 
-    public boolean needActive(){
+/*    public boolean needActive(){
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         if(tenant != null && tenant.getIsEnabled() == false){
             return false;
         }
         return true;
-    }
+    }*/
 
     public boolean hasAuthority(){
         return loginUser.getUserRoleNames().contains("系统激活专用") ? true : false;
