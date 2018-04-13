@@ -129,6 +129,11 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Transactional
     @Modifying
+    @Query(value= "update user_account set active_time = null,is_active = false where tenant_uid = ?1 and id not in(select user_id from user_role where role_id = 9)",nativeQuery=true)
+    public void deactiveTenantMembersStatus(String tenantUid);
+
+    @Transactional
+    @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where id = ?1",nativeQuery=true)
     public void activeSingleUser(Integer userId);
 

@@ -386,19 +386,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
-            item.setMaitanance(easyInstallItem.getMaitanance());
             item.setFunctionGroup(easyInstallItem.getFunctionGroup());
             item.setAssetCode68(easyInstallItem.getAssetCode68());
-            item.setManufactDate(easyInstallItem.getManufactDate());
+            item.setRegistrationNo(easyInstallItem.getRegistrationNo());
+            item.setMaitanance(easyInstallItem.getMaitanance());
             item.setPurchaseDate(easyInstallItem.getPurchaseDate());
             item.setWarrantyDate(easyInstallItem.getWarrantyDate());
-            item.setFactoryWarrantyDate(easyInstallItem.getFactoryWarrantyDate());
-            item.setWarrantyYear(easyInstallItem.getWarrantyYear());
-            item.setTerminateDate(easyInstallItem.getTerminateDate());
             item.setPurchasePrice(easyInstallItem.getPurchasePrice());
-            item.setSalvageValue(easyInstallItem.getSalvageValue());
-            item.setLifecycleInYear(easyInstallItem.getLifecycleInYear());
-            item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
             item.setAssetUsage(easyInstallItem.getAssetUsage());
             item.setCapitalSource(easyInstallItem.getCapitalSource());
             item.setMeasureGrade(easyInstallItem.getMeasureGrade());
@@ -407,6 +401,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setImportEquipment(easyInstallItem.getImportEquipment());
             item.setMeasuringItemCategory(easyInstallItem.getMeasuringItemCategory());
             item.setAccountingCategory(easyInstallItem.getAccountingCategory());
+            item.setSalvageValue(easyInstallItem.getSalvageValue());
+            item.setLifecycleInYear(easyInstallItem.getLifecycleInYear());
+            item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
         });
         itemDao.save(saveList);
         WebUtil.addSuccessMessage("已保存");
