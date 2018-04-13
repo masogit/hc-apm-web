@@ -639,7 +639,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         WebUtil.addSuccessMessage("激活成功！");
     }
 
-/*    @Transactional
+    @Transactional
     public void activeTenant(){
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenant.setIsEnabled(true);
@@ -649,7 +649,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         tenantInfoRepository.save(tenant);
         dao.updateMembersStatus(loginUser.getTenantUID());
         WebUtil.addSuccessMessage("激活成功！");
-    }*/
+    }
 
     public boolean needActive(){
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
