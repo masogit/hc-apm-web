@@ -143,15 +143,20 @@ public class UaaService {
 
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+        TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userRoleDao.deleteByUserAccount(userAccount.getId());
         
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
         if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
-            deactiveTemporaryUser(userAccount.getId());
+            TenantInfo tenant = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+            if(tenant.getIsEnabled() == null || (!tenant.getIsEnabled())){
+                deactiveTemporaryUser(userAccount.getId());
+            }
         }
         if(newRoleNames.contains(TEMP_STAFF)){
             activeTemporaryUser(userAccount.getId());
+
         }
         if(newRoleNames.isEmpty()){
             newRoleNames.add("临床科室人员");
