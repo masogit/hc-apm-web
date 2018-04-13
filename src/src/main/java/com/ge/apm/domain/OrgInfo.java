@@ -2,10 +2,9 @@
  */
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.Serializable;
 import java.util.UUID;
+
 import javax.persistence.Basic;
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
@@ -18,10 +17,17 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -98,6 +104,7 @@ public class OrgInfo implements Serializable {
     private Integer assetOwnerId;
     @Column(name = "asset_owner_id2")
     private Integer assetOwnerId2;
+
     public OrgInfo() {
     }
 
@@ -306,4 +313,5 @@ public class OrgInfo implements Serializable {
 
         return name;
     }
+    
 }
