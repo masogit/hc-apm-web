@@ -521,6 +521,72 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
            asdDao.save(selected.getSardList());
        
     }
+    public void setCost(SharedAssetReqDetail sard){
+        if("次".equals(sard.getChargingType())){
+            sard.setCountQty(1);
+            sard.setCost(sard.getUnitPrice());
+        }
+        else if("小时".equals(sard.getChargingType())){
+            long nd = 1000 * 24 * 60 * 60;
+            long nh = 1000 * 60 * 60;
+            long nm = 1000 * 60;
+            long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
+            Integer countQty = null;
+            // 计算差多少天
+            long day = diff / nd;
+            // 计算差多少小时
+            long hour = diff % nd / nh;
+            // 计算差多少分钟
+            long min = diff % nd % nh / nm;
+            countQty = (int)(day*24*60/30+hour*2+min/30);
+            sard.setCountQty(countQty);
+            sard.setCost(countQty*sard.getUnitPrice()/2);
+        }
+        else{
+            Calendar cal1 = Calendar.getInstance();
+            cal1.setTime(sard.getChargingBeginTime());
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(sard.getChargingEndTime());
+            int day1= cal1.get(Calendar.DAY_OF_YEAR);
+            int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+            int year1 = cal1.get(Calendar.YEAR);
+            int year2 = cal2.get(Calendar.YEAR);
+            Date date1 = sard.getChargingBeginTime();
+            Date date2 = sard.getChargingEndTime();
+            long  between = date2.getTime() - date1.getTime();
+            if(year1 != year2) {  //同一年
+                int timeDistance = 0 ;
+                for(int i = year1 ; i < year2 ; i ++){
+                    if(i%4==0 && i%100!=0 || i%400==0)    //闰年
+                    {
+                        timeDistance += 366;
+                    }
+                    else    //不是闰年
+                    {
+                        timeDistance += 365;
+                    }
+                }
+                if(between >= (24* 3600000)){
+                    sard.setCountQty(timeDistance + (day2-day1));
+                    sard.setCost((timeDistance + (day2-day1))*sard.getUnitPrice());
+                }
+                else{
+                    sard.setCountQty(0);
+                    sard.setCost(null);
+                }
+            }
+            else {  //不同年
+                if(between >= (24* 3600000)){
+                    sard.setCountQty(day2-day1);
+                    sard.setCost((day2-day1)*sard.getUnitPrice());
+                }else{
+                    sard.setCountQty(0);
+                    sard.setCost(null);
+                }
+            }
+        }
+    }
+    
     public void saveSard(String type){
          List<SharedAssetReqDetail> sardList = selected.getSardList();
          List<SharedAssetTypeAccesssory> accessoryList = selectedSard.getAccessoryList();
@@ -562,7 +628,8 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
  
         }
      
-         selectedSard.setAccessoryList(accessoryList); 
+         selectedSard.setAccessoryList(accessoryList);
+         this.setCost(selectedSard);
      }
     @Override
     public void onBeforeNewObject(SharedAssetRequest object) {
