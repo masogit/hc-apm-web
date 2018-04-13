@@ -133,7 +133,12 @@
         
 
             function openSwapTypeViewWindow(xhr, status, args) {
-                this.location.href = args.url;
+                var pageName = args.pageName;
+                if (pageName == 'Edit_2'){
+                    window.open(args.url, '_blank');
+                }else{
+                    this.location.href = args.url;
+                }
             }
 
         </script>
