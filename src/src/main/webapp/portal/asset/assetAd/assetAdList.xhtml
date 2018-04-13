@@ -19,6 +19,9 @@
 		<p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.comment}" />
 		</p:column>
+		<p:column headerText="序号" sortBy="#{item.index}" filterMatchMode="EQ">
+			<h:outputText value="#{item.index}" />
+		</p:column>
 		<p:column headerText="生效时间" sortBy="#{item.startDate}">
 			<h:outputText value="#{item.startDate}" />
 		</p:column>
