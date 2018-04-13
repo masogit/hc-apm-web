@@ -43,7 +43,7 @@
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="wo" legend="维修工单配置">
+                    <p:fieldset id="wo" legend="维修配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
                                 <label class="label">维修#{msg.dispatchUserName}</label>
@@ -175,7 +175,20 @@
                                 <label class = "label">到货安装是否需要核对入库</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}"/>
                             </h:panelGroup >
-
+                            <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.siteUID != null}">
+                                <label class="label">调剂中心</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{v2_WorkflowConfigController.getDispatherClinical()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">设备编码选择</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetCodeConfig}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                         <!-- <p:spacer/> -->

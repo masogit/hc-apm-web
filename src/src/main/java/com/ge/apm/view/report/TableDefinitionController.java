@@ -83,11 +83,7 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     }
 
     public String getEditUrl() {
-        if (selected.getTableType() == null || selected.getTableType().equals(TableDefinition.TableDefinitionType.JSON.toString())) {
-            return "createTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
-        } else {
-            return "createExcelTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
-        }
+        return "createTable.xhtml?faces-redirect=true&amp;id=" + selected.getId();
     }
 
     public String getCreateUrl() {

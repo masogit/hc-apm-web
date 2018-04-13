@@ -55,7 +55,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
 
     public List<OrgInfo> findByTenantUIDAndOrgType(String tenantUID, Integer orgType);
 
-    public List<OrgInfo> findByParentUIDAndOrgType(String parentUID, Integer orgType);
+    public List<OrgInfo> findByParentUIDAndOrgTypeOrderByNameAsc(String parentUID, Integer orgType);
 
     public List<OrgInfo> findByParentUID(String parentUID);
 
@@ -64,5 +64,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public OrgInfo findByTenantUIDAndName(String tenantUID, String name);
 
     OrgInfo findByUid(String uid);
+
+    public List<OrgInfo> findByParentUIDAndOrgType(String parentUID, Integer orgType);
 
 }

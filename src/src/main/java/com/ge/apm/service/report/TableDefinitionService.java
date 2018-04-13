@@ -53,9 +53,11 @@ public class TableDefinitionService {
 
     public List<String> getItemKeyList(TableSchema table) {
         List<String> keyList = new ArrayList();
-        table.getGroups().forEach(item -> {
-            keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
-        });
+        if (table.getGroups() != null) {
+            table.getGroups().forEach(item -> {
+                keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
+            });
+        }
         return keyList;
     }
 
@@ -89,7 +91,7 @@ public class TableDefinitionService {
         if (getCountByTemplate(tableDefinition.getId()) > 0) {
             WebUtil.addErrorMessage("模版使用中,不能删除");
         } else {
-            if (null != tableDefinition.getTableType() && tableDefinition.getTableType().equals(TableDefinition.TableDefinitionType.EXCEL.toString())) {
+            if (null != tableDefinition.getExcelStorageId()) {
                 blobService.deleteBlobFilesByStorageId(tableDefinition.getSchema());
             }
             templateDao.delete(tableDefinition);
@@ -110,8 +112,7 @@ public class TableDefinitionService {
     }
 
     @Transactional
-    public void updateExcelTemplate(TableDefinition selectedTableDefinition, UploadedFile uploadedFile) {
-        V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+    public void updateExcelTemplate(TableDefinition selectedTableDefinition, V2_BlobObject blobObject) {
         if (getCountByTemplate(selectedTableDefinition.getId()) > 0) {
             //模版下有记录
             TableDefinition newTemplate = new TableDefinition();
@@ -126,8 +127,8 @@ public class TableDefinitionService {
             newTemplate.setCreatedDate(new Date());
             newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             newTemplate.setStatus(selectedTableDefinition.getStatus());
-            newTemplate.setTableType(selectedTableDefinition.getTableType());
-            newTemplate.setSchema(blobObject.getObjectStorageId());
+            newTemplate.setExcelStorageId(blobObject.getObjectStorageId());
+            newTemplate.setSchema(selectedTableDefinition.getSchema());
             templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
@@ -139,8 +140,9 @@ public class TableDefinitionService {
             blobService.saveBlobObject(blobObject);
         } else {
             //模版下无记录
-            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getSchema())) {
-                selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
+            
+            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
+                selectedTableDefinition.setExcelStorageId(blobObject.getObjectStorageId());
                 selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
                 selectedTableDefinition.setLastModifiedDate(new Date());
                 templateDao.save(selectedTableDefinition);

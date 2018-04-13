@@ -76,14 +76,14 @@
                                         <label class="label">当二维码为空时自动生成</label>
                                         <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateQrcode}" onLabel="是" offLabel="否" disabled="#{assetFileImportController.isImported}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+<!--                                    <h:panelGroup>
                                         <label class="label">同时生成保养工单*</label>
                                         <p:selectOneMenu  value="#{assetFileImportController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItem itemLabel="是" itemValue="true"/>
                                             <f:selectItem itemLabel="否" itemValue="false"/>
                                         </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    </h:panelGroup>-->
                                 </h:panelGrid>
 
                             </h:panelGroup>

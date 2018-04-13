@@ -160,10 +160,12 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.clinicalDeptName}</label>
-                                        <p:selectOneMenu id="clinicalDeptName" value="#{assetCreateController.assetInfo.clinicalDeptId}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
+                                        <p:selectOneMenu id="clinicalDeptName" value="#{assetCreateController.clinicalDept}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" var="t"  filter="true" filterMatchMode="startsWith" converter="orgInfoConverter">
                                             <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel assetOwnerName parentAssetList" />
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{assetCreateController.getClinicalDeptList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                            <f:selectItems value="#{assetCreateController.getClinicalDeptListWithEmptyValue()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                            <p:column>
+                                                <h:outputText value="#{t.name}"/>
+                                            </p:column>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -217,15 +219,14 @@
                                         <label class="label">#{msg.maitananceTel}</label>
                                         <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+<!--                                    <h:panelGroup>
                                         <label class="label">同时生成保养工单*</label>
                                         <p:selectOneMenu  value="#{assetCreateController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItem itemLabel="是" itemValue="true"/>
                                             <f:selectItem itemLabel="否" itemValue="false"/>
                                         </p:selectOneMenu>
-                                        <!--<p:selectBooleanButton title="同时生成保养工单"    onLabel="是" offLabel="否"  value="#{assetCreateController.isGeneratePmOrder}"/>-->
-                                    </h:panelGroup>
+                                    </h:panelGroup>-->
 
                                 </p:panelGrid>
                             </p:fieldset>

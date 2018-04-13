@@ -52,7 +52,10 @@
         <script>
             window.onload = function () {
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
-
+                var isActive = "#{userContextService.isActive()}";
+                if(isActive == '1'){
+                    PF('ActiveDlg').show();
+                }
             }
         </script>
 
