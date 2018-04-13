@@ -20,19 +20,26 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请科室</label>
-                            <p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />
+                            <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>   
                         <h:panelGroup>
                             <label class='label'>虚拟电话网</label>
-                            <p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
+                            <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请日期</label>
-                            <p:inputText id="applyTime" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applyTime}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applyTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                            <!--<p:calendar id="applyTime"  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.applyTime}" mindate="#{sharedAssetRequestV2Controller.selected.applyTime}"-->
+                                        <!--maxdate="#{sharedAssetRequestV2Controller.selected.applyTime}" timeOnly="true" readonlyInput="true" showButtonPanel="false"/>-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>备注</label>
@@ -64,7 +71,7 @@
                         paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                         lazy="true" rowKey="#{item.swapName.hashCode()}" 
                        sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
-                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                         currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                         rows="20" emptyMessage="#{msg.noRecordFound}"
                         rowsPerPageTemplate="20,40,60,90">
@@ -84,12 +91,12 @@
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
-                        <f:facet name="{Toolbar}">
-                       <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                            <p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>
-                        </p:commandButton>
-                       
-                    </f:facet>
+                        <!--<f:facet name="{Toolbar}">-->
+                       <!--<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">-->
+                            <!--<p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>-->
+                        <!--</p:commandButton>-->
+                       <!---->
+                    <!--</f:facet>-->
                     </p:dataTable>
                 </p:fieldset>
 
@@ -97,8 +104,10 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected.state eq 2}" >
                         <h:panelGroup >
                             <label class='label'>批量输入</label>
-                            <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费开始时间" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
-                            <p:inputText  style="width: 100px;margin-left:10px " placeholder="设备接收人" value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
+                            <h:outputText value="计费开始时间："/>
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                            <h:outputText value="设备接收人："/>
+                            <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
                         </h:panelGroup>
                         <h:panelGroup >
                             <p:messages id="messages" closable="true" style="width: 900px" />

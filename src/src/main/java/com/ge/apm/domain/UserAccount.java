@@ -34,8 +34,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
-
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -103,7 +103,7 @@ public class UserAccount implements Serializable {
     @Basic(optional = false)
     @NotNull
     @Column(name = "is_active")
-    private boolean isActive;
+    private boolean isActive ;
     
     @Column(name = "org_level")
     private Integer orgLevel;
@@ -204,6 +204,11 @@ public class UserAccount implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+
+
+    @Column(name = "active_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date activeTime;
     
     @Transient
     private Integer excelIdex;
@@ -227,7 +232,7 @@ public class UserAccount implements Serializable {
         isSuperAdmin = false;
         isSiteAdmin = false;
         isLocalAdmin = false;
-        isActive = true;
+        isActive = false;
         isOnline = false;
     }
 
@@ -405,10 +410,11 @@ public class UserAccount implements Serializable {
 
     public String getUserRoleNames() {
         String roleNames = "";
-        if(userRoleList!=null){
-        	for(UserRole userRole: userRoleList){
-                roleNames = roleNames + userRole.getRole().getRoleDesc()+ " ";
-            }
+        if(CollectionUtils.isEmpty(userRoleList)){
+            return roleNames;
+        }
+        for(UserRole userRole: userRoleList){
+            roleNames = roleNames + userRole.getRole().getRoleDesc()+ " ";
         }
         return roleNames;
     }
@@ -767,4 +773,11 @@ public class UserAccount implements Serializable {
         }
     }
 
+    public Date getActiveTime() {
+        return activeTime;
+    }
+
+    public void setActiveTime(Date activeTime) {
+        this.activeTime = activeTime;
+    }
 }

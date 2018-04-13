@@ -9,16 +9,13 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.*;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmOrderRule;
@@ -30,6 +27,7 @@ import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.dao.GenericRepository;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.JpaCRUDController;
@@ -51,6 +49,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	private PmOrderRuleRepository pmOrderRuleRepository;
 	private OrgInfoRepository orgInfoRepository;
 	private String siteUid;
+	private BrandRepository brandRepository;
 
 	@Override
 	protected void init() {
@@ -61,6 +60,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+		brandRepository = WebUtil.getBean(BrandRepository.class);
 		targetAssets = new ArrayList<AssetInfo>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
@@ -90,8 +90,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();// getFilter(user.getSiteUID());
 		List<String> uids = null;
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
-			assetFilters
-					.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
 		}
 		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
@@ -103,8 +102,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
 		}
 		if (null != queryAsset.getClinicalDeptId()) {
-			assetFilters
-					.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+			assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
+		}
+		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
+			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
+			/*List<Integer> brandIds = brandRepository.findIdsNameLike(queryAsset.getBrand());
+			assetFilters.add(new SearchFilter("brandId", SearchFilter.Operator.IN, brandIds));*/
 		}
 		if (!assetFilters.isEmpty()) {
 			if (queryAsset.getRuleStatus() != null) {

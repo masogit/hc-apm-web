@@ -8,7 +8,7 @@
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:composition>
-        <div class="ui-g-12 card">
+        <div class="ui-g-12 card" >
 
             <h:form id="pmOrderDetailForm">
                 <p:fieldset legend="保养单" rendered="#{not empty v2PmOrderController.selected}">
@@ -29,6 +29,14 @@
                             <p:outputLabel value="#{v2PmOrderController.selected.ruleLevel}"></p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
+                            <label class="label">保养类型</label>
+                            <p:outputLabel value="#{fieldMsg.fieldValue('pmType',v2PmOrderController.selected.pmType)}"></p:outputLabel>
+                        </h:panelGroup>
+                       <!-- <h:panelGroup>
+                            <label class="label">保养类型</label>
+                            <p:outputLabel value="#{v2PmOrderController.acquirePmType(v2PmOrderController.selected)}"></p:outputLabel>
+                        </h:panelGroup>-->
+                        <h:panelGroup>
                             <label class="label">使用科室</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.assetInfo.clinicalDeptName}"></p:outputLabel>
                         </h:panelGroup>
@@ -44,6 +52,23 @@
                             <label class="label">当前处理步骤</label>
                             <p:outputLabel value="#{v2PmOrderController.selected.currentStepName}"></p:outputLabel>
                         </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">工时</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.manHours}"></p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">计划完成时间</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.planTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">实际完成时间</label>
+                            <p:outputLabel value="#{v2PmOrderController.selected.endTime}">
+                                <f:convertDateTime pattern="yyyy-MM-dd"/>
+                            </p:outputLabel>
+                        </h:panelGroup>
+
                     </p:panelGrid>
 
 
@@ -57,17 +82,22 @@
                         </p:column>
                         <p:column headerText="#{msg.startTime}">
                             <h:outputText value="#{stepItem.startTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.endTime}">
                             <h:outputText value="#{stepItem.endTime}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
+
+
+
                         <p:column headerText="#{msg.description}">
                             <h:outputText value="#{stepItem.comments}" />
                         </p:column>
+
+
 
                     </p:dataTable>
 

@@ -373,6 +373,13 @@ export class App extends Component<void, Props, void> {
     this.props.init()
   }
 
+  componentWillUnmount() {
+    EventBus.removeEventListener('process-analysis-brief-data', this.mountBriefData )
+    EventBus.removeEventListener('process-analysis-detail-data', this.mountDetailData )
+    EventBus.removeEventListener('process-analysis-gross-data', this.mountGrossData )
+    EventBus.removeEventListener('process-analysis-phase-data', this.mountPhaseData )
+  }
+
   componentWillReceiveProps(nextProps) {
     let { dataType, distributionEttr, distributionResponse } = nextProps
     let distribution

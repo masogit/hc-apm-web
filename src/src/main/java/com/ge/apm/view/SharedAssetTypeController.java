@@ -199,7 +199,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     
         List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
         
-        objectList = dao.find();
+        objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
         
         
         return objectList;
@@ -243,12 +243,8 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             objectList = dao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
-            if(objectList.size()==0){
-                return 0; 
-            }
-            else{
-                return dao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid).size();
-            }
+
+            return objectList.size();
         }
     }
     

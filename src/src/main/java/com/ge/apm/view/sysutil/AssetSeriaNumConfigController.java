@@ -6,6 +6,7 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.common.UserCommonService;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,12 +33,14 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	private List<OrgInfo> institutionList;
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
+	private UserCommonService userCommonService;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(AssetSeriaNumConfigRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
+		userCommonService = WebUtil.getBean(UserCommonService.class);
         user = UserContextService.getCurrentUserAccount();
         institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
     }
@@ -72,7 +75,7 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	}
 	
 	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgType(parentUID,orgType);
+		return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
 	}
 
 	public List<OrgInfo> getInstitutionList() {
@@ -113,14 +116,19 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 //   		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedSite"));
 //   		 	return;
 		}
-		dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
 	@Override
 	public void save(){
+		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+			return;
+		}
+
 		selected.setTenantUID(user.getTenantUID());
 		selected.setCreatedBy(user.getName());
 		selected.setLastModifiedBy(user.getName());
+		dao.deleteBySiteUID(selected.getSiteUID());
 		super.save();
 	}
 	
@@ -129,6 +137,13 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 		onBeforeSave(selected);
 		save();
 	}
-	
-	
+
+	@Override
+	public void delete() {
+		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+			return;
+		}
+		super.delete();
+	}
 }

@@ -9,8 +9,16 @@ public class QueryAsset {
 	private Integer ruleStatus;//规则状态 0：全部 1、已配置 2、未配置
 	private Integer level;
 	private Integer clinicalDeptId;//使用科室
-	
-	
+	private String brand;//品牌
+
+	public String getBrand() {
+		return brand;
+	}
+
+	public void setBrand(String brand) {
+		this.brand = brand;
+	}
+
 	public Integer getClinicalDeptId() {
 		return clinicalDeptId;
 	}

@@ -7,17 +7,25 @@ import javax.faces.bean.ViewScoped;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.report.TieFacesService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.transaction.annotation.Transactional;
+import org.tiefaces.components.websheet.TieWebSheetBean;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -26,7 +34,7 @@ import webapp.framework.web.WebUtil;
  */
 @ManagedBean
 @ViewScoped
-public class TableCreateController {
+public class TableCreateController extends TieWebSheetBean {
 
     private TableDefinitionRepository templateDao;
     private TableDefinitionService templateService;
@@ -43,11 +51,21 @@ public class TableCreateController {
 
     private Boolean isStringEditable = false;
 
-    @PostConstruct
-    protected void init() {
+    //for Excel
+    private UploadedFile uploadedFile;
+    private BlobFileService blobService;
+    private Map<String, Object> tableFields;
+    private HashMap<String, Object> context = new HashMap<String, Object>();
+    private V2_BlobObject uploadedFileObject;
+
+    @Override
+    public void initialLoad() {
         tableValue = new HashMap<String, Object>();
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         templateService = WebUtil.getBean(TableDefinitionService.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
+        tableFields = new HashMap<>();
+
         String templateId = WebUtil.getRequestParameter("id");
         if (Strings.isNullOrEmpty(templateId)) {
             CreateTemplate();
@@ -61,6 +79,15 @@ public class TableCreateController {
             } else {
                 tableString = selectedTableDefinition.getSchema();
             }
+
+            if (null != selectedTableDefinition.getExcelStorageId()) {
+                try {
+                    StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
+                    loadWebSheetByStream(savedFile.getStream());
+                } catch (Exception e) {
+                    WebUtil.addErrorMessage("Excel模版加载失败");
+                }
+            }
         }
 
     }
@@ -72,7 +99,17 @@ public class TableCreateController {
         selectedTableDefinition.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
         selectedTableDefinition.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Draft.toString());
-        selectedTableDefinition.setTableType(TableDefinition.TableDefinitionType.JSON.toString());
+    }
+
+    private void loadWebSheetByStream(InputStream inputStream) {
+        try {
+            this.setTieCommandAliasList(TieFacesService.commonAliasList());
+            tableFields.clear();
+            context.put("X", tableFields);
+            loadWebSheet(inputStream, context);
+        } catch (Exception e) {
+            WebUtil.addErrorMessage(e, "读取模版失败");
+        }
     }
 
     @Transactional
@@ -84,19 +121,47 @@ public class TableCreateController {
             tableString = JSONObject.toJSONString(table);
             selectedTableDefinition.setSchema(tableString);
             templateDao.save(selectedTableDefinition);
-            WebUtil.addSuccessMessage("已保存");
+            WebUtil.addSuccessMessage("JSON已保存");
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
                 selectedTableDefinition.setSchema(tableString);
                 selectedTableDefinition.setName(table.getTitle());
                 templateDao.save(selectedTableDefinition);
-                WebUtil.addSuccessMessage("已保存");
+                WebUtil.addSuccessMessage("JSON已保存");
             } else {
-                WebUtil.addErrorMessage("字段有变动,不能保存");
+                WebUtil.addErrorMessage("字段有变动,JSON不能保存");
             }
 
         }
+
+        //for excel
+        if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
+            //新建
+            if (uploadedFile != null) {
+//                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+                if (null != uploadedFileObject) {
+                    uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                    uploadedFileObject.setBoSubType("Excel");
+                    selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
+                    selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
+                    blobService.saveBlobObject(uploadedFileObject);
+                    WebUtil.addSuccessMessage("Excel已保存");
+                }
+            }
+        } else {
+            //修改
+            if (uploadedFile != null) {
+                //Eexcel 模版有变动
+                templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
+                WebUtil.addSuccessMessage("Excel已保存");
+            } else {
+                selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                WebUtil.addSuccessMessage("Excel已保存");
+            }
+        }
+
     }
 
     public void onTitleChange() {
@@ -200,7 +265,7 @@ public class TableCreateController {
                 editTableItem.setOptions(new ArrayList<TableOption>());
             }
         }
-        if(null != editTableItem.getExp()){
+        if (null != editTableItem.getExp()) {
             editTableItem.getExp().clear();
         }
 
@@ -258,6 +323,38 @@ public class TableCreateController {
         if (!Strings.isNullOrEmpty(editTableItem.getKey())) {
             editTableItem.setResKey(editTableItem.getKey().concat("_res"));
         }
+    }
+
+    public void cancelUpload() {
+        this.uploadedFile = null;
+        if (null != uploadedFileObject) {
+            blobService.deleteBlobFile(uploadedFileObject);
+            uploadedFileObject = null;
+        }
+        if (null != selectedTableDefinition.getExcelStorageId()) {
+            try {
+                StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
+                loadWebSheetByStream(savedFile.getStream());
+            } catch (Exception e) {
+                WebUtil.addErrorMessage("Excel模版加载失败");
+            }
+        }
+    }
+
+    public void uploadDataFile(FileUploadEvent event) {
+        this.uploadedFile = event.getFile();
+        uploadedFileObject = blobService.uploadFile(uploadedFile);
+    }
+
+    public void finishUpload() {
+        if (null != uploadedFileObject) {
+            StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
+            table.setTitle(uploadedFileObject.getObjectName().indexOf(".")>0? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")):uploadedFileObject.getObjectName());
+            loadWebSheetByStream(savedFile.getStream());
+        }
+    }
+
+    public void testSubmit() {
     }
 
     //getter and setter
@@ -323,6 +420,22 @@ public class TableCreateController {
 
     public void setIsStringEditable(Boolean isStringEditable) {
         this.isStringEditable = isStringEditable;
+    }
+
+    public Map<String, Object> getTableFields() {
+        return tableFields;
+    }
+
+    public void setTableFields(Map<String, Object> tableFields) {
+        this.tableFields = tableFields;
+    }
+
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
     }
 
 }

@@ -26,6 +26,7 @@ export default {
             from,
             to,
             dept,
+            hospital: state.depts.selectedHospital,
             type,
             supplier,
             rltgrp,

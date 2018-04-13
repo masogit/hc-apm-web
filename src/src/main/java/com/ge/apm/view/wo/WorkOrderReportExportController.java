@@ -113,8 +113,8 @@ public class WorkOrderReportExportController implements Serializable{
         currentSiteUID = currentUser.getSiteUID();
 
         institutionList = orgDao.findByTenantUIDAndOrgType(currentUser.getTenantUID(), 1);
-        hospitalList = orgDao.findByParentUIDAndOrgType(currentUser.getInstitutionUID(), 2);
-        siteList = orgDao.findByParentUIDAndOrgType(currentUser.getHospitalUID(), 3);
+        hospitalList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(currentUser.getInstitutionUID(), 2);
+        siteList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(currentUser.getHospitalUID(), 3);
 
         isStatusOpen = Boolean.TRUE;
         isStatusClose = Boolean.TRUE;
@@ -294,7 +294,7 @@ public class WorkOrderReportExportController implements Serializable{
     }
 
     public void filterSiteByHospital(){
-        siteList = orgDao.findByParentUIDAndOrgType(this.getCurrentHospitalUID(), 3);
+        siteList = orgDao.findByParentUIDAndOrgTypeOrderByNameAsc(this.getCurrentHospitalUID(), 3);
     }
 
     public StreamedContent getExportFile() {

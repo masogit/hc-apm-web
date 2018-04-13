@@ -2,6 +2,7 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -9,6 +10,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -21,6 +23,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -33,6 +36,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     SharedAssetReqDetailRepository asdDao = null;
     private List<AssetInfo> selectInfo ;
     private SharedAssetReqDetail selectedSard;
+    private UaaService uuaService;
     SharedAssetReqTypeRepository apdDao = null;
     AssetInfoRepository asiDao = null;
     SharedAssetTypeRepository swapDao = null;
@@ -47,6 +51,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     private boolean confirm;
     @Override
     protected void init() {
+        uuaService = WebUtil.getBean(UaaService.class);
         asdDao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
         asiDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -117,15 +122,68 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     @Override
     protected Page<SharedAssetRequest> loadData(PageRequest pageRequest) {
+        setUserSearchFilters();
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+    private void setUserSearchFilters() {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+
+//        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+//        //申请日期过滤
+//        if (applyTimeFormatTime != null ) {
+//            String[] split = applyTimeFormatTime.split("~");
+//            if (split.length == 1) {
+//                try {
+//                    Date dateFrom = sdf.parse(split[0] + " 00:00:00");
+//                    searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
+//                } catch (ParseException ex) {
+//                    Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            } else {
+//                if (split[0].equals("")) {
+//                    try {
+//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
+//                    } catch (ParseException ex) {
+//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                } else {
+//                    try {
+//                        Date dateFrom = sdf.parse(split[0] + " 00:00:00");
+//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
+//                    } catch (ParseException ex) {
+//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }
+//            }
+//
+//        }
+
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+//        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")||p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){
+//            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        }
+
+    }
     
     public void getAssetInfo(Date times,Date timesa,String accepter,String ClinicalUid) throws ParseException{//查询并插入借用设备信息
-        
         List<SharedAssetReqDetail> sardList = selected.getSardList();
         Date endsTime = null;
         List<AssetInfo> assetInfoList = selected.getInfoList();
@@ -196,7 +254,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                             assetDetaiVo.setClinicalDeptForReturnName(ClinicalName);
                                             endsTime = timesa;
                                             if( "1".equals(this.selected.getType())){
-                                               
+                                               assetDetaiVo.setChargingType("维修借用");
                                              }
                                     
                                             else if("次".equals(swapTypeVo.getChargingType())){
@@ -255,7 +313,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                                     }
                                                     else{
                                                          assetDetaiVo.setCountQty(0);
-                                                         assetDetaiVo.setCost(0);
+                                                         assetDetaiVo.setCost(null);
                                                     }
                                                 }
                                             else    //不同年
@@ -265,7 +323,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                                }
                                                 else{
                                                     assetDetaiVo.setCountQty(0);
-                                                    assetDetaiVo.setCost(0);
+                                                    assetDetaiVo.setCost(null);
                                                 }
                                             }
                                         }
@@ -336,7 +394,9 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         item.setBorrowStatus(true); 
                                     }
                                     assetDetaiVo.setAccessoryList(swapTypeVo.getAccessoryList());
-                                    assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
+                                    if( !"1".equals(this.selected.getType())){
+                                        assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
+                                    }
                                     assetDetaiVo.setUnitPrice(swapTypeVo.getUnitPrice());//单价
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
@@ -427,19 +487,22 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     public void prepareEditSard(){
         selectedBorrowAccessoryList = new ArrayList<String>();
-        for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
-            if(item.getBorrowStatus() !=null&&item.getBorrowStatus()){
-                selectedBorrowAccessoryList.add(item.getName());
+        if(this.selectedSard.getAccessoryList()!=null){
+            for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
+                if(item.getBorrowStatus() !=null&&item.getBorrowStatus()){
+                    selectedBorrowAccessoryList.add(item.getName());
+                }
             }
-        }
-        selectedReturnAccessoryList = new ArrayList<String>();
-        for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
-            if(selectedReturnAccessoryList!=null){
-                if(item.getReturnStatus() !=null&&item.getReturnStatus()){
-                    selectedReturnAccessoryList.add(item.getName());
+            selectedReturnAccessoryList = new ArrayList<String>();
+            for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
+                if(selectedReturnAccessoryList!=null){
+                    if(item.getReturnStatus() !=null&&item.getReturnStatus()){
+                        selectedReturnAccessoryList.add(item.getName());
+                    }
                 }
             }
         }
+        
     }
     public void deliverR() {
            String msg = "";
@@ -452,6 +515,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                WebUtil.addWarnMessage("请录入设备！");
                return;
            }
+           this.selected.setCreateDate(new Date());
            dao.save(selected);
            asiDao.save(selected.getInfoList());
            asdDao.save(selected.getSardList());
@@ -505,6 +569,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
         object.setId(UUID.randomUUID().toString().replace("-", ""));
         object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
         object.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
+        object.setCreateDate(new Date());
         object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
         object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
       //  object.setState(UserContextService.getCurrentUserAccount().getSiteUID());

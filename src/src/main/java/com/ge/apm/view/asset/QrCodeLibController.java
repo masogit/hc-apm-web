@@ -7,6 +7,7 @@ import javax.faces.bean.ViewScoped;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
+import com.ge.apm.service.common.UserCommonService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -52,6 +53,8 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
     OrgInfo selectedOrg;
 
+    private UserCommonService userCommonService;
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(QrCodeLibRepository.class);
@@ -60,6 +63,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         qrCodeLibDao = WebUtil.getBean(QrCodeLibRepository.class);
         acService = WebUtil.getBean(AssetCreateService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
 
         userContextService = WebUtil.getBean(UserContextService.class);
 
@@ -126,6 +130,11 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     }
 
     public void createQrCode() {
+
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedOrg.getSiteUID())){
+            return;
+        }
         if (userContextService.hasRole("ITAdmin")) {
             tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
             //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();

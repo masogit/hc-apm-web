@@ -2,6 +2,7 @@
  */
 package com.ge.apm.service.common;
 
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
@@ -18,6 +19,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.service.UserContext;
 
 /**
  *
@@ -29,6 +32,9 @@ public class UserCommonService {
     @Autowired
     private ServiceRequestApiService srApi;
     
+    @Autowired
+    private OrgInfoRepository orgInfoDao;
+
     @Autowired
     private UserAccountRepository userDao;
 
@@ -104,5 +110,52 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
         List<UserAccount> assetHeaderList = userDao.getAssetHeadList(tenantUid);
         assetHeaderList.addAll(userDao.findByTenantUIDAndStaffRole(tenantUid));
         return assetHeaderList.stream().distinct().collect(Collectors.toList());
+    }
+
+    //判断用户是否有操作数据权限
+    public boolean isCanOperate(UserAccount cua, String siteUID){
+        boolean flag = false;
+
+        if(!UserContextService.isOnlyLocalITAdmin()){
+            return true;
+        }
+        OrgInfo tempOrgInfo = orgInfoDao.getByUid(siteUID);
+
+        if(cua.getOrgLevel() < tempOrgInfo.getOrgLevel()){
+            flag = true;
+        }
+
+        if(cua.getOrgLevel() == tempOrgInfo.getOrgLevel() && cua.getSiteUID().equals(siteUID)){
+            flag = true;
+        }
+
+        if(!flag){
+            WebUtil.addErrorMessage("没有操作权限");
+        }
+
+        return flag;
+    }
+
+    //判断用户是否有操作数据权限
+    public boolean isCanOperate(UserAccount cua, OrgInfo oi){
+        boolean flag = false;
+
+        if(!UserContextService.isOnlyLocalITAdmin()){
+            return true;
+        }
+
+        if(cua.getOrgLevel() < oi.getOrgLevel()){
+            flag = true;
+        }
+
+        if(cua.getOrgLevel() == oi.getOrgLevel() && cua.getSiteUID().equals(oi.getSiteUID())){
+            flag = true;
+        }
+
+        if(!flag){
+            WebUtil.addErrorMessage("没有操作权限");
+        }
+
+        return flag;
     }
 }

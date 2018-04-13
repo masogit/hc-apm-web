@@ -1,0 +1,131 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="设备详情" />
+			</div>
+			<div class="ui-g-12 card">
+				<h:form id="inventoryAssetInfoListForm">
+					<p:carousel value="#{inventoryAssetInfoController.assetInfo}" headerText="" var="item" itemStyle="text-align:left" responsive="false">
+						<p:panelGrid columns="2" style="width:100%;margin:10px 0px" columnClasses="label,value" layout="grid" styleClass="ui-panelgrid-blank">
+							<h:outputText value="设备编号（院方）" />
+							<h:outputText value="#{item.departNum}" />
+							<h:outputText value="名称" />
+							<h:outputText value="#{item.name}" />
+							<h:outputText value="设备分类" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetGroup', item.assetGroup)}" />
+							<h:outputText value="当前状态" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetStatus', item.status)}" />
+							<h:outputText value="盘点结果" />
+							<h:outputText value="#{item.inventoryStatus==0?'未盘点':item.inventoryStatus==1?'已盘点':item.inventoryStatus==2?'无台账':'有问题'}" />
+							<!-- <h:outputText value="所属单位" />
+							<h:outputText value="#{item.orgPath}" /> -->
+							<h:outputText value="使用科室" />
+							<h:outputText value="#{item.clinicalDeptName}" />
+							<h:outputText value="使用责任人" />
+							<h:outputText value="#{item.clinicalOwnerName}" />
+							<h:outputText value="二维码" />
+							<h:outputText value="#{item.qrCode}" />
+							<h:outputText value="备注" />
+							<h:outputText value="#{item.comments}" />
+							<h:outputText value="设备别名" />
+							<h:outputText value="#{item.aliasName}" />
+							<h:outputText value="SystemID/厂商报修ID" />
+							<h:outputText value="#{item.systemId}" />
+							<h:outputText value="制造商" />
+							<h:outputText value="#{item.makerShortName}" />
+							<h:outputText value="供应商" />
+							<h:outputText value="#{item.vendor}" />
+							<h:outputText value="维修商" />
+							<h:outputText value="#{item.maitanance}" />
+							<h:outputText value="维修电话" />
+							<h:outputText value="#{item.maitananceTel}" />
+							<h:outputText value="维修负责人" />
+							<h:outputText value="#{item.assetOwnerName}" />
+							<h:outputText value="维修负责人电话" />
+							<h:outputText value="#{item.assetOwnerTel}" />
+							<h:outputText value="维修负责人2" />
+							<h:outputText value="#{item.assetOwnerName2}" />
+							<h:outputText value="维修负责人2电话" />
+							<h:outputText value="#{item.assetOwnerTel2}" />
+							<h:outputText value="维修负责人3" />
+							<h:outputText value="#{item.assetOwnerName3}" />
+							<h:outputText value="维修负责人3电话" />
+							<h:outputText value="#{item.assetOwnerTel3}" />
+							<h:outputText value="制造商序列号" />
+							<h:outputText value="#{item.serialNum}" />
+							<h:outputText value="2010国家编码" />
+							<h:outputText value="#{item.nationalStandardCode}" />
+							<h:outputText value="维修类型" />
+							<h:outputText value="#{fieldMsg.fieldValue('repairForm', item.repairForm)}" />
+							<h:outputText value="用途分类" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}" />
+							<h:outputText value="功能等级" />
+							<h:outputText value="#{item.functionGrade}" />
+							<h:outputText value="医疗器械分类" />
+							<h:outputText value="#{fieldMsg.fieldValue('assetFunctionType', item.functionGroup)}" />
+							<h:outputText value="资金来源" />
+							<h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}" />
+							<h:outputText value="风险等级" />
+							<h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}" />
+							<h:outputText value="计量等级" />
+							<h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}" />
+							<h:outputText value="是否急救设备" />
+							<h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}" />
+							<h:outputText value="是否进口设备" />
+							<h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}" />
+							<h:outputText value="核算类别" />
+							<h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}" />
+							<h:outputText value="计量项目类别" />
+							<h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}" />
+							<h:outputText value="资产编号" />
+							<h:outputText value="#{item.financingNum}" />
+							<h:outputText value="条码" />
+							<h:outputText value="#{item.barcode}" />
+							<h:outputText value="注册证号" />
+							<h:outputText value="#{item.registrationNo}" />
+							<h:outputText value="院内IT系统编号" />
+							<h:outputText value="#{item.modalityId}" />
+							<h:outputText value="安装位置编码" />
+							<h:outputText value="#{item.locationCode}" />
+							<h:outputText value="安装位置" />
+							<h:outputText value="#{item.locationName}" />
+							<h:outputText value="设备型号" />
+							<h:outputText value="#{item.functionType}" />
+							<h:outputText value="出厂日期" />
+							<h:outputText value="#{item.manufactDate}" />
+							<h:outputText value="采购日期" />
+							<h:outputText value="#{item.purchaseDate}" />
+							<h:outputText value="维保截止日期" />
+							<h:outputText value="#{item.warrantyDate}" />
+							<h:outputText value="到货日期" />
+							<h:outputText value="#{item.arriveDate}" />
+							<h:outputText value="启用日期" />
+							<h:outputText value="#{item.installDate}" />
+							<h:outputText value="质保日期" />
+							<h:outputText value="#{item.factoryWarrantyDate}" />
+							<h:outputText value="报废日期" />
+							<h:outputText value="#{item.terminateDate}" />
+							<h:outputText value="上次维护日期" />
+							<h:outputText value="#{item.lastPmDate}" />
+							<h:outputText value="上次巡检日期" />
+							<h:outputText value="#{item.lastQaDate}" />
+							<h:outputText value="上次计量日期" />
+							<h:outputText value="#{item.lastMeteringDate}" />
+							<h:outputText value="最终残值(元)" />
+							<p:inputNumber minValue="0" decimalPlaces="2" value="#{item.salvageValue}"/>
+							<h:outputText value="采购价格(元)" />
+							<p:inputNumber minValue="0" decimalPlaces="2" value="#{item.purchasePrice}"/>
+							<h:outputText value="使用年限" />
+							<h:outputText value="#{item.lifecycle}" />
+							<h:outputText value="折旧算法" />
+							<h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList', item.depreciationMethod)}" />
+						</p:panelGrid>
+					</p:carousel>
+				</h:form>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

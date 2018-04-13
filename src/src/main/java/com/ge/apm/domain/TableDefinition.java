@@ -34,10 +34,6 @@ public class TableDefinition implements Serializable {
         Draft, Released, Expired
     }
 
-    public enum TableDefinitionType {
-        JSON, EXCEL
-    }
-
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -64,9 +60,9 @@ public class TableDefinition implements Serializable {
     @Column(name = "description")
     private String description;
 
-    //类型
-    @Column(name = "table_type")
-    private String tableType;
+    //Excel 模版Id
+    @Column(name = "excel_storage_Id")
+    private String excelStorageId;
 
     //基本id
     @Column(name = "base_id", columnDefinition = "CHAR(32)")
@@ -183,12 +179,12 @@ public class TableDefinition implements Serializable {
         this.status = status;
     }
 
-    public String getTableType() {
-        return tableType;
+    public String getExcelStorageId() {
+        return excelStorageId;
     }
 
-    public void setTableType(String tableType) {
-        this.tableType = tableType;
+    public void setExcelStorageId(String excelStorageId) {
+        this.excelStorageId = excelStorageId;
     }
 
     public String getBaseId() {

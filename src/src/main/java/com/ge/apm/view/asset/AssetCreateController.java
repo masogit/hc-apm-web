@@ -53,6 +53,9 @@ public class AssetCreateController {
     private String[] selectedPictures;
 
     private UserAccount owner;
+
+    private OrgInfo clinicalDept;
+
     private Brand brand;
     private String rejectText;
     private List<String> rejectTextHistory;
@@ -163,6 +166,16 @@ public class AssetCreateController {
         return acService.getClinicalDeptList(assetInfo.getSiteUID());
     }
 
+    public List<OrgInfo> getClinicalDeptListWithEmptyValue() {
+        List<OrgInfo> orgInfos = acService.getClinicalDeptList(assetInfo.getSiteUID());
+
+        OrgInfo emptyValue = new OrgInfo();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        orgInfos.add(0, emptyValue);
+
+        return orgInfos;
+    }
+
     public String getHospitalName() {
         return acService.getSiteName(assetInfo.getSiteUID());
     }
@@ -180,7 +193,7 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
         Boolean res = acService.CreateAeest(assetInfo, isGeneratePmOrder);
-        if(isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+        if(null!=isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
             WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
         }
         if (res) {
@@ -209,6 +222,12 @@ public class AssetCreateController {
     }
 
     public void onClinicalDeptChange() {
+        if (this.clinicalDept == null) {
+            assetInfo.setClinicalDeptId(null);
+        } else {
+            assetInfo.setClinicalDeptId(this.clinicalDept.getId());
+        }
+
         if (null != assetInfo.getClinicalDeptId()) {
             OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
@@ -427,5 +446,11 @@ public class AssetCreateController {
         this.selectedGbNode = selectedGbNode;
     }
 
-    
+    public OrgInfo getClinicalDept() {
+        return clinicalDept;
+    }
+
+    public void setClinicalDept(OrgInfo clinicalDept) {
+        this.clinicalDept = clinicalDept;
+    }
 }

@@ -10,7 +10,7 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="借还维护-借用"/>
+                <p:outputLabel class="pageTitle" value="借还维护"/>
             </div>
             <div class="ui-g-12 card">
                 <h:form id="SharedAssetRequestEditForm">
@@ -86,8 +86,8 @@
                                         <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" action="#{sharedAssetRequestNewController.getAssetInfo(sharedAssetRequestNewController.selected.msgBeginTime,sharedAssetRequestNewController.selected.msgEndTime,sharedAssetRequestNewController.selected.msgAccepter,sharedAssetRequestNewController.selected.clinicalDeptUid)}" update="datalist,confirm"/>
                                     </h:panelGroup>
                              </p:panelGrid>
-                             <p:dataTable id="datalist" value="#{sharedAssetReqDetailController.lazyModel}" var="item" widgetVar="varDataList"
-                               selectionMode="single" selection="#{sharedAssetReqDetailController.selected}"
+                         <p:dataTable id="datalist" value="#{sharedAssetRequestNewController.selected.sardList}" var="item" widgetVar="varDataList"
+                               selectionMode="single" selection="#{sharedAssetRequestNewController.selectedSard}"
                                lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
                                rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
                                paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -154,7 +154,7 @@
                            </p:dataTable>
                      </p:fieldset>
 <!--                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestNewController.save}" value="#{msg.Save}" action="List?faces-redirect=true"/>-->
-                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认借用" rendered="#{sharedAssetRequestNewController.selected.state == null}" >
+                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认"  >
                        <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                      </p:commandButton>
 <!--                     <p:commandButton id="confirmcancel" validateClient="true" actionListener="#{sharedAssetRequestNewController.cancel()}" action="List?faces-redirect=true" value="取消借用" rendered="#{sharedAssetRequestNewController.selected.state == '1'}" >
