@@ -10,12 +10,16 @@ import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
+import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -35,17 +39,20 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
+	private InventoryOrderRepository inventoryOrderRepository;
 	private String orderId;
 	private List<String> listClinicalDeptName;
+	private static final String ORG_NAME = "orgName";
 	private int inventoryStatus = 2;
-	private boolean initBln=true;
 
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
+		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
+		getInventoryClinicalDeptUID(orderId);
 	}
 
 	@Override
@@ -74,7 +81,7 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId));
 		searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus));
 		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
-		getClinicalDeptNames(pageAssetInfo);
+		
 		//after
 		return pageAssetInfo;
 	}
@@ -92,30 +99,24 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		object.setSiteUID(currentUser.getSiteUID());
 	}
 	
-	private void getClinicalDeptNames(Page<InventoryOrderDetail> pageInventoryOrderDetail){
-		
-		if(listClinicalDeptName==null){
-			listClinicalDeptName = new ArrayList<String>();
+	private void getInventoryClinicalDeptUID(String orderId) {
+		listClinicalDeptName = new ArrayList<String>();
+		if (StringUtils.isEmpty(orderId)) {
+			return;
 		}
-		if(initBln){
-            String name="";
-            AssetInfo assetInfo=null;
-            for(InventoryOrderDetail detail: pageInventoryOrderDetail){
-                assetInfo=detail.getAssetInfo();
-                if(assetInfo!=null){
-                    name=assetInfo.getClinicalDeptName();
-                }
-                else{
-                    name=detail.getOrgName();
-                }
-                if(StringUtils.isNotEmpty(name)){
-                    if(!listClinicalDeptName.contains(name)){
-                        listClinicalDeptName.add(name);
-                    }
-                }
-            }
-            initBln=false;
-        }
+		InventoryOrder order = inventoryOrderRepository.findById(orderId);
+		String assignee_org = order.getAssigneeOrg();
+		JSONArray array = new JSONArray(assignee_org);
+		JSONObject obj = null;
+		String temp = "";
+		for (int i = 0; i < array.length(); ++i) {
+			obj = array.getJSONObject(i);
+			temp = obj.getString(ORG_NAME);
+			temp = temp.substring(temp.lastIndexOf("/ ") + 1, temp.length()).trim();
+			if (!listClinicalDeptName.contains(temp)) {
+				listClinicalDeptName.add(temp);
+			}
+		}
 	}
 
 	public List<String> getListClinicalDeptName() {
