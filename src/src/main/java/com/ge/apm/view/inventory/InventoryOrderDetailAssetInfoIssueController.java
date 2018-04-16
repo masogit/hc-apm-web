@@ -38,10 +38,8 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private UserAccount currentUser;
 	private InventoryIssueRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
-	private static final String ID = "id";
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
-	private List<Integer> listAssetId;
 	private List<String> listClinicalDeptName;
 
 	@Override
@@ -77,7 +75,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 			}
 		}
 		searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId));
-		searchFilters.add(new SearchFilter("isSolved", SearchFilter.Operator.EQ, false));
 		Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
 		return pageAssetInfo;
 	}
@@ -98,7 +95,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 
 
 	private void getInventoryClinicalDeptUID(String orderId) {
-		listAssetId = new ArrayList<Integer>();
 		listClinicalDeptName = new ArrayList<String>();
 		if (StringUtils.isEmpty(orderId)) {
 			return;
@@ -107,17 +103,14 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		String assignee_org = order.getAssigneeOrg();
 		JSONArray array = new JSONArray(assignee_org);
 		JSONObject obj = null;
-		Integer assetId;
 		String temp = "";
 		for (int i = 0; i < array.length(); ++i) {
 			obj = array.getJSONObject(i);
-			assetId = obj.getInt(ID);
 			temp = obj.getString(ORG_NAME);
-			temp = temp.substring(temp.lastIndexOf(" ") + 1, temp.length());
+			temp = temp.substring(temp.lastIndexOf("/ ") + 1, temp.length()).trim();
 			if (!listClinicalDeptName.contains(temp)) {
 				listClinicalDeptName.add(temp);
 			}
-			listAssetId.add(assetId);
 		}
 	}
 
