@@ -12,16 +12,15 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
-import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -40,6 +39,7 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 	private UserAccount currentUser;
 	private InventoryOrderDetailAssetInfoRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
+	private InventoryOrderService service;
 	private String orderId;
 	private List<String> listClinicalDeptName;
 	private static final String ORG_NAME = "orgName";
@@ -50,9 +50,10 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		dao = WebUtil.getBean(InventoryOrderDetailAssetInfoRepository.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
+		service=WebUtil.getBean(InventoryOrderService.class);
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		getInventoryClinicalDeptUID(orderId);
+		listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
 	}
 
 	@Override
@@ -97,26 +98,6 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
 		object.setInstitutionUID(currentUser.getInstitutionUID());
 		object.setHospitalUID(currentUser.getHospitalUID());
 		object.setSiteUID(currentUser.getSiteUID());
-	}
-	
-	private void getInventoryClinicalDeptUID(String orderId) {
-		listClinicalDeptName = new ArrayList<String>();
-		if (StringUtils.isEmpty(orderId)) {
-			return;
-		}
-		InventoryOrder order = inventoryOrderRepository.findById(orderId);
-		String assignee_org = order.getAssigneeOrg();
-		JSONArray array = new JSONArray(assignee_org);
-		JSONObject obj = null;
-		String temp = "";
-		for (int i = 0; i < array.length(); ++i) {
-			obj = array.getJSONObject(i);
-			temp = obj.getString(ORG_NAME);
-			temp = temp.substring(temp.lastIndexOf("/ ") + 1, temp.length()).trim();
-			if (!listClinicalDeptName.contains(temp)) {
-				listClinicalDeptName.add(temp);
-			}
-		}
 	}
 
 	public List<String> getListClinicalDeptName() {
