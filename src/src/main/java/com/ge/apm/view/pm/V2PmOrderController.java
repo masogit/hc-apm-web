@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
     V2_PmOrderRepository dao;
+    private Double totalManHours;
     private String dptName;
     private OrgInfoRepository orgDao;
     private UserAccountRepository userDao;
@@ -116,15 +117,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return false;
 	}
 
-
-
-private String qaStatus="0";
+    private String qaStatus="0";
 	public void onQaStatusChange(){
-       /*if(qaStatus.equalsIgnoreCase("1")){
-		qaStatus=  "1";
-       }else{
-           qaStatus="0";
-       }*/
     }
 	public Boolean canCreateSr() {
 		if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
@@ -541,7 +535,7 @@ private String qaStatus="0";
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
-public void closePM(V2_PmOrder selectedPmOrder){
+    public void closePM(V2_PmOrder selectedPmOrder){
         if(isChecked()==false){
         pmOrderService.closePM(selectedPmOrder,picList);
         }else{
@@ -658,6 +652,11 @@ public void batchDefineQualify(){
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
+    public void repairPmOrderBatch() {
+        pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
+    }
+
+
     public void repairPmOrder() {
         if(endTime==null){
             WebUtil.addErrorMessage("结束时间"+WebUtil.getMessage("ValidationRequire"));
@@ -1064,6 +1063,11 @@ public void batchDefineQualify(){
         this.qaStatus = qaStatus;
     }
 
+    public Double getTotalManHours() {
+        return totalManHours;
+    }
 
-
+    public void setTotalManHours(Double totalManHours) {
+        this.totalManHours = totalManHours;
+    }
 }
