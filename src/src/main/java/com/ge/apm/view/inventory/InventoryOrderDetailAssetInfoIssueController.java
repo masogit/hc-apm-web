@@ -20,6 +20,7 @@ import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryIssue;
 import com.ge.apm.domain.InventoryOrder;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -38,6 +39,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	private UserAccount currentUser;
 	private InventoryIssueRepository dao;
 	private InventoryOrderRepository inventoryOrderRepository;
+	private InventoryOrderService service;
 	private static final String ORG_NAME = "orgName";
 	private String orderId;
 	private List<String> listClinicalDeptName;
@@ -45,11 +47,12 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 	@Override
 	protected void init() {
 		dao = WebUtil.getBean(InventoryIssueRepository.class);
+		service=WebUtil.getBean(InventoryOrderService.class);
 		inventoryOrderRepository = WebUtil.getBean(InventoryOrderRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
 		HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
 		orderId = request.getParameter("orderId");
-		getInventoryClinicalDeptUID(orderId);
+		listClinicalDeptName=service.getInventoryClinicalDeptUID(orderId,true,0);
 	}
 
 	@Override
@@ -93,26 +96,6 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
 		object.setSiteUID(currentUser.getSiteUID());
 	}
 
-
-	private void getInventoryClinicalDeptUID(String orderId) {
-		listClinicalDeptName = new ArrayList<String>();
-		if (StringUtils.isEmpty(orderId)) {
-			return;
-		}
-		InventoryOrder order = inventoryOrderRepository.findById(orderId);
-		String assignee_org = order.getAssigneeOrg();
-		JSONArray array = new JSONArray(assignee_org);
-		JSONObject obj = null;
-		String temp = "";
-		for (int i = 0; i < array.length(); ++i) {
-			obj = array.getJSONObject(i);
-			temp = obj.getString(ORG_NAME);
-			temp = temp.substring(temp.lastIndexOf("/ ") + 1, temp.length()).trim();
-			if (!listClinicalDeptName.contains(temp)) {
-				listClinicalDeptName.add(temp);
-			}
-		}
-	}
 
 	public List<String> getListClinicalDeptName() {
 		return listClinicalDeptName;
