@@ -17,7 +17,7 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <h:panelGroup rendered="#{!assetInfoController.terminate}">
+            <h:panelGroup rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead')}">
                 <p:link outcome="/portal/analysis/assetUsageSingle.xhtml" value="#{msg.DeviceUtilizationAnalysis}">
                     <f:param name="asset_name" value="#{assetInfoController.selected.name}" />
                     <f:param name="asset_id" value="#{assetInfoController.selected.id}" />
