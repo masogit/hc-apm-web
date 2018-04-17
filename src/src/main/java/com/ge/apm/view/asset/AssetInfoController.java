@@ -621,7 +621,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     private boolean updateQrCode() {
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode);
+        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode,selected.getSiteUID());
         if (qrCodeLib == null) {
             WebUtil.addErrorMessage(WebUtil.getMessage("InvalidQRCode"));
             return false;
@@ -635,9 +635,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             return false;
         }
 
-        QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode());
+        QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode(),selected.getSiteUID());
         if (null != oldQRCodeLib) {
-            qrCodeService.discardQrCode(qrCode);
+            qrCodeService.discardQrCode(qrCode,selected.getSiteUID());
         }
         qrCodeLib.setStatus(3);
         qrcodeDao.save(qrCodeLib);
@@ -894,7 +894,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getQrCodeImageBase64() {
-        return qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
+        return qrCodeService.getQrCodeImageBase64(selected);
     }
 
     public boolean isTimeValidate() {
@@ -996,7 +996,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         if (asset.getQrCode() != null) {
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(), 1);
+            qrCodeService.updateQrCodeStatus(asset.getQrCode(),asset.getSiteUID(), 1);
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);

@@ -534,7 +534,7 @@ public class AssetFileImportService {
             return true;
         }
 
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
+        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,orgUid);
         if (qrCodeLib == null) {
             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
             return false;
@@ -588,7 +588,7 @@ public class AssetFileImportService {
             return false;
         }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
-            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode());
+            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode(),asset.getSiteUID());
             if (qrCodeLib != null) {
                 qrCodeLib.setStatus(3);
                 qrcodeDao.save(qrCodeLib);

@@ -27,8 +27,8 @@ public class QrCodeShowController {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
     }
 
-    public String getQrCodeImageBase64(String code) {
-        return qrCodeService.getQrCodeImageBase64(code);
+    public String getQrCodeImageBase64(String code,String siteUid) {
+        return qrCodeService.getQrCodeImageBase64(code,siteUid);
     }
     
     public String getQrCodeImageWithTemplate(String code,String templateId) {

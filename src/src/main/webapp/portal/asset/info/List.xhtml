@@ -447,7 +447,7 @@
                 </h:panelGroup>
                 <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.zipFile}" />
+                                <p:fileDownload value="#{assetInfoController.zipFile}" contentDisposition="inline" />
                 </p:commandButton>
                 <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>
