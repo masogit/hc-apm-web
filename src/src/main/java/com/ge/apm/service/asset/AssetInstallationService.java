@@ -92,7 +92,7 @@ public class AssetInstallationService {
                 ArrivalListItem temp = itemDao.findById(itemId);
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), 3);
+                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(),newAsset.getSiteUID(), 3);
                 }
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 if (isGeneratePmOrder) {
@@ -137,7 +137,7 @@ public class AssetInstallationService {
         arrivalListItem.setUsageStatus(3);
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID(), 2);
         }
 
     }

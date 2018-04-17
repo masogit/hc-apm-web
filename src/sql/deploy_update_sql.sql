@@ -81,4 +81,16 @@ update unstructured_data_collection uc set schema_id=(select performance_report 
 --end for v1.9.1 change
 
 --v2.1
-INSERT INTO sys_role (id, name, role_desc) VALUES (8, 'SharedAssetMgmt', '设备调剂管理人员');
+INSERT INTO sys_role ( name, role_desc) VALUES ( 'SharedAssetMgmt', '设备调剂管理人员');
+
+
+--v4.2
+update qr_code_lib set uid = replace('' || uuid_generate_v4(),'-','') where uid is null;
+create table qr_code_lib_bak as (select* from qr_code_lib);
+alter table qr_code_lib drop constraint uk_qr_code_lib_qrcode;
+alter table qr_code_lib alter column site_id drop not null;
+alter table qr_code_lib alter column hospital_id drop not null;
+alter table qr_code_lib drop constraint qr_code_lib_pkey;
+alter table qr_code_lib alter column uid set not null;
+alter table qr_code_lib alter column id drop not null;
+alter table qr_code_lib add primary key(uid);

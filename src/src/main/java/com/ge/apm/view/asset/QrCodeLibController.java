@@ -22,10 +22,11 @@ import com.ge.apm.service.asset.QrCodeService;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.StreamedContent;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 @ManagedBean
 @ViewScoped
-public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
+public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
 
     QrCodeLibRepository dao = null;
     TenantInfoRepository tenantInfoDao = null;
@@ -67,13 +68,17 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
         userContextService = WebUtil.getBean(UserContextService.class);
 
-        if (userContextService.hasRole("SuperAdmin")) {
-            this.filterByHospital = false;
-            this.filterBySite = false;
-        } else {
+//        if (userContextService.hasRole("SuperAdmin")) {
+        this.filterByHospital = false;
+        this.filterBySite = false;
+//        } else {
+//            tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
+//            this.filterBySite = true;
+//            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
+//        }
+
+        if (!userContextService.hasRole("SuperAdmin")) {
             tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
-            this.filterBySite = true;
-            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         }
 
     }
@@ -86,10 +91,13 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     @Override
     protected Page<QrCodeLib> loadData(PageRequest pageRequest) {
 
-        this.setSiteFilter();
+//        this.setSiteFilter();
+        if (this.searchFilters == null) {
+            searchFilters = new ArrayList();
+        }
 
-         this.removeFilterOnField("siteUID");
-        if(siteUIDFilter!=null && siteUIDFilter.getId()>0){
+        this.removeFilterOnField("siteUID");
+        if (siteUIDFilter != null && siteUIDFilter.getId() > 0) {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter.getSiteUID()));
         }
 
@@ -110,8 +118,8 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
         return orgInfoDao.getByUid(orgUid).getName();
     }
 
-    public String getSiteName(Integer siteId) {
-        return acService.getTenantName(siteId);
+    public String getTenantName(String tenantUid) {
+        return acService.getTenantName(tenantUid);
     }
 
     public List<TenantInfo> getTenantList() {
@@ -132,7 +140,7 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
     public void createQrCode() {
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedOrg.getSiteUID())){
+        if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedOrg.getSiteUID())) {
             return;
         }
         if (userContextService.hasRole("ITAdmin")) {
@@ -140,14 +148,14 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
             //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
         }
         qrCodeService.createManyQrCode(tenantUID, selectedOrg.getSiteUID(), qrCodeNum);
-        this.selectedOrg=null;
+        this.selectedOrg = null;
         qrCodeNum = 0;
 
     }
 
     public void showQrCode() {
         qrCode = this.selected.getQrCode();
-        qrCodeImageBase64 = qrCodeService.getQrCodeImageBase64(this.selected.getQrCode());
+        qrCodeImageBase64 = qrCodeService.getQrCodeImageBase64(this.selected.getQrCode(), selected.getSiteUID());
     }
 
     public void onSiteChange() {
@@ -155,25 +163,25 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
             hospitalFileterList = orgInfoDao.getByTenantUID(tenantUID).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
         }
     }
-    
-    public void onSiteUIDChange(){
-        if(siteUID!=null){
+
+    public void onSiteUIDChange() {
+        if (siteUID != null) {
             selectedOrg = orgInfoDao.getByUid(siteUID);
-        }else{
+        } else {
             selectedOrg = null;
         }
     }
 
     public void onHospitalChange(NodeSelectEvent event) {
         if (null != event.getTreeNode().getData()) {
-            selectedOrg = (OrgInfo)event.getTreeNode().getData();
+            selectedOrg = (OrgInfo) event.getTreeNode().getData();
         }
     }
-    
-    public void onSiteFilterChange(NodeSelectEvent event){
+
+    public void onSiteFilterChange(NodeSelectEvent event) {
         if (null != event.getTreeNode().getData()) {
-            siteUIDFilter = (OrgInfo)event.getTreeNode().getData();
-        }else{
+            siteUIDFilter = (OrgInfo) event.getTreeNode().getData();
+        } else {
             this.removeFilterOnField("siteUID");
         }
     }
@@ -189,8 +197,8 @@ public class QrCodeLibController extends JpaCRUDController<QrCodeLib> {
 
     public void exportQrCode() throws Exception {
         List<QrCodeLib> exportList = dao.findBySearchFilter(searchFilters);
-        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(QrCodeLib::getQrCode).collect(Collectors.toList());
-        zipFile = qrCodeService.exportQrCodeList(qrCodeList);
+//        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(QrCodeLib::getQrCode).collect(Collectors.toList());
+        zipFile = qrCodeService.exportQrCodeList(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()));
     }
 
     public String getFullorgName(String uid) {
