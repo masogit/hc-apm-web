@@ -50,8 +50,8 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':item.assetInfo.status==5?'停用':item.assetInfo.status}" />
 		</p:column>
-		<p:column headerText="设备位置" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		<p:column headerText="设备位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
 		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.lastModifiedBy}" />
