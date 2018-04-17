@@ -52,9 +52,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private UserCommonService ucService;
-	private UserCommonService userCommonService;
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
+	private UserCommonService userCommonService;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -62,10 +62,10 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-		ucService = WebUtil.getBean(UserCommonService.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
-		isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
-		isInsulate = (isInsulate == true || isInsulate == null) ? true : false;
+		isInsulate = user.getUserRoleList().stream().anyMatch( userRole -> (userRole.getRoleId() == 11));
+		/*isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+		isInsulate = (isInsulate == null || isInsulate == false) ? false : true;*/
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 		//institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
 		updateDispater();
@@ -73,7 +73,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public void initDispatchUserList() {
 		if(isInsulate){
-			List<SearchFilter> filters = getInsulateSearchFilter();
+			List<SearchFilter> filters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
 			dispatchUserList = userDao.findBySearchFilter(filters);
 		}else{
 			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
@@ -91,7 +91,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 	public List<OrgInfo> getIncludeOrgInfo(String uid,String parentUID,Integer orgType){
-		if(isInsulate){
+		return userCommonService.getIncludeOrgInfo(isInsulate,loginUserOrgType,uid,parentUID,orgType);
+		/*if(isInsulate){
 			List<OrgInfo> orgInfos = Lists.newArrayList();
 			if(loginUserOrgType >= orgType){
 				if(StringUtils.isEmpty(uid)){//新增时
@@ -111,7 +112,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}
 		}else{
 			return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
-		}
+		}*/
 	}
 
 	public void updateDispater(){
@@ -195,9 +196,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return tenantInfoRepository.findByuid(tenantUID).getName();
 	}
 
-        public List<UserAccount> getAssetCreateApproverlList(){
-            return ucService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
-        }
+	public List<UserAccount> getAssetCreateApproverlList(){
+		return userCommonService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
+	}
 
    	public List<OrgInfo> getDispatherClinical(){
 		OrgInfo org = orgInfoRepository.findByUid(selected.getSiteUID());
@@ -209,11 +210,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
-		List<SearchFilter> searchFilters = getInsulateSearchFilter();
+		List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
-	public List<SearchFilter> getInsulateSearchFilter(){
+/*	public List<SearchFilter> getInsulateSearchFilter(){
 		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
 		if(isInsulate){
 			if(loginUserOrgType == 1){
@@ -227,7 +228,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
 		}
 		return searchFilters;
-	}
+	}*/
 
 	public void onOwnerChange() {
 		if (null != owner) {
@@ -362,9 +363,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         onBeforeSave(selected);
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
-            return;
-        }
+//        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+//            return;
+//        }
 
         dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
@@ -373,9 +374,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	@Override
 	public void delete() {
 		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
-			return;
-		}
+//		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+//			return;
+//		}
 		super.delete();
 	}
 
