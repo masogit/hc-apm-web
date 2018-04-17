@@ -110,8 +110,13 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "dept_for_shared_asset",columnDefinition = "CHAR(32)")
     private String deptForSharedAsset;
 
+    @Column(name = "wo_manhour_price")
+    private Double woManhourPrice;
 
     /****for pm *****/
+    @Column(name = "pm_manhour_price")
+    private Double pmManhourPrice;
+
     @Column(name="pm_simplify")
     private Boolean pmSimplify; // 简化保养
 
@@ -503,7 +508,23 @@ public class WorkflowConfig implements Serializable {
     public void setAssetCodeConfig(String assetCodeConfig) {
         this.assetCodeConfig = assetCodeConfig;
     }
-    
+
+    public Double getWoManhourPrice() {
+        return woManhourPrice;
+    }
+
+    public void setWoManhourPrice(Double woManhourPrice) {
+        this.woManhourPrice = woManhourPrice;
+    }
+
+    public Double getPmManhourPrice() {
+        return pmManhourPrice;
+    }
+
+    public void setPmManhourPrice(Double pmManhourPrice) {
+        this.pmManhourPrice = pmManhourPrice;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;

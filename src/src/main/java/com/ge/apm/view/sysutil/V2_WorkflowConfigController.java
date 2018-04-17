@@ -9,6 +9,8 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.alibaba.druid.util.StringUtils;
+import com.google.common.collect.Lists;
 import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
@@ -51,6 +53,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private TenantInfoRepository tenantInfoRepository;
 	private UserCommonService ucService;
 	private UserCommonService userCommonService;
+	private Boolean isInsulate;
+	private Integer loginUserOrgType;
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -60,60 +64,21 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		ucService = WebUtil.getBean(UserCommonService.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
-		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
-		initDispatchUserList();
+		isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+		isInsulate = (isInsulate == true || isInsulate == null) ? true : false;
+		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+		//institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
+		updateDispater();
 	}
 
 	public void initDispatchUserList() {
-		dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
-		/*
-		dispatchUserList.clear();
-		Set<String> uids = new HashSet<String>();
-		String tenantUID = user.getTenantUID();
-		if(selected == null){
-			*//**
-			 * 默认级别：租户
-			 *//*
-			dispatchUserList = userDao.getByTenantUID(tenantUID);
-			return;
+		if(isInsulate){
+			List<SearchFilter> filters = getInsulateSearchFilter();
+			dispatchUserList = userDao.findBySearchFilter(filters);
 		}else{
-			uids.add(selected.getTenantUID());
-			selected.setTenantUID(tenantUID);
-			
-			*//***
-			 * 租户级别
-			 *//*
-			if(isNullOrBelongs(selected.getInstitutionUID(),uids) || selected.getTenantUID().equals(selected.getInstitutionUID())){
-				System.out.println("租户级别");
-				dispatchUserList = userDao.getByTenantUID(tenantUID);
-				return;
-			}else{
-				*//***
-				 * 集团级别
-				 *//*
-				uids.add(selected.getInstitutionUID());
-				if(isNullOrBelongs(selected.getHospitalUID(),uids) || selected.getInstitutionUID().equals(selected.getHospitalUID())){
-					System.out.println("集团级别");
-					dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
-					return;
-				}else{
-					*//***
-					 * 医院级别
-					 *//*
-					uids.add(selected.getHospitalUID());
-					if(isNullOrBelongs(selected.getSiteUID(),uids) || selected.getHospitalUID().equals(selected.getSiteUID())){
-						System.out.println("医院级别");
-						dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
-						return;
-					}else{
-						System.out.println("院区级别");
-						dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
-						return;
-					}
-				}
-			}
+			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
 		}
-	*/}
+	}
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
@@ -125,8 +90,51 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return false;
 	}
 
-	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
+	public List<OrgInfo> getIncludeOrgInfo(String uid,String parentUID,Integer orgType){
+		if(isInsulate){
+			List<OrgInfo> orgInfos = Lists.newArrayList();
+			if(loginUserOrgType >= orgType){
+				if(StringUtils.isEmpty(uid)){//新增时
+					if(orgType == 1){
+						uid = user.getInstitutionUID();
+					}else if(orgType == 2){
+						uid = user.getHospitalUID();
+					}else if(orgType == 3){
+						uid = user.getSiteUID();
+					}
+				}
+				OrgInfo orgInfo = orgInfoRepository.findByUid(uid);
+				orgInfos.add(orgInfo);
+				return orgInfos;
+			}else{
+				return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
+			}
+		}else{
+			return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
+		}
+	}
+
+	public void updateDispater(){
+		if(isInsulate){
+			if(selected == null){
+				return;
+			}
+			List<SearchFilter> filters = new ArrayList<>();
+			if(selected.getSiteUID() != null){
+				filters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+				dispatchUserList = userDao.findBySearchFilter(filters);
+				return;
+			}else if(selected.getHospitalUID() != null){
+				filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+				dispatchUserList = userDao.findBySearchFilter(filters);
+				return;
+			}else if(selected.getInstitutionUID() != null){
+				filters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+				dispatchUserList = userDao.findBySearchFilter(filters);
+				return;
+			}
+			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
+		}
 	}
 	
 	public List<UserInfo> getUserList() {
@@ -201,9 +209,24 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		List<SearchFilter> searchFilters = getInsulateSearchFilter();
         return dao.findBySearchFilter(searchFilters, pageRequest);
+	}
+
+	public List<SearchFilter> getInsulateSearchFilter(){
+		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+		if(isInsulate){
+			if(loginUserOrgType == 1){
+				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+			}else if(loginUserOrgType == 2){
+				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+			}else if(loginUserOrgType == 3){
+				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+			}
+		}else{
+			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		}
+		return searchFilters;
 	}
 
 	public void onOwnerChange() {
@@ -424,5 +447,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void setSiteList(List<OrgInfo> siteList) {
 		this.siteList = siteList;
 	}
+
+
 	
 }
