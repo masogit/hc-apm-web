@@ -414,26 +414,26 @@
 
 
                     </p:fieldset>
-<!--                    <p:fieldset legend="相关报告" >
-                        <h:panelGroup id="addReport">
-                            <p:selectOneMenu value="#{commonReportController.reportUid}">
-                                <p:ajax update="addReport" />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                            </p:selectOneMenu>
-                            <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
-                        </h:panelGroup>
-                        <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
-                            #{commonReportController.getTemplateName(reportItem.schemaId)}
+                    <!--                    <p:fieldset legend="相关报告" >
+                                            <h:panelGroup id="addReport">
+                                                <p:selectOneMenu value="#{commonReportController.reportUid}">
+                                                    <p:ajax update="addReport" />
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                                </p:selectOneMenu>
+                                                <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
+                                            </h:panelGroup>
+                                            <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                    #{commonReportController.getTemplateName(reportItem.schemaId)}
 
-                            <h:outputText id="installDate" value="#{reportItem.createdDate}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </h:outputText>
-                            <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
-                            <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
-                            <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
-                        </p:dataList>
-                    </p:fieldset>-->
+                    <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                    </h:outputText>
+                    <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                    <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                    <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
+                </p:dataList>
+            </p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -465,11 +465,22 @@
             </div>
             <p:dialog id="qrCodeLibShowDlg" widgetVar="qrCodeLibShowDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="二维码展示">
                 <h:form id="qrCodeLibShowForm">
-                    <p:panel header="#{qrCodeLibController.qrCode}" style="text-align:center" rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
-                        <h:panelGrid columns="1" style="width:100%">
-                            <img src="#{assetInstallationController.getQrCodeImageForAsset()}" />
-                        </h:panelGrid>
-                    </p:panel>
+                    <h:panelGroup rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
+                        <h:panelGroup>
+                            <label class="label">选择导出模版</label>
+                            <p:selectOneMenu  value="#{assetInstallationController.exportQrCodeTemplateId}">
+                                <p:ajax update="preview" />
+                                <f:selectItem itemLabel="默认使用中模版" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetInstallationController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                        <p:panel header="#{qrCodeLibController.qrCode}" id="preview" style="text-align:center" rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
+                            <h:panelGrid columns="1" style="width:100%">
+                                <!--<img src="#{assetInstallationController.getQrCodeImageForAsset()}" />-->
+                                <img src="#{qrCodeShowController.getQrCodeImageWithTemplate(assetInstallationController.arrivalListItem.qrCode,assetInstallationController.exportQrCodeTemplateId)}" />
+                            </h:panelGrid>
+                        </p:panel>
+                    </h:panelGroup>
                 </h:form>
             </p:dialog>
 
