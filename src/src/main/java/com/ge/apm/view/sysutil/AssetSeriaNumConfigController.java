@@ -6,7 +6,9 @@ import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.service.common.UserCommonService;
+import com.google.common.collect.Lists;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,6 +36,8 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private UserCommonService userCommonService;
+	private Boolean isInsulate;
+	private Integer loginUserOrgType;
 
     @Override
     protected void init() {
@@ -42,7 +46,8 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
         user = UserContextService.getCurrentUserAccount();
-        institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
+		isInsulate = user.getUserRoleList().stream().anyMatch( userRole -> (userRole.getRoleId() == 11));
+		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
     }
 
     @Override
@@ -52,9 +57,11 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 
     @Override
     protected Page<AssetSeriaNumConfig> loadData(PageRequest pageRequest) {
-    	 List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
+    	 List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+    	 return dao.findBySearchFilter(searchFilters, pageRequest);
+/*		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
          searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-         return dao.findBySearchFilter(searchFilters, pageRequest);
+         return dao.findBySearchFilter(searchFilters, pageRequest);*/
     }
 
     @Override
@@ -74,8 +81,9 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 		return oi.getName();
 	}
 	
-	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
+	public List<OrgInfo> getIncludeOrgInfo(String uid,String parentUID,Integer orgType){
+		return userCommonService.getIncludeOrgInfo(isInsulate,loginUserOrgType,uid,parentUID,orgType);
+		//return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
 	}
 
 	public List<OrgInfo> getInstitutionList() {
@@ -121,9 +129,9 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	@Override
 	public void save(){
 		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+/*		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 			return;
-		}
+		}*/
 
 		selected.setTenantUID(user.getTenantUID());
 		selected.setCreatedBy(user.getName());
@@ -141,9 +149,9 @@ public class AssetSeriaNumConfigController extends JpaCRUDController<AssetSeriaN
 	@Override
 	public void delete() {
 		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
-		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+		/*if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
 			return;
-		}
+		}*/
 		super.delete();
 	}
 }
