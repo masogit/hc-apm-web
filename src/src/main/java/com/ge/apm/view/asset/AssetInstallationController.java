@@ -368,7 +368,7 @@ public class AssetInstallationController {
         asset.setFinancingNum(arrivalListItem.getFinancingNum());
         asset.setModalityId(arrivalListItem.getModalityId());
         asset.setSystemId(arrivalListItem.getSystemId());
-        return qrCodeService.getQrCodeImageBase64(asset);
+        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId);
     }
 
     public void onAssetOwnerNameChange() {
