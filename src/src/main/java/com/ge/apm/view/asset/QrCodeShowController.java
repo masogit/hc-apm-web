@@ -7,6 +7,7 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.service.asset.QrCodeService;
+import com.google.common.base.Strings;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -30,13 +31,17 @@ public class QrCodeShowController {
     public String getQrCodeImageBase64(String code) {
         return qrCodeService.getQrCodeImageBase64(code);
     }
-    
-    public String getQrCodeImageWithTemplate(String code,String templateId) {
-        return qrCodeService.getQrCodeImageBase64WithTemplate(code,templateId);
+
+    public String getQrCodeImageWithTemplate(String code, String templateId) {
+        if (Strings.isNullOrEmpty(templateId)) {
+            return getQrCodeImageBase64(code);
+        } else {
+            return qrCodeService.getQrCodeImageBase64WithTemplate(code, templateId);
+        }
     }
-    
+
     public String getQrCodeImageBase64ByAsset(AssetInfo asset) {
         return qrCodeService.getQrCodeImageBase64(asset);
     }
-    
+
 }
