@@ -34,7 +34,7 @@
                         <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" />
                         <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" />
                         <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet grid" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true"/>
-                        <p:commandButton value="归还已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(11)}"  rendered="true"/>
+                        <!--<p:commandButton value="归还已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(11)}"  rendered="true"/>-->
 
                         <p:commandButton value="归还已完成"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(12)}"  rendered="true"/>
                 </h:panelGrid>

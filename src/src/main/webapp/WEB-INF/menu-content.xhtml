@@ -29,8 +29,8 @@
 
             </p:submenu>
 
-            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="false" >
-                       <!--rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt')}">-->
+            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o"
+                       rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt')}">
                 <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
                 <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
@@ -41,6 +41,7 @@
                 <p:menuitem id="um908" value="设备库存情况" outcome="/portal/BorrowApplyV2/StockOfAsset" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
 <!--<p:menuitem id="um905" value="调剂设备json测试" outcome="/portal/SharedAssetTypeAcc/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin')}"/>-->
                 <p:menuitem id="um900" value="调剂设备配置" outcome="/portal/SharedAssetType/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
+                <p:menuitem id="um909" value="调剂名称设置" outcome="/portal/SharedAssetType/AssetToShare.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
             </p:submenu>
             <!--<p:submenu id="um074" label="调剂中心" icon="fa fa-folder-open-o"-->
                        <!--rendered="#{userContextService.hasRole('SuperAdmin') }">-->
