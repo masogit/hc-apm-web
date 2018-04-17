@@ -467,7 +467,7 @@
                 <h:form id="qrCodeLibShowForm">
                     <h:panelGroup rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
                         <h:panelGroup>
-                            <label class="label">选择导出模版</label>
+                            <label class="label">选择模版</label>
                             <p:selectOneMenu  value="#{assetInstallationController.exportQrCodeTemplateId}">
                                 <p:ajax update="preview" />
                                 <f:selectItem itemLabel="默认使用中模版" itemValue="#{null}" noSelectionOption="true" />
@@ -476,8 +476,8 @@
                         </h:panelGroup>
                         <p:panel header="#{qrCodeLibController.qrCode}" id="preview" style="text-align:center" rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
                             <h:panelGrid columns="1" style="width:100%">
-                                <!--<img src="#{assetInstallationController.getQrCodeImageForAsset()}" />-->
-                                <img src="#{qrCodeShowController.getQrCodeImageWithTemplate(assetInstallationController.arrivalListItem.qrCode,assetInstallationController.exportQrCodeTemplateId)}" />
+                                <img src="#{assetInstallationController.getQrCodeImageForAsset()}" />
+                                <!--<img src="#{qrCodeShowController.getQrCodeImageWithTemplate(assetInstallationController.arrivalListItem.qrCode,assetInstallationController.exportQrCodeTemplateId)}" />-->
                             </h:panelGrid>
                         </p:panel>
                     </h:panelGroup>
