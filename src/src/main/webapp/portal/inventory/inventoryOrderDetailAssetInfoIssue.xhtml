@@ -49,7 +49,7 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':'停用'}" />
 		</p:column>
-		<p:column headerText="设备位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
+		<p:column headerText="安装位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
 		<p:column headerText="问题描述">
