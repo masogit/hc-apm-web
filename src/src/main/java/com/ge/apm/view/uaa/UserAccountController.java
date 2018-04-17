@@ -220,15 +220,32 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
+        TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
+
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
             List<String> disableRoleList = new ArrayList<>();
             disableRoleList.add("ITAdmin");
             disableRoleList.add("ActivationPerson");
+            //判断租户是否隔离，租户隔离时移除LocalITAdmin
+            if(ti.getInsulate() == null || !ti.getInsulate()){
+                disableRoleList.add("LocalITAdmin");
+            }
             allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
         }else{
-            allRoles = uaaService.getSysRoleNames();
+            //判断租户是否隔离，租户隔离时移除LocalITAdmin
+            if(ti.getInsulate() == null || !ti.getInsulate()){
+                List<String> disableRoleList = new ArrayList<>();
+                disableRoleList.add("LocalITAdmin");
+                allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
+            }else{
+                allRoles = uaaService.getSysRoleNames();
+            }
+
         }
+
+
+
 
         assignedRoles = new ArrayList<String>();
         for (UserRole userRole : selected.getUserRoleList()) {
