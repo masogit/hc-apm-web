@@ -198,7 +198,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}
 			dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());*/
 		}else{
-			dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());
+			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
 		}
 	}
 	
