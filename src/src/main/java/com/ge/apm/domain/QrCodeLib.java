@@ -9,12 +9,12 @@ import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import org.hibernate.annotations.GenericGenerator;
 
 /**
  *
@@ -25,23 +25,26 @@ import javax.persistence.TemporalType;
 public class QrCodeLib implements Serializable {
 
     private static final long serialVersionUID = 1L;
+//    @Id
+//    @GeneratedValue(strategy = GenerationType.IDENTITY)
+//    @Basic(optional = false)
+//    @Column(name = "id")
+//    private Integer id;
+    
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Basic(optional = false)
-    @Column(name = "id")
-    private Integer id;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String uid;
-    @Basic(optional = false)
-    @Column(name = "site_id")
-    private int siteId;
-    @Basic(optional = false)
-    @Column(name = "hospital_id")
-    private int hospitalId;
+//    @Basic(optional = false)
+//    @Column(name = "site_id")
+//    private int siteId;
+//    @Basic(optional = false)
+//    @Column(name = "hospital_id")
+//    private int hospitalId;
     @Basic(optional = false)
     @Column(name = "qr_code")
     private String qrCode;
-    @Basic(optional = false)
     @Column(name = "issue_date")
     @Temporal(TemporalType.DATE)
     private Date issueDate;
@@ -120,14 +123,8 @@ public class QrCodeLib implements Serializable {
     public QrCodeLib() {
     }
 
-    public QrCodeLib(Integer id) {
-        this.id = id;
-    }
 
     public QrCodeLib(Integer id, int siteId, int hospitalId, String qrCode, Date issueDate, int status) {
-        this.id = id;
-        this.siteId = siteId;
-        this.hospitalId = hospitalId;
         this.qrCode = qrCode;
         this.issueDate = issueDate;
         this.status = status;
@@ -148,29 +145,29 @@ public class QrCodeLib implements Serializable {
         this.uid = uid;
     }
 
-    public Integer getId() {
-        return id;
-    }
+//    public Integer getId() {
+//        return id;
+//    }
+//
+//    public void setId(Integer id) {
+//        this.id = id;
+//    }
 
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public int getSiteId() {
-        return siteId;
-    }
-
-    public void setSiteId(int siteId) {
-        this.siteId = siteId;
-    }
-
-    public int getHospitalId() {
-        return hospitalId;
-    }
-
-    public void setHospitalId(int hospitalId) {
-        this.hospitalId = hospitalId;
-    }
+//    public int getSiteId() {
+//        return siteId;
+//    }
+//
+//    public void setSiteId(int siteId) {
+//        this.siteId = siteId;
+//    }
+//
+//    public int getHospitalId() {
+//        return hospitalId;
+//    }
+//
+//    public void setHospitalId(int hospitalId) {
+//        this.hospitalId = hospitalId;
+//    }
 
     public String getQrCode() {
         return qrCode;
@@ -287,7 +284,7 @@ public class QrCodeLib implements Serializable {
     @Override
     public int hashCode() {
         int hash = 0;
-        hash += (id != null ? id.hashCode() : 0);
+        hash += (uid != null ? uid.hashCode() : 0);
         return hash;
     }
 
@@ -298,7 +295,7 @@ public class QrCodeLib implements Serializable {
             return false;
         }
         QrCodeLib other = (QrCodeLib) object;
-        if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+        if ((this.uid == null && other.uid != null) || (this.uid != null && !this.uid.equals(other.uid))) {
             return false;
         }
         return true;
@@ -306,7 +303,7 @@ public class QrCodeLib implements Serializable {
 
     @Override
     public String toString() {
-        return "com.ge.apm.domain.QrCodeLib[ id=" + id + " ]";
+        return "com.ge.apm.domain.QrCodeLib[ uid=" + uid + " ]";
     }
 
 }

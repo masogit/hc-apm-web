@@ -80,6 +80,7 @@
                         <p:column headerText="创建" >
                             <p:link   outcome="CreateAsset" >#{msg.Create}
                                 <f:param name="qrCode" value="#{item.qrCode}" />
+                                <f:param name="siteUid" value="#{item.siteUID}" />
                             </p:link >
                         </p:column>
 

@@ -81,6 +81,7 @@ public class AssetCreateController {
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
+        String siteUid = WebUtil.getRequestParameter("siteUid");
         acService = WebUtil.getBean(AssetCreateService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -89,7 +90,7 @@ public class AssetCreateController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
-        createRequest = acService.getCreateRequest(qrCode);
+        createRequest = acService.getCreateRequest(qrCode,siteUid);
         assetInfo = createAssetInfo();
 
         pictureList = acService.getQrCodePictureList(createRequest.getUid());
@@ -122,8 +123,8 @@ public class AssetCreateController {
 
     private AssetInfo createAssetInfo() {
         AssetInfo newAsset = new AssetInfo();
-        newAsset.setSiteId(createRequest.getSiteId());
-        newAsset.setHospitalId(createRequest.getHospitalId());
+//        newAsset.setSiteId(createRequest.getSiteId());
+//        newAsset.setHospitalId(createRequest.getHospitalId());
         newAsset.setQrCode(createRequest.getQrCode());
         newAsset.setSerialNum(createRequest.getSerialNum());
         newAsset.setFunctionType(createRequest.getModelNum());
@@ -198,7 +199,7 @@ public class AssetCreateController {
         }
         if (res) {
             acService.createAttachments(assetInfo, selectedPictures);
-            acService.updateQrLib(assetInfo.getQrCode(), 3);
+            acService.updateQrLib(assetInfo.getQrCode(), 3,createRequest.getSiteUID());
             WebUtil.addSuccessMessage("创建成功");
             return "RequestsList?faces-redirect=true";
         } else {

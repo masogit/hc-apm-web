@@ -403,13 +403,17 @@ public class AssetInstallationController {
                         case "financingNum":
                             num = arrivalListItem.getFinancingNum();
                             if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-                                qrCodeService.discardQrCode(arrivalListItem.getQrCode());
+                                if(!qrCodeService.deleteQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID())){
+                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID());
+                                }
                             }
                             break;
                         case "departNum":
                             num = arrivalListItem.getDepartNum();
                             if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-                                qrCodeService.discardQrCode(arrivalListItem.getQrCode());
+                                if(!qrCodeService.deleteQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID())){
+                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID());
+                                }
                             }
                             break;
                         case "qrCode":
