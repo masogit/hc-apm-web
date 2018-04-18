@@ -11,7 +11,6 @@
 					<p:fileUpload fileUploadListener="#{userAccountImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
 						invalidFileMessage="只支持xls格式的文件" invalidSizeMessage="文件大小不得超过5M" update=":userAccountTab:dataListForm, :userAccountTab:UserAccountListForm"
 						sizeLimit="5242880" allowTypes="/(\.|\/)(xls)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
-					<p:growl id="messages" showDetail="true" />
 				</p:panelGrid>
 				<h:panelGroup>
 					<p>说明</p>
@@ -27,6 +26,8 @@
 
 	<div class="ui-g-12 card">
 		<h:form id="dataListForm">
+			<p:messages id="messages" showDetail="true" closable="false" autoUpdate="false" rendered="#{not empty userAccountImportController.importFailedDataList}">
+			</p:messages>
 			<p:fieldset legend="导入失败的数据">
 				<p:dataTable id="datalist2" rendered="#{not empty userAccountImportController.importFailedDataList}"
 					value="#{userAccountImportController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -38,13 +39,13 @@
 					<p:column headerText="#{msg.Institution}">
 						<h:outputText value="#{item.institutionName}" />
 					</p:column>
-					<p:column headerText="#{msg.Hospital}" >
+					<p:column headerText="#{msg.Hospital}">
 						<h:outputText value="#{item.hospitalName}" />
 					</p:column>
-					<p:column headerText="#{msg.Site}" >
+					<p:column headerText="#{msg.Site}">
 						<h:outputText value="#{item.siteName}" />
 					</p:column>
-					<p:column headerText="#{msg.Department}" >
+					<p:column headerText="#{msg.Department}">
 						<h:outputText value="#{item.departName}" />
 					</p:column>
 					<p:column headerText="#{msg.login_name}">
@@ -62,7 +63,7 @@
 					<p:column rendered="false" headerText="#{msg.isSiteAdmin}">
 						<h:outputText value="#{item.isSiteAdmin? msg.True2Yes : msg.False2No }" />
 					</p:column>
-					<p:column headerText="#{msg.isActive}" >
+					<p:column headerText="#{msg.isActive}">
 						<h:outputText value="#{item.isActive? msg.True2Yes : msg.False2No }" />
 					</p:column>
 					<p:column headerText="#{msg.Locked}?">
@@ -85,6 +86,7 @@
 				</p:dataTable>
 			</p:fieldset>
 		</h:form>
+
 	</div>
 </div>
 </html>
