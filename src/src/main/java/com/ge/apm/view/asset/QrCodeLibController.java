@@ -19,6 +19,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.service.asset.QrCodeService;
+import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.StreamedContent;
@@ -46,8 +47,8 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
     private String qrCodeImageBase64;
 
     private String tenantUIDFilter;
-    private OrgInfo siteUIDFilter;
-    private Integer hospitalIdFilter;
+    private String siteUIDFilter;
+//    private Integer hospitalIdFilter;
     private UserContextService userContextService;
 
     private List<OrgInfo> hospitalFileterList = new ArrayList();
@@ -80,6 +81,7 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         if (!userContextService.hasRole("SuperAdmin")) {
             tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
         }
+        onSiteChange();
 
     }
 
@@ -91,14 +93,8 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
     @Override
     protected Page<QrCodeLib> loadData(PageRequest pageRequest) {
 
-//        this.setSiteFilter();
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
-        }
-
-        this.removeFilterOnField("siteUID");
-        if (siteUIDFilter != null && siteUIDFilter.getId() > 0) {
-            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter.getSiteUID()));
         }
 
         if (this.searchFilters == null) {
@@ -178,14 +174,6 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         }
     }
 
-    public void onSiteFilterChange(NodeSelectEvent event) {
-        if (null != event.getTreeNode().getData()) {
-            siteUIDFilter = (OrgInfo) event.getTreeNode().getData();
-        } else {
-            this.removeFilterOnField("siteUID");
-        }
-    }
-
     public void onTenantFilterChange() {
         if (tenantUIDFilter == null) {
             hospitalFileterList.clear();
@@ -197,7 +185,6 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
 
     public void exportQrCode() throws Exception {
         List<QrCodeLib> exportList = dao.findBySearchFilter(searchFilters);
-//        List<String> qrCodeList = exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).map(QrCodeLib::getQrCode).collect(Collectors.toList());
         zipFile = qrCodeService.exportQrCodeList(exportList.stream().filter(item -> item.getQrCode() != null && !item.getQrCode().isEmpty()).collect(Collectors.toList()));
     }
 
@@ -237,10 +224,6 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         return qrCodeNum;
     }
 
-    public Integer getHospitalIdFilter() {
-        return hospitalIdFilter;
-    }
-
     public String getQrCode() {
         return qrCode;
     }
@@ -251,10 +234,6 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
 
     public void setQrCodeNum(Integer qrCodeNum) {
         this.qrCodeNum = qrCodeNum;
-    }
-
-    public void setHospitalIdFilter(Integer hospitalIdFilter) {
-        this.hospitalIdFilter = hospitalIdFilter;
     }
 
     public void setQrCode(String qrCode) {
@@ -273,11 +252,11 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         this.tenantUIDFilter = tenantUIDFilter;
     }
 
-    public OrgInfo getSiteUIDFilter() {
+    public String getSiteUIDFilter() {
         return siteUIDFilter;
     }
 
-    public void setSiteUIDFilter(OrgInfo siteUIDFilter) {
+    public void setSiteUIDFilter(String siteUIDFilter) {
         this.siteUIDFilter = siteUIDFilter;
     }
 
