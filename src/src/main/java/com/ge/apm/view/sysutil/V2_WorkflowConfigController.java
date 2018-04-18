@@ -176,24 +176,28 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 	public void updateDispater(){
+		dispatchUserList.clear();
 		if(isInsulate){
 			if(selected == null){
 				return;
 			}
 			List<SearchFilter> filters = new ArrayList<>();
-			if(selected.getSiteUID() != null){
+			if(selectedUserOrg.getSiteUID() != null){
 				filters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
-			}else if(selected.getHospitalUID() != null){
+			}
+/*			else if(selectedUserOrg.getHospitalUID() != null){
 				filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedUserOrg.getHospitalUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
-			}else if(selected.getInstitutionUID() != null){
+			}else if(selectedUserOrg.getInstitutionUID() != null){
 				filters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedUserOrg.getInstitutionUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
 			}
+			dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());*/
+		}else{
 			dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());
 		}
 	}
@@ -314,12 +318,22 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	@Transactional
 	@Override
 	public void onBeforeSave(WorkflowConfig config) {
-		selected.setTenantUID(user.getTenantUID());
+		selected.setTenantUID(selectedUserOrg.getTenantUID());
 		selected.setSiteId(user.getSiteId());
 		selected.setHospitalId(user.getHospitalId());
 		selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
 		selected.setHospitalUID(selectedUserOrg.getHospitalUID());
 		selected.setSiteUID(selectedUserOrg.getSiteUID());
+		int orgType = selectedUserOrg.getOrgType();
+		if(orgType == 0){
+			selected.setAssetSeriaNumLevel(4);//租户级别
+		}else if(orgType == 1){
+			selected.setAssetSeriaNumLevel(3);//集团级别
+		}else if(orgType == 2){
+			selected.setAssetSeriaNumLevel(2);//医院级别
+		}else if(orgType == 3){
+			selected.setAssetSeriaNumLevel(1);//科室级别
+		}
 /*		if(selected.getInstitutionUID() == null){//租户级别
 			selected.setInstitutionUID(selected.getTenantUID());
 			selected.setHospitalUID(selected.getTenantUID());
