@@ -224,6 +224,20 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class ="label">#{msg.generateMethod} *</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.generateMethod}" disabled="false" required="false" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
+                                <label class ="label">初始流水号</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.format}" disabled="false">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                         <!-- <p:spacer/> -->

@@ -150,6 +150,39 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "need_instorage_check")
     private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
 
+    @Column(name = "generate_method")
+    private Integer generateMethod;//资产编码生成方式
+
+    @Column(name="format",columnDefinition = "CHAR(10)")
+    private String format;//初始流水号
+
+    @Column(name = "asset_seria_num_level")
+    private Integer assetSeriaNumLevel;//资产编码level 租户：4 集团：3，医院：2 院区：1
+
+    public Integer getAssetSeriaNumLevel() {
+        return assetSeriaNumLevel;
+    }
+
+    public void setAssetSeriaNumLevel(Integer assetSeriaNumLevel) {
+        this.assetSeriaNumLevel = assetSeriaNumLevel;
+    }
+
+    public Integer getGenerateMethod() {
+        return generateMethod;
+    }
+
+    public void setGenerateMethod(Integer generateMethod) {
+        this.generateMethod = generateMethod;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
     public Integer getPmReminderTimes() {
         return pmReminderTimes;
     }
