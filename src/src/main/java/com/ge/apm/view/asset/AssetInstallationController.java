@@ -65,6 +65,8 @@ public class AssetInstallationController {
 //    private String currentQrCode;
 
     private ConfigService configService;
+    
+    private String exportQrCodeTemplateId;
 
     @PostConstruct
     protected void init() {
@@ -366,7 +368,7 @@ public class AssetInstallationController {
         asset.setFinancingNum(arrivalListItem.getFinancingNum());
         asset.setModalityId(arrivalListItem.getModalityId());
         asset.setSystemId(arrivalListItem.getSystemId());
-        return qrCodeService.getQrCodeImageBase64(asset);
+        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId);
     }
 
     public void onAssetOwnerNameChange() {
@@ -438,7 +440,12 @@ public class AssetInstallationController {
             }
         }
     }
-
+    
+    public List<QrCodeTemplate> getQrCodeTemplates() {
+        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
+        return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
+    }
+    
     public List<UserAccount> getOwnerList() {
         return aiService.getWorkerList();
     }
@@ -502,4 +509,13 @@ public class AssetInstallationController {
     public void setGbTree(TreeNode gbTree) {
         this.gbTree = gbTree;
     }
+
+    public String getExportQrCodeTemplateId() {
+        return exportQrCodeTemplateId;
+    }
+
+    public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
+        this.exportQrCodeTemplateId = exportQrCodeTemplateId;
+    }
+    
 }

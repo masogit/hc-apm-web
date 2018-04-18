@@ -142,6 +142,9 @@ public class QrCodeService {
     }
 
     public BufferedImage getQrCodeImageWithTemplate(String qrCode, AssetInfo asset, String templateId) {
+        if(Strings.isNullOrEmpty(templateId)){
+            return getQrCodeImage(qrCode,asset);
+        }
         QrCodeTemplate template = templateDao.findById(templateId);
         return getQrCodeImage(qrCode, asset, template);
     }
@@ -183,6 +186,10 @@ public class QrCodeService {
 
     public String getQrCodeImageBase64(AssetInfo asset) {
         return qrCodeDrawService.getImageBase64(getQrCodeImage(null, asset));
+    }
+    
+    public String getQrCodeImageBase64WithTemplate(AssetInfo asset,String templateId) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(null, asset,templateId));
     }
 
     public String getQrCodeImageBase64WithTemplate(String qrCode, String templateId) {
