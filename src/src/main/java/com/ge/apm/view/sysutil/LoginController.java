@@ -152,8 +152,13 @@ public class LoginController extends LoginService {
         MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
         UserAccountRepository dao = WebUtil.getBean(UserAccountRepository.class);
         if(user.getIsActive()){
-            String accessToken = msUtil.getAuthenticateByUserPassword(userName, password);
-            request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+            try{
+                String accessToken = msUtil.getAuthenticateByUserPassword(userName, password);
+                request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+
         }else{
             user.setIsActive(true);
             dao.save(user);

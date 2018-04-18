@@ -10,9 +10,15 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.collect.Lists;
 import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,11 +29,6 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.V2_WorkflowConfigRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_DeviceType;
-import com.ge.apm.domain.V2_WorkflowConfig;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.UserCommonService;
 
 import webapp.framework.dao.SearchFilter;
@@ -55,6 +56,15 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
+
+	private OrgInfo selectedUserOrg;
+	private TenantInfo selectedTenant;
+	private TreeNode orgTree;
+	private TreeNode selectedNode;
+	private String tenantUid;
+	private UaaService uaaService;
+	private OrgInfo selectedOrg;
+
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -63,13 +73,63 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
-		isInsulate = user.getUserRoleList().stream().anyMatch( userRole -> (userRole.getRoleId() == 11));
-		/*isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
-		isInsulate = (isInsulate == null || isInsulate == false) ? false : true;*/
+		uaaService = WebUtil.getBean(UaaService.class);
+		isInsulate = UserContextService.isOnlyLocalITAdmin();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-		//institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
+		/*user.getUserRoleList().stream().anyMatch( userRole -> (userRole.getRoleId() == 11));
+		isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+		isInsulate = (isInsulate == null || isInsulate == false) ? false : true;
+		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);*/
+		updateDispater();
+		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
+		setTenantUid(user.getTenantUID());
+
+	}
+
+	public String getOrgFullName(OrgInfo org) {
+		if (null == org || org.getId() == -1) {
+			return null;
+		}
+		String name = org.getName();
+		while (org.getParentOrg() != null) {
+			org = org.getParentOrg();
+			name = org.getName() + "/" + name;
+		}
+
+		return name;
+	}
+
+	public void onSelectOrgForUser(NodeSelectEvent event) {
+		TreeNode node = event.getTreeNode();
+		selectedUserOrg = (OrgInfo) node.getData();
 		updateDispater();
 	}
+
+	public void setTenantUid(String tenantUid) {
+		//searchFilters.clear();
+		//this.tenantUid = tenantUid;
+		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+		//判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+		if(UserContextService.isOnlyLocalITAdmin()){
+			selectedTenant = tempTenantInfo;
+			orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+		}else{
+			selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+			OrgInfo rootOrg = new OrgInfo();
+			rootOrg.setId(-1);
+			rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+			orgTree = new DefaultTreeNode("root", null, null);
+			TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+			rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
+		}
+
+		TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+		if (null != selectedUserOrg) {
+			selectedUserOrg.setSelected(true);
+			TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+		}
+	}
+
 
 	public void initDispatchUserList() {
 		if(isInsulate){
@@ -122,19 +182,19 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}
 			List<SearchFilter> filters = new ArrayList<>();
 			if(selected.getSiteUID() != null){
-				filters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
+				filters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
 			}else if(selected.getHospitalUID() != null){
-				filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
+				filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedUserOrg.getHospitalUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
 			}else if(selected.getInstitutionUID() != null){
-				filters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
+				filters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedUserOrg.getInstitutionUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
 			}
-			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
+			dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());
 		}
 	}
 	
@@ -214,22 +274,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
-/*	public List<SearchFilter> getInsulateSearchFilter(){
-		List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-		if(isInsulate){
-			if(loginUserOrgType == 1){
-				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
-			}else if(loginUserOrgType == 2){
-				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-			}else if(loginUserOrgType == 3){
-				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
-			}
-		}else{
-			searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-		}
-		return searchFilters;
-	}*/
-
 	public void onOwnerChange() {
 		if (null != owner) {
 			selected.setDispatchUserId(owner.getId());
@@ -273,7 +317,10 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		selected.setTenantUID(user.getTenantUID());
 		selected.setSiteId(user.getSiteId());
 		selected.setHospitalId(user.getHospitalId());
-		if(selected.getInstitutionUID() == null){//租户级别
+		selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
+		selected.setHospitalUID(selectedUserOrg.getHospitalUID());
+		selected.setSiteUID(selectedUserOrg.getSiteUID());
+/*		if(selected.getInstitutionUID() == null){//租户级别
 			selected.setInstitutionUID(selected.getTenantUID());
 			selected.setHospitalUID(selected.getTenantUID());
 			selected.setSiteUID(selected.getTenantUID());
@@ -284,7 +331,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 		if(selected.getSiteUID() == null){//医院级别
 			selected.setSiteUID(selected.getHospitalUID());
-		}
+		}*/
 
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
@@ -321,8 +368,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setPmDispatchUserName2(null);
 		}
-
-		//dao.deleteBySiteUID(selected.getSiteUID());
 	}
 	
 	@Transactional
@@ -369,6 +414,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
         dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
+		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
     }
 
 	@Override
@@ -378,14 +424,32 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 //			return;
 //		}
 		super.delete();
+		selectedUserOrg = null;
+		dispatchUserList.clear();
 	}
 
 	@Override
 	public void prepareEdit(){
-		if(selected != null){
+/*		if(selected != null){
 			initDispatchUserList();
-		}
+		}*/
+		dispatchUserList.clear();
 		super.prepareEdit();
+		selectedUserOrg = orgInfoRepository.getByUid(selected.getSiteUID());
+		updateDispater();
+	}
+
+	public void prepareCreate(){
+		dispatchUserList.clear();
+		try {
+			super.prepareCreate();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		selectedUserOrg = null;
+		initDispatchUserList();
 	}
 	
 	public void onSelect(){
@@ -394,20 +458,20 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 	}
 	
-	public void updateHospitalAndSite(){
+	/*public void updateHospitalAndSite(){
 		selected.setHospitalUID(null);
 		selected.setSiteUID(null);
 		dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
 	}
-	
+
 	public void updateSite(){
 		selected.setSiteUID(null);
 		dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
 	}
-	
+
 	public void updateDispaters(){
 		dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
-	}
+	}*/
 
 	public UserAccount getOwner() {
 		return owner;
@@ -449,6 +513,47 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		this.siteList = siteList;
 	}
 
+	public OrgInfo getSelectedUserOrg() {
+		return selectedUserOrg;
+	}
 
-	
+	public void setSelectedUserOrg(OrgInfo selectedUserOrg) {
+		this.selectedUserOrg = selectedUserOrg;
+	}
+
+	public TreeNode getOrgTree() {
+		return orgTree;
+	}
+
+	public void setOrgTree(TreeNode orgTree) {
+		this.orgTree = orgTree;
+	}
+
+	public TreeNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(TreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+	}
+
+	public String getTenantUid() {
+		return tenantUid;
+	}
+
+	public TenantInfo getSelectedTenant() {
+		return selectedTenant;
+	}
+
+	public void setSelectedTenant(TenantInfo selectedTenant) {
+		this.selectedTenant = selectedTenant;
+	}
+
+	public OrgInfo getSelectedOrg() {
+		return selectedOrg;
+	}
+
+	public void setSelectedOrg(OrgInfo selectedOrg) {
+		this.selectedOrg = selectedOrg;
+	}
 }
