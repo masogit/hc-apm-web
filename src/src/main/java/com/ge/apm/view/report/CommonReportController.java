@@ -13,6 +13,9 @@ import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.cxf.common.util.StringUtils;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 /*
@@ -62,6 +65,12 @@ public class CommonReportController {
         }
     }
 
+    public String typeCheck(){
+        if(StringUtils.isEmpty(reportUid))
+            return "";
+        final UnstructuredDataCollection uReport = reportDao.findByUid(reportUid);
+        return uReport.getBoType();
+    }
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
@@ -102,4 +111,7 @@ public class CommonReportController {
     public void setReportUid(String reportUid) {
         this.reportUid = reportUid;
     }
+
+
+
 }
