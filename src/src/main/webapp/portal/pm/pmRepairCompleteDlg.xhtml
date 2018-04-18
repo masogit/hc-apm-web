@@ -124,6 +124,7 @@
 
                     </p:fieldset>
                    <!-- <p:fieldset legend="保养清单" >
+
                         <h:panelGroup id="addReport">
                             <p:selectOneMenu value="#{commonReportController.reportUid}">
                                 <p:ajax update="addReport" />
@@ -138,8 +139,9 @@
                             <h:outputText id="installDate" value="#{reportItem.createdDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </h:outputText>
-                            &lt;!&ndash;<p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                            <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
                             <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />&ndash;&gt;
+
                             <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                         </p:dataList>
 
@@ -159,11 +161,6 @@
                             <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />&ndash;&gt;
                             <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                         </p:dataList>
-
-
-
-
-
 
                     </p:fieldset>-->
                     <p:selectOneRadio id="console"  value="#{v2PmOrderController.qaStatus}" >
