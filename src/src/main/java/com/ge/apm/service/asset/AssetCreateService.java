@@ -64,12 +64,12 @@ public class AssetCreateService {
     @Autowired
     private V2_PmOrderService pmService;
 
-    public String getTenantName(Integer siteId) {
-        TenantInfo si = tenantDao.findById(siteId);
+    public String getTenantName(String uid) {
+        TenantInfo si = tenantDao.findByuid(uid);
         if (si != null) {
             return si.getName();
         } else {
-            return siteId.toString();
+            return uid.toString();
         }
     }
 
@@ -100,8 +100,8 @@ public class AssetCreateService {
         }
     }
 
-    public QrCodeLib getCreateRequest(String qrCode) {
-        return qrLibDao.findByQrCode(qrCode);
+    public QrCodeLib getCreateRequest(String qrCode,String siteUid) {
+        return qrLibDao.findByQrCode(qrCode,siteUid);
     }
 
     public List<OrgInfo> getClinicalDeptList(String siteUid) {
@@ -157,8 +157,8 @@ public class AssetCreateService {
         return picsList;
     }
 
-    public void updateQrLib(String qrCode, int i) {
-        QrCodeLib qrLibItem = qrLibDao.findByQrCode(qrCode);
+    public void updateQrLib(String qrCode, int i,String siteUid) {
+        QrCodeLib qrLibItem = qrLibDao.findByQrCode(qrCode,siteUid);
         qrLibItem.setStatus(i);
         qrLibDao.save(qrLibItem);
     }
