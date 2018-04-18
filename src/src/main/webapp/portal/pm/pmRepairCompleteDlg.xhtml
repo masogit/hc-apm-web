@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养完成">
+        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="650" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养完成">
             <h:form id="pmrepairCompleteDialogForm" class="pmrepairCompleteDialogFormcls" >
                 <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -123,14 +123,14 @@
                         <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     </p:fieldset>
-                   <!-- <p:fieldset legend="相关报告" >
+                    <p:fieldset legend="保养清单" >
                         <h:panelGroup id="addReport">
                             <p:selectOneMenu value="#{commonReportController.reportUid}">
                                 <p:ajax update="addReport" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{commonReportController.getReportTypeList(v2PmOrderController.selectedPmOrder.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
-                            <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(v2PmOrderController.selectedPmOrder.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
+                            <p:commandLink value="添加电气安全报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter9(v2PmOrderController.selectedPmOrder.id)}" disabled="#{!commonReportController.typeCheck().equalsIgnoreCase('pm-safety-report') or empty commonReportController.reportUid}" update="reportList"/>
                         </h:panelGroup>
                         <p:dataList id="reportList" value="#{commonReportController.getReportList(v2PmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                             #{commonReportController.getTemplateName(reportItem.schemaId)}
@@ -138,11 +138,34 @@
                             <h:outputText id="installDate" value="#{reportItem.createdDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </h:outputText>
-                            <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
-                            <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                            <!--<p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                            <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />-->
                             <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                         </p:dataList>
-                    </p:fieldset>-->
+
+
+
+
+                        <h:panelGroup id="addReport1">
+                            <p:commandLink value="添加性能检测报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(v2PmOrderController.selectedPmOrder.id)}" update="reportList1" disabled="#{!commonReportController.typeCheck().equalsIgnoreCase('pm-performance-report')}"/>
+                        </h:panelGroup>
+                        <p:dataList id="reportList1" value="#{commonReportController.getReportList(v2PmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                            #{commonReportController.getTemplateName(reportItem.schemaId)}
+
+                            <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </h:outputText>
+                            <!--<p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                            <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />-->
+                            <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
+                        </p:dataList>
+
+
+
+
+
+
+                    </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
                         <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
