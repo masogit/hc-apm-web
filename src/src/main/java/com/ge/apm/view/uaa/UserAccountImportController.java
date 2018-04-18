@@ -80,10 +80,8 @@ public class UserAccountImportController extends GenericCRUDController<UserAccou
     }
     
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", " 处理完成！");
         this.file = event.getFile();
         importFailedDataList=service.handleExcel(file, currentUser);
-        FacesContext.getCurrentInstance().addMessage(null, message);
     }
     
     public UploadedFile getFile() {
