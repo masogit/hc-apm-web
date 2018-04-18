@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFRow;
@@ -49,7 +52,10 @@ public class UserAccountService {
 	private static final String HEADER_ROLENAME="角色";
 	private static final String HEADER_UUID="UUID";
 	private OrgInfo orgInfoTemp;
-
+	private int successCount;
+	private int failedCount;
+	private int existsCount;
+	private int recordCount;
 	
 	@Autowired
 	UserAccountMapper userAccountMapper;
@@ -124,6 +130,7 @@ public class UserAccountService {
 		if(StringUtils.isEmpty(uuid)){
 			//create
 			if(isExistsByLoginName(loginName)){
+				existsCount++;
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在;");
 				return newUser;
 			}
@@ -331,6 +338,7 @@ public class UserAccountService {
 				}
 				if(!pass){
 					importFailedDataList.add(newUser);
+					failedCount++;
 					continue;
 				}
 				newUser.setLoginName(loginName);
@@ -347,14 +355,28 @@ public class UserAccountService {
 				newUser.setDepartName(department);
 				if(handleNewUser(newUser, institution, hospital, site, department)==false){
 					importFailedDataList.add(newUser);
+					failedCount++;
+				}
+				else{
+					successCount++;
 				}
 			} catch (Exception e) {
 				logger.error(e.getMessage());
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.FORMAT_ERROR,false);
 				importFailedDataList.add(newUser);
+				failedCount++;
 			}
 		}
+		addWarnMessage();
 		return importFailedDataList;
+	}
+	
+	private void addWarnMessage(){
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "成功导入!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
+        FacesContext.getCurrentInstance().addMessage(null, message);
+        successCount=0;
+        failedCount=0;
+        existsCount=0;
 	}
 
 	@Transactional
