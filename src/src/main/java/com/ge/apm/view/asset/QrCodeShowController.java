@@ -28,16 +28,12 @@ public class QrCodeShowController {
         qrCodeService = WebUtil.getBean(QrCodeService.class);
     }
 
-    public String getQrCodeImageBase64(String code,String siteUid) {
-        return qrCodeService.getQrCodeImageBase64(code,siteUid);
+    public String getQrCodeImageBase64(String code, String siteUid) {
+        return qrCodeService.getQrCodeImageBase64(code, siteUid);
     }
 
     public String getQrCodeImageWithTemplate(String code, String templateId) {
-        if (Strings.isNullOrEmpty(templateId)) {
-            return getQrCodeImageBase64(code);
-        } else {
-            return qrCodeService.getQrCodeImageBase64WithTemplate(code, templateId);
-        }
+        return qrCodeService.getQrCodeImageBase64WithTemplate(code, templateId);
     }
 
     public String getQrCodeImageBase64ByAsset(AssetInfo asset) {
