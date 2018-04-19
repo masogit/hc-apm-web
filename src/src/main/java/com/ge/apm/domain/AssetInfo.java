@@ -2,6 +2,7 @@
  */
 package com.ge.apm.domain;
 
+import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.ge.apm.service.utils.PinyinUtil;
 import org.springframework.data.annotation.CreatedBy;
@@ -837,7 +838,9 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptName(String clinicalDeptName) {
         this.clinicalDeptName = clinicalDeptName;
-        this.clinicalDeptNamePyCode = PinyinUtil.getShortPinyin(clinicalDeptName).toLowerCase();
+        if (!StringUtils.isEmpty(clinicalDeptName)) {
+            this.clinicalDeptNamePyCode = PinyinUtil.getShortPinyin(clinicalDeptName).toLowerCase();
+        }
     }
 
     public Integer getAssetGroup() {
