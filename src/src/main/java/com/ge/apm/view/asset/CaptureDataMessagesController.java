@@ -17,11 +17,12 @@ import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
-import com.ge.apm.dao.AssetAdRepository;
+import com.ge.apm.dao.CaptureDataMessagesRepository;
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.domain.AssetAd;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.CaptureDataMessages;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.asset.AssetAdService;
+import com.ge.apm.service.asset.CaptureDataMessagesService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -35,32 +36,32 @@ import webapp.framework.web.mvc.ServerEventInterface;
  */
 @ManagedBean
 @ViewScoped
-public class AssetAdController extends GenericCRUDUUIDController<AssetAd> implements Serializable, ServerEventInterface {
+public class CaptureDataMessagesController extends GenericCRUDUUIDController<CaptureDataMessages> implements Serializable, ServerEventInterface {
 
 	private static final long serialVersionUID = 1L;
-	private AssetAdRepository dao;
-    private AssetAdService service;
+	private CaptureDataMessagesRepository dao;
+    private CaptureDataMessagesService service;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
     private UploadedFile file;
-    private List<AssetAd> importFailedDataList;
+    private List<CaptureDataMessages> importFailedDataList;
     private String content;
     
     @Override
     protected void init() {
-        dao = WebUtil.getBean(AssetAdRepository.class);
-        service = WebUtil.getBean(AssetAdService.class);
+        dao = WebUtil.getBean(CaptureDataMessagesRepository.class);
+        service = WebUtil.getBean(CaptureDataMessagesService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
     }
 
     @Override
-    protected GenericRepositoryUUID<AssetAd> getDAO() {
+    protected GenericRepositoryUUID<CaptureDataMessages> getDAO() {
         return dao;
     }
 
     @Override
-    protected Page<AssetAd> loadData(PageRequest pageRequest) {
+    protected Page<CaptureDataMessages> loadData(PageRequest pageRequest) {
     	List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
@@ -84,23 +85,40 @@ public class AssetAdController extends GenericCRUDUUIDController<AssetAd> implem
     }
 
     @Override
-    public void onBeforeNewObject(AssetAd object) {
+    public void onBeforeNewObject(CaptureDataMessages object) {
         super.onBeforeNewObject(object);
         object.setTenantUID(currentUser.getTenantUID());
         object.setInstitutionUID(currentUser.getInstitutionUID());
         object.setHospitalUID(currentUser.getHospitalUID());
         object.setSiteUID(currentUser.getSiteUID());
     }
+    
+    public void checkSystemId(){
+    	System.out.println("xxx checkSystemId");
+    	String systemId=this.selected.getSystemId();
+    	if(StringUtils.isNotEmpty(systemId)){
+    		AssetInfo info=service.getAssetInfoBySystemId(systemId);
+    		if(info==null){
+    			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
+    			FacesContext.getCurrentInstance().addMessage(null, message);
+    		}
+    		else{
+    			FacesMessage message = new FacesMessage("注意", "该systemID对应设备名："+info.getName()+"，对应使用科室："+info.getClinicalDeptName());
+    			FacesContext.getCurrentInstance().addMessage(null, message);
+    		}
+    		
+    	}
+    }
 
     @Override
     public void save() {
     	String systemId=this.selected.getSystemId();
-    	if(StringUtils.isNotEmpty(systemId) && service.checkSystemIdExists(systemId)){
+    	if(StringUtils.isNotEmpty(systemId) && service.checkSystemIdExists(this.selected)){
     		super.save();
     		this.selected=null;
     	}
     	else{
-    		FacesMessage message = new FacesMessage("SystemID输入有误");
+    		FacesMessage message = new FacesMessage("注意","SystemID输入有误");
             FacesContext.getCurrentInstance().addMessage(null, message);
     	}
     }
@@ -126,11 +144,11 @@ public class AssetAdController extends GenericCRUDUUIDController<AssetAd> implem
         this.file = file;
     }
 
-	public List<AssetAd> getImportFailedDataList() {
+	public List<CaptureDataMessages> getImportFailedDataList() {
 		return importFailedDataList;
 	}
 
-	public void setImportFailedDataList(List<AssetAd> importFailedDataList) {
+	public void setImportFailedDataList(List<CaptureDataMessages> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
 	
