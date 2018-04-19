@@ -219,4 +219,13 @@ public class AssetInstallationService {
         return new Tuple2(false, "设备编号已被分配");
     }
 
+    public List<Supplier> getSupplierListBySiteUid(String siteUID) {
+        return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+//        if(Strings.isNullOrEmpty(siteUID)){
+//            return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+//        }else{
+//            return supplierDao.getBySiteUID(siteUID);
+//        }
+    }
+
 }

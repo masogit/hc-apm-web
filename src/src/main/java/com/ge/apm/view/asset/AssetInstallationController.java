@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -27,6 +28,7 @@ import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
@@ -67,6 +69,11 @@ public class AssetInstallationController {
     private ConfigService configService;
     
     private String exportQrCodeTemplateId;
+    
+    private String deptName;
+    
+    private List<OrgInfo> deptInfoList; 
+    private UaaService uaaService;
 
     @PostConstruct
     protected void init() {
@@ -79,6 +86,7 @@ public class AssetInstallationController {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String itemId = (String) UrlEncryptController.getValueFromMap(encodeStr, "itemId");
@@ -92,6 +100,7 @@ public class AssetInstallationController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
 
+        deptInfoList = uaaService.getClinicalDeptListBySiteUID(arrivalListItem.getArrivalList().getSiteUID());
         attachList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
         attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
@@ -445,6 +454,17 @@ public class AssetInstallationController {
         }
     }
     
+    public List<String> autoCompleteDept(String query){
+        return deptInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query)).map(OrgInfo::getName).collect(Collectors.toList());
+    }
+    
+    public void onClinicalDeptChange(SelectEvent event){
+        OrgInfo dept = deptInfoList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
+        if(dept!=null){
+            arrivalListItem.setClinicalDeptUID(dept.getUid());
+        }
+    }
+    
     public List<QrCodeTemplate> getQrCodeTemplates() {
         QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
         return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
@@ -520,6 +540,14 @@ public class AssetInstallationController {
 
     public void setExportQrCodeTemplateId(String exportQrCodeTemplateId) {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
     }
     
 }
