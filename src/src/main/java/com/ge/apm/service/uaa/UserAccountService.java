@@ -342,7 +342,9 @@ public class UserAccountService {
 						canParseDouble=false;
 					}
 					if(canParseDouble){
-						loginName=loginName.substring(0, loginName.indexOf("."));
+						if(loginName.indexOf(".")>0){
+							loginName=loginName.substring(0,loginName.indexOf("."));
+						}
 					}
 				}
 				name=ExcelParser.getCellStringValue(row, nameIndex);
