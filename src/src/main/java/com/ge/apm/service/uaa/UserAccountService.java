@@ -456,7 +456,7 @@ public class UserAccountService {
 		try {
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
-			userAccountMapper.saveUserRole(user.getId(),7);
+			userAccountMapper.saveUserRoleWithRoleId(user.getId(),7);
 			user.setPlainPassword(null);
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("create user error : {}", e.getMessage());
