@@ -20,8 +20,8 @@ import org.hibernate.annotations.GenericGenerator;
  * Created by 212605082 on 2018/3/7.
  */
 @Entity
-@Table(name = "asset_ad")
-public class AssetAd implements Serializable {
+@Table(name = "capture_data_messages")
+public class CaptureDataMessages implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -31,9 +31,18 @@ public class AssetAd implements Serializable {
 	@Column(columnDefinition = "CHAR(32)")
 	private String id;
 
-	// 设备名称
 	@Column(name = "system_id")
 	private String systemId;
+	
+	@Column(name = "asset_uid")
+	private String assetUID;
+	
+	@Column(name = "ge_device_type")
+	private Integer geDeviceType;
+	
+	//0:单个设备,1:geDeviceType
+	@Column(name = "type")
+	private Integer type;
 
 	@Column(name = "comment")
 	private String comment;
@@ -59,11 +68,11 @@ public class AssetAd implements Serializable {
 
 	@Transient
 	private Integer excelIdex;
-
-	@Column(name = "status")
+	
+	@Transient
 	private String status;
 
-	@Column(name = "status_code")
+	@Transient
 	private String statusCode;
 
 	@Transient
@@ -251,6 +260,30 @@ public class AssetAd implements Serializable {
 		this.index = index;
 	}
 
+	public String getAssetUID() {
+		return assetUID;
+	}
+
+	public void setAssetUID(String assetUID) {
+		this.assetUID = assetUID;
+	}
+
+	public Integer getGeDeviceType() {
+		return geDeviceType;
+	}
+
+	public void setGeDeviceType(Integer geDeviceType) {
+		this.geDeviceType = geDeviceType;
+	}
+
+	public Integer getType() {
+		return type;
+	}
+
+	public void setType(Integer type) {
+		this.type = type;
+	}
+
 	@Override
 	public int hashCode() {
 		int hash = 0;
@@ -262,10 +295,10 @@ public class AssetAd implements Serializable {
 	public boolean equals(Object object) {
 		// TODO: Warning - this method won't work in the case the id fields are
 		// not set
-		if (!(object instanceof AssetAd)) {
+		if (!(object instanceof CaptureDataMessages)) {
 			return false;
 		}
-		AssetAd other = (AssetAd) object;
+		CaptureDataMessages other = (CaptureDataMessages) object;
 		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
 			return false;
 		}
@@ -274,6 +307,6 @@ public class AssetAd implements Serializable {
 
 	@Override
 	public String toString() {
-		return "com.ge.apm.domain.AssetAD[ id=" + id + " ]";
+		return "com.ge.apm.domain.CaptureDataMessages[ id=" + id + " ]";
 	}
 }
