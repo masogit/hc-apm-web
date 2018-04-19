@@ -448,6 +448,40 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         return root;
     }
 
+    public TreeNode getOrgTreeBySiteWithoutClinical(String siteUID){
+        List<OrgInfo> orgList = null;
+        orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
+        TreeNode root  = new DefaultTreeNode("root", null, null);
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+        for(OrgInfo org: orgList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+            treeMapG.put(org.getUid(),node);
+        }
+        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo)node.getData();
+            if(org.getParentUID()!=null){
+                TreeNode parentNode = treeMap.get(org.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+
+        if(treeMap.get(siteUID)!=null){
+            root.getChildren().add(treeMap.get(siteUID));
+        }
+        xtreeMap = treeMap;
+        if(!root.getChildren().isEmpty()){
+            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
+            rootUID = temp.getUid();
+        }
+        return root;
+    }
+
     public  Map<String, TreeNode> xtreeMap;
     public String rootUID;
     public TreeNode getOrgTreeBySiteExceptClinicalDept(String siteUID){
@@ -733,6 +767,20 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         TreeNode root = new DefaultTreeNode("root", null, null);
         for(OrgInfo item : orgList){
             TreeNode siteNode = getOrgTreeBySite(item.getUid());
+            root.getChildren().addAll(siteNode.getChildren());
+        }
+        return root;
+    }
+
+    public TreeNode getOrgFullTreeByTenantWithoutClinical(String tenantUid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
+        orgInfoFilters.add(new SearchFilter("parentUID", SearchFilter.Operator.IsNull, tenantUid));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
+        List<OrgInfo> orgList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        for(OrgInfo item : orgList){
+            TreeNode siteNode = getOrgTreeBySiteWithoutClinical(item.getUid());
             root.getChildren().addAll(siteNode.getChildren());
         }
         return root;
