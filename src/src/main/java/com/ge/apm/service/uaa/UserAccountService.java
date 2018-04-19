@@ -24,12 +24,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserModel;
@@ -56,6 +58,8 @@ public class UserAccountService {
 	private int failedCount;
 	private int existsCount;
 	private int recordCount;
+	boolean isInsulate=false;
+	UserAccount currentUser;
 	
 	@Autowired
 	UserAccountMapper userAccountMapper;
@@ -65,6 +69,9 @@ public class UserAccountService {
 
 	@Autowired
 	AssetInfoMapper assetInfoMapper;
+	
+	@Autowired
+	TenantInfoRepository tenantInfoRepository;
 	
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
@@ -163,10 +170,21 @@ public class UserAccountService {
 		return newUser;
 	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department){
-		if(getInstitutionID(newUser, institution)){
-			if(getHospitalID(newUser, hospital)){
-				if(getSiteID(newUser, site)){
-					if(getDepartmentID(newUser, department)){
+		if(isInsulate){
+			newUser.setInstitutionUID(currentUser.getInstitutionUID());
+			newUser.setHospitalUID(currentUser.getHospitalUID());
+			orgInfoTemp=orgInfoRepository.getHospitalByName(site,currentUser.getHospitalUID());
+			if(getSiteID(newUser, site)){
+				if(getDepartmentID(newUser, department)){
+				}
+			}
+		}
+		else{
+			if(getInstitutionID(newUser, institution)){
+				if(getHospitalID(newUser, hospital)){
+					if(getSiteID(newUser, site)){
+						if(getDepartmentID(newUser, department)){
+						}
 					}
 				}
 			}
@@ -212,7 +230,7 @@ public class UserAccountService {
 		return true;
 	}
 	private boolean getSiteID(UserAccount newUser,String site){
-		OrgInfo temp=orgInfoRepository.getHospitalByName(site,orgInfoTemp.getUid());
+		OrgInfo temp=orgInfoRepository.getSiteByName(site,orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(site)){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"院区错误;");
@@ -229,7 +247,7 @@ public class UserAccountService {
 	}
 	private boolean getDepartmentID(UserAccount newUser,String department){
 		
-		OrgInfo temp=orgInfoRepository.getHospitalByName(department,orgInfoTemp.getUid());
+		OrgInfo temp=orgInfoRepository.getDepartmentByName(department,orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(department)){
 				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室错误;");
@@ -245,6 +263,11 @@ public class UserAccountService {
 	
 	public List<UserAccount> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
 //		 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+		currentUser=user;
+		TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
+		if(tenantInfo!=null && tenantInfo.getInsulate()!=null){
+			isInsulate=tenantInfo.getInsulate();
+		}
 		List<UserAccount> importFailedDataList = new ArrayList<UserAccount>();
 		HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
 		HSSFSheet sheet = workbook.getSheetAt(0);
@@ -304,14 +327,26 @@ public class UserAccountService {
 			try {
 				newUser.setExcelIdex(j + 1);
 				newUser.setTenantUID(user.getTenantUID());
-//				newUser.setInstitutionUID(user.getInstitutionUID());
-//				newUser.setHospitalUID(user.getHospitalUID());
-//				newUser.setSiteUID(user.getSiteUID());
 				institution=ExcelParser.getCellStringValue(row, institutionIndex);
 				hospital=ExcelParser.getCellStringValue(row, hospitalIndex);
 				site=ExcelParser.getCellStringValue(row, siteIndex);
 				department=ExcelParser.getCellStringValue(row, departmentIndex);
 				loginName=ExcelParser.getCellStringValue(row, loginnameIndex);
+				if(loginName!=null && loginName.length()>0){
+					boolean canParseDouble=false;
+					try {
+						Double.parseDouble(loginName);
+						canParseDouble=true;
+					} catch (Exception e) {
+						// TODO: handle exception
+						canParseDouble=false;
+					}
+					if(canParseDouble){
+						if(loginName.indexOf(".")>0){
+							loginName=loginName.substring(0,loginName.indexOf("."));
+						}
+					}
+				}
 				name=ExcelParser.getCellStringValue(row, nameIndex);
 				email=ExcelParser.getCellStringValue(row, emailIndex);
 				telephone=ExcelParser.getCellStringValue(row, telephoneIndex);
@@ -372,7 +407,7 @@ public class UserAccountService {
 	}
 	
 	private void addWarnMessage(){
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "成功导入!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
         FacesContext.getCurrentInstance().addMessage(null, message);
         successCount=0;
         failedCount=0;
@@ -421,7 +456,7 @@ public class UserAccountService {
 		try {
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
-			userAccountMapper.saveUserRole(user.getId());
+			userAccountMapper.saveUserRoleWithRoleId(user.getId(),7);
 			user.setPlainPassword(null);
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("create user error : {}", e.getMessage());
