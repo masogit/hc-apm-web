@@ -141,7 +141,7 @@
                                <p:column headerText="备注" sortBy="#{item.remark}" >
                                     <h:outputText value="#{item.remark}"/>
                                </p:column>
-                               <p:column headerText="删除">
+                               <p:column headerText="删除" >
                                 <p:commandButton id="deleteButton"  icon="ui-icon-trash"  actionListener="#{sharedAssetRequestNewController.deleteBy(item.id)}"  update="datalist">
                                       <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                 </p:commandButton>

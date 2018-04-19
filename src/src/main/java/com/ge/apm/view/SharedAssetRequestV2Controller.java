@@ -9,6 +9,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
+import org.primefaces.ultima.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -22,10 +23,15 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 /**
  *
  * @author caoyong
@@ -459,6 +465,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
 
      public void getAssetInfoR(Date times) throws ParseException{//查询并插入归还设备信息
+         if (selected.getState() != 8){
+             WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+             return;
+         }
+
           List<SharedAssetReqDetail> sardList = selected.getSardList();
           List<AssetInfo> assetInfoList = selected.getInfoList();
           List<SharedAssetReqType> sartList = selected.getSartList();
@@ -719,6 +730,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
      }
     
     public void getAssetInfo(Date times,String accepter) throws ParseException{//查询并插入借用设备信息
+        if (selected.getState() != 2){
+            WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+            return;
+        }
+
         List<SharedAssetReqDetail> sardList = selected.getSardList();
         List<AssetInfo> assetInfoList = selected.getInfoList();
         List<SharedAssetReqType> sartList = selected.getSartList();
@@ -1094,7 +1110,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             requestContext.addCallbackParam("url", url);
             return;
         }else {
-            WebUtil.addErrorMessage("当前状态不可受理！");
+            WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
             requestContext.addCallbackParam("url","norespond");
             return;
         }
@@ -1112,7 +1128,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            requestContext.addCallbackParam("url", url);
            return;
        }else {
-           WebUtil.addErrorMessage("当前状态不可受理！");
+           WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
            requestContext.addCallbackParam("url","norespond");
            return;
        }
@@ -1217,7 +1233,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            }
           
        }else {
-           WebUtil.addErrorMessage("当前状态不可交付！");
+           WebUtil.addErrorMessage("当前不是可交付状态，请返回！");
            requestContext.addCallbackParam("url", "norespond");
            return;
        }
@@ -1286,7 +1302,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 return;
            }
        }else {
-           WebUtil.addErrorMessage("当前状态不可交付！");
+           WebUtil.addErrorMessage("当前不是可交付状态，请返回！");
             requestContext.addCallbackParam("url", "norespond");
            return;
        }
