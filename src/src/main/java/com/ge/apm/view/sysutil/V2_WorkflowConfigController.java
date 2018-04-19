@@ -64,6 +64,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private String tenantUid;
 	private UaaService uaaService;
 	private OrgInfo selectedOrg;
+	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
 
 	@Override
 	protected void init() {
@@ -80,7 +81,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
 		isInsulate = (isInsulate == null || isInsulate == false) ? false : true;
 		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);*/
-		updateDispater();
+		/*updateDispater();
+		updateApproverlList();*/
 		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
 		setTenantUid(user.getTenantUID());
 
@@ -103,6 +105,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		TreeNode node = event.getTreeNode();
 		selectedUserOrg = (OrgInfo) node.getData();
 		updateDispater();
+		updateApproverList();
 	}
 
 	public void setTenantUid(String tenantUid) {
@@ -131,14 +134,14 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	}
 
 
-	public void initDispatchUserList() {
+/*	public void initDispatchUserList() {
 		if(isInsulate){
 			List<SearchFilter> filters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
 			dispatchUserList = userDao.findBySearchFilter(filters);
 		}else{
 			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
 		}
-	}
+	}*/
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
@@ -152,35 +155,14 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public List<OrgInfo> getIncludeOrgInfo(String uid,String parentUID,Integer orgType){
 		return userCommonService.getIncludeOrgInfo(isInsulate,loginUserOrgType,uid,parentUID,orgType);
-		/*if(isInsulate){
-			List<OrgInfo> orgInfos = Lists.newArrayList();
-			if(loginUserOrgType >= orgType){
-				if(StringUtils.isEmpty(uid)){//新增时
-					if(orgType == 1){
-						uid = user.getInstitutionUID();
-					}else if(orgType == 2){
-						uid = user.getHospitalUID();
-					}else if(orgType == 3){
-						uid = user.getSiteUID();
-					}
-				}
-				OrgInfo orgInfo = orgInfoRepository.findByUid(uid);
-				orgInfos.add(orgInfo);
-				return orgInfos;
-			}else{
-				return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
-			}
-		}else{
-			return orgInfoRepository.findByParentUIDAndOrgTypeOrderByNameAsc(parentUID,orgType);
-		}*/
 	}
 
 	public void updateDispater(){
 		dispatchUserList.clear();
+		if(selected == null || selectedUserOrg == null){
+			return;
+		}
 		if(isInsulate){
-			if(selected == null){
-				return;
-			}
 			Integer orgType = selectedUserOrg.getOrgType();
 			if(orgType == 0){
                 dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());
@@ -191,24 +173,30 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
             }else if(orgType == 3){
                 dispatchUserList = userDao.getBySiteUID(selectedUserOrg.getSiteUID());
             }
-/*			List<SearchFilter> filters = new ArrayList<>();
-			if(selectedUserOrg.getSiteUID() != null){
-				filters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
-				dispatchUserList = userDao.findBySearchFilter(filters);
-				return;
-			}
-			else if(selectedUserOrg.getHospitalUID() != null){
-				filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedUserOrg.getHospitalUID()));
-				dispatchUserList = userDao.findBySearchFilter(filters);
-				return;
-			}else if(selectedUserOrg.getInstitutionUID() != null){
-				filters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectedUserOrg.getInstitutionUID()));
-				dispatchUserList = userDao.findBySearchFilter(filters);
-				return;
-			}
-			dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());*/
 		}else{
 			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
+		}
+	}
+
+	public void updateApproverList(){
+		approveUserList.clear();
+		if(selectedUserOrg == null || selected == null){
+			return;
+		}
+		if(isInsulate){
+			Integer orgType = selectedUserOrg.getOrgType();
+			if(orgType == 0){
+				approveUserList = userDao.getAssetHeadAndStaffByTenantUID(selectedUserOrg.getTenantUID());
+			}else if(orgType == 1) {
+				approveUserList = userDao.getAssetHeadAndStaffByInstitutionUID(selectedUserOrg.getInstitutionUID());
+			}else if(orgType == 2){
+				approveUserList = userDao.getAssetHeadAndStaffByHospitalUID(selectedUserOrg.getHospitalUID());
+			}else if(orgType == 3){
+				approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
+			}
+		}else{
+			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
+			//return userCommonService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
 		}
 	}
 	
@@ -268,10 +256,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public String getTenantName(String tenantUID){
 		return tenantInfoRepository.findByuid(tenantUID).getName();
-	}
-
-	public List<UserAccount> getAssetCreateApproverlList(){
-		return userCommonService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
 	}
 
    	public List<OrgInfo> getDispatherClinical(){
@@ -459,17 +443,17 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	@Override
 	public void prepareEdit(){
-/*		if(selected != null){
-			initDispatchUserList();
-		}*/
 		dispatchUserList.clear();
+		approveUserList.clear();
 		super.prepareEdit();
 		selectedUserOrg = orgInfoRepository.getByUid(selected.getSiteUID());
-		updateDispater();
+/*		updateDispater();
+		updateApproverList();*/
 	}
 
 	public void prepareCreate(){
 		dispatchUserList.clear();
+		approveUserList.clear();
 		try {
 			super.prepareCreate();
 		} catch (InstantiationException e) {
@@ -478,7 +462,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			e.printStackTrace();
 		}
 		selectedUserOrg = null;
-		initDispatchUserList();
+/*		updateDispater();
+		updateApproverList();*/
 	}
 	
 	public void onSelect(){
@@ -584,5 +569,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public void setSelectedOrg(OrgInfo selectedOrg) {
 		this.selectedOrg = selectedOrg;
+	}
+
+	public List<UserAccount> getApproveUserList() {
+		return approveUserList;
+	}
+
+	public void setApproveUserList(List<UserAccount> approveUserList) {
+		this.approveUserList = approveUserList;
 	}
 }
