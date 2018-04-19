@@ -181,13 +181,23 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			if(selected == null){
 				return;
 			}
-			List<SearchFilter> filters = new ArrayList<>();
+			Integer orgType = selectedUserOrg.getOrgType();
+			if(orgType == 0){
+                dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());
+            }else if(orgType == 1) {
+                dispatchUserList = userDao.getByInstitutionUID(selectedUserOrg.getInstitutionUID());
+            }else if(orgType == 2){
+                dispatchUserList = userDao.getByHospitalUID(selectedUserOrg.getHospitalUID());
+            }else if(orgType == 3){
+                dispatchUserList = userDao.getBySiteUID(selectedUserOrg.getSiteUID());
+            }
+/*			List<SearchFilter> filters = new ArrayList<>();
 			if(selectedUserOrg.getSiteUID() != null){
 				filters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedUserOrg.getSiteUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
 			}
-/*			else if(selectedUserOrg.getHospitalUID() != null){
+			else if(selectedUserOrg.getHospitalUID() != null){
 				filters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectedUserOrg.getHospitalUID()));
 				dispatchUserList = userDao.findBySearchFilter(filters);
 				return;
@@ -386,6 +396,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	
 	@Transactional
     public void applyChange() {
+		if(selectedUserOrg == null){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
+			return;
+		}
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
 		Boolean isPmManual = selected.getIsPmManualEnabled();

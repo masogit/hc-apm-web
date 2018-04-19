@@ -8,7 +8,7 @@
 
     <ui:composition>
 
-        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
+        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.SystemConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset id="basic" legend="公共配置">
@@ -136,6 +136,23 @@
                             <h:panelGroup>
                                 <label class="label">工单人工费用(元/小时)</label>
                                 <p:inputNumber id="woManHourPrice" value="#{v2_WorkflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <!-- 紧急工单配置-->
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.timeoutDispatch}</label>
+                                <p:inputNumber id="emergencyTimeoutDispatch" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">紧急工单#{msg.timeoutAccept}</label>
+                                <p:inputNumber id="emergencyTimeoutAccept" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.timeoutClose}</label>
+                                <p:inputNumber id="emergencyTimeoutClose" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.maxMessageCount}</label>
+                                <p:inputNumber id="emergencyMaxMessageCount" value="#{v2_WorkflowConfigController.selected.emergencyMaxMessageCount}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
