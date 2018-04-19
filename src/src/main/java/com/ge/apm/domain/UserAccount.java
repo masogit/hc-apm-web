@@ -34,6 +34,8 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+
+import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.annotations.Cache;
@@ -76,6 +78,8 @@ public class UserAccount implements Serializable {
     @Size(min = 1, max = 32)
     @Column(name = "name")
     private String name;
+    @Column(name = "name_py_code")
+    private String namePyCode;
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 255)
@@ -314,6 +318,7 @@ public class UserAccount implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]","");
     }
 
     public String getPassword() {
@@ -445,6 +450,14 @@ public class UserAccount implements Serializable {
 
     public void setIsLocked(Boolean isLocked) {
         this.isLocked = isLocked;
+    }
+
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
     }
 
     @Transient
