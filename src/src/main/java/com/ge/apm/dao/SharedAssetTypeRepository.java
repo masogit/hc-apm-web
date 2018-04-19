@@ -19,4 +19,7 @@ public interface SharedAssetTypeRepository extends GenericRepositoryUUID<SharedA
     @Query(value = "select id from SharedAssetType ")
     public List<String> findAllUid();
 
+    @Query(value = "select distinct s.* from shared_asset_type s where s.site_uid =?1",nativeQuery = true)
+    public List<SharedAssetType> findbySiteUid(String SiteUid);
+
 }

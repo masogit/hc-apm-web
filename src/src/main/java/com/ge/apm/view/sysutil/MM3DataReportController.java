@@ -77,7 +77,7 @@ public class MM3DataReportController {
     }
     
     public String getTenantName(AssetInfo asset){
-       return asset==null?"":aiService.getTenantName(asset.getSiteId());
+       return asset==null?"":aiService.getTenantName(asset.getSiteUID());
     }
     
     public UploadedFile getFile() {

@@ -288,13 +288,14 @@ public class UserContextService implements Serializable {
     }
 
     private Boolean isDispatcher = null;
+    private Boolean isPmDispatcher = null;
 
     private Boolean isAssetApprover = null;
     
     private Boolean needAssetApproval = null;
     
     private Boolean needInstorageCheck = null;
-    
+
     public Boolean needInstorageCheck(){
         if (needInstorageCheck == null) {
             getUserPrivilege();
@@ -316,6 +317,15 @@ public class UserContextService implements Serializable {
         return isDispatcher;
     }
 
+
+    public Boolean isPmDispatcher(){
+        if (isPmDispatcher == null) {
+            getUserPrivilege();
+        }
+        return isPmDispatcher;
+
+    }
+
     public Boolean isAssetApprover() {
         if (isAssetApprover == null) {
             getUserPrivilege();
@@ -325,8 +335,12 @@ public class UserContextService implements Serializable {
 
     private void getUserPrivilege() {
         List<WorkflowConfig> wcList = getSiteConfigurations();
-        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
+        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item. getDispatchUserId()).orElse(0).equals(userAccount.getId())
                 || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+
+        isPmDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getPmDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+
         isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
         
         needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
@@ -343,6 +357,29 @@ public class UserContextService implements Serializable {
         orgList.add(userAccount.getSiteUID());
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         return wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
+    }
+
+    public String isActive(){
+        UserAccount currentUser = getLoginUser();
+        if(!currentUser.getIsActive() && currentUser.getId() != 0){
+            return "1";//need active
+        }else {
+            return "0";
+        }
+    }
+
+    public static boolean isOnlyLocalITAdmin() {
+
+        if(UserContext.getRoles().contains("LocalITAdmin")){
+            if(UserContext.getRoles().contains("ITAdmin") || isSuperAdmin()){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
+
     }
 
 }

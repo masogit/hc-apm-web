@@ -75,14 +75,21 @@ class Chart extends React.PureComponent {
       key: 'range',
       value: filters.range
     })
-    if (depts) {
-      filterOptions.push({
-        type: 'select',
-        key: 'dept',
-        value: filters.dept,
-        options: depts,
-        placeholder: '全部科室'
-      })
+    if (depts.depts) {
+      filterOptions.push(
+        {
+          type: 'select',
+          key: 'hospital',
+          value: depts.selectedHospital,
+          options: depts.hospitals,
+        },
+        {
+          type: 'select',
+          key: 'dept',
+          value: filters.dept,
+          options: depts.depts,
+          placeholder: '全部科室'
+        })
     }
     filterOptions.push({
       type: 'select',

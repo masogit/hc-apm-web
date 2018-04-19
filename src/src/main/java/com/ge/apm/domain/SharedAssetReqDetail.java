@@ -74,10 +74,10 @@ public class SharedAssetReqDetail implements Serializable{
     private Date chargingEndTime;//计费结束时间
     
     @Column(name = "count_qty")
-    private int countQty;//计费数量
+    private Integer countQty;//计费数量
     
     @Column(name = "cost")
-    private double cost;//费用
+    private Double cost;//费用
     
     @Column(name = "accepter")
     private String accepter;//设备接收人：默认等于申请人或上一条
@@ -222,19 +222,20 @@ public class SharedAssetReqDetail implements Serializable{
         this.chargingEndTime = chargingEndTime;
     }
 
-    public int getCountQty() {
-        return countQty;
+    public Integer getCountQty() {
+        return countQty == null ? 0 : countQty;
     }
 
-    public void setCountQty(int countQty) {
+    public void setCountQty(Integer countQty) {
         this.countQty = countQty;
     }
 
-    public double getCost() {
-        return cost;
+    public Double getCost() {
+
+        return cost == null ? 0 : cost;
     }
 
-    public void setCost(double cost) {
+    public void setCost(Double cost) {
         this.cost = cost;
     }
 

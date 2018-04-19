@@ -144,14 +144,21 @@
           from: String,
           to: String,
           range: Object,
-          dept: String,
+          dept: {
+            type: String,
+            notify: true,
+          },
           type: String,
+          hospital: {
+            type: String,
+            notify: true,
+          },
           data: Array,
           total: Object,
           scales: Object,
           _queryUrl: {
             type: String,
-            computed: '_getQueryUrl(range, sortBy, dept, type)'
+            computed: '_getQueryUrl(range, sortBy, dept, type, hospital)'
           },
           benchmarkSuffix: {
             value: '_bm',
@@ -161,7 +168,8 @@
         observers: [
           '_replot(width, height, data)',
           'saveOptionsInHistory(sortBy)',
-          '_loadData(range, dept, type, sortBy, pageStart, pageSize)'
+          '_resetDept(hospital)',
+          '_loadData(range, dept, hospital, type, sortBy, pageStart, pageSize)'
         ],
         listeners: {
           'iron-resize': '_onResize'
@@ -779,16 +787,16 @@
           options['sort'] = value;
           location.hash = '#' + URI().query(options).query();
         },
-        _getQueryUrl: function(range, sortBy, dept, type) {
+        _getQueryUrl: function(range, sortBy, dept, type, hospital) {
           var DATE_FORMAT = WebUtils.constants.DATE_FORMAT;
 
           var from = moment(range.from).format(DATE_FORMAT);
           var to = moment(range.to).format(DATE_FORMAT);
-
           return URI(this.resolveApiUrl('/api/list')).query({
             'from': from,
             'to': to,
             'orderby': sortBy,
+            'hospital': hospital,
             'type': type || undefined,
             'dept': dept || undefined
           }).toString();
@@ -812,6 +820,9 @@
           this.set('width', rect.width);
           this.set('height', rect.height);
         },
+        _resetDept: function() {
+          this.set('dept', '');
+        }
       });
     });
   </script>

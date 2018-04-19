@@ -133,6 +133,9 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
         if (null != queryAsset.getClinicalDeptId()) {
             assetFilters.add(new SearchFilter("clinicalDeptId", SearchFilter.Operator.EQ, queryAsset.getClinicalDeptId()));
         }
+		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
+			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
+		}
 		if(level != null) {
 			List<String> uids = null;
 			if(level == 1) {
@@ -314,7 +317,8 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("token is {}",token);
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
-		WebUtil.addSuccessMessage("保养工单生成成功！");
+		//WebUtil.addSuccessMessage("保养工单生成成功！");
+		WebUtil.addSuccessMessage("正在生成保养工单，请稍候！");
 		//targetAssets.clear();
 	}
 

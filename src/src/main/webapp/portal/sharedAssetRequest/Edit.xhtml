@@ -44,7 +44,9 @@
                             </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class='label'>创建日期</label>
-                                <p:calendar id="createDate" pattern="yyyy/MM/dd"  value="#{sharedAssetRequestNewController.selected.createDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                                <h:outputText value="#{sharedAssetRequestNewController.selected.createDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class='label'>备注</label>
@@ -65,14 +67,16 @@
                      <p:fieldset legend="借用维护明细信息" style="margin-bottom:20px">
                              <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup >
+                                        <div style="width:630px">
                                            <label class='label'>批量输入</label>
-                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费开始时间" value="#{sharedAssetRequestNewController.selected.msgBeginTime}" required="true" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费开始时间" value="#{sharedAssetRequestNewController.selected.msgBeginTime}" required="true" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true" requiredMessage="请选择开始时间"/>
                                            <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费结束时间" value="#{sharedAssetRequestNewController.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
-                                           <p:inputText  style="width: 100px;margin-left:10px " placeholder="设备接收人" value="#{sharedAssetRequestNewController.selected.msgAccepter}" />
-                                           <p:selectOneMenu style="margin-left:40px; " id="clinicalDeptUid"  value="#{sharedAssetRequestNewController.selected.clinicalDeptUid}" required="true" requiredMessage="#{msg.clinicalDeptUid} #{msg.ValidationRequire}">        
+                                           <p:inputText  style="width: 100px;margin-left:10px " placeholder="设备接收人" required="true" value="#{sharedAssetRequestNewController.selected.msgAccepter}" requiredMessage="请选择设备接收人"/>
+                                           <p:selectOneMenu style="margin-left:40px;float:right" id="clinicalDeptUid"  value="#{sharedAssetRequestNewController.selected.clinicalDeptUid}" required="true" requiredMessage="请选择科室">        
                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                            <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestNewController.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                       </p:selectOneMenu>
+                                           </p:selectOneMenu>
+                                        </div>   
                                    </h:panelGroup>
 <!--                                    <h:panelGroup >
                                        <label class='label'>科室名称</label>
@@ -137,7 +141,7 @@
                                <p:column headerText="备注" sortBy="#{item.remark}" >
                                     <h:outputText value="#{item.remark}"/>
                                </p:column>
-                               <p:column headerText="删除">
+                               <p:column headerText="删除" >
                                 <p:commandButton id="deleteButton"  icon="ui-icon-trash"  actionListener="#{sharedAssetRequestNewController.deleteBy(item.id)}"  update="datalist">
                                       <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                 </p:commandButton>
@@ -154,7 +158,7 @@
                            </p:dataTable>
                      </p:fieldset>
 <!--                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestNewController.save}" value="#{msg.Save}" action="List?faces-redirect=true"/>-->
-                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="确认借用" rendered="#{sharedAssetRequestNewController.selected.state == 0}" >
+                     <p:commandButton id="confirm" validateClient="true" actionListener="#{sharedAssetRequestNewController.deliverR}" action="List?faces-redirect=true" value="提交" rendered="#{sharedAssetRequestNewController.selected.state == 0}" >
                        <p:confirm header="提交确认" message="您确定要提交吗" icon="ui-icon-warning"/>
                      </p:commandButton>
 <!--                     <p:commandButton id="confirmcancel" validateClient="true" actionListener="#{sharedAssetRequestNewController.cancel()}" action="List?faces-redirect=true" value="取消借用" rendered="#{sharedAssetRequestNewController.selected.state == '1'}" >
