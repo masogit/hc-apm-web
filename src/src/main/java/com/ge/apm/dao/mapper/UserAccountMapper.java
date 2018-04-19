@@ -56,9 +56,13 @@ public interface UserAccountMapper {
 	@Options(useGeneratedKeys=true)
 	public Integer saveUserAccount(UserAccount user);
 	
+	
 	@Update("update user_account set telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked} where uid=#{uid}")
 	public void updateUserAccount(UserAccount user);
 
 	@Insert("insert into user_role(user_id,role_id) values (#{userId},9)")
 	public void saveUserRole(Integer userId);
+	
+	@Insert("insert into user_role(user_id,role_id) values (#{userId},#{roleId})")
+	public void saveUserRole(Integer userId,Integer roleId);
 } 
