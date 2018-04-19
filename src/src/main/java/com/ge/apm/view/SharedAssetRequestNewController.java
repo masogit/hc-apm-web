@@ -253,11 +253,11 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                             assetDetaiVo.setClinicalDeptForReturnUid(ClinicalUid);
                                             assetDetaiVo.setClinicalDeptForReturnName(ClinicalName);
                                             endsTime = timesa;
-                                            if( "1".equals(this.selected.getType())){
-                                               assetDetaiVo.setChargingType("维修借用");
-                                             }
+//                                            if( "1".equals(this.selected.getType())){
+//                                               assetDetaiVo.setChargingType("维修借用");
+//                                             }
                                     
-                                            else if("次".equals(swapTypeVo.getChargingType())){
+                                            if("次".equals(swapTypeVo.getChargingType())){
                                                 assetDetaiVo.setCountQty(1);
                                                 assetDetaiVo.setCost(swapTypeVo.getUnitPrice());
                                             }
@@ -331,6 +331,10 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         if(!"".equals(accepter)){
                                             assetDetaiVo.setAccepter(accepter);
                                         }
+                                        if( "1".equals(this.selected.getType())){
+                                               assetDetaiVo.setChargingType("维修借用");
+                                               assetDetaiVo.setCost(null);
+                                        }
                                         
 //                                        if(times==null&&"".equals(accepter)){
 //                                            assetDetaiVo.setAccepter(acceptman);
@@ -398,6 +402,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
                                     }
                                     assetDetaiVo.setUnitPrice(swapTypeVo.getUnitPrice());//单价
+                                    assetDetaiVo.setAssetInfoId(infoList.get(0).getUid());
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
                                     //asdDao.save(assetDetaiVo);
@@ -516,12 +521,18 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                return;
            }
            this.selected.setCreateDate(new Date());
+//           System.out.println(selected.getInfoList().get(0).getClinicalDeptUID());
            dao.save(selected);
            asiDao.save(selected.getInfoList());
            asdDao.save(selected.getSardList());
        
     }
     public void setCost(SharedAssetReqDetail sard){
+        
+        if ("1".equals(selected.getType())) {
+            sard.setChargingType("维修借用");
+            sard.setCost(null);
+        }    
         if("次".equals(sard.getChargingType())){
             sard.setCountQty(1);
             sard.setCost(sard.getUnitPrice());
@@ -585,6 +596,10 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                 }
             }
         }
+         if ("1".equals(selected.getType())) {
+            sard.setChargingType("维修借用");
+            sard.setCost(null);
+        }
     }
     
     public void saveSard(String type){
@@ -627,7 +642,28 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
             }
  
         }
-     
+        
+         if (selectedSard.getChargingEndTime() != null){
+          String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
+          OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
+          
+         List<AssetInfo> assetInfoList = selected.getInfoList();
+         AssetInfo asset = asiDao.findByUid(selectedSard.getAssetInfoId());
+                 for (AssetInfo assetInfo : assetInfoList) {
+                     if (assetInfo.getUid().equals(selectedSard.getAssetInfoId())) {
+
+                         assetInfo.setClinicalDeptUID(userOrg.getUid());
+                         assetInfo.setClinicalDeptName(userOrg.getName());
+                         System.out.println(assetInfoList.get(0).getClinicalDeptUID());
+                         break;
+                     }
+                 }
+                 if(asset !=null){
+                 asset.setClinicalDeptUID(userOrg.getUid());
+                 asset.setClinicalDeptName(userOrg.getName());
+                 assetInfoList.add(asset);
+                 }
+         }
          selectedSard.setAccessoryList(accessoryList);
          this.setCost(selectedSard);
      }
