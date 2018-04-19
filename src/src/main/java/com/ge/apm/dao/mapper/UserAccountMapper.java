@@ -64,5 +64,5 @@ public interface UserAccountMapper {
 	public void saveUserRole(Integer userId);
 	
 	@Insert("insert into user_role(user_id,role_id) values (#{userId},#{roleId})")
-	public void saveUserRole(Integer userId,Integer roleId);
+	public void saveUserRoleWithRoleId(Integer userId,Integer roleId);
 } 
