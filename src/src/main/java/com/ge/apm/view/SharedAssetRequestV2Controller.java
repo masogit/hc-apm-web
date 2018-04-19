@@ -9,6 +9,7 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
+import org.primefaces.ultima.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -22,10 +23,15 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+
+import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 /**
  *
  * @author caoyong
@@ -34,10 +40,6 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<SharedAssetRequest>{
     private Double total;
-    private Boolean msg;//提示申请科室与当前使用科室不一致字段
-    private String msgMan;
-    private Date msgStartTime;
-    private String accepter;
     private UaaService uuaService;
     private Integer queryIndex=-1;
     UserOrgInfoRepository userOrgDao = null;
@@ -396,17 +398,23 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void onSelectE() throws IOException, ParseException {
-        
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+
         String pageName = "";
-        if(selected.getState() == 8){
+        if(sta == 8){
             pageName = "Edit_1";
-        }else if(selected.getState() == 7 || selected.getState() == 11){
+            selected.setMsgEndTime(this.getTime("归还"));
+            selected.setState(sta);
+            this.save();
+
+        }else if(sta == 7 || sta == 11){
             pageName = "Edit";
-        }else if(selected.getState() == 12 || selected.getState() == 9 || selected.getState() == 10 || selected.getState() == 13){
+        }else if(sta == 12 || sta == 9 || sta == 10 || sta == 13){
             pageName = "Edit_2";
         }
-        selected.setMsgEndTime(this.getTime("归还"));
-        this.save();
+
         String url = "actionName=Edit&selectedid=" + selected.getId();
         url = pageName+".xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
@@ -416,19 +424,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void onSelectC() throws IOException, ParseException {
-        
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+
         String pageName = "";
         selected.getSartList();
-        if(selected.getState() == 2){
+        if(sta == 2){
             pageName = "Edit_1";
-        }else if(selected.getState() == 1||selected.getState() == 5){
+            selected.setMsgAccepter(this.selected.getApplicant());
+            selected.setMsgBeginTime(this.getTime("借用"));
+            selected.setState(sta);
+            this.save();
+
+        }else if(sta == 1||sta == 5){
             pageName = "Edit";
-        }else if(selected.getState() == 6 || selected.getState() == 3 || selected.getState() == 4 || selected.getState() == 0){
+        }else if(sta == 6 || sta == 3 || sta == 4 || sta == 0){
             pageName = "Edit_2";
         }
-        selected.setMsgAccepter(this.selected.getApplicant());
-        selected.setMsgBeginTime(this.getTime("借用"));
-        this.save();
+
         String url = "actionName=Edit&selectedid=" + selected.getId();
         url = pageName+".xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
@@ -459,6 +473,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
 
      public void getAssetInfoR(Date times) throws ParseException{//查询并插入归还设备信息
+         String uid = selected.getId();
+         SharedAssetRequest realSAR = dao.findById(uid);
+         int sta = realSAR.getState();
+         if (sta != 8){
+             WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+             return;
+         }
+
           List<SharedAssetReqDetail> sardList = selected.getSardList();
           List<AssetInfo> assetInfoList = selected.getInfoList();
           List<SharedAssetReqType> sartList = selected.getSartList();
@@ -489,7 +511,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
                 //在asset_info中判断是否属于 调剂中心科室
                 else if(depts.contains(ClinicalDeptUID)){
-                    WebUtil.addWarnMessage("该设备当前不可归还！");
+                    WebUtil.addWarnMessage("该设备已归还！");
                     return; 
                 }
                 else if(!depts.contains(userOrg.getUid())){
@@ -719,6 +741,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
      }
     
     public void getAssetInfo(Date times,String accepter) throws ParseException{//查询并插入借用设备信息
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+        if (sta != 2){
+            WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+            return;
+        }
+
         List<SharedAssetReqDetail> sardList = selected.getSardList();
         List<AssetInfo> assetInfoList = selected.getInfoList();
         List<SharedAssetReqType> sartList = selected.getSartList();
@@ -747,7 +777,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
                 //在asset_info中判断是否属于 调剂中心科室
                 else if(!depts.contains(ClinicalDeptUID)){
-                    WebUtil.addWarnMessage("该设备当前不可借用！");
+                    WebUtil.addWarnMessage("该设备已借出！");
                     return; 
                 }
                 else if(!depts.contains(userOrg.getUid())){
@@ -1094,7 +1124,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             requestContext.addCallbackParam("url", url);
             return;
         }else {
-            WebUtil.addErrorMessage("当前状态不可受理！");
+            WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
             requestContext.addCallbackParam("url","norespond");
             return;
         }
@@ -1112,7 +1142,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            requestContext.addCallbackParam("url", url);
            return;
        }else {
-           WebUtil.addErrorMessage("当前状态不可受理！");
+           WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
            requestContext.addCallbackParam("url","norespond");
            return;
        }
@@ -1217,7 +1247,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            }
           
        }else {
-           WebUtil.addErrorMessage("当前状态不可交付！");
+           WebUtil.addErrorMessage("当前不是可交付状态，请返回！");
            requestContext.addCallbackParam("url", "norespond");
            return;
        }
@@ -1286,7 +1316,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 return;
            }
        }else {
-           WebUtil.addErrorMessage("当前状态不可交付！");
+           WebUtil.addErrorMessage("当前不是可交付状态，请返回！");
             requestContext.addCallbackParam("url", "norespond");
            return;
        }
@@ -1547,21 +1577,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
 
     /**
-     * @return the accepter
-     */
-    public String getAccepter() {
-        return accepter;
-    }
-
-    /**
-     * @param accepter the accepter to set
-     */
-    public void setAccepter(String accepter) {
-        this.accepter = accepter;
-    }
-
-
-    /**
      * @return the total
      */
     public Double getTotal() {
@@ -1587,36 +1602,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         this.total = total;
     }
 
-    /**
-     * @return the msg
-     */
-    public Boolean getMsg() {
-        return msg;
+    public Integer getQueryIndex() {
+        return queryIndex;
     }
 
-    /**
-     * @param msg the msg to set
-     */
-    public void setMsg(Boolean msg) {
-        this.msg = msg;
+    public void setQueryIndex(Integer queryIndex) {
+        this.queryIndex = queryIndex;
     }
 
-    /**
-     * @return the msgMan
-     */
-    public String getMsgMan() {
-        return msgMan;
-    }
-
-    /**
-     * @param msgMan the msgMan to set
-     */
-    public void setMsgMan(String msgMan) {
-        this.msgMan = msgMan;
-    }
-
-    
-    
 }
     
     

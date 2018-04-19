@@ -232,7 +232,7 @@ function mapParamsGross(params) {
 
 function mapParamsPhase(params, phase) {
   let {
-    filterBy: { assettype, dept, hospital },
+    filterBy: { assettype, dept },
     period, dataType,
     distributionEttr, distributionResponse,
     hospital,

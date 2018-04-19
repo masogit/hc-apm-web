@@ -96,6 +96,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private void setUserSearchFilters() {
         this.updateSearchFilter(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        this.updateSearchFilter(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 
         if (!this.hasFilterOnField("siteUID")) {
             UserAccount user = UserContextService.getCurrentUserAccount();

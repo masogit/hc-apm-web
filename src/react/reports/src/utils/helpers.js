@@ -105,16 +105,16 @@ export function HumanizeDurationInput(valueInSec) {
   }
   return [(valueInSec / ONE_MIN) | 0, 'min']
 }
-export function HumanizeDurationLabel(valueInSec, unit = 'h') {
+export function HumanizeDurationLabel(valueInSec, units = ['h', 'min'], round = false) {
   if (valueInSec === 0) {
     return '0'
   }
   try {
-    return humanizeDuration(valueInSec * 1000, { units: [unit], language: LANG })
+    return humanizeDuration(valueInSec * 1000, { units, language: LANG, round })
   } catch(e) {
     warn('Current language: ' + LANG)
     warn(e)
     LANG = 'zh_CN'
-    return humanizeDuration(valueInSec * 1000, { units: [unit], language: LANG })
+    return humanizeDuration(valueInSec * 1000, { units, language: LANG }, round )
   }
 }
