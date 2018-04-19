@@ -91,15 +91,17 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         queryBiomedGroup.setTenantUID(currentUser.getTenantUID());
         queryAsset.setTenantUID(currentUser.getTenantUID());
 
-        if(currentUser.getOrgLevel() == 1){
-            queryBiomedGroup.setInstitutionUID(currentUser.getInstitutionUID());
-            queryAsset.setInstitutionUID(currentUser.getInstitutionUID());
-        }else if(currentUser.getOrgLevel() == 2){
-            queryBiomedGroup.setHospitalUID(currentUser.getHospitalUID());
-            queryAsset.setHospitalUID(currentUser.getHospitalUID());
-        }else{
-            queryBiomedGroup.setSiteUID(currentUser.getSiteUID());
-            queryAsset.setSiteUID(currentUser.getSiteUID());
+        if(currentUser.getOrgLevel() != 0) {
+            if (currentUser.getOrgLevel() == 1) {
+                queryBiomedGroup.setInstitutionUID(currentUser.getInstitutionUID());
+                queryAsset.setInstitutionUID(currentUser.getInstitutionUID());
+            } else if (currentUser.getOrgLevel() == 2) {
+                queryBiomedGroup.setHospitalUID(currentUser.getHospitalUID());
+                queryAsset.setHospitalUID(currentUser.getHospitalUID());
+            } else {
+                queryBiomedGroup.setSiteUID(currentUser.getSiteUID());
+                queryAsset.setSiteUID(currentUser.getSiteUID());
+            }
         }
 
         this.getQueryBiomedGroupList();
@@ -219,11 +221,15 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
     public void getQueryAssetsList() {
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
             sourceAssets = assetTagService.getAssetList(queryAsset);
+
+            sourceAssets = new ArrayList(sourceAssets);
+            sourceAssets.removeAll(targetAssets);
+            /*
             targetAssets.forEach((item)->{
                 if(sourceAssets.contains(item)){
                     sourceAssets.remove(item);
                 }
-            });
+            });*/
         }else{
             sourceAssets = new ArrayList<AssetInfo>();
         }
@@ -318,13 +324,13 @@ public class AssetTagController extends JpaCRUDController<AssetTag> {
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
             if(selectedOrg.getOrgLevel() == 1){
                 queryAsset.setInstitutionUID(selectedOrg.getInstitutionUID());
-                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getInstitutionUID(), 4);
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getInstitutionUID(), 4);
             }else if(selectedOrg.getOrgLevel() == 2){
                 queryAsset.setHospitalUID(selectedOrg.getHospitalUID());
-                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getHospitalUID(), 4);
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getHospitalUID(), 4);
             }else if(selectedOrg.getOrgLevel() == 3){
                 queryAsset.setSiteUID(selectedOrg.getSiteUID());
-                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getSiteUID(), 4);
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getSiteUID(), 4);
             }
         }
 

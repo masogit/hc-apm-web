@@ -2,6 +2,7 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -9,6 +10,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
@@ -21,6 +23,7 @@ import java.text.ParseException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 @ManagedBean
 @ViewScoped
@@ -33,6 +36,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     SharedAssetReqDetailRepository asdDao = null;
     private List<AssetInfo> selectInfo ;
     private SharedAssetReqDetail selectedSard;
+    private UaaService uuaService;
     SharedAssetReqTypeRepository apdDao = null;
     AssetInfoRepository asiDao = null;
     SharedAssetTypeRepository swapDao = null;
@@ -47,6 +51,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     private boolean confirm;
     @Override
     protected void init() {
+        uuaService = WebUtil.getBean(UaaService.class);
         asdDao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
         asiDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -117,15 +122,68 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     @Override
     protected Page<SharedAssetRequest> loadData(PageRequest pageRequest) {
+        setUserSearchFilters();
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
     }
+    private void setUserSearchFilters() {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+
+//        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
+//        //申请日期过滤
+//        if (applyTimeFormatTime != null ) {
+//            String[] split = applyTimeFormatTime.split("~");
+//            if (split.length == 1) {
+//                try {
+//                    Date dateFrom = sdf.parse(split[0] + " 00:00:00");
+//                    searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
+//                } catch (ParseException ex) {
+//                    Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                }
+//            } else {
+//                if (split[0].equals("")) {
+//                    try {
+//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
+//                    } catch (ParseException ex) {
+//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                } else {
+//                    try {
+//                        Date dateFrom = sdf.parse(split[0] + " 00:00:00");
+//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
+//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
+//                    } catch (ParseException ex) {
+//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
+//                    }
+//                }
+//            }
+//
+//        }
+
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+//        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/List.xhtml")||p.equalsIgnoreCase("/portal/ReturnApplyV2/List.xhtml")){
+//            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+//        }
+
+    }
     
     public void getAssetInfo(Date times,Date timesa,String accepter,String ClinicalUid) throws ParseException{//查询并插入借用设备信息
-        
         List<SharedAssetReqDetail> sardList = selected.getSardList();
         Date endsTime = null;
         List<AssetInfo> assetInfoList = selected.getInfoList();
@@ -195,11 +253,11 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                             assetDetaiVo.setClinicalDeptForReturnUid(ClinicalUid);
                                             assetDetaiVo.setClinicalDeptForReturnName(ClinicalName);
                                             endsTime = timesa;
-                                            if( "1".equals(this.selected.getType())){
-                                               
-                                             }
+//                                            if( "1".equals(this.selected.getType())){
+//                                               assetDetaiVo.setChargingType("维修借用");
+//                                             }
                                     
-                                            else if("次".equals(swapTypeVo.getChargingType())){
+                                            if("次".equals(swapTypeVo.getChargingType())){
                                                 assetDetaiVo.setCountQty(1);
                                                 assetDetaiVo.setCost(swapTypeVo.getUnitPrice());
                                             }
@@ -255,7 +313,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                                     }
                                                     else{
                                                          assetDetaiVo.setCountQty(0);
-                                                         assetDetaiVo.setCost(0);
+                                                         assetDetaiVo.setCost(null);
                                                     }
                                                 }
                                             else    //不同年
@@ -265,13 +323,17 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                                }
                                                 else{
                                                     assetDetaiVo.setCountQty(0);
-                                                    assetDetaiVo.setCost(0);
+                                                    assetDetaiVo.setCost(null);
                                                 }
                                             }
                                         }
                                         }
                                         if(!"".equals(accepter)){
                                             assetDetaiVo.setAccepter(accepter);
+                                        }
+                                        if( "1".equals(this.selected.getType())){
+                                               assetDetaiVo.setChargingType("维修借用");
+                                               assetDetaiVo.setCost(null);
                                         }
                                         
 //                                        if(times==null&&"".equals(accepter)){
@@ -336,8 +398,11 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         item.setBorrowStatus(true); 
                                     }
                                     assetDetaiVo.setAccessoryList(swapTypeVo.getAccessoryList());
-                                    assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
+                                    if( !"1".equals(this.selected.getType())){
+                                        assetDetaiVo.setChargingType(swapTypeVo.getChargingType());//计价方式
+                                    }
                                     assetDetaiVo.setUnitPrice(swapTypeVo.getUnitPrice());//单价
+                                    assetDetaiVo.setAssetInfoId(infoList.get(0).getUid());
                                     assetDetaiVo.setCreateDate(new Date());
                                     assetDetaiVo.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
                                     //asdDao.save(assetDetaiVo);
@@ -427,19 +492,22 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     }
     public void prepareEditSard(){
         selectedBorrowAccessoryList = new ArrayList<String>();
-        for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
-            if(item.getBorrowStatus() !=null&&item.getBorrowStatus()){
-                selectedBorrowAccessoryList.add(item.getName());
+        if(this.selectedSard.getAccessoryList()!=null){
+            for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
+                if(item.getBorrowStatus() !=null&&item.getBorrowStatus()){
+                    selectedBorrowAccessoryList.add(item.getName());
+                }
             }
-        }
-        selectedReturnAccessoryList = new ArrayList<String>();
-        for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
-            if(selectedReturnAccessoryList!=null){
-                if(item.getReturnStatus() !=null&&item.getReturnStatus()){
-                    selectedReturnAccessoryList.add(item.getName());
+            selectedReturnAccessoryList = new ArrayList<String>();
+            for(SharedAssetTypeAccesssory item: this.selectedSard.getAccessoryList()){
+                if(selectedReturnAccessoryList!=null){
+                    if(item.getReturnStatus() !=null&&item.getReturnStatus()){
+                        selectedReturnAccessoryList.add(item.getName());
+                    }
                 }
             }
         }
+        
     }
     public void deliverR() {
            String msg = "";
@@ -452,11 +520,88 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                WebUtil.addWarnMessage("请录入设备！");
                return;
            }
+           this.selected.setCreateDate(new Date());
+//           System.out.println(selected.getInfoList().get(0).getClinicalDeptUID());
            dao.save(selected);
            asiDao.save(selected.getInfoList());
            asdDao.save(selected.getSardList());
        
     }
+    public void setCost(SharedAssetReqDetail sard){
+        
+        if ("1".equals(selected.getType())) {
+            sard.setChargingType("维修借用");
+            sard.setCost(null);
+        }    
+        if("次".equals(sard.getChargingType())){
+            sard.setCountQty(1);
+            sard.setCost(sard.getUnitPrice());
+        }
+        else if("小时".equals(sard.getChargingType())){
+            long nd = 1000 * 24 * 60 * 60;
+            long nh = 1000 * 60 * 60;
+            long nm = 1000 * 60;
+            long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
+            Integer countQty = null;
+            // 计算差多少天
+            long day = diff / nd;
+            // 计算差多少小时
+            long hour = diff % nd / nh;
+            // 计算差多少分钟
+            long min = diff % nd % nh / nm;
+            countQty = (int)(day*24*60/30+hour*2+min/30);
+            sard.setCountQty(countQty);
+            sard.setCost(countQty*sard.getUnitPrice()/2);
+        }
+        else{
+            Calendar cal1 = Calendar.getInstance();
+            cal1.setTime(sard.getChargingBeginTime());
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(sard.getChargingEndTime());
+            int day1= cal1.get(Calendar.DAY_OF_YEAR);
+            int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+            int year1 = cal1.get(Calendar.YEAR);
+            int year2 = cal2.get(Calendar.YEAR);
+            Date date1 = sard.getChargingBeginTime();
+            Date date2 = sard.getChargingEndTime();
+            long  between = date2.getTime() - date1.getTime();
+            if(year1 != year2) {  //同一年
+                int timeDistance = 0 ;
+                for(int i = year1 ; i < year2 ; i ++){
+                    if(i%4==0 && i%100!=0 || i%400==0)    //闰年
+                    {
+                        timeDistance += 366;
+                    }
+                    else    //不是闰年
+                    {
+                        timeDistance += 365;
+                    }
+                }
+                if(between >= (24* 3600000)){
+                    sard.setCountQty(timeDistance + (day2-day1));
+                    sard.setCost((timeDistance + (day2-day1))*sard.getUnitPrice());
+                }
+                else{
+                    sard.setCountQty(0);
+                    sard.setCost(null);
+                }
+            }
+            else {  //不同年
+                if(between >= (24* 3600000)){
+                    sard.setCountQty(day2-day1);
+                    sard.setCost((day2-day1)*sard.getUnitPrice());
+                }else{
+                    sard.setCountQty(0);
+                    sard.setCost(null);
+                }
+            }
+        }
+         if ("1".equals(selected.getType())) {
+            sard.setChargingType("维修借用");
+            sard.setCost(null);
+        }
+    }
+    
     public void saveSard(String type){
          List<SharedAssetReqDetail> sardList = selected.getSardList();
          List<SharedAssetTypeAccesssory> accessoryList = selectedSard.getAccessoryList();
@@ -497,14 +642,37 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
             }
  
         }
-     
-         selectedSard.setAccessoryList(accessoryList); 
+        
+         if (selectedSard.getChargingEndTime() != null){
+          String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
+          OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
+          
+         List<AssetInfo> assetInfoList = selected.getInfoList();
+         AssetInfo asset = asiDao.findByUid(selectedSard.getAssetInfoId());
+                 for (AssetInfo assetInfo : assetInfoList) {
+                     if (assetInfo.getUid().equals(selectedSard.getAssetInfoId())) {
+
+                         assetInfo.setClinicalDeptUID(userOrg.getUid());
+                         assetInfo.setClinicalDeptName(userOrg.getName());
+                         System.out.println(assetInfoList.get(0).getClinicalDeptUID());
+                         break;
+                     }
+                 }
+                 if(asset !=null){
+                 asset.setClinicalDeptUID(userOrg.getUid());
+                 asset.setClinicalDeptName(userOrg.getName());
+                 assetInfoList.add(asset);
+                 }
+         }
+         selectedSard.setAccessoryList(accessoryList);
+         this.setCost(selectedSard);
      }
     @Override
     public void onBeforeNewObject(SharedAssetRequest object) {
         object.setId(UUID.randomUUID().toString().replace("-", ""));
         object.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
         object.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
+        object.setCreateDate(new Date());
         object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
         object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
       //  object.setState(UserContextService.getCurrentUserAccount().getSiteUID());

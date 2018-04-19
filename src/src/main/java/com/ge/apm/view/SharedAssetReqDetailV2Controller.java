@@ -195,7 +195,7 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
                vo.setCost(vo.getUnitPrice()*vo.getCountQty());
            }else{
                vo.setCountQty(0);
-               vo.setCost(0);
+               vo.setCost(null);
            }
            
            
@@ -206,7 +206,7 @@ public class SharedAssetReqDetailV2Controller extends GenericCRUDUUIDController<
                vo.setCost(vo.getUnitPrice()*vo.getCountQty());
            }else{
                vo.setCountQty(0);
-               vo.setCost(0);
+               vo.setCost(null);
            }
        }else if("次".equals(vo.getUnit())){
            

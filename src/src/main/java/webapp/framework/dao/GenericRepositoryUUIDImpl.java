@@ -11,7 +11,7 @@ import org.springframework.data.jpa.domain.Specifications;
 import org.springframework.data.jpa.repository.support.JpaEntityInformation;
 import org.springframework.data.jpa.repository.support.SimpleJpaRepository;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.data.domain.Sort;
 /**
  * Shared base repository providing query by example and query by string pattern.
  */
@@ -66,6 +66,20 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     @Override
     public E findById(String id){
         return entityManager.find(this.type, id);
+    }
+    
+    
+    @Override
+    public Page<E> findBySpecification(Specification<E> spec, Pageable pageable) {
+        return spec == null ? findAll(pageable) : findAll(spec, pageable);
+    }
+    @Override
+    public List<E> findBySpecification(Specification<E> spec, Sort sort) {
+        return spec == null ? findAll(sort) : findAll(spec, sort);
+    }
+    @Override
+    public List<E> findBySpecification(Specification<E> spec) {
+        return spec == null ? findAll() : findAll(spec);
     }
     
     @Override

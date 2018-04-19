@@ -17,7 +17,7 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <h:panelGroup rendered="#{!assetInfoController.terminate}">
+            <h:panelGroup rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead')}">
                 <p:link outcome="/portal/analysis/assetUsageSingle.xhtml" value="#{msg.DeviceUtilizationAnalysis}">
                     <f:param name="asset_name" value="#{assetInfoController.selected.name}" />
                     <f:param name="asset_id" value="#{assetInfoController.selected.id}" />
@@ -308,19 +308,19 @@
                                 </h:panelGroup>
                                 <h:panelGroup></h:panelGroup>
 
-                                <h:panelGroup >
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.purchasePrice}</label>
                                     <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.salvageValue}</label>
                                     <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.lifecycle}</label>
                                     <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.depreciationMethod}</label>
                                     <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
                                 </h:panelGroup>

@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javaslang.Tuple2;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -69,8 +71,6 @@ public class AssetInstallationService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private V2_PmOrderService pmService;
-    @Autowired
-    private UserContextService userContextService;
 
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
@@ -78,37 +78,50 @@ public class AssetInstallationService {
         return res.contains("successfully");
     }
 
-    public List<ArrivalListItem> getListItem(String arrivalListId)
-    {
-    	return itemDao.findByArrivalListId(arrivalListId);
+    public List<ArrivalListItem> getListItem(String arrivalListId) {
+        return itemDao.findByArrivalListId(arrivalListId);
     }
-    
+
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {
         String token = UserContextService.getAccessToken();
         String res = installApiService.submitArrivalListItem(token, itemId, isFinish);
 
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         if (res.contains("successfully")) {
             if (isFinish) {
                 ArrivalListItem temp = itemDao.findById(itemId);
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), 3);
+                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(),newAsset.getSiteUID(), 3);
                 }
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 if (isGeneratePmOrder) {
                     pmService.createPMrequest(newAsset.getUid(), null);
                 }
                 List<V2_BlobObject> assetPicList = Optional.ofNullable(getPicList(itemId)).orElse(new ArrayList<V2_BlobObject>())
-                        .stream().filter(item -> "asset".equals(item.getBoSubType())).collect(Collectors.toList());
+                        .stream().filter(item -> item.getBoSubType().contains("asset")).collect(Collectors.toList());
+                assetPicList.addAll(getPicList(temp.getArrivalListId()));
                 assetPicList.forEach(item -> {
                     item.setId(null);
                     item.setBoUuid(newAsset.getUid());
                     item.setBoId(newAsset.getId());
-                    item.setBoSubType("1");
+                    switch (item.getBoSubType()) {
+                        case "asset":
+                            item.setBoSubType("1");
+                            break;
+                        case "asset2":
+                            item.setBoSubType("2");
+                            break;
+                        case "asset3":
+                            item.setBoSubType("3");
+                            break;
+                        default:
+                    }
+
                     item.setBoType(V2_BlobObject.BO_TYPE_AssetInfo);
                 });
                 blobDao.save(assetPicList);
-                if(!userContextService.needInstorageCheck()){
+                if (!userContextService.needInstorageCheck()) {
                     temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
                     itemDao.save(temp);
                 }
@@ -124,7 +137,7 @@ public class AssetInstallationService {
         arrivalListItem.setUsageStatus(3);
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID(), 2);
         }
 
     }
@@ -147,6 +160,10 @@ public class AssetInstallationService {
         return userDao.getByUid(userUid);
     }
 
+    public UserAccount getUserAccountById(Integer userId) {
+        return userDao.getById(userId);
+    }
+
     public List<UserAccount> getWorkerList() {
         return ucService.getWorkerList(0);
     }
@@ -167,6 +184,39 @@ public class AssetInstallationService {
     public QrCodeLib getNewQrcode(String tenantUid, String siteUid) {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(tenantUid, siteUid, 1);
         return qrcodeLib;
+    }
+
+    public Tuple2<Boolean, String> isValidDeptNum(ArrivalListItem item) {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        if (!userContextService.needInstorageCheck()) {
+            return new Tuple2(true, "");
+        }
+
+        if (Strings.isNullOrEmpty(item.getDepartNum())) {
+            return new Tuple2(false, "设备编号不可为空");
+        }
+        List<SearchFilter> departNumFilters = new ArrayList<>();
+        departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
+        departNumFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
+        List<AssetInfo> assetList = assetDao.findBySearchFilter(departNumFilters);
+        if (null != assetList && assetList.size() > 0) {
+            return new Tuple2(false, "设备编号已经使用");
+        }
+        departNumFilters.clear();
+        departNumFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, item.getDepartNum()));
+        departNumFilters.add(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.EQ, item.getArrivalList().getSiteUID()));
+        List<ArrivalListItem> itemList = itemDao.findBySearchFilter(departNumFilters);
+        if (null == itemList || itemList.isEmpty()) {
+            return new Tuple2(true, "");
+        }
+
+        if (itemList.size() > 1) {
+            return new Tuple2(false, "设备编号已被分配");
+        }
+        if (itemList.get(0).getId().equals(item.getId())) {
+            return new Tuple2(true, "");
+        }
+        return new Tuple2(false, "设备编号已被分配");
     }
 
 }

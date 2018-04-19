@@ -27,13 +27,15 @@ function mapState2Props(state) {
     ProcessAnalysis: { filterBy, orderBy, period },
     assetTypes,
     depts,
+    hospitals,
   } = state
-  return { filterBy, orderBy, period, departments: depts, assetTypes }
+  return { filterBy, orderBy, period, departments: depts.depts, hospital: depts.selectedHospital, hospitals: depts.hospitals, assetTypes }
 }
 function mapDispatch2Props(dispatch) {
   return {
     onFilterChange: (type) => (data) => dispatch({ type: 'ProcessAnalysis/update/filter', data: { type, data } }),
-    onPeriodChange: (data) => dispatch({ type: 'ProcessAnalysis/update/period', data })
+    onPeriodChange: (data) => dispatch({ type: 'ProcessAnalysis/update/period', data }),
+    onHospitalChange: (data) => dispatch({ type: 'depts/update/selectedHospital', payload: data.key }),
   }
 }
 
@@ -52,23 +54,26 @@ export class Header extends PureComponent {
       { key: 'composite_order', label: t('composite_order') },
     ]
   }
-  filtersDept() {
+  _filtersDept() {
     let { t, departments = [] } = this.props
     return [
       { key: 'all_dept', label: t('all_dept') },
     ].concat(departments.map(t => ({ key: String(t.id), label: t.name })))
 
   }
-  filtersAssetType() {
+  _filtersAssetType() {
     let { t, assetTypes = [] } = this.props
     return [
       { key: 'all_asset_type', label: t('all_asset_type') },
     ].concat(assetTypes.map(d => ({ key: String(d.id), label: d.name})))
   }
-
+  _filtersHospital() {
+    let { t, hospitals = [] } = this.props
+    return hospitals.map(d => ({ key: String(d.id), label: d.name}))
+  }
   render() {
-    let { period, filterBy,
-      onFilterChange, onPeriodChange
+    let { period, filterBy, hospital,
+      onFilterChange, onPeriodChange, onHospitalChange
     } = this.props
     return (<nav id="header" className="header level">
 
@@ -84,10 +89,13 @@ export class Header extends PureComponent {
           />
         </div>
         <div className="nav-item">
-          { SelectHelper(filterBy['assettype'], this.filtersAssetType(), onFilterChange('assettype')) }
+          { SelectHelper(filterBy['assettype'], this._filtersAssetType(), onFilterChange('assettype')) }
         </div>
         <div className="nav-item">
-          { SelectHelper(filterBy['dept'], this.filtersDept(), onFilterChange('dept')) }
+          { SelectHelper(hospital, this._filtersHospital(), onHospitalChange) }
+        </div>
+        <div className="nav-item">
+          { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
         </div>
       </div>
     </nav>)

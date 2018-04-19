@@ -8,42 +8,69 @@
 
     <ui:composition>
 
-        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.V3_WorkFlowConfig}">
+        <p:dialog id="V2_WorkflowConfigEditDlg" widgetVar="V2_WorkflowConfigEditDialog" onHide="#{v2_WorkflowConfigController.onSelect()}" width="1000" height="450" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{v2_WorkflowConfigController.CRUDActionName} #{msg.SystemConfig}">
             <h:form id="V2_WorkflowConfigEditForm">
                 <h:panelGroup id="display">
                     <p:fieldset id="basic" legend="公共配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
-                            <h:panelGroup >
+                            <h:panelGroup>
+                                <label class="label">#{msg.orgId}</label>
+                                <p:inputText id="selectedUserOrgName" value="#{v2_WorkflowConfigController.getOrgFullName(v2_WorkflowConfigController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                                <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                                <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{v2_WorkflowConfigController.orgTree}" selection="#{v2_WorkflowConfigController.selectedNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":V2_WorkflowConfigEditForm:selectedUserOrgName,
+                                                                                            :V2_WorkflowConfigEditForm:dispatchUserId,
+                                                                                            :V2_WorkflowConfigEditForm:dispatchUserId2,
+                                                                                            :V2_WorkflowConfigEditForm:pmDispatchUserId,
+                                                                                            :V2_WorkflowConfigEditForm:pmDispatchUserId2"
+                                                    listener="#{v2_WorkflowConfigController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+                            <!--<h:panelGroup >
                                 <label class="label">集团</label>
                                 <p:selectOneMenu id="group" value="#{v2_WorkflowConfigController.selected.institutionUID}" >
-                                    <p:ajax update="display" />
+                                    <p:ajax update="display" listener="#{v2_WorkflowConfigController.updateDispater()}" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2_WorkflowConfigController.institutionList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(
+                                    v2_WorkflowConfigController.selected.institutionUID,v2_WorkflowConfigController.selected.tenantUID,1)
+                                    }" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
                             <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.institutionUID != null}">
                                 <label class="label">医院</label>
                                 <p:selectOneMenu id="hospital" value="#{v2_WorkflowConfigController.selected.hospitalUID}" >
-                                    <p:ajax update="display" />
+                                    <p:ajax update="display" listener="#{v2_WorkflowConfigController.updateDispater()}" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(
+                                    v2_WorkflowConfigController.selected.hospitalUID,v2_WorkflowConfigController.selected.institutionUID,2)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
                             <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.hospitalUID != null}">
                                 <label class="label">院区</label>
                                 <p:selectOneMenu id="site" value="#{v2_WorkflowConfigController.selected.siteUID}" >
-                                    <p:ajax update="display" />
+                                    <p:ajax update="display" listener="#{v2_WorkflowConfigController.updateDispater()}" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(v2_WorkflowConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                    <f:selectItems value="#{v2_WorkflowConfigController.getIncludeOrgInfo(
+                                    v2_WorkflowConfigController.selected.siteUID,v2_WorkflowConfigController.selected.hospitalUID,3)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
                         </p:panelGrid>
                     </p:fieldset>
 
-                    <p:fieldset id="wo" legend="维修工单配置">
+                    <p:fieldset id="wo" legend="维修配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup >
                                 <label class="label">维修#{msg.dispatchUserName}</label>
@@ -106,6 +133,27 @@
                                 <label class = "label">不允许临时账号?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
                             </h:panelGroup >
+                            <h:panelGroup>
+                                <label class="label">工单人工费用(元/小时)</label>
+                                <p:inputNumber id="woManHourPrice" value="#{v2_WorkflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <!-- 紧急工单配置-->
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.timeoutDispatch}</label>
+                                <p:inputNumber id="emergencyTimeoutDispatch" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">紧急工单#{msg.timeoutAccept}</label>
+                                <p:inputNumber id="emergencyTimeoutAccept" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.timeoutClose}</label>
+                                <p:inputNumber id="emergencyTimeoutClose" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">紧急工单#{msg.maxMessageCount}</label>
+                                <p:inputNumber id="emergencyMaxMessageCount" value="#{v2_WorkflowConfigController.selected.emergencyMaxMessageCount}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -151,6 +199,10 @@
                                 <label class="label">保养提醒次数</label>
                                 <p:inputNumber id="pmReminderTimes" value="#{v2_WorkflowConfigController.selected.pmReminderTimes}" minValue="0" decimalPlaces="0"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">保养工单人工费用(元/小时)</label>
+                                <p:inputNumber id="pmManHourPrice" value="#{v2_WorkflowConfigController.selected.pmManhourPrice}" minValue="0" decimalPlaces="0"/>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
 
@@ -175,7 +227,34 @@
                                 <label class = "label">到货安装是否需要核对入库</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}"/>
                             </h:panelGroup >
+                            <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.siteUID != null}">
+                                <label class="label">调剂中心</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{v2_WorkflowConfigController.getDispatherClinical()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">设备编码选择</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetCodeConfig}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class ="label">#{msg.generateMethod} *</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.generateMethod}" disabled="false" required="false" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
 
+                            <h:panelGroup>
+                                <label class ="label">初始流水号</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.format}" disabled="false">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
                         <!-- <p:spacer/> -->

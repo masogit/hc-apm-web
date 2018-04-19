@@ -3,6 +3,7 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,6 +45,9 @@ public class QrCodeTemplate  implements Serializable {
     @NotNull
     @Column(name = "is_Using")
     private boolean isUsing=false;
+    
+    @Column(name = "using_date", nullable = true)
+    private Date usingDate;
     
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
@@ -134,6 +138,14 @@ public class QrCodeTemplate  implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getUsingDate() {
+        return usingDate;
+    }
+
+    public void setUsingDate(Date usingDate) {
+        this.usingDate = usingDate;
     }
 
     @Override

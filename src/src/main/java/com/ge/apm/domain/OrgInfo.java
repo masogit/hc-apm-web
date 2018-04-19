@@ -21,6 +21,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -80,6 +81,8 @@ public class OrgInfo implements Serializable {
     @Size(max = 64)
     @Column(name = "name_en")
     private String nameEn;
+    @Column(name = "name_py_code")
+    private String namePyCode;
     
     @JoinColumn(name = "parent_uid", referencedColumnName = "uid",insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
@@ -189,6 +192,7 @@ public class OrgInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]","");
     }
 
     public String getNameEn() {
@@ -245,6 +249,14 @@ public class OrgInfo implements Serializable {
 
     public void setOrgType(Integer orgType) {
         this.orgType = orgType;
+    }
+
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
     }
 
     @Override

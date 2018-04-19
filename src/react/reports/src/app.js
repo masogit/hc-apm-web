@@ -16,6 +16,7 @@ import router from '#/router'
 import user from '#/models/common/user'
 import assetTypes from '#/models/common/assetTypes'
 import depts from '#/models/common/depts'
+import hospitals from '#/models/common/hospitals'
 /* Asset Browser */
 import assetBrowser from '#/models/assetBrowser'
 /* AssetPerf */
@@ -64,7 +65,7 @@ const app = dva({
 /** Common */
 app.model(user)
 app.model(assetTypes)
-
+app.model(depts)
 /** Asset Browser */
 app.model(assetBrowser)
 /* Asset Perf */
@@ -77,7 +78,6 @@ staffPerfModels.forEach(model => app.model(model))
 /* Scan Details */
 app.model(assets)
 app.model(briefs)
-app.model(depts)
 app.model(sd_filters)
 app.model(steps)
 /* Maintenance Cost */

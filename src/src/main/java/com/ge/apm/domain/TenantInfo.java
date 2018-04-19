@@ -3,16 +3,9 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.UUID;
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -75,7 +68,7 @@ public class TenantInfo implements Serializable {
     @Column(name = "default_lang")
     private String defaultLang;
     @Column(name = "is_enabled")
-    private Boolean isEnabled;
+    private Boolean isEnabled = false;
 
     @Basic(optional = false)
     @NotNull
@@ -99,6 +92,19 @@ public class TenantInfo implements Serializable {
     @Column(name = "type")
     private Integer type = 0;//0、普通租户，1、代理商租户
 
+    @Column(name = "is_insulate")
+    private Boolean isInsulate;
+
+    @Column(name = "active_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date activeTime;
+
+    @Column(name = "active_user_id")
+    private Integer activeUserId;
+
+    @Column(name = "active_type")
+    private Integer activeType;//0 means super admin ,1 means by tenant user
+
     public Integer getType() {
 		return type;
 	}
@@ -107,8 +113,11 @@ public class TenantInfo implements Serializable {
 		this.type = type;
 	}
 
+
+
 	public TenantInfo() {
-        isEnabled = true;
+        isInsulate = false;
+        isEnabled = false;
         wfAutoStep2 = false;
         wfAutoStep3 = false;
         wfAutoStep4 = false;
@@ -291,6 +300,14 @@ public class TenantInfo implements Serializable {
         this.passwordLifeTime = passwordLifeTime;
     }
 
+    public Boolean getInsulate() {
+        return isInsulate;
+    }
+
+    public void setInsulate(Boolean insulate) {
+        isInsulate = insulate;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -315,5 +332,28 @@ public class TenantInfo implements Serializable {
     public String toString() {
         return "com.ge.apm.domain.SiteInfo[ id=" + id + " ]";
     }
-    
+
+    public Date getActiveTime() {
+        return activeTime;
+    }
+
+    public void setActiveTime(Date activeTime) {
+        this.activeTime = activeTime;
+    }
+
+    public Integer getActiveUserId() {
+        return activeUserId;
+    }
+
+    public void setActiveUserId(Integer activeUserId) {
+        this.activeUserId = activeUserId;
+    }
+
+    public Integer getActiveType() {
+        return activeType;
+    }
+
+    public void setActiveType(Integer activeType) {
+        this.activeType = activeType;
+    }
 }

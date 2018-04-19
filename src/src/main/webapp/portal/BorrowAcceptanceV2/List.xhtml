@@ -31,11 +31,11 @@
                 <div class="ui-g-12 card">
             <h:form id="IouListForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(-2)}" rendered="true" />
-                        <p:commandButton value="借用待受理"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(1)}"  rendered="true" />
-                        <p:commandButton value="借用待交付"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(2)}"  rendered="true"/>
-                        <p:commandButton value="借用已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(5)}"  rendered="true"/>
-                        <p:commandButton value="借用已完成"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(6)}"  rendered="true"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(-2)}" rendered="true" />
+                        <p:commandButton value="借用待受理"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(1)}"  rendered="true" />
+                        <p:commandButton value="借用待交付"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(2)}"  rendered="true"/>
+                        <p:commandButton value="借用已搁置"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(5)}"  rendered="true"/>
+                        <p:commandButton value="借用已完成"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(6)}"  rendered="true"/>
                 </h:panelGrid>
                 
                 <p:dataTable id="datalist" value="#{sharedAssetRequestV2Controller.lazyModel}" var="item" widgetVar="varDataList"
@@ -67,7 +67,13 @@
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
                     </p:column>
-                    <p:column headerText="借用状态" sortBy="#{item.state}" filterMatchMode="LIKE">
+                    <p:column headerText="借用状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ" filterable="#{sharedAssetRequestV2Controller.queryIndex == -2}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('assetBorrowStatus',item.state)}"/>
                          
 <!--                        <h:outputText value="借用待受理" rendered="#{item.state eq '1'}"></h:outputText> 
@@ -82,14 +88,14 @@
                            <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{sharedAssetRequestV2Controller.applyTimeFormatTime}"/>
                         </f:facet>
                          <h:outputText value="#{item.applyTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
-                    <p:column headerText="申请失效日期" sortBy="#{item.invalidTime}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.invalidTime}">
-                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
-                        </h:outputText>
-                    </p:column>
+                    <!--<p:column headerText="申请失效日期" sortBy="#{item.invalidTime}">-->
+                        <!--<h:outputText value="#{item.invalidTime}">-->
+                            <!--<f:convertDateTime pattern="yyyy/MM/dd HH:mm" />-->
+                        <!--</h:outputText>-->
+                    <!--</p:column>-->
                     <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
@@ -99,7 +105,7 @@
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
-                <p:overlayPanel widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
+                <p:overlayPanel id="filterTime" widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="cal1" />
                         <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{sharedAssetRequestV2Controller.applyTimeFrom}"
@@ -123,8 +129,15 @@
                     }
                 });
             }
+
             function openSwapTypeViewWindow(xhr, status, args) {
-                this.location.href = args.url;
+                var pageName = args.pageName;
+                if (pageName == 'Edit_2'){
+                    window.open(args.url, '_blank');
+                }else{
+                    this.location.href = args.url;
+                }
+
             }
 
         </script>

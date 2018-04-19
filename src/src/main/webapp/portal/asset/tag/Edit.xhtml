@@ -23,6 +23,14 @@
             <p:fieldset legend="相关设备" rendered="#{assetTagController.selected != null}">
                 <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     <h:panelGroup>
+                        <label class="label">#{msg.assetGroup}</label>
+                        <p:selectOneMenu id="assetGroup" value="#{assetTagController.queryAsset.assetGroup}">
+                            <p:ajax  listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
+                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                        </p:selectOneMenu>
+                    </h:panelGroup>
+                    <h:panelGroup>
                         <label class="label">#{msg.hospitalId}</label>
                         <p:inputText id="selectedOrgName" value="#{assetTagController.selectedOrg==null ? '': assetTagController.selectedOrg.name}" readonly="true"/>
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
@@ -46,14 +54,6 @@
                             <p:ajax  listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                             <f:selectItems value="#{assetTagController.clinicalDeptList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                        </p:selectOneMenu>
-                    </h:panelGroup>
-                    <h:panelGroup>
-                        <label class="label">#{msg.assetGroup}</label>
-                        <p:selectOneMenu id="assetGroup" value="#{assetTagController.queryAsset.assetGroup}">
-                            <p:ajax  listener="#{assetTagController.getQueryAssetsList()}" update="AssetsPickList" />
-                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                            <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                         </p:selectOneMenu>
                     </h:panelGroup>
                 </p:panelGrid>
