@@ -24,6 +24,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.mapper.AssetInfoMapper;
 import com.ge.apm.dao.mapper.UserAccountMapper;
@@ -65,6 +66,9 @@ public class UserAccountService {
 
 	@Autowired
 	AssetInfoMapper assetInfoMapper;
+	
+	@Autowired
+	TenantInfoRepository tenantInfoRepository;
 	
 	@Autowired
 	OrgInfoRepository orgInfoRepository;
@@ -312,6 +316,19 @@ public class UserAccountService {
 				site=ExcelParser.getCellStringValue(row, siteIndex);
 				department=ExcelParser.getCellStringValue(row, departmentIndex);
 				loginName=ExcelParser.getCellStringValue(row, loginnameIndex);
+				if(loginName!=null && loginName.length()>0){
+					boolean canParseDouble=false;
+					try {
+						Double.parseDouble(loginName);
+						canParseDouble=true;
+					} catch (Exception e) {
+						// TODO: handle exception
+						canParseDouble=false;
+					}
+					if(canParseDouble){
+						loginName=loginName.substring(0, loginName.indexOf("."));
+					}
+				}
 				name=ExcelParser.getCellStringValue(row, nameIndex);
 				email=ExcelParser.getCellStringValue(row, emailIndex);
 				telephone=ExcelParser.getCellStringValue(row, telephoneIndex);
@@ -421,7 +438,7 @@ public class UserAccountService {
 		try {
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
-			userAccountMapper.saveUserRole(user.getId());
+			userAccountMapper.saveUserRole(user.getId(),7);
 			user.setPlainPassword(null);
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("create user error : {}", e.getMessage());
