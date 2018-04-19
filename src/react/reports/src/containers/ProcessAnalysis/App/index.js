@@ -58,8 +58,8 @@ function GetDonutChartRow(label, value) {
 
 const TWO_DAY = 48 * 3600
 function HumanizeDurationLabel(value) {
-  let unit = value > TWO_DAY ? 'd' : 'h'
-  return humanize(value, unit)
+  let units = value > TWO_DAY ? ['d', 'h'] : ['h', 'm']
+  return humanize(value, units, true)
 }
 
 function GetDistance(ball, gross) {

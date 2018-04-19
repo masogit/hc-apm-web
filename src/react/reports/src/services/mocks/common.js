@@ -1,9 +1,4 @@
 export const Hospitals = [
-<<<<<<< HEAD
-  { id: 1, name: '某医院' },
-  { id: 2, name: '某某医院' },
-  { id: 3, name: '某某某医院' },
-=======
   {
     "name": "陆家嘴",
     "id": "18"
@@ -40,7 +35,6 @@ export const Hospitals = [
     "name": "张江集团/张江医院/张江院区",
     "id": "189"
   }
->>>>>>> release
 ]
 
 export const AssetTypes = {
