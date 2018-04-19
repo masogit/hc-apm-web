@@ -96,6 +96,14 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+        if(!Strings.isNullOrEmpty(tenantUIDFilter)){
+            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUIDFilter) );
+        }
+        if(!Strings.isNullOrEmpty(siteUIDFilter)){
+            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter) );
+        }else{
+            this.removeFilterOnField("siteUID");
+        }
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -171,6 +179,15 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
     public void onHospitalChange(NodeSelectEvent event) {
         if (null != event.getTreeNode().getData()) {
             selectedOrg = (OrgInfo) event.getTreeNode().getData();
+        }
+    }
+
+    public void onSiteFilterChange(NodeSelectEvent event){
+        if (null != event.getTreeNode().getData()) {
+            OrgInfo selectedOrg=(OrgInfo)event.getTreeNode().getData();
+            siteUIDFilter = selectedOrg==null? null:selectedOrg.getSiteUID();
+        }else{
+            this.removeFilterOnField("siteUID");
         }
     }
 
