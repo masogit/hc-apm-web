@@ -172,7 +172,7 @@ public class UserAccountService {
 		return newUser;
 	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department){
-		newUser.setOrgType(0);
+		
 		if(isInsulate){
 			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 			newUser.setHospitalUID(currentUser.getHospitalUID());
@@ -213,10 +213,10 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
-			newUser.setOrgType(1);
 		}
 		newUser.setInstitutionUID(orgInfoTemp.getUid());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
 	private boolean getHospitalID(UserAccount newUser,String hospital){
@@ -229,11 +229,11 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
-			newUser.setOrgType(2);
 		}
 		newUser.setHospitalUID(orgInfoTemp.getUid());
 		newUser.setHospitalId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
 	private boolean getSiteID(UserAccount newUser,String site){
@@ -246,11 +246,11 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
-			newUser.setOrgType(3);
 		}
 		newUser.setSiteUID(orgInfoTemp.getUid());
 		newUser.setSiteId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
 	private boolean getDepartmentID(UserAccount newUser,String department,boolean isInsulate){
@@ -270,9 +270,9 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
-			newUser.setOrgType(4);
 		}
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
 	}
 	
