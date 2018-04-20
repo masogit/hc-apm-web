@@ -14,7 +14,7 @@
                     <p:fieldset id="basic" legend="公共配置">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{v2_WorkflowConfigController.selected != null}">
                             <h:panelGroup>
-                                <label class="label">#{msg.orgId}</label>
+                                <label class="label">#{msg.orgId}*</label>
                                 <p:inputText id="selectedUserOrgName" value="#{v2_WorkflowConfigController.getOrgFullName(v2_WorkflowConfigController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
                                 <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
                                 <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
@@ -236,14 +236,14 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">设备编码选择</label>
+                                <label class="label">三码配置</label>
                                 <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetCodeConfig}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class ="label">#{msg.generateMethod} *</label>
+                                <label class ="label">#{msg.generateMethod}</label>
                                 <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.generateMethod}" disabled="false" required="false" requiredMessage="#{msg.generateMethod} #{msg.ValidationRequire}">
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('generateMethod')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
