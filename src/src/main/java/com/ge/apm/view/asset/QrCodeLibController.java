@@ -19,6 +19,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
@@ -56,6 +57,8 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
     OrgInfo selectedOrg;
 
     private UserCommonService userCommonService;
+    
+    private UaaService uaaService;
 
     @Override
     protected void init() {
@@ -66,6 +69,7 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         acService = WebUtil.getBean(AssetCreateService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         userContextService = WebUtil.getBean(UserContextService.class);
 
@@ -78,10 +82,10 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
 //            hospitalFileterList = orgInfoDao.getByTenantUID(tenantUIDFilter).stream().filter(item -> item.getOrgType() < 4).collect(Collectors.toList());
 //        }
 
-        if (!userContextService.hasRole("SuperAdmin")) {
-            tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
-        }
-        onSiteChange();
+//        if (!userContextService.hasRole("SuperAdmin")) {
+//            tenantUIDFilter = UserContextService.getCurrentUserAccount().getTenantUID();
+//        }
+//        onSiteChange();
 
     }
 
@@ -96,13 +100,23 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         if (this.searchFilters == null) {
             searchFilters = new ArrayList();
         }
+        this.removeFilterOnField("siteUID");
+        this.removeFilterOnField("tenantUID");
+        this.removeFilterOnField("institutionUID");
+        this.removeFilterOnField("hospitalUID");
+        if (!userContextService.hasRole("SuperAdmin") ) {
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+        
         if(!Strings.isNullOrEmpty(tenantUIDFilter)){
-            this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUIDFilter) );
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUIDFilter) );
         }
         if(!Strings.isNullOrEmpty(siteUIDFilter)){
-            this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter) );
-        }else{
-            this.removeFilterOnField("siteUID");
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, siteUIDFilter) );
         }
 
         if (this.searchFilters == null) {
