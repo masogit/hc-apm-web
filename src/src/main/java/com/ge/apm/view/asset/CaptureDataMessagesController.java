@@ -94,7 +94,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     public void checkSystemId(){
-    	System.out.println("xxx checkSystemId");
     	String systemId=this.selected.getSystemId();
     	if(StringUtils.isNotEmpty(systemId)){
     		AssetInfo info=service.getAssetInfoBySystemId(systemId);
