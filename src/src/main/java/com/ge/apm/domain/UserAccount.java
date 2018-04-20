@@ -178,6 +178,9 @@ public class UserAccount implements Serializable {
     @Transient
     private String orgFullName;
     
+    @Transient
+    private Integer orgType;
+    
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
     private List<UserRole> userRoleList;
@@ -793,4 +796,14 @@ public class UserAccount implements Serializable {
     public void setActiveTime(Date activeTime) {
         this.activeTime = activeTime;
     }
+
+	public Integer getOrgType() {
+		return orgType;
+	}
+
+	public void setOrgType(Integer orgType) {
+		this.orgType = orgType;
+	}
+    
+    
 }
