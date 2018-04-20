@@ -54,7 +54,7 @@ public interface UserAccountMapper {
 
 	@Insert("insert into user_account(telephone,site_id,hospital_id,hospital_uid,org_id,login_name,name,pwd_salt,password,institution_uid,site_uid,tenant_uid,org_level,org_uid,uid,email,is_super_admin,is_site_admin,is_local_admin,is_active,is_locked,wechat_id) "+
 			 " values "+
-			" (#{telephone},#{siteId},#{hospitalId},#{hospitalUID},#{orgInfoId},#{loginName},#{name},#{pwdSalt},#{password},#{institutionUID},#{siteUID},#{tenantUID},#{orgLevel},#{orgInfoUID},#{uid},'temp@ge.com',false,false,false,true,false,#{weChatId})")
+			" (#{telephone},#{siteId},#{hospitalId},#{hospitalUID},#{orgInfoId},#{loginName},#{name},#{pwdSalt},#{password},#{institutionUID},#{siteUID},#{tenantUID},#{orgLevel},#{orgInfoUID},#{uid},#{email},false,false,false,true,false,#{weChatId})")
 	@Options(useGeneratedKeys=true)
 	public Integer saveUserAccount(UserAccount user);
 	
