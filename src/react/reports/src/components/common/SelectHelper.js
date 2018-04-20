@@ -22,6 +22,7 @@ export default function selectHelper(defaultKey: string, options: Array<Option>,
       labelInValue
       style={{width: 120}}
       defaultValue={defaultValue}
+      dropdownMatchSelectWidth={false}
       optionFilterProp="children"
       onChange={onChange}>
       {options.map(o => (
