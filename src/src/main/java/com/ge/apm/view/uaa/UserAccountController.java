@@ -1,7 +1,6 @@
 package com.ge.apm.view.uaa;
 
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.*;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +16,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
@@ -24,10 +24,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import webapp.framework.web.mvc.JpaCRUDController;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.dao.BiomedGroupUserRepository;
-import com.ge.apm.dao.V2_WorkOrderRepository;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,8 +37,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
-import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserOrgInfoRepository;
 import org.primefaces.event.NodeUnselectEvent;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
@@ -80,6 +74,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private TenantInfoRepository tenantInfoRepository;
 
+    private JsonTemplateRepository jsonTemplateRepository;
+
+    private String protocol;
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -95,7 +93,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         selectedOrg = orgInfoDao.getByUid(loginUser.getOrgInfoUID());
         setTenantUid(loginUser.getTenantUID());
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-
+        jsonTemplateRepository = WebUtil.getBean(JsonTemplateRepository.class);
+        protocol = jsonTemplateRepository.findByType(3);
         /*
         orgTree = buildOrgTree(UserContextService.getSiteId(), loginUser.getOrgInfoId());
         try{
@@ -134,15 +133,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             selectedUserOrg.setSelected(true);
             TreeNodeUtil.expandParentsNodes(selectedUserOrg);
         }
-
-//        TreeNodeUtil.expandTreeNode(selectedUserOrg);
-//        selectedOrg = null;
     }
-
-    public TenantInfo getSelectedTenant() {
-        return selectedTenant;
-    }
-
+    
     public String getOrgFullNameByUid(String orgUid) {
         OrgInfo org = orgInfoDao.getByUid(orgUid);
         return org == null ? "" : getOrgFullName(org);
@@ -159,6 +151,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
 
         return name;
+    }
+
+    public TenantInfo getSelectedTenant() {
+        return selectedTenant;
     }
 
     @Override
@@ -182,8 +178,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
             }
         }
-
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        for(UserAccount user: pageUserAccount){
+        	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
+        }
+        return pageUserAccount;
     }
 
     @Override
@@ -221,15 +220,32 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }
         selected = uaaService.loadUserWithUserRoles(selected.getId());
 
+        TenantInfo ti = tenantInfoRepository.findByuid(selected.getTenantUID());
+
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if(UserContextService.isOnlyLocalITAdmin()){
             List<String> disableRoleList = new ArrayList<>();
             disableRoleList.add("ITAdmin");
             disableRoleList.add("ActivationPerson");
+            //判断租户是否隔离，租户隔离时移除LocalITAdmin
+            if(ti.getInsulate() == null || !ti.getInsulate()){
+                disableRoleList.add("LocalITAdmin");
+            }
             allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
         }else{
-            allRoles = uaaService.getSysRoleNames();
+            //判断租户是否隔离，租户隔离时移除LocalITAdmin
+            if(ti.getInsulate() == null || !ti.getInsulate()){
+                List<String> disableRoleList = new ArrayList<>();
+                disableRoleList.add("LocalITAdmin");
+                allRoles = uaaService.getSysRoleNamesByDisableList(disableRoleList);
+            }else{
+                allRoles = uaaService.getSysRoleNames();
+            }
+
         }
+
+
+
 
         assignedRoles = new ArrayList<String>();
         for (UserRole userRole : selected.getUserRoleList()) {
@@ -374,6 +390,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     }
 
     @Override
+
     public void onBeforeSave(UserAccount user) {
         //remove space charactors.
         String loginName = user.getLoginName();
@@ -404,9 +421,13 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             }
         }
         if(user.getIsLocked()){
-            lockAccount();
+            //lockAccount();
+            selected.setIsLocked(true);
+            selected.setLockTime(TimeUtil.timeNow().toDate());
         }else{
-            unlockAccount();
+            //unlockAccount();
+            selected.setIsLocked(false);
+            selected.setPasswordErrorCount(0);
         }
     }
 
@@ -627,6 +648,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
             TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
             tenant.setIsEnabled(true);
             tenant.setActiveTime(new Date());
+            tenant.setActiveUserId(loginUser.getId());
+            tenant.setActiveType(1);
             tenantInfoRepository.save(tenant);
             dao.updateMembersStatus(loginUser.getTenantUID());
         }
@@ -639,6 +662,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         TenantInfo tenant = tenantInfoRepository.findByuid(loginUser.getTenantUID());
         tenant.setIsEnabled(true);
         tenant.setActiveTime(new Date());
+        tenant.setActiveUserId(loginUser.getId());
+        tenant.setActiveType(1);
         tenantInfoRepository.save(tenant);
         dao.updateMembersStatus(loginUser.getTenantUID());
         WebUtil.addSuccessMessage("激活成功！");
@@ -677,6 +702,14 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         }else{
             agree = false;
         }
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 
     public List<String> getItems() {

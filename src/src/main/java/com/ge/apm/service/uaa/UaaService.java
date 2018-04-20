@@ -34,7 +34,7 @@ public class UaaService {
     public static final String ASSET = "asset";
     public static final String TEMPORARY_ACCOUNT = "";
     private static Map<String, SysRole> sysRoles;
-    
+    public static final String TEMP_STAFF = "仅报修权限账号";
     @Autowired
     OrgInfoRepository orgInfoDao;
 
@@ -143,15 +143,20 @@ public class UaaService {
 
         //first remove all existing user roles
         UserRoleRepository userRoleDao = WebUtil.getBean(UserRoleRepository.class);
+        TenantInfoRepository tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userRoleDao.deleteByUserAccount(userAccount.getId());
         
         //then set user roles
         SysRoleRepository sysRoleDao = WebUtil.getBean(SysRoleRepository.class);
-        if((!newRoleNames.contains("临时报修帐号")) && (userAccount.getUserRoleNames().contains("临时报修帐号"))){
-            deactiveTemporaryUser(userAccount.getId());
+        if((!newRoleNames.contains(TEMP_STAFF)) && (userAccount.getUserRoleNames().contains(TEMP_STAFF))){
+            TenantInfo tenant = tenantInfoRepository.findByuid(userAccount.getTenantUID());
+            if(tenant.getIsEnabled() == null || (!tenant.getIsEnabled())){
+                deactiveTemporaryUser(userAccount.getId());
+            }
         }
-        if(newRoleNames.contains("临时报修帐号")){
+        if(newRoleNames.contains(TEMP_STAFF)){
             activeTemporaryUser(userAccount.getId());
+
         }
         if(newRoleNames.isEmpty()){
             newRoleNames.add("临床科室人员");
@@ -432,6 +437,40 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
             }
         }
         
+        if(treeMap.get(siteUID)!=null){
+            root.getChildren().add(treeMap.get(siteUID));
+        }
+        xtreeMap = treeMap;
+        if(!root.getChildren().isEmpty()){
+            OrgInfo temp = (OrgInfo)root.getChildren().get(0).getData();
+            rootUID = temp.getUid();
+        }
+        return root;
+    }
+
+    public TreeNode getOrgTreeBySiteWithoutClinical(String siteUID){
+        List<OrgInfo> orgList = null;
+        orgList = orgInfoDao.getOrgInfosByParentId(siteUID);
+        TreeNode root  = new DefaultTreeNode("root", null, null);
+
+        Map<String, TreeNode> treeMap = new LinkedHashMap<>();
+        for(OrgInfo org: orgList){
+            TreeNode node = new DefaultTreeNode("org", org, null);
+            node.setRowKey("org_"+org.getId());
+            treeMap.put(org.getUid(), node);
+            treeMapG.put(org.getUid(),node);
+        }
+        for(Map.Entry<String, TreeNode> nodeItem: treeMap.entrySet()){
+            TreeNode node = nodeItem.getValue();
+            OrgInfo org = (OrgInfo)node.getData();
+            if(org.getParentUID()!=null){
+                TreeNode parentNode = treeMap.get(org.getParentUID());
+                if(parentNode!=null){
+                    parentNode.getChildren().add(node);
+                }
+            }
+        }
+
         if(treeMap.get(siteUID)!=null){
             root.getChildren().add(treeMap.get(siteUID));
         }
@@ -728,6 +767,20 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         TreeNode root = new DefaultTreeNode("root", null, null);
         for(OrgInfo item : orgList){
             TreeNode siteNode = getOrgTreeBySite(item.getUid());
+            root.getChildren().addAll(siteNode.getChildren());
+        }
+        return root;
+    }
+
+    public TreeNode getOrgFullTreeByTenantWithoutClinical(String tenantUid) {
+        List<SearchFilter> orgInfoFilters = new ArrayList<>();
+        orgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUid));
+        orgInfoFilters.add(new SearchFilter("parentUID", SearchFilter.Operator.IsNull, tenantUid));
+        orgInfoFilters.add(new SearchFilter("orgType", SearchFilter.Operator.NE, 4));
+        List<OrgInfo> orgList = orgInfoDao.findBySearchFilter(orgInfoFilters);
+        TreeNode root = new DefaultTreeNode("root", null, null);
+        for(OrgInfo item : orgList){
+            TreeNode siteNode = getOrgTreeBySiteWithoutClinical(item.getUid());
             root.getChildren().addAll(siteNode.getChildren());
         }
         return root;

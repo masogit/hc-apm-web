@@ -9,9 +9,9 @@
 			<p:fieldset legend="批量导入 设备绩效配置" id="uploaderContainer">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<p:fileUpload fileUploadListener="#{smallAssetPerformanceConfigController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false"
-						auto="true" invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
+						auto="true" invalidFileMessage="只支持xls格式的文件" invalidSizeMessage="文件大小不得超过5M"
 						update=":smallAssetPerformanceConfigTab:dataListForm, :smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm" sizeLimit="5242880"
-						allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+						allowTypes="/(\.|\/)(xls)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
 					<p:growl id="messages" showDetail="true" />
 				</p:panelGrid>
 				<h:panelGroup>

@@ -252,7 +252,7 @@ public class SharedAssetType implements Serializable{
     public void setAccessoryList(List<SharedAssetTypeAccesssory> accessoryList){
         this.accessoryList = accessoryList;
         accessories = JSON.toJSONString(accessoryList);
-        System.out.println(accessories);
+//        System.out.println(accessories);
     }
     
     public List<SharedAssetTypeAccesssory> getAccessoryList(){

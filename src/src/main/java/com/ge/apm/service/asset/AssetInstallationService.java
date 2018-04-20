@@ -92,7 +92,7 @@ public class AssetInstallationService {
                 ArrivalListItem temp = itemDao.findById(itemId);
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), 3);
+                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(),newAsset.getSiteUID(), 3);
                 }
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 if (isGeneratePmOrder) {
@@ -137,7 +137,7 @@ public class AssetInstallationService {
         arrivalListItem.setUsageStatus(3);
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), 2);
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID(), 2);
         }
 
     }
@@ -217,6 +217,15 @@ public class AssetInstallationService {
             return new Tuple2(true, "");
         }
         return new Tuple2(false, "设备编号已被分配");
+    }
+
+    public List<Supplier> getSupplierListBySiteUid(String siteUID) {
+        return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+//        if(Strings.isNullOrEmpty(siteUID)){
+//            return supplierDao.getByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+//        }else{
+//            return supplierDao.getBySiteUID(siteUID);
+//        }
     }
 
 }

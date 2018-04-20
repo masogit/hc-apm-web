@@ -6,6 +6,7 @@
 package com.ge.apm.domain;
 
 
+import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -377,6 +378,9 @@ public class SharedAssetRequest implements Serializable{
     @Transient
     SharedAssetReqTypeRepository apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
     
+    @Transient
+    SharedAssetReqDetailRepository asdDao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
+    
     public List<SharedAssetReqType> getSartList() {
         if(sartList!=null) return sartList;
         if (id != null) {
@@ -399,9 +403,14 @@ public class SharedAssetRequest implements Serializable{
 
     public List<SharedAssetReqDetail> getSardList() {
         if(sardList!=null) return sardList;
-        
-        sardList = new ArrayList<SharedAssetReqDetail>();
-        
+        if(id != null){
+            List<SharedAssetReqDetail> dataList = asdDao.findByReturnId(id);
+            if (dataList != null && dataList.size() > 0) {
+                sardList = dataList;
+            } else {
+                sardList = new ArrayList<SharedAssetReqDetail>();
+            }
+        }
         return sardList;
     }
 

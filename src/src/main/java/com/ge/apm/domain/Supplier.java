@@ -2,6 +2,8 @@
  */
 package com.ge.apm.domain;
 
+import com.ge.apm.service.utils.PinyinUtil;
+
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -38,6 +40,8 @@ public class Supplier implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+    @Column(name = "name_py_code")
+    private String namePyCode;
     @Size(max = 32)
     @Column(name = "city")
     private String city;
@@ -122,6 +126,7 @@ public class Supplier implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]","");
     }
 
     public String getCity() {
@@ -162,6 +167,14 @@ public class Supplier implements Serializable {
 
     public void setTel(String tel) {
         this.tel = tel;
+    }
+
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
     }
 
     @Override

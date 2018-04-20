@@ -2,7 +2,9 @@
  */
 package com.ge.apm.domain;
 
+import com.alibaba.druid.util.StringUtils;
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.ge.apm.service.utils.PinyinUtil;
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
@@ -19,7 +21,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 /**
- *
  * @author 212547631
  */
 @Entity
@@ -32,10 +33,10 @@ public class AssetInfo implements Serializable {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
-    
+
     @Column(columnDefinition = "CHAR(32)")
     private String uid;
-    
+
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
@@ -46,6 +47,9 @@ public class AssetInfo implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+
+    @Column(name = "name_py_code")
+    private String namePyCode;
 
     @Size(max = 64)
     @Column(name = "alias_name")
@@ -114,7 +118,7 @@ public class AssetInfo implements Serializable {
     @Column(name = "clinical_dept_id")
     private Integer clinicalDeptId;//使用科室
 
-    @Column(name = "clinical_dept_uid" , columnDefinition = "CHAR(32)")
+    @Column(name = "clinical_dept_uid", columnDefinition = "CHAR(32)")
     private String clinicalDeptUID;//设备使用科室
 
     @Size(max = 64)
@@ -211,7 +215,7 @@ public class AssetInfo implements Serializable {
     @Size(max = 256)
     @Column(name = "qr_code")
     private String qrCode;//二维码
-    
+
     @Column(name = "asset_owner_id2")
     private Integer assetOwnerId2;//维修负责人2
 
@@ -235,7 +239,7 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "dispatch_mode")
     private Integer dispatchMode;//派工模式
-    
+
     // @Max(value=?)  @Min(value=?)//if you know range of your decimal fields consider using these annotations to enforce field validation
     @Column(name = "purchase_price")
     private Double purchasePrice;//采购价格(元)
@@ -293,7 +297,7 @@ public class AssetInfo implements Serializable {
     //医疗器械子分类
     @Column(name = "asset_code68")
     private Integer assetCode68;
-    
+
     @Column(name = "comments")
     @Size(min = 0, max = 256)
     private String comments;//备注
@@ -306,8 +310,8 @@ public class AssetInfo implements Serializable {
     @Basic(optional = false)
     @NotNull
     private Integer hospitalId;
-    
-    @JoinColumn(insertable=false,updatable=false, name = "hospital_id", referencedColumnName = "id")
+
+    @JoinColumn(insertable = false, updatable = false, name = "hospital_id", referencedColumnName = "id")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
     private OrgInfo hospital;
@@ -323,7 +327,7 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
+
     //设备类型 [1:放射类,2:超声类,3:呼吸麻醉类,4:手术室类,5:供应消杀类,6:输注泵类,7:除颤仪,8:康复类,9:血液透析类,10:实验室类,11:内窥类,12:生命体征支持类,13:其他类]
     @Column(name = "asset_category")
     private Integer assetCategory;
@@ -415,10 +419,10 @@ public class AssetInfo implements Serializable {
     @LastModifiedDate
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
-    
-    @Column(name="ib_status")
+
+    @Column(name = "ib_status")
     private Integer ibStatus;
-    
+
     @Column(name = "ge_device_type")
     private Integer geDeviceType; // 0-其他，1-MR, 2-CT, 3-US
 
@@ -428,6 +432,12 @@ public class AssetInfo implements Serializable {
     private String swapTypeUid;
     @Column(name = "swap_type_state")//调剂设备状态（"0"：正常，"1"：借用中）
     private String swapTypeState;
+
+    @Column(name = "manufacture_py_code")
+    private String manufacturePyCode;
+
+    @Column(name = "clinical_dept_name_py_code")
+    private String clinicalDeptNamePyCode;
 
     public Integer getAssetUsage() {
         return assetUsage;
@@ -617,17 +627,17 @@ public class AssetInfo implements Serializable {
 
     @PrePersist
     public void initializeUid() {
-        if (uid==null) {
+        if (uid == null) {
             uid = UUID.randomUUID().toString().replace("-", "");
         }
-        if(isDeleted == null){
+        if (isDeleted == null) {
             isDeleted = false;
         }
-        if (supplierId==null) {
+        if (supplierId == null) {
             supplierId = -1;
         }
     }
-    
+
     public String getUid() {
         return uid;
     }
@@ -666,6 +676,7 @@ public class AssetInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
     }
 
     public String getAliasName() {
@@ -722,6 +733,7 @@ public class AssetInfo implements Serializable {
 
     public void setManufacture(String manufacture) {
         this.manufacture = manufacture;
+        this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
     }
 
     public String getVendor() {
@@ -748,9 +760,13 @@ public class AssetInfo implements Serializable {
         this.maitananceTel = maitananceTel;
     }
 
-    public String getNationalStandardCode() { return nationalStandardCode; }
+    public String getNationalStandardCode() {
+        return nationalStandardCode;
+    }
 
-    public void setNationalStandardCode(String nationalStandardCode) { this.nationalStandardCode = nationalStandardCode; }
+    public void setNationalStandardCode(String nationalStandardCode) {
+        this.nationalStandardCode = nationalStandardCode;
+    }
 
     public String getSerialNum() {
         return serialNum;
@@ -822,6 +838,9 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptName(String clinicalDeptName) {
         this.clinicalDeptName = clinicalDeptName;
+        if (!StringUtils.isEmpty(clinicalDeptName)) {
+            this.clinicalDeptNamePyCode = PinyinUtil.getShortPinyin(clinicalDeptName).toLowerCase();
+        }
     }
 
     public Integer getAssetGroup() {
@@ -993,16 +1012,16 @@ public class AssetInfo implements Serializable {
     }
 
     public Double getLifecycleInYear() {
-    	if(lifecycle == null){
-    		return null;
-    	}
-        return new Double(lifecycle)/12.0;
+        if (lifecycle == null) {
+            return null;
+        }
+        return new Double(lifecycle) / 12.0;
     }
 
     public void setLifecycleInYear(Double lifecycle) {
-    	if(lifecycle == null){
+        if (lifecycle == null) {
             this.lifecycle = null;
-    	} else {
+        } else {
             this.lifecycle = new Double(lifecycle * 12).intValue();
         }
 
@@ -1327,7 +1346,31 @@ public class AssetInfo implements Serializable {
     public void setGeDeviceType(Integer geDeviceType) {
         this.geDeviceType = geDeviceType;
     }
-    
+
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
+    }
+
+    public String getManufacturePyCode() {
+        return manufacturePyCode;
+    }
+
+    public void setManufacturePyCode(String manufacturePyCode) {
+        this.manufacturePyCode = manufacturePyCode;
+    }
+
+    public String getClinicalDeptNamePyCode() {
+        return clinicalDeptNamePyCode;
+    }
+
+    public void setClinicalDeptNamePyCode(String clinicalDeptNamePyCode) {
+        this.clinicalDeptNamePyCode = clinicalDeptNamePyCode;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -1352,5 +1395,5 @@ public class AssetInfo implements Serializable {
     public String toString() {
         return name;
     }
-    
+
 }

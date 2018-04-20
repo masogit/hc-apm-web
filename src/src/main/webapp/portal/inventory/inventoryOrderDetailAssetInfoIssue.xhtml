@@ -49,8 +49,8 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':'停用'}" />
 		</p:column>
-		<p:column headerText="设备位置" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		<p:column headerText="安装位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
 		<p:column headerText="问题描述">
 			<h:outputText value="#{item.comment}" />
@@ -58,7 +58,17 @@
 		<p:column headerText="未通过项">
 			<h:outputText value="#{item.inventoryCheckListItems}" />
 		</p:column>
-
+		<p:column headerText="已解决" filterBy="#{item.isSolved}" filterMatchMode="EQ">
+			<f:facet name="filter">
+				<p:selectOneMenu onchange="PF('varDataList4').filter()" autoWidth="false" style="max-width: 150px;">
+					<f:converter converterId="javax.faces.Boolean" />
+					<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+					<f:selectItem itemLabel="是" itemValue="true" />
+					<f:selectItem itemLabel="否" itemValue="false" />
+				</p:selectOneMenu>
+			</f:facet>
+			<h:outputText value="#{item.isSolved?'是':'否'}" />
+		</p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
 				<p:dataExporter type="xls" target="datalist4" fileName="InventoryOrderDetailAssetInfoIssue_export" />

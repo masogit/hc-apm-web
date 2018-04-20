@@ -53,6 +53,9 @@ public class AssetCreateController {
     private String[] selectedPictures;
 
     private UserAccount owner;
+
+    private OrgInfo clinicalDept;
+
     private Brand brand;
     private String rejectText;
     private List<String> rejectTextHistory;
@@ -78,6 +81,7 @@ public class AssetCreateController {
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
+        String siteUid = WebUtil.getRequestParameter("siteUid");
         acService = WebUtil.getBean(AssetCreateService.class);
         brandDao = WebUtil.getBean(BrandRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -86,7 +90,7 @@ public class AssetCreateController {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
-        createRequest = acService.getCreateRequest(qrCode);
+        createRequest = acService.getCreateRequest(qrCode,siteUid);
         assetInfo = createAssetInfo();
 
         pictureList = acService.getQrCodePictureList(createRequest.getUid());
@@ -119,8 +123,8 @@ public class AssetCreateController {
 
     private AssetInfo createAssetInfo() {
         AssetInfo newAsset = new AssetInfo();
-        newAsset.setSiteId(createRequest.getSiteId());
-        newAsset.setHospitalId(createRequest.getHospitalId());
+//        newAsset.setSiteId(createRequest.getSiteId());
+//        newAsset.setHospitalId(createRequest.getHospitalId());
         newAsset.setQrCode(createRequest.getQrCode());
         newAsset.setSerialNum(createRequest.getSerialNum());
         newAsset.setFunctionType(createRequest.getModelNum());
@@ -163,6 +167,16 @@ public class AssetCreateController {
         return acService.getClinicalDeptList(assetInfo.getSiteUID());
     }
 
+    public List<OrgInfo> getClinicalDeptListWithEmptyValue() {
+        List<OrgInfo> orgInfos = acService.getClinicalDeptList(assetInfo.getSiteUID());
+
+        OrgInfo emptyValue = new OrgInfo();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        orgInfos.add(0, emptyValue);
+
+        return orgInfos;
+    }
+
     public String getHospitalName() {
         return acService.getSiteName(assetInfo.getSiteUID());
     }
@@ -180,12 +194,12 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
         Boolean res = acService.CreateAeest(assetInfo, isGeneratePmOrder);
-        if(isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+        if(null!=isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
             WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
         }
         if (res) {
             acService.createAttachments(assetInfo, selectedPictures);
-            acService.updateQrLib(assetInfo.getQrCode(), 3);
+            acService.updateQrLib(assetInfo.getQrCode(), 3,createRequest.getSiteUID());
             WebUtil.addSuccessMessage("创建成功");
             return "RequestsList?faces-redirect=true";
         } else {
@@ -209,6 +223,12 @@ public class AssetCreateController {
     }
 
     public void onClinicalDeptChange() {
+        if (this.clinicalDept == null) {
+            assetInfo.setClinicalDeptId(null);
+        } else {
+            assetInfo.setClinicalDeptId(this.clinicalDept.getId());
+        }
+
         if (null != assetInfo.getClinicalDeptId()) {
             OrgInfo clinicalDept = acService.getOrgInfo(assetInfo.getClinicalDeptId());
             assetInfo.setClinicalDeptName(clinicalDept.getName());
@@ -427,5 +447,11 @@ public class AssetCreateController {
         this.selectedGbNode = selectedGbNode;
     }
 
-    
+    public OrgInfo getClinicalDept() {
+        return clinicalDept;
+    }
+
+    public void setClinicalDept(OrgInfo clinicalDept) {
+        this.clinicalDept = clinicalDept;
+    }
 }

@@ -184,6 +184,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             if (CollectionUtils.isNotEmpty(checkItemLists)) {
                 checkItemLists.removeAll(checkItemLists.stream().filter(item -> item.getUid().equals("000")).collect(Collectors.toList()));
                 for (PmOrderRuleCheckList item : checkItemLists) {
+                    item.setId(null);
                     item.setRuleUID(selected.getUid());
                 }
                 pmOrderRuleCheckListRepository.save(checkItemLists);

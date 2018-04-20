@@ -12,8 +12,8 @@ export default function selectHelper(defaultKey: string, options: Array<Option>,
   // HACK: when i18n is not ready, label would fallback to the key
   // and defaultValue only rendered once
   // so do this trick at initial phrase
-  let defaultValue = find(options, {key: defaultKey}) || options[0]
-  if (defaultValue.key === defaultValue.label) {
+  let defaultValue = find(options, {key: String(defaultKey)}) || options[0]
+  if (defaultValue === undefined || defaultValue.key === defaultValue.label) {
     return null
   }
   return (
@@ -22,6 +22,7 @@ export default function selectHelper(defaultKey: string, options: Array<Option>,
       labelInValue
       style={{width: 120}}
       defaultValue={defaultValue}
+      dropdownMatchSelectWidth={false}
       optionFilterProp="children"
       onChange={onChange}>
       {options.map(o => (

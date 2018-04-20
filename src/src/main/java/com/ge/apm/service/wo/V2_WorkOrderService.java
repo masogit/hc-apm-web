@@ -270,7 +270,16 @@ public class V2_WorkOrderService {
         formData.setStepDetail(approvedDetails);
         formData.setDesc(comments);
         
-        String res = srApi.invokeWorkOrderAction(token,formData,"approvalPass",selectedWorkOrder.getId());
+        String approvalType = "approvalReject";
+        if(approvedDetails.stream().anyMatch(item -> item.getApproved())){
+            if(approvedDetails.stream().anyMatch(item -> !item.getApproved())){
+                approvalType = "approvalPartial";
+            }else{
+                approvalType = "approvalPass";
+            }
+        }
+        
+        String res = srApi.invokeWorkOrderAction(token,formData,approvalType,selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
         }

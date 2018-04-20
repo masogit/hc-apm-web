@@ -31,12 +31,12 @@
                 <div class="ui-g-12 card">
             <h:form id="IouListForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" />
-                        <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" />
-                        <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet grid" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true"/>
-                        <p:commandButton value="归还已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(11)}"  rendered="true"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" />
+                        <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" />
+                        <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true"/>
+                        <!--<p:commandButton value="归还已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(11)}"  rendered="true"/>-->
 
-                        <p:commandButton value="归还已完成"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(12)}"  rendered="true"/>
+                        <p:commandButton value="归还已完成"  process="@this" update="datalist buttonSet filterTime" actionListener="#{sharedAssetRequestV2Controller.searchList(12)}"  rendered="true"/>
                 </h:panelGrid>
                 
                 <p:dataTable id="datalist" value="#{sharedAssetRequestV2Controller.lazyModel}" var="item" widgetVar="varDataList"
@@ -69,7 +69,13 @@
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
                     </p:column>
-                    <p:column headerText="归还状态" sortBy="#{item.state}"  filterMatchMode="LIKE">
+                    <p:column headerText="归还状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ" filterable="#{sharedAssetRequestV2Controller.queryIndex == -3}">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetReturnStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{fieldMsg.fieldValue('assetReturnStatus',item.state)}"/>
 <!--                        <h:outputText value="归还待提交" rendered="#{item.state eq '7'}"></h:outputText> 
                         <h:outputText value="归还待受理" rendered="#{item.state eq '8'}"></h:outputText> 
@@ -100,14 +106,14 @@
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
-                <p:overlayPanel widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
+                <p:overlayPanel id="filterTime" widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
                     <h:panelGrid id="grid" columns="2">
                         <p:outputLabel for="cal1" />
                         <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{sharedAssetRequestV2Controller.applyTimeFrom}"
-                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间" readonly="true"/>
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
                         <p:outputLabel for="cal2"/>
                         <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
-                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间" readonly="true"/>
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
                     </h:panelGrid>
                     <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                     <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
@@ -127,7 +133,12 @@
         
 
             function openSwapTypeViewWindow(xhr, status, args) {
-                this.location.href = args.url;
+                var pageName = args.pageName;
+                if (pageName == 'Edit_2'){
+                    window.open(args.url, '_blank');
+                }else{
+                    this.location.href = args.url;
+                }
             }
 
         </script>
