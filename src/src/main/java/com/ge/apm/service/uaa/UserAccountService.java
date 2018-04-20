@@ -183,7 +183,6 @@ public class UserAccountService {
 			newUser.setHospitalUID(currentUser.getHospitalUID());
 			newUser.setSiteUID(currentUser.getSiteUID());
 			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getHospitalUID());
-			newUser.setHospitalId(orgInfoTemp.getId());
 			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
 			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 			newUser.setOrgType(orgInfoTemp.getOrgType());
@@ -202,6 +201,7 @@ public class UserAccountService {
 		}
 		newUser.setOrgInfoUID(orgInfoTemp.getUid());
 		newUser.setOrgInfoId(orgInfoTemp.getId());
+		newUser.setHospitalId(orgInfoTemp.getId());
 	}
 	
 	private boolean getInstitutionID(UserAccount newUser,String institution){
@@ -232,7 +232,6 @@ public class UserAccountService {
 			orgInfoTemp=temp;
 		}
 		newUser.setHospitalUID(orgInfoTemp.getUid());
-		newUser.setHospitalId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
