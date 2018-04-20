@@ -5,10 +5,10 @@
  */
 package com.ge.apm.service.asset;
 
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -87,6 +88,8 @@ public class AssetFileImportService {
     private QrCodeService qrCodeService;
     @Autowired
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    @Autowired
+    ConfigService configService;
     
     private UserContextService userContextService=WebUtil.getBean(UserContextService.class);
 
@@ -611,6 +614,7 @@ public class AssetFileImportService {
         if (!StringUtils.isEmpty(asset.getUid())) {
             List<SearchFilter> assetFilters = new ArrayList<>();
             assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
+            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
             List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
             return tempList;
         } else {
@@ -679,6 +683,8 @@ public class AssetFileImportService {
 
         LocalDateTime startTime = LocalDateTime.now();
 
+        boolean isAssetCodeMerged = isAssetCodeMergeConfigured();
+
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -694,8 +700,10 @@ public class AssetFileImportService {
             }
         });
 
-        int row = 1;
+        int row = 0;
         for (Map<String, Object> item: importAssetMap.values()) {
+            ++row;
+
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
@@ -726,13 +734,13 @@ public class AssetFileImportService {
                 //already loaded this data in the previous steps
 //                item.put("asset", assetList.get(0));
 //                item.put("status", ImportStatus.Exist);
-                AssetInfo assetInfo = assetList.get(0);
-
-                if (!assetInfo.getTenantUID().equals(tenantUID)) {
-                    item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, String.format("第%d行错误: 该资产属于其他租户，不允许导入！", row));
-                }
+//                AssetInfo assetInfo = assetList.get(0);
+//
+//                if (!assetInfo.getTenantUID().equals(tenantUID)) {
+//                    item.put("status", ImportStatus.CheckFail);
+//                    result.add(Boolean.FALSE);
+//                    AssetRow.addErrMessage(item, String.format("第%d行错误: 该资产属于其他租户，不允许导入！", row));
+//                }
 
             }
 
@@ -746,6 +754,7 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
+                continue;
             }
 
             if (newAsset.getUid() == null) {
@@ -758,7 +767,28 @@ public class AssetFileImportService {
                 }
             }
 
-            ++row;
+            //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
+            if (isAssetCodeMerged && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+                if (newAsset.getDepartNum().length() > 16) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 设备编号不能超过16位");
+                    continue;
+                }
+
+                if (!newAsset.getDepartNum().equals(newAsset.getFinancingNum()) && !StringUtils.isEmpty(newAsset.getFinancingNum())) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 资产编码与设备编码不相同不允许导入");
+                } else {
+                    newAsset.setFinancingNum(newAsset.getDepartNum());
+                    newAsset.setQrCode(newAsset.getDepartNum());
+                }
+
+
+            }
+
+
         }
 
         LocalDateTime endTime = LocalDateTime.now();
@@ -814,6 +844,20 @@ public class AssetFileImportService {
         doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, "#");
 
         return doc;
+
+    }
+
+    /**
+     * 检查是否配置三码合一
+     */
+    private boolean isAssetCodeMergeConfigured() {
+
+        WorkflowConfig config = configService.findConfigBySite(orgUid);
+        if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
+            return true;
+        } else {
+            return false;
+        }
 
     }
 
