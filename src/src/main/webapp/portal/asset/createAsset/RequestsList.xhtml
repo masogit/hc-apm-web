@@ -19,7 +19,7 @@
                     <p:dataTable id="datalist" value="#{qrCodeLibCreateController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{qrCodeLibCreateController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.submitDate}"
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
