@@ -33,7 +33,7 @@ public class ConfigService {
 
     public WorkflowConfig findConfigBySite(String siteUid) {
         OrgInfo org = orgDao.findByUid(siteUid);
-        TenantInfo tenant = tenantDao.findByuid(siteUid);
+        TenantInfo tenant = tenantDao.findByuid(org.getTenantUID());
         List<WorkflowConfig> configList = configDao.findBySiteUID(siteUid);
         if (tenant.getInsulate()!=null && tenant.getInsulate()) {
             if (null != configList && !configList.isEmpty()) {
