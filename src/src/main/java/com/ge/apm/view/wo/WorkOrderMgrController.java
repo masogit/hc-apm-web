@@ -788,7 +788,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void approveWorkOrder() {
         approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
-        if(approvedDetails.stream().anyMatch(item -> !item.getApproved()) && Strings.isNullOrEmpty(comments)){
+        if(approvedDetails.stream().anyMatch(item -> item.getApproved()==null || !item.getApproved()) && Strings.isNullOrEmpty(comments)){
             WebUtil.addErrorMessage("审核不通过原因必须填写");
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return ;

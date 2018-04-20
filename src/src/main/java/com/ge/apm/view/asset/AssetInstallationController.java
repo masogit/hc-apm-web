@@ -455,7 +455,8 @@ public class AssetInstallationController {
     }
     
     public List<String> autoCompleteDept(String query){
-        return deptInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query)).map(OrgInfo::getName).collect(Collectors.toList());
+        return deptInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query)
+            || (item.getNamePyCode() == null? false: item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
     }
     
     public void onClinicalDeptChange(SelectEvent event){
