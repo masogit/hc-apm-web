@@ -24,6 +24,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -512,7 +513,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public List<String> autoCompleteVendor(String query) {
-        return suppliersList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).map(Supplier::getName).collect(Collectors.toList());
+        List<String> res = suppliersList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query) 
+                || (item.getNamePyCode() == null? false: item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
+        res.sort(new PinYinComparator());
+        return res;
     }
 
     public void onVendorChange(SelectEvent event) {

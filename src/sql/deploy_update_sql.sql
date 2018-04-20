@@ -94,3 +94,5 @@ alter table qr_code_lib drop constraint qr_code_lib_pkey;
 alter table qr_code_lib alter column uid set not null;
 alter table qr_code_lib alter column id drop not null;
 alter table qr_code_lib add primary key(uid);
+
+update supplier a set tenant_uid=(select uid from tenant_info o where o.id=a.site_id) where tenant_uid is null

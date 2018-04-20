@@ -96,9 +96,6 @@ export class Header extends PureComponent {
         <div className="nav-item">
           { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
         </div>
-        <div className="nav-item">
-          { SelectHelper(filterBy['hostpital'], this._filtersHospital(), onFilterChange('hospital')) }
-        </div>
       </div>
     </nav>)
   }

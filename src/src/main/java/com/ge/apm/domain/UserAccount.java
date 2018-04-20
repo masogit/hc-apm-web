@@ -114,8 +114,12 @@ public class UserAccount implements Serializable {
     
     @Column(name = "is_online")
     private Boolean isOnline;
+    
+    //siteId==tenantuid.id
     @Column(name = "site_id")
     private Integer siteId;
+    
+    //hospitalId==siteuid.id
     @Column(name = "hospital_id")
     private Integer hospitalId;
     @Column(name = "last_login_time")
@@ -177,6 +181,9 @@ public class UserAccount implements Serializable {
     
     @Transient
     private String orgFullName;
+    
+    @Transient
+    private Integer orgType;
     
     @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
@@ -793,4 +800,14 @@ public class UserAccount implements Serializable {
     public void setActiveTime(Date activeTime) {
         this.activeTime = activeTime;
     }
+
+	public Integer getOrgType() {
+		return orgType;
+	}
+
+	public void setOrgType(Integer orgType) {
+		this.orgType = orgType;
+	}
+    
+    
 }

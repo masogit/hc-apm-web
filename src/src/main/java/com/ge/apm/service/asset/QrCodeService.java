@@ -466,6 +466,9 @@ public class QrCodeService {
 
     public boolean deleteQrcode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if(null == qrCodeLib){
+            return true;
+        }
         if (qrCodeLib.getStatus() != 1 || qrCodeLib.getStatus() != 2) {
             return false;
         }
