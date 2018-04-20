@@ -6,8 +6,10 @@
 package com.ge.apm.service.common;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.WorkflowConfig;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +28,21 @@ public class ConfigService {
     @Autowired
     private OrgInfoRepository orgDao;
 
+    @Autowired
+    private TenantInfoRepository tenantDao;
 
     public WorkflowConfig findConfigBySite(String siteUid) {
         OrgInfo org = orgDao.findByUid(siteUid);
+        TenantInfo tenant = tenantDao.findByuid(siteUid);
         List<WorkflowConfig> configList = configDao.findBySiteUID(siteUid);
+        if (tenant.getInsulate()!=null && tenant.getInsulate()) {
+            if (null != configList && !configList.isEmpty()) {
+                return configList.get(0);
+            }else{
+                return null;
+            }
+        }
+        
         if (null != configList && !configList.isEmpty()) {
             return configList.get(0);
         }
