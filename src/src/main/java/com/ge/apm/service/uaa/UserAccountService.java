@@ -181,6 +181,8 @@ public class UserAccountService {
 			newUser.setHospitalId(orgInfoTemp.getId());
 			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
 			newUser.setSiteId(orgInfoTemp.getId());
+			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
+			newUser.setOrgType(orgInfoTemp.getOrgType());
 			if(getDepartmentID(newUser, department,isInsulate)){
 			}
 		}
@@ -254,12 +256,6 @@ public class UserAccountService {
 		return true;
 	}
 	private boolean getDepartmentID(UserAccount newUser,String department,boolean isInsulate){
-		if(isInsulate){
-			if(StringUtils.isEmpty(department)){
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室错误;");
-				return false;
-			}
-		}
 		
 		OrgInfo temp=orgInfoRepository.getDepartmentByName(department,orgInfoTemp.getUid());
 		if(temp==null){
