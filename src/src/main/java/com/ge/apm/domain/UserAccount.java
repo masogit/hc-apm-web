@@ -114,8 +114,12 @@ public class UserAccount implements Serializable {
     
     @Column(name = "is_online")
     private Boolean isOnline;
+    
+    //siteId==tenantuid.id
     @Column(name = "site_id")
     private Integer siteId;
+    
+    //hospitalId==siteuid.id
     @Column(name = "hospital_id")
     private Integer hospitalId;
     @Column(name = "last_login_time")

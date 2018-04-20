@@ -172,15 +172,18 @@ public class UserAccountService {
 		return newUser;
 	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department){
-		
+		orgInfoTemp=orgInfoRepository.getByUid(currentUser.getTenantUID());
+		if(orgInfoTemp==null){
+			newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团不存在;");
+			return;
+		}
+		newUser.setSiteId(orgInfoTemp.getId());
 		if(isInsulate){
 			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 			newUser.setHospitalUID(currentUser.getHospitalUID());
 			newUser.setSiteUID(currentUser.getSiteUID());
 			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getHospitalUID());
-			newUser.setHospitalId(orgInfoTemp.getId());
 			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
-			newUser.setSiteId(orgInfoTemp.getId());
 			newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 			newUser.setOrgType(orgInfoTemp.getOrgType());
 			if(getDepartmentID(newUser, department,isInsulate)){
@@ -198,14 +201,10 @@ public class UserAccountService {
 		}
 		newUser.setOrgInfoUID(orgInfoTemp.getUid());
 		newUser.setOrgInfoId(orgInfoTemp.getId());
+		newUser.setHospitalId(orgInfoTemp.getId());
 	}
 	
 	private boolean getInstitutionID(UserAccount newUser,String institution){
-		orgInfoTemp=orgInfoRepository.getByUid(newUser.getTenantUID());
-		if(orgInfoTemp==null){
-			newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团不存在;");
-			return false;
-		}
 		OrgInfo temp=orgInfoRepository.getInstitutionByName(institution,orgInfoTemp.getUid());
 		if(temp==null){
 			if(StringUtils.isNotEmpty(institution)){
@@ -233,7 +232,6 @@ public class UserAccountService {
 			orgInfoTemp=temp;
 		}
 		newUser.setHospitalUID(orgInfoTemp.getUid());
-		newUser.setHospitalId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
@@ -250,7 +248,6 @@ public class UserAccountService {
 			orgInfoTemp=temp;
 		}
 		newUser.setSiteUID(orgInfoTemp.getUid());
-		newUser.setSiteId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
