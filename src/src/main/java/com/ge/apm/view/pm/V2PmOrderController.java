@@ -106,6 +106,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
     }
+
+    public boolean qaStatusCheck(){
+        if("0".equalsIgnoreCase(qaStatus)){
+            return true;
+        }else{
+            return false;
+        }
+    }
 	public boolean isChecked() {
 		Map<String, Boolean> map = this.selectedMap;
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
@@ -116,6 +124,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		}
 		return false;
 	}
+	public void zhangtao(){
+        System.out.println(qaStatus);
+    }
 
     private String qaStatus="0";
 	public void onQaStatusChange(){
@@ -256,7 +267,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 				dptName = selectedAsset.getLocationName();
 			}
 		}
-        pmOrderService.closePM(selectedPmOrder,picList);
+      //  pmOrderService.closePM(selectedPmOrder,picList);
     }
     public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
@@ -668,9 +679,11 @@ public void batchDefineQualify(){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-
+selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
-        cancel();
+        //保养合格的话 去关单
+
+        //cancel();
     }
     public void stagingPmOrder(){
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1070,4 +1083,5 @@ public void batchDefineQualify(){
     public void setTotalManHours(Double totalManHours) {
         this.totalManHours = totalManHours;
     }
+
 }
