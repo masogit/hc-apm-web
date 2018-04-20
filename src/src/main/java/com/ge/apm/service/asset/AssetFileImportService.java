@@ -607,34 +607,57 @@ public class AssetFileImportService {
 
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
 
-        List<SearchFilter> assetFilters = new ArrayList<>();
-
 
         if (!StringUtils.isEmpty(asset.getUid())) {
+            List<SearchFilter> assetFilters = new ArrayList<>();
             assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
+            List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
+            return tempList;
         } else {
+            return Collections.emptyList();
 
-            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-
-            if (!StringUtils.isEmpty(asset.getQrCode())) {
-                assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
-            } else {
-                assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
-
-                if (!StringUtils.isEmpty(asset.getDepartNum())) {
-                    assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-                }
-
-                if (!StringUtils.isEmpty(asset.getFinancingNum())) {
-                    assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
-                }
-            }
+//            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+//            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+//            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
+//        } else {
+//
+//            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+//            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+//            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
+//
+//            if (!StringUtils.isEmpty(asset.getQrCode())) {
+//                assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+//            } else {
+//                assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
+//
+//                if (!StringUtils.isEmpty(asset.getDepartNum())) {
+//                    assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+//                }
+//
+//                if (!StringUtils.isEmpty(asset.getFinancingNum())) {
+//                    assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
+//                }
+//            }
         }
 
-        List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
-        return tempList;
+
+    }
+
+    private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
+        List<SearchFilter> assetFilters = new ArrayList<>();
+        assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
+        assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
+        assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
+        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
+        List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
+        if (resultList.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     private List<UserAccount> getUserInfosByName(String userName) {
@@ -717,6 +740,22 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
+            }
+
+            if (null == newAsset.getDepartNum()) {
+                item.put("status", ImportStatus.CheckFail);
+                result.add(Boolean.FALSE);
+                AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
+            }
+
+            if (newAsset.getUid() == null) {
+                //check depart num to avoid duplicate when update
+                boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+                if (isDuplicate) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 设备编号重复");
+                }
             }
 
             ++row;
