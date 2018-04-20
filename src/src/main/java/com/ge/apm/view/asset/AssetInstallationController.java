@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -455,7 +456,10 @@ public class AssetInstallationController {
     }
     
     public List<String> autoCompleteDept(String query){
-        return deptInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query)).map(OrgInfo::getName).collect(Collectors.toList());
+        List<String> res = deptInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query)
+            || (item.getNamePyCode() == null? false: item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
+        res.sort(new PinYinComparator());
+        return res;
     }
     
     public void onClinicalDeptChange(SelectEvent event){

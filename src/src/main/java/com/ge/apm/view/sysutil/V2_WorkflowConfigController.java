@@ -447,8 +447,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		approveUserList.clear();
 		super.prepareEdit();
 		selectedUserOrg = orgInfoRepository.getByUid(selected.getSiteUID());
-/*		updateDispater();
-		updateApproverList();*/
+		updateDispater();
+		updateApproverList();
 	}
 
 	public void prepareCreate(){

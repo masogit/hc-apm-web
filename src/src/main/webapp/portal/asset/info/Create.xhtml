@@ -238,9 +238,9 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum">
-                                    <p:ajax process="@this" update="#{empty assetInfoController.selected.financingNum ? '':'@(.financingNum)'}"/>
+                                    <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                 </p:inputText>
-                                <p:commandButton actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 3}"
+                                <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 4}"
                                     process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) " icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
                             </h:panelGroup>
 
