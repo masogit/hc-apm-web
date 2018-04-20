@@ -27,6 +27,8 @@ import java.util.*;
 @Component
 public class V2_PmOrderService {
     @Autowired
+    private ServiceRequestMsgRepository msgDao;
+    @Autowired
     protected RestTemplate template;
     @Autowired
     private BiomedGroupRepository groupDao;
@@ -327,6 +329,34 @@ formData.setAttachments(attachment);
             WebUtil.addSuccessMessage("操作成功");
         }
     }
+    public void repairWorkOrderBatch(Date endTime,Double totalManHours,List<V2_PmOrder> pmList,Map<String, Boolean> hmPmOrder) {
+        String token = UserContextService.getAccessToken();
+        List<V2_PmOrder> pmListTmp = new ArrayList<V2_PmOrder>();
+        pmList.stream().forEach(item->{
+            if(hmPmOrder.containsKey(item.getId()) && hmPmOrder.get(item.getId()) == true){
+                hmPmOrder.put(item.getId(),false);
+                pmListTmp.add(item);
+            }
+        });
+        Double averageHours = totalManHours/pmListTmp.size();
+        ArrayList<PmOrderActionForm> formDataList = new ArrayList<PmOrderActionForm>();
+        pmListTmp.stream().forEach(item->{
+            PmOrderActionForm formData = new PmOrderActionForm();
+            formData.setPmOrderId(item.getId());
+            formData.setActionType("repair");
+            formData.setStepId(item.getCurrentStepId());
+            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
+            formData.setManHours(averageHours);
+            item.setCurrentStepName("保养中");
+            formDataList.add(formData);
+        });
+        String res = srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+        if (res==null || !res.contains("OK")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
+        }else{
+            WebUtil.addSuccessMessage("批量完成成功");
+        }
+    }
 
     public void reassignWorkOrder(V2_PmOrder selectedPmOrder, String assigneeId,String comments) {
         String token = UserContextService.getAccessToken();
@@ -438,6 +468,10 @@ formData.setStepId(selectedPmOrder.getCurrentStepId());//Accept
 
     public void setUserDao(UserAccountRepository userDao) {
         this.userDao = userDao;
+    }
+
+    public List<ServiceRequestMsg> getServiceRequestMessageList(String id) {
+        return msgDao.findBySrIdOrderBySendTime(id);
     }
 }
 

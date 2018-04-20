@@ -29,12 +29,13 @@ function mapState2Props(state) {
     depts,
     hospitals,
   } = state
-  return { filterBy, orderBy, period, departments: depts, hospitals, assetTypes }
+  return { filterBy, orderBy, period, departments: depts.depts, hospital: depts.selectedHospital, hospitals: depts.hospitals, assetTypes }
 }
 function mapDispatch2Props(dispatch) {
   return {
     onFilterChange: (type) => (data) => dispatch({ type: 'ProcessAnalysis/update/filter', data: { type, data } }),
-    onPeriodChange: (data) => dispatch({ type: 'ProcessAnalysis/update/period', data })
+    onPeriodChange: (data) => dispatch({ type: 'ProcessAnalysis/update/period', data }),
+    onHospitalChange: (data) => dispatch({ type: 'depts/update/selectedHospital', payload: data.key }),
   }
 }
 
@@ -68,13 +69,11 @@ export class Header extends PureComponent {
   }
   _filtersHospital() {
     let { t, hospitals = [] } = this.props
-    return [
-      { key: 'default_hospital', label: t('default_hospital') },
-    ].concat(hospitals.map(d => ({ key: String(d.id), label: d.name})))
+    return hospitals.map(d => ({ key: String(d.id), label: d.name}))
   }
   render() {
-    let { period, filterBy,
-      onFilterChange, onPeriodChange
+    let { period, filterBy, hospital,
+      onFilterChange, onPeriodChange, onHospitalChange
     } = this.props
     return (<nav id="header" className="header level">
 
@@ -93,10 +92,10 @@ export class Header extends PureComponent {
           { SelectHelper(filterBy['assettype'], this._filtersAssetType(), onFilterChange('assettype')) }
         </div>
         <div className="nav-item">
-          { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
+          { SelectHelper(hospital, this._filtersHospital(), onHospitalChange) }
         </div>
         <div className="nav-item">
-          { SelectHelper(filterBy['hostpital'], this._filtersHospital(), onFilterChange('hospital')) }
+          { SelectHelper(filterBy['dept'], this._filtersDept(), onFilterChange('dept')) }
         </div>
       </div>
     </nav>)

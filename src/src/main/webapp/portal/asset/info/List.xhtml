@@ -402,7 +402,7 @@
                     </div>
 
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton " immediate="true"/>
-                    <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
+                    <p:remoteCommand name="rc2" update="@(.selectCheckBoxHeader)"/>
                 </h:form>
             </div>
         </div>
@@ -430,7 +430,7 @@
                 </p:tree>
             </p:scrollPanel>
         </p:overlayPanel>
-        <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="选择类型">
+        <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="导出二维码">
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display" >
                     <label class="label">选择导出模版</label>
@@ -447,7 +447,7 @@
                 </h:panelGroup>
                 <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.zipFile}" />
+                                <p:fileDownload value="#{assetInfoController.zipFile}" contentDisposition="inline" />
                 </p:commandButton>
                 <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>

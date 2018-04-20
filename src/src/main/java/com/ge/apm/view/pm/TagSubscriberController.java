@@ -51,7 +51,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}*/
 // 关注人tentant下的tag
 	public void takeAssetTags(){
-		//assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
+		//获得的是:和标签绑定的用户的院区下的所有标签
 		assetTags =  assetTagRepository.getTagBySite(userAccountRepository.getById(this.selected.getSubscribeUserId()).getSiteUID());
 
 	}

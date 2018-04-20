@@ -4,6 +4,7 @@ import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.dao.SupplierRepository;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -23,6 +24,7 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.web.WebUtil;
@@ -78,8 +81,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private TreeNode gbTree;
 
     private List<V2_BlobObject> attachList;
-    
+
     private BlobFileService blobService;
+
+    private String vendorName;
+    SupplierRepository supplierDao = null;
+    List<Supplier> suppliersList;
 
     @Override
     protected void init() {
@@ -91,6 +98,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
@@ -130,6 +138,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 //            }
             prepareEdit();
         }
+
+        suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
     }
 
     @Override
@@ -146,7 +156,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         object.setAgent(user.getName());
         object.setArrivalDate(new Date());
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
-        
+
     }
 
     public void applyChange() {
@@ -224,87 +234,85 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         saveEasyItem();
     }
 
-    private Boolean isAvailableQrcode(String qrcode) {
-        if (Strings.isNullOrEmpty(qrcode)) {
-            return true;
-        }
-
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
-        if (qrCodeLib == null) {
-            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
-            return false;
-        }
-        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
-            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-            return false;
-        }
-        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
-            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-            return false;
-        }
-
-        return true;
-    }
-
-    public void submitEasyInstall() {
-        if (installCount == 1 && !Strings.isNullOrEmpty(easyInstallItem.getQrCode())) {
-            if (!isAvailableQrcode(easyInstallItem.getQrCode())) {
-                return;
-            }
-        }
-
-        StringBuilder financingNumErrorMsg = new StringBuilder();
-
-        String prefix = easyInstallItem.getFinancingNum();
-        List<ArrivalListItem> submitItem = getNewInstallAssetList().subList(0, installCount);
-        for (ArrivalListItem item : submitItem) {
-            item.setClinicalDeptUID(easyInstallItem.getClinicalDeptUID());
-            item.setAliasName(easyInstallItem.getAliasName());
-            item.setAssetOwnerUID(easyInstallItem.getAssetOwnerUID());
-            item.setAssetOwnerUID2(easyInstallItem.getAssetOwnerUID2());
-            item.setAssetOwnerUID3(easyInstallItem.getAssetOwnerUID3());
-            item.setClinicalOwnerUid(easyInstallItem.getClinicalOwnerUid());
-            item.setLocationCode(easyInstallItem.getLocationCode());
-            item.setLocationName(easyInstallItem.getLocationName());
-            item.setComments(easyInstallItem.getComments());
-            item.setFinancingNum(easyInstallItem.getFinancingNum());
-            item.setSerialNum(easyInstallItem.getSerialNum());
-            item.setDepartNum(easyInstallItem.getDepartNum());
-
-            if (installCount == 1) {
-                item.setQrCode(easyInstallItem.getQrCode());
-                item.setFinancingNum(easyInstallItem.getFinancingNum());
-            } else {
-                if (generateMap.get("generateQrCode")) {
-                    item.setQrCode(aiService.getNewQrcode(easyInstallItem.getArrivalList().getTenantUID(), easyInstallItem.getArrivalList().getSiteUID()).getQrCode());
-                }
-                if (generateMap.get("generateFinancingNum")) {
-                    String financingNum = gennerateFinancingNum(easyInstallItem, prefix);
-                    if (null != financingNum && financingNum.startsWith("error:")) {
-                        String errorMsg = financingNum.replace("error:", "");
-                        if (financingNumErrorMsg.lastIndexOf(errorMsg) < 0) {
-                            financingNumErrorMsg.append(errorMsg).append("\r\n");
-                        }
-                        financingNum = "";
-                    }
-                    item.setFinancingNum(financingNum);
-                }
-            }
-
-            aiService.saveOrUpdateItem(item);
-            if (!aiService.submitInstallItem(item.getId(), true, generatePmorder)) {
-                WebUtil.addErrorMessage("提交失败");
-                break;
-            }
-        }
-        if (financingNumErrorMsg.length() > 0) {
-            WebUtil.addErrorMessage(financingNumErrorMsg.toString());
-        }
-        WebUtil.addSuccessMessage("提交成功");
-        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-        initEasyInstallItem();
-    }
-
+//    private Boolean isAvailableQrcode(String qrcode) {
+//        if (Strings.isNullOrEmpty(qrcode)) {
+//            return true;
+//        }
+//
+//        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
+//        if (qrCodeLib == null) {
+//            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
+//            return false;
+//        }
+//        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
+//            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
+//            return false;
+//        }
+//        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
+//            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
+//            return false;
+//        }
+//
+//        return true;
+//    }
+//    public void submitEasyInstall() {
+//        if (installCount == 1 && !Strings.isNullOrEmpty(easyInstallItem.getQrCode())) {
+//            if (!isAvailableQrcode(easyInstallItem.getQrCode())) {
+//                return;
+//            }
+//        }
+//
+//        StringBuilder financingNumErrorMsg = new StringBuilder();
+//
+//        String prefix = easyInstallItem.getFinancingNum();
+//        List<ArrivalListItem> submitItem = getNewInstallAssetList().subList(0, installCount);
+//        for (ArrivalListItem item : submitItem) {
+//            item.setClinicalDeptUID(easyInstallItem.getClinicalDeptUID());
+//            item.setAliasName(easyInstallItem.getAliasName());
+//            item.setAssetOwnerUID(easyInstallItem.getAssetOwnerUID());
+//            item.setAssetOwnerUID2(easyInstallItem.getAssetOwnerUID2());
+//            item.setAssetOwnerUID3(easyInstallItem.getAssetOwnerUID3());
+//            item.setClinicalOwnerUid(easyInstallItem.getClinicalOwnerUid());
+//            item.setLocationCode(easyInstallItem.getLocationCode());
+//            item.setLocationName(easyInstallItem.getLocationName());
+//            item.setComments(easyInstallItem.getComments());
+//            item.setFinancingNum(easyInstallItem.getFinancingNum());
+//            item.setSerialNum(easyInstallItem.getSerialNum());
+//            item.setDepartNum(easyInstallItem.getDepartNum());
+//
+//            if (installCount == 1) {
+//                item.setQrCode(easyInstallItem.getQrCode());
+//                item.setFinancingNum(easyInstallItem.getFinancingNum());
+//            } else {
+//                if (generateMap.get("generateQrCode")) {
+//                    item.setQrCode(aiService.getNewQrcode(easyInstallItem.getArrivalList().getTenantUID(), easyInstallItem.getArrivalList().getSiteUID()).getQrCode());
+//                }
+//                if (generateMap.get("generateFinancingNum")) {
+//                    String financingNum = gennerateFinancingNum(easyInstallItem, prefix);
+//                    if (null != financingNum && financingNum.startsWith("error:")) {
+//                        String errorMsg = financingNum.replace("error:", "");
+//                        if (financingNumErrorMsg.lastIndexOf(errorMsg) < 0) {
+//                            financingNumErrorMsg.append(errorMsg).append("\r\n");
+//                        }
+//                        financingNum = "";
+//                    }
+//                    item.setFinancingNum(financingNum);
+//                }
+//            }
+//
+//            aiService.saveOrUpdateItem(item);
+//            if (!aiService.submitInstallItem(item.getId(), true, generatePmorder)) {
+//                WebUtil.addErrorMessage("提交失败");
+//                break;
+//            }
+//        }
+//        if (financingNumErrorMsg.length() > 0) {
+//            WebUtil.addErrorMessage(financingNumErrorMsg.toString());
+//        }
+//        WebUtil.addSuccessMessage("提交成功");
+//        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+//        initEasyInstallItem();
+//    }
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
         if (prifix != null) {
             if (prifix.length() > 3) {
@@ -340,8 +348,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private void initEasyInstallItem() {
         easyInstallItem = getNewInstallAssetList().stream().findAny().orElse(new ArrivalListItem());
-        if(selected.getContractPrice()!=null){
-            easyInstallItem.setPurchasePrice(selected.getContractPrice()/selected.getQuantity());
+        if (selected.getContractPrice() != null) {
+            easyInstallItem.setPurchasePrice(selected.getContractPrice() / selected.getQuantity());
         }
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
@@ -386,19 +394,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
-            item.setMaitanance(easyInstallItem.getMaitanance());
             item.setFunctionGroup(easyInstallItem.getFunctionGroup());
             item.setAssetCode68(easyInstallItem.getAssetCode68());
-            item.setManufactDate(easyInstallItem.getManufactDate());
+            item.setRegistrationNo(easyInstallItem.getRegistrationNo());
+            item.setMaitanance(easyInstallItem.getMaitanance());
             item.setPurchaseDate(easyInstallItem.getPurchaseDate());
             item.setWarrantyDate(easyInstallItem.getWarrantyDate());
-            item.setFactoryWarrantyDate(easyInstallItem.getFactoryWarrantyDate());
-            item.setWarrantyYear(easyInstallItem.getWarrantyYear());
-            item.setTerminateDate(easyInstallItem.getTerminateDate());
             item.setPurchasePrice(easyInstallItem.getPurchasePrice());
-            item.setSalvageValue(easyInstallItem.getSalvageValue());
-            item.setLifecycleInYear(easyInstallItem.getLifecycleInYear());
-            item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
             item.setAssetUsage(easyInstallItem.getAssetUsage());
             item.setCapitalSource(easyInstallItem.getCapitalSource());
             item.setMeasureGrade(easyInstallItem.getMeasureGrade());
@@ -407,6 +409,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setImportEquipment(easyInstallItem.getImportEquipment());
             item.setMeasuringItemCategory(easyInstallItem.getMeasuringItemCategory());
             item.setAccountingCategory(easyInstallItem.getAccountingCategory());
+            item.setSalvageValue(easyInstallItem.getSalvageValue());
+            item.setLifecycleInYear(easyInstallItem.getLifecycleInYear());
+            item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
         });
         itemDao.save(saveList);
         WebUtil.addSuccessMessage("已保存");
@@ -418,6 +423,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         } else {
             return new ArrayList();
         }
+    }
+
+    public void takeWorkOrder(String itemId) {
+        ArrivalListItem item = itemDao.findById(itemId);
+        item.setCurrentPersonUID(UserContextService.getCurrentUserAccount().getUid());
+        aiService.reAssignWorkOrder(item);
+        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
+//        cancel();
     }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
@@ -473,9 +486,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             WebUtil.addErrorMessage("fail to upload file");
         }
     }
-    
-    public List<V2_BlobObject> getAttachList(String type){
-        return attachList==null? null :attachList.stream().filter(item -> item.getBoSubType()==null || item.getBoSubType().equals(type) ).collect(Collectors.toList());
+
+    public List<V2_BlobObject> getAttachList(String type) {
+        return attachList == null ? null : attachList.stream().filter(item -> item.getBoSubType() == null || item.getBoSubType().equals(type)).collect(Collectors.toList());
     }
 
     public List<String> completeGbName(String prefix) {
@@ -486,21 +499,34 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return aiService.getOrgInfoByUid(orgUid);
     }
 
-    public Integer getInstalledCount(){
-        if(arrivalItemList !=null){
-            return arrivalItemList.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus()) ||
-                    ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
-        }else{
+    public Integer getInstalledCount() {
+        if (arrivalItemList != null) {
+            return arrivalItemList.stream().filter(item -> ArrivalListItem.INSTALL_STATUS_FINISHED.equals(item.getInstallStatus())
+                    || ArrivalListItem.INSTALL_STATUS_INSTORAGE.equals(item.getInstallStatus())).collect(Collectors.toList()).size();
+        } else {
             return 0;
         }
     }
-    
-    public void saveArrivalList(){
+
+    public void saveArrivalList() {
         this.save();
     }
-    //geter and setter
 
-    
+    public List<String> autoCompleteVendor(String query) {
+        List<String> res = suppliersList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query) 
+                || (item.getNamePyCode() == null? false: item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
+        res.sort(new PinYinComparator());
+        return res;
+    }
+
+    public void onVendorChange(SelectEvent event) {
+        Supplier vendor = suppliersList.stream().filter(item -> item.getName().equals(vendorName)).findFirst().orElse(null);
+        if (vendor != null) {
+            selected.setVendor(vendor.getId().toString());
+        }
+    }
+
+    //geter and setter
     public OrgInfo getSelectedOrg() {
         return selectedOrg;
     }
@@ -597,6 +623,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     public void setGeneratePmorder(Boolean generatePmorder) {
         this.generatePmorder = generatePmorder;
+    }
+
+    public String getVendorName() {
+        return vendorName;
+    }
+
+    public void setVendorName(String vendorName) {
+        this.vendorName = vendorName;
     }
 
 }

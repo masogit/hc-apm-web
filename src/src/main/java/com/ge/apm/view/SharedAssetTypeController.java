@@ -50,6 +50,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     AssetInfoRepository assetInfoDao = null;
     OrgInfoRepository orgInfoDao = null;
     private String operation;
+    private String createDateFormatTime = null;
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
@@ -176,7 +177,9 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     @Override
     public void delete() {
         if(dao.findAssetIsExist(this.selected.getId()).isEmpty()){
+            String name = selected.getSwapName();
             super.delete();
+            WebUtil.addSuccessMessage("’已成功删除 ‘"+name+"’");
         }
         else{
             WebUtil.addErrorMessage("此调剂设备已在使用，请核实！");
@@ -199,7 +202,7 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     
         List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
         
-        objectList = dao.find();
+        objectList = dao.findbySiteUid(UserContextService.getCurrentUserAccount().getSiteUID());
         
         
         return objectList;
@@ -243,12 +246,8 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
             String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
             OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
             objectList = dao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
-            if(objectList.size()==0){
-                return 0; 
-            }
-            else{
-                return dao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid).size();
-            }
+
+            return objectList.size();
         }
     }
     
@@ -272,10 +271,26 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         this.selectedAccessory = selectedAccessory;
     }
 
+    public void saveAccessory(){
+        List<SharedAssetTypeAccesssory> accessoryList = selected.getAccessoryList();
+        if (accessoryList.size() > 0) {
+            for (int i = 0; i < accessoryList.size(); i++) {
+                SharedAssetTypeAccesssory sata = accessoryList.get(i);
+                if (sata.getName().equals(selectedAccessory.getName())){
+                    accessoryList.remove(sata);
+                    i--;
+                }
+            }
+
+        }
+
+        selected.getAccessoryList().add(selectedAccessory);
+    }
+
     public void prepareCreateAccessory(){
         crudActionName = "Create";
         selectedAccessory = new SharedAssetTypeAccesssory();
-        selected.getAccessoryList().add(selectedAccessory);
+//        selected.getAccessoryList().add(selectedAccessory);
     }
     
     public void prepareEditAccessory(){
@@ -286,5 +301,12 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         if(selectedAccessory!=null)
             selected.getAccessoryList().remove(selectedAccessory);
     }
-    
+
+    public String getCreateDateFormatTime() {
+        return createDateFormatTime;
+    }
+
+    public void setCreateDateFormatTime(String createDateFormatTime) {
+        this.createDateFormatTime = createDateFormatTime;
+    }
 }

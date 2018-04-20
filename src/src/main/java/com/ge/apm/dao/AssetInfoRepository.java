@@ -109,21 +109,22 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Modifying
     @Transactional
     @Query("update AssetInfo ai set ai.swapTypeState = :swapTypeState where ai.id = :id")
-    public void updateAssetInfoSwapTypeState(@Param("swapTypeState")String swapTypeState, @Param("id")Integer id);
+    public void updateAssetInfoSwapTypeState(@Param("swapTypeState") String swapTypeState, @Param("id") Integer id);
+
+    @Modifying
+    @Transactional
+    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid where ai.uid in :assetUids")
+    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids);
+
     public List<AssetInfo> findByClinicalDeptUIDIn(List<String> clinicalDeptUIDs);
 
     @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
-    public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum ,@Param("financingNum") String financingNum ,@Param("qrCode") String qrCode, @Param("siteUID") String siteUID );
-    
-    @Query(value="select o.* from asset_info o limit 1", nativeQuery = true)
-	public AssetInfo findTestRecord();
+    public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum, @Param("financingNum") String financingNum, @Param("qrCode") String qrCode, @Param("siteUID") String siteUID);
+
     
     @Modifying
     @Query("update AssetInfo ai set ai.inventoryStatus=?2 where ai.id in ?1")
     void updateInventoryStatusAndIdIn(List<Integer> assetIds, Integer ORDER_STATUS_DONE_FINISHED);
-
-    
-   // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
 
 //    @Query("select count(1) as totalTimes, ai.assetOwnerId,ai.assetOwnerId2,ai.assetOwnerId3 from AssetInfo ai where ai.assetOwnerId=:assetOwnerId and ai.siteUID=:siteUID "
 //            + "group by ai.assetOwnerId2,ai.assetOwnerId3,ai.assetOwnerId ordey by totalTimes desc")

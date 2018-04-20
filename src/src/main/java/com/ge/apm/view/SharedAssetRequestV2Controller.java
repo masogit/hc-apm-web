@@ -8,6 +8,7 @@ import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.RowEditEvent;
 import org.primefaces.ultima.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,12 +40,6 @@ import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 @ViewScoped
 public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<SharedAssetRequest>{
     private Double total;
-    private Date beginTime;
-    private Date endTime;
-    private Boolean msg;//提示申请科室与当前使用科室不一致字段
-    private String msgMan;
-    private Date msgStartTime;
-    private String accepter;
     private UaaService uuaService;
     private Integer queryIndex=-1;
     UserOrgInfoRepository userOrgDao = null;
@@ -403,42 +398,58 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void onSelectE() throws IOException, ParseException {
-        
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+
         String pageName = "";
-        if(selected.getState() == 8){
+        if(sta == 8){
             pageName = "Edit_1";
-        }else if(selected.getState() == 7 || selected.getState() == 11){
+            selected.setMsgEndTime(this.getTime("归还"));
+            selected.setState(sta);
+            this.save();
+
+        }else if(sta == 7 || sta == 11){
             pageName = "Edit";
-        }else if(selected.getState() == 12 || selected.getState() == 9 || selected.getState() == 10 || selected.getState() == 13){
+        }else if(sta == 12 || sta == 9 || sta == 10 || sta == 13){
             pageName = "Edit_2";
         }
-        selected.setMsgEndTime(this.getTime("归还"));
-        this.save();
+
         String url = "actionName=Edit&selectedid=" + selected.getId();
         url = pageName+".xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+        requestContext.addCallbackParam("pageName", pageName);
     }
     
     public void onSelectC() throws IOException, ParseException {
-        
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+
         String pageName = "";
-        if(selected.getState() == 2){
+        selected.getSartList();
+        if(sta == 2){
             pageName = "Edit_1";
-        }else if(selected.getState() == 1||selected.getState() == 5){
+            selected.setMsgAccepter(this.selected.getApplicant());
+            selected.setMsgBeginTime(this.getTime("借用"));
+            selected.setState(sta);
+            this.save();
+
+        }else if(sta == 1||sta == 5){
             pageName = "Edit";
-        }else if(selected.getState() == 6 || selected.getState() == 3 || selected.getState() == 4 || selected.getState() == 0){
+        }else if(sta == 6 || sta == 3 || sta == 4 || sta == 0){
             pageName = "Edit_2";
         }
-        selected.setMsgAccepter(this.selected.getApplicant());
-        selected.setMsgBeginTime(this.getTime("借用"));
-        this.save();
+
         String url = "actionName=Edit&selectedid=" + selected.getId();
         url = pageName+".xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
+        requestContext.addCallbackParam("pageName", pageName);
+
     }
     
     public String queryBorrowInfo(String assetId){
@@ -459,14 +470,21 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return "";
         }
     }
-    
+
+
      public void getAssetInfoR(Date times) throws ParseException{//查询并插入归还设备信息
+         String uid = selected.getId();
+         SharedAssetRequest realSAR = dao.findById(uid);
+         int sta = realSAR.getState();
+         if (sta != 8){
+             WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+             return;
+         }
+
           List<SharedAssetReqDetail> sardList = selected.getSardList();
           List<AssetInfo> assetInfoList = selected.getInfoList();
           List<SharedAssetReqType> sartList = selected.getSartList();
          
-            String endTime = null;
-            Date endsTime = null;
             String applyAssetInfo = selected.getApplyAssetInfo();
             String Uid = selected.getId();
             List<SharedAssetReqType> applySwapTypeList  = apdDao.findSwapTypeId(Uid);
@@ -487,13 +505,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1){
+                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
                     WebUtil.addWarnMessage("该设备故障，不可借用！");
                     return; 
                 }
                 //在asset_info中判断是否属于 调剂中心科室
                 else if(depts.contains(ClinicalDeptUID)){
-                    WebUtil.addWarnMessage("该设备当前不可归还！");
+                    WebUtil.addWarnMessage("该设备已归还！");
                     return; 
                 }
                 else if(!depts.contains(userOrg.getUid())){
@@ -519,145 +537,57 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         WebUtil.addErrorMessage("获取该设备借用信息有误！");
                                         return; 
                                     }
-                                    detail_list.get(0).setReturnId(Uid);
-                                    detail_list.get(0).setAssetInfoId(infoVo.getUid());
-                                    detail_list.get(0).setAssetName(infoVo.getName());
-                                    detail_list.get(0).setAssetNumber(infoVo.getDepartNum());
-                                    detail_list.get(0).setBorrowDealUid(UserContextService.getCurrentUserAccount().getUid());
-                                    detail_list.get(0).setFinancingNum(infoVo.getFinancingNum());
-                                    detail_list.get(0).setClinicalDeptForReturnUid(this.selected.getClinicalDeptUid());
-                                    detail_list.get(0).setClinicalDeptForReturnName(this.selected.getClinicalDeptName());
+                                    SharedAssetReqDetail sard = detail_list.get(0);
+                                    sard.setReturnId(Uid);
+                                    sard.setAssetInfoId(infoVo.getUid());
+                                    sard.setAssetName(infoVo.getName());
+                                    sard.setAssetNumber(infoVo.getDepartNum());
+                                    sard.setBorrowDealUid(UserContextService.getCurrentUserAccount().getUid());
+                                    sard.setFinancingNum(infoVo.getFinancingNum());
+                                    sard.setClinicalDeptForReturnUid(this.selected.getClinicalDeptUid());
+                                    sard.setClinicalDeptForReturnName(this.selected.getClinicalDeptName());
                                     String swaptypeid = applySwapType.getSharedAssetTypeId();
                                     SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
                                     if(times==null){
                                      //时间往后推
-                                        Calendar calendar = Calendar.getInstance();
-                                        Date date = new Date();
-                                        calendar.setTime(date);
-                                        int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-                                        int month = calendar.get(Calendar.MONTH) + 1;
-                                        String year =  format(date).substring(0, 4);
-                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                                        int minute = calendar.get(Calendar.MINUTE);
-                                        if(minute>=0&&minute<30){
-                                            endTime = year+"-"+month+"-"+day+" "+hour+":"+"00:00";
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            endsTime = dateFormat.parse(endTime);
-//                                            assetDetaiVo.setChargingEndTime(endsTime);
-                                            detail_list.get(0).setChargingEndTime(endsTime);
-                                        }
-                                        else{
-                                            endTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            endsTime = dateFormat.parse(endTime);
-//                                            assetDetaiVo.setChargingEndTime(endsTime);
-                                            detail_list.get(0).setChargingEndTime(endsTime);
-                                        }
+                                        sard.setChargingEndTime(this.setEndTime());
                                     }
                                     else{
-                                        endsTime = times;
-                                        detail_list.get(0).setChargingEndTime(times);
+                                        sard.setChargingEndTime(times);
                                     }
-                                          detail_list.get(0).setChargingType(swapTypeVo.getChargingType());
-                                          detail_list.get(0).setUnitPrice(swapTypeVo.getUnitPrice());
-                                          detail_list.get(0).setUnit(swapTypeVo.getUnit());
-                                        if("次".equals(swapTypeVo.getChargingType())){
-                                            detail_list.get(0).setCountQty(1);
-                                            detail_list.get(0).setCost(swapTypeVo.getUnitPrice());
+                                    sard.setChargingType(swapTypeVo.getChargingType());
+                                    sard.setUnitPrice(swapTypeVo.getUnitPrice());
+                                    sard.setUnit(swapTypeVo.getUnit());
+
+                                    this.setCost(sard);
+
+                                    //附件状态默认全选
+                                    for(SharedAssetTypeAccesssory item:sard.getAccessoryList()){
+                                        if (item.getBorrowStatus()) {
+                                            item.setReturnStatus(true);
                                         }
-                                        else if("小时".equals(swapTypeVo.getChargingType())){
-                                            long nd = 1000 * 24 * 60 * 60;
-                                            long nh = 1000 * 60 * 60;
-                                            long nm = 1000 * 60;
-                                            long diff = endsTime.getTime() - (detail_list.get(0).getChargingBeginTime()).getTime();
-                                            Integer countQty = null;
-                                            //long time = (diff % nd / nh)*2;
-                                            // 计算差多少天
-                                            long day = diff / nd;
-                                            // 计算差多少小时
-                                            long hour = diff % nd / nh;
-                                            // 计算差多少分钟
-                                            long min = diff % nd % nh / nm;
-                                            System.out.println(day);
-                                            System.out.println(hour);
-                                            System.out.println(min);
-                                            countQty = (int)(day*24*60/30+hour*2+min/30);
-                                            detail_list.get(0).setCountQty(countQty);
-                                            detail_list.get(0).setCost(countQty*swapTypeVo.getUnitPrice()/2);
-                                        }
-                                        else{
-                                            Calendar cal1 = Calendar.getInstance();
-                                            cal1.setTime(detail_list.get(0).getChargingBeginTime());
-                                            Calendar cal2 = Calendar.getInstance();
-                                            cal2.setTime(endsTime);
-                                            int day1= cal1.get(Calendar.DAY_OF_YEAR);
-                                            int day2 = cal2.get(Calendar.DAY_OF_YEAR);
-                                            int year1 = cal1.get(Calendar.YEAR);
-                                            int year2 = cal2.get(Calendar.YEAR); 
-                                            Date date1 = detail_list.get(0).getChargingBeginTime();
-                                            Date date2 = endsTime;
-                                            long  between = date2.getTime() - date1.getTime();
-                                            if(year1 != year2)   //同一年
-                                                {
-                                                    int timeDistance = 0 ;
-                                                    for(int i = year1 ; i < year2 ; i ++)
-                                                    {
-                                                        if(i%4==0 && i%100!=0 || i%400==0)    //闰年            
-                                                        {
-                                                            timeDistance += 366;
-                                                        }
-                                                        else    //不是闰年
-                                                        {
-                                                            timeDistance += 365;
-                                                        }
-                                                    }
-                                                    if(between >= (24* 3600000)){
-                                                    detail_list.get(0).setCountQty(timeDistance + (day2-day1));
-                                                    detail_list.get(0).setCost((timeDistance + (day2-day1))*swapTypeVo.getUnitPrice());
-                                                    }
-                                                    else{
-                                                         detail_list.get(0).setCountQty(0);
-                                                         detail_list.get(0).setCost(null);
-                                                    }
-                                                }
-                                            else    //不同年
-                                            {  if(between >= (24* 3600000)){
-                                                    detail_list.get(0).setCountQty(day2-day1);
-                                                    detail_list.get(0).setCost((day2-day1)*swapTypeVo.getUnitPrice());
-                                               }
-                                                else{
-                                                    detail_list.get(0).setCountQty(0);
-                                                    detail_list.get(0).setCost(null);
-                                                }
+                                    }
+                                    sard.setAccessoryList(sard.getAccessoryList());
+
+                                    //asdDao.save(detail_list.get(0));
+                                    if (sardList != null && sardList.size() > 0) {
+                                        for (int i = 0; i < sardList.size(); i++) {
+                                            SharedAssetReqDetail sard2 = sardList.get(i);
+                                            if (sard.getAssetNumber().equals(sard2.getAssetNumber())) {
+                                                selectedSard = sard2;
+                                                WebUtil.addWarnMessage("该设备已录入，请勿重复录入！");
+                                                return;
+                                            }
+                                            if (i == sardList.size()-1) {
+                                                sardList.add(sard);
+                                                selectedSard = sard;
+                                                break;
                                             }
                                         }
-                                        //附件状态默认全选
-                                        for(SharedAssetTypeAccesssory item:detail_list.get(0).getAccessoryList()){
-                                            if (item.getBorrowStatus()) {
-                                                item.setReturnStatus(true);
-                                            }
-                                        }
-                                        detail_list.get(0).setAccessoryList(detail_list.get(0).getAccessoryList());
-                                        
-                                        //asdDao.save(detail_list.get(0));
-                                        if (sardList != null && sardList.size() > 0) {
-                                            for (int i = 0; i < sardList.size(); i++) {
-                                                SharedAssetReqDetail sard = sardList.get(i);
-                                                if (detail_list.get(0).getAssetNumber().equals(sard.getAssetNumber())) {
-                                                    selectedSard = sard;
-                                                    WebUtil.addWarnMessage("该设备已录入，请勿重复录入！");
-                                                    return;
-                                                } 
-                                                if (i == sardList.size()-1) {
-                                                    sardList.add(detail_list.get(0));
-                                                    selectedSard = detail_list.get(0);
-                                                    break;
-                                                }
-                                            }
-                                        }else if(sardList.size() == 0){
-                                            sardList.add(detail_list.get(0));
-                                            selectedSard = detail_list.get(0);
-                                        }
+                                    }else if(sardList.size() == 0){
+                                        sardList.add(sard);
+                                        selectedSard = sard;
+                                    }
                                      
                                     //更改使用科室
 
@@ -694,7 +624,71 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             }
     }
     
-    
+    public void setCost(SharedAssetReqDetail sard){
+        if("次".equals(sard.getChargingType())){
+            sard.setCountQty(1);
+            sard.setCost(sard.getUnitPrice());
+        }
+        else if("小时".equals(sard.getChargingType())){
+            long nd = 1000 * 24 * 60 * 60;
+            long nh = 1000 * 60 * 60;
+            long nm = 1000 * 60;
+            long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
+            Integer countQty = null;
+            // 计算差多少天
+            long day = diff / nd;
+            // 计算差多少小时
+            long hour = diff % nd / nh;
+            // 计算差多少分钟
+            long min = diff % nd % nh / nm;
+            countQty = (int)(day*24*60/30+hour*2+min/30);
+            sard.setCountQty(countQty);
+            sard.setCost(countQty*sard.getUnitPrice()/2);
+        }
+        else{
+            Calendar cal1 = Calendar.getInstance();
+            cal1.setTime(sard.getChargingBeginTime());
+            Calendar cal2 = Calendar.getInstance();
+            cal2.setTime(sard.getChargingEndTime());
+            int day1= cal1.get(Calendar.DAY_OF_YEAR);
+            int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+            int year1 = cal1.get(Calendar.YEAR);
+            int year2 = cal2.get(Calendar.YEAR);
+            Date date1 = sard.getChargingBeginTime();
+            Date date2 = sard.getChargingEndTime();
+            long  between = date2.getTime() - date1.getTime();
+            if(year1 != year2) {  //同一年
+                int timeDistance = 0 ;
+                for(int i = year1 ; i < year2 ; i ++){
+                    if(i%4==0 && i%100!=0 || i%400==0)    //闰年
+                    {
+                        timeDistance += 366;
+                    }
+                    else    //不是闰年
+                    {
+                        timeDistance += 365;
+                    }
+                }
+                if(between >= (24* 3600000)){
+                    sard.setCountQty(timeDistance + (day2-day1));
+                    sard.setCost((timeDistance + (day2-day1))*sard.getUnitPrice());
+                }
+                else{
+                    sard.setCountQty(0);
+                    sard.setCost(null);
+                }
+            }
+            else {  //不同年
+                if(between >= (24* 3600000)){
+                    sard.setCountQty(day2-day1);
+                    sard.setCost((day2-day1)*sard.getUnitPrice());
+                }else{
+                    sard.setCountQty(0);
+                    sard.setCost(null);
+                }
+            }
+        }
+    }
     
     public void onSelectR() throws IOException {
         
@@ -706,56 +700,55 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
     }
+
+    public Date setBeginTime(){
+        Calendar cal = Calendar.getInstance();
+        Date date = new Date();
+        cal.setTime(date);
+        cal.set(Calendar.SECOND,0);
+        int minutes = cal.get(Calendar.MINUTE);
+        if (minutes>=0 && minutes <=30){
+            cal.set(Calendar.MINUTE,30);
+        }else {
+            cal.set(Calendar.MINUTE,0);
+            cal.add(Calendar.HOUR,1);
+        }
+        return cal.getTime();
+    }
+
+    public Date setEndTime(){
+        Calendar cal = Calendar.getInstance();
+        Date date = new Date();
+        cal.setTime(date);
+        cal.set(Calendar.SECOND,0);
+        int minutes = cal.get(Calendar.MINUTE);
+        if (minutes>=0 && minutes <30){
+            cal.set(Calendar.MINUTE,0);
+        }else {
+            cal.set(Calendar.MINUTE,30);
+        }
+        return cal.getTime();
+    }
+
      public Date getTime(String type) throws ParseException{
-            Calendar calendar = Calendar.getInstance();
             if(type=="借用"){
-                Date date = new Date();
-                calendar.setTime(date);
-                int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-                int month = calendar.get(Calendar.MONTH) + 1;
-                String year =  format(date).substring(0, 4);
-                int day = calendar.get(Calendar.DAY_OF_MONTH);
-                int minute = calendar.get(Calendar.MINUTE);
-                if(minute>=0&&minute<30){
-                    String startTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date beginTime = dateFormat.parse(startTime);
-                    return beginTime;
-                }
-                else{
-                    int hours = hour+1;
-                    String startTime = year+"-"+month+"-"+day+" "+hours+":"+"00:00";
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date beginTime = dateFormat.parse(startTime);
-                    return beginTime;
-                }
+                return setBeginTime();
             }
             else{
-                
-                 Date date = new Date();
-                 calendar.setTime(date);
-                 int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-                 int month = calendar.get(Calendar.MONTH) + 1;
-                 String year =  format(date).substring(0, 4);
-                 int day = calendar.get(Calendar.DAY_OF_MONTH);
-                 int minute = calendar.get(Calendar.MINUTE);
-                if(minute>=0&&minute<30){
-                    String endTime = year+"-"+month+"-"+day+" "+hour+":"+"00:00";
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date endsTime = dateFormat.parse(endTime);
-                    return endsTime;
-                }
-                else{
-                    String endTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-                    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date endsTime = dateFormat.parse(endTime);
-                    return endsTime;
-                }
-}
+                return setEndTime();
+            }
             
      }
     
     public void getAssetInfo(Date times,String accepter) throws ParseException{//查询并插入借用设备信息
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+        if (sta != 2){
+            WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+            return;
+        }
+
         List<SharedAssetReqDetail> sardList = selected.getSardList();
         List<AssetInfo> assetInfoList = selected.getInfoList();
         List<SharedAssetReqType> sartList = selected.getSartList();
@@ -778,13 +771,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addWarnMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1){
+                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
                     WebUtil.addWarnMessage("该设备故障，不可借用！");
                     return; 
                 }
                 //在asset_info中判断是否属于 调剂中心科室
                 else if(!depts.contains(ClinicalDeptUID)){
-                    WebUtil.addWarnMessage("该设备当前不可借用！");
+                    WebUtil.addWarnMessage("该设备已借出！");
                     return; 
                 }
                 else if(!depts.contains(userOrg.getUid())){
@@ -814,64 +807,17 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     String swaptypeid = applySwapType.getSharedAssetTypeId();
                                     SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
                                     assetDetaiVo.setSharedAssetTypeId(swaptypeid);
+
+                                    assetDetaiVo.setAccepter(acceptman);
+                                    if (accepter != null && !"".equals(accepter)){
+                                        assetDetaiVo.setAccepter(accepter);
+                                    }
                                     //时间往后推
-                                    if(times==null&&"".equals(accepter)){
-                                        assetDetaiVo.setAccepter(acceptman);
-                                        Calendar calendar = Calendar.getInstance();
-                                        Date date = new Date();
-                                        calendar.setTime(date);
-                                        int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-                                        int month = calendar.get(Calendar.MONTH) + 1;
-                                        String year =  format(date).substring(0, 4);
-                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                                        int minute = calendar.get(Calendar.MINUTE);
-                                        if(minute>=0&&minute<30){
-                                            String startTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            Date beginTime = dateFormat.parse(startTime);
-                                            assetDetaiVo.setChargingBeginTime(beginTime);
-                                        }
-                                        else{
-                                            int hours = hour+1;
-                                            String startTime = year+"-"+month+"-"+day+" "+hours+":"+"00:00";
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            Date beginTime = dateFormat.parse(startTime);
-                                            assetDetaiVo.setChargingBeginTime(beginTime);
-                                        }
+                                    assetDetaiVo.setChargingBeginTime(times);
+                                    if(times==null){
+                                        assetDetaiVo.setChargingBeginTime(this.setBeginTime());
                                     }
-                                    else if(times!=null&&!"".equals(accepter)){
-                                        assetDetaiVo.setChargingBeginTime(times);
-                                        assetDetaiVo.setAccepter(accepter);
-                                    }
-                                    else if(times==null&&!"".equals(accepter)){
-                                        assetDetaiVo.setAccepter(accepter);
-                                        Calendar calendar = Calendar.getInstance();
-                                        Date date = new Date();
-                                        calendar.setTime(date);
-                                        int hour  = calendar.get(Calendar.HOUR_OF_DAY);
-                                        int month = calendar.get(Calendar.MONTH) + 1;
-                                        String year =  format(date).substring(0, 4);
-                                        int day = calendar.get(Calendar.DAY_OF_MONTH);
-                                        int minute = calendar.get(Calendar.MINUTE);
-                                        if(minute>=0&&minute<30){
-                                            String startTime = year+"-"+month+"-"+day+" "+hour+":"+"30:00";
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            Date beginTime = dateFormat.parse(startTime);
-                                            assetDetaiVo.setChargingBeginTime(beginTime);
-                                        }
-                                        else{
-                                            int hours = hour+1;
-                                            String startTime = year+"-"+month+"-"+day+" "+hours+":"+"00:00";
-                                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                                            Date beginTime = dateFormat.parse(startTime);
-                                            assetDetaiVo.setChargingBeginTime(beginTime);
-                                        }
-                                    }
-                                    else{
-                                        assetDetaiVo.setChargingBeginTime(times);
-                                        assetDetaiVo.setAccepter(acceptman);
-                                    }
-                                        
+
                                     //附件状态默认全选
                                     for(SharedAssetTypeAccesssory item:swapTypeVo.getAccessoryList()){
                                         item.setBorrowStatus(true); 
@@ -904,7 +850,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         selectedSard = assetDetaiVo;
                                     }
                                         
-                                    
                                     //更改使用科室
                                     
                                     OrgInfo findByUid = orgInfoDao.findByUid(this.selected.getClinicalDeptUid());
@@ -1047,6 +992,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
      
         selectedSard.setAccessoryList(accessoryList);
+        this.setCost(selectedSard);
     }
 
     
@@ -1068,28 +1014,28 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 
                WebUtil.addWarnMessage("请先添加申请明细，再进行提交！");
                return;
-           } else {
-                String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
-                selected.setClinicalDeptName(name);
-                selected.setApplyTime(new Date());
-                selected.setCreateDate(new Date());
+       } else {
+            String name = orgInfoDao.getByUid(selected.getClinicalDeptUid()).getName();
+            selected.setClinicalDeptName(name);
+            selected.setApplyTime(new Date());
+            selected.setCreateDate(new Date());
 
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                cal.set(Calendar.HOUR_OF_DAY, 0);
-                cal.set(Calendar.MINUTE, 0);
-                cal.set(Calendar.SECOND, 0);
-                cal.set(Calendar.MILLISECOND, 0);
-                cal.add(Calendar.DAY_OF_MONTH, 1);
-                selected.setInvalidTime(cal.getTime());
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(new Date());
+            cal.set(Calendar.HOUR_OF_DAY, 0);
+            cal.set(Calendar.MINUTE, 0);
+            cal.set(Calendar.SECOND, 0);
+            cal.set(Calendar.MILLISECOND, 0);
+            cal.add(Calendar.DAY_OF_MONTH, 1);
+            selected.setInvalidTime(cal.getTime());
 
-                dao.save(selected);
-                apdDao.save(selected.getSartList());
-                String url = "List.xhtml?faces-redirect=true";
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("url", url);
-                return;
-           }
+            dao.save(selected);
+            apdDao.save(selected.getSartList());
+            String url = "List.xhtml?faces-redirect=true";
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("url", url);
+            return;
+       }
        
     }
     
@@ -1155,62 +1101,98 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     
     public void Accept() {
        String uid = selected.getId();
-       int sta = selected.getState();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
        int state = 2;//2借用待交付状态
-       
-       if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
-           dao.updateState(uid, state);
-       }else {
-           WebUtil.addErrorMessage("当前状态不可受理！");
-           return;
-       }
+
+       List<SharedAssetReqType> sartList = selected.getSartList();
+        for (SharedAssetReqType sart : sartList) {
+            if (sart.getExceptQty() == 0){
+                String url = "norespond" ;
+                RequestContext requestContext = RequestContext.getCurrentInstance();
+                requestContext.addCallbackParam("url", url);
+
+                WebUtil.addWarnMessage("设备 '"+sart.getSwapName()+"' 的预计借用数必须大于0！");
+                return;
+            }
+        }
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
+            dao.updateState(uid, state);
+            apdDao.save(sartList);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+            return;
+        }else {
+            WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
+            requestContext.addCallbackParam("url","norespond");
+            return;
+        }
     }
     
     public void AcceptR() {
        String uid = selected.getId();
-       int sta = selected.getState();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
        int state = 8;//2归还待交付状态
-       
+        RequestContext requestContext = RequestContext.getCurrentInstance();
        if(sta  == 7 || sta == 11){//归还待受理状态
            dao.updateState(uid, state);
+           String url = "List.xhtml?faces-redirect=true";
+           requestContext.addCallbackParam("url", url);
+           return;
        }else {
-           WebUtil.addErrorMessage("当前状态不可受理！");
+           WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
+           requestContext.addCallbackParam("url","norespond");
            return;
        }
     }
     
     public void Shelve() {
        String uid = selected.getId();
-       int sta = selected.getState();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
        int state = 5;//5为借用搁置状态
-       
+        RequestContext requestContext = RequestContext.getCurrentInstance();
        if(sta == 1){//借用待受理状态
            dao.updateState(uid, state);
+           String url = "List.xhtml?faces-redirect=true";
+           requestContext.addCallbackParam("url", url);
+           return;
        }else {
            WebUtil.addErrorMessage("当前状态不可搁置！");
+           requestContext.addCallbackParam("url","norespond");
            return;
        }
     }
 
     public void ShelveR() {
         String uid = selected.getId();
-        int sta = selected.getState();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
         int state = 11;//归还搁置状态
-
+        RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 7){//待受理状态
             dao.updateState(uid, state);
+            String url = "List.xhtml?faces-redirect=true";
+            requestContext.addCallbackParam("url", url);
+            return;
         }else {
             WebUtil.addErrorMessage("当前状态不可搁置！");
+            requestContext.addCallbackParam("url","norespond");
             return;
         }
     }
     
     public void deliver() {
-       
-       int sta = selected.getState();
-       int state = 3;//完成交付进入借用待确认状态
-       
-       if(sta == 2){
+
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
+        int state = 3;//完成交付进入借用待确认状态
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+
+        if(sta == 2){
            //处理多用户申请
            String msg = "";
            List<AssetInfo> infoList = selected.getInfoList();
@@ -1218,7 +1200,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            List<SharedAssetReqType> sartList = selected.getSartList();
            if (sardList == null || sardList.size() == 0) {
                String url = "norespond" ;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("url", url);
                WebUtil.addWarnMessage("请录入设备！");
                return;
@@ -1249,10 +1230,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                }
            }
            if (!msg.equals("")) {
-                String url = "norespond" ;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
-                requestContext.addCallbackParam("url", url);
-                
+               requestContext.addCallbackParam("url", "norespond");
                WebUtil.addWarnMessage(msg);
                return;
            } else {
@@ -1264,23 +1242,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                 asdDao.save(selected.getSardList());
                 String url = "List.xhtml?faces-redirect=true";
-                RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("url", url);
                 return;
            }
           
        }else {
-           WebUtil.addErrorMessage("当前状态不可交付！");
+           WebUtil.addErrorMessage("当前不是可交付状态，请返回！");
+           requestContext.addCallbackParam("url", "norespond");
            return;
        }
     }
     
     public void deliverR() {
-       String uid = selected.getId();
-       int sta = selected.getState();
+        String uid = selected.getId();
+        SharedAssetRequest realSAR = dao.findById(uid);
+        int sta = realSAR.getState();
        int state = 9;//完成交付
-       
-       if(sta == 8){//借用待交付
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+
+        if(sta == 8){//借用待交付
           //处理多用户申请
            String msg = "";
            List<AssetInfo> infoList = selected.getInfoList();
@@ -1288,7 +1268,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            List<SharedAssetReqType> sartList = selected.getSartList();
            if (sardList == null || sardList.size() == 0) {
                String url = "norespond" ;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("url", url);
                WebUtil.addWarnMessage("请录入设备！");
                return;
@@ -1320,7 +1299,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            }
            if (!msg.equals("")) {
                 String url = "norespond" ;
-                RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("url", url);
                 
                WebUtil.addWarnMessage(msg);
@@ -1334,34 +1312,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
                 asdDao.save(selected.getSardList());
                 String url = "List.xhtml?faces-redirect=true";
-                RequestContext requestContext = RequestContext.getCurrentInstance();
                 requestContext.addCallbackParam("url", url);
                 return;
            }
        }else {
-           WebUtil.addErrorMessage("当前状态不可交付！");
+           WebUtil.addErrorMessage("当前不是可交付状态，请返回！");
+            requestContext.addCallbackParam("url", "norespond");
            return;
        }
     }
-    public int getSwapQty(){
-        String Uid = this.selectedSart.getSharedAssetTypeId();
-        if(null == Uid||Uid.equalsIgnoreCase("")){
-            return 0;
-        }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            System.out.println(UserContextService.getCurrentUserAccount().getSiteUID());
-            System.out.println(userOrg.getUid());
-            objectList = swapDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
-           if(objectList == null){
-                return 0; 
-            }
-            else{
-                return objectList.size();
-            }
-        }
-    }
+
     public int getSwapQty(String TypeUid,String Uid){
       
         SharedAssetRequest shared = new SharedAssetRequest();
@@ -1382,7 +1342,25 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             return objectList.size();
         }
     }
-    
+    public int getSwapQty(){
+        String Uid = this.selectedSart.getSharedAssetTypeId();
+        if(null == Uid||Uid.equalsIgnoreCase("")){
+            return 0;
+        }else{
+            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
+            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
+            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
+            System.out.println(UserContextService.getCurrentUserAccount().getSiteUID());
+            System.out.println(userOrg.getUid());
+            objectList = swapDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
+            if(objectList == null){
+                return 0;
+            }
+            else{
+                return objectList.size();
+            }
+        }
+    }
     
     //
     private String filterState = null;
@@ -1426,6 +1404,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void saveSart(){
+        if (selectedSart.getApplyQty() == 0){
+            String message = "wrong" ;
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("message", message);
+
+            WebUtil.addWarnMessage("申请数必须大于0！");
+            return;
+        }
         selectedSart.setId(UUID.randomUUID().toString().replace("-", ""));
         String swapName = swapDao.findById(selectedSart.getSharedAssetTypeId()).getSwapName();
         selectedSart.setSwapName(swapName);
@@ -1485,7 +1471,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
        
     }
-    
+    public void onRowEditSart(RowEditEvent event){
+        SharedAssetReqType sart = (SharedAssetReqType) event.getObject();
+        List<SharedAssetReqType> sartList = selected.getSartList();
+        for (SharedAssetReqType sharedAssetReqType : sartList) {
+            if (sharedAssetReqType.getId() == sart.getId()){
+                sharedAssetReqType.setExceptQty(sart.getExceptQty());
+            }
+        }
+
+    }
     
     public void submmit() {
        String uid = selected.getId();
@@ -1580,47 +1575,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
     }
 
-    /**
-     * @return the beginTime
-     */
-    public Date getBeginTime() throws ParseException {
-        return beginTime;
-    }
-
-    /**
-     * @param beginTime the beginTime to set
-     */
-    public void setBeginTime(Date beginTime) {
-        this.beginTime = beginTime;
-    }
-
-    /**
-     * @return the accepter
-     */
-    public String getAccepter() {
-        return accepter;
-    }
-
-    /**
-     * @param accepter the accepter to set
-     */
-    public void setAccepter(String accepter) {
-        this.accepter = accepter;
-    }
-
-    /**
-     * @return the endTime
-     */
-    public Date getEndTime() {
-        return endTime;
-    }
-
-    /**
-     * @param endTime the endTime to set
-     */
-    public void setEndTime(Date endTime) {
-        this.endTime = endTime;
-    }
 
     /**
      * @return the total
@@ -1648,36 +1602,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         this.total = total;
     }
 
-    /**
-     * @return the msg
-     */
-    public Boolean getMsg() {
-        return msg;
+    public Integer getQueryIndex() {
+        return queryIndex;
     }
 
-    /**
-     * @param msg the msg to set
-     */
-    public void setMsg(Boolean msg) {
-        this.msg = msg;
+    public void setQueryIndex(Integer queryIndex) {
+        this.queryIndex = queryIndex;
     }
 
-    /**
-     * @return the msgMan
-     */
-    public String getMsgMan() {
-        return msgMan;
-    }
-
-    /**
-     * @param msgMan the msgMan to set
-     */
-    public void setMsgMan(String msgMan) {
-        this.msgMan = msgMan;
-    }
-
-    
-    
 }
     
     

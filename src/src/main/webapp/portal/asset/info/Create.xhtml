@@ -119,10 +119,12 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}</label>
-                                <p:selectOneMenu id="clinicalDeptName" value="#{assetInfoController.selected.clinicalDeptId}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
+                                <p:selectOneMenu id="clinicalDeptName" value="#{assetInfoController.clinicalDept}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" var="t"  filter="true" filterMatchMode="startsWith" converter="orgInfoConverter">
                                     <p:ajax  listener="#{assetInfoController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInfoService.getClinicalDeptList(assetInfoController.selectedSiteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{assetInfoService.getClinicalDeptListWithEmptyValue(assetInfoController.selectedSiteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -236,9 +238,9 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum">
-                                    <p:ajax process="@this" update="#{empty assetInfoController.selected.financingNum ? '':'@(.financingNum)'}"/>
+                                    <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                 </p:inputText>
-                                <p:commandButton actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 3}"
+                                <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 4}"
                                     process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) " icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
                             </h:panelGroup>
 

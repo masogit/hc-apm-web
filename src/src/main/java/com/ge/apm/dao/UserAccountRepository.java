@@ -129,6 +129,11 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
 
     @Transactional
     @Modifying
+    @Query(value= "update user_account set active_time = null,is_active = false where tenant_uid = ?1 and id not in(select user_id from user_role where role_id = 9)",nativeQuery=true)
+    public void deactiveTenantMembersStatus(String tenantUid);
+
+    @Transactional
+    @Modifying
     @Query(value= "update user_account set active_time= now(),is_active=true where id = ?1",nativeQuery=true)
     public void activeSingleUser(Integer userId);
 
@@ -137,4 +142,21 @@ public interface UserAccountRepository extends GenericRepository<UserAccount> {
     @Modifying
     @Query(value= "update user_account set active_time= null,is_active=false where id = ?1",nativeQuery=true)
     public void deactiveTemporaryUser(Integer userId);
+
+
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and site_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffBySiteUID(String siteUID);
+
+    //    @Query(value= "select * from user_account where id > 0 and hospital_uid=?1 and id not in(select user_id from user_role where role_id=9)",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and hospital_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffByHospitalUID(String hospitalUID);
+
+    //@Query(value= "select * from user_account where id > 0 and institution_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and (r.role_id=3 or r.role_id=2) and institution_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffByInstitutionUID(String InsitiUID);
+
+    //当前租户下的肥临时报修人
+    //@Query(value= "select * from user_account where id > 0 and tenant_uid=?1 and id not in(select user_id from user_role where role_id=9) ",nativeQuery=true)
+    @Query(value= "select u.* from user_account u join user_role r on u.id=r.user_id where u.id > 0 and  (r.role_id=3 or r.role_id=2) and tenant_uid=?1 ",nativeQuery=true)
+    public List<UserAccount> getAssetHeadAndStaffByTenantUID(String tenantUID);
 }

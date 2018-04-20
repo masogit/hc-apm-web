@@ -811,6 +811,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'NeedSite', '院区不能为空!', 'site should not be null !', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'GuestAccountCheckedWarning', '临时报修账号角色不能与其他角色同时存在!', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'GuestAccountNeedToUnCheckWarning', '临时报修账号角色不能与其他角色同时存在!', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'InvalidDateInputFormat', '请输入正确的日期!', '', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceScanhd', '设备扫描量（次）', 'Scan #', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceScanlg', '扫描次数', 'Scan', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'deviceExpohd', '设备曝光量（次）', 'Exposure #', NULL, '-1');
@@ -1338,6 +1339,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('partsType', '2', '医工采购', 'Buy', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('partsType', '3', '外修采购', 'External Buy', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('partsType', '4', '报废设备拆卸', 'Terminated Get', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('partsType', '5', '保修合同配件', 'MSA', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'assetRuleManager', '资产规则管理', 'asset rule manager', NULL, '-1');
 
@@ -1452,3 +1454,15 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmType', '1', '周期', 'Cycle', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmType', '2', '一次性', 'Disposable', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmType', '3', '重测', 'ReSurvey', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetCodeConfig', 'DFQ', '资产编号,设备编号,二维码合一', '', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetCodeConfig', 'DF', '资产编号,设备编号合一', '', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('qaStatus', '0', '合格', 'Pass', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('qaStatus', '1', '不合格', 'Failure', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmTypeWeb', '2', '一次性', 'Disposable', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmTypeWeb', '3', '重测', 'ReSurvey', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'selectedOrg', '所属部门不能为空！', 'selected should not be null！', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SystemConfig', '流程配置项', 'system config', NULL, '-1');

@@ -30,7 +30,7 @@
                             <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class='label'>虚拟电话网</label>
+                            <label class='label'>虚拟网电话</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}"/>
                             <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
@@ -64,7 +64,7 @@
                             <h:outputText value="#{item.swapName}"/>
                         </p:column>
                         <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
-                            <h:outputText value="#{sharedAssetTypeController.getSwapQty(item.sharedAssetTypeId)}"/>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getSwapQty(item.sharedAssetTypeId,item.sharedId)}"/>
                         </p:column>
                         <p:column headerText="申请归还数" sortBy="#{item.expectDate}" >
                             <h:outputText value="#{item.applyQty}"/>
@@ -162,7 +162,7 @@
                 </p:fieldset>
                 <h:panelGroup id="display">
                     <br/>
-                    <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
+                    <!--<p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>-->
                 </h:panelGroup>
             </h:form>
          </div>  

@@ -108,25 +108,24 @@
                                      update="datalistDetail,display" value="提交"  style="float:left"  icon="ui-icon-check" />
 <!--                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.refersR}" action="List?faces-redirect=true" value="取消归还" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 8 }"/>-->
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true" icon="ui-icon-arrow-back"/>
-                   
+                    <script>
+                        function openSwapTypeViewWindow(xhr, status, args) {
+                            var url = args.url;
+                            if (url == "norespond") {
+
+                            } else {
+                                this.location.href = url;
+                            }
+                        }
+
+                    </script>
                 </h:panelGroup>
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
          </div>  
         </div> 
-         <script>
-           
-            function openSwapTypeViewWindow(xhr, status, args) {
-                var url = args.url;
-                if (url == "norespond") {
-                    
-                } else {
-                    this.location.href = url;
-                }
-            }
 
-        </script>
     </ui:define>  
 </ui:composition>
 

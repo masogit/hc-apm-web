@@ -23,7 +23,7 @@
                             <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{userAccountController.orgTree}" selection="#{userAccountController.selectedNode}" var="node" selectionMode="single">
-                                        <p:ajax process="@this" event="select" update=":UserAccountEditForm:selectedUserOrgName" listener="#{userAccountController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                        <p:ajax process="@this" event="select" update=":userAccountTab:UserAccountEditForm:selectedUserOrgName" listener="#{userAccountController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
 
@@ -62,7 +62,7 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{userAccountController.save}" value="#{msg.Save}" update=":UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'UserAccountEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{userAccountController.save}" value="#{msg.Save}" update=":userAccountTab:UserAccountListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'UserAccountEditDialog');"/>
                     &nbsp;&nbsp;
                     <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('UserAccountEditDialog').hide()"/>
                 </h:panelGroup>
