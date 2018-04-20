@@ -35,6 +35,8 @@ import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UploadFileErrorTypeEnum;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserModel;
+import com.ge.apm.domain.UserOrgInfo;
+import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
 
@@ -138,7 +140,7 @@ public class UserAccountService {
 			//create
 			if(isExistsByLoginName(loginName)){
 				existsCount++;
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在;");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在有");
 				return newUser;
 			}
 			//create finally
@@ -170,20 +172,23 @@ public class UserAccountService {
 		return newUser;
 	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department){
+		newUser.setOrgType(0);
 		if(isInsulate){
 			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 			newUser.setHospitalUID(currentUser.getHospitalUID());
-			orgInfoTemp=orgInfoRepository.getHospitalByName(site,currentUser.getHospitalUID());
-			if(getSiteID(newUser, site)){
-				if(getDepartmentID(newUser, department)){
-				}
+			newUser.setSiteUID(currentUser.getSiteUID());
+			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getHospitalUID());
+			newUser.setHospitalId(orgInfoTemp.getId());
+			orgInfoTemp=orgInfoRepository.getByUid(currentUser.getSiteUID());
+			newUser.setSiteId(orgInfoTemp.getId());
+			if(getDepartmentID(newUser, department,isInsulate)){
 			}
 		}
 		else{
 			if(getInstitutionID(newUser, institution)){
 				if(getHospitalID(newUser, hospital)){
 					if(getSiteID(newUser, site)){
-						if(getDepartmentID(newUser, department)){
+						if(getDepartmentID(newUser, department,isInsulate)){
 						}
 					}
 				}
@@ -208,9 +213,10 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
+			newUser.setOrgType(1);
 		}
 		newUser.setInstitutionUID(orgInfoTemp.getUid());
-		newUser.setOrgLevel(1);
+		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		return true;
 	}
 	private boolean getHospitalID(UserAccount newUser,String hospital){
@@ -223,10 +229,11 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
+			newUser.setOrgType(2);
 		}
 		newUser.setHospitalUID(orgInfoTemp.getUid());
 		newUser.setHospitalId(orgInfoTemp.getId());
-		newUser.setOrgLevel(2);
+		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		return true;
 	}
 	private boolean getSiteID(UserAccount newUser,String site){
@@ -239,13 +246,20 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
+			newUser.setOrgType(3);
 		}
 		newUser.setSiteUID(orgInfoTemp.getUid());
 		newUser.setSiteId(orgInfoTemp.getId());
-		newUser.setOrgLevel(3);
+		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		return true;
 	}
-	private boolean getDepartmentID(UserAccount newUser,String department){
+	private boolean getDepartmentID(UserAccount newUser,String department,boolean isInsulate){
+		if(isInsulate){
+			if(StringUtils.isEmpty(department)){
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"科室错误;");
+				return false;
+			}
+		}
 		
 		OrgInfo temp=orgInfoRepository.getDepartmentByName(department,orgInfoTemp.getUid());
 		if(temp==null){
@@ -256,8 +270,9 @@ public class UserAccountService {
 		}
 		else{
 			orgInfoTemp=temp;
+			newUser.setOrgType(4);
 		}
-		newUser.setOrgLevel(4);
+		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		return true;
 	}
 	
@@ -434,7 +449,10 @@ public class UserAccountService {
 			try {
 				user.entryptPassword();
 				userAccountMapper.saveUserAccount(user);
-				userAccountMapper.saveUserRole(user.getId());
+				UserRole userRole=new UserRole();
+				userRole.setRoleId(9);
+				userRole.setUserId(user.getId());
+				userAccountMapper.saveUserRole(userRole);
 				user.setPlainPassword(null);
 				return user;
 			} catch (NoSuchAlgorithmException e) {
@@ -445,7 +463,7 @@ public class UserAccountService {
 	}
 	
 	@Transactional
-	private void createUser(UserAccount user) {
+	public void createUser(UserAccount user) {
 		if(StringUtils.isNotEmpty(user.getUid())){
 			updateUser(user);
 			return;
@@ -456,7 +474,18 @@ public class UserAccountService {
 		try {
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
-			userAccountMapper.saveUserRoleWithRoleId(user.getId(),7);
+			UserRole userRole=new UserRole();
+			userRole.setRoleId(7);
+			userRole.setUserId(user.getId());
+			userAccountMapper.saveUserRole(userRole);
+			UserOrgInfo userOrgInfo=new UserOrgInfo();
+			userOrgInfo.setOrgType(user.getOrgType());
+			userOrgInfo.setOrgUid(user.getOrgInfoUID());
+			userOrgInfo.setUserUid(user.getUid());
+			if(userOrgInfo.getId()==null){
+				userOrgInfo.setId(UUID.randomUUID().toString().replace("-", ""));
+			}
+			userAccountMapper.saveUserOrgInfo(userOrgInfo);
 			user.setPlainPassword(null);
 		} catch (NoSuchAlgorithmException e) {
 			logger.error("create user error : {}", e.getMessage());
