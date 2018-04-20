@@ -407,7 +407,7 @@ public class UserAccountService {
 	}
 	
 	private void addWarnMessage(){
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "成功导入!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
+		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
         FacesContext.getCurrentInstance().addMessage(null, message);
         successCount=0;
         failedCount=0;
