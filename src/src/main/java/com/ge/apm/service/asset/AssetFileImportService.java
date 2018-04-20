@@ -359,6 +359,8 @@ public class AssetFileImportService {
 
         LocalDateTime startTime = LocalDateTime.now();
 
+        boolean isAssetCodeMerged = isAssetCodeMergeConfigured();
+
         OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
@@ -492,26 +494,38 @@ public class AssetFileImportService {
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
+
                 String qrCode = newAsset.getQrCode();
 
-                if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
-                    QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
-                    newAsset.setQrCode(newCode.getQrCode());
-                    if(createAsset(newAsset,isGeneratePmOrder)){
-                        item.put("status", ImportStatus.Created);
-                    }else{
+                if (isAssetCodeMerged) {
+                    String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, orgUid);
+                    if (!"Normal".equals(qrCodeStatus)) {
                         item.put("status", ImportStatus.Failure);
+                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage(qrCodeStatus));
                     }
-                } else if (isAvailableQrcode(qrCode, item)) {
-                    if(createAsset(newAsset,isGeneratePmOrder)){
-                        item.put("status", ImportStatus.Created);
-                    }else{
-                        item.put("status", ImportStatus.Failure);
-                    }
+
                 } else {
-                    item.put("status", ImportStatus.Failure);
+
+                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
+                        QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
+                        newAsset.setQrCode(newCode.getQrCode());
+                        if(createAsset(newAsset,isGeneratePmOrder)){
+                            item.put("status", ImportStatus.Created);
+                        }else{
+                            item.put("status", ImportStatus.Failure);
+                        }
+                    } else if (isAvailableQrcode(qrCode, item)) {
+                        if(createAsset(newAsset,isGeneratePmOrder)){
+                            item.put("status", ImportStatus.Created);
+                        }else{
+                            item.put("status", ImportStatus.Failure);
+                        }
+                    } else {
+                        item.put("status", ImportStatus.Failure);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
+                    }
                 }
+
 
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.Failure);
