@@ -796,9 +796,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
-        accessoryList.forEach(item -> {
+        approvedDetails.forEach(item -> {
             item.setCreatedDate(null);
-            if (null != item.getApproved()) {
+            if (null == item.getApproved()) {
                 item.setApproved(false);
             }
         });
