@@ -82,22 +82,25 @@ class Chart extends React.PureComponent {
           key: 'hospital',
           value: depts.selectedHospital,
           options: depts.hospitals,
+          dropdownMatchSelectWidth: false,
         },
         {
           type: 'select',
           key: 'dept',
           value: filters.dept,
           options: depts.depts,
-          placeholder: '全部科室'
+          placeholder: '全部科室',
+          dropdownMatchSelectWidth: false,
         })
-    }
-    filterOptions.push({
-      type: 'select',
-      key: 'assetType',
-      value: filters.assetType,
-      options: assetTypes,
-      placeholder: '全部设备类型'
-    })
+      }
+      filterOptions.push({
+        type: 'select',
+        key: 'assetType',
+        value: filters.assetType,
+        options: assetTypes,
+        placeholder: '全部设备类型',
+        dropdownMatchSelectWidth: false,
+      })
 
     return (
       <div className={styles['chart']}>

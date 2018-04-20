@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+<ui:include src="captureDataMessageEdit.xhtml" />
+<h:form id="captureDataMessagesListForm">
+	<p:dataTable id="datalist" value="#{captureDataMessagesController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+		selection="#{captureDataMessagesController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true" rowKey="#{item.id}"
+		sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+
+		<p:ajax event="rowSelect" update="editButton deleteButton" />
+		<p:ajax event="filter" listener="#{captureDataMessagesController.onFilter}" />
+
+		<p:column headerText="SystemID" filterBy="#{item.systemId}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.systemId}" />
+		</p:column>
+		<p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.comment}" />
+		</p:column>
+		<p:column headerText="序号" sortBy="#{item.index}" filterMatchMode="EQ">
+			<h:outputText value="#{item.index}" />
+		</p:column>
+		<p:column headerText="生效时间" sortBy="#{item.startDate}">
+			<h:outputText value="#{item.startDate}" />
+		</p:column>
+		<p:column headerText="截止时间" sortBy="#{item.endDate}">
+			<h:outputText value="#{item.endDate}" />
+		</p:column>
+		<p:column headerText="预览广告">
+			<p:commandButton update=":captureDataMessagesTab:displayCaptureDataMessagesContent" oncomplete="PF('captureDataMessagesDlg').show()" icon="fa fa-search"
+				actionListener="#{captureDataMessagesController.setContent(item.id)}" />
+		</p:column>
+
+		<f:facet name="{Toolbar}">
+			<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+				actionListener="#{captureDataMessagesController.prepareCreate}" update=":captureDataMessagesTab:captureDataMessagesEditDlg"
+				oncomplete="PF('captureDataMessagesEditDialog').show()" />
+			<p:commandButton id="editButton" actionListener="#{captureDataMessagesController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+				update=":captureDataMessagesTab:captureDataMessagesEditDlg" oncomplete="PF('captureDataMessagesEditDialog').show()"
+				disabled="#{empty captureDataMessagesController.selected.id}" />
+			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{captureDataMessagesController.delete}"
+				update=":captureDataMessagesTab:captureDataMessagesListForm:datalist" disabled="#{empty captureDataMessagesController.selected.id}">
+				<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+</h:form>
+<p:dialog header="Content" widgetVar="captureDataMessagesDlg" modal="true" resizable="false" draggable="true" appendTo="@(body)" width="750" height="450">
+	<p:outputPanel id="displayCaptureDataMessagesContent">
+		<h:outputText value="#{captureDataMessagesController.getContent()}" escape="false" />
+	</p:outputPanel>
+</p:dialog>
+
+</html>
