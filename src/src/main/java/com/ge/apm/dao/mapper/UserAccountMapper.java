@@ -13,6 +13,8 @@ import com.ge.apm.dao.mapper.provider.UserAccountProvider;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.UserModel;
+import com.ge.apm.domain.UserOrgInfo;
+import com.ge.apm.domain.UserRole;
 
 public interface UserAccountMapper {
 	@Select("select * from user_account")
@@ -60,9 +62,9 @@ public interface UserAccountMapper {
 	@Update("update user_account set telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked} where uid=#{uid}")
 	public void updateUserAccount(UserAccount user);
 
-	@Insert("insert into user_role(user_id,role_id) values (#{userId},9)")
-	public void saveUserRole(Integer userId);
-	
 	@Insert("insert into user_role(user_id,role_id) values (#{userId},#{roleId})")
-	public void saveUserRoleWithRoleId(Integer userId,Integer roleId);
+	public void saveUserRole(UserRole userRole);
+	
+	@Insert("insert into user_org(id,org_uid,user_uid,org_type) values (#{id},#{orgUid},#{userUid},#{orgType})")
+	public void saveUserOrgInfo(UserOrgInfo userOrgInfo);
 } 
