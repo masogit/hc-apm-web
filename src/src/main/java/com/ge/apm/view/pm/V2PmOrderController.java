@@ -107,6 +107,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
     }
 
+    public void xx3(){
+        if(selectedPmOrder.getPlanTime()==null){
+            WebUtil.addErrorMessage("计划时间必填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needplantime", true);
+            return;
+        }
+        if(endTime==null){
+            WebUtil.addErrorMessage("结束时间必须填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needendtime", true);
+            return;
+        }
+
+    }
+
     public boolean qaStatusCheck(){
         if("0".equalsIgnoreCase(qaStatus)){
             return true;
@@ -252,6 +266,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		}
 	}
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
+        if(selectedPmOrder.getPlanTime()==null){
+            WebUtil.addErrorMessage("计划时间必填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needplantime", true);
+            return;
+        }
+        if(endTime==null){
+            WebUtil.addErrorMessage("结束时间必须填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needendtime", true);
+            return;
+        }
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());

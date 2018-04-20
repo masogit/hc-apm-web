@@ -14,7 +14,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">结束保养时间*</label>
@@ -172,7 +172,8 @@
                     <h:panelGroup class="buttonG">
                         <!--<p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>-->
                         <p:commandButton class="x1" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '1'}" actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog')"/>
-                        <p:commandButton class="x2" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '0'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" onclick="PF('createSRDialog').show();PF('pmrepairCompleteDialog').hide()"/>
+                        <p:commandButton class="x2" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '0'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleComplete(xhr, status, args);"/>
+                        <!--<p:commandButton class="x2" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '0'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" ="PF('createSRDialog').show();PF('pmrepairCompleteDialog').hide()"/>-->
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
                         <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1 or v2PmOrderController.accessoryListEmpty()}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
@@ -183,7 +184,7 @@
 
         <p:dialog class ="approveDialogClass" id="approveDialog" widgetVar="approveDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="选择审核人">
             <h:form id="approveDialogForm" >
-                <h:panelGroup id="display2" rendered="#{v2PmOrderController.selectedPmOrder !=null}">
+                <h:panelGroup id="display2" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">审核人</label>
@@ -205,6 +206,30 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+
+            <script>
+                function handleComplete(xhr, status, args) {
+                    if(args.needplantime) {
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate').addClass("ui-state-error");
+                    }
+                    else if(args.needendtime) {
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate1').addClass("ui-state-error");
+                    }else{
+                      /*  handleSubmit(args, 'pmrepairCompleteDialog');
+                        PF('createSRDialog').show()*/
+
+                    }
+                }
+            </script>
+            <!--<script>
+                function handleComplete(xhr, status, args) {
+                    if (args.needComents) {
+                        $('#woTab\\:pmrepairCompleteDialogForm\\:comment').addClass("ui-state-error");
+                    } else {
+                        handleSubmit(args, 'approveDialog');
+                    }
+                }
+            </script>-->
         </p:dialog>
 
         <!--PF('pmrepairCompleteDialog').hide()
