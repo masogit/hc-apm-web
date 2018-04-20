@@ -512,7 +512,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public List<String> autoCompleteVendor(String query) {
-        return suppliersList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)).map(Supplier::getName).collect(Collectors.toList());
+        return suppliersList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query) 
+                || item.getNamePyCode() == null? false: item.getNamePyCode().contains(query.toLowerCase())).map(Supplier::getName).collect(Collectors.toList());
     }
 
     public void onVendorChange(SelectEvent event) {
