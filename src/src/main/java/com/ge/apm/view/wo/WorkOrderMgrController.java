@@ -351,10 +351,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
-            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
-                searchFilters.add(new SearchFilter("serviceRequest.cancelPerson", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
-                searchFilters.add(new SearchFilter("serviceRequest.cancelPerson", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
-            }
+//            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+//                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+//                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
