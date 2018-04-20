@@ -796,6 +796,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
             return;
         }
+        accessoryList.forEach(item -> {
+            item.setCreatedDate(null);
+            if (null != item.getApproved()) {
+                item.setApproved(false);
+            }
+        });
         woService.approveAction(selectedWorkOrder, approvedDetails, comments);
         cancel();
     }
