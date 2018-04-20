@@ -307,6 +307,7 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
+
         if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
             formData.setActionType("simplify");
         }else{
@@ -320,6 +321,7 @@ formData.setAttachments(attachment);
         selectedPmOrder.setCurrentStepName("保养中");
         formData.setDetails(accDetails);
         formData.setCoworkers(coDetails);
+        formData.setQualityChecking(selectedPmOrder.getQualityChecking());
      /*   formData.setManHours(selectedWorkOrder.getManHours());
         formData.setOtherExpense(selectedWorkOrder.getOtherExpense());*/
         String res = srApi.invokePmOrderAction(token,formData,"repair",selectedPmOrder.getId());
