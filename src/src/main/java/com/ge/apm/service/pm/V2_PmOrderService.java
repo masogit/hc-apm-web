@@ -349,6 +349,7 @@ formData.setAttachments(attachment);
             formData.setStepId(item.getCurrentStepId());
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
             formData.setManHours(averageHours);
+            formData.setPlanTime(item.getPlanTime().toString());
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
