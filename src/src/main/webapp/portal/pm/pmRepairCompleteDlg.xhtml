@@ -25,11 +25,10 @@
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-
-                                <label class="label">#{msg.manhours}*</label>
-                                <p:inputText id="manHoursId" value="#{v2PmOrderController.selectedPmOrder.manHours}"   minValue="0" maxValue="999" requiredMessage="工时(小时)#{msg.ValidationRequire}"/>
+                                <label class="label">#{msg.manhours}**</label>
+                                <p:inputNumber id="manHoursId" validatorMessage="工时不能小于0.01" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}">
+                                </p:inputNumber>
                             </h:panelGroup>
-
                         </p:panelGrid>
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
