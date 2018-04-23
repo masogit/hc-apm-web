@@ -12,7 +12,6 @@ import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ import webapp.framework.dao.SearchFilter;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -118,7 +116,7 @@ public class AssetCreateService {
         return orgDao.findBySearchFilter(OrgInfoFilters);
     }
 
-    public Boolean CreateAeest(AssetInfo assetInfo,Boolean isGeneratePmOrder) {
+    public Boolean createAsset(AssetInfo assetInfo, Boolean isGeneratePmOrder) {
         boolean isNew = assetInfo.getId()==null;
         if(null == assetDao.save(assetInfo)){
             return false;

@@ -9,15 +9,18 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BrandRepository;
 import com.ge.apm.dao.GbCodeRepository;
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.google.common.base.Strings;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -28,11 +31,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import webapp.framework.dao.SearchFilter;
 
 /**
  *
@@ -193,7 +191,7 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
-        Boolean res = acService.CreateAeest(assetInfo, isGeneratePmOrder);
+        Boolean res = acService.createAsset(assetInfo, isGeneratePmOrder);
         if(null!=isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
             WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
         }

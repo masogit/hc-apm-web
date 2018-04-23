@@ -504,6 +504,12 @@ public class AssetFileImportService {
                         AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage(qrCodeStatus));
                     }
 
+                    if(createAsset(newAsset,isGeneratePmOrder)){
+                        item.put("status", ImportStatus.Created);
+                    }else{
+                        item.put("status", ImportStatus.Failure);
+                    }
+
                 } else {
 
                     if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
@@ -601,7 +607,7 @@ public class AssetFileImportService {
 
     @Transactional
     Boolean createAsset(AssetInfo asset, Boolean isGeneratePmOrder) {
-        if(!assetCreateService.CreateAeest(asset,isGeneratePmOrder)){
+        if(!assetCreateService.createAsset(asset,isGeneratePmOrder)){
             return false;
         }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
