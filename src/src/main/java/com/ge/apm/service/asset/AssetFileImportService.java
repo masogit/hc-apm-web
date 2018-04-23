@@ -55,7 +55,6 @@ public class AssetFileImportService {
 
     private Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     private String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-    private String orgUid = UserContextService.getCurrentUserAccount().getSiteUID();
     public List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
     public List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
     public List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
@@ -90,15 +89,16 @@ public class AssetFileImportService {
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
     @Autowired
     ConfigService configService;
-    
+
     private UserContextService userContextService=WebUtil.getBean(UserContextService.class);
+
+    private OrgInfo selectedOrgToImport;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 4;
         int dataRow = 5;
-        OrgInfo currentOrg = orgDao.getByUid(orgUid);
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, ++dataRow)) {
             OrgInfo org = new OrgInfo();
@@ -110,16 +110,16 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-            org.setHospitalId(currentOrg.getId());
-            org.setParentOrg(currentOrg);
-            org.setSiteId(currentOrg.getSiteId());
+            org.setHospitalId(selectedOrgToImport.getId());
+            org.setParentOrg(selectedOrgToImport);
+            org.setSiteId(selectedOrgToImport.getSiteId());
 
-            org.setParentUID(orgUid);
-            org.setHospitalUID(currentOrg.getHospitalUID());
-            org.setTenantUID(currentOrg.getTenantUID());
-            org.setInstitutionUID(currentOrg.getInstitutionUID());
-            org.setSiteUID(currentOrg.getSiteUID());
-            org.setOrgLevel(currentOrg.getOrgLevel());
+            org.setParentUID(selectedOrgToImport.getUid());
+            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            org.setTenantUID(selectedOrgToImport.getTenantUID());
+            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            org.setSiteUID(selectedOrgToImport.getSiteUID());
+            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
             org.setOrgType(4);
 
             Map<String, Object> map = new LinkedHashMap();
@@ -158,8 +158,6 @@ public class AssetFileImportService {
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
         int dataRow = 7;
-
-        OrgInfo currentOrg = orgDao.getByUid(orgUid);
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, ++dataRow)) {
             try{
@@ -275,13 +273,13 @@ public class AssetFileImportService {
 
 
                 if (isNewAsset) {
-                    asset.setSiteId(currentOrg.getSiteId());
-                    asset.setHospitalId(currentOrg.getId());
+                    asset.setSiteId(selectedOrgToImport.getSiteId());
+                    asset.setHospitalId(selectedOrgToImport.getId());
 
-                    asset.setTenantUID(currentOrg.getTenantUID());
-                    asset.setHospitalUID(currentOrg.getHospitalUID());
-                    asset.setInstitutionUID(currentOrg.getInstitutionUID());
-                    asset.setSiteUID(currentOrg.getSiteUID());
+                    asset.setTenantUID(selectedOrgToImport.getTenantUID());
+                    asset.setHospitalUID(selectedOrgToImport.getHospitalUID());
+                    asset.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+                    asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
                     asset.setIsValid(true);
 //                    asset.setStatus(1);
@@ -361,7 +359,6 @@ public class AssetFileImportService {
 
         boolean isAssetCodeMerged = isAssetCodeMergeConfigured();
 
-        OrgInfo currentOrg = orgDao.getByUid(orgUid);
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
             if (null == orgs || orgs.isEmpty()) {
@@ -460,12 +457,12 @@ public class AssetFileImportService {
                 List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
                 if (null == supplierList || supplierList.isEmpty()) {
                     Supplier newSupplier = new Supplier();
-                    newSupplier.setSiteId(currentOrg.getSiteId());
+                    newSupplier.setSiteId(selectedOrgToImport.getSiteId());
                     newSupplier.setName(newAsset.getVendor());
-                    newSupplier.setTenantUID(currentOrg.getTenantUID());
-                    newSupplier.setHospitalUID(currentOrg.getHospitalUID());
-                    newSupplier.setInstitutionUID(currentOrg.getInstitutionUID());
-                    newSupplier.setSiteUID(currentOrg.getSiteUID());
+                    newSupplier.setTenantUID(selectedOrgToImport.getTenantUID());
+                    newSupplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+                    newSupplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+                    newSupplier.setSiteUID(selectedOrgToImport.getSiteUID());
                     supplierDao.save(newSupplier);
                     newAsset.setSupplierId(newSupplier.getId());
                     newAsset.setVendor(newAsset.getVendor());
@@ -498,7 +495,7 @@ public class AssetFileImportService {
                 String qrCode = newAsset.getQrCode();
 
                 if (isAssetCodeMerged) {
-                    String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, orgUid);
+                    String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
                     if (!"Normal".equals(qrCodeStatus)) {
                         item.put("status", ImportStatus.Failure);
                         AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage(qrCodeStatus));
@@ -513,7 +510,7 @@ public class AssetFileImportService {
                 } else {
 
                     if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
-                        QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
+                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
                         newAsset.setQrCode(newCode.getQrCode());
                         if(createAsset(newAsset,isGeneratePmOrder)){
                             item.put("status", ImportStatus.Created);
@@ -557,12 +554,12 @@ public class AssetFileImportService {
             return true;
         }
 
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,orgUid);
+        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
         if (qrCodeLib == null) {
             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
             return false;
         }
-        if (!qrCodeLib.getSiteUID().equals(orgUid)) {
+        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
@@ -622,7 +619,7 @@ public class AssetFileImportService {
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
-        OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+        OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrgToImport.getUid()));
         OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, org.getName()));
         return orgDao.findBySearchFilter(OrgInfoFilters);
@@ -669,6 +666,7 @@ public class AssetFileImportService {
 
     private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
         List<SearchFilter> assetFilters = new ArrayList<>();
+        String orgUid = selectedOrgToImport.getUid();
         assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
@@ -872,7 +870,7 @@ public class AssetFileImportService {
      */
     private boolean isAssetCodeMergeConfigured() {
 
-        WorkflowConfig config = configService.findConfigBySite(orgUid);
+        WorkflowConfig config = configService.findConfigBySite(selectedOrgToImport.getUid());
         if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
             return true;
         } else {
@@ -881,4 +879,7 @@ public class AssetFileImportService {
 
     }
 
+    public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
+        this.selectedOrgToImport = selectedOrgToImport;
+    }
 }
