@@ -770,7 +770,7 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
-            if (null == newAsset.getDepartNum()) {
+            if (StringUtils.isEmpty(newAsset.getDepartNum())) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
