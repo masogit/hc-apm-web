@@ -349,7 +349,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void submitAppvalPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        accessoryList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> {
+            item.setCreatedDate(null);
+            if (null != item.getApproved() && !item.getApproved()) {
+                item.setApproved(null);
+            }
+        });
         pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler,comments);
         cancel();
     }
@@ -597,9 +602,22 @@ public void batchDefineQualify(){
 
     }
     public void approvePMorder(){
-        if(selectedPmOrder!=null)
-            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
+        if(selectedPmOrder!=null){
+            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
+            if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
+                WebUtil.addErrorMessage("审核不通过原因必须填写");
+                RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
+                return;
+            }
+            approvedDetails.forEach(item -> {
+                item.setCreatedDate(null);
+                if (null == item.getApproved()) {
+                    item.setApproved(false);
+                }
+            });
             pmOrderService.approvePMorder(selectedPmOrder,approvedDetails,this.comments);
+        }
+
     }
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
