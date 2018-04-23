@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -166,6 +167,9 @@ public class UserAccountService {
 			user.setTelephone(newUser.getTelephone());
 			user.setName(newUser.getName());
 			user.setIsActive(newUser.getIsActive());
+			if(user.getIsActive()){
+				user.setActiveTime(new Date());
+			}
 			user.setIsLocked(newUser.getIsLocked());
 			return user;
 		}
@@ -389,6 +393,9 @@ public class UserAccountService {
 				newUser.setEmail(email);
 				newUser.setTelephone(telephone);
 				newUser.setIsActive(isActive);
+				if(isActive){
+					newUser.setActiveTime(new Date());
+				}
 				newUser.setIsLocked(isLocked);
 //				newUser.setUserRoleList(userRoleList);
 				newUser.setUid(UUID);
@@ -415,7 +422,13 @@ public class UserAccountService {
 	}
 	
 	private void addWarnMessage(){
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
+		FacesMessage message=null;
+		if(failedCount>0){
+			message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
+		}
+		else{
+			message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
+		}
         FacesContext.getCurrentInstance().addMessage(null, message);
         successCount=0;
         failedCount=0;
@@ -465,6 +478,9 @@ public class UserAccountService {
 		user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
 		//TODO nickName
 		try {
+			user.setCreatedBy(currentUser.getLoginName());
+			user.setCreatedDate(new Date());
+			user.setPasswordErrorCount(0);
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
 			UserRole userRole=new UserRole();
@@ -488,6 +504,8 @@ public class UserAccountService {
 	private void updateUser(UserAccount user) {
 		//TODO nickName
 		try {
+			user.setLastModifiedBy(currentUser.getLoginName());
+			user.setLastModifiedDate(new Date());
 			userAccountMapper.updateUserAccount(user);
 		} catch (Exception e) {
 			logger.error("update user error : {}", e.getMessage());
