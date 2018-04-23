@@ -83,6 +83,7 @@ class Chart extends React.PureComponent {
           value: depts.selectedHospital,
           options: depts.hospitals,
           dropdownMatchSelectWidth: false,
+          allowClear: false,
         },
         {
           type: 'select',
@@ -91,6 +92,7 @@ class Chart extends React.PureComponent {
           options: depts.depts,
           placeholder: '全部科室',
           dropdownMatchSelectWidth: false,
+          allowClear: false,
         })
       }
       filterOptions.push({
@@ -100,6 +102,7 @@ class Chart extends React.PureComponent {
         options: assetTypes,
         placeholder: '全部设备类型',
         dropdownMatchSelectWidth: false,
+        allowClear: false,
       })
 
     return (

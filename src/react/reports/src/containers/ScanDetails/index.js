@@ -33,6 +33,7 @@ class ScanDetails extends React.PureComponent {
           value: depts.selectedHospital,
           options: depts.hospitals,
           dropdownMatchSelectWidth: false,
+          allowClear: false,
         },
         {
           type: 'select',
@@ -40,6 +41,7 @@ class ScanDetails extends React.PureComponent {
           value: filters.dept,
           options: depts.depts,
           placeholder: '全部科室',
+          allowClear: false,
           dropdownMatchSelectWidth: false,
 
         },

@@ -157,7 +157,7 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "generate_method")
     private Integer generateMethod;//资产编码生成方式
 
-    @Column(name="format",columnDefinition = "CHAR(10)")
+    @Column(name="format")
     private String format;//初始流水号
 
     @Column(name = "asset_seria_num_level")
