@@ -37,8 +37,8 @@
                         <h:panelGroup>
                             <label class='label'>计价方式</label>
                             <p:selectOneRadio id="chargingType" required="true"  value="#{sharedAssetTypeController.selected.chargingType}" requiredMessage="计价方式 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="小时" itemValue="小时" />
-                                <f:selectItem itemLabel="自然小时" itemValue="自然小时" />
+                                <f:selectItem itemLabel="小时(半点/整点)" itemValue="小时(半点/整点)" />
+                                <!--<f:selectItem itemLabel="自然小时" itemValue="自然小时" />-->
                                 <f:selectItem itemLabel="天" itemValue="天" />
                                 <f:selectItem itemLabel="次" itemValue="次" />
                             </p:selectOneRadio>

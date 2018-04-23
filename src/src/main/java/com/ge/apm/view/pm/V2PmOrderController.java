@@ -106,6 +106,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
     }
+
+
 	public boolean isChecked() {
 		Map<String, Boolean> map = this.selectedMap;
 		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
@@ -132,6 +134,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return true;
 	}
     public void prepareAproval(String woid) {
+	    comments=null;
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
@@ -240,7 +243,35 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 			needConfirmTime = currentStatus == 2 && selected.getAssetInfo().getStatus() != 2;
 		}
 	}
+
+	public boolean requiredCheck(){
+        if(selectedPmOrder.getManHours()==null && endTime==null){
+            WebUtil.addErrorMessage("工时必填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needManhours", true);
+            WebUtil.addErrorMessage("结束时间必须填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needendtime", true);
+            return false;
+        }else if (endTime ==null){
+            WebUtil.addErrorMessage("结束时间必须填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needendtime", true);
+            return false;
+        }else if (selectedPmOrder.getManHours()==null){
+            WebUtil.addErrorMessage("工时必填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needManhours", true);
+            return false;
+        }
+
+        if(selectedPmOrder.getPlanTime()==null){
+            WebUtil.addErrorMessage("计划完成时间必须填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needplanTime", true);
+            return false;
+        }
+        return true;
+    }
     public void createServiceRequest(V2_PmOrder selectedPmOrder) {
+        if(!requiredCheck()){
+            return;
+        }
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
@@ -256,7 +287,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 				dptName = selectedAsset.getLocationName();
 			}
 		}
-        pmOrderService.closePM(selectedPmOrder,picList);
+      //  pmOrderService.closePM(selectedPmOrder,picList);
     }
     public void saveServiceRequest() {
         if (selectedAsset.getStatus() == 4) {
@@ -319,7 +350,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void submitAppvalPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        accessoryList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> {
+            item.setCreatedDate(null);
+            if (null != item.getApproved() && !item.getApproved()) {
+                item.setApproved(null);
+            }
+        });
         pmOrderService.submitWorkOrder(selectedPmOrder, accessoryList,approvaler,comments);
         cancel();
     }
@@ -567,12 +603,28 @@ public void batchDefineQualify(){
 
     }
     public void approvePMorder(){
-        if(selectedPmOrder!=null)
-            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
+        if(selectedPmOrder!=null){
+            approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(true));
+            if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
+                WebUtil.addErrorMessage("审核不通过原因必须填写");
+                RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
+                return;
+            }
+            approvedDetails.forEach(item -> {
+                item.setCreatedDate(null);
+                if (null == item.getApproved()) {
+                    item.setApproved(false);
+                }
+            });
             pmOrderService.approvePMorder(selectedPmOrder,approvedDetails,this.comments);
+        }
+
     }
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
+       if(selectedPmOrder.getManHours()==null){
+            selectedPmOrder.setManHours(0.1);
+       }
        confirmedUpDate = null;
        endTime=selectedPmOrder.getEndTime();
        planTime=selectedPmOrder.getPlanTime();
@@ -654,23 +706,25 @@ public void batchDefineQualify(){
     }
     public void repairPmOrderBatch() {
         pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
+        this.totalManHours =null;
+        this.endTime=null;
     }
 
 
     public void repairPmOrder() {
-        if(endTime==null){
-            WebUtil.addErrorMessage("结束时间"+WebUtil.getMessage("ValidationRequire"));
-        }
-       /* if(planTime==null){
-            WebUtil.addErrorMessage("计划完成时间"+WebUtil.getMessage("ValidationRequire"));
-        }*/
+
+       if(!requiredCheck()){
+           return;
+       }
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-
+selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
-        cancel();
+        //保养合格的话 去关单
+
+        //cancel();
     }
     public void stagingPmOrder(){
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -1070,4 +1124,5 @@ public void batchDefineQualify(){
     public void setTotalManHours(Double totalManHours) {
         this.totalManHours = totalManHours;
     }
+
 }

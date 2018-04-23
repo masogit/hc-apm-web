@@ -164,7 +164,7 @@
                     </p:dataGrid>
 
                     <h:panelGroup >
-                        <label class="label">审批通知消息</label>
+                        <label class="label">保养工单消息</label>
                         <p:dataList value="#{v2PmOrderController.getServiceRequestMessageList(v2PmOrderController.selected.id)}" var="msgItem" rendered="#{not empty v2PmOrderController.getServiceRequestMessageList(v2PmOrderController.selected.id)}">
                             <h:outputText value="#{msgItem.sendTime}" >
                                 <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
