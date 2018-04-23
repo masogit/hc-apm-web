@@ -702,6 +702,8 @@ public void batchDefineQualify(){
     }
     public void repairPmOrderBatch() {
         pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
+        this.totalManHours =null;
+        this.endTime=null;
     }
 
 
