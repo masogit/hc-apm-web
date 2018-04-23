@@ -1,12 +1,14 @@
 @import "_theme";
 
+$antd-border-color: #d9d9d9;
+
 .layout-compact .layout-wrapper {
 
   px-dropdown {
     .dropcell.px-dropdown {
-      border-radius: 1rem;
-      background-color: transparent;
-      border: 1px solid $text-color-default;
+      border-radius: 3px;
+      background-color: white;
+      border: 1px solid $antd-border-color !important;
 
       &:hover {
         border-color: $highlight-color;
@@ -14,7 +16,7 @@
           color: $highlight-color;
         }
         .dropcell.px-dropdown {
-          border-color: $highlight-color
+          border-color: $highlight-color;
         }
       }
     }
@@ -24,12 +26,12 @@
     }
 
     .px-dropdown--content {
-      margin-top: .5rem;
+      margin-top: .3rem;
       color: $text-color-default;
-      background: $main-bg-color;
+      background: white;
       text-align: left;
-      border-radius: 15px;
-      border: 1px solid #595959;
+      border-radius: 3px;
+      border: 1px solid $antd-border-color !important;
     }
 
     .px-dropdown--listitem:hover {
@@ -40,8 +42,10 @@
 
   px-datetime-field {
     .dt-text-field {
-      border-radius: 1rem;
-      padding: .4rem .8rem;
+      background-color: white;
+      border-radius: 3px;
+      padding: .3rem .5em;
+      border: 1px solid $antd-border-color !important;
     }
   }
 
