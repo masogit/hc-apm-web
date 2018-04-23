@@ -19,8 +19,8 @@
 							</p:selectOneRadio>
 							<label class="label">SystemID</label>
 							<p:inputText value="#{captureDataMessagesController.selected.systemId}" required="true" requiredMessage="SystemID不能为空">
-							
-								<p:ajax event="blur" update="@this" listener="#{captureDataMessagesController.checkSystemId()}"/>
+
+								<p:ajax event="blur" update="@this" listener="#{captureDataMessagesController.checkSystemId()}" />
 							</p:inputText>
 							<label class="label">备注</label>
 							<p:inputText value="#{captureDataMessagesController.selected.comment}" />
@@ -42,7 +42,7 @@
 				<div class="ui-g-9">
 					<h:panelGroup>
 						<label class="label">广告内容</label>
-						<p:textEditor value="#{captureDataMessagesController.selected.content}" height="400" />
+						<p:textEditor value="#{captureDataMessagesController.selected.content}" height="350" />
 					</h:panelGroup>
 				</div>
 			</div>
