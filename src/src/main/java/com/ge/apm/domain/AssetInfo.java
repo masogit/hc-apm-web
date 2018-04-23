@@ -14,8 +14,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -676,7 +674,10 @@ public class AssetInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        if (!StringUtils.isEmpty(name)) {
+            this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        }
+
     }
 
     public String getAliasName() {
@@ -733,7 +734,10 @@ public class AssetInfo implements Serializable {
 
     public void setManufacture(String manufacture) {
         this.manufacture = manufacture;
-        this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        if (!StringUtils.isEmpty(manufacture)) {
+            this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        }
+
     }
 
     public String getVendor() {
