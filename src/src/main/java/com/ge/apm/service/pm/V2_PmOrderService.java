@@ -289,10 +289,17 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     }*/
 
 
-    public void approvePMorder(V2_PmOrder selectedPmOrder,Object accessList,String comments){
+    public void approvePMorder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessList,String comments){
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setActionType("pass");
+        String actionType =null;
+        if(accessList.stream().allMatch(item->item.getApproved().toString().equalsIgnoreCase("true")))
+            actionType="pass";
+        else if(accessList.stream().allMatch(item->item.getApproved().toString().equalsIgnoreCase("false")))
+                actionType="reject";
+            else
+                actionType="partial";
+        formData.setActionType(actionType);
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         formData.setComments(comments);
         formData.setDetails(accessList);
@@ -307,6 +314,7 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     public void repairWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accDetails, List<V2_WorkOrderCoworker> coDetails,Date endTime,Date planTime,List<V2_BlobObject> attachment) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
+
         if(selectedPmOrder.getSimplify()!=null && selectedPmOrder.getSimplify()==true){
             formData.setActionType("simplify");
         }else{
@@ -320,6 +328,7 @@ formData.setAttachments(attachment);
         selectedPmOrder.setCurrentStepName("保养中");
         formData.setDetails(accDetails);
         formData.setCoworkers(coDetails);
+        formData.setQualityChecking(selectedPmOrder.getQualityChecking());
      /*   formData.setManHours(selectedWorkOrder.getManHours());
         formData.setOtherExpense(selectedWorkOrder.getOtherExpense());*/
         String res = srApi.invokePmOrderAction(token,formData,"repair",selectedPmOrder.getId());
@@ -347,6 +356,7 @@ formData.setAttachments(attachment);
             formData.setStepId(item.getCurrentStepId());
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
             formData.setManHours(averageHours);
+            formData.setPlanTime(item.getPlanTime().toString());
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });

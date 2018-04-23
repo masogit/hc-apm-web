@@ -19,4 +19,7 @@ public interface UnstructuredDataCollectionRepository extends GenericRepositoryU
     public Integer getCountByTemplate(String templateId);
     
     public List<UnstructuredDataCollection> findByBoUuid(String boUuid);
+
+    @Query(value = "select u from UnstructuredDataCollection u where u.id=?1")
+    public UnstructuredDataCollection findByUid(String id);
 }
