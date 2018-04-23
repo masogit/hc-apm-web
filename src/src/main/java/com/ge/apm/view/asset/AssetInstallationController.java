@@ -97,7 +97,7 @@ public class AssetInstallationController {
         if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
         }
-        if(Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())){
+        if(!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())){
             OrgInfo org = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());
             deptName = org==null? null:org.getName();
         }
