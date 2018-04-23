@@ -127,6 +127,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
+                vendorName = supplier==null? null:supplier.getName();
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
