@@ -66,7 +66,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
 		msgModeList = fieldMsg.getFieldValueList("focusOption");
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
-		//获取当前租户下的所有用户
+		//获取当前租户下的所有用户 --获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 
 
@@ -130,6 +130,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
+		System.out.println(this.selected);
 		this.selected.setReceiveMsgMode(null);
 		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(currentUser.getSiteUID(), this.selected.getSubscribeUserId());
 	}

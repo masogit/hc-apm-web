@@ -194,8 +194,10 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			}else if(orgType == 3){
 				approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
 			}
+			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
 		}else{
 			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
+			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
 			//return userCommonService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
 		}
 	}

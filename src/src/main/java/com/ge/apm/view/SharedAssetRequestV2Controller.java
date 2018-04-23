@@ -57,7 +57,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     private Date applyTimeFrom = null;
     private String applyTimeFormatTime = null;
     private String filterApplyTime = null;
-    
+
      public String getFilterApplyTime() {
         return filterApplyTime;
     }
@@ -178,7 +178,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //       setSearchFilter();
        
        setUserSearchFilters();
-       
+
+       this.updateSearchFilter(new SearchFilter("type", SearchFilter.Operator.IsNull,null));//过滤借还维护的单子
+
         if (queryIndex == -2) {
             List<String> stateList = new ArrayList<String>();
             stateList.add("0");
@@ -291,7 +293,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         object.setClinicalDeptUid(UserContextService.getCurrentUserAccount().getSiteUID());
         object.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
         
-        object.setApplicant(UserContextService.getCurrentUserAccount().getName());
+        object.setApplicant(UserContextService.getCurrentUserAccount().getLoginName());
         
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
@@ -322,38 +324,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             searchFilters = new ArrayList<SearchFilter>();
         }
         
-//        SimpleDateFormat sdf = new SimpleDateFormat( "yyyy-MM-dd HH:mm:ss" );
-//        //申请日期过滤
-//        if (applyTimeFormatTime != null ) {
-//            String[] split = applyTimeFormatTime.split("~");
-//            if (split.length == 1) {
-//                try {
-//                    Date dateFrom = sdf.parse(split[0] + " 00:00:00");
-//                    searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
-//                } catch (ParseException ex) {
-//                    Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
-//                }
-//            } else {
-//                if (split[0].equals("")) {
-//                    try {
-//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
-//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
-//                    } catch (ParseException ex) {
-//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                } else {
-//                    try {
-//                        Date dateFrom = sdf.parse(split[0] + " 00:00:00");
-//                        Date dateTo = sdf.parse(split[1] + " 23:59:59");
-//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.GTE, dateFrom));
-//                        searchFilters.add(new SearchFilter("applyTime", SearchFilter.Operator.LTE, dateTo));
-//                    } catch (ParseException ex) {
-//                        Logger.getLogger(SharedAssetRequestV2Controller.class.getName()).log(Level.SEVERE, null, ex);
-//                    }
-//                }
-//            }
-//
-//        }
+
        
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
@@ -477,7 +448,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
          SharedAssetRequest realSAR = dao.findById(uid);
          int sta = realSAR.getState();
          if (sta != 8){
-             WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+             WebUtil.addErrorMessage("申请已取消或已完成交付，不能录入设备，请返回并刷新！");
              return;
          }
 
@@ -731,7 +702,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
 
      public Date getTime(String type) throws ParseException{
-            if(type=="借用"){
+            if("借用".equals(type)){
                 return setBeginTime();
             }
             else{
@@ -745,7 +716,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
         if (sta != 2){
-            WebUtil.addErrorMessage("当前不是可交付状态，不能录入设备，请返回并刷新！");
+            WebUtil.addErrorMessage("申请已取消或已完成交付，不能录入设备，请返回并刷新！");
             return;
         }
 
@@ -1124,7 +1095,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             requestContext.addCallbackParam("url", url);
             return;
         }else {
-            WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
+            WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
             requestContext.addCallbackParam("url","norespond");
             return;
         }
@@ -1142,7 +1113,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            requestContext.addCallbackParam("url", url);
            return;
        }else {
-           WebUtil.addErrorMessage("当前不是可受理状态，请返回并刷新！");
+           WebUtil.addErrorMessage("申请已取消或已受理，请返回并刷新！");
            requestContext.addCallbackParam("url","norespond");
            return;
        }
@@ -1160,7 +1131,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            requestContext.addCallbackParam("url", url);
            return;
        }else {
-           WebUtil.addErrorMessage("当前状态不可搁置！");
+           WebUtil.addErrorMessage("申请已取消或已搁置受理，请返回并刷新！");
            requestContext.addCallbackParam("url","norespond");
            return;
        }
@@ -1574,6 +1545,19 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
            return;
        }
     }
+
+    public String getNameByLoginName(String loginName){
+        List<String> nameList = dao.findNameByLoginName(loginName);
+        if (nameList != null && nameList.size() > 0)
+            return nameList.get(0);
+        return loginName;
+    }
+
+    public String getNameByLoginName2(){
+        return this.getNameByLoginName(selected.getApplicant());
+    }
+
+
 
 
     /**
