@@ -134,6 +134,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		return true;
 	}
     public void prepareAproval(String woid) {
+	    comments=null;
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
@@ -621,6 +622,9 @@ public void batchDefineQualify(){
     }
     public void prepareCompleteOrder(String woid) {
        selectedPmOrder = dao.findById(woid);
+       if(selectedPmOrder.getManHours()==null){
+            selectedPmOrder.setManHours(0.1);
+       }
        confirmedUpDate = null;
        endTime=selectedPmOrder.getEndTime();
        planTime=selectedPmOrder.getPlanTime();

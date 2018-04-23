@@ -289,10 +289,17 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
     }*/
 
 
-    public void approvePMorder(V2_PmOrder selectedPmOrder,Object accessList,String comments){
+    public void approvePMorder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessList,String comments){
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
-        formData.setActionType("pass");
+        String actionType =null;
+        if(accessList.stream().allMatch(item->item.getApproved().toString().equalsIgnoreCase("true")))
+            actionType="pass";
+        else if(accessList.stream().allMatch(item->item.getApproved().toString().equalsIgnoreCase("false")))
+                actionType="reject";
+            else
+                actionType="partial";
+        formData.setActionType(actionType);
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         formData.setComments(comments);
         formData.setDetails(accessList);
