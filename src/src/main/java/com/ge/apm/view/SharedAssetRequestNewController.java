@@ -206,13 +206,13 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                 if(null==infoVo.getSharedAssetTypeUid()|| infoVo.getSharedAssetTypeUid().equalsIgnoreCase("0")){
                     WebUtil.addErrorMessage("该设备不属于调剂设备类型！");
                     return;
-                }else if(infoVo.getStatus()!= 1){
+                }else if(infoVo.getStatus()!= 1 && infoVo.getStatus()!= 3){
                     WebUtil.addErrorMessage("该设备故障，不可借用！");
                     return; 
                 }
                 //在asset_info中判断是否属于 调剂中心科室
                 else if(!depts.contains(ClinicalDeptUID)){
-                    WebUtil.addErrorMessage("该设备当前不可借用！");
+                    WebUtil.addErrorMessage("该设备已借出！");
                     return; 
                 }
                 else if(!depts.contains(userOrg.getUid())){
@@ -239,6 +239,9 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         String swaptypeid = infoList.get(0).getSharedAssetTypeUid();
                                         SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
                                         assetDetaiVo.setSharedAssetTypeId(swaptypeid);
+                                        selected.setClinicalDeptName(ClinicalName);
+                                        selected.setClinicalDeptUid(ClinicalUid);
+                                        
                                         //时间往后推
                                         
                                         if(timesa==null){
