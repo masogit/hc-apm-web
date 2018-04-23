@@ -161,10 +161,11 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedOrg.getSiteUID())) {
             return;
         }
-        if (userContextService.hasRole("ITAdmin")) {
-            tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-            //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
-        }
+//        if (userContextService.hasRole("ITAdmin")) {
+//            tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+//            //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+//        }
+        tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         qrCodeService.createManyQrCode(tenantUID, selectedOrg.getSiteUID(), qrCodeNum);
         this.selectedOrg = null;
         qrCodeNum = 0;
