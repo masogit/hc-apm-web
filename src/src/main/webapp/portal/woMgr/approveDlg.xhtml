@@ -10,7 +10,7 @@
             <h:form id="approveDialogForm" >
                 <h:panelGroup id="display3" rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
                     <p:fieldset legend="费用明细" >
-                        <p:dataTable  id="accessList123" value="#{workOrderMgrController.approvedDetails}" var="item" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable  id="accessList123" value="#{workOrderMgrController.getNeedApprovalDetails()}" var="item" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <!--<p:column selectionMode="multiple" style="text-align:center;color: #000!important"/>-->
                             <p:column >
                                 <p:selectBooleanCheckbox value="#{workOrderMgrController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
