@@ -6,9 +6,13 @@ import com.ge.apm.dao.QrCodeTemplateRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +43,8 @@ public class QrCodeTemplateCreateController {
 
     static Map<String, String> fontNameMap;
 
+    UaaService uaaService;
+
     @PostConstruct
     protected void init() {
         templateDao = WebUtil.getBean(QrCodeTemplateRepository.class);
@@ -46,6 +52,7 @@ public class QrCodeTemplateCreateController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         templateService = WebUtil.getBean(QrCodeTemplateService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         String actionName = WebUtil.getRequestParameter("action");
         if (actionName.equals("Create")) {
@@ -129,6 +136,13 @@ public class QrCodeTemplateCreateController {
             thisTemplateElementList.remove(element);
             removedElementList.add(element);
         }
+    }
+
+    public List<OrgInfo> getHospitalFileterList() {
+        List<OrgInfo> orgInfoList = null;
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
+        return orgInfoList;
     }
 
     //getter and setter
