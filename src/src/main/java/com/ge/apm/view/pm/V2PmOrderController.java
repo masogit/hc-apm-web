@@ -139,7 +139,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         //将不同意的审批项所对应的seletedMap中的对应值设成false
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
-        approvedDetails=approvedDetails.stream().filter(item -> item.getApproved() == null||item.getApproved()==false).collect(Collectors.toList());
+       /* approvedDetails=approvedDetails.stream().filter(item -> item.getApproved() == null||item.getApproved()==false).collect(Collectors.toList());*/
 
     }
 
@@ -271,14 +271,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return true;
     }
     public void createServiceRequest(V2_PmOrder selectedPmOrder,int  from) {
-		//保修前把单子关了
-		repairPmOrder();
         //如果from 是1 表示是从保养对话框来的报修命令，就要校验一些必填项
        if(from ==1) {
            if (!requiredCheck()) {
                return;
            }
        }
+        //去保修前把单子关了
+        pmOrderService.closePM(selectedPmOrder,picList);
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
@@ -572,7 +572,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 		picList =  blobDao.findByBoUuid(selected.getId());
     }
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
-        List<V2_WorkOrder_Detail> list = pmOrderService.getWorkOrderDetails(woId);
         return pmOrderService.getWorkOrderDetails(woId);
     }
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -733,6 +732,8 @@ selectedPmOrder.setQualityChecking(qaStatus);
 
         //cancel();
     }
+
+
     public void stagingPmOrder(){
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -794,6 +795,11 @@ selectedPmOrder.setQualityChecking(qaStatus);
         }
       //  cancelWorkdetail();
     }
+
+    public List<V2_WorkOrder_Detail> getNeedApprovalDetails(){
+        return approvedDetails==null? null:approvedDetails.stream().filter(item->item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
+    }
+
     private V2_WorkOrderCoworkerRepository coWorkerDao;
     public void addCoWokerItem() {
         if (!coWorkerList.contains(coWorkerDetail)) {
@@ -820,67 +826,7 @@ selectedPmOrder.setQualityChecking(qaStatus);
             return true;
         }
     }
-    //getter and setter
-    public Integer getQueryIndex() {
-        return queryIndex;
-    }
-    public void setQueryIndex(Integer queryIndex) {
-        this.queryIndex = queryIndex;
-    }
-    public AssetInfo getSelectedAsset() {
-        return selectedAsset;
-    }
-    public void setSelectedAsset(AssetInfo selectedAsset) {
-        this.selectedAsset = selectedAsset;
-    }
-    public Integer getCurrentStatus() {
-        return currentStatus;
-    }
-    public void setCurrentStatus(Integer currentStatus) {
-        this.currentStatus = currentStatus;
-    }
-    public Boolean getNeedConfirmTime() {
-        return needConfirmTime;
-    }
-    public void setNeedConfirmTime(Boolean needConfirmTime) {
-        this.needConfirmTime = needConfirmTime;
-    }
-    public String getCancelReason() {
-        return cancelReason;
-    }
-    public void setCancelReason(String cancelReason) {
-        this.cancelReason = cancelReason;
-    }
-    public V2_ServiceRequest getNewServiceRequest() {
-        return newServiceRequest;
-    }
-    public void setNewServiceRequest(V2_ServiceRequest newServiceRequest) {
-        this.newServiceRequest = newServiceRequest;
-    }
-    public Date getEsTime() {
-        return esTime;
-    }
-    public void setEsTime(Date esTime) {
-        this.esTime = esTime;
-    }
-    public String getComments() {
-        return comments;
-    }
-    public void setComments(String comments) {
-        this.comments = comments;
-    }
-    public Date getConfirmedUpDate() {
-        return confirmedUpDate;
-    }
-    public void setConfirmedUpDate(Date confirmedUpDate) {
-        this.confirmedUpDate = confirmedUpDate;
-    }
-    public String getCheckInDate() {
-        return checkInDate;
-    }
-    public void setCheckInDate(String checkInDate) {
-        this.checkInDate = checkInDate;
-    }
+
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
            // accessoryList = new ArrayList<V2_WorkOrder_Detail>();
@@ -1130,6 +1076,67 @@ selectedPmOrder.setQualityChecking(qaStatus);
 
     public void setTotalManHours(Double totalManHours) {
         this.totalManHours = totalManHours;
+    }
+    //getter and setter
+    public Integer getQueryIndex() {
+        return queryIndex;
+    }
+    public void setQueryIndex(Integer queryIndex) {
+        this.queryIndex = queryIndex;
+    }
+    public AssetInfo getSelectedAsset() {
+        return selectedAsset;
+    }
+    public void setSelectedAsset(AssetInfo selectedAsset) {
+        this.selectedAsset = selectedAsset;
+    }
+    public Integer getCurrentStatus() {
+        return currentStatus;
+    }
+    public void setCurrentStatus(Integer currentStatus) {
+        this.currentStatus = currentStatus;
+    }
+    public Boolean getNeedConfirmTime() {
+        return needConfirmTime;
+    }
+    public void setNeedConfirmTime(Boolean needConfirmTime) {
+        this.needConfirmTime = needConfirmTime;
+    }
+    public String getCancelReason() {
+        return cancelReason;
+    }
+    public void setCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
+    }
+    public V2_ServiceRequest getNewServiceRequest() {
+        return newServiceRequest;
+    }
+    public void setNewServiceRequest(V2_ServiceRequest newServiceRequest) {
+        this.newServiceRequest = newServiceRequest;
+    }
+    public Date getEsTime() {
+        return esTime;
+    }
+    public void setEsTime(Date esTime) {
+        this.esTime = esTime;
+    }
+    public String getComments() {
+        return comments;
+    }
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+    public Date getConfirmedUpDate() {
+        return confirmedUpDate;
+    }
+    public void setConfirmedUpDate(Date confirmedUpDate) {
+        this.confirmedUpDate = confirmedUpDate;
+    }
+    public String getCheckInDate() {
+        return checkInDate;
+    }
+    public void setCheckInDate(String checkInDate) {
+        this.checkInDate = checkInDate;
     }
 
 }
