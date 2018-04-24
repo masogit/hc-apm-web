@@ -25,7 +25,7 @@
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-                                <label class="label">#{msg.manhours}**</label>
+                                <label class="label">#{msg.manhours}*</label>
                                 <p:inputNumber id="manHoursId" validatorMessage="工时不能小于0.01" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}">
                                 </p:inputNumber>
                             </h:panelGroup>
