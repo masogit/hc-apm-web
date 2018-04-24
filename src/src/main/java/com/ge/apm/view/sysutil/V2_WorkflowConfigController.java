@@ -106,6 +106,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		selectedUserOrg = (OrgInfo) node.getData();
 		updateDispater();
 		updateApproverList();
+		selected.setSiteUID(selectedUserOrg.getSiteUID());
 	}
 
 	public void setTenantUid(String tenantUid) {
@@ -165,7 +166,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
 			if(orgType == 0){
-                dispatchUserList = userDao.getByTenantUID(selectedUserOrg.getTenantUID());
+                dispatchUserList = userDao.getByTenantUIDStaff(selectedUserOrg.getTenantUID());
             }else if(orgType == 1) {
                 dispatchUserList = userDao.getByInstitutionUID(selectedUserOrg.getInstitutionUID());
             }else if(orgType == 2){
@@ -174,7 +175,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
                 dispatchUserList = userDao.getBySiteUID(selectedUserOrg.getSiteUID());
             }
 		}else{
-			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
+			dispatchUserList = userDao.getByTenantUIDStaff(user.getTenantUID());
 		}
 	}
 
@@ -580,4 +581,5 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void setApproveUserList(List<UserAccount> approveUserList) {
 		this.approveUserList = approveUserList;
 	}
+
 }

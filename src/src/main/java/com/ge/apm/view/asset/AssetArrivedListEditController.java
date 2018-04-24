@@ -194,8 +194,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void submitArrivalList() {
-        onBeforeSave(selected);
-        dao.save(selected);
+        saveArrivalList();
         if (aiService.submitArrivalList(selected.getId())) {
             WebUtil.addSuccessMessage("到货清单已经提交");
         } else {
@@ -211,12 +210,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selectedOrg = (OrgInfo) node.getData();
     }
 
-    public void onSupplierChange() {
-        if (null != supplier) {
-            selected.setSupplierId(supplier.getId());
-            selected.setVendor(supplier.getName());
-        }
-    }
+//    public void onSupplierChange() {
+//        if (null != supplier) {
+//            selected.setSupplierId(supplier.getId());
+//            selected.setVendor(supplier.getName());
+//        }
+//    }
 
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);

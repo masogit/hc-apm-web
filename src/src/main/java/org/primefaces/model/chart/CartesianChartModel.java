@@ -14,6 +14,7 @@ public class CartesianChartModel extends ChartModel {
     private boolean showDatatip = true;
     private String datatipFormat;
     private boolean showPointLabels = false;
+    private String datatipEditor;
     
     public CartesianChartModel() {
         series = new ArrayList<ChartSeries>();
@@ -80,5 +81,13 @@ public class CartesianChartModel extends ChartModel {
     }
     public void setShowPointLabels(boolean showPointLabels) {
         this.showPointLabels = showPointLabels;
+    }
+    
+    public String getDatatipEditor() {
+        return datatipEditor;
+    }
+
+    public void setDatatipEditor(String datatipEditor) {
+        this.datatipEditor = datatipEditor;
     }
 }
