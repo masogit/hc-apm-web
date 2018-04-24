@@ -671,10 +671,7 @@ public class AssetFileImportService {
         String orgUid = selectedOrgToImport.getUid();
         assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
-        assetFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
-        assetFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgUid, "1*2+"));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
         List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
         if (resultList.size() > 0) {
             return true;
