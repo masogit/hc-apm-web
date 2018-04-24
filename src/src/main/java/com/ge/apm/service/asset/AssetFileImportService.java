@@ -95,6 +95,8 @@ public class AssetFileImportService {
 
     private OrgInfo selectedOrgToImport;
 
+    boolean isAssetCodeMerged;
+
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
@@ -359,8 +361,6 @@ public class AssetFileImportService {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-        boolean isAssetCodeMerged = isAssetCodeMergeConfigured();
-
         importOrgMap.values().forEach(item -> {
             List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
             if (null == orgs || orgs.isEmpty()) {
@@ -497,10 +497,11 @@ public class AssetFileImportService {
 
             }
 
+
+            String qrCode = newAsset.getQrCode();
+
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
-
-                String qrCode = newAsset.getQrCode();
 
                 if (isAssetCodeMerged) {
                     String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
@@ -542,6 +543,16 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
+                if (isAssetCodeMerged) {
+
+                } else {
+
+                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
+                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
+                        newAsset.setQrCode(newCode.getQrCode());
+
+                    }
+                }
 //                item.put("asset", assetList.get(0));
                 item.put("status", ImportStatus.Exist);
 //                item.put("assetFromExcel", newAsset);
@@ -705,8 +716,6 @@ public class AssetFileImportService {
     public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
-
-        boolean isAssetCodeMerged = isAssetCodeMergeConfigured();
 
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
@@ -886,5 +895,7 @@ public class AssetFileImportService {
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
+
+        isAssetCodeMerged = isAssetCodeMergeConfigured();
     }
 }
