@@ -262,14 +262,8 @@ formData.setAssignee(approvaler);
             formData.setPmOrderId(item.getId());
             formData.setDesc(comments);
             formDataList.add(formData);
-            String res = srApi.invokePmOrderAction(token,formData,"reAssign",item.getId());
-            if (res==null || !res.contains("OK")) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
-            }
-
-
         });
-        String res = srApi.invokePmOrderActionBatch(token,formDataList,"assign");
+        String res = srApi.invokePmOrderActionBatch(token,formDataList,"reAssign");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
         }else{
@@ -301,7 +295,7 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
                 actionType="partial";
         formData.setActionType(actionType);
         formData.setStepId(selectedPmOrder.getCurrentStepId());
-        formData.setComments(comments);
+        formData.setDesc(comments);
         formData.setDetails(accessList);
         String res = srApi.invokePmOrderAction(token,formData,"审批",selectedPmOrder.getId());
 
@@ -375,7 +369,7 @@ formData.setAttachments(attachment);
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         formData.setAssignee(assigneeId);
         formData.setDesc(comments);
-        String res = srApi.invokePmOrderAction(token,formData,"reAssign",selectedPmOrder.getId());
+        String res = srApi.invokePmOrderAction(token,formData,"转单",selectedPmOrder.getId());
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
         }
