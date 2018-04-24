@@ -156,10 +156,13 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     }
 
     public boolean canEdit(String siteUID) {
+        if(!Strings.isNullOrEmpty(siteUID)){
+            return accessibleOrgInfoList.contains(siteUID);
+        }
+        
         if (selected == null) {
             return false;
-        }
-        if (Strings.isNullOrEmpty(siteUID)) {
+        }else{
             siteUID = selected.getSiteUID();
         }
         return accessibleOrgInfoList.contains(siteUID);

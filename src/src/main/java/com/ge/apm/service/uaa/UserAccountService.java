@@ -177,11 +177,12 @@ public class UserAccountService {
 	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department){
 		orgInfoTemp=orgInfoRepository.getByUid(currentUser.getTenantUID());
-		if(orgInfoTemp==null){
+		TenantInfo tenantInfo=tenantInfoRepository.findByuid(currentUser.getTenantUID());
+		if(orgInfoTemp==null || tenantInfo==null){
 			newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团不存在;");
 			return;
 		}
-		newUser.setSiteId(orgInfoTemp.getId());
+		newUser.setSiteId(tenantInfo.getId());
 		if(isInsulate){
 			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 			newUser.setHospitalUID(currentUser.getHospitalUID());
@@ -205,7 +206,7 @@ public class UserAccountService {
 		}
 		newUser.setOrgInfoUID(orgInfoTemp.getUid());
 		newUser.setOrgInfoId(orgInfoTemp.getId());
-		newUser.setHospitalId(orgInfoTemp.getId());
+		
 	}
 	
 	private boolean getInstitutionID(UserAccount newUser,String institution){
@@ -252,6 +253,7 @@ public class UserAccountService {
 			orgInfoTemp=temp;
 		}
 		newUser.setSiteUID(orgInfoTemp.getUid());
+		newUser.setHospitalId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
@@ -480,6 +482,8 @@ public class UserAccountService {
 		try {
 			user.setCreatedBy(currentUser.getLoginName());
 			user.setCreatedDate(new Date());
+			user.setLastModifiedBy(user.getCreatedBy());
+			user.setLastModifiedDate(user.getCreatedDate());
 			user.setPasswordErrorCount(0);
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
