@@ -231,10 +231,9 @@
         </p:dialog>
 
         <!--关单对话框-->
-        <p:dialog id="closePmDialog" class="closePmDialogClass" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@this" header="关单">
+        <p:dialog id="closePmDialog" class="closePmDialogClass" widgetVar="closePmDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@this" header="关单框">
             <h:form id="closePmDialogForm" >
                 <h:panelGroup id="display4" >
-
                     <p:selectOneRadio id="console"  value="#{v2PmOrderController.qaStatus}" >
                         <p:ajax  update="@(.toRepairButton)" />
                         <f:selectItems value="#{fieldMsg.getFieldValueList('qaStatus')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
@@ -254,7 +253,11 @@
                     <p:fileUpload id="type" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     <h:panelGroup>
                         <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.closePM(v2PmOrderController.selectedPmOrder)}" value="确认关单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'closePmDialog');"/>
-                        <p:commandButton immediate="true" class="toRepairButton" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" rendered="#{v2PmOrderController.selectedPmOrder.assetInfo.status ne 4}" disabled="#{v2PmOrderController.qaStatus.equals('0')}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>
+
+
+                      <!--  <p:commandButton immediate="true" class="toRepairButton" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder)}" rendered="#{v2PmOrderController.selectedPmOrder.assetInfo.status ne 4}" disabled="#{v2PmOrderController.qaStatus.equals('0')}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  onclick="PF('createSRDialog').show();PF('closePmDialog').hide()"/>-->
+                        <p:commandButton immediate="true" class="toRepairButton" value="去报修" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder,2)}" rendered="#{v2PmOrderController.selectedPmOrder.assetInfo.status ne 4}" disabled="#{v2PmOrderController.qaStatus.equals('0')}" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm:datalist :growl"  oncomplete="toRepair(xhr, status, args)"/>
+
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('closePmDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -426,6 +429,13 @@
                     <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('transferOrderDialog').hide()"/>
                 </h:panelGroup>
             </h:form>
+            <script>
+                function toRepair(xhr, status, args) {
+                    handleSubmit(args, 'closePmDialog');
+                    PF('createSRDialog').show()
+                }
+
+            </script>
         </p:dialog>
 
    <!-- </ui:define>-->
