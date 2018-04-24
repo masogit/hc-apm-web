@@ -401,7 +401,7 @@
             </h:form>
         </p:dialog>
 <!--转单-->
-        <p:dialog class ="transferOrderClass" id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="转单"><!--转单对话框-->
+        <p:dialog class ="transferOrderClass" id="transferOrderDialog" widgetVar="transferOrderDialog" modal="true" width="300"  resizable="true" draggable="true" appendTo="@(body)" header="转单框"><!--转单对话框-->
             <h:form class ="transferOrderDialogClass" id="transferOrderDialogForm" >
                 <h:panelGroup id="display2" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -414,7 +414,7 @@
                         </h:panelGroup>
                         <!--批量转单-->
                         <h:panelGroup rendered="#{v2PmOrderController.isChecked() eq true}">
-                            <label class="label">#{msg.WorkOrderAssignee}</label>
+                            <label class="label">保养人</label>
                             <p:selectOneMenu  value="#{v2PmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{v2PmOrderController.findRepairPersonBatch()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
