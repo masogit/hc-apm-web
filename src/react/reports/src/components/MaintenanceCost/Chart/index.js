@@ -102,7 +102,6 @@ class Chart extends React.PureComponent {
         options: assetTypes,
         placeholder: '全部设备类型',
         dropdownMatchSelectWidth: false,
-        allowClear: false,
       })
 
     return (
