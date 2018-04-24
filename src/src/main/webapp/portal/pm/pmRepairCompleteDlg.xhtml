@@ -84,7 +84,7 @@
                                 </p:dataTable>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.addworker}</label>
+                                <label class="label">增加协作人</label>
                                 <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.coworker}">
                                         <h:outputText value="#{item.cowokerUserName}"/>
