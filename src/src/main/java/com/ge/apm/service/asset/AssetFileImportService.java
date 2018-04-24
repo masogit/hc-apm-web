@@ -12,6 +12,7 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,7 +191,8 @@ public class AssetFileImportService {
                 String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
                 asset.setFinancingNum(financingNum);
                 
-                if(userContextService.needAssetApproval()){
+                WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+                if(!Strings.isNullOrEmpty(siteConfig.getAssetApprover())){
                     asset.setUsageStatus(2);
                 }else{
                     asset.setUsageStatus(3);
