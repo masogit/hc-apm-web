@@ -481,10 +481,12 @@ public class AssetFileImportService {
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
             if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
-                financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+                financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
                         null,
                         nationalStandardCode,
-                        newAsset.getSiteUID()
+                        newAsset.getSiteUID(),
+                        null,
+                        null
                 );
                 newAsset.setFinancingNum(financingNum);
             }
