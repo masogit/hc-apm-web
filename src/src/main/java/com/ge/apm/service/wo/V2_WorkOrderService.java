@@ -291,7 +291,7 @@ public class V2_WorkOrderService {
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setAssigneeId(String.valueOf(assigneeId));
-        formData.setDesc(comments);
+        formData.setDesc(comments==null?"":comments);
         String res = srApi.invokeWorkOrderAction(token,formData,"reassign",selectedWorkOrder.getId());
         if (res==null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
