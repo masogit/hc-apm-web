@@ -262,14 +262,8 @@ formData.setAssignee(approvaler);
             formData.setPmOrderId(item.getId());
             formData.setDesc(comments);
             formDataList.add(formData);
-            String res = srApi.invokePmOrderAction(token,formData,"reAssign",item.getId());
-            if (res==null || !res.contains("OK")) {
-                WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
-            }
-
-
         });
-        String res = srApi.invokePmOrderActionBatch(token,formDataList,"assign");
+        String res = srApi.invokePmOrderActionBatch(token,formDataList,"reAssign");
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
         }else{
