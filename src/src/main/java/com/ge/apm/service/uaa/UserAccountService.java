@@ -1,6 +1,7 @@
 package com.ge.apm.service.uaa;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -40,6 +41,7 @@ import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 
 @Component
 public class UserAccountService {
@@ -281,6 +283,9 @@ public class UserAccountService {
 		TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
 		if(tenantInfo!=null && tenantInfo.getInsulate()!=null){
 			isInsulate=tenantInfo.getInsulate();
+			if(UserContextService.isOnlyLocalITAdmin()){
+				isInsulate=false;
+			}
 		}
 		List<UserAccount> importFailedDataList = new ArrayList<UserAccount>();
 		HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
@@ -393,6 +398,12 @@ public class UserAccountService {
 				newUser.setLoginName(loginName);
 				newUser.setName(name);
 				newUser.setEmail(email);
+				if(StringUtils.isNotEmpty(telephone)){
+					if(StringUtils.contains(telephone, "E")){
+						BigDecimal bd = new BigDecimal(telephone);
+				        telephone=bd.toPlainString();
+					}
+				}
 				newUser.setTelephone(telephone);
 				newUser.setIsActive(isActive);
 				if(isActive){
@@ -425,12 +436,7 @@ public class UserAccountService {
 	
 	private void addWarnMessage(){
 		FacesMessage message=null;
-		if(failedCount>0){
-			message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
-		}
-		else{
-			message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
-		}
+		message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
         FacesContext.getCurrentInstance().addMessage(null, message);
         successCount=0;
         failedCount=0;
