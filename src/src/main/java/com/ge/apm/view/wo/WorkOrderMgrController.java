@@ -253,10 +253,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("srId");
         removeFilterOnField("feedbackRating");
         removeFilterOnField("assetId");
-        removeFilterOnField("assetInfo.institutionUID");
-        removeFilterOnField("assetInfo.siteUID");
-        removeFilterOnField("assetInfo.hosputalUID");
-        removeFilterOnField("assetInfo.tenantUID");
         removeFilterOnField("approvalStatus");
         removeFilterOnField("assetInfo.assetOwnerId");
         removeFilterOnField("assetInfo.assetOwnerId2");
@@ -270,10 +266,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.LTE, 3));
         } else if (queryIndex == 2) { //待派工
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*D+E*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4), "1*D+E*"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*D+F*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.EQ, 5, "1*D+F*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
+            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
 
 //            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
 //            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
@@ -474,6 +468,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
         
+    }
+    
+    public List<V2_WorkOrder_Detail> getNeedApprovalDetails(){
+        return approvedDetails==null? null:approvedDetails.stream().filter(item->item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
     }
     
     public void prepareCloseOrder(String woid) {
