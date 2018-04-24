@@ -190,12 +190,12 @@ public class AssetFileImportService {
 
                 String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
                 asset.setFinancingNum(financingNum);
-                
+
+                asset.setUsageStatus(3); //已建档
+
                 WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
-                if(!Strings.isNullOrEmpty(siteConfig.getAssetApprover())){
-                    asset.setUsageStatus(2);
-                }else{
-                    asset.setUsageStatus(3);
+                if(siteConfig != null && !Strings.isNullOrEmpty(siteConfig.getAssetApprover())){
+                    asset.setUsageStatus(2); //待审核
                 }
 
                 //load asset if it is already existed in db, then update the record
@@ -773,7 +773,7 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
-            if (StringUtils.isEmpty(newAsset.getDepartNum())) {
+            if (StringUtils.isEmpty(newAsset.getDepartNum()) && StringUtils.isEmpty(newAsset.getUid())) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
