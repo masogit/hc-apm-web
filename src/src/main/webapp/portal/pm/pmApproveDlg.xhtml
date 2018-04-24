@@ -10,7 +10,7 @@
         <h:form id="pmapproveDialogForm" class="pmapproveDialogForm1">
             <h:panelGroup id="display3" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                 <p:fieldset legend="备件审批" >
-                    <p:dataTable  id="accessList123" value="#{v2PmOrderController.approvedDetails}" var="item" paginator="false"
+                    <p:dataTable  id="accessList123" value="#{v2PmOrderController.getNeedApprovalDetails()}" var="item" paginator="false"
                                   rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                         <p:column >
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}"  class="selectCheckBox" rendered="#{empty item.approved or !item.approved}">
