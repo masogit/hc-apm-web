@@ -52,9 +52,9 @@ public interface UserAccountMapper {
 	@Select("select id from user_account where uid =#{uid}")
 	public UserAccount getUserByUId(String uid);
 
-	@Insert("insert into user_account(telephone,site_id,hospital_id,hospital_uid,org_id,login_name,name,pwd_salt,password,institution_uid,site_uid,tenant_uid,org_level,org_uid,uid,email,is_super_admin,is_site_admin,is_local_admin,is_active,is_locked,wechat_id,created_by,created_date,password_error_count,active_time,name_py_code) "+
+	@Insert("insert into user_account(telephone,site_id,hospital_id,hospital_uid,org_id,login_name,name,pwd_salt,password,institution_uid,site_uid,tenant_uid,org_level,org_uid,uid,email,is_super_admin,is_site_admin,is_local_admin,is_active,is_locked,wechat_id,created_by,created_date,password_error_count,active_time,name_py_code,last_modified_by,last_modified_date) "+
 			 " values "+
-			" (#{telephone},#{siteId},#{hospitalId},#{hospitalUID},#{orgInfoId},#{loginName},#{name},#{pwdSalt},#{password},#{institutionUID},#{siteUID},#{tenantUID},#{orgLevel},#{orgInfoUID},#{uid},#{email},false,false,false,#{isActive},#{isLocked},#{weChatId},#{createdBy},#{createdDate},0,#{activeTime},#{namePyCode})")
+			" (#{telephone},#{siteId},#{hospitalId},#{hospitalUID},#{orgInfoId},#{loginName},#{name},#{pwdSalt},#{password},#{institutionUID},#{siteUID},#{tenantUID},#{orgLevel},#{orgInfoUID},#{uid},#{email},false,false,false,#{isActive},#{isLocked},#{weChatId},#{createdBy},#{createdDate},0,#{activeTime},#{namePyCode},#{lastModifiedBy},#{lastModifiedDate})")
 	@Options(useGeneratedKeys=true)
 	public Integer saveUserAccount(UserAccount user);
 	

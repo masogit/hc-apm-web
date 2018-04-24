@@ -69,12 +69,6 @@
 					<p:column headerText="#{msg.Locked}?">
 						<h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }" />
 					</p:column>
-					<p:column headerText="#{msg.roleId}">
-						<h:outputText value="#{item.userRoleNames}" />
-					</p:column>
-					<p:column headerText="UUID">
-						<h:outputText value="#{item.uid}" />
-					</p:column>
 					<p:column headerText="备注">
 						<h:outputText value="#{item.statusDisplay}" />
 					</p:column>
