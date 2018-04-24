@@ -137,7 +137,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 	    comments=null;
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
+        //将不同意的审批项所对应的seletedMap中的对应值设成false
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+		//approvedDetails=approvedDetails.stream().filter(item -> item.getApproved()).collect(Collectors.toList());
+
+	//	approvedDetails.removeAll(approvedDetails.stream().filter(item -> item.getApproved()).collect(Collectors.toList()));
+        System.out.println();
 
     }
 
@@ -268,10 +273,15 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return true;
     }
-    public void createServiceRequest(V2_PmOrder selectedPmOrder) {
-        if(!requiredCheck()){
-            return;
-        }
+    public void createServiceRequest(V2_PmOrder selectedPmOrder,int  from) {
+		//保修前把单子关了
+		repairPmOrder();
+        //如果from 是1 表示是从保养对话框来的报修命令，就要校验一些必填项
+       if(from ==1) {
+           if (!requiredCheck()) {
+               return;
+           }
+       }
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
