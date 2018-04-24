@@ -78,6 +78,7 @@ public class AssetFileImportController {
         autoGenerateFinancingNum = configuredCount > 0L;
 
         selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+        aiService.setSelectedOrgToImport(selectedOrg);
 
         initOrgTree();
 
