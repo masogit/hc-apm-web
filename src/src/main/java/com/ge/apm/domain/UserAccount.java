@@ -708,6 +708,7 @@ public class UserAccount implements Serializable {
 		if (this.orgInfo == null) {
 			return;
 		}
+		setDepartName(orgInfo.getName());
 		OrgInfo parentOrg = org.getParentOrg();
 		while (parentOrg != null) {
 			if (parentOrg.getOrgType() == 0) {
