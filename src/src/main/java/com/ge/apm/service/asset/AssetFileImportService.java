@@ -488,7 +488,11 @@ public class AssetFileImportService {
                         null,
                         null
                 );
-                newAsset.setFinancingNum(financingNum);
+
+                if (!financingNum.startsWith("error:")) {
+                    newAsset.setFinancingNum(financingNum);
+                }
+
             }
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
