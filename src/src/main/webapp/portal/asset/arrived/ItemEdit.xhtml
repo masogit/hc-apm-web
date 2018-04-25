@@ -64,10 +64,6 @@
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.agent}" />
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.arrivalListClassCode}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.arrivalList.classCode}" />
-                            </h:panelGroup>
-                            <h:panelGroup>
                                 <label class="label">#{msg.creatorUID}</label>
                                 <h:outputText value="#{assetInstallationController.getUserAccountByUid(assetInstallationController.arrivalListItem.arrivalList.creatorUID).name}" />
                             </h:panelGroup>
@@ -111,18 +107,6 @@
                             <h:panelGroup>
                                 <label class="label">保修时长(年)</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.warrantyYear}" />
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.warrantyDate}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.warrantyDate}">
-                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                </h:outputText>
-                            </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.terminateDate}</label>
-                                <h:outputText value="#{assetInstallationController.arrivalListItem.terminateDate}">
-                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                </h:outputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.purchasePrice}</label>

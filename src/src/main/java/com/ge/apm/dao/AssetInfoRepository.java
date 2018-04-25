@@ -23,6 +23,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o where o.siteId = ?1 and o.isValid = true")
     public List<AssetInfo> getBySiteId(int siteId);
 
+    @Query("select 1 from AssetInfo o where o.systemId=?1")
+    public Integer checkExistsBySystemId(String systemId);
+    
+    @Query("select o from AssetInfo o where o.systemId=?1 and o.ibStatus=1")
+    public AssetInfo getBySystemIdAndIbStatus(String systemId);
+
     @Query("select o from AssetInfo o where o.qrCode = ?1")
     public AssetInfo getByQrCode(String qrCode);
     
@@ -111,6 +117,11 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o  where (o.departNum = :departNum or o.financingNum = :financingNum or o.qrCode = :qrCode) and o.siteUID = :siteUID")
     public List<AssetInfo> findSwapTypeInfo(@Param("departNum") String departNum, @Param("financingNum") String financingNum, @Param("qrCode") String qrCode, @Param("siteUID") String siteUID);
+
+    
+    @Modifying
+    @Query("update AssetInfo ai set ai.inventoryStatus=?2 where ai.id in ?1")
+    void updateInventoryStatusAndIdIn(List<Integer> assetIds, Integer ORDER_STATUS_DONE_FINISHED);
 
     
    // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
