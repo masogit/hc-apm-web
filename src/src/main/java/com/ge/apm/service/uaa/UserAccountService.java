@@ -143,7 +143,7 @@ public class UserAccountService {
 			//create
 			if(isExistsByLoginName(loginName)){
 				existsCount++;
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在有");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在");
 				return newUser;
 			}
 			//create finally
