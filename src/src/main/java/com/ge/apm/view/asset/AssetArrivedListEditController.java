@@ -524,6 +524,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         Supplier selectedSupplier = suppliersList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
         if (selectedSupplier != null) {
             selected.setSupplierId(selectedSupplier.getId());
+            selected.setVendor(selectedSupplier.getName());
         }
     }
 
