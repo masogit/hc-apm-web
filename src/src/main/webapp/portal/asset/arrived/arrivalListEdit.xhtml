@@ -201,10 +201,10 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <label class="label">#{msg.measureGrade}</label>
-                                        <p:selectOneMenu id="measureGrade" value="#{assetArrivedListEditController.easyInstallItem.measureGrade}">
+                                        <label class="label">#{msg.measuringItemCategory}</label>
+                                        <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
 
@@ -231,15 +231,13 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-
                                     <h:panelGroup>
-                                        <label class="label">#{msg.measuringItemCategory}</label>
-                                        <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}">
+                                        <label class="label">#{msg.measureGrade}</label>
+                                        <p:selectOneMenu id="measureGrade" value="#{assetArrivedListEditController.easyInstallItem.measureGrade}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-
                                     <h:panelGroup>
                                         <label class="label">#{msg.accountingCategory}</label>
                                         <p:selectOneMenu id="accountingCategory" value="#{assetArrivedListEditController.easyInstallItem.accountingCategory}">
