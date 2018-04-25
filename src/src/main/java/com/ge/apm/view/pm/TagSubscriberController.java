@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @ManagedBean
@@ -69,7 +70,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		//获取当前租户下的所有用户 --获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
 		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
 
-
+		tenantUserList = tenantUserList.stream().distinct().collect(Collectors.toList());
 		for (I18nMessage local1 : msgModeList) {
 			hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
 		}
