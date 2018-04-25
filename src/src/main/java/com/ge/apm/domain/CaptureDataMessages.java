@@ -75,7 +75,7 @@ public class CaptureDataMessages implements Serializable {
 	@Transient
 	private Integer ibStatus;
 	
-	@Transient
+	@Column(name = "ge_device_type")
 	private Integer geDeviceType;
 
 	@Transient
@@ -287,11 +287,8 @@ public class CaptureDataMessages implements Serializable {
 		this.type = type;
 	}
 
-	public boolean getIbStatus() {
-		if(ibStatus!=null && ibStatus==1){
-			return true;
-		}
-		return false;
+	public Integer getIbStatus() {
+		return this.ibStatus;
 	}
 
 	public void setIbStatus(Integer ibStatus) {
