@@ -97,6 +97,8 @@ public class AssetFileImportService {
 
     boolean isAssetCodeMerged;
 
+    private final String OLD_QRCODE_KEY = "old_qrcode";
+
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
@@ -179,32 +181,30 @@ public class AssetFileImportService {
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
                 }
-                asset.setName(assetName);
+//                asset.setName(assetName);
 
-                String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
-                asset.setDepartNum(departNum);
+//                String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
+//                asset.setDepartNum(departNum);
 
 
-                String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-                if (!StringUtils.isEmpty(inputQrcode)) {
-                    asset.setQrCode(inputQrcode.replace("-", ""));
-                }
 
-                String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
-                asset.setFinancingNum(financingNum);
 
-                asset.setUsageStatus(3); //已建档
+//                String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
+//                asset.setFinancingNum(financingNum);
 
-                WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
-                if(siteConfig != null && !Strings.isNullOrEmpty(siteConfig.getAssetApprover())){
-                    asset.setUsageStatus(2); //待审核
-                }
+
 
                 //load asset if it is already existed in db, then update the record
                 List<AssetInfo> assetList = getAssetInfos(asset);
                 if (assetList != null && assetList.size() == 1) {
                     asset = assetList.get(0);
                     isNewAsset = false;
+                    map.put(OLD_QRCODE_KEY, asset.getQrCode());
+                }
+
+                String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
+                if (!StringUtils.isEmpty(inputQrcode)) {
+                    asset.setQrCode(inputQrcode.replace("-", ""));
                 }
 
                 AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
@@ -275,6 +275,13 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
 
+
+                asset.setUsageStatus(3); //已建档
+
+                WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+                if(siteConfig != null && !Strings.isNullOrEmpty(siteConfig.getAssetApprover())){
+                    asset.setUsageStatus(2); //待审核
+                }
 
                 if (isNewAsset) {
                     asset.setSiteId(selectedOrgToImport.getSiteId());
@@ -543,19 +550,27 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-                if (isAssetCodeMerged) {
 
-                } else {
-
-                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
+                if (StringUtils.isEmpty(qrCode)) {
+                    if (autoGenerateQrcode) {
                         QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
                         newAsset.setQrCode(newCode.getQrCode());
+                    }
+
+                } else {
+                    String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+                    if (!qrCode.equals(oldQrCode)) {
+                        boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
+                        if (!qrCodeUpdated) {
+                            item.put("status", ImportStatus.Failure);
+                            AssetRow.addErrMessage(item, "错误: 无效二维码");
+                            return;
+                        }
 
                     }
                 }
-//                item.put("asset", assetList.get(0));
+
                 item.put("status", ImportStatus.Exist);
-//                item.put("assetFromExcel", newAsset);
                 assetDao.save(newAsset);
 
             }

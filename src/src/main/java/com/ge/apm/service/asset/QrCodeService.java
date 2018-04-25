@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -111,6 +112,33 @@ public class QrCodeService {
             qrCodeLibDao.save(qrCodeLib);
         }
         return qrCodeLib;
+    }
+
+    public void createSpecifiedQrCode(String qrCode, OrgInfo currentOrg, int status) {
+        if (StringUtils.isEmpty(qrCode)) {
+            throw new IllegalArgumentException("qrCode should not be empty");
+        }
+        if (currentOrg == null) {
+            throw new IllegalArgumentException("current org should not be empty");
+        }
+
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getSiteUID());
+        if (qrCodeLib != null) {
+            throw new IllegalArgumentException("current qrcode already exists");
+        }
+
+        qrCodeLib = new QrCodeLib();
+
+        qrCodeLib.setSiteUID(currentOrg.getSiteUID());
+        qrCodeLib.setHospitalUID(currentOrg.getHospitalUID());
+        qrCodeLib.setTenantUID(currentOrg.getTenantUID());
+        qrCodeLib.setInstitutionUID(currentOrg.getInstitutionUID());
+        /*-- 1:已发行(未上传) / 2: 已上传(待建档) / 3: 已建档(待删除)*/
+        qrCodeLib.setStatus(status);
+        qrCodeLib.setIssueDate(new Date());
+        qrCodeLib.setQrCode(qrCode);
+        qrCodeLibDao.save(qrCodeLib);
+
     }
 
     public List<QrCodeLib> createManyQrCode(String tenantUID, String siteUID, Integer count) {
@@ -444,6 +472,16 @@ public class QrCodeService {
         }
     }
 
+    public void createQrCodeIfNotExists(String qrCode, OrgInfo currentOrg, int status) {
+
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
+
+        if (qrCodeLib == null) {
+            createSpecifiedQrCode(qrCode, currentOrg, status);
+        }
+
+    }
+
     private Boolean createSpecialQrCode(String qrcode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode,siteUid);
         if (null != qrCodeLib) {
@@ -485,5 +523,22 @@ public class QrCodeService {
         //TODO v2_blobObject
         qrCodeLibDao.delete(qrCodeLib);
         return true;
+    }
+
+    public boolean updateExistingQrCodeNotUsed(String qrCode, OrgInfo currentOrg) {
+
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
+
+        if (qrCodeLib == null) {
+            return false;
+        }
+        if (qrCodeLib.getStatus() != 1) {
+            return false;
+        }
+        qrCodeLib.setStatus(3);
+        qrCodeLibDao.save(qrCodeLib);
+
+        return true;
+
     }
 }
