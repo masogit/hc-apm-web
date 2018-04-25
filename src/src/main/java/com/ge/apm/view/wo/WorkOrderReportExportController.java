@@ -207,7 +207,9 @@ public class WorkOrderReportExportController implements Serializable{
     }
     
     public void previewData(ActionEvent actionEvent){
-        //workOrderList =                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           workOrderExportService.createData(currentInstitutionUID, currentHospitalUID, currentSiteUID, startTime, endTime, getStatusList());
+
+        this.selectedItems = null;
+
         if(null == startTime && null == endTime && null == closedStartTime && null == closedEndTime)
         {
         	showMsgBox("报修时间范围和关单时间范围需任填一组（最早时间/最晚时间）");
@@ -280,6 +282,8 @@ public class WorkOrderReportExportController implements Serializable{
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
+
+        //orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
