@@ -119,7 +119,7 @@
 
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">
-                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":easyInstallDialogForm :growl"/>
+                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":growl"/>
                                 </h:panelGroup>
 
                             </p:fieldset>
@@ -180,12 +180,6 @@
                                         <label class="label">#{msg.purchasePrice}</label>
                                         <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
                                     </h:panelGroup>
-
-                                    <!--                                    <h:panelGroup>
-                                                                            <label class="label">#{msg.terminateDate}</label>
-                                                                            <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.terminateDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
-                                                                        </h:panelGroup>-->
-
 
                                 </p:panelGrid>
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -324,7 +318,7 @@
                                                                       multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                                                     </p:fieldset>-->
                                 <h:panelGroup>
-                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":easyInstallDialogForm :growl"/>
+                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":growl"/>
                                 </h:panelGroup>
                             </p:fieldset>
 
@@ -332,7 +326,7 @@
                                          selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          rowsPerPageTemplate="5,10,15"  value="#{assetArrivedListEditController.arrivalItemList}" var="item">
-                                <p:ajax event="rowSelect" update=":ItemDetailViewForm" />
+                                <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemDetailViewForm" />
                                 <p:column headerText="#{msg.arrivalListItemNum}" >
                                     <h:outputText value="#{item.itemNum}"/>
                                 </p:column>
@@ -375,7 +369,7 @@
                     </p:fieldset>
                 </h:form>
                 <ui:include src="ItemDetailView.xhtml"/>
-                <ui:include src="easyInstallDlg.xhtml"/>
+                <!--<ui:include src="easyInstallDlg.xhtml"/>-->
             </div>
         </div>
     </ui:define>
