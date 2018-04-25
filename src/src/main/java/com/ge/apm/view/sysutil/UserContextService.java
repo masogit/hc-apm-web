@@ -167,6 +167,14 @@ public class UserContextService implements Serializable {
     		return false;
     }
 
+    public boolean isHospitalUser(){
+        UserAccount loginUser = getLoginUser();
+        if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
+            return false;
+        }
+        return true;
+    }
+
     public int getLoginUserId() {
         return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
     }
