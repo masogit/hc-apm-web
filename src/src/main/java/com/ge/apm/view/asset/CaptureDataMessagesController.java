@@ -13,14 +13,17 @@ import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.CaptureDataMessagesRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.CaptureDataMessages;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CaptureDataMessagesService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -41,15 +44,19 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 	private static final long serialVersionUID = 1L;
 	private CaptureDataMessagesRepository dao;
     private CaptureDataMessagesService service;
+    private AssetInfoRepository assetInfoRepository;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
     private UploadedFile file;
     private List<CaptureDataMessages> importFailedDataList;
     private String content;
+    private AssetInfo assetInfo;
+    boolean validate=true;
     
     @Override
     protected void init() {
         dao = WebUtil.getBean(CaptureDataMessagesRepository.class);
+        assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
         service = WebUtil.getBean(CaptureDataMessagesService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         currentUser = UserContextService.getCurrentUserAccount();
@@ -58,6 +65,17 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     @Override
     protected GenericRepositoryUUID<CaptureDataMessages> getDAO() {
         return dao;
+    }
+    
+    @Override
+    public void prepareEdit() {
+    	// TODO Auto-generated method stub
+    	super.prepareEdit();
+    	if(this.selected.getType()!=null && this.selected.getType()==1)
+    		return;
+    	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
+    	this.selected.setIbStatus(assetInfo.getIbStatus());
+    	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
     }
 
     @Override
@@ -93,32 +111,67 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         object.setSiteUID(currentUser.getSiteUID());
     }
     
+    public void onTabChanged(TabChangeEvent event){
+    	String tabName = event.getTab().getId();
+        if("type0".equals(tabName)){
+        	this.selected.setType(0);
+        	checkSystemId();
+        }
+        else if("type1".equals(tabName)){
+        	this.selected.setType(1);
+        }
+    }
+    
     public void checkSystemId(){
     	String systemId=this.selected.getSystemId();
+    	if(this.selected.getType()!=null && this.selected.getType()==1)
+    		return;
     	if(StringUtils.isNotEmpty(systemId)){
-    		AssetInfo info=service.getAssetInfoBySystemId(systemId);
-    		if(info==null){
+    		assetInfo=service.getAssetInfoBySystemId(systemId);
+    		if(assetInfo==null){
+    			validate=false;
     			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
     			FacesContext.getCurrentInstance().addMessage(null, message);
     		}
     		else{
-    			FacesMessage message = new FacesMessage("注意", "该systemID对应设备名："+info.getName()+"，对应使用科室："+info.getClinicalDeptName());
-    			FacesContext.getCurrentInstance().addMessage(null, message);
+    			validate=true;
+    			this.selected.setIbStatus(assetInfo.getIbStatus());
+    			this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+    			this.selected.setAssetUID(assetInfo.getUid());
+    			OrgInfo orgInfo=assetInfo.getHospital();
+    			if(orgInfo!=null && orgInfo.getName()!=null){
+    				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"医院:"+orgInfo.getName()+"，设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
+        			FacesContext.getCurrentInstance().addMessage(null, message);
+    			}
+    			else{
+    				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
+        			FacesContext.getCurrentInstance().addMessage(null, message);
+    			}
     		}
-    		
     	}
     }
 
     @Override
     public void save() {
-    	String systemId=this.selected.getSystemId();
-    	if(StringUtils.isNotEmpty(systemId) && service.checkSystemIdExists(this.selected)){
-    		super.save();
-    		this.selected=null;
+    	if(this.selected.getType()==null){
+			this.selected.setType(0);
+		}
+    	if(this.selected.getType()==0){
+    		if(validate){
+        		super.save();
+        		assetInfo.setIbStatus(this.selected.getIbStatus());
+        		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
+        		assetInfoRepository.save(assetInfo);
+        		this.selected=null;
+        	}
+        	else{
+        		FacesMessage message = new FacesMessage("注意！保存失败");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+        	}
     	}
     	else{
-    		FacesMessage message = new FacesMessage("注意","SystemID输入有误");
-            FacesContext.getCurrentInstance().addMessage(null, message);
+    		super.save();
+    		this.selected=null;
     	}
     }
     
