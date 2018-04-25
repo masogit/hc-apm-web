@@ -423,23 +423,18 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     }
     
-    public String queryBorrowInfo(String assetId){
-        String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-        OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-        if(userOrg.getOrgType()==4){
-            List<SharedAssetReqDetail> detailList = asdDao.getAssetUid(assetId,userOrg.getUid());
-            if(detailList.size()!=1){
-                WebUtil.addErrorMessage("找不到借用详情！");
-                return "";
-            }else{
-                operation = "EditForQuery.xhtml?actionName=Edit&selectedid=" + detailList.get(0).getBorrowId();
-                //ArrivalList o=new ArrivalList();
-                return UrlEncryptController.encodeUrlParam(operation);
-            }
-        }else{
-            WebUtil.addErrorMessage("非临床科室操作！");
+    public String queryBorrowInfo(String assetId,String clinicalDeptUID){
+
+        List<String> borrowIds = asdDao.getBorrowDetail(assetId, clinicalDeptUID);
+        if(borrowIds.size()!=1){
+            WebUtil.addErrorMessage("找不到借用详情！");
             return "";
+        }else{
+            operation = "EditForQuery.xhtml?actionName=Edit&selectedid=" + borrowIds.get(0);
+            //ArrivalList o=new ArrivalList();
+            return UrlEncryptController.encodeUrlParam(operation);
         }
+
     }
 
 
@@ -493,7 +488,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 else{
                     if(sartList.size()>0){
                         for(SharedAssetReqType applySwapType :sartList){
-                            if(applySwapType.getSharedAssetTypeId().equals(infoVo.getSharedAssetTypeUid())){
+                            if(infoVo.getSharedAssetTypeUid().equals(applySwapType.getSharedAssetTypeId())){
                                 selectedSart = applySwapType;//明细表联动选中
                                 
                                 if(applySwapType.getActualQty() < applySwapType.getApplyQty()){
@@ -501,7 +496,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     List<SharedAssetReqDetail> detail_list = asdDao.getBorrowInfo(infoVo.getUid());
                                     if(detail_list.size()==1){
                                         if(!ClinicalDeptUID.equals(detail_list.get(0).getClinicalDeptUid())){
-                                            WebUtil.addErrorMessage("该设备当前使用科室与申请科室不一致，使用科室是:"+ClinicalDeptName+"        ,借用人是:"+selected.getApplicant()+"           ,计费开始时间是:"+detail_list.get(0).getChargingBeginTime());
+                                            WebUtil.addErrorMessage("该设备当前使用科室与申请科室不一致，使用科室是:"+ClinicalDeptName);
                                             return;
                                         }
                                     }else{
@@ -596,66 +591,63 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     public void setCost(SharedAssetReqDetail sard){
-        if("次".equals(sard.getChargingType())){
-            sard.setCountQty(1);
-            sard.setCost(sard.getUnitPrice());
-        }
-        else if("小时".equals(sard.getChargingType())){
-            long nd = 1000 * 24 * 60 * 60;
-            long nh = 1000 * 60 * 60;
-            long nm = 1000 * 60;
-            long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
-            Integer countQty = null;
-            // 计算差多少天
-            long day = diff / nd;
-            // 计算差多少小时
-            long hour = diff % nd / nh;
-            // 计算差多少分钟
-            long min = diff % nd % nh / nm;
-            countQty = (int)(day*24*60/30+hour*2+min/30);
-            sard.setCountQty(countQty);
-            sard.setCost(countQty*sard.getUnitPrice()/2);
-        }
-        else{
-            Calendar cal1 = Calendar.getInstance();
-            cal1.setTime(sard.getChargingBeginTime());
-            Calendar cal2 = Calendar.getInstance();
-            cal2.setTime(sard.getChargingEndTime());
-            int day1= cal1.get(Calendar.DAY_OF_YEAR);
-            int day2 = cal2.get(Calendar.DAY_OF_YEAR);
-            int year1 = cal1.get(Calendar.YEAR);
-            int year2 = cal2.get(Calendar.YEAR);
-            Date date1 = sard.getChargingBeginTime();
-            Date date2 = sard.getChargingEndTime();
-            long  between = date2.getTime() - date1.getTime();
-            if(year1 != year2) {  //同一年
-                int timeDistance = 0 ;
-                for(int i = year1 ; i < year2 ; i ++){
-                    if(i%4==0 && i%100!=0 || i%400==0)    //闰年
-                    {
-                        timeDistance += 366;
+        if (sard.getChargingEndTime() != null) {
+            if ("次".equals(sard.getChargingType())) {
+                sard.setCountQty(1);
+                sard.setCost(sard.getUnitPrice());
+            } else if ("小时".equals(sard.getChargingType())) {
+                long nd = 1000 * 24 * 60 * 60;
+                long nh = 1000 * 60 * 60;
+                long nm = 1000 * 60;
+                long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
+                Integer countQty = null;
+                // 计算差多少天
+                long day = diff / nd;
+                // 计算差多少小时
+                long hour = diff % nd / nh;
+                // 计算差多少分钟
+                long min = diff % nd % nh / nm;
+                countQty = (int) (day * 24 * 60 / 30 + hour * 2 + min / 30);
+                sard.setCountQty(countQty);
+                sard.setCost(countQty * sard.getUnitPrice() / 2);
+            } else {
+                Calendar cal1 = Calendar.getInstance();
+                cal1.setTime(sard.getChargingBeginTime());
+                Calendar cal2 = Calendar.getInstance();
+                cal2.setTime(sard.getChargingEndTime());
+                int day1 = cal1.get(Calendar.DAY_OF_YEAR);
+                int day2 = cal2.get(Calendar.DAY_OF_YEAR);
+                int year1 = cal1.get(Calendar.YEAR);
+                int year2 = cal2.get(Calendar.YEAR);
+                Date date1 = sard.getChargingBeginTime();
+                Date date2 = sard.getChargingEndTime();
+                long between = date2.getTime() - date1.getTime();
+                if (year1 != year2) {  //同一年
+                    int timeDistance = 0;
+                    for (int i = year1; i < year2; i++) {
+                        if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0)    //闰年
+                        {
+                            timeDistance += 366;
+                        } else    //不是闰年
+                        {
+                            timeDistance += 365;
+                        }
                     }
-                    else    //不是闰年
-                    {
-                        timeDistance += 365;
+                    if (between >= (24 * 3600000)) {
+                        sard.setCountQty(timeDistance + (day2 - day1));
+                        sard.setCost((timeDistance + (day2 - day1)) * sard.getUnitPrice());
+                    } else {
+                        sard.setCountQty(0);
+                        sard.setCost(null);
                     }
-                }
-                if(between >= (24* 3600000)){
-                    sard.setCountQty(timeDistance + (day2-day1));
-                    sard.setCost((timeDistance + (day2-day1))*sard.getUnitPrice());
-                }
-                else{
-                    sard.setCountQty(0);
-                    sard.setCost(null);
-                }
-            }
-            else {  //不同年
-                if(between >= (24* 3600000)){
-                    sard.setCountQty(day2-day1);
-                    sard.setCost((day2-day1)*sard.getUnitPrice());
-                }else{
-                    sard.setCountQty(0);
-                    sard.setCost(null);
+                } else {  //不同年
+                    if (between >= (24 * 3600000)) {
+                        sard.setCountQty(day2 - day1);
+                        sard.setCost((day2 - day1) * sard.getUnitPrice());
+                    } else {
+                        sard.setCountQty(0);
+                        sard.setCost(null);
+                    }
                 }
             }
         }
