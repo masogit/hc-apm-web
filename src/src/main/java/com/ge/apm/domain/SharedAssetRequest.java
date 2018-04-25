@@ -127,7 +127,7 @@ public class SharedAssetRequest implements Serializable{
     @Temporal(TemporalType.DATE)
     private Date modifyDate;//修改日期
     
-    @Column(name = "apply_asset_info")//设备信息（临时）
+    @Transient//设备信息（临时）
     private String applyAssetInfo;
     
     @Column(name = "behavior")//借用归还状态 1借用 2归还
