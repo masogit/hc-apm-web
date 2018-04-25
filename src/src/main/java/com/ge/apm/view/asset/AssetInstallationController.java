@@ -418,27 +418,38 @@ public class AssetInstallationController {
                             num = arrivalListItem.getFinancingNum();
                             if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
                                 if (!qrCodeService.deleteQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID())) {
-                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+//                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+                                    WebUtil.addErrorMessage("二维码不正确");
+                                    arrivalListItem.setQrCode(null);
+                                }else{
+                                    arrivalListItem.setQrCode(num);
                                 }
+                            }else{
+                                arrivalListItem.setQrCode(num);
                             }
                             break;
                         case "departNum":
                             num = arrivalListItem.getDepartNum();
                             if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
                                 if (!qrCodeService.deleteQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID())) {
-                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+//                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+                                    WebUtil.addErrorMessage("二维码不正确");
+                                    arrivalListItem.setQrCode(null);
+                                }else{
+                                    arrivalListItem.setQrCode(num);
                                 }
+                            }else{
+                                arrivalListItem.setQrCode(num);
                             }
                             break;
                         case "qrCode":
                             num = arrivalListItem.getQrCode();
+                            arrivalListItem.setQrCode(num);
                             break;
                         default:
                     }
                     arrivalListItem.setFinancingNum(num);
                     arrivalListItem.setDepartNum(num);
-
-                    arrivalListItem.setQrCode(num);
                     break;
                 case "DF":
                     switch (fieldName) {
