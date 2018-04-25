@@ -39,7 +39,7 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "asset_info_id")
     private String assetInfoId;//资产设备id
     
-    @Column(name = "shared_asset_type_id")
+    @Column(name = "shared_asset_type")
     private String sharedAssetTypeId;//调剂设备id 
     
     @Column(name = "asset_number")
