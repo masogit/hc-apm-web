@@ -9,15 +9,15 @@
 			<p:fieldset legend="批量导入 设备绩效报表" id="uploaderContainer">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<p:fileUpload fileUploadListener="#{smallAssetPerformanceController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
-						invalidFileMessage="只支持xls格式的文件" invalidSizeMessage="文件大小不得超过5M"
+						invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
 						update=":smallAssetPerformanceTab:dataListForm, :smallAssetPerformanceTab:smallAssetPerformanceListForm" sizeLimit="5242880"
-						allowTypes="/(\.|\/)(xls)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+						allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
 					<p:growl id="messages" showDetail="true" />
 				</p:panelGrid>
 				<h:panelGroup>
 					<p>说明</p>
 					<p>
-						1. <a href="APM_SmallAssetPerformance_Template.xls" title="download">#{msg.downloadTemplateFile}</a>
+						1. <a href="APM_SmallAssetPerformance_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
 					</p>
 					<p>2. 文件中填入要导入的数据，其中[项目名称]和[日期]必填</p>
 					<p>3. 上传文件进行导入</p>
