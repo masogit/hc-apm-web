@@ -24,10 +24,12 @@ public interface SharedAssetRequestRepository extends GenericRepositoryUUID<Shar
     @Query(value = "select clinical_dept_uid from asset_info where clinical_dept_uid =?1",nativeQuery = true)
     public List<String> findSharedDeptForAssetInfo(String UID);
     
-    @Query(value = "select id from shared_asset_request where site_uid =?1 AND state in(6,12)",nativeQuery = true)
+//    @Query(value = "select id from shared_asset_request where site_uid =?1 AND state in(6,12)",nativeQuery = true)
+    @Query(value = "select id from shared_asset_request where site_uid =?1",nativeQuery = true)
     public List<String> findSharedIdforQuery(String siteUID);
     
-    @Query(value = "select id from shared_asset_request where clinical_dept_uid = ?1 and state in(6,12)",nativeQuery = true)
+//    @Query(value = "select id from shared_asset_request where clinical_dept_uid = ?1 and state in(6,12)",nativeQuery = true)
+    @Query(value = "select id from shared_asset_request where clinical_dept_uid = ?1",nativeQuery = true)
     public List<String> findSharedIdByOrgUidforQuery(String orgUid);
     
     @Query("select o from SharedAssetRequest o where o.id = :id")
