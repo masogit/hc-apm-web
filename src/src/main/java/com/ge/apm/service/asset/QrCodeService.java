@@ -514,12 +514,12 @@ public class QrCodeService {
         if (null != assetList && !assetList.isEmpty()) {
             return false;
         }
-        List<SearchFilter> searchFilterList = Arrays.asList(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.EQ, siteUid),
-                new SearchFilter("qrCode", SearchFilter.Operator.EQ, qrCode));
-        List<ArrivalListItem> ArrivalListItemList = itemDao.findBySearchFilter(searchFilterList);
-        if (null != ArrivalListItemList && !ArrivalListItemList.isEmpty()) {
-            return false;
-        }
+//        List<SearchFilter> searchFilterList = Arrays.asList(new SearchFilter("arrivalList.siteUID", SearchFilter.Operator.EQ, siteUid),
+//                new SearchFilter("qrCode", SearchFilter.Operator.EQ, qrCode));
+//        List<ArrivalListItem> ArrivalListItemList = itemDao.findBySearchFilter(searchFilterList);
+//        if (null != ArrivalListItemList && !ArrivalListItemList.isEmpty()) {
+//            return false;
+//        }
         //TODO v2_blobObject
         qrCodeLibDao.delete(qrCodeLib);
         return true;

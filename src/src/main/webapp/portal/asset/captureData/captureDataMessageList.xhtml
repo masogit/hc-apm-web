@@ -28,7 +28,7 @@
 		<p:column headerText="截止时间" sortBy="#{item.endDate}">
 			<h:outputText value="#{item.endDate}" />
 		</p:column>
-		<p:column headerText="预览广告">
+		<p:column headerText="预览消息">
 			<p:commandButton update=":captureDataMessagesTab:displayCaptureDataMessagesContent" oncomplete="PF('captureDataMessagesDlg').show()" icon="fa fa-search"
 				actionListener="#{captureDataMessagesController.setContent(item.id)}" />
 		</p:column>
