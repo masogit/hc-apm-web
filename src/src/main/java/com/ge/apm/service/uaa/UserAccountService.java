@@ -15,9 +15,11 @@ import javax.faces.context.FacesContext;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -290,8 +292,16 @@ public class UserAccountService {
 			}
 		}
 		List<UserAccount> importFailedDataList = new ArrayList<UserAccount>();
-		HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-		HSSFSheet sheet = workbook.getSheetAt(0);
+		
+		Workbook workbook = null;
+		if(file.getFileName().toLowerCase().endsWith(".xls")){
+			workbook=new HSSFWorkbook(file.getInputstream());
+		}
+		else if(file.getFileName().toLowerCase().endsWith(".xlsx")){
+			workbook=new XSSFWorkbook(file.getInputstream());
+		}
+		
+		Sheet sheet = workbook.getSheetAt(0);
 		if (sheet == null) {
 			return null;
 		}
@@ -339,7 +349,7 @@ public class UserAccountService {
 		int uuidIndex=header.get(HEADER_UUID);
 
 		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
-			HSSFRow row = sheet.getRow(j);
+			Row row = sheet.getRow(j);
 			if (row == null) {
 				continue;
 			}
