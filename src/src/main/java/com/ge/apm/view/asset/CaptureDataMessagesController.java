@@ -50,8 +50,8 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private UploadedFile file;
     private List<CaptureDataMessages> importFailedDataList;
     private String content;
-    private boolean validate=true;
     private AssetInfo assetInfo;
+    boolean validate=true;
     
     @Override
     protected void init() {
@@ -65,6 +65,17 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     @Override
     protected GenericRepositoryUUID<CaptureDataMessages> getDAO() {
         return dao;
+    }
+    
+    @Override
+    public void prepareEdit() {
+    	// TODO Auto-generated method stub
+    	super.prepareEdit();
+    	if(this.selected.getType()!=null && this.selected.getType()==1)
+    		return;
+    	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
+    	this.selected.setIbStatus(assetInfo.getIbStatus());
+    	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
     }
 
     @Override
@@ -102,14 +113,19 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     
     public void onTabChanged(TabChangeEvent event){
     	String tabName = event.getTab().getId();
-        if("type0".equals(tabName))
-            this.selected.setType(0);
-        else if("type1".equals(tabName))
-            this.selected.setType(1);
+        if("type0".equals(tabName)){
+        	this.selected.setType(0);
+        	checkSystemId();
+        }
+        else if("type1".equals(tabName)){
+        	this.selected.setType(1);
+        }
     }
     
     public void checkSystemId(){
     	String systemId=this.selected.getSystemId();
+    	if(this.selected.getType()!=null && this.selected.getType()==1)
+    		return;
     	if(StringUtils.isNotEmpty(systemId)){
     		assetInfo=service.getAssetInfoBySystemId(systemId);
     		if(assetInfo==null){
@@ -137,21 +153,25 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 
     @Override
     public void save() {
-    	if(validate){
-    		if(this.selected.getType()==null){
-    			this.selected.setType(0);
-    		}
-    		super.save();
-    		if(this.selected.getType()==0){
-    			assetInfo.setIbStatus(this.selected.getType());
-    			assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
-    			assetInfoRepository.save(assetInfo);
-    		}
-    		this.selected=null;
+    	if(this.selected.getType()==null){
+			this.selected.setType(0);
+		}
+    	if(this.selected.getType()==0){
+    		if(validate){
+        		super.save();
+        		assetInfo.setIbStatus(this.selected.getIbStatus());
+        		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
+        		assetInfoRepository.save(assetInfo);
+        		this.selected=null;
+        	}
+        	else{
+        		FacesMessage message = new FacesMessage("注意！保存失败");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+        	}
     	}
     	else{
-    		FacesMessage message = new FacesMessage("注意！保存失败");
-            FacesContext.getCurrentInstance().addMessage(null, message);
+    		super.save();
+    		this.selected=null;
     	}
     }
     
