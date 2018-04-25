@@ -9,12 +9,11 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="设备广告"/>
+                <p:outputLabel class="pageTitle" value="小屏消息配置"/>
             </div>
 
             <div class="ui-g-12 card ">
                 <p:tabView id="captureDataMessagesTab">
-                    <p:ajax event="tabChange"/>
                     <p:tab title="查询" id="showList">
                         <ui:include src="captureDataMessageList.xhtml"/>
                     </p:tab>
