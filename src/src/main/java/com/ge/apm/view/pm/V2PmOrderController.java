@@ -139,7 +139,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
         //将不同意的审批项所对应的seletedMap中的对应值设成false
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
-       /* approvedDetails=approvedDetails.stream().filter(item -> item.getApproved() == null||item.getApproved()==false).collect(Collectors.toList());*/
 
     }
 
