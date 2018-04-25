@@ -44,7 +44,7 @@
                     rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.applyTime}"
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                    rows="20" emptyMessage="#{msg.noRecordFound}" 
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
                     rowsPerPageTemplate="20,40,60,90">
                     
                     <p:ajax event="rowSelect" update="" listener="#{sharedAssetRequestV2Controller.onSelectC}" oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
