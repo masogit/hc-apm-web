@@ -37,9 +37,6 @@ public class CaptureDataMessages implements Serializable {
 	@Column(name = "asset_uid")
 	private String assetUID;
 	
-	@Column(name = "ge_device_type")
-	private Integer geDeviceType;
-	
 	//0:单个设备,1:geDeviceType
 	@Column(name = "type")
 	private Integer type;
@@ -74,6 +71,12 @@ public class CaptureDataMessages implements Serializable {
 
 	@Transient
 	private String statusCode;
+	
+	@Transient
+	private Integer ibStatus;
+	
+	@Transient
+	private Integer geDeviceType;
 
 	@Transient
 	private String statusDisplay;
@@ -282,6 +285,17 @@ public class CaptureDataMessages implements Serializable {
 
 	public void setType(Integer type) {
 		this.type = type;
+	}
+
+	public boolean getIbStatus() {
+		if(ibStatus!=null && ibStatus==1){
+			return true;
+		}
+		return false;
+	}
+
+	public void setIbStatus(Integer ibStatus) {
+		this.ibStatus = ibStatus;
 	}
 
 	@Override
