@@ -248,10 +248,10 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         selected.setClinicalDeptUid(ClinicalUid);
                                         
                                         //时间往后推
-                                        
+                                        assetDetaiVo.setClinicalDeptUid(ClinicalUid);
+                                        assetDetaiVo.setClinicalDeptName(ClinicalName);
+
                                         if(timesa==null){
-                                            assetDetaiVo.setClinicalDeptUid(ClinicalUid);
-                                            assetDetaiVo.setClinicalDeptName(ClinicalName);
                                             infoVo.setClinicalDeptName(ClinicalName);
                                             infoVo.setClinicalDeptUID(ClinicalUid);
                                         }
