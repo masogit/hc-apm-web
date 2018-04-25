@@ -92,7 +92,7 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="单价" sortBy="#{item.unitPrice}" filterBy="#{item.unitPrice}" filterMatchMode="GTE">
+                        <p:column headerText="单价" sortBy="#{item.unitPrice}">
                             <f:facet name="filter">
                                 <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetReqDetailForQueryController.filterUnitPrice}"/>
                             </f:facet>
@@ -101,7 +101,7 @@
                         <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.chargingType}"/>
                         </p:column>
-                        <p:column headerText="费用" sortBy="#{item.cost}" filterBy="#{item.cost}" filterMatchMode="GTE">
+                        <p:column headerText="费用" sortBy="#{item.cost}">
                             <f:facet name="filter">
                                 <p:inputText id="filterCost" widgetVar="varFilterCost" value="#{sharedAssetReqDetailForQueryController.filterCost}"/>
                             </f:facet>
