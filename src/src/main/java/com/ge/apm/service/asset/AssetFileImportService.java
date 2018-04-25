@@ -97,6 +97,8 @@ public class AssetFileImportService {
 
     boolean isAssetCodeMerged;
 
+    private final String OLD_QRCODE_KEY = "old_qrcode";
+
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
@@ -197,6 +199,7 @@ public class AssetFileImportService {
                 if (assetList != null && assetList.size() == 1) {
                     asset = assetList.get(0);
                     isNewAsset = false;
+                    map.put(OLD_QRCODE_KEY, asset.getQrCode());
                 }
 
                 String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
@@ -547,13 +550,22 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-                if (!StringUtils.isEmpty(qrCode)) {
-                    qrCodeService.createQrCodeIfNotExists(qrCode, selectedOrgToImport, 3);
 
-                } else {
-                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
+                if (StringUtils.isEmpty(qrCode)) {
+                    if (autoGenerateQrcode) {
                         QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
                         newAsset.setQrCode(newCode.getQrCode());
+                    }
+
+                } else {
+                    String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+                    if (!qrCode.equals(oldQrCode)) {
+                        boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
+                        if (!qrCodeUpdated) {
+                            item.put("status", ImportStatus.Failure);
+                            AssetRow.addErrMessage(item, "错误: 无效二维码");
+                            return;
+                        }
 
                     }
                 }

@@ -524,4 +524,21 @@ public class QrCodeService {
         qrCodeLibDao.delete(qrCodeLib);
         return true;
     }
+
+    public boolean updateExistingQrCodeNotUsed(String qrCode, OrgInfo currentOrg) {
+
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
+
+        if (qrCodeLib == null) {
+            return false;
+        }
+        if (qrCodeLib.getStatus() != 1) {
+            return false;
+        }
+        qrCodeLib.setStatus(3);
+        qrCodeLibDao.save(qrCodeLib);
+
+        return true;
+
+    }
 }
