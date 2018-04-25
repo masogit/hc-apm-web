@@ -561,7 +561,7 @@ public class AssetFileImportService {
                     String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
                     if (!qrCode.equals(oldQrCode)) {
                         if (!StringUtils.isEmpty(oldQrCode)) {
-                            qrCodeService.updateQrCodeStatus(qrCode, selectedOrgToImport.getUid(), 1);
+                            qrCodeService.updateQrCodeStatus(oldQrCode, selectedOrgToImport.getUid(), 1);
                         }
 
                         boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
