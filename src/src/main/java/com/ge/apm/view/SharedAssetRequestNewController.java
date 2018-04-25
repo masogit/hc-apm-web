@@ -32,6 +32,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     SharedAssetRequestRepository dao = null;
     AssetInfoRepository assetInfoDao = null;
     SharedAssetReqDetailRepository detailDao = null;
+    private String applyTimeFormatTime = null;
     OrgInfoRepository orgInfoDao = null;
     SharedAssetReqDetailRepository asdDao = null;
     private List<AssetInfo> selectInfo ;
@@ -40,6 +41,9 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
     SharedAssetReqTypeRepository apdDao = null;
     AssetInfoRepository asiDao = null;
     SharedAssetTypeRepository swapDao = null;
+    private String filterApplyTime = null;
+    private Date applyTimeTo = null;
+    private Date applyTimeFrom = null;
     public SharedAssetReqDetail getSelectedSard() {
         return selectedSard;
     }
@@ -399,6 +403,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                     //附件状态默认全选
                                     for(SharedAssetTypeAccesssory item:swapTypeVo.getAccessoryList()){
                                         item.setBorrowStatus(true); 
+                                        item.setReturnStatus(true);
                                     }
                                     assetDetaiVo.setAccessoryList(swapTypeVo.getAccessoryList());
                                     if( !"1".equals(this.selected.getType())){
@@ -604,7 +609,38 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
             sard.setCost(null);
         }
     }
+     public String getFilterApplyTime() {
+        return filterApplyTime;
+    }
+
+    public void setFilterApplyTime(String filterApplyTime) {
+        this.filterApplyTime = filterApplyTime;
+    }
+
+    public Date getApplyTimeTo() {
+        return applyTimeTo;
+    }
     
+    public void setApplyTimeTo(Date applyTimeTo) {
+        this.applyTimeTo = applyTimeTo;
+    }
+
+    public Date getApplyTimeFrom() {
+        return applyTimeFrom;
+    }
+
+    public void setApplyTimeFrom(Date applyTimeFrom) {
+        this.applyTimeFrom = applyTimeFrom;
+    }
+    
+    public String getApplyTimeFormatTime() {
+
+            return applyTimeFormatTime;
+    }
+
+    public void setApplyTimeFormatTime(String applyTimeFormatTime) {
+        this.applyTimeFormatTime = applyTimeFormatTime;
+    }
     public void saveSard(String type){
          List<SharedAssetReqDetail> sardList = selected.getSardList();
          List<SharedAssetTypeAccesssory> accessoryList = selectedSard.getAccessoryList();
@@ -678,6 +714,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
         object.setCreateDate(new Date());
         object.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
         object.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        object.setApplyTime(new Date());
       //  object.setState(UserContextService.getCurrentUserAccount().getSiteUID());
 //        object.setApplicant(UserContextService.getCurrentUserAccount().getName());
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();

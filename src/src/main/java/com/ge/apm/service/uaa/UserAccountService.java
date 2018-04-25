@@ -283,8 +283,10 @@ public class UserAccountService {
 		TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
 		if(tenantInfo!=null && tenantInfo.getInsulate()!=null){
 			isInsulate=tenantInfo.getInsulate();
-			if(UserContextService.isOnlyLocalITAdmin()){
-				isInsulate=false;
+			if(isInsulate){
+				if(!UserContextService.isOnlyLocalITAdmin()){
+					isInsulate=false;
+				}
 			}
 		}
 		List<UserAccount> importFailedDataList = new ArrayList<UserAccount>();

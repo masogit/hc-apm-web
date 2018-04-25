@@ -158,11 +158,11 @@ public class AssetInstallationController {
             RequestContext.getCurrentInstance().addCallbackParam("ClinicalDeptName", true);
             isValidate = false;
         }
-        if (null == arrivalListItem.getIsGeneratePmOrder()) {
-            WebUtil.addErrorMessage("同时生成保养工单" + WebUtil.getMessage("ValidationRequire"));
-            RequestContext.getCurrentInstance().addCallbackParam("IsGeneratePmOrder", true);
-            isValidate = false;
-        }
+//        if (null == arrivalListItem.getIsGeneratePmOrder()) {
+//            WebUtil.addErrorMessage("同时生成保养工单" + WebUtil.getMessage("ValidationRequire"));
+//            RequestContext.getCurrentInstance().addCallbackParam("IsGeneratePmOrder", true);
+//            isValidate = false;
+//        }
         if (arrivalListItem.getWorkHours() == null) {
             WebUtil.addErrorMessage("安装工时" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("workHours", true);

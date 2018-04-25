@@ -96,3 +96,6 @@ alter table qr_code_lib alter column id drop not null;
 alter table qr_code_lib add primary key(uid);
 
 update supplier a set tenant_uid=(select uid from tenant_info o where o.id=a.site_id) where tenant_uid is null
+
+INSERT INTO sys_role (name, role_desc, home_page) VALUES ('LocalITAdmin','本地后台运营管理','/portal/uaa/userAccount/List.xhtml');
+

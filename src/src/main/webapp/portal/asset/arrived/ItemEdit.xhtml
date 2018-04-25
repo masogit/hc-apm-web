@@ -444,14 +444,14 @@
             </p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">同时生成保养工单*</label>
                                 <p:selectOneMenu  value="#{assetInstallationController.arrivalListItem.isGeneratePmOrder}" id="IsGeneratePmOrder" required="false"  requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItem itemLabel="是" itemValue="true"/>
                                     <f:selectItem itemLabel="否" itemValue="false"/>
                                 </p:selectOneMenu>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">安装工时*</label>
                                 <p:inputNumber id="workHours" value="#{assetInstallationController.arrivalListItem.workHours}" required="false" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}" minValue="0" decimalPlaces="1" />
