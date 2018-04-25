@@ -81,6 +81,7 @@ update unstructured_data_collection uc set schema_id=(select performance_report 
 --end for v1.9.1 change
 
 --v2.1
+SELECT setval('"sys_role_id_seq"', 11, false);
 INSERT INTO sys_role ( name, role_desc) VALUES ( 'SharedAssetMgmt', '设备调剂管理人员');
 
 
