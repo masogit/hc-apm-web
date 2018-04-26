@@ -64,6 +64,14 @@
                         </p:column>
                         <p:column headerText="保养类型" sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
+<!--
+                            <f:facet name="filter" >
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.repairType}">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </f:facet>-->
+
                         </p:column>
 
                         <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
@@ -121,7 +129,7 @@
 
 
                             <p:commandButton value="转单" class="transButton" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}"  disabled="#{item.approvalStatus==1 or item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" update="@(.transferOrderDialogClass)"   oncomplete="PF('transferOrderDialog').show()"/>
-                            <p:commandButton  value="完成" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
+                            <p:commandButton  value="完成"  disabled="#{item.approvalStatus eq '1'}"  rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
                         </p:column>
 
 
