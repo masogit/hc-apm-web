@@ -188,6 +188,7 @@ public class AssetFinacingNumGenerateService {
      * @param uid
      * @return
      */
+    @Deprecated
     public String generateFinancingNum(Integer assetId, String nationalStardCode, String uid) {
         LOGGER.info("generate finacing num begin ,assetId is {},code is {},uid is {}", assetId, nationalStardCode, uid);
         if (assetId != null) {
@@ -263,7 +264,7 @@ public class AssetFinacingNumGenerateService {
         }
     }
 
-    public String getFinacingNum(String nationalStardCode, OrgInfoLevel level) {
+    private String getFinacingNum(String nationalStardCode, OrgInfoLevel level) {
         DecimalFormat df = new DecimalFormat(FORMAT_STR);
         if (level.getLevel() == 1) {
             String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithSiteUID(level.getUid(), nationalStardCode);
