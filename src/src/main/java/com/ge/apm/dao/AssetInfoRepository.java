@@ -131,4 +131,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
             + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
     public List<Object[]> findAssetOwnerComposition(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
+
+    @Query("select w.deptForSharedAsset from WorkflowConfig w where w.siteUID = :siteUID")
+    public List<String> getOrgId(@Param("siteUID") String siteUID);
 }

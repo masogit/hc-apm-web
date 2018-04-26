@@ -541,4 +541,16 @@ public class QrCodeService {
         return true;
 
     }
+
+    public void releaseQrCodeInUse(String qrCode, String siteUid) {
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
+        if (qrCodeLib != null) {
+            int status = qrCodeLib.getStatus();
+            if (status == 3) {
+                qrCodeLib.setStatus(1);
+                qrCodeLibDao.save(qrCodeLib);
+            }
+
+        }
+    }
 }

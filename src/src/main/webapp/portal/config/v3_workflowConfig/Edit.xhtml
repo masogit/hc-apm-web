@@ -20,14 +20,15 @@
                                 <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{v2_WorkflowConfigController.orgTree}" selection="#{v2_WorkflowConfigController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":V2_WorkflowConfigEditForm:selectedUserOrgName,
-                                                                                            :V2_WorkflowConfigEditForm:dispatchUserId,
-                                                                                            :V2_WorkflowConfigEditForm:dispatchUserId2,
-                                                                                            :V2_WorkflowConfigEditForm:pmDispatchUserId,
-                                                                                            :V2_WorkflowConfigEditForm:pmDispatchUserId2,
-                                                                                            :V2_WorkflowConfigEditForm:approveUserList,
-                                                                                            :V2_WorkflowConfigEditForm:deptForSharedAsset"
-                                                    listener="#{v2_WorkflowConfigController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                            <p:ajax process="@this" event="select" update=":V2_WorkflowConfigEditForm" listener="#{v2_WorkflowConfigController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                                    <!--update=":V2_WorkflowConfigEditForm:selectedUserOrgName,-->
+                                                                                            <!--:V2_WorkflowConfigEditForm:dispatchUserId,-->
+                                                                                            <!--:V2_WorkflowConfigEditForm:dispatchUserId2,-->
+                                                                                            <!--:V2_WorkflowConfigEditForm:pmDispatchUserId,-->
+                                                                                            <!--:V2_WorkflowConfigEditForm:pmDispatchUserId2,-->
+                                                                                            <!--:V2_WorkflowConfigEditForm:approveUserList,-->
+                                                                                            <!--:V2_WorkflowConfigEditForm:deptForSharedAsset"-->
+
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -232,6 +233,7 @@
                             <h:panelGroup rendered="#{v2_WorkflowConfigController.selected.siteUID != null}">
                                 <label class="label">调剂中心</label>
                                 <p:selectOneMenu id="deptForSharedAsset" value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
+                                    #{v2_WorkflowConfigController.selected.siteUID != null}
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.getDispatherClinical()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
