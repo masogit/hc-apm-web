@@ -102,7 +102,22 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 	private List<V2_PmOrder> currentPagePmOrders;
 	private Integer pmType;
 	private I18nMessageRepository i18nMessageRepository;
+    private  String head;
 
+    public String getHead() {
+        return head;
+    }
+
+    public void setHead(String head) {
+        this.head = head;
+    }
+
+    /*public String headerTakeGrap(int rem){
+			if(rem==1)
+				return "接单对话框";
+			if(rem==2)
+				return "抢单对话框";
+		}*/
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
     }
@@ -276,11 +291,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                return;
            }
        }
-        //去保修前把单子关了
-        pmOrderService.closePM(selectedPmOrder,picList);
+        //去保修前把单子关了,把备件信息和协作人都传给后台
+        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+        coWorkerList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> item.setCreatedDate(null));
+        selectedPmOrder.setQualityChecking(qaStatus);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
+
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
+        newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
@@ -311,7 +333,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newServiceRequest.setAssetLocation(dptName);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             //报修完后直接关单
-            pmOrderService.closePM(selectedPmOrder,picList);
+            //pmOrderService.closePM(selectedPmOrder,picList);
             cancel();
         }
     }
@@ -537,7 +559,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
         }
-        else if (queryIndex == 0) { //保养中
+        else if (queryIndex == 0) { //已计划
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*3+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
@@ -576,6 +598,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
+    public List<V2_WorkOrderCoworker> getGaolei(String woId) {
+        return pmOrderService.getWorkOrderCoworker(woId);
+    }
+
     public void closePM(V2_PmOrder selectedPmOrder){
         if(isChecked()==false){
         pmOrderService.closePM(selectedPmOrder,picList);
@@ -634,7 +660,7 @@ public void batchDefineQualify(){
        endTime=selectedPmOrder.getEndTime();
        planTime=selectedPmOrder.getPlanTime();
        accessoryList = getWorkOrderDetail(woid);
-        coWorkerList = getWorkOrderCoworker(woid);
+       coWorkerList = getWorkOrderCoworker(woid);
        picList = new ArrayList<V2_BlobObject>();
    }
 
@@ -696,19 +722,31 @@ public void batchDefineQualify(){
         planTimeForBatch=null;
         comments=null;
     }
+
+    public void prepareActTakeGrap(String woid,String head) {
+        this.setHead(head);
+        if(woid!=null &&  !woid.isEmpty()) {
+            selectedPmOrder = dao.findById(woid);
+            //关单时 默认设置为合格
+            selectedPmOrder.setQualityChecking("1");
+        }
+        confirmedUpDate = null;
+        confirmedDownTime = null;
+        needConfirmTime = false;
+        picList = new ArrayList<V2_BlobObject>();
+    }
     public void prepareAct(String woid) {
         if(woid!=null &&  !woid.isEmpty()) {
             selectedPmOrder = dao.findById(woid);
             //关单时 默认设置为合格
             selectedPmOrder.setQualityChecking("1");
         }
-        /*if(selectedPmOrder.getAssetInfo()!=null)
-         currentStatus = selectedPmOrder.getAssetInfo().getStatus();*/
         confirmedUpDate = null;
         confirmedDownTime = null;
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
+
     public void repairPmOrderBatch() {
         pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
         this.totalManHours =null;
@@ -725,7 +763,7 @@ public void batchDefineQualify(){
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-selectedPmOrder.setQualityChecking(qaStatus);
+        selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         //保养合格的话 去关单
 
