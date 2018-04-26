@@ -395,6 +395,18 @@ public class UserAccountService {
 					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"登录名不能为空;");
 					pass=false;
 				}
+				if(StringUtils.isEmpty(name)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"姓名不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(strActive)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"激活值不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(strLocked)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
+					pass=false;
+				}
 				if(!pass){
 					importFailedDataList.add(newUser);
 					failedCount++;
