@@ -91,6 +91,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date takeTime;
     private String approvaler;
     private List<V2_BlobObject> picList;
+    private List<V2_BlobObject> picListForRP;
     private List<V2_BlobObject> audioList;
     private V2_WorkOrderService woService;
     private V2_ServiceRequest newServiceRequest;
@@ -173,6 +174,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         blobService.deleteBlobFileById(blobId);
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
+    public void removeAttachmentByIdForRP(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picListForRP.removeAll(picListForRP.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
     public List<UserAccount> findRepairPerson(){
         if(this.selectedPmOrder!=null) {
             return  woService.getWorkerList(this.selectedPmOrder.getAssetId());
@@ -218,6 +223,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             WebUtil.addErrorMessage("fail to upload file");
         }
     }
+
+    public void handleFileUploadForRP(FileUploadEvent event) {
+        V2_BlobObject blobObject = blobService.uploadFile(event);
+        if (null != blobObject) {
+            picListForRP.add(blobObject);
+            blobObject.setBoType(V2_BlobObject.BO_TYPE_PmRequest);
+            blobService.saveBlobObject(blobObject);
+            WebUtil.addSuccessMessage(blobObject.getObjectName() + WebUtil.getMessage("SuccessUploaded"));
+        } else {
+            WebUtil.addErrorMessage("fail to upload file");
+        }
+    }
+
     public OrgInfo getOrgInfoByUid(String orgUid) {
         return orgDao.getByUid(orgUid);
     }
@@ -292,11 +310,18 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
            }
        }
         //去保修前把单子关了,把备件信息和协作人都传给后台
-        accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        coWorkerList.forEach(item -> item.setCreatedDate(null));
-        accessoryList.forEach(item -> item.setCreatedDate(null));
+        if(accessoryList!=null) {
+            accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+            accessoryList.forEach(item -> item.setCreatedDate(null));
+        }
+        if(coWorkerList!=null) {
+            coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
+            coWorkerList.forEach(item -> item.setCreatedDate(null));
+        }
+
         selectedPmOrder.setQualityChecking(qaStatus);
+
+
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
 
         selected = null;
@@ -331,7 +356,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newServiceRequest.setSrRepairType("1");
             selectedAsset.setStatus(currentStatus);
             newServiceRequest.setAssetLocation(dptName);
-            woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
+            woService.createServiceRequest(newServiceRequest, selectedAsset,picListForRP);
             //报修完后直接关单
             //pmOrderService.closePM(selectedPmOrder,picList);
             cancel();
@@ -1176,4 +1201,11 @@ public void batchDefineQualify(){
         this.checkInDate = checkInDate;
     }
 
+    public List<V2_BlobObject> getPicListForRP() {
+        return picListForRP;
+    }
+
+    public void setPicListForRP(List<V2_BlobObject> picListForRP) {
+        this.picListForRP = picListForRP;
+    }
 }
