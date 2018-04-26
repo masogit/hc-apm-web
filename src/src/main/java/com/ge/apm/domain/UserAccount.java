@@ -682,16 +682,9 @@ public class UserAccount implements Serializable {
 	}
 
 	public String getOrgFullName() {
-		OrgInfo org = this.orgInfo;
 		if (this.orgInfo == null)
 			return "";
-		String name = org.getName();
 		setOrgFullName();
-		name = StringUtils.isEmpty(getSiteName()) ? name : getSiteName() + "/" + name;
-		name = StringUtils.isEmpty(getHospitalName()) ? name : getHospitalName() + "/" + name;
-		name = StringUtils.isEmpty(getInstitutionName()) ? name : getInstitutionName() + "/" + name;
-		name = StringUtils.isEmpty(getTenantName()) ? name : getTenantName() + "/" + name;
-		this.orgFullName = name;
 		return this.orgFullName;
 	}
 
@@ -708,6 +701,7 @@ public class UserAccount implements Serializable {
 			return;
 		}
 		OrgInfo parentOrg = org;
+		String name="";
 		while (parentOrg != null) {
 			if (parentOrg.getOrgType() == 0) {
 				setTenantName(parentOrg.getName());
@@ -720,8 +714,15 @@ public class UserAccount implements Serializable {
 			} else if (parentOrg.getOrgType() == 4) {
 				setDepartName(parentOrg.getName());
 			}
+			if(StringUtils.isEmpty(name)){
+				name=parentOrg.getName();
+			}
+			else{
+				name=parentOrg.getName()+"/"+name;
+			}
 			parentOrg = parentOrg.getParentOrg();
 		}
+		this.orgFullName=name;
 	}
 
 	public String getTenantName() {
