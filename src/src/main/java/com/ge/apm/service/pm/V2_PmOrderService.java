@@ -316,6 +316,7 @@ public List<PmOrderSteps> getPmOrderStep(String pmOrderId) {
         formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(planTime));
         formData.setStepId(selectedPmOrder.getCurrentStepId());
 formData.setAttachments(attachment);
+            if(endTime!=null)
         formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("保养中");
@@ -324,7 +325,7 @@ formData.setAttachments(attachment);
         formData.setQualityChecking(selectedPmOrder.getQualityChecking());
      /*   formData.setManHours(selectedWorkOrder.getManHours());
         formData.setOtherExpense(selectedWorkOrder.getOtherExpense());*/
-        String res = srApi.invokePmOrderAction(token,formData,"repair",selectedPmOrder.getId());
+        String res = srApi.invokePmOrderAction(token,formData,"保养",selectedPmOrder.getId());
         if (res==null || !res.equalsIgnoreCase("Ok")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"完成");
         }else{
