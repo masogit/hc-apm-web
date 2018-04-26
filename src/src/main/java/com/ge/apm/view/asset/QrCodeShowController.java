@@ -32,8 +32,8 @@ public class QrCodeShowController {
         return qrCodeService.getQrCodeImageBase64(code, siteUid);
     }
 
-    public String getQrCodeImageWithTemplate(String code, String templateId) {
-        return qrCodeService.getQrCodeImageBase64WithTemplate(code, templateId);
+    public String getQrCodeImageWithTemplate(String code, String templateId,String siteUid) {
+        return qrCodeService.getQrCodeImageBase64WithTemplate(code, templateId, siteUid);
     }
 
     public String getQrCodeImageBase64ByAsset(AssetInfo asset) {

@@ -29,8 +29,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o where o.systemId=?1")
     public AssetInfo getBySystemId(String systemId);
 
-    @Query("select o from AssetInfo o where o.qrCode = ?1")
-    public AssetInfo getByQrCode(String qrCode);
+    @Query("select o from AssetInfo o where o.qrCode = ?1 and o.siteUID= ?2")
+    public AssetInfo getByQrCodeAndSiteUid(String qrCode,String site_uid);
     
     @Query("select o from AssetInfo o where o.name = ?1 and o.siteUID = ?2 and o.isDeleted = false and o.isValid = true and o.status in (1,2,3)")
     public List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID);

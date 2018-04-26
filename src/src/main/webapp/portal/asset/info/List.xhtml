@@ -441,7 +441,7 @@
                     </p:selectOneMenu>
                     <h:panelGrid columns="1" style="width:100%" id="preview">
                         <h:panelGroup rendered="#{not empty assetInfoController.exportQrCodeTemplateId}">
-                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId)}" />
+                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId,'')}" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>
