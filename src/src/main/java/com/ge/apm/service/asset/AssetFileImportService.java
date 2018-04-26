@@ -382,6 +382,9 @@ public class AssetFileImportService {
             }
         });
 
+        //release qrcode in use in order to exchange qrcode in two different asset
+        releaseQRCodeInUse(importAssetMap);
+
         importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
@@ -560,9 +563,9 @@ public class AssetFileImportService {
                 } else {
                     String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
                     if (!qrCode.equals(oldQrCode)) {
-                        if (!StringUtils.isEmpty(oldQrCode)) {
-                            qrCodeService.updateQrCodeStatus(oldQrCode, selectedOrgToImport.getUid(), 1);
-                        }
+//                        if (!StringUtils.isEmpty(oldQrCode)) {
+//                            qrCodeService.updateQrCodeStatus(oldQrCode, selectedOrgToImport.getUid(), 1);
+//                        }
 
                         boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
                         if (!qrCodeUpdated) {
@@ -895,6 +898,19 @@ public class AssetFileImportService {
         doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, "#");
 
         return doc;
+
+    }
+
+    private void releaseQRCodeInUse(Map<String, Map<String, Object>> importAssetMap) {
+
+        importAssetMap.values().forEach(item -> {
+            AssetInfo newAsset = (AssetInfo) item.get("asset");
+            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+            if (StringUtils.isEmpty(oldQrCode)) return;
+
+            qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+
+        });
 
     }
 
