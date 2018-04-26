@@ -595,7 +595,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             if ("次".equals(sard.getChargingType())) {
                 sard.setCountQty(1);
                 sard.setCost(sard.getUnitPrice());
-            } else if ("小时".equals(sard.getChargingType())) {
+            } else if ("小时(半点/整点)".equals(sard.getChargingType())) {
                 long nd = 1000 * 24 * 60 * 60;
                 long nh = 1000 * 60 * 60;
                 long nm = 1000 * 60;
