@@ -104,3 +104,5 @@ INSERT INTO sys_role (name, role_desc, home_page) VALUES ('LocalITAdmin','本地
 --alter table qr_code_lib drop constraint qr_code_lib_pkey;
 --alter table qr_code_lib alter column id set not null;
 --alter table qr_code_lib add primary key(id);
+
+alter table asset_info drop constraint uk_asset_info_qr_code;
