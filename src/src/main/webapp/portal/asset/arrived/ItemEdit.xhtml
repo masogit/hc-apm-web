@@ -438,7 +438,7 @@
                             </h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">安装工时*</label>
-                                <p:inputNumber id="workHours" value="#{assetInstallationController.arrivalListItem.workHours}" required="false" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}" minValue="0" decimalPlaces="1" />
+                                <p:inputNumber id="workHours" maxValue="999" value="#{assetInstallationController.arrivalListItem.workHours}" required="false" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}" minValue="0" decimalPlaces="1" />
                             </h:panelGroup>
 
 
@@ -469,7 +469,6 @@
                         <p:panel header="#{qrCodeLibController.qrCode}" id="preview" style="text-align:center" rendered="#{not empty assetInstallationController.arrivalListItem.qrCode}">
                             <h:panelGrid columns="1" style="width:100%">
                                 <img src="#{assetInstallationController.getQrCodeImageForAsset()}" />
-                                <!--<img src="#{qrCodeShowController.getQrCodeImageWithTemplate(assetInstallationController.arrivalListItem.qrCode,assetInstallationController.exportQrCodeTemplateId)}" />-->
                             </h:panelGrid>
                         </p:panel>
                     </h:panelGroup>

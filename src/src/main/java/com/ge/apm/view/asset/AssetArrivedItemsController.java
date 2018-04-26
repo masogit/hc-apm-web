@@ -211,7 +211,7 @@ public class AssetArrivedItemsController extends GenericCRUDUUIDController<Arriv
         asset.setFinancingNum(selected.getFinancingNum());
         asset.setModalityId(selected.getModalityId());
         asset.setSystemId(selected.getSystemId());
-        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId);
+        return qrCodeService.getQrCodeImageBase64WithTemplate(asset, exportQrCodeTemplateId,selected.getArrivalList().getSiteUID() );
     }
     
     public List<QrCodeTemplate> getQrCodeTemplates() {
