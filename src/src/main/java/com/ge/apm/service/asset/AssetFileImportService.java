@@ -494,8 +494,8 @@ public class AssetFileImportService {
 
             if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
 
-                //修改的时候如果有#号，不需要资产编号
-                if (newAsset.getUid() == null || !isFinanceNumWithClearMark(item)) {
+                //修改的时候不需要生成资产编号
+                if (newAsset.getUid() == null) {
                     financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
                             null,
                             nationalStandardCode,
@@ -942,6 +942,13 @@ public class AssetFileImportService {
 
         String financeNum = (String)item.get(NEW_FINANCE_NUM_KEY);
         return AssetRow.DELETE_MARK.equals(financeNum);
+
+    }
+
+    private boolean isFinanceNumEmpty(Map<String, Object> item) {
+
+        String financeNum = (String)item.get(NEW_FINANCE_NUM_KEY);
+        return StringUtils.isEmpty(financeNum);
 
     }
 }
