@@ -98,6 +98,7 @@ public class AssetFileImportService {
     boolean isAssetCodeMerged;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
+    private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -187,10 +188,9 @@ public class AssetFileImportService {
 //                asset.setDepartNum(departNum);
 
 
-
-
-//                String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
-//                asset.setFinancingNum(financingNum);
+                //keep the new finance num to prevent lose its data to use later
+                String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
+                map.put(NEW_FINANCE_NUM_KEY, financingNum);
 
 
 
@@ -493,16 +493,20 @@ public class AssetFileImportService {
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
             if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
-                financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
-                        null,
-                        nationalStandardCode,
-                        newAsset.getSiteUID(),
-                        null,
-                        null
-                );
 
-                if (!financingNum.startsWith("error:")) {
-                    newAsset.setFinancingNum(financingNum);
+                //修改的时候如果有#号，不需要资产编号
+                if (newAsset.getUid() == null || !isFinanceNumWithClearMark(item)) {
+                    financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                            null,
+                            nationalStandardCode,
+                            newAsset.getSiteUID(),
+                            null,
+                            null
+                    );
+
+                    if (!financingNum.startsWith("error:")) {
+                        newAsset.setFinancingNum(financingNum);
+                    }
                 }
 
             }
@@ -932,5 +936,12 @@ public class AssetFileImportService {
         this.selectedOrgToImport = selectedOrgToImport;
 
         isAssetCodeMerged = isAssetCodeMergeConfigured();
+    }
+
+    private boolean isFinanceNumWithClearMark(Map<String, Object> item) {
+
+        String financeNum = (String)item.get(NEW_FINANCE_NUM_KEY);
+        return AssetRow.DELETE_MARK.equals(financeNum);
+
     }
 }
