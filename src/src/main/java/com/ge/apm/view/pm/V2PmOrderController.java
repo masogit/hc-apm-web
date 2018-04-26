@@ -296,7 +296,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
-        pmOrderService.closePMforRepair(selectedPmOrder,picList,accessoryList,coWorkerList);
+        selectedPmOrder.setQualityChecking(qaStatus);
+        pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
 
         selected = null;
         newServiceRequest = new V2_ServiceRequest();
@@ -332,7 +333,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newServiceRequest.setAssetLocation(dptName);
             woService.createServiceRequest(newServiceRequest, selectedAsset, picList);
             //报修完后直接关单
-            pmOrderService.closePM(selectedPmOrder,picList);
+            //pmOrderService.closePM(selectedPmOrder,picList);
             cancel();
         }
     }
@@ -558,7 +559,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE,true ));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*2+"));
         }
-        else if (queryIndex == 0) { //保养中
+        else if (queryIndex == 0) { //已计划
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Maintain"));
              searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(),"1*3+"));
              searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid(), "1*3+"));
