@@ -2,6 +2,7 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
+import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.domain.UserAccount;
@@ -26,6 +27,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     AssetInfoRepository dao = null;
     private SharedAssetTypeRepository swapDao;
+    private WorkflowConfigRepository wfcDao;
     private UaaService uaaService;
 
     private String oneSearchStr;
@@ -40,6 +42,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private String batchSharedAssetTypeUid;
 
+    List<String> deptids;
+
     private long queryIndex = -1;
     public long getQueryIndex() {
         return queryIndex;
@@ -53,8 +57,10 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         swapDao = WebUtil.getBean(SharedAssetTypeRepository.class);
+        wfcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
+        deptids = wfcDao.findDeptForSharedAsset();
         this.selectedMap = new HashMap();
 
     }
@@ -167,6 +173,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void onSelectAllOfPage() {
         for (AssetInfo item : currentPageAssets) {
+            if (isBorrow(item.getUid()))
+                continue;
             selectedMap.put(item.getUid(), this.isSelectedCurrentPage);
         }
     }
@@ -185,6 +193,26 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     public void saveOne(){
         super.save();
         this.selectedMap.clear();
+    }
+
+    @Override
+    public void onBeforeUpdateObject(AssetInfo object) {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgIds = dao.getOrgId(user.getSiteUID());
+        if (orgIds.size() > 0) {
+            selected.setClinicalDeptUID(orgIds.get(0));
+            selected.setAssetDeptUID(orgIds.get(0));
+        }
+    }
+
+    public boolean isBorrow(String uid){
+        AssetInfo a = dao.findByUid(uid);
+        String sharedAssetTypeUid = a.getSharedAssetTypeUid();
+        String clinicalDeptUID = a.getClinicalDeptUID();
+        if (sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID))
+            return true;
+        return false;
+
     }
 
     public void prepareEditOne(String uid){
