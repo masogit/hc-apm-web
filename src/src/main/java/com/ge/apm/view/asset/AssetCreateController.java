@@ -9,6 +9,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BrandRepository;
 import com.ge.apm.dao.GbCodeRepository;
 import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
@@ -44,6 +45,7 @@ public class AssetCreateController {
     private QrCodeLib createRequest;
     private AssetCreateService acService;
     private BrandRepository brandDao;
+    private OrgInfoRepository orgDao;
 
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
@@ -85,6 +87,7 @@ public class AssetCreateController {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
@@ -121,8 +124,6 @@ public class AssetCreateController {
 
     private AssetInfo createAssetInfo() {
         AssetInfo newAsset = new AssetInfo();
-//        newAsset.setSiteId(createRequest.getSiteId());
-//        newAsset.setHospitalId(createRequest.getHospitalId());
         newAsset.setQrCode(createRequest.getQrCode());
         newAsset.setSerialNum(createRequest.getSerialNum());
         newAsset.setFunctionType(createRequest.getModelNum());
@@ -138,6 +139,9 @@ public class AssetCreateController {
             newAsset.setClinicalDeptId(createRequest.getOrgId());
             newAsset.setClinicalDeptUID(org.getUid());
         }
+        OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
+        newAsset.setHospitalId(siteOrg.getId());
+        newAsset.setSiteId(siteOrg.getSiteId());
         newAsset.setTenantUID(createRequest.getTenantUID());
         newAsset.setHospitalUID(createRequest.getHospitalUID());
         newAsset.setInstitutionUID(createRequest.getInstitutionUID());

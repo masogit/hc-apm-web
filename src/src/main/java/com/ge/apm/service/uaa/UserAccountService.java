@@ -391,22 +391,6 @@ public class UserAccountService {
 				roleName=ExcelParser.getCellStringValue(row, rolenameIndex);
 				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
 				
-				if(StringUtils.isEmpty(loginName)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"登录名不能为空;");
-					pass=false;
-				}
-				if(StringUtils.isEmpty(name)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"姓名不能为空;");
-					pass=false;
-				}
-				if(StringUtils.isEmpty(strActive)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"激活值不能为空;");
-					pass=false;
-				}
-				if(StringUtils.isEmpty(strLocked)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
-					pass=false;
-				}
 				if(!pass){
 					importFailedDataList.add(newUser);
 					failedCount++;
@@ -433,6 +417,23 @@ public class UserAccountService {
 				newUser.setHospitalName(hospital);
 				newUser.setSiteName(site);
 				newUser.setDepartName(department);
+				
+				if(StringUtils.isEmpty(loginName)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"登录名不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(name)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"姓名不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(strActive)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"激活值不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(strLocked)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
+					pass=false;
+				}
 				if(handleNewUser(newUser, institution, hospital, site, department)==false){
 					importFailedDataList.add(newUser);
 					failedCount++;
