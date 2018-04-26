@@ -36,7 +36,7 @@
                                  rows="10" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm"/>
+                        <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm pmTab:pmOrderDetailForm:pmcoworkerList"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
 
 
@@ -105,14 +105,14 @@
 
                             <p:commandButton  value="完成" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
    <!--v2PmOrderController.isChecked()加了后 一选中了checkbox 接单按钮就会灰掉 保证不能即批量又单个接单-->
-                            <p:commandButton class="takeOrderbutton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" value="接单" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton class="takeOrderbutton" disabled="#{item.currentPersonId!=userContextService.loginUserUid or v2PmOrderController.isChecked()}" rendered="#{item.simplify ne true}" value="接单" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,'接单对话框')}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <!--抢单操作 31-->
                         <p:column headerText="操作" rendered="#{v2PmOrderController.queryIndex==31}">
                             <p:commandButton  value="完成" rendered="#{item.simplify}" actionListener="#{v2PmOrderController.prepareCompleteOrder(item.id)}" update="@(.pmrepairCompleteDialogFormcls)" oncomplete="PF('pmrepairCompleteDialog').show()"/>
 
-                            <p:commandButton  value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareAct(item.id)}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
+                            <p:commandButton  value="抢单" rendered="#{item.simplify ne true}" actionListener="#{v2PmOrderController.prepareActTakeGrap(item.id,'抢单对话框')}" update="@(.t1)" oncomplete="PF('takeOrderDialog').show()"/>
                         </p:column>
 
                         <!--已计划 0-->
@@ -377,7 +377,7 @@
             </h:form>
         </p:dialog>
 <!--接单对话框-->
-        <p:dialog class ="t1" id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="接单对话框">
+        <p:dialog class ="t1" id="takeOrderDialog" widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{v2PmOrderController.head}">
             <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
@@ -394,7 +394,7 @@
 
                     <br/>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="确认接单" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{v2PmOrderController.acceptWorkOrder()}" value="确认" update="pmTab:takeOrderDialogForm :growl pmTab:pmOrderListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'takeOrderDialog');"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('takeOrderDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
