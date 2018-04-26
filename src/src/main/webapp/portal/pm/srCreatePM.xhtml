@@ -76,8 +76,7 @@
                         </p:panel>
 
                     </p:dataGrid>
-                    <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUploadForRP}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUploadForRP}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
                         <p:commandButton value="保存" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm" disabled="#{!v2PmOrderController.canCreateSr()}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>

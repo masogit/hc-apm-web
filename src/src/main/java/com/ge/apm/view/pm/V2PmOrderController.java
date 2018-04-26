@@ -74,6 +74,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Boolean needConfirmTime = false;
     private String cancelReason;
     private String stepFileter;
+    private String repairType;
     //for details form
     private List<V2_WorkOrder_Detail> approvedDetails;
     private List<V2_WorkOrder_Detail> accessoryList;
@@ -607,8 +608,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
 		currentPagePmOrders = result.getContent();
 		this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
-
-
 		return result;
     }
     public void onSelectPmOrder(){
@@ -687,6 +686,7 @@ public void batchDefineQualify(){
        accessoryList = getWorkOrderDetail(woid);
        coWorkerList = getWorkOrderCoworker(woid);
        picList = new ArrayList<V2_BlobObject>();
+       picListForRP = new ArrayList<V2_BlobObject>();
    }
 
     //
@@ -1207,5 +1207,13 @@ public void batchDefineQualify(){
 
     public void setPicListForRP(List<V2_BlobObject> picListForRP) {
         this.picListForRP = picListForRP;
+    }
+
+    public String getRepairType() {
+        return repairType;
+    }
+
+    public void setRepairType(String repairType) {
+        this.repairType = repairType;
     }
 }
