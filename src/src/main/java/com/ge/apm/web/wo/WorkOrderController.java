@@ -223,35 +223,35 @@ public class WorkOrderController {
         return map;
     }
     
-    @RequestMapping(value="unloginAssetInfo")
-    public @ResponseBody Object unloginAssetInfo(HttpServletRequest request, String qrCode) {
-        AssetInfo info = assetDao.getByQrCode(qrCode);
-        if (info==null)
-            return null;
-        Map map = new HashMap();
-        map.put("assetId", info.getId());
-        map.put("assetName", info.getName());
-        map.put("supplier", info.getSupplierId()==null?"":service.getSupplierName(info.getSupplierId()));
-        map.put("assetGroup", service.getMsgValue("assetGroup", info.getAssetGroup().toString()));
-//        map.put("assetStatus", service.getMsgValue("assetStatus", info.getStatus()+""));
-        map.put("assetStatus", info.getStatus());
-        
-        return map;
-    }
+//    @RequestMapping(value="unloginAssetInfo")
+//    public @ResponseBody Object unloginAssetInfo(HttpServletRequest request, String qrCode) {
+//        AssetInfo info = assetDao.getByQrCode(qrCode);
+//        if (info==null)
+//            return null;
+//        Map map = new HashMap();
+//        map.put("assetId", info.getId());
+//        map.put("assetName", info.getName());
+//        map.put("supplier", info.getSupplierId()==null?"":service.getSupplierName(info.getSupplierId()));
+//        map.put("assetGroup", service.getMsgValue("assetGroup", info.getAssetGroup().toString()));
+////        map.put("assetStatus", service.getMsgValue("assetStatus", info.getStatus()+""));
+//        map.put("assetStatus", info.getStatus());
+//        
+//        return map;
+//    }
     
-    @RequestMapping(value="scanaction")
-    public @ResponseBody Object scanAction(String qrCode, String woId) {
-        WorkOrder wo = null;
-        if (woId != null && !"".equals(woId)) {
-            wo = woWcService.scanActionByWoId(Integer.parseInt(woId));
-        } else {
-            AssetInfo info = assetDao.getByQrCode(qrCode);
-            if (info==null)
-                return null;
-            wo = woWcService.scanAction(info);
-        }
-        return wo;
-    }
+//    @RequestMapping(value="scanaction")
+//    public @ResponseBody Object scanAction(String qrCode, String woId) {
+//        WorkOrder wo = null;
+//        if (woId != null && !"".equals(woId)) {
+//            wo = woWcService.scanActionByWoId(Integer.parseInt(woId));
+//        } else {
+//            AssetInfo info = null;//assetDao.getByQrCode(qrCode);
+//            if (info==null)
+//                return null;
+//            wo = woWcService.scanAction(info);
+//        }
+//        return wo;
+//    }
     
     @RequestMapping(value="choosetab")
     public @ResponseBody Object chooseTab(HttpServletRequest request) {
