@@ -73,6 +73,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
                     this.prepareCreate();
                     this.selected.setAssetId(Integer.parseInt(requestAssetId));
                     this.selectedAsset = assetService.getAssetInfo(Integer.parseInt(requestAssetId));
+                    this.selected.setHospitalId(selectedAsset.getHospitalId());
                 } catch (InstantiationException ex) {
                     Logger.getLogger(AssetContractController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IllegalAccessException ex) {
