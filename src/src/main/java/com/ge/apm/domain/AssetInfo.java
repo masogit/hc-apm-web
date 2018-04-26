@@ -129,6 +129,9 @@ public class AssetInfo implements Serializable {
     @Column(name = "asset_dept_id")
     private Integer assetDeptId;//所属设备科
 
+    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
+    private String assetDeptUID;
+
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
 
@@ -1373,6 +1376,14 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptNamePyCode(String clinicalDeptNamePyCode) {
         this.clinicalDeptNamePyCode = clinicalDeptNamePyCode;
+    }
+
+    public String getAssetDeptUID() {
+        return assetDeptUID;
+    }
+
+    public void setAssetDeptUID(String assetDeptUID) {
+        this.assetDeptUID = assetDeptUID;
     }
 
     @Override
