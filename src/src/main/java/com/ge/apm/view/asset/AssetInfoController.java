@@ -1469,9 +1469,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void updateFinancingNumByNationalStandardCode() {
         if (null != selected && null != selectedGb) {
-            String financingNum = assetFinacingNumGenerateService.generateFinancingNum(this.selected.getId(),
+            String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                    this.selected.getId(),
                     this.selectedGb.getCode(),
-                    this.selected.getSiteUID()
+                    this.selected.getSiteUID(),
+                    null,
+                    null
             );
             if (financingNum != null && StringUtils.isEmpty(this.selected.getFinancingNum())) {
                 this.selected.setFinancingNum(financingNum);
