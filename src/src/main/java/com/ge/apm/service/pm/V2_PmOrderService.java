@@ -92,6 +92,25 @@ public class V2_PmOrderService {
     }
 
 
+    public void closePMforRepair(V2_PmOrder selectedPmOrder,List<V2_BlobObject> picList,List<V2_WorkOrder_Detail> accessoryList, List<V2_WorkOrderCoworker> coWorkerList ){
+        String token = UserContextService.getAccessToken();
+        PmOrderActionForm formData = new PmOrderActionForm();
+        formData.setAttachments(picList);
+        formData.setActionType("close");
+        formData.setDetails(accessoryList);
+        formData.setCoworkers(coWorkerList);
+        formData.setStepId(selectedPmOrder.getCurrentStepId());
+        formData.setQualityChecking(selectedPmOrder.getQualityChecking());
+        formData.setPmOrderId(selectedPmOrder.getId());
+        String res = srApi.invokePmOrderAction(token,formData,"close",selectedPmOrder.getId());
+        if (res==null || !res.equalsIgnoreCase("ok")) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"提交");
+        }else{
+            WebUtil.addSuccessMessage("关单成功");
+        }
+    }
+
+
 
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
