@@ -707,7 +707,9 @@ public class UserAccount implements Serializable {
         if (this.orgInfo == null) {
             return;
         }
-        setDepartName(orgInfo.getName());
+        if(org.getOrgType()==4){
+			setDepartName(org.getName());
+		}
         OrgInfo parentOrg = org.getParentOrg();
         while (parentOrg != null) {
             if (parentOrg.getOrgType() == 0) {

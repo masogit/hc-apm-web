@@ -127,7 +127,7 @@ public class UserAccountService {
 		return pass;
 	}
 	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department){
-		newUser=checkLoginName(newUser);
+		checkLoginName(newUser);
 		if(checkData(newUser)){
 			setUIDs(newUser, institution, hospital, site, department);
 			if(checkData(newUser)){
@@ -166,16 +166,9 @@ public class UserAccountService {
 				}
 			}
 			//update finally
-			user.setEmail(newUser.getEmail());
-			user.setLoginName(newUser.getLoginName());
-			user.setTelephone(newUser.getTelephone());
-			user.setName(newUser.getName());
-			user.setIsActive(newUser.getIsActive());
-			if(user.getIsActive()){
-				user.setActiveTime(new Date());
-			}
-			user.setIsLocked(newUser.getIsLocked());
-			return user;
+			newUser.setUid(user.getUid());
+			newUser.setId(user.getId());
+			return newUser;
 		}
 		return newUser;
 	}
