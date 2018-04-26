@@ -181,18 +181,18 @@ public class QrCodeService {
         } else if (!Strings.isNullOrEmpty(qrCode)) {
             template = getTemplateBySiteUid(siteUid);
         }
-        return getQrCodeImage(qrCode, asset, template);
+        return getQrCodeImage(qrCode, asset, template,siteUid);
     }
 
-    public BufferedImage getQrCodeImageWithTemplate(String qrCode, AssetInfo asset, String templateId) {
+    public BufferedImage getQrCodeImageWithTemplate(String qrCode, AssetInfo asset, String templateId,String siteUid) {
         if(Strings.isNullOrEmpty(templateId)){
             return getQrCodeImage(qrCode,asset,asset.getSiteUID());
         }
         QrCodeTemplate template = templateDao.findById(templateId);
-        return getQrCodeImage(qrCode, asset, template);
+        return getQrCodeImage(qrCode, asset, template,siteUid);
     }
 
-    private BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, QrCodeTemplate template) {
+    private BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, QrCodeTemplate template,String siteUid) {
         List<QrCodeTemplateElement> elementList;
         if (template == null) {
             template = templateService.getDefaultTemplate();
@@ -201,7 +201,7 @@ public class QrCodeService {
             elementList = templateService.getElementsByTemplate(template.getId());
         }
         if (!Strings.isNullOrEmpty(qrCode)) {
-            elementList = getElementsValue(template, elementList, qrCode);
+            elementList = getElementsValue(template, elementList, qrCode,siteUid);
         } else {
             elementList = getElementsValue(template, elementList, asset);
         }
@@ -240,12 +240,12 @@ public class QrCodeService {
         return qrCodeDrawService.getImageBase64(getQrCodeImage(null, asset,asset.getSiteUID()));
     }
     
-    public String getQrCodeImageBase64WithTemplate(AssetInfo asset,String templateId) {
-        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(null, asset,templateId));
+    public String getQrCodeImageBase64WithTemplate(AssetInfo asset,String templateId,String siteUid) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(null, asset,templateId,siteUid));
     }
 
-    public String getQrCodeImageBase64WithTemplate(String qrCode, String templateId) {
-        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(qrCode, null, templateId));
+    public String getQrCodeImageBase64WithTemplate(String qrCode, String templateId,String siteUid) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(qrCode, null, templateId,siteUid));
     }
 
     private static Map<String, String> FieldsMap;
@@ -271,8 +271,8 @@ public class QrCodeService {
         return FieldsMap;
     }
 
-    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode) {
-        AssetInfo asset = assetDao.getByQrCode(qrCode);
+    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode,String SiteUid) {
+        AssetInfo asset = assetDao.getByQrCodeAndSiteUid(qrCode,SiteUid);
         if (asset == null) {
             //Demo asset for preview
             asset = new AssetInfo();
@@ -365,7 +365,7 @@ public class QrCodeService {
         assetList.forEach(item -> {
             if (!Strings.isNullOrEmpty(item.getQrCode())) {
                 try {
-                    BufferedImage image = getQrCodeImage(item.getQrCode(), null, template == null ? getTemplateBySiteUid(item.getSiteUID()) : template);
+                    BufferedImage image = getQrCodeImage(item.getQrCode(), null, template == null ? getTemplateBySiteUid(item.getSiteUID()) : template, item.getSiteUID());
                     String fileName = Optional.ofNullable(item.getClinicalDeptName()).orElse("").concat("_").concat(item.getName()).concat("_").concat(item.getQrCode()).concat(".jpg");
                     out.putNextEntry(new ZipEntry(fileName));
                     ImageIO.write(image, "JPG", out);
@@ -405,7 +405,7 @@ public class QrCodeService {
 
     List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements) {
 
-        return getElementsValue(template, elements, "0123456789123456");
+        return getElementsValue(template, elements, "0123456789123456","");
     }
 
     public String getPreViewBase64(QrCodeTemplate template, List<QrCodeTemplateElement> elementList) {
