@@ -91,12 +91,16 @@ create table qr_code_lib_bak as (select* from qr_code_lib);
 alter table qr_code_lib drop constraint uk_qr_code_lib_qrcode;
 alter table qr_code_lib alter column site_id drop not null;
 alter table qr_code_lib alter column hospital_id drop not null;
-alter table qr_code_lib drop constraint qr_code_lib_pkey;
+--alter table qr_code_lib drop constraint qr_code_lib_pkey;
 alter table qr_code_lib alter column uid set not null;
-alter table qr_code_lib alter column id drop not null;
-alter table qr_code_lib add primary key(uid);
+--alter table qr_code_lib alter column id drop not null;
+--alter table qr_code_lib add primary key(uid);
+alter table qr_code_lib add constraint uk_qr_code_lib_qrcode_site_uid unique(qr_code,site_uid);
 
 update supplier a set tenant_uid=(select uid from tenant_info o where o.id=a.site_id) where tenant_uid is null
 
 INSERT INTO sys_role (name, role_desc, home_page) VALUES ('LocalITAdmin','本地后台运营管理','/portal/uaa/userAccount/List.xhtml');
 
+--alter table qr_code_lib drop constraint qr_code_lib_pkey;
+--alter table qr_code_lib alter column id set not null;
+--alter table qr_code_lib add primary key(id);

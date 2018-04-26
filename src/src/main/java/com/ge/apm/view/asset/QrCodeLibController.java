@@ -24,11 +24,11 @@ import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.StreamedContent;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.GenericCRUDController;
 
 @ManagedBean
 @ViewScoped
-public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
+public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     QrCodeLibRepository dao = null;
     TenantInfoRepository tenantInfoDao = null;
