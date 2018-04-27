@@ -12,7 +12,6 @@ import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +95,7 @@ public class AssetFileImportService {
     private OrgInfo selectedOrgToImport;
 
     boolean isAssetCodeMerged;
-    Boolean autoGenerateFinancingNum;
+    boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
@@ -279,8 +278,8 @@ public class AssetFileImportService {
 
                 asset.setUsageStatus(3); //已建档
 
-                WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
-                if(siteConfig != null && !Strings.isNullOrEmpty(siteConfig.getAssetApprover())){
+                boolean isNeedApprover = configService.isNeedAssetApprover(selectedOrgToImport.getSiteUID());
+                if(isNeedApprover){
                     asset.setUsageStatus(2); //待审核
                 }
 
