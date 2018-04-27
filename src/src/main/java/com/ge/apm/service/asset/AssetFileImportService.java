@@ -96,6 +96,7 @@ public class AssetFileImportService {
     private OrgInfo selectedOrgToImport;
 
     boolean isAssetCodeMerged;
+    Boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
@@ -364,7 +365,7 @@ public class AssetFileImportService {
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum, Boolean isGeneratePmOrder) {
+                           Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
@@ -936,6 +937,14 @@ public class AssetFileImportService {
         this.selectedOrgToImport = selectedOrgToImport;
 
         isAssetCodeMerged = isAssetCodeMergeConfigured();
+
+        WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+        if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
+            if (siteConfig.getGenerateMethod() == 1) {
+                autoGenerateFinancingNum = true;
+            }
+
+        }
     }
 
     private boolean isFinanceNumWithClearMark(Map<String, Object> item) {
