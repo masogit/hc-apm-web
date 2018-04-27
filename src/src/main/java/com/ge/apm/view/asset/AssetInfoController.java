@@ -3,6 +3,7 @@ package com.ge.apm.view.asset;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.*;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
@@ -63,6 +64,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private V2_PmScheduleRepository pmSchDao;
     private ExWorkOrderRepository exWoDao;
     private V2_PmOrderRepository v2_pmOrderRepository;
+
+    private ConfigService configService;
 
     private boolean resultStatus;
 
@@ -230,6 +233,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
+        configService = WebUtil.getBean(ConfigService.class);
 
         importService = WebUtil.getBean(AssetFileImportService.class);
 
@@ -1382,7 +1386,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void onParentAssetChange() {
 
-        AssetSeriaNumConfig config = assetFinacingNumGenerateService.findConfigByUid(this.selected.getTenantUID(), this.selected.getSiteUID());
+        WorkflowConfig config = configService.findConfigBySite(this.selected.getSiteUID());
 
         if (config == null || config.getGenerateMethod() == null || config.getGenerateMethod().intValue() != 2) {
             //not configured to generate by parent asset
