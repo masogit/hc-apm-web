@@ -5,32 +5,29 @@
  */
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.AssetSeriaNumConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetFileImportService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.web.WebUtil;
+
+import javax.annotation.PostConstruct;
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -46,7 +43,7 @@ public class AssetFileImportController {
     private Map<String, Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
-    private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
+
     private UaaService uaaService;
 
     private OrgInfoRepository orgDao;
@@ -56,7 +53,7 @@ public class AssetFileImportController {
     
     private Boolean canbeImported = false;
     private Boolean autoGenerateQrcode = true;
-    private Boolean autoGenerateFinancingNum;
+//    private Boolean autoGenerateFinancingNum;
     private Boolean isGeneratePmOrder;
 
     private StreamedContent exportFile;
@@ -68,14 +65,13 @@ public class AssetFileImportController {
     @PostConstruct
     protected void init() {
         aiService = WebUtil.getBean(AssetFileImportService.class);
-        assetSeriaNumConfigRepository = WebUtil.getBean(AssetSeriaNumConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
-        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-        Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
+//        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+//        Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
 
-        autoGenerateFinancingNum = configuredCount > 0L;
+//        autoGenerateFinancingNum = configuredCount > 0L;
 
         selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         aiService.setSelectedOrgToImport(selectedOrg);
@@ -121,7 +117,7 @@ public class AssetFileImportController {
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode, autoGenerateFinancingNum,isGeneratePmOrder);
+            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
 
             try {
@@ -239,13 +235,13 @@ public class AssetFileImportController {
         this.autoGenerateQrcode = autoGenerateQrcode;
     }
 
-    public Boolean getAutoGenerateFinancingNum() {
-        return autoGenerateFinancingNum;
-    }
-
-    public void setAutoGenerateFinancingNum(Boolean autoGenerateFinancingNum) {
-        this.autoGenerateFinancingNum = autoGenerateFinancingNum;
-    }
+//    public Boolean getAutoGenerateFinancingNum() {
+//        return autoGenerateFinancingNum;
+//    }
+//
+//    public void setAutoGenerateFinancingNum(Boolean autoGenerateFinancingNum) {
+//        this.autoGenerateFinancingNum = autoGenerateFinancingNum;
+//    }
 
     public Boolean getIsGeneratePmOrder() {
         return isGeneratePmOrder;
