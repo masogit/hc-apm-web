@@ -388,6 +388,14 @@ public class AssetFileImportService {
         importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
+            //if site uid not match, ignore update
+            if (newAsset.getUid() != null) {
+                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                    return ;
+                }
+
+            }
+
             String orgName = newAsset.getClinicalDeptName();
             if (importOrgMap.containsKey(orgName)) {
                 OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
