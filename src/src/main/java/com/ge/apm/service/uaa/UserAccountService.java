@@ -168,6 +168,7 @@ public class UserAccountService {
 			//update finally
 			newUser.setUid(user.getUid());
 			newUser.setId(user.getId());
+			newUser.setPasswordErrorCount(user.getPasswordErrorCount());
 			return newUser;
 		}
 		return newUser;
