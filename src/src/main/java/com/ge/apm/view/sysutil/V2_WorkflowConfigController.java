@@ -65,6 +65,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private UaaService uaaService;
 	private OrgInfo selectedOrg;
 	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
+	private String newFormat;
 
 	@Override
 	protected void init() {
@@ -331,18 +332,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else if(orgType == 3){
 			selected.setAssetSeriaNumLevel(1);//科室级别
 		}
-/*		if(selected.getInstitutionUID() == null){//租户级别
-			selected.setInstitutionUID(selected.getTenantUID());
-			selected.setHospitalUID(selected.getTenantUID());
-			selected.setSiteUID(selected.getTenantUID());
-		}
-		if(selected.getHospitalUID() == null){//集团级别
-			selected.setHospitalUID(selected.getInstitutionUID());
-			selected.setSiteUID(selected.getInstitutionUID());
-		}
-		if(selected.getSiteUID() == null){//医院级别
-			selected.setSiteUID(selected.getHospitalUID());
-		}*/
 
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
 		if (selected.getDispatchUserId() != null) {
@@ -421,6 +410,18 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			return;
 		}
 
+		if(selected.getId() != null){
+    		if(selected.getFormat() != null && newFormat != null){
+    			if(selected.getFormat().length() > newFormat.length()){
+					RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+					WebUtil.addErrorMessage(WebUtil.getMessage("FormatIllegal"));
+					return;
+				}
+			}
+		}
+		if(newFormat != null){
+    		selected.setFormat(newFormat);
+		}
         onBeforeSave(selected);
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
@@ -431,6 +432,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
+		newFormat = null;
     }
 
 	@Override
@@ -452,6 +454,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		selectedUserOrg = orgInfoRepository.getByUid(selected.getSiteUID());
 		updateDispater();
 		updateApproverList();
+		newFormat = selected.getFormat();
 	}
 
 	public void prepareCreate(){
@@ -582,4 +585,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		this.approveUserList = approveUserList;
 	}
 
+	public String getNewFormat() {
+		return newFormat;
+	}
+
+	public void setNewFormat(String newFormat) {
+		this.newFormat = newFormat;
+	}
 }
