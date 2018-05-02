@@ -556,6 +556,30 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void repairWorkOrder() {
+        boolean valid = true;
+        if(confirmedUpDate==null){
+            WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
+            valid=false;
+        }
+        if(null==selectedWorkOrder.getCaseType()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType")+WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+            valid=false;
+        }
+        if(null==selectedWorkOrder.getRepairResult()){
+            WebUtil.addErrorMessage("维修结果"+WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
+            valid=false;
+        }
+        if(null==selectedWorkOrder.getManHours()|| selectedWorkOrder.getManHours()<0.01 ){
+            WebUtil.addErrorMessage("工时不能小于0.01");
+            RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+            valid=false;
+        }
+        if(!valid){
+            return ;
+        }
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
