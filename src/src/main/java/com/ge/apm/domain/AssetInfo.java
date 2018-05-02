@@ -83,7 +83,7 @@ public class AssetInfo implements Serializable {
 
     @Size(max = 64)
     @Column(name = "national_standard_code")
-    private String nationalStandardCode;//2010国家编码
+    private String nationalStandardCode;//2010国家编码 设备国标码
 
     @Size(max = 64)
     @Column(name = "serial_num")

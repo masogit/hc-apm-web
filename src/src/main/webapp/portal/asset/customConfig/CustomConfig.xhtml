@@ -1,0 +1,57 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="自定义配置"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:panelGroup >
+                    <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                    <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                        <p:scrollPanel style="height:300px;border: 0" mode="native">
+                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}"  oncomplete="PF('varPanelOrg').hide();"/>
+                                <p:ajax process="@this" event="expand"/>
+                                <p:ajax process="@this" event="collapse"/>
+                                <p:treeNode type="org">
+                                    <h:outputText value="#{node.name}"/>
+                                </p:treeNode>
+                            </p:tree>
+                        </p:scrollPanel>
+                    </p:overlayPanel>
+                </h:panelGroup>
+                <p:fieldset legend="资产查看页面" toggleable="true" toggleSpeed="500">
+                    <p:pickList id="AssetsListPickList" value="#{customConfigController.assetsListPageFields}" var="item"   
+                                itemValue="#{item}" itemLabel="#{item.name}" showCheckbox="false" responsive="true"
+                                showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains" converter="assetInfoConverter" >
+                        <f:facet name="sourceCaption">"可选择的字段"</f:facet>
+                        <f:facet name="targetCaption">"已选择的字段"</f:facet>
+                        <p:ajax event="transfer" listener="#{customConfigController.onFieldsTransfer}" />
+                        <p:column style="width:40%">
+                            <h:outputText value="#{item.name}" />
+                        </p:column>
+                    </p:pickList>
+                </p:fieldset>
+                <p:fieldset legend="资产详细页面" toggleable="true" toggleSpeed="500">
+
+                </p:fieldset>
+
+                <h:form id="ConfigEditForm">
+                    <h:panelGroup >
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{CustomConfigController.saveChange()}" validateClient="true" update=" :growl" style="float:left"/>
+                    </h:panelGroup>
+
+                </h:form>
+
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
