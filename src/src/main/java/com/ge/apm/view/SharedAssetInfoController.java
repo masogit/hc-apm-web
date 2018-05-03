@@ -195,15 +195,15 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         this.selectedMap.clear();
     }
 
-    @Override
-    public void onBeforeUpdateObject(AssetInfo object) {
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgIds = dao.getOrgId(user.getSiteUID());
-        if (orgIds.size() > 0) {
-            selected.setClinicalDeptUID(orgIds.get(0));
-            selected.setAssetDeptUID(orgIds.get(0));
-        }
-    }
+//    @Override
+//    public void onBeforeUpdateObject(AssetInfo object) {
+//        UserAccount user = UserContextService.getCurrentUserAccount();
+//        List<String> orgIds = dao.getOrgId(user.getSiteUID());
+//        if (orgIds.size() > 0) {
+//            selected.setClinicalDeptUID(orgIds.get(0));
+//            selected.setAssetDeptUID(orgIds.get(0));
+//        }
+//    }
 
     public boolean isBorrow(String uid){
         AssetInfo a = dao.findByUid(uid);
