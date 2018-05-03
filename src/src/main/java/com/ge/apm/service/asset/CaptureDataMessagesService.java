@@ -1,5 +1,9 @@
 package com.ge.apm.service.asset;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +34,7 @@ public class CaptureDataMessagesService {
 	private OrgInfoRepository orgInfoRepository;
 	
 	private final Logger log = LoggerFactory.getLogger(CaptureDataMessagesService.class);
+	private String content="";
 	
 //	public boolean checkSystemIdExists(CaptureDataMessages captureDM){
 //		try {
@@ -53,4 +58,5 @@ public class CaptureDataMessagesService {
 		OrgInfo info=orgInfoRepository.findById(id);
 		return info;
 	}
+	
 }
