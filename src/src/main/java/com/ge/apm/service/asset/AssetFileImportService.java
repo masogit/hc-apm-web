@@ -917,6 +917,15 @@ public class AssetFileImportService {
 
         importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
+
+            //if site uid not match, ignore update
+            if (newAsset.getUid() != null) {
+                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                    return ;
+                }
+
+            }
+
             String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
             if (StringUtils.isEmpty(oldQrCode)) return;
             if (oldQrCode.equals(newAsset.getQrCode())) return;
