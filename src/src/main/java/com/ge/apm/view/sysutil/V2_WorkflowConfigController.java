@@ -14,6 +14,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -66,6 +67,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private OrgInfo selectedOrg;
 	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
 	private String newFormat;
+	private List<OrgInfo> dispatherClinical = new ArrayList<OrgInfo>();
 
 	@Override
 	protected void init() {
@@ -107,7 +109,29 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		selectedUserOrg = (OrgInfo) node.getData();
 		updateDispater();
 		updateApproverList();
+		updateDispatherClinical();
 		selected.setSiteUID(selectedUserOrg.getSiteUID());
+	}
+
+	private void updateDispatherClinical() {
+		dispatherClinical.clear();
+		if(selected == null || selectedUserOrg == null){
+			return;
+		}
+		if(isInsulate){
+			Integer orgType = selectedUserOrg.getOrgType();
+			if(orgType == 0){
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getTenantUID(),4);
+			}else if(orgType == 1) {
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getInstitutionUID(),4);
+			}else if(orgType == 2){
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getHospitalUID(),4);
+			}else if(orgType == 3){
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+			}
+		}else{
+			dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+		}
 	}
 
 	public void setTenantUid(String tenantUid) {
@@ -262,13 +286,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return tenantInfoRepository.findByuid(tenantUID).getName();
 	}
 
-   	public List<OrgInfo> getDispatherClinical(){
+/*   	public List<OrgInfo> getDispatherClinical(){
 		OrgInfo org = orgInfoRepository.findByUid(selected.getSiteUID());
 		if(org.getOrgLevel() != 3){
 			return null;
 		}
 		return orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
-	}
+	}*/
 
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
@@ -419,6 +443,27 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				}
 			}
 		}
+
+		if(selected.getGenerateMethod() != null && selected.getGenerateMethod() == 1){
+    		if(StringUtils.isEmpty(selected.getPrefix())){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
+				return;
+			}else{
+    			List<WorkflowConfig> prefixList = dao.findByTenantUID(user.getTenantUID());
+    			if(CollectionUtils.isNotEmpty(prefixList)){
+					boolean isExist = prefixList.stream().anyMatch(config -> config.getPrefix().equals(selected.getPrefix()));
+					if(isExist){
+						RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+						WebUtil.addErrorMessage(WebUtil.getMessage("prefixExistsAlready"));
+						return;
+					}
+				}
+			}
+
+		}
+
+
 		if(newFormat != null){
     		selected.setFormat(newFormat);
 		}
@@ -450,16 +495,19 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void prepareEdit(){
 		dispatchUserList.clear();
 		approveUserList.clear();
+		dispatchUserList.clear();
 		super.prepareEdit();
 		selectedUserOrg = orgInfoRepository.getByUid(selected.getSiteUID());
 		updateDispater();
 		updateApproverList();
+		updateDispatherClinical();
 		newFormat = selected.getFormat();
 	}
 
 	public void prepareCreate(){
 		dispatchUserList.clear();
 		approveUserList.clear();
+		dispatchUserList.clear();
 		try {
 			super.prepareCreate();
 		} catch (InstantiationException e) {
@@ -591,5 +639,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public void setNewFormat(String newFormat) {
 		this.newFormat = newFormat;
+	}
+
+	public void setDispatherClinical(List<OrgInfo> dispatherClinical) {
+		this.dispatherClinical = dispatherClinical;
+	}
+
+	public List<OrgInfo> getDispatherClinical() {
+		return dispatherClinical;
 	}
 }
