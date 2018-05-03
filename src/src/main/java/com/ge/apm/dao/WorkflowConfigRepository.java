@@ -36,4 +36,7 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     public List<String> findDeptForSharedAsset();
 
     List<WorkflowConfig> findByTenantUID(String tenantUID);
+
+    @Query(value="select * from workflow_config where generate_method = 1 and prefix is not null and tenant_uid = ?1",nativeQuery = true)
+    List<WorkflowConfig> findAllPrefixByTenantUID(String tenantUID);
 }
