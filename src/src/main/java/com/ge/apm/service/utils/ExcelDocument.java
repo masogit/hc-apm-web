@@ -8,9 +8,11 @@ package com.ge.apm.service.utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -491,6 +493,22 @@ public class ExcelDocument {
 
     }
 
+    public void writeCellFormula(String sheetName, int rowNum, int colNum, String formula) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        cell.setCellFormula(formula);
+
+    }
+
     public void removeRow(String sheetName, int rowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(rowNum - 1);
@@ -512,6 +530,16 @@ public class ExcelDocument {
                     cell.setCellType(CellType.BLANK);
                 }
             }
+        }
+
+    }
+
+    public void calculateFormula() {
+
+        if (documentType.equals(ExcelType.XLS)) {
+            HSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
+        } else if (documentType.equals(ExcelType.XLSX)) {
+            XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
         }
 
     }

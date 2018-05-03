@@ -525,6 +525,20 @@ public class QrCodeService {
         return true;
     }
 
+    public boolean isQrcodeAvailableInStatus(String qrCode, String siteUid, int status) {
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if(null == qrCodeLib){
+            return false;
+        }
+
+        if (status == qrCodeLib.getStatus()) {
+            return true;
+        } else {
+            return false;
+        }
+
+    }
+
     public boolean updateExistingQrCodeNotUsed(String qrCode, OrgInfo currentOrg) {
 
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
