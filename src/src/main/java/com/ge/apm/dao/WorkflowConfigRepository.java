@@ -35,4 +35,5 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     @Query(value="select distinct dept_for_shared_asset from workflow_config WHERE dept_for_shared_asset IS NOT NULL",nativeQuery = true)
     public List<String> findDeptForSharedAsset();
 
+    List<WorkflowConfig> findByTenantUID(String tenantUID);
 }
