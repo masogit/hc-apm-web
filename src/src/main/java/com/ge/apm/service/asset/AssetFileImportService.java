@@ -896,7 +896,13 @@ public class AssetFileImportService {
             ++startRow;
         }
 
-        doc.calculateFormula();
+        String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
+
+        String sumFormula = String.format("SUM('Asset List'!$Y$7:$Y$%d)", assetList.size() + 6);
+
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
+//        doc.calculateFormula();
 
         //export org info list
         for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {

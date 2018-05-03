@@ -493,6 +493,22 @@ public class ExcelDocument {
 
     }
 
+    public void writeCellFormula(String sheetName, int rowNum, int colNum, String formula) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        cell.setCellFormula(formula);
+
+    }
+
     public void removeRow(String sheetName, int rowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(rowNum - 1);
