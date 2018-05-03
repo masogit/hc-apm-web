@@ -51,6 +51,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private List<CaptureDataMessages> importFailedDataList;
     private String content;
     private AssetInfo assetInfo;
+    private int conentTextLength=120;
     boolean validate=true;
     
     @Override
@@ -156,6 +157,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
+    	setIndexValue();
     	if(this.selected.getType()==0){
     		if(validate){
         		super.save();
@@ -172,6 +174,25 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	else{
     		super.save();
     		this.selected=null;
+    	}
+    }
+    
+    private void setIndexValue(){
+    	CaptureDataMessages captureDataMessages=null;
+    	if(this.selected.getType()==0){
+    		captureDataMessages=dao.findBySystemId(this.selected.getSystemId());
+    	}
+    	else if(this.selected.getType()==1){
+    		captureDataMessages=dao.findByGeDeviceType(this.selected.getGeDeviceType());
+    	}
+    	if(captureDataMessages!=null){
+    		Integer index=captureDataMessages.getIndex();
+    		if(index!=null){
+    			this.selected.setIndex(index+1);
+    		}
+    		else{
+    			this.selected.setIndex(0);
+    		}
     	}
     }
     
