@@ -263,6 +263,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListBusinessAck', '商务验收', 'Asset Arrival List Business Acknowledge', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListClinicalAck', '临床验收', 'Asset Arrival List Clinical Acknowledge', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListTechnicalAck', '技术验收', 'Asset Arrival List Technical Acknowledge', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListBusinessAckDate', '商务验收日期', 'Asset Arrival List Business Acknowledge', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListClinicalAckDate', '临床验收日期', 'Asset Arrival List Clinical Acknowledge', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListTechnicalAckDate', '技术验收日期', 'Asset Arrival List Technical Acknowledge', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListPic', '相关图片', 'Asset Arrival List Picture', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListInstallInfo', '安装信息', 'Install Info', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListInstallAckNone', '待验收', 'Acknowledge none', NULL, '-1');
