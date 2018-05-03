@@ -902,6 +902,7 @@ public class AssetFileImportService {
 
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
+        doc.getWorkBook().setForceFormulaRecalculation(true);
 //        doc.calculateFormula();
 
         //export org info list
