@@ -155,13 +155,23 @@ public class WorkflowConfig implements Serializable {
      */
 
     @Column(name = "generate_method")
-    private Integer generateMethod;//资产编码生成方式
+    private Integer generateMethod;//资产编码生成方式 1、国标码+设备数 2、
 
     @Column(name="format")
     private String format;//初始流水号
 
     @Column(name = "asset_seria_num_level")
     private Integer assetSeriaNumLevel;//资产编码level 租户：4 集团：3，医院：2 院区：1
+
+    private String prefix;//国标码前缀
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
 
     /***
      * 紧急工单配置
