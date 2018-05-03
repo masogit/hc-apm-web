@@ -158,16 +158,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			TreeNodeUtil.expandParentsNodes(selectedUserOrg);
 		}
 	}
-
-
-/*	public void initDispatchUserList() {
-		if(isInsulate){
-			List<SearchFilter> filters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
-			dispatchUserList = userDao.findBySearchFilter(filters);
-		}else{
-			dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
-		}
-	}*/
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
@@ -450,14 +440,21 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
 				return;
 			}else{
-    			List<WorkflowConfig> prefixList = dao.findByTenantUID(user.getTenantUID());
+    			List<WorkflowConfig> prefixList = dao.findAllPrefixByTenantUID(user.getTenantUID());
     			if(CollectionUtils.isNotEmpty(prefixList)){
-					boolean isExist = prefixList.stream().anyMatch(config -> config.getPrefix().equals(selected.getPrefix()));
+					for (WorkflowConfig temp:prefixList) {
+						if((!temp.equals(selected)) && temp.getPrefix().equals(selected.getPrefix())){
+							RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+							WebUtil.addErrorMessage(WebUtil.getMessage("prefixExistsAlready"));
+							return;
+						}
+					}
+					/*boolean isExist = prefixList.stream().anyMatch(config -> config.getPrefix().equals(selected.getPrefix()));
 					if(isExist){
 						RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 						WebUtil.addErrorMessage(WebUtil.getMessage("prefixExistsAlready"));
 						return;
-					}
+					}*/
 				}
 			}
 

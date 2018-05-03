@@ -896,6 +896,15 @@ public class AssetFileImportService {
             ++startRow;
         }
 
+        String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
+
+        String sumFormula = String.format("SUM('Asset List'!$Y$7:$Y$%d)", assetList.size() + 6);
+
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
+        doc.getWorkBook().setForceFormulaRecalculation(true);
+//        doc.calculateFormula();
+
         //export org info list
         for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
             doc.clearRow(AssetFileImportService.SHEET_ORG, startRow);
@@ -928,9 +937,19 @@ public class AssetFileImportService {
 
             String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
             if (StringUtils.isEmpty(oldQrCode)) return;
-            if (oldQrCode.equals(newAsset.getQrCode())) return;
+            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
 
-            qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            boolean releaseable = true;
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                if (!exists) {
+                    releaseable = false;
+                }
+            }
+
+            if (releaseable) {
+                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            }
 
         });
 
