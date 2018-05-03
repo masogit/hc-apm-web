@@ -10,19 +10,14 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
-import javaslang.Tuple2;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.ReorderEvent;
 import org.primefaces.event.TransferEvent;
 import org.primefaces.model.DualListModel;
 import webapp.framework.web.WebUtil;
@@ -39,19 +34,22 @@ public class CustomConfigController {
     private OrgInfoRepository orgDao;
     private DualListModel<String> assetsListPageFields;
     private List<String> sourceListFields;
-    private List<String> targetListFields;
+    private LinkedList<String> targetListFields;
     private OrgInfo selectSite;
-    private Map<String, String> allFields;
+    private CustomConfigObject customConfigObject;
     
     @PostConstruct
     protected void init() {
         ccService = WebUtil.getBean(CustomConfigService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        allFields = ccService.getAllFields();
-        CustomConfigObject customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
-        sourceListFields = customConfig.getAssetListPageFields();
-        targetListFields = new ArrayList();
+        loadConfigForSite(selectSite.getUid());
+    }
+    
+    private void loadConfigForSite(String siteUid){
+        customConfigObject = ccService.getCurrentCustomConfig(siteUid);
+        targetListFields = customConfigObject.getAssetListPageFields();
+        sourceListFields = ccService.getAllFields().keySet().stream().filter(item-> !targetListFields.contains(item)).collect(Collectors.toList());
         assetsListPageFields = new DualListModel<>(sourceListFields, targetListFields);
     }
     
@@ -62,25 +60,46 @@ public class CustomConfigController {
             } else {
                 selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
             }
+            loadConfigForSite(selectSite.getUid());
         }
-
     }
     
-    public void onAssetsTransfer(TransferEvent event) {
+    public void onFieldsTransfer(TransferEvent event) {
 
         for(Object item : event.getItems()) {
             if(event.isAdd()){
-                targetFields.add((String)item);
+                targetListFields.add((String)item);
             }else{
-                targetFields.remove((String)item);
+                targetListFields.remove((String)item);
             }
         }
+    }
+    
+    public void onFieldsReorder(ReorderEvent event){
+        
+    }
+    
+    public void saveChange(){
+        customConfigObject.setAssetListPageFields(targetListFields);
+        ccService.saveConfig(selectSite,customConfigObject);
+        WebUtil.addSuccessMessage("已保存");
+    }
+    
+    public void deleteConfig(){
+        ccService.removeConfig(selectSite);
+        WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
     }
 
     public OrgInfo getSelectSite() {
         return selectSite;
     }
-    
-    
+
+    public DualListModel<String> getAssetsListPageFields() {
+        return assetsListPageFields;
+    }
+
+    public void setAssetsListPageFields(DualListModel<String> assetsListPageFields) {
+        this.assetsListPageFields = assetsListPageFields;
+    }
     
 }

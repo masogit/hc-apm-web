@@ -6,6 +6,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.CustomConfig;
+import java.util.List;
 import webapp.framework.dao.GenericRepositoryUUID;
 /**
  *
@@ -14,4 +15,6 @@ import webapp.framework.dao.GenericRepositoryUUID;
 public interface CustomConfigRepository extends GenericRepositoryUUID<CustomConfig>{
     
     CustomConfig findBySiteUID(String siteUID);
+    
+    List<CustomConfig>  findBySiteUIDIn(List<String> orgUid);
 }

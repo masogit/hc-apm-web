@@ -7,11 +7,18 @@ package com.ge.apm.service.asset;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.CustomConfigRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.view.sysutil.UserContextService;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -22,12 +29,16 @@ import webapp.framework.web.WebUtil;
  */
 @Component
 public class CustomConfigService {
-    
+
     @Autowired
     CustomConfigRepository customConfigDao;
+    @Autowired
+    OrgInfoRepository orgDao;
+    @Autowired
+    ConfigService configService;
 
     public LinkedHashMap<String, String> getAllFields() {
-        LinkedHashMap<String, String> res= new LinkedHashMap();
+        LinkedHashMap<String, String> res = new LinkedHashMap();
         res.put("serialNum", WebUtil.getMessage("serialNum"));
         res.put("name", WebUtil.getMessage("name"));
         res.put("aliasName", WebUtil.getMessage("aliasName"));
@@ -90,14 +101,28 @@ public class CustomConfigService {
 
     public CustomConfigObject getCustomConfigBySite(String siteUID) {
         CustomConfig res = customConfigDao.findBySiteUID(siteUID);
-        return res==null? null:JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
+        return res == null ? null : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
     }
-    
-    public CustomConfigObject getCurrentCustomConfig(){
-        return null;
+
+    public CustomConfigObject getCurrentCustomConfig(String siteUid) {
+        OrgInfo org = orgDao.findByUid(siteUid);
+        if (configService.isInsulateTenant(org.getTenantUID())) {
+            CustomConfigObject res = getCustomConfigBySite(siteUid);
+            return res == null ? getDefalutCustomConfigObject() : res;
+        }
+        List<CustomConfig> configList = customConfigDao.findBySiteUIDIn(Arrays.asList(org.getSiteUID(), org.getHospitalUID(), org.getInstitutionUID(), org.getTenantUID()));
+        if(null==configList || configList.isEmpty()){
+            return getDefalutCustomConfigObject();
+        }
+        CustomConfig config = configList.stream().filter(item->org.getSiteUID().equals(item.getSiteUID())).findAny()
+                .orElse(configList.stream().filter(item->org.getHospitalUID().equals(item.getHospitalUID())).findAny()
+                        .orElse(configList.stream().filter(item->org.getInstitutionUID().equals(item.getInstitutionUID())).findAny()
+                                .orElse(configList.stream().filter(item->org.getTenantUID().equals(item.getTenantUID())).findAny().orElse(null))));
+        return config==null?getDefalutCustomConfigObject():JSONObject.parseObject(config.getConfig(), CustomConfigObject.class);
+        
     }
-    
-    private CustomConfigObject getDefalutCustomConfigObject(){
+
+    private CustomConfigObject getDefalutCustomConfigObject() {
         CustomConfigObject object = new CustomConfigObject();
         List<String> defaultAssetListPageFields = new ArrayList();
         defaultAssetListPageFields.add("name");
@@ -115,4 +140,31 @@ public class CustomConfigService {
         object.setAssetListPageFields(defaultAssetListPageFields);
         return object;
     }
+
+    public void saveConfig(OrgInfo selectSite, CustomConfigObject customConfigObject) {
+        CustomConfig config = customConfigDao.findBySiteUID(selectSite.getSiteUID());
+        if(config==null){
+            config = new CustomConfig();
+            config.setConfig(JSONObject.toJSONString(customConfigObject));
+            config.setTenantUID(selectSite.getTenantUID());
+            config.setInstitutionUID(selectSite.getInstitutionUID());
+            config.setHospitalUID(selectSite.getHospitalUID());
+            config.setSiteUID(selectSite.getSiteUID());
+            config.setCreatedDate(new Date());
+            config.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
+        }else{
+            config.setConfig(JSONObject.toJSONString(customConfigObject));
+            config.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+            config.setLastModifiedDate(new Date());
+        }
+        customConfigDao.save(config);
+    }
+
+    public void removeConfig(OrgInfo selectSite) {
+        CustomConfig config = customConfigDao.findBySiteUID(selectSite.getSiteUID());
+        if(null!=config){
+            customConfigDao.delete(config);
+        }
+    }
+
 }

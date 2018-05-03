@@ -5,29 +5,29 @@
  */
 package com.ge.apm.domain.pure;
 
-import java.util.List;
+import java.util.LinkedList;
 
 /**
  *
  * @author 212579464
  */
 public class CustomConfigObject {
-    List<String> AssetListPageFields;
-    List<String> AssetDetailPageFields;
+    LinkedList<String> AssetListPageFields;
+    LinkedList<String> AssetDetailPageFields;
 
-    public List<String> getAssetListPageFields() {
+    public LinkedList<String> getAssetListPageFields() {
         return AssetListPageFields;
     }
 
-    public void setAssetListPageFields(List<String> AssetListPageFields) {
+    public void setAssetListPageFields(LinkedList<String> AssetListPageFields) {
         this.AssetListPageFields = AssetListPageFields;
     }
 
-    public List<String> getAssetDetailPageFields() {
+    public LinkedList<String> getAssetDetailPageFields() {
         return AssetDetailPageFields;
     }
 
-    public void setAssetDetailPageFields(List<String> AssetDetailPageFields) {
+    public void setAssetDetailPageFields(LinkedList<String> AssetDetailPageFields) {
         this.AssetDetailPageFields = AssetDetailPageFields;
     }
     
