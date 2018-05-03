@@ -928,9 +928,19 @@ public class AssetFileImportService {
 
             String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
             if (StringUtils.isEmpty(oldQrCode)) return;
-            if (oldQrCode.equals(newAsset.getQrCode())) return;
+            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
 
-            qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            boolean releaseable = true;
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                if (!exists) {
+                    releaseable = false;
+                }
+            }
+
+            if (releaseable) {
+                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            }
 
         });
 
