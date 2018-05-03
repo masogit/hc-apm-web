@@ -1,5 +1,6 @@
 package com.ge.apm.dao;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.Query;
@@ -20,4 +21,13 @@ public interface CaptureDataMessagesRepository extends GenericRepositoryUUID<Cap
 	
 	@Query("select o.content from CaptureDataMessages o where o.id=?1")
 	public String getContentById(String id);
+	
+	@Query("select o from CaptureDataMessages o where o.assetUID=?1 and o.startDate<?2 and o.endDate>?2 and o.type=0 order by o.index")
+	List<CaptureDataMessages> getMessage(String assetUID, Date date);
+	
+	@Query("select o from CaptureDataMessages o where o.geDeviceType=?1 and o.startDate<?2 and o.endDate>?2 and o.type=1 order by o.index")
+	List<CaptureDataMessages> getMessage(Integer geDeviceType, Date date);
+	
+	@Query("select o from CaptureDataMessages o where o.assetUID=?1 order by o.index")
+	List<CaptureDataMessages> findByAssetUID(String assetUID);
 }
