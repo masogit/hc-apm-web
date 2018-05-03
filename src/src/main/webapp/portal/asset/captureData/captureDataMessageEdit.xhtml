@@ -53,7 +53,7 @@
 					<h:panelGroup>
 						<label class="label">消息内容</label>
 						<span id="idContentEditorMessage" class="ui-messages-warn" style="display:none;"></span>
-						<p:editor id="idContentEditor" height="350" onchange="contentEditorChange()">
+						<p:editor id="idContentEditor" value="#{captureDataMessagesController.selected.content}" height="350" onchange="contentEditorChange()">
 						</p:editor>
 					</h:panelGroup>
 				</div>
