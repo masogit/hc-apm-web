@@ -16,17 +16,21 @@
 		<p:column headerText="SystemID" filterBy="#{item.systemId}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.systemId}" />
 		</p:column>
+		<p:column headerText="设备类型" sortBy="#{item.geDeviceType}" filterMatchMode="LIKE">
+			<h:outputText value="#{fieldMsg.fieldValue('geDeviceType', item.geDeviceType)}" />
+		</p:column>
 		<p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.comment}" />
 		</p:column>
-		<p:column headerText="序号" sortBy="#{item.index}" filterMatchMode="EQ">
-			<h:outputText value="#{item.index}" />
-		</p:column>
 		<p:column headerText="生效时间" sortBy="#{item.startDate}">
-			<h:outputText value="#{item.startDate}" />
+			<h:outputText value="#{item.startDate}" >
+				<f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+			</h:outputText>
 		</p:column>
 		<p:column headerText="截止时间" sortBy="#{item.endDate}">
-			<h:outputText value="#{item.endDate}" />
+			<h:outputText value="#{item.endDate}" >
+				<f:convertDateTime pattern="MM/dd/yyyy HH:mm:ss" />
+			</h:outputText>
 		</p:column>
 		<p:column headerText="预览消息">
 			<p:commandButton update=":captureDataMessagesTab:displayCaptureDataMessagesContent" oncomplete="PF('captureDataMessagesDlg').show()" icon="fa fa-search"
