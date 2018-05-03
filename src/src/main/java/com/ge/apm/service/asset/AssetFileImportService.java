@@ -896,6 +896,8 @@ public class AssetFileImportService {
             ++startRow;
         }
 
+        doc.calculateFormula();
+
         //export org info list
         for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
             doc.clearRow(AssetFileImportService.SHEET_ORG, startRow);

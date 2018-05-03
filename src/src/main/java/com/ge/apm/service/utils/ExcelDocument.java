@@ -8,9 +8,11 @@ package com.ge.apm.service.utils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
@@ -512,6 +514,16 @@ public class ExcelDocument {
                     cell.setCellType(CellType.BLANK);
                 }
             }
+        }
+
+    }
+
+    public void calculateFormula() {
+
+        if (documentType.equals(ExcelType.XLS)) {
+            HSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
+        } else if (documentType.equals(ExcelType.XLSX)) {
+            XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
         }
 
     }
