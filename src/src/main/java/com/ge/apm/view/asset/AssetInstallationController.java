@@ -421,10 +421,10 @@ public class AssetInstallationController {
 //                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
                                     WebUtil.addErrorMessage("二维码不正确");
                                     arrivalListItem.setQrCode(null);
-                                }else{
+                                } else {
                                     arrivalListItem.setQrCode(num);
                                 }
-                            }else{
+                            } else {
                                 arrivalListItem.setQrCode(num);
                             }
                             break;
@@ -435,10 +435,10 @@ public class AssetInstallationController {
 //                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
                                     WebUtil.addErrorMessage("二维码不正确");
                                     arrivalListItem.setQrCode(null);
-                                }else{
+                                } else {
                                     arrivalListItem.setQrCode(num);
                                 }
-                            }else{
+                            } else {
                                 arrivalListItem.setQrCode(num);
                             }
                             break;
@@ -470,6 +470,29 @@ public class AssetInstallationController {
         }
     }
 
+    public void onAckChange(String ackType) {
+        switch (ackType) {
+            case "technical":
+                if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getTechnicalAckStatus())) {
+                    arrivalListItem.setTechnicalAckDate(new Date());
+                }else{
+                    arrivalListItem.setTechnicalAckDate(null);
+                }
+            case "clinical":
+                if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getClinicalAckStatus())) {
+                    arrivalListItem.setClinicalAckDate(new Date());
+                }else{
+                    arrivalListItem.setClinicalAckDate(null);
+                }
+            case "business":
+                if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getBusinessAckStatus())) {
+                    arrivalListItem.setBusinessAckDate(new Date());
+                }else{
+                    arrivalListItem.setBusinessAckDate(null);
+                }
+        }
+    }
+
     public List<String> autoCompleteDept(String query) {
         List<String> res = deptInfoList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
@@ -485,7 +508,8 @@ public class AssetInstallationController {
     }
 
     public List<QrCodeTemplate> getQrCodeTemplates() {
-        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class);
+        QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class
+        );
         return qtService.getTemplateByUser(UserContextService.getCurrentUserAccount());
     }
 
