@@ -6,6 +6,7 @@ import java.util.Date;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -15,6 +16,8 @@ import javax.validation.constraints.Size;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -85,12 +88,23 @@ public class CaptureDataMessages implements Serializable {
 	private String otherErrorMessage;
 
 	@Column(name = "start_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date startDate;
 
 	@Column(name = "end_date")
-	@Temporal(TemporalType.DATE)
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
 	private Date endDate;
+	
+	public static final int imageLength2="</img>".length();
+	public static final int pLength1="<p>".length();
+	public static final int pLength2="</p>".length();
+	public static final String beginImage="<img";
+	public static final String endImage="</img>";
+	public static final String beginP="<p>";
+	public static final String endP="</p>";
+	public static final String pageLimit="<!--page-->";
 
 	public String getId() {
 		return id;
