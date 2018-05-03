@@ -263,6 +263,9 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListBusinessAck', '商务验收', 'Asset Arrival List Business Acknowledge', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListClinicalAck', '临床验收', 'Asset Arrival List Clinical Acknowledge', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListTechnicalAck', '技术验收', 'Asset Arrival List Technical Acknowledge', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListBusinessAckDate', '商务验收日期', 'Asset Arrival List Business Acknowledge', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListClinicalAckDate', '临床验收日期', 'Asset Arrival List Clinical Acknowledge', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListTechnicalAckDate', '技术验收日期', 'Asset Arrival List Technical Acknowledge', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListPic', '相关图片', 'Asset Arrival List Picture', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListInstallInfo', '安装信息', 'Install Info', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'AssetArrivalListInstallAckNone', '待验收', 'Acknowledge none', NULL, '-1');
@@ -896,7 +899,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('importStatus', 'CheckFail', '数据错误', 'Fail to add', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('importStatus', 'NoAsset', '无匹配设备', 'No Asset found', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '2', '前缀+年份+流水号+设备数', '主设备和附属设备资产编号的生成规则', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '1', '国标码+设备数', '前7位为分类代码（即国标码）+后五位（该类设备的累计数量）', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '1', '前缀+国标码+设备数', '前7位为分类代码（即国标码）+后五位（该类设备的累计数量）', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('generateMethod', '0', '其他', '其他计算方式', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('contractType', '1', '全保', '全保', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('contractType', '2', '人工保', '全保', NULL, '-1');
@@ -1473,3 +1476,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'SystemConfig', '流程配置项', 'system config', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'FormatIllegal', '初始流水号长度只能递增!', 'init format just allows longer ! ', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'prefixIsNull', '资产编码生成规则是前缀+国标码+设备数时，前缀不能为空！', 'prefix cannot be null !', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'prefixExistsAlready', '前缀已存在！', 'prefix exists already !', NULL, '-1');
