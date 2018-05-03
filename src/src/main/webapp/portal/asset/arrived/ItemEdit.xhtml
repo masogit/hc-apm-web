@@ -435,7 +435,7 @@
 
 
                     </p:fieldset>
-                                        <p:fieldset legend="相关报告" >
+<!--                                        <p:fieldset legend="相关报告" >
                                             <h:panelGroup id="addReport">
                                                 <p:selectOneMenu value="#{commonReportController.reportUid}">
                                                     <p:ajax update="addReport" />
@@ -454,7 +454,7 @@
                     <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                     <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                 </p:dataList>
-            </p:fieldset>
+            </p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <!--                            <h:panelGroup>
