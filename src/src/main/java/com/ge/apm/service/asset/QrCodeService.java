@@ -482,7 +482,7 @@ public class QrCodeService {
 
     }
 
-    private Boolean createSpecialQrCode(String qrcode, String siteUid) {
+    public boolean createSpecialQrCode(String qrcode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode,siteUid);
         if (null != qrCodeLib) {
             return false;
@@ -502,6 +502,14 @@ public class QrCodeService {
         return true;
     }
 
+    public void forceRemoveQrcode(String qrCode, String siteUid){
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if(null == qrCodeLib){
+            return ;
+        }
+        qrCodeLibDao.delete(qrCodeLib);
+    }
+    
     public boolean deleteQrcode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
         if(null == qrCodeLib){
