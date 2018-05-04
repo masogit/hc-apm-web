@@ -167,10 +167,14 @@ public class UserContextService implements Serializable {
     		return false;
     }
 
+    WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+
     public boolean isHospitalUser(){
         UserAccount loginUser = getLoginUser();
         if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
-            return false;
+            //判断医院级别是否有调剂中心
+            List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
+            if (list.size() == 0) return false;
         }
         return true;
     }
