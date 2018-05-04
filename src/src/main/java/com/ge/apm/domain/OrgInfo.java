@@ -96,6 +96,9 @@ public class OrgInfo implements Serializable {
     @Column(name = "site_id")
     private Integer siteId;
 
+    @Transient
+    private int lineNum;
+
     @PrePersist
     public void initializeUid() {
         if (uid == null)
@@ -325,4 +328,11 @@ public class OrgInfo implements Serializable {
         return name;
     }
 
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
+    }
 }
