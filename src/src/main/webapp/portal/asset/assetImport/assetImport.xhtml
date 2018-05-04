@@ -59,11 +59,21 @@
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="importDataForm">
+                    <h:panelGroup >
+                        <p:selectOneRadio id="status" value="#{assetFileImportController.displayErrorsOnly}">
+                            <p:ajax event="change" process="@this" update=":importDataForm" listener="#{assetFileImportController.switchAssetCheckStatus}"/>
+                            <f:selectItem itemValue="false" itemLabel="全部记录"/>
+                            <f:selectItem itemValue="true" itemLabel="错误记录"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
                     <p:tabView>
                         <p:tab title="资产导入">
-                            <p:dataTable id="assetTable" value="#{assetFileImportController.importAssetMap.values()}" var="item" rows="10" paginator="true"
+                            <p:dataTable id="assetTable" value="#{assetFileImportController.displayAssets.values()}" var="item" rows="10" paginator="true"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          rowsPerPageTemplate="5,10,15" >
+                                <p:column headerText="行" >
+                                    <h:outputText value="#{item.get('asset').lineNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.assetName}" >
                                     <h:outputText value="#{item.get('asset').name}"/>
                                 </p:column>
@@ -109,7 +119,10 @@
                             </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
-                            <p:dataTable  value="#{assetFileImportController.importOrgMap.values()}" var="item" >
+                            <p:dataTable  value="#{assetFileImportController.displayOrgs.values()}" var="item" >
+                                <p:column headerText="行" >
+                                    <h:outputText value="#{item.get('org').lineNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.Department}" >
                                     <h:outputText value="#{item.get('org').name}"/>
                                 </p:column>
