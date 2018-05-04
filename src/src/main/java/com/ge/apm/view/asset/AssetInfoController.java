@@ -154,6 +154,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private Sort lastPageSort; //download use
 
+    WorkflowConfig config;
+    
     public Integer getQueryIndex() {
         return queryIndex;
     }
@@ -252,6 +254,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 prepareCreate();
                 selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
                 updateSelectedOrg(selectedOrg);
+                config = configService.findConfigBySite(selected.getSiteUID());
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -277,6 +280,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
             prepareEdit();
+            config = configService.findConfigBySite(selected.getSiteUID());
         }
 //        else if ("Delete".equalsIgnoreCase(actionName)) {
 //            //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
@@ -625,6 +629,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
+        selected.setQrCode(qrcodeLib.getQrCode());
+        onDepartNumChange("qrCode");
     }
 
     private boolean updateQrCode() {
@@ -669,7 +675,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setQrCode(null);
         } else {
             if (!qrCode.equals(selected.getQrCode())) {
-                if (!updateQrCode()) {
+                if("DFQ".equals(getAssetCodeConfig())){
+                    if(!qrCodeService.createSpecialQrCode(qrCode,selected.getSiteUID())){
+                        WebUtil.addErrorMessage("二维码不正确");
+                        return "";
+                    };
+                    qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
+                    selected.setQrCode(qrCode);
+                }else if (!updateQrCode()) {
                     qrCode = "";
                     return "";
                 }
@@ -1783,6 +1796,51 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         streamedContent.setName("AssetInfo_export.xlsx");
 
         excelFile = streamedContent;
+    }
+    
+    //三码合一设置
+    public String getAssetCodeConfig() {
+        return config ==null?null:config.getAssetCodeConfig();
+    }
+    public void onDepartNumChange(String fieldName) {
+        if (!Strings.isNullOrEmpty(config.getAssetCodeConfig())) {
+            String num = null;
+            switch (config.getAssetCodeConfig()) {
+                case "DFQ":
+                    switch (fieldName) {
+                        case "financingNum":
+                            num = selected.getFinancingNum();
+                            qrCode = num;
+                            break;
+                        case "departNum":
+                            num = selected.getDepartNum();
+                            qrCode = num;
+                            break;
+                        case "qrCode":
+                            num = qrCode;
+                            break;
+                        default:
+                    }
+                    selected.setFinancingNum(num);
+                    selected.setDepartNum(num);
+                    break;
+                case "DF":
+                    switch (fieldName) {
+                        case "financingNum":
+                            num = selected.getFinancingNum();
+                            selected.setFinancingNum(num);
+                            selected.setDepartNum(num);
+                            break;
+                        case "departNum":
+                            num = selected.getDepartNum();
+                            selected.setFinancingNum(num);
+                            selected.setDepartNum(num);
+                            break;
+                    }
+                    break;
+                default:
+            }
+        }
     }
 
     public String getExportQrCodeTemplateId() {
