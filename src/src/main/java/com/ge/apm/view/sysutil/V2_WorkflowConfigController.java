@@ -120,7 +120,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
-			if(orgType == 0){
+			dispatherClinical = orgInfoRepository.findBySiteUIDAndOrgType(selectedUserOrg.getSiteUID(),4);
+			/*if(orgType == 0){
 				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getTenantUID(),4);
 			}else if(orgType == 1) {
 				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getInstitutionUID(),4);
@@ -128,9 +129,9 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getHospitalUID(),4);
 			}else if(orgType == 3){
 				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
-			}
+			}*/
 		}else{
-			dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+			dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selectedUserOrg.getSiteUID(),4);
 		}
 	}
 
