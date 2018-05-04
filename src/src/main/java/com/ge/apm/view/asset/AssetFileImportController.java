@@ -21,8 +21,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,6 +63,8 @@ public class AssetFileImportController {
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
+
+    private boolean displayErrorsOnly;
 
     @PostConstruct
     protected void init() {
@@ -194,6 +198,41 @@ public class AssetFileImportController {
 
     }
 
+    public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
+
+        if (!displayErrorsOnly) return;
+
+        if (importAssetMap == null) return;
+
+        Map<String, Map<String, Object>> result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Map<String, Object>> entry: importAssetMap.entrySet()) {
+            Map<String, Object> map = entry.getValue();
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+
+        displayAssets = result;
+    }
+
+    Map<String, Map<String, Object>> displayAssets;
+
+    public Map<String, Map<String, Object>> getDisplayAssets() {
+
+        if (displayErrorsOnly) {
+            return displayAssets;
+        } else {
+            return importAssetMap;
+        }
+
+    }
+
     //Getter and Setter
     public Map<String, Map<String, Object>> getImportOrgMap() {
         return importOrgMap;
@@ -273,5 +312,13 @@ public class AssetFileImportController {
 
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public boolean isDisplayErrorsOnly() {
+        return displayErrorsOnly;
+    }
+
+    public void setDisplayErrorsOnly(boolean displayErrorsOnly) {
+        this.displayErrorsOnly = displayErrorsOnly;
     }
 }
