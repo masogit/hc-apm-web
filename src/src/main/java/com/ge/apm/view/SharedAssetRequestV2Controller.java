@@ -376,7 +376,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         String pageName = "";
         if(sta == 8){
             pageName = "Edit_1";
-            selected.setMsgEndTime(this.getTime("归还"));
+            selected.setMsgEndTime(new Date());
+//            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
             this.save();
 
@@ -403,8 +404,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         selected.getSartList();
         if(sta == 2){
             pageName = "Edit_1";
-            selected.setMsgAccepter(this.selected.getApplicant());
-            selected.setMsgBeginTime(this.getTime("借用"));
+//            selected.setMsgAccepter(this.selected.getApplicant());
+            selected.setMsgAccepter(this.getNameByLoginName(selected.getApplicant()));
+//            selected.setMsgBeginTime(this.getTime("借用"));
+            selected.setMsgBeginTime(new Date());
             selected.setState(sta);
             this.save();
 
@@ -514,13 +517,18 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     sard.setClinicalDeptForReturnName(this.selected.getClinicalDeptName());
                                     String swaptypeid = applySwapType.getSharedAssetTypeId();
                                     SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
-                                    if(times==null){
-                                     //时间往后推
-                                        sard.setChargingEndTime(this.setEndTime());
-                                    }
-                                    else{
+
+                                    //时间往前推
+                                    if ("小时(半点/整点)".equals(swapTypeVo.getChargingType())){
+                                        sard.setChargingEndTime(this.setEndTime(times));
+                                    }else {
                                         sard.setChargingEndTime(times);
+
                                     }
+                                    if(times==null){
+                                        sard.setChargingEndTime(this.setEndTime(new Date()));
+                                    }
+
                                     sard.setChargingType(swapTypeVo.getChargingType());
                                     sard.setUnitPrice(swapTypeVo.getUnitPrice());
                                     sard.setUnit(swapTypeVo.getUnit());
@@ -610,7 +618,21 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 countQty = (int) (day * 24 * 60 / 30 + hour * 2 + min / 30);
                 sard.setCountQty(countQty);
                 sard.setCost(countQty * sard.getUnitPrice() / 2);
-            } else {
+            }else if ("自然小时".equals(sard.getChargingType())){
+                long nd = 1000 * 24 * 60 * 60;
+                long nh = 1000 * 60 * 60;
+                long nm = 1000 * 60;
+                long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
+                // 计算差多少天
+                long day = diff / nd;
+                // 计算差多少小时
+                long hour = diff % nd / nh;
+                // 计算差多少分钟
+                long min = diff % nd % nh / nm;
+                double number = day * 24 + hour + min/60.0;
+                number = number < 0 ? 0 : number;
+                sard.setCost(number * sard.getUnitPrice());
+            }else {
                 Calendar cal1 = Calendar.getInstance();
                 cal1.setTime(sard.getChargingBeginTime());
                 Calendar cal2 = Calendar.getInstance();
@@ -664,9 +686,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         requestContext.addCallbackParam("url", url);
     }
 
-    public Date setBeginTime(){
+    public Date setBeginTime(Date date){
         Calendar cal = Calendar.getInstance();
-        Date date = new Date();
+//        Date date = new Date();
         cal.setTime(date);
         cal.set(Calendar.SECOND,0);
         int minutes = cal.get(Calendar.MINUTE);
@@ -679,9 +701,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         return cal.getTime();
     }
 
-    public Date setEndTime(){
+    public Date setEndTime(Date date){
         Calendar cal = Calendar.getInstance();
-        Date date = new Date();
+//        Date date = new Date();
         cal.setTime(date);
         cal.set(Calendar.SECOND,0);
         int minutes = cal.get(Calendar.MINUTE);
@@ -695,10 +717,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
      public Date getTime(String type) throws ParseException{
             if("借用".equals(type)){
-                return setBeginTime();
+                return setBeginTime(new Date());
             }
             else{
-                return setEndTime();
+                return setEndTime(new Date());
             }
             
      }
@@ -776,9 +798,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         assetDetaiVo.setAccepter(accepter);
                                     }
                                     //时间往后推
-                                    assetDetaiVo.setChargingBeginTime(times);
+                                    if ("小时(半点/整点)".equals(swapTypeVo.getChargingType())){
+                                        assetDetaiVo.setChargingBeginTime(this.setBeginTime(times));
+                                    }else {
+                                        assetDetaiVo.setChargingBeginTime(times);
+
+                                    }
                                     if(times==null){
-                                        assetDetaiVo.setChargingBeginTime(this.setBeginTime());
+                                        assetDetaiVo.setChargingBeginTime(this.setBeginTime(new Date()));
                                     }
 
                                     //附件状态默认全选
