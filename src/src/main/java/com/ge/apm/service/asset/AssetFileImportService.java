@@ -903,7 +903,7 @@ public class AssetFileImportService {
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
         doc.getWorkBook().setForceFormulaRecalculation(true);
-//        doc.calculateFormula();
+        doc.calculateFormula();
 
         //export org info list
         for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
