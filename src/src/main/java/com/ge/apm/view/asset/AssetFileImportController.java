@@ -219,6 +219,24 @@ public class AssetFileImportController {
         }
 
         displayAssets = result;
+
+        if (importOrgMap == null) return;
+
+        result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Map<String, Object>> entry: importOrgMap.entrySet()) {
+            Map<String, Object> map = entry.getValue();
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+
+        displayOrgs = result;
     }
 
     Map<String, Map<String, Object>> displayAssets;
@@ -229,6 +247,18 @@ public class AssetFileImportController {
             return displayAssets;
         } else {
             return importAssetMap;
+        }
+
+    }
+
+    Map<String, Map<String, Object>> displayOrgs;
+
+    public Map<String, Map<String, Object>> getDisplayOrgs() {
+
+        if (displayErrorsOnly) {
+            return displayOrgs;
+        } else {
+            return importOrgMap;
         }
 
     }

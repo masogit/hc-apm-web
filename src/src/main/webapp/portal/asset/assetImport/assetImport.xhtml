@@ -116,7 +116,7 @@
                             </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
-                            <p:dataTable  value="#{assetFileImportController.importOrgMap.values()}" var="item" >
+                            <p:dataTable  value="#{assetFileImportController.displayOrgs.values()}" var="item" >
                                 <p:column headerText="#{msg.Department}" >
                                     <h:outputText value="#{item.get('org').name}"/>
                                 </p:column>
