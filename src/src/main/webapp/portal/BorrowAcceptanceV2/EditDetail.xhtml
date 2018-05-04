@@ -8,7 +8,7 @@
 
     <ui:composition>
     
-        <p:dialog id="EditDlg" widgetVar="EditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="编辑详情" width="480">
+        <p:dialog id="EditDlg" widgetVar="EditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="编辑详情" width="520">
             <h:form id="EditForm">
                 <h:panelGroup id="display2">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selectedSard != null}">
@@ -16,9 +16,15 @@
                             <label class="label">设备名称</label>
                             <h:inputText value="#{sharedAssetReqDetailController.getSwapName(sharedAssetReqDetailController.selected.sharedAssetTypeId)}"/>
                         </h:panelGroup>-->
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType == '小时(半点/整点)'}">
                             <label class="label">计费开始时间</label>
-                            <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30"  value="#{sharedAssetRequestV2Controller.selectedSard.chargingBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selectedSard.chargingBeginTime}" readonlyInput="true" showOn="button"
+                                         showButtonPanel="true" navigator="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType != '小时(半点/整点)'}">
+                            <label class="label">计费开始时间</label>
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selectedSard.chargingBeginTime}" readonlyInput="true" showOn="button"
+                                         showButtonPanel="true" navigator="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">设备接收人</label>
