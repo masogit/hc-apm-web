@@ -128,6 +128,8 @@ public class AssetFileImportService {
             org.setOrgLevel(selectedOrgToImport.getOrgLevel());
             org.setOrgType(4);
 
+            org.setLineNum(dataRow);
+
             Map<String, Object> map = new LinkedHashMap();
             map.put("org", org);
             map.put("status", ImportStatus.New);
@@ -201,6 +203,8 @@ public class AssetFileImportService {
                     isNewAsset = false;
                     map.put(OLD_QRCODE_KEY, asset.getQrCode());
                 }
+
+                asset.setLineNum(dataRow);
 
                 String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
                 if (!StringUtils.isEmpty(inputQrcode)) {
@@ -753,7 +757,8 @@ public class AssetFileImportService {
 
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
-            List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
             if (null == orgs || orgs.isEmpty()) {
                 item.put("status", ImportStatus.New);
             } else if (orgs.size() > 1) {
@@ -761,6 +766,8 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
                 result.add(Boolean.FALSE);
             } else {
+                OrgInfo existingOrgInfo = orgs.get(0);
+                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
             }
