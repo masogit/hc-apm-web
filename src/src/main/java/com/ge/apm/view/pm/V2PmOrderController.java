@@ -6,16 +6,22 @@
 package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
+import com.ge.apm.view.sysutil.CheckItem;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
+import javaslang.Tuple;
+import javaslang.Tuple2;
 import org.apache.commons.collections4.map.HashedMap;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -23,12 +29,15 @@ import org.primefaces.event.TabChangeEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+import webapp.framework.web.service.UserContext;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
@@ -58,11 +67,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date planTimeForBatch;
     private String currentPersonIdBatch;
     private String qualityCheckingBatch;
-	Boolean terminate;
+    Boolean terminate;
     private UaaService uaaService;
     private UserContextService userContextService;
-    private AssetFaultTypeService assetFaultTypeService;
-    private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private WorkOrderDetailRepository detailDao;
     private List<V2_PmOrder> selectedPmOrderList;
@@ -100,10 +107,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String pmOrderId;
     private String filterPlanTime;
     private Map<String, Boolean> selectedMap;
-	private Boolean isSelectedCurrentPage = false;
-	private List<V2_PmOrder> currentPagePmOrders;
-	private Integer pmType;
-	private I18nMessageRepository i18nMessageRepository;
+    private TableDefinitionRepository tableDao;
+    private UnstructuredDataRepository unstructuredDataDao;
+    private PmOrderRuleCheckListRepository pmckLstDao;
+    HashMap<String,UnstructuredData> hmCheck;
+    private Boolean isSelectedCurrentPage = false;
+    private List<V2_PmOrder> currentPagePmOrders;
+    private Integer pmType;
+    private I18nMessageRepository i18nMessageRepository;
     private  String head;
 
     public String getHead() {
@@ -125,36 +136,94 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
-	public boolean isChecked() {
-		Map<String, Boolean> map = this.selectedMap;
-		for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-			if (entry.getValue()) {
-				return true;
-			}
+    public List<TableDefinition> getReportList(String siteUID) {
+        OrgInfo site = orgDao.getByUid(siteUID);
+        List<String> orgUids = Arrays.asList(site.getSiteUID(), site.getHospitalUID(), site.getInstitutionUID(), site.getTenantUID());
+        return tableDao.getBySiteUIDIn(orgUids);
+    }
 
-		}
-		return false;
-	}
+    public boolean isChecked() {
+        Map<String, Boolean> map = this.selectedMap;
+        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
+            if (entry.getValue()) {
+                return true;
+            }
 
+        }
+        return false;
+    }
+    public String getTableDefName(String templateId){
+        TableDefinition tb= tableDao.findById(templateId);
+        if(tb !=null){
+            return tb.getName();
+        }else{
+            return "未知报告: unstrurct data collection的 记录并未能在table defintion中找到 schema_Id is "+templateId;
+        }
+    }
+
+    UnstructuredData untest;
+    public void hmCheckSet(String key)throws Exception{
+        //临时用hmCheck1  因为hmCheck的value 是String ?
+        System.out.println(key);
+        String x9= (String) hmCheck.get(key).getValue();
+        untest = (UnstructuredData) hmCheck.get(key);
+    }
     private String qaStatus="0";
 	public void onQaStatusChange(){
     }
-	public Boolean canCreateSr() {
-		if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
-			if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
-				if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
-					return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
-				}
-				return false;
-			}
-		}
-		return true;
-	}
+
+    public Boolean canCreateSr() {
+        if (selectedAsset != null && selectedAsset.getIbStatus() != null && selectedAsset.getIbStatus() == 1) {
+            if (selectedAsset.getRepairForm() != null && selectedAsset.getRepairForm() == 2) {
+                if (null != selectedAsset.getGeDeviceType() && (selectedAsset.getGeDeviceType() == 22 || selectedAsset.getGeDeviceType() == 3)) {
+                    return selectedAsset.getWarrantyDate() == null || selectedAsset.getWarrantyDate().before(new Date());
+                }
+                return false;
+            }
+        }
+        return true;
+    }
+    private UnstructuredDataCollectionRepository unDataColDao;
+
+    @Transactional
+    public void saveCheckItemData(){
+        boolean status=false;
+
+        UnstructuredDataCollection unColl = new UnstructuredDataCollection();
+        ArrayList<UnstructuredData> unD= new ArrayList<UnstructuredData>();
+        Iterator<Map.Entry<String, UnstructuredData>> it = hmCheck.entrySet().iterator();
+        try{
+            if(checkCollection.isEmpty()){//检查项没有对应的unData即通过和不通过设置，保存新设置
+                unColl.setBoUuid(selectedPmOrder.getId());
+                unColl.setBoType("pm-checklist-report");
+                PmOrderRule pmOrderRule= pmOrderService.acqPmOrderRule(selectedPmOrder);
+                unColl.setSchemaId(pmOrderRule.getPerformanceReport());
+                //将检查项的数据保存到UnstructuredDataCollection中.
+                while(it.hasNext()){
+                    Map.Entry<String, UnstructuredData> entry = it.next();
+                    untest =   entry.getValue();
+                    if(untest.getCollectionId()==null){
+                        unD.add(untest);
+                    }
+                }
+                unColl.setData(unD);
+                reportDao.save(unColl);
+            }else{
+                while (it.hasNext()) {
+                    Map.Entry<String, UnstructuredData> entry = it.next();
+                    untest = entry.getValue();
+                 //   unstructuredDataDao.updateUnData(untest.getId(), "\"" + untest.getValue().toString() + "\"");
+                    unstructuredDataDao.save(untest);
+                }
+            }
+            WebUtil.addSuccessMessage("保存检查项操作成功");
+        }catch(Exception ex){
+            ex.printStackTrace();
+        }
+    }
     public void prepareAproval(String woid) {
-	    comments=null;
         prepareAct(woid);
         approvedDetails = getWorkOrderDetail(selectedPmOrder.getId());
-        //将不同意的审批项所对应的seletedMap中的对应值设成false
         approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
 
     }
@@ -167,6 +236,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
     }
 
+    public void removeAttachmentByIdForRP(String blobId) {
+        blobService.deleteBlobFileById(blobId);
+        picListForRP.removeAll(picListForRP.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
+    }
     public void accessoryArrival(String itemId){
         accessoryList.stream().filter(item -> itemId.equals(item.getId())).forEach(item -> item.setArrived(true));
     }
@@ -174,10 +247,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void removeAttachmentById(String blobId) {
         blobService.deleteBlobFileById(blobId);
         picList.removeAll(picList.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
-    }
-    public void removeAttachmentByIdForRP(String blobId) {
-        blobService.deleteBlobFileById(blobId);
-        picListForRP.removeAll(picListForRP.stream().filter(item -> item.getId().equals(blobId)).collect(Collectors.toList()));
     }
     public List<UserAccount> findRepairPerson(){
         if(this.selectedPmOrder!=null) {
@@ -329,7 +398,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         newServiceRequest = new V2_ServiceRequest();
         newServiceRequest.setRequestorId(UserContextService.getCurrentUserAccount().getId());
         newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
-        newServiceRequest.setFromDeptId(UserContextService.getCurrentUserAccount().getOrgInfoId());
         newServiceRequest.setRequestorName(UserContextService.getCurrentUserAccount().getName());
         newServiceRequest.setRequestTime(new Date());
 		if(selectedPmOrder!=null){
@@ -377,6 +445,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     ///
     protected void init() {
+
+        tableDao = WebUtil.getBean(TableDefinitionRepository.class);
+        unstructuredDataDao = WebUtil.getBean(UnstructuredDataRepository.class);
+        //  pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
+        pmckLstDao = WebUtil.getBean(PmOrderRuleCheckListRepository.class);
+        reportDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         woService = WebUtil.getBean(V2_WorkOrderService.class);
         dao = WebUtil.getBean(V2_PmOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -385,8 +459,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        assetFaultTypeService = WebUtil.getBean(AssetFaultTypeService.class);
-        assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
@@ -401,6 +473,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         this.filterBySite = false;
         this.filterByHospital = false;
+        hmCheck = new HashMap<String,UnstructuredData>();
     }
     public void submitAppvalPmOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -453,7 +526,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 pmListTmp.add(item);
             }
         });
-            if(pmListTmp.size()>0){ //如果是批量操作
+        if(pmListTmp.size()>0){ //如果是批量操作
             return pmOrderService.getWorkerList(pmListTmp.get(0).getAssetId());
         }
 
@@ -622,10 +695,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
         return pmOrderService.getWorkOrderCoworker(woId);
     }
-    public List<V2_WorkOrderCoworker> getGaolei(String woId) {
-        return pmOrderService.getWorkOrderCoworker(woId);
-    }
-
     public void closePM(V2_PmOrder selectedPmOrder){
         if(isChecked()==false){
         pmOrderService.closePM(selectedPmOrder,picList);
@@ -675,19 +744,36 @@ public void batchDefineQualify(){
         }
 
     }
-    public void prepareCompleteOrder(String woid) {
-       selectedPmOrder = dao.findById(woid);
-       if(selectedPmOrder.getManHours()==null){
+    // List<CheckItem> checkItemsList;
+    List<PmOrderRuleCheckList> pmCheckItemList;
+    public void prepareCompleteOrder(String woid) throws  Exception{
+        accessoryList = getWorkOrderDetail(woid);
+        selectedPmOrder = dao.findById(woid);
+        if(selectedPmOrder.getManHours()==null){
             selectedPmOrder.setManHours(0.1);
-       }
-       confirmedUpDate = null;
-       endTime=selectedPmOrder.getEndTime();
-       planTime=selectedPmOrder.getPlanTime();
-       accessoryList = getWorkOrderDetail(woid);
-       coWorkerList = getWorkOrderCoworker(woid);
-       picList = new ArrayList<V2_BlobObject>();
-       picListForRP = new ArrayList<V2_BlobObject>();
-   }
+        }
+        confirmedUpDate = null;
+        endTime=selectedPmOrder.getEndTime();
+        planTime=selectedPmOrder.getPlanTime();
+        accessoryList = getWorkOrderDetail(woid);
+        coWorkerList = getWorkOrderCoworker(woid);
+        picList = new ArrayList<V2_BlobObject>();
+        loadHmCheck(selectedPmOrder);
+        pmCheckItemList = acPmOrderUleCheckList(selectedPmOrder);
+
+
+        if(hmCheck.isEmpty()) {
+            for(PmOrderRuleCheckList pmList:pmCheckItemList){
+                UnstructuredData unData =new UnstructuredData();
+                unData.setValue("pass");
+                unData.setKey(pmList.getUid());
+                hmCheck.put(pmList.getUid(),unData);
+            }
+        }
+        System.out.println();
+        picList = new ArrayList<V2_BlobObject>();
+        picListForRP = new ArrayList<V2_BlobObject>();
+    }
 
     //
 	public void onSelectAllOfPage() {
@@ -771,11 +857,8 @@ public void batchDefineQualify(){
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
-
     public void repairPmOrderBatch() {
         pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
-        this.totalManHours =null;
-        this.endTime=null;
     }
 
 
@@ -794,14 +877,14 @@ public void batchDefineQualify(){
 
         //cancel();
     }
-
-
     public void stagingPmOrder(){
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
         accessoryList.forEach(item -> item.setCreatedDate(null));
         pmOrderService.stagingPmrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
+        //保存检查项
+        saveCheckItemData();
         cancel();
     }
     @Override
@@ -857,6 +940,58 @@ public void batchDefineQualify(){
         }
       //  cancelWorkdetail();
     }
+
+    public List<TableDefinition> getTablesName(V2_PmOrder v2){
+        List<TableDefinition> tDefinitions = pmOrderService.getTablesName(v2);
+        return tDefinitions;
+    }
+
+    public  List<PmOrderRuleCheckList> acPmOrderUleCheckList(V2_PmOrder v2PmOrder){
+        if(v2PmOrder ==null)
+            return null;
+        PmOrderRule pmOrderRule= pmOrderService.acqPmOrderRule(v2PmOrder);
+
+        if(pmOrderRule==null){
+            return null;
+        }
+        return pmckLstDao.findAllByRuleUID(pmOrderRule.getUid());
+    }
+
+
+    List<UnstructuredDataCollection> checkCollection ;
+    UnstructuredDataCollection unCollection;
+    List<PmOrderRuleCheckList> pmCheckList;
+    PmOrderRuleCheckList pmOrderRuleCheckListData;
+    private UnstructuredDataCollectionRepository reportDao;
+    public List<CheckItem>  loadHmCheck(V2_PmOrder v2PmOrder) throws Exception{
+        checkCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(),"pm-checklist-report");
+        pmCheckList= acPmOrderUleCheckList(v2PmOrder);
+        List<CheckItem> CheckItemList = new ArrayList<CheckItem>();
+        if(pmCheckList==null)return null;
+        for(int i=0;i<pmCheckList.size();i++){
+            pmOrderRuleCheckListData = (PmOrderRuleCheckList)pmCheckList.get(i);
+            if(!checkCollection.isEmpty()){ //
+                unCollection =  (UnstructuredDataCollection)checkCollection.get(0);
+                if(unCollection!=null) {
+                    List<UnstructuredData> dataList = (List<UnstructuredData>) unCollection.getData();
+                    for (int k = 0; k < dataList.size(); k++) {
+                        UnstructuredData unsData = (UnstructuredData) dataList.get(k);
+                        if (unsData.getKey().equalsIgnoreCase(pmOrderRuleCheckListData.getUid())) {
+                            CheckItemList.add(new CheckItem(pmOrderRuleCheckListData.getUid(), unsData));
+                            hmCheck.put(pmOrderRuleCheckListData.getUid(), unsData);
+                        }
+                    }
+                }
+            }
+        }
+
+        System.out.println();
+        return CheckItemList;
+    }
+
+
+
+    //map : item.uid(pmorderrulecheck.uid) value: unstrundata
 
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails(){
         return approvedDetails==null? null:approvedDetails.stream().filter(item->item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
@@ -1201,6 +1336,22 @@ public void batchDefineQualify(){
         this.checkInDate = checkInDate;
     }
 
+    public void setPmCheckItemList(List<PmOrderRuleCheckList> pmCheckItemList) {
+        this.pmCheckItemList = pmCheckItemList;
+    }
+
+    public List<PmOrderRuleCheckList> getPmCheckItemList() {
+        return pmCheckItemList;
+    }
+
+    public List<PmOrderRuleCheckList> getPmCheckList() {
+        return pmCheckList;
+    }
+
+    public void setPmCheckList(List<PmOrderRuleCheckList> pmCheckList) {
+        this.pmCheckList = pmCheckList;
+    }
+
     public List<V2_BlobObject> getPicListForRP() {
         return picListForRP;
     }
@@ -1216,4 +1367,12 @@ public void batchDefineQualify(){
     public void setRepairType(String repairType) {
         this.repairType = repairType;
     }
+    public HashMap<String, UnstructuredData> getHmCheck() {
+        return hmCheck;
+    }
+
+    public void setHmCheck(HashMap<String, UnstructuredData> hmCheck) {
+        this.hmCheck = hmCheck;
+    }
+
 }

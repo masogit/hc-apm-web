@@ -107,6 +107,11 @@ public class TableDefinitionService {
         return template == null ? "" : template.getSchema();
     }
 
+    public String getTableSchema(String tableId) {
+        TableDefinition template = Strings.isNullOrEmpty(tableId) ? null : templateDao.findById(tableId);
+        return template == null ? "" : template.getSchema();
+    }
+
     public Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         return TableResultReportService.getRuleResultData(tableValue, table);
     }
