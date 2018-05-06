@@ -65,12 +65,6 @@ public class CommonReportController {
         }
     }
 
-    public String typeCheck(){
-        if(StringUtils.isEmpty(reportUid))
-            return "";
-        final UnstructuredDataCollection uReport = reportDao.findByUid(reportUid);
-        return uReport.getBoType();
-    }
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
@@ -88,6 +82,8 @@ public class CommonReportController {
 
     public String getEditLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
+        if(table==null)
+                return "";
         if (null != table.getExcelStorageId()) {
             return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
         }else{
@@ -97,6 +93,8 @@ public class CommonReportController {
 
     public String getViewLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
+        if(table==null)
+            return "";
          if (null != table.getExcelStorageId()) {
             return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
         }else{

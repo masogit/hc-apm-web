@@ -22,4 +22,13 @@ public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDe
 
     @Query("select o from TableDefinition o where o.tenantUID = ?1 and o.status='Released'")
 	public List<TableDefinition> findByTenantUID(String tenantUID);
+
+    public TableDefinition findById(String ID);
+
+
+	/*@Query(value = "select name from table_definition where id in (\n" +
+			"\tselect performance_report from pm_order_rule where uid='4c0c9434f3684dbe8c750cee8e69c333' union select safety_report from pm_order_rule where uid='4c0c9434f3684dbe8c750cee8e69c333')",nativeQuery = true)*/
+	@Query(value = "select td.* from table_definition td where td.id in (\n" +
+			"\tselect performance_report from pm_order_rule where uid=?1 union select safety_report from pm_order_rule where uid=?1)",nativeQuery = true)
+	public List<TableDefinition> findTableName(String pmOrderRuleId);
 }

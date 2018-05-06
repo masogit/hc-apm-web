@@ -67,9 +67,55 @@ public class V2_PmOrderService {
     private UserCommonService ucService;
     @Autowired
     private PmOrderRequestApiService pmApi;
+    @Autowired
+    private RelRuleAssetRepository relRuleAssetRepository;
 
     @Autowired
     private UserAccountRepository userDao;
+    @Autowired
+    private TableDefinitionRepository tableDao;
+    @Autowired
+    private PmOrderRuleRepository pmOrderRuleRepository;
+
+
+    public PmOrderRule acqPmOrderRule(V2_PmOrder v2PmOrder){
+        PmOrderRule pmOrderRule=null;
+        int level =  v2PmOrder.getRuleLevel();
+        switch (level){
+            case 3:{
+                pmOrderRule= pmOrderRuleRepository.findPmOrderRuleLevel3(v2PmOrder.getAssetUid());break;
+            }
+            case 2:{
+                pmOrderRule = pmOrderRuleRepository.findPmOrderRuleLevel2(v2PmOrder.getAssetUid());break;
+            }
+        }
+        return pmOrderRule;
+    }
+    public List<TableDefinition> getTablesName(V2_PmOrder v2PmOrder){
+        PmOrderRule pmOrderRule=acqPmOrderRule(v2PmOrder);
+        List<TableDefinition> tableDefinitions = tableDao.findTableName(pmOrderRule.getUid());
+        return tableDefinitions;
+       /* int level;
+            if(level ==2)*/
+
+
+        /*
+        String ruleId;
+        *    if(level ==2 )
+        *      ruleId = select rule_uid2  from rel_rule_asset where asset_uid = ''
+        *    if(level ==3 )
+        *      ruleId = select rule_uid  from rel_rule_asset where asset_uid = ''
+        *
+        *select performance_report,safety_report from pm_order_rule where uid=ruleId;
+        *
+        * select * from table_definition where id in(
+        * select performance_report from pm_order_rule where uid='4c0c9434f3684dbe8c750cee8e69c333'
+union
+select safety_report from pm_order_rule where uid='4c0c9434f3684dbe8c750cee8e69c333')
+
+        *
+        * */
+    }
 
 
     public List<V2_WorkOrderCoworker> getWorkOrderCoworker(String woId) {
@@ -354,6 +400,7 @@ formData.setAttachments(attachment);
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
+       // System.out.println();
         String res = srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
