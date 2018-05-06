@@ -14,45 +14,106 @@
 
             <div class="ui-g-12 card">
                 <h:form id="customConfigForm">
-                <h:panelGroup >
-                    <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
-                    <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
-                        <p:scrollPanel style="height:300px;border: 0" mode="native">
-                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}" update="customConfigForm" oncomplete="PF('varPanelOrg').hide();"/>
-                                <p:ajax process="@this" event="expand"/>
-                                <p:ajax process="@this" event="collapse"/>
-                                <p:treeNode type="org">
-                                    <h:outputText value="#{node.name}"/>
-                                </p:treeNode>
-                            </p:tree>
-                        </p:scrollPanel>
-                    </p:overlayPanel>
-                </h:panelGroup>
-                <p:fieldset legend="资产查看页面" toggleable="true" toggleSpeed="500">
-                    <p:pickList id="AssetsListPickList" value="#{customConfigController.assetsListPageFields}" var="item"    
-                                itemValue="#{item}" itemLabel="#{item}" showCheckbox="false" responsive="true" showSourceControls="true" showTargetControls="true"
-                                showSourceFilter="false" showTargetFilter="false" filterMatchMode="contains" >
-                        <f:facet name="sourceCaption">可选择的字段</f:facet>
-                        <f:facet name="targetCaption">已选择的字段</f:facet>
-                        <p:ajax event="transfer" listener="#{customConfigController.onFieldsTransfer}" />
-                        <p:ajax event="reorder" listener="#{customConfigController.onFieldsReorder}" />
-                        <p:column style="width:40%">
-                            <h:outputText value="#{item}" />
-                        </p:column>
-                    </p:pickList>
-                </p:fieldset>
-                <p:fieldset legend="资产详细页面" toggleable="true" toggleSpeed="500">
-
-                </p:fieldset>
+                    <h:panelGroup >
+                        <p:commandButton id="btnOrg" value="#{customConfigController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                        <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
+                            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
+                                    <p:ajax process="@this" event="select" listener="#{customConfigController.onSelectSiteTreeNode}" update="customConfigForm" oncomplete="PF('varPanelOrg').hide();"/>
+                                    <p:ajax process="@this" event="expand"/>
+                                    <p:ajax process="@this" event="collapse"/>
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </p:overlayPanel>
+                    </h:panelGroup>
+                    <h:panelGroup >
+                        <h:outputText id="configInfo" value="#{customConfigController.getCustomConfigInfomation()}"/>
+                    </h:panelGroup>
+                    <p:tabView  id="tabView">
+                        <p:tab title="资产列表页面">
+                            <p:dataTable id="ListPageFieldsTable" var='item' value="#{customConfigController.assetsListPageFields}" draggableRows="true">
+                            <p:ajax event="rowReorder" update="ListPageFieldsTable"/>
+                            <p:column headerText="显示的字段">
+                                <h:outputText value="#{customConfigController.allFields[item.key]}" />
+                            </p:column>
+<!--                            <p:column headerText="是否导出">
+                                <h:outputText value="#{item.exportable? '导出':'不导出'}"  />
+                            </p:column>-->
+                            <p:column headerText="列宽%">
+                                <h:outputText value="#{item.width}" />
+                            </p:column>
+                            <p:column headerText="操作">
+                                <f:facet name="header" >
+                                    <h:outputText value="操作" />
+                                    <p:commandLink value="添加"  oncomplete="PF('ListPageFieldsAddDialog').show()"/>
+                                </f:facet>
+                                <p:commandLink value="修改" actionListener="#{customConfigController.prepareEditListField(item.key)}" update=":ListPageFieldsEditForm" oncomplete="PF('ListPageFieldsEditDialog').show()"/>
+                                <p:commandLink value="删除" actionListener="#{customConfigController.removeListPageField(item.key)}" update="ListPageFieldsTable :ListPageFieldsAddForm"/>
+                            </p:column>
+                        </p:dataTable>
+                        </p:tab>
+                        <p:tab title="资产详细页面">
+                            
+                        </p:tab>
+                    </p:tabView>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{customConfigController.saveChange()}" validateClient="true" update=" :growl" style="float:left"/>
-                        <p:commandButton value="#{msg.Delete}" icon="ui-icon-check" action="#{customConfigController.deleteConfig()}" validateClient="true" update=" :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{customConfigController.saveChange()}" validateClient="true" update=":customConfigForm:configInfo :growl" style="float:left"/>
+                        <p:commandButton value="#{msg.Delete}" icon="ui-icon-check" action="#{customConfigController.deleteConfig()}" validateClient="true" update=":customConfigForm:configInfo :growl" style="float:left"/>
                     </h:panelGroup>
 
                 </h:form>
 
+                <p:dialog id="ListPageFieldsEditDialog" widgetVar="ListPageFieldsEditDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Edit}">
+                    <h:form id="ListPageFieldsEditForm" >
+                        <h:panelGroup id="display" rendered="#{not empty customConfigController.currentEditField}">
+                            <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <h:panelGroup >
+                                    <label class="label">#{msg.name}</label>
+                                    <h:outputText value="#{customConfigController.allFields[customConfigController.currentEditField.key]}"/>
+                                </h:panelGroup>
+<!--                                <h:panelGroup >
+                                    <label class="label">是否导出</label>
+                                    <p:inputSwitch value="#{customConfigController.currentEditField.exportable}" />
+                                </h:panelGroup>-->
+                                <h:panelGroup >
+                                    <label class="label">列宽</label>
+                                    <p:inputNumber symbol="%" value="#{customConfigController.currentEditField.width}" />
+                                </h:panelGroup>
+
+                            </p:panelGrid>
+                            <br/>
+                            <h:panelGroup>
+                                <p:commandButton immediate="false" validateClient="true" value="#{msg.Confirm}" update=":ListPageFieldsEditForm :customConfigForm:tabView:ListPageFieldsTable :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'ListPageFieldsEditDialog');"/>
+                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('ListPageFieldsEditDialog').hide()"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
+                
+                <p:dialog id="ListPageFieldsAddDialog" widgetVar="ListPageFieldsAddDialog" modal="true" width="900"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Add}">
+                    <h:form id="ListPageFieldsAddForm" >
+                        <h:panelGroup id="display" >
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <c:forEach items="#{customConfigController.getListPageAddFieldList()}" var="item" >
+                                    <h:panelGroup >
+                                        <p:selectBooleanCheckbox itemLabel="#{customConfigController.allFields[item]}" value="#{customConfigController.selectedAddFields[item]}"   />
+                                    </h:panelGroup>
+                                
+                                </c:forEach>
+
+                            </p:panelGrid>
+                            <br/>
+                            <h:panelGroup>
+                                <p:commandButton immediate="false" validateClient="true" actionListener="#{customConfigController.addFieldsForListPage()}" value="#{msg.Confirm}" update=":customConfigForm:tabView:ListPageFieldsTable :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'ListPageFieldsAddDialog');"/>
+                                <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('ListPageFieldsAddDialog').hide()"/>
+                            </h:panelGroup>
+                        </h:panelGroup>
+                    </h:form>
+                </p:dialog>
             </div>
         </div>
     </ui:define>
