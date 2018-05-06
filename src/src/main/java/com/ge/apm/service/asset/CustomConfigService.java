@@ -10,15 +10,15 @@ import com.ge.apm.dao.CustomConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.pure.CustomConfigField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -40,6 +40,7 @@ public class CustomConfigService {
     public LinkedHashMap<String, String> getAllFields() {
         LinkedHashMap<String, String> res = new LinkedHashMap();
         res.put("serialNum", WebUtil.getMessage("serialNum"));
+        res.put("departNum", WebUtil.getMessage("departNum"));
         res.put("name", WebUtil.getMessage("name"));
         res.put("aliasName", WebUtil.getMessage("aliasName"));
         res.put("assetGroup", WebUtil.getMessage("assetGroup"));
@@ -99,16 +100,20 @@ public class CustomConfigService {
         return res;
     }
 
-    public CustomConfigObject getCustomConfigBySite(String siteUID) {
-        CustomConfig res = customConfigDao.findBySiteUID(siteUID);
-        return res == null ? null : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
+    public CustomConfig getCustomConfigBySite(String siteUID){
+        return customConfigDao.findBySiteUID(siteUID);
     }
+    
+//    public CustomConfigObject getCustomConfigBySite(String siteUID) {
+//        CustomConfig res = customConfigDao.findBySiteUID(siteUID);
+//        return res == null ? null : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
+//    }
 
     public CustomConfigObject getCurrentCustomConfig(String siteUid) {
         OrgInfo org = orgDao.findByUid(siteUid);
         if (configService.isInsulateTenant(org.getTenantUID())) {
-            CustomConfigObject res = getCustomConfigBySite(siteUid);
-            return res == null ? getDefalutCustomConfigObject() : res;
+            CustomConfig res = getCustomConfigBySite(siteUid);
+            return res == null ? getDefalutCustomConfigObject() : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
         }
         List<CustomConfig> configList = customConfigDao.findBySiteUIDIn(Arrays.asList(org.getSiteUID(), org.getHospitalUID(), org.getInstitutionUID(), org.getTenantUID()));
         if(null==configList || configList.isEmpty()){
@@ -124,25 +129,25 @@ public class CustomConfigService {
 
     private CustomConfigObject getDefalutCustomConfigObject() {
         CustomConfigObject object = new CustomConfigObject();
-        List<String> defaultAssetListPageFields = new ArrayList();
-        defaultAssetListPageFields.add("name");
-        defaultAssetListPageFields.add("functionType");
-        defaultAssetListPageFields.add("serialNum");
-        defaultAssetListPageFields.add("departNum");
-        defaultAssetListPageFields.add("assetGroup");
-        defaultAssetListPageFields.add("clinicalDeptName");
-        defaultAssetListPageFields.add("manufacture");
-        defaultAssetListPageFields.add("vendor");
-        defaultAssetListPageFields.add("status");
-        defaultAssetListPageFields.add("warrantyDate");
-        defaultAssetListPageFields.add("financingNum");
-        defaultAssetListPageFields.add("qrCode");
+        List<CustomConfigField> defaultAssetListPageFields = new ArrayList();
+        defaultAssetListPageFields.add(new CustomConfigField("name"));
+        defaultAssetListPageFields.add(new CustomConfigField("functionType"));
+        defaultAssetListPageFields.add(new CustomConfigField("serialNum"));
+        defaultAssetListPageFields.add(new CustomConfigField("departNum"));
+        defaultAssetListPageFields.add(new CustomConfigField("assetGroup"));
+        defaultAssetListPageFields.add(new CustomConfigField("clinicalDeptName"));
+        defaultAssetListPageFields.add(new CustomConfigField("manufacture"));
+        defaultAssetListPageFields.add(new CustomConfigField("vendor"));
+        defaultAssetListPageFields.add(new CustomConfigField("status"));
+        defaultAssetListPageFields.add(new CustomConfigField("warrantyDate"));
+        defaultAssetListPageFields.add(new CustomConfigField("financingNum"));
+        defaultAssetListPageFields.add(new CustomConfigField("qrCode"));
         object.setAssetListPageFields(defaultAssetListPageFields);
         return object;
     }
 
     public void saveConfig(OrgInfo selectSite, CustomConfigObject customConfigObject) {
-        CustomConfig config = customConfigDao.findBySiteUID(selectSite.getSiteUID());
+        CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if(config==null){
             config = new CustomConfig();
             config.setConfig(JSONObject.toJSONString(customConfigObject));
@@ -161,7 +166,7 @@ public class CustomConfigService {
     }
 
     public void removeConfig(OrgInfo selectSite) {
-        CustomConfig config = customConfigDao.findBySiteUID(selectSite.getSiteUID());
+        CustomConfig config = getCustomConfigBySite(selectSite.getSiteUID());
         if(null!=config){
             customConfigDao.delete(config);
         }
