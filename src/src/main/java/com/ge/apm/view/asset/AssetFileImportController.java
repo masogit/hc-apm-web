@@ -124,6 +124,8 @@ public class AssetFileImportController {
             aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
 
+            filterErrorRecords();
+
             try {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
 //                InputStream stream = this.file.getInputstream();
@@ -199,6 +201,11 @@ public class AssetFileImportController {
     }
 
     public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
+
+        filterErrorRecords();
+    }
+
+    public void filterErrorRecords() {
 
         if (!displayErrorsOnly) return;
 
