@@ -52,8 +52,9 @@
 				<div class="ui-g-9">
 					<h:panelGroup>
 						<div class="ui-g">
+							<button type="button" onclick="triggerUpload()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">上传图片</button>
 							<p:fileUpload skinSimple="true" fileUploadListener="#{captureDataMessagesController.handleImageUpload}" mode="advanced" dragDropSupport="false"
-								multiple="false" auto="true" invalidFileMessage="只支持jpg,png格式的文件" invalidSizeMessage="文件大小不得超过5M" sizeLimit="5242880"
+								style="display:none" multiple="false" auto="true" invalidFileMessage="只支持jpg,png格式的文件" invalidSizeMessage="文件大小不得超过5M" sizeLimit="5242880"
 								update="@this:imageTextTempContent" allowTypes="/(\.|\/)(jpg|png|JPG|PNG)$/" label="上传图片" styleClass="ui-fileupload-simple ui-widget" />
 							<!-- <p:fileUpload id="simpleUploadImage" label="选择图片" mode="simple" skinSimple="true" value="#{captureDataMessagesController.file}"/>
 						<p:commandButton value="上传图片" ajax="true" actionListener="#{captureDataMessagesController.upload()}" partialSubmit="true" process="simpleUploadImage"/> -->
@@ -79,7 +80,6 @@
 		var contentEditorMessage = null;
 		var imageTextTempContent = null;
 		var contentEditorChangeInit = true;
-		var setImageTextTempContentInit = true;
 		function captureDataMessageParseImage(str) {
 			var strArr = [];
 			var start = 0;
@@ -119,8 +119,7 @@
 		}
 
 		function setCaptureDataMessageValue() {
-			contentEditor = $(
-					"[id='captureDataMessagesTab:captureDataMessagesEditForm:idContentEditor'] iframe")
+			contentEditor = $("[id='captureDataMessagesTab:captureDataMessagesEditForm:idContentEditor'] iframe")
 					.contents().find("html body");
 			contentEditorMessage = $("#idContentEditorMessage");
 			imageTextTempContent = $("[id='captureDataMessagesTab:captureDataMessagesEditForm:imageTextTempContent']");
@@ -152,23 +151,31 @@
 				if (noError) {
 					contentEditorMessage.html("").css("display", "none");
 				} else {
-					contentEditorMessage.html(errorString).css("display",
-							"block");
+					contentEditorMessage.html(errorString).css("display", "block");
 				}
 			}
 		}
 
 		function setImageTextTempContent() {
-			if (setImageTextTempContentInit) {
-				setCaptureDataMessageValue();
-				setImageTextTempContentInit = false;
-			}
-			contentEditor.html(contentEditor.html()
-					+ imageTextTempContent.val());
+			setCaptureDataMessageValue();
+			contentEditor.html(contentEditor.html() + imageTextTempContent.val());
 		}
-		
-		//ui-fileupload-simple ui-widget
-		
+		function triggerUpload() {
+			$("[id^='captureDataMessagesTab:captureDataMessagesEditForm']").find("input").trigger("click");
+		}
+
+		/* function changeUploadFileCss(){
+			//ui-fileupload-simple ui-widget
+			//ui-fileupload ui-widget ui-fileupload-simple ui-widget
+			var captureDataMessageUploadElement=$("[id^='captureDataMessagesTab:captureDataMessagesEditForm']");
+			if(captureDataMessageUploadElement.length>0){
+				captureDataMessageUploadElement.removeClass("ui-fileupload");
+				captureDataMessageUploadElement.children().removeClass("ui-fileupload-buttonbar ui-widget-header ui-corner-top");
+				captureDataMessageUploadElement.find(".ui-fileupload-content").remove();
+				clearInterval(captureDataMessageInterval);
+			}
+		}
+		var captureDataMessageInterval=setInterval(changeUploadFileCss, 50); */
 	</script>
 </ui:composition>
 
