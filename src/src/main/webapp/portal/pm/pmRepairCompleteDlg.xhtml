@@ -121,12 +121,12 @@
                     <p:fieldset legend="保养清单" >
                         <p:fieldset legend="保养报告" >
                             <h:panelGroup id="addReport">
-                                <p:selectOneMenu value="#{commonReportController.reportUid}">
+                                <p:selectOneMenu value="#{v2PmOrderController.reportUid}">
                                     <p:ajax update="addReport" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                     <f:selectItems value="#{v2PmOrderController.getTablesName(v2PmOrderController.selectedPmOrder)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
-                                <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(v2PmOrderController.selectedPmOrder.id)}" update="@(.rpClass)" disabled="#{empty commonReportController.reportUid}"/>
+                                <p:commandLink value="添加报告"  validateClient="false" process="addReport" actionListener="#{v2PmOrderController.addReporter(v2PmOrderController.selectedPmOrder.id)}"  update="@(.rpClass)" disabled="#{empty v2PmOrderController.reportUid or v2PmOrderController.hasRepairReport() }"/>
                             </h:panelGroup>
                             <p:dataList class="rpClass"  value="#{commonReportController.getReportList(v2PmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                                 #{v2PmOrderController.getTableDefName(reportItem.schemaId)}

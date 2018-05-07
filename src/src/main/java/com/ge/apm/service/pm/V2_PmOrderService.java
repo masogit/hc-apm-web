@@ -65,6 +65,8 @@ public class V2_PmOrderService {
     private TableDefinitionRepository tableDao;
     @Autowired
     private PmOrderRuleRepository pmOrderRuleRepository;
+    @Autowired
+    private UnstructuredDataCollectionRepository reportDao;
 
     public PmOrderRule acqPmOrderRule(V2_PmOrder v2PmOrder){
         PmOrderRule pmOrderRule=null;
@@ -103,6 +105,9 @@ public class V2_PmOrderService {
         }
     }
 
+    public List<UnstructuredDataCollection> getReportList(String boUid) {
+        return reportDao.findByBoUuid(boUid);
+    }
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();

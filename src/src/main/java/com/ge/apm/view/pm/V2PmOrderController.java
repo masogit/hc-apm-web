@@ -103,18 +103,34 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private  String head;
+    private String reportUid;
     public String getHead() {
         return head;
     }
     public void setHead(String head) {
         this.head = head;
     }
-    /*public String headerTakeGrap(int rem){
-			if(rem==1)
-				return "接单对话框";
-			if(rem==2)
-				return "抢单对话框";
-		}*/
+
+
+    /*
+    *
+    * case reportUid
+    *   reportUid then 'xingnengbaogao'
+    *   when
+    *
+    * */
+
+    public void addReporter(String boUid) {
+        UnstructuredDataCollection newReport = new UnstructuredDataCollection();
+        newReport.setBoUuid(boUid);
+        newReport.setSchemaId(reportUid);
+        PmOrderRule pmOrderRule= pmOrderService.acqPmOrderRule(selectedPmOrder);
+        if(reportUid.equalsIgnoreCase(pmOrderRule.getPerformanceReport()))
+            newReport.setBoType("pm-performance-report");
+        if(reportUid.equalsIgnoreCase(pmOrderRule.getSafetyReport()))
+            newReport.setBoType("pm-safety-report");
+        reportDao.save(newReport);
+    }
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
     }
@@ -123,6 +139,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<String> orgUids = Arrays.asList(site.getSiteUID(), site.getHospitalUID(), site.getInstitutionUID(), site.getTenantUID());
         return tableDao.getBySiteUIDIn(orgUids);
     }
+
+    public boolean hasRepairReport(){
+        List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(selectedPmOrder.getId());
+        return reportList.stream().anyMatch(item->item.getSchemaId().equalsIgnoreCase(reportUid));
+
+    }
+
     public boolean isChecked() {
         Map<String, Boolean> map = this.selectedMap;
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
@@ -132,6 +155,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return false;
     }
+
+
     public String getTableDefName(String templateId){
         TableDefinition tb= tableDao.findById(templateId);
         if(tb !=null){
@@ -698,14 +723,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
         pmCheckItemList = acPmOrderUleCheckList(selectedPmOrder);
-        if(hmCheck.isEmpty()) {
-            for(PmOrderRuleCheckList pmList:pmCheckItemList){
-                UnstructuredData unData =new UnstructuredData();
-                unData.setValue("pass");
-                unData.setKey(pmList.getUid());
-                hmCheck.put(pmList.getUid(),unData);
-            }
-        }
+       if(!pmCheckItemList.isEmpty()) {
+           if (hmCheck.isEmpty()) {
+               for (PmOrderRuleCheckList pmList : pmCheckItemList) {
+                   UnstructuredData unData = new UnstructuredData();
+                   unData.setValue("pass");
+                   unData.setKey(pmList.getUid());
+                   hmCheck.put(pmList.getUid(), unData);
+               }
+           }
+       }
         picList = new ArrayList<V2_BlobObject>();
         picListForRP = new ArrayList<V2_BlobObject>();
     }
@@ -1264,5 +1291,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setRepairTypeInt(Integer repairTypeInt) {
         this.repairTypeInt = repairTypeInt;
+    }
+
+    public String getReportUid() {
+        return reportUid;
+    }
+
+    public void setReportUid(String reportUid) {
+        this.reportUid = reportUid;
     }
 }
