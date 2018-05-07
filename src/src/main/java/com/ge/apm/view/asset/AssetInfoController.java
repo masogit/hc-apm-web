@@ -628,7 +628,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
-        selected.setQrCode(qrcodeLib.getQrCode());
+//        selected.setQrCode(qrcodeLib.getQrCode());
         onDepartNumChange("qrCode");
     }
 
