@@ -13,11 +13,8 @@ public class ImageUtils {
 		try {
 			if(input!=null){
 				byte[] b = new byte[input.available()];
-				String temp = "<img src=\"data:image/jpeg;base64,";
 				input.read(b);
-				temp += encoder.encodeToString(b);
-				temp+="\">";
-				return temp;
+				return encoder.encodeToString(b);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

@@ -206,12 +206,14 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     
     public void handleImageUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
+        
         String imageString=ImageUtils.getBase64(file.getInputstream());
         if(imageString==null){
         	FacesMessage message = new FacesMessage("注意！解析图片失败！");
             FacesContext.getCurrentInstance().addMessage(null, message);
         }
         else{
+        	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
         	this.selected.setTempImageContent(imageString);
         	FacesMessage message = new FacesMessage("图片上传成功！");
             FacesContext.getCurrentInstance().addMessage(null, message);
@@ -221,11 +223,12 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     public void upload() throws IOException, ParseException{
     	if(file!=null){
     		String imageString=ImageUtils.getBase64(file.getInputstream());
-            if(imageString==null){
+    		if(imageString==null){
             	FacesMessage message = new FacesMessage("注意！解析图片失败！");
                 FacesContext.getCurrentInstance().addMessage(null, message);
             }
             else{
+            	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
             	this.selected.setTempImageContent(imageString);
             	FacesMessage message = new FacesMessage("图片上传成功！");
                 FacesContext.getCurrentInstance().addMessage(null, message);
