@@ -373,7 +373,8 @@ public class AssetFileImportService {
         LocalDateTime startTime = LocalDateTime.now();
 
         importOrgMap.values().forEach(item -> {
-            List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
             if (null == orgs || orgs.isEmpty()) {
                 orgDao.save((OrgInfo) item.get("org"));
                 item.put("status", ImportStatus.Created);
@@ -381,6 +382,9 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
             } else {
+                OrgInfo existingOrgInfo = orgs.get(0);
+                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+                item.put("org", existingOrgInfo);
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
             }
@@ -768,7 +772,7 @@ public class AssetFileImportService {
             } else {
                 OrgInfo existingOrgInfo = orgs.get(0);
                 existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-                item.put("org", orgs.get(0));
+                item.put("org", existingOrgInfo);
                 item.put("status", ImportStatus.Exist);
             }
         });
