@@ -680,8 +680,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                         return "";
                     };
                     qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
-                    selected.setQrCode(qrCode);
-                } else if (!updateQrCode()) {
+                    selected.setQrCode(null);
+                } 
+                if (!updateQrCode()) {
                     qrCode = "";
                     return "";
                 }
