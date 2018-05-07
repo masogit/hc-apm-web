@@ -106,6 +106,8 @@ public class AssetFileImportController {
             
             canbeImported = aiService.checkData(importOrgMap,importAssetMap);
 
+            filterErrorRecords();
+
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
             Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
