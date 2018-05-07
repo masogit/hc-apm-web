@@ -165,13 +165,13 @@
                             </p:commandButton>
                             <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="assetImport?faces-redirect=true"  update=":growl"/>
                         </h:panelGroup>
-                        <h:panelGroup >
-                            <h:outputText value="#{assetFileImportController.assetErrorCounts}资产导入数据有错误,请检查" rendered="#{assetFileImportController.assetErrorCounts>0}" />
-                            <h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />
-                            <c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">
-                                <h:outputText value="#{item}" />
-                            </c:forEach>
-                        </h:panelGroup>
+                        <!--<h:panelGroup >-->
+                            <!--<h:outputText value="#{assetFileImportController.assetErrorCounts}资产导入数据有错误,请检查" rendered="#{assetFileImportController.assetErrorCounts>0}" />-->
+                            <!--<h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />-->
+                            <!--<c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">-->
+                                <!--<h:outputText value="#{item}" />-->
+                            <!--</c:forEach>-->
+                        <!--</h:panelGroup>-->
                     </p:panelGrid>
                 </h:form>
             </div>
