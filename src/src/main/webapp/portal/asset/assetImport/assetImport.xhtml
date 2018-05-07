@@ -120,7 +120,7 @@
                         </p:tab>
                         <p:tab title="部门导入">
                             <p:dataTable  value="#{assetFileImportController.displayOrgs.values()}" var="item" >
-                                <p:column headerText="行" >
+                                <p:column headerText="Excel行" >
                                     <h:outputText value="#{item.get('org').lineNum}"/>
                                 </p:column>
                                 <p:column headerText="#{msg.Department}" >
