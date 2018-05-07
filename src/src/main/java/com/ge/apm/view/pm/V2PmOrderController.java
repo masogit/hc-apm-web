@@ -6,43 +6,31 @@
 package com.ge.apm.view.pm;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
-import com.ge.apm.domain.pure.TableSchema;
-import com.ge.apm.service.asset.AssetFaultTypeService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
-import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
-import javaslang.Tuple;
-import javaslang.Tuple2;
 import org.apache.commons.collections4.map.HashedMap;
-import org.apache.commons.lang3.StringUtils;
-import org.primefaces.component.tabview.Tab;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.TabChangeEvent;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
-import webapp.framework.web.service.UserContext;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 /**
  *v
@@ -70,7 +58,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private UaaService uaaService;
     private UserContextService userContextService;
     private BlobFileService blobService;
-    private WorkOrderDetailRepository detailDao;
     private List<V2_PmOrder> selectedPmOrderList;
     //private V2_WorkOrderCoworkerRepository coWorkerDao;
     //status：2-待派工/3-已派工/4-已关单/5-已取消
@@ -81,6 +68,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private String cancelReason;
     private String stepFileter;
     private String repairType;
+    private Integer repairTypeInt;
     //for details form
     private List<V2_WorkOrder_Detail> approvedDetails;
     private List<V2_WorkOrder_Detail> accessoryList;
@@ -431,7 +419,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         uaaService = WebUtil.getBean(UaaService.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
@@ -1269,5 +1256,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public void setHmCheck(HashMap<String, UnstructuredData> hmCheck) {
         this.hmCheck = hmCheck;
+    }
+
+    public Integer getRepairTypeInt() {
+        return repairTypeInt;
+    }
+
+    public void setRepairTypeInt(Integer repairTypeInt) {
+        this.repairTypeInt = repairTypeInt;
     }
 }
