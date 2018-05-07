@@ -1324,10 +1324,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            objectList = swapDao.findbyBorrowQty(SiteUid,shared.getClinicalDeptUid(),TypeUid);
+            List<AssetInfo> objectList = new ArrayList<AssetInfo>();
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            objectList = swapDao.findbyBorrowQty(user.getSiteUID(),user.getOrgInfoUID(),Uid);
           
             return objectList.size();
         }
@@ -1337,18 +1336,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            System.out.println(UserContextService.getCurrentUserAccount().getSiteUID());
-            System.out.println(userOrg.getUid());
-            objectList = swapDao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
-            if(objectList == null){
-                return 0;
-            }
-            else{
-                return objectList.size();
-            }
+            List<AssetInfo> objectList = new ArrayList<AssetInfo>();
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            objectList = swapDao.findbyBorrowQty(user.getSiteUID(),user.getOrgInfoUID(),Uid);
+
+            return objectList.size();
         }
     }
     

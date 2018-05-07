@@ -209,9 +209,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         AssetInfo a = dao.findByUid(uid);
         String sharedAssetTypeUid = a.getSharedAssetTypeUid();
         String clinicalDeptUID = a.getClinicalDeptUID();
-        if (sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID))
-            return true;
-        return false;
+
+        return sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID);
 
     }
 
