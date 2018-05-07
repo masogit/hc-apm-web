@@ -74,9 +74,9 @@ update pm_order_rule pr  set performance_report=(select id from table_definition
 where pr.performance_report in (Select Schema from table_definition where tenant_uid=pr.tenant_uid);
 
 --data refrence change
-update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-safety-report';
+update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='safety-report';
 
-update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-performance-report';
+update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='performance-report';
 
 --end for v1.9.1 change
 
