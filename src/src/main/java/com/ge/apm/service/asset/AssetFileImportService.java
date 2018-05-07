@@ -508,21 +508,22 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
+            if (autoGenerateFinancingNum && newAsset.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
 
                 //修改的时候不需要生成资产编号
-                if (newAsset.getUid() == null) {
-                    financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
-                            null,
-                            nationalStandardCode,
-                            newAsset.getSiteUID(),
-                            null,
-                            null
-                    );
+                financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                        null,
+                        nationalStandardCode,
+                        newAsset.getSiteUID(),
+                        null,
+                        financingNum
+                );
 
-                    if (!financingNum.startsWith("error:")) {
-                        newAsset.setFinancingNum(financingNum);
-                    }
+                if (!financingNum.startsWith("error:")) {
+                    newAsset.setFinancingNum(financingNum);
+                } else {
+                    item.put("status", ImportStatus.Failure);
+                    AssetRow.addErrMessage(item, financingNum);
                 }
 
             }
@@ -987,7 +988,7 @@ public class AssetFileImportService {
 
         WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
         if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
-            if (siteConfig.getGenerateMethod() == 1) {
+            if (siteConfig.getGenerateMethod() == 1 || siteConfig.getGenerateMethod() == 2) {
                 autoGenerateFinancingNum = true;
             }
 
