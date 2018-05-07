@@ -26,6 +26,7 @@ import com.ge.apm.domain.CaptureDataMessages;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CaptureDataMessagesService;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -203,10 +204,33 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	this.selected=null;
     }
     
-    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+    public void handleImageUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        String imageString=ImageUtils.getBase64(file.getInputstream());
+        if(imageString==null){
+        	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+        else{
+        	this.selected.setTempImageContent(imageString);
+        	FacesMessage message = new FacesMessage("图片上传成功！");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void upload() throws IOException, ParseException{
+    	if(file!=null){
+    		String imageString=ImageUtils.getBase64(file.getInputstream());
+            if(imageString==null){
+            	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+            else{
+            	this.selected.setTempImageContent(imageString);
+            	FacesMessage message = new FacesMessage("图片上传成功！");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+    	}
     }
     
     public UploadedFile getFile() {
