@@ -160,9 +160,9 @@
 
                         <h:panelGroup>
                             <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{!assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
-                            <p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">
-                                <p:fileDownload value="#{assetFileImportController.exportFile}" />
-                            </p:commandButton>
+                            <!--<p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">-->
+                                <!--<p:fileDownload value="#{assetFileImportController.exportFile}" />-->
+                            <!--</p:commandButton>-->
                             <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="assetImport?faces-redirect=true"  update=":growl"/>
                         </h:panelGroup>
                         <!--<h:panelGroup >-->
