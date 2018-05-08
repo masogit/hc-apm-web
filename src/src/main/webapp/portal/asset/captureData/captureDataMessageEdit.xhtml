@@ -15,7 +15,7 @@
 						<h:panelGroup>
 							<label class="label">配置级别</label>
 							<p:selectOneRadio id="idDeviceType" value="#{captureDataMessagesController.selected.type}" required="true" requiredMessage="请选择配置级别"
-								onclick="showHide(this);">
+								onclick="CaptureDataMessageJS.showHide(this);">
 								<f:selectItem itemLabel="单个设备" itemValue="0"></f:selectItem>
 								<f:selectItem itemLabel="设备类型" itemValue="1"></f:selectItem>
 							</p:selectOneRadio>
@@ -54,18 +54,18 @@
 				<div class="ui-g-9">
 					<h:panelGroup>
 						<div class="ui-g">
-							<button type="button" onclick="triggerUpload()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">上传图片</button>
+							<button type="button" onclick="CaptureDataMessageJS.triggerUpload()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">上传图片</button>
 							<p:fileUpload fileUploadListener="#{captureDataMessagesController.handleImageUpload}" mode="advanced" dragDropSupport="false" style="display:none"
 								multiple="false" auto="true" update="@this:imageTextTempContent,@this:insertImageButton" label="上传图片" />
 							<!-- <p:fileUpload id="simpleUploadImage" label="选择图片" mode="simple" skinSimple="true" value="#{captureDataMessagesController.file}"/>
 						<p:commandButton value="上传图片" ajax="true" actionListener="#{captureDataMessagesController.upload()}" partialSubmit="true" process="simpleUploadImage"/> -->
-							<p:commandButton id="insertImageButton" value="插入图片" onclick="setImageTextTempContent()"
+							<p:commandButton id="insertImageButton" value="插入图片" onclick="CaptureDataMessageJS.setImageTextTempContent()"
 								disabled="#{empty captureDataMessagesController.selected.tempImageContent}" />
 						</div>
 						<p:inputText id="imageTextTempContent" value="#{captureDataMessagesController.selected.tempImageContent}" style="display:none;" />
 						<label class="label">消息内容</label>
 						<span id="idContentEditorMessage" class="ui-messages-warn" style="display: none;"></span>
-						<p:editor id="idContentEditor" value="#{captureDataMessagesController.selected.content}" height="350" onchange="contentEditorChange()">
+						<p:editor id="idContentEditor" value="#{captureDataMessagesController.selected.content}" height="350" onchange="CaptureDataMessageJS.contentEditorChange()">
 						</p:editor>
 					</h:panelGroup>
 				</div>
