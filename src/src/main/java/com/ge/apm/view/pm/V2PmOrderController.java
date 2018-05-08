@@ -723,7 +723,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
         pmCheckItemList = acPmOrderUleCheckList(selectedPmOrder);
-       if(!pmCheckItemList.isEmpty()) {
+       if(pmCheckItemList!=null) {
            if (hmCheck.isEmpty()) {
                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
                    UnstructuredData unData = new UnstructuredData();
