@@ -59,7 +59,8 @@ public class EditReportController {
         tableService.saveTableDate(report,tableValue);
         WebUtil.addSuccessMessage("已保存");
     }
-    
+
+
     public void submit(){
         tableValue.putAll(tableService.getRuleResultData(tableValue,table));
         tableService.saveTableDate(report,tableValue);

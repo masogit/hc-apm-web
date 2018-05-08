@@ -440,6 +440,9 @@ public class AssetInfo implements Serializable {
     @Column(name = "clinical_dept_name_py_code")
     private String clinicalDeptNamePyCode;
 
+    @Transient
+    private int lineNum;
+
     public Integer getAssetUsage() {
         return assetUsage;
     }
@@ -1384,6 +1387,14 @@ public class AssetInfo implements Serializable {
 
     public void setAssetDeptUID(String assetDeptUID) {
         this.assetDeptUID = assetDeptUID;
+    }
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
     }
 
     @Override

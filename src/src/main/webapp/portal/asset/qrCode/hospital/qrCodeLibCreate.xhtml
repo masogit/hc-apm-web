@@ -32,7 +32,7 @@
                         <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;" />
                         <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false" class="ui-selectonemenu-panel">
                             <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
                                     <p:ajax process="@this" event="select" oncomplete="PF('varPanelOrg').hide();" listener="#{qrCodeLibController.onHospitalChange}" update=":qrCodeLibCreateForm:hospitalIdSelect"/>
                                     <p:ajax process="@this" event="expand"/>
                                     <p:ajax process="@this" event="collapse"/>

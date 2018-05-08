@@ -154,6 +154,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     private Sort lastPageSort; //download use
 
+    WorkflowConfig config;
+
     public Integer getQueryIndex() {
         return queryIndex;
     }
@@ -252,6 +254,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 prepareCreate();
                 selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
                 updateSelectedOrg(selectedOrg);
+                config = configService.findConfigBySite(selected.getSiteUID());
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -277,6 +280,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 }
             }
             prepareEdit();
+            config = configService.findConfigBySite(selected.getSiteUID());
         }
 //        else if ("Delete".equalsIgnoreCase(actionName)) {
 //            //setSelected(Integer.parseInt(WebUtil.getRequestParameter("selectedid")));
@@ -352,7 +356,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
             this.updateSearchFilter(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
-        }else{
+        } else {
             searchFilters.removeAll(searchFilters.stream().filter(item -> item.conditionPath.equals("1*5+")).collect(Collectors.toList()));
         }
 
@@ -387,27 +391,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         stus.add(3);
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String p=request.getServletPath();
-        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
+        String p = request.getServletPath();
+        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
-        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
+        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
 
         if (queryIndex == 1) {
             //正常可借用
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
-        } else if(queryIndex == 2){
+        } else if (queryIndex == 2) {
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
-        }else if(queryIndex == 3){
+        } else if (queryIndex == 3) {
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
         }
-
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -625,10 +628,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
+//        selected.setQrCode(qrcodeLib.getQrCode());
+        onDepartNumChange("qrCode");
     }
 
     private boolean updateQrCode() {
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode,selected.getSiteUID());
+        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode, selected.getSiteUID());
         if (qrCodeLib == null) {
             WebUtil.addErrorMessage(WebUtil.getMessage("InvalidQRCode"));
             return false;
@@ -642,9 +647,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             return false;
         }
 
-        QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode(),selected.getSiteUID());
+        QrCodeLib oldQRCodeLib = qrcodeDao.findByQrCode(selected.getQrCode(), selected.getSiteUID());
         if (null != oldQRCodeLib) {
-            qrCodeService.discardQrCode(qrCode,selected.getSiteUID());
+            qrCodeService.discardQrCode(qrCode, selected.getSiteUID());
         }
         qrCodeLib.setStatus(3);
         qrcodeDao.save(qrCodeLib);
@@ -669,6 +674,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setQrCode(null);
         } else {
             if (!qrCode.equals(selected.getQrCode())) {
+                if ("DFQ".equals(getAssetCodeConfig())) {
+                    if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
+                        WebUtil.addErrorMessage("二维码不正确");
+                        return "";
+                    };
+                    qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
+                    selected.setQrCode(null);
+                } 
                 if (!updateQrCode()) {
                     qrCode = "";
                     return "";
@@ -1003,7 +1016,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         if (asset.getQrCode() != null) {
-            qrCodeService.updateQrCodeStatus(asset.getQrCode(),asset.getSiteUID(), 1);
+            qrCodeService.updateQrCodeStatus(asset.getQrCode(), asset.getSiteUID(), 1);
         }
         asset.setIsDeleted(true);
         asset.setIsValid(false);
@@ -1378,6 +1391,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             } else {
                 this.selected.setFinancingNum(financingNum);
+                onDepartNumChange("financingNum");
             }
 
         }
@@ -1783,6 +1797,58 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         streamedContent.setName("AssetInfo_export.xlsx");
 
         excelFile = streamedContent;
+    }
+
+    //三码合一设置
+    public String getAssetCodeConfig() {
+        return config == null ? null : config.getAssetCodeConfig();
+    }
+
+    public void onDepartNumChange(String fieldName) {
+        if (!Strings.isNullOrEmpty(config.getAssetCodeConfig())) {
+            String num = null;
+            switch (config.getAssetCodeConfig()) {
+                case "DFQ":
+                    switch (fieldName) {
+                        case "financingNum":
+                            num = selected.getFinancingNum();
+                            break;
+                        case "departNum":
+                            num = selected.getDepartNum();
+                            break;
+                        case "qrCode":
+                            num = qrCode;
+                            break;
+                        default:
+                    }
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
+                        qrCode = num.substring(0, 16);
+                        selected.setFinancingNum(qrCode);
+                        selected.setDepartNum(qrCode);
+                        WebUtil.addErrorMessage("二维码超长,最大16位");
+                    } else {
+                        qrCode = num;
+                        selected.setFinancingNum(num);
+                        selected.setDepartNum(num);
+                    }
+                    break;
+                case "DF":
+                    switch (fieldName) {
+                        case "financingNum":
+                            num = selected.getFinancingNum();
+                            selected.setFinancingNum(num);
+                            selected.setDepartNum(num);
+                            break;
+                        case "departNum":
+                            num = selected.getDepartNum();
+                            selected.setFinancingNum(num);
+                            selected.setDepartNum(num);
+                            break;
+                    }
+                    break;
+                default:
+            }
+        }
     }
 
     public String getExportQrCodeTemplateId() {
