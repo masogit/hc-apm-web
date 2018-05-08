@@ -8,7 +8,8 @@
 	<p:dialog id="captureDataMessagesEditDlg" widgetVar="captureDataMessagesEditDialog" modal="true" resizable="false" draggable="true" appendTo="@(body)"
 		header="小屏消息编辑" styleClass="fullscreen-dialog">
 		<h:form id="captureDataMessagesEditForm" rendered="#{captureDataMessagesController.selected != null}">
-			<p:messages id="messages" autoUpdate="true" closable="false" showDetail="true"></p:messages>
+			<p:messages id="messages" autoUpdate="true" closable="false" showDetail="true" for="systemID"></p:messages>
+			<p:growl id="messages2" showDetail="true" for="other"/>
 			<div class="ui-g">
 				<div class="ui-g-3">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
