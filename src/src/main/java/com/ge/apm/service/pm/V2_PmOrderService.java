@@ -83,6 +83,9 @@ public class V2_PmOrderService {
     }
     public List<TableDefinition> getTablesName(V2_PmOrder v2PmOrder){
         PmOrderRule pmOrderRule=acqPmOrderRule(v2PmOrder);
+        if(pmOrderRule==null){
+            return null;
+        }
         List<TableDefinition> tableDefinitions = tableDao.findTableName(pmOrderRule.getUid());
         return tableDefinitions;
     }
