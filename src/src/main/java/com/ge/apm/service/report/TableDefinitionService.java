@@ -77,6 +77,11 @@ public class TableDefinitionService {
     public TableDefinition getTemplateById(String templateId) {
         return templateDao.findById(templateId);
     }
+    
+    public TableDefinition getTemplateByBaseId(String BaseId) {
+        return templateDao.findByBaseId(BaseId);
+    }
+    
     public void deleteTemplate(TableDefinition tableDefinition) {
         if (getCountByTemplate(tableDefinition.getId()) > 0) {
             WebUtil.addErrorMessage("模版使用中,不能删除");
@@ -188,4 +193,5 @@ public class TableDefinitionService {
             udcDao.delete(report);
         }
     }
+    
 }
