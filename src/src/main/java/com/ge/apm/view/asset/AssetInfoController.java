@@ -203,6 +203,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         setSelectedSiteUID(selected.getSiteUID());
 
         getOwnerList();
+        getClinicalOwnerList();
     }
 
     private boolean showDialog = false;
@@ -833,6 +834,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         updateParentAssetList();
+
+        getClinicalOwnerList();
     }
 
     public void onClinicalOwnerChange() {
@@ -937,6 +940,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return res;
     }
 
+    public List<UserAccount> completeClinicalOwnerList(String query) {
+
+        List<UserAccount> res = this.clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
+        res.sort(new PinYinComparatorByName());
+
+        return res;
+    }
+
     private List<UserAccount> getEmptyAccountList() {
         List<UserAccount> accountList = new ArrayList();
         UserAccount emptyValue = new UserAccount();
@@ -945,12 +958,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return accountList;
     }
 
-    public List<UserAccount> getClinicalOwnerList() {
-        List<UserAccount> accountList = getEmptyAccountList();
+    private List<UserAccount> clinicalOwnerList;
+
+    public void getClinicalOwnerList() {
         if (null != selected.getClinicalDeptId()) {
-            accountList.addAll(userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId()));
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId());
         }
-        return accountList;
     }
 
     public String getQrCodeImageBase64() {

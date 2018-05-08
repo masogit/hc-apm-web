@@ -136,16 +136,28 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalOwnerName}</label>
-                                <p:selectOneMenu id="clinicalOwnerName" value="#{assetInfoController.clinicalOwner}" converter="userAccountConverter" var="t" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">
-                                    <p:ajax  listener="#{assetInfoController.onClinicalOwnerChange()}" update="clinicalOwnerTel" />
-                                    <f:selectItems value="#{assetInfoController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                                <!--<p:selectOneMenu id="clinicalOwnerName" value="#{assetInfoController.clinicalOwner}" converter="userAccountConverter" var="t" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}">-->
+                                    <!--<p:ajax  listener="#{assetInfoController.onClinicalOwnerChange()}" update="clinicalOwnerTel" />-->
+                                    <!--<f:selectItems value="#{assetInfoController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>-->
+                                    <!--<p:column>-->
+                                        <!--<h:outputText value="#{t.name}"/>-->
+                                    <!--</p:column>-->
+                                    <!--<p:column>-->
+                                        <!--<h:outputText value="#{t.telephone}"/>-->
+                                    <!--</p:column>-->
+                                <!--</p:selectOneMenu>-->
+
+                                <p:autoComplete id="clinicalOwnerName" value="#{assetInfoController.clinicalOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" var="t" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}"
+                                                itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeClinicalOwnerList}">
+                                    <p:ajax event="itemSelect" listener="#{assetInfoController.onClinicalOwnerChange}" process="@this" update="clinicalOwnerTel" />
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
                                     <p:column>
                                         <h:outputText value="#{t.telephone}"/>
                                     </p:column>
-                                </p:selectOneMenu>
+                                </p:autoComplete>
+
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalOwnerTel}</label>
