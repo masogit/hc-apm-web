@@ -9,6 +9,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -20,6 +21,7 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
@@ -199,6 +201,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         selectedOrg = orgDao.getByUid(selected.getSiteUID());
 
         setSelectedSiteUID(selected.getSiteUID());
+
+        getOwnerList();
     }
 
     private boolean showDialog = false;
@@ -771,7 +775,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.owner = owner;
     }
 
-    public void onOwnerChange() {
+    public void onOwnerChange(SelectEvent event) {
+        Object obj = event.getSource();
         if (null != owner) {
             selected.setAssetOwnerId(owner.getId());
             selected.setAssetOwnerName(owner.getName());
@@ -917,13 +922,19 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
         if (ownerList == null) {
-            ownerList = getEmptyAccountList();
-            List<UserAccount> workerList = ucService.getWorkerList(selected.getId());
-            if (null != workerList) {
-                ownerList.addAll(workerList);
-            }
+            ownerList = ucService.getWorkerList(selected.getId());
         }
         return ownerList;
+    }
+
+    public List<UserAccount> completeOwnerList(String query) {
+
+        List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
+        res.sort(new PinYinComparatorByName());
+
+        return res;
     }
 
     private List<UserAccount> getEmptyAccountList() {
@@ -1915,5 +1926,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setDeptName(String deptName) {
         this.deptName = deptName;
+    }
+
+    public void setOwnerList(List<UserAccount> ownerList) {
+        this.ownerList = ownerList;
     }
 }
