@@ -155,6 +155,13 @@ public class TableDefinitionService {
                 dataItem.setCollectionId(report.getId());
                 dataItem.setKey(item.getKey());
                 dataItem.setValue(item.getValue());
+                if(item.getKey().contains("_res")){
+                    switch ((String)item.getValue()){
+                        case "合格" : 
+                        case "正常" : dataItem.setValue("Normal");
+                        default: 
+                    }
+                }
                 dataList.add(dataItem);
             } else {
                 dataItem.setValue(item.getValue());
