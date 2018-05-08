@@ -4,23 +4,25 @@
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <ui:composition>
-
 	<p:dialog id="captureDataMessagesEditDlg" widgetVar="captureDataMessagesEditDialog" modal="true" resizable="false" draggable="true" appendTo="@(body)"
 		header="小屏消息编辑" styleClass="fullscreen-dialog">
 		<h:form id="captureDataMessagesEditForm" rendered="#{captureDataMessagesController.selected != null}">
-			<p:messages id="messages" autoUpdate="true" closable="false" showDetail="true"></p:messages>
+			<p:messages id="messages" autoUpdate="true" closable="false" showDetail="true" for="systemID"></p:messages>
+			<p:growl id="messages2" showDetail="true" for="other" />
 			<div class="ui-g">
 				<div class="ui-g-3">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 						<h:panelGroup>
 							<label class="label">配置级别</label>
-							<p:selectOneRadio value="#{captureDataMessagesController.selected.type}" required="true" requiredMessage="请选择配置级别" onclick="showHide(this);">
+							<p:selectOneRadio id="idDeviceType" value="#{captureDataMessagesController.selected.type}" required="true" requiredMessage="请选择配置级别"
+								onclick="showHide(this);">
 								<f:selectItem itemLabel="单个设备" itemValue="0"></f:selectItem>
 								<f:selectItem itemLabel="设备类型" itemValue="1"></f:selectItem>
 							</p:selectOneRadio>
-							<span id="type0Span" style="captureDataMessagesController .selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID</label>
+							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID</label>
 								<p:inputText value="#{captureDataMessagesController.selected.systemId}">
-									<p:ajax event="blur" update="@this:idIbStatus, @this:idGeDeviceType" listener="#{captureDataMessagesController.checkSystemId()}" />
+									<p:ajax event="blur" update="@this:idIbStatus, @this:idGeDeviceType" listener="#{captureDataMessagesController.checkSystemId()}"
+										process="@this,@parent:idDeviceType" />
 								</p:inputText> <label class="label">是否GE IB</label> <p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
 									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" />
 									<f:selectItem itemLabel="否" itemValue="0" />
@@ -51,8 +53,18 @@
 				</div>
 				<div class="ui-g-9">
 					<h:panelGroup>
+						<div class="ui-g">
+							<button type="button" onclick="triggerUpload()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">上传图片</button>
+							<p:fileUpload fileUploadListener="#{captureDataMessagesController.handleImageUpload}" mode="advanced" dragDropSupport="false" style="display:none"
+								multiple="false" auto="true" update="@this:imageTextTempContent,@this:insertImageButton" label="上传图片" />
+							<!-- <p:fileUpload id="simpleUploadImage" label="选择图片" mode="simple" skinSimple="true" value="#{captureDataMessagesController.file}"/>
+						<p:commandButton value="上传图片" ajax="true" actionListener="#{captureDataMessagesController.upload()}" partialSubmit="true" process="simpleUploadImage"/> -->
+							<p:commandButton id="insertImageButton" value="插入图片" onclick="setImageTextTempContent()"
+								disabled="#{empty captureDataMessagesController.selected.tempImageContent}" />
+						</div>
+						<p:inputText id="imageTextTempContent" value="#{captureDataMessagesController.selected.tempImageContent}" style="display:none;" />
 						<label class="label">消息内容</label>
-						<span id="idContentEditorMessage" class="ui-messages-warn" style="display:none;"></span>
+						<span id="idContentEditorMessage" class="ui-messages-warn" style="display: none;"></span>
 						<p:editor id="idContentEditor" value="#{captureDataMessagesController.selected.content}" height="350" onchange="contentEditorChange()">
 						</p:editor>
 					</h:panelGroup>
@@ -60,86 +72,6 @@
 			</div>
 		</h:form>
 	</p:dialog>
-	<script type="text/javascript">
-		var beginImage='&lt;img';
-		var beginImageLength=beginImage.length;
-		var endImage='&lt;/img&gt;';
-		var endImageLength=endImage.length;
-		var brTag='&lt;br&gt;';
-		var contentEditor=null;
-		var contentEditorMessage=null;
-		function captureDataMessageParseImage(str){
-			var strArr=[];
-			var start=0;
-			var end=0;
-			if(str){
-				while((start=str.indexOf(beginImage))>-1){
-					if(start!=0){
-						strArr.push(str.substr(0,start));
-						str=str.substring(start,str.length);
-						start=0;
-					}
-					end=str.indexOf('"&gt;');
-					if(end>-1){
-						//ignore image
-						if(end+1!=str.length){
-							str=str.substring(end+2,str.length);
-						}
-						else{
-							str="";
-						}
-					}
-				}
-				if(str){
-					strArr.push(str);
-				}
-			}
-			return strArr;
-		}
-		function showHide(a) {
-			var type0Span = document.getElementById("type0Span");
-			if (a.value) {
-				if (a.value == 0) {
-					type0Span.setAttribute("style", "display:block;");
-				} else {
-					type0Span.setAttribute("style", "display:none;");
-				}
-			}
-		}
-		
-		function setCaptureDataMessageValue(){
-			contentEditor=$("[id='captureDataMessagesTab:captureDataMessagesEditForm:idContentEditor'] iframe").contents().find("html body");
-			contentEditorMessage=$("#idContentEditorMessage");
-		}
-		function contentEditorChange(){
-			if(contentEditor==null){
-				setCaptureDataMessageValue();
-			}
-			var contentStr=contentEditor.html();
-			if(contentStr){
-				var strArr=captureDataMessageParseImage(contentStr);
-				var strCount=0;
-				for(var obj in strArr){
-					strCount+=strArr[obj].length;	
-				}
-				if(strCount>120){
-					contentEditorMessage.html("请注意！连续输入120个字符将被强制分页。").css("display","block");
-				}
-				else{
-					contentEditorMessage.html("").css("display","none");
-				}
-				if(contentStr.indexOf(brTag)>-1){
-					contentEditorMessage.html("请注意！不允许输入回车符。").css("display","block");
-					contentStr=contentStr.replace(brTag,"");
-					contentEditor.html(contentStr);
-				}
-				else{
-					contentEditorMessage.html("").css("display","none");
-				}
-			}
-		}
-		
-	</script>
 </ui:composition>
 
 </html>
