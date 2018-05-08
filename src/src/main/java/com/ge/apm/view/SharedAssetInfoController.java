@@ -200,7 +200,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgIds = dao.getOrgId(user.getSiteUID());
         if (orgIds.size() > 0) {
-            selected.setClinicalDeptUID(orgIds.get(0));
+//            selected.setClinicalDeptUID(orgIds.get(0));
             selected.setAssetDeptUID(orgIds.get(0));
         }
     }
@@ -209,9 +209,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         AssetInfo a = dao.findByUid(uid);
         String sharedAssetTypeUid = a.getSharedAssetTypeUid();
         String clinicalDeptUID = a.getClinicalDeptUID();
-        if (sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID))
-            return true;
-        return false;
+
+        return sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID);
 
     }
 

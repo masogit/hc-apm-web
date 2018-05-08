@@ -128,6 +128,8 @@ public class AssetFileImportService {
             org.setOrgLevel(selectedOrgToImport.getOrgLevel());
             org.setOrgType(4);
 
+            org.setLineNum(dataRow);
+
             Map<String, Object> map = new LinkedHashMap();
             map.put("org", org);
             map.put("status", ImportStatus.New);
@@ -201,6 +203,8 @@ public class AssetFileImportService {
                     isNewAsset = false;
                     map.put(OLD_QRCODE_KEY, asset.getQrCode());
                 }
+
+                asset.setLineNum(dataRow);
 
                 String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
                 if (!StringUtils.isEmpty(inputQrcode)) {
@@ -369,7 +373,8 @@ public class AssetFileImportService {
         LocalDateTime startTime = LocalDateTime.now();
 
         importOrgMap.values().forEach(item -> {
-            List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
             if (null == orgs || orgs.isEmpty()) {
                 orgDao.save((OrgInfo) item.get("org"));
                 item.put("status", ImportStatus.Created);
@@ -377,6 +382,9 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
             } else {
+                OrgInfo existingOrgInfo = orgs.get(0);
+                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+                item.put("org", existingOrgInfo);
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
             }
@@ -500,21 +508,22 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
+            if (autoGenerateFinancingNum && newAsset.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
 
                 //修改的时候不需要生成资产编号
-                if (newAsset.getUid() == null) {
-                    financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
-                            null,
-                            nationalStandardCode,
-                            newAsset.getSiteUID(),
-                            null,
-                            null
-                    );
+                financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
+                        null,
+                        nationalStandardCode,
+                        newAsset.getSiteUID(),
+                        null,
+                        financingNum
+                );
 
-                    if (!financingNum.startsWith("error:")) {
-                        newAsset.setFinancingNum(financingNum);
-                    }
+                if (!financingNum.startsWith("error:")) {
+                    newAsset.setFinancingNum(financingNum);
+                } else {
+                    item.put("status", ImportStatus.Failure);
+                    AssetRow.addErrMessage(item, financingNum);
                 }
 
             }
@@ -753,7 +762,8 @@ public class AssetFileImportService {
 
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
-            List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
             if (null == orgs || orgs.isEmpty()) {
                 item.put("status", ImportStatus.New);
             } else if (orgs.size() > 1) {
@@ -761,7 +771,9 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
                 result.add(Boolean.FALSE);
             } else {
-                item.put("org", orgs.get(0));
+                OrgInfo existingOrgInfo = orgs.get(0);
+                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+                item.put("org", existingOrgInfo);
                 item.put("status", ImportStatus.Exist);
             }
         });
@@ -896,6 +908,15 @@ public class AssetFileImportService {
             ++startRow;
         }
 
+        String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
+
+        String sumFormula = String.format("SUM('Asset List'!$Y$7:$Y$%d)", assetList.size() + 6);
+
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
+        doc.getWorkBook().setForceFormulaRecalculation(true);
+        doc.calculateFormula();
+
         //export org info list
         for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
             doc.clearRow(AssetFileImportService.SHEET_ORG, startRow);
@@ -917,11 +938,30 @@ public class AssetFileImportService {
 
         importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
+
+            //if site uid not match, ignore update
+            if (newAsset.getUid() != null) {
+                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                    return ;
+                }
+
+            }
+
             String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
             if (StringUtils.isEmpty(oldQrCode)) return;
-            if (oldQrCode.equals(newAsset.getQrCode())) return;
+            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
 
-            qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            boolean releaseable = true;
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                if (!exists) {
+                    releaseable = false;
+                }
+            }
+
+            if (releaseable) {
+                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            }
 
         });
 
@@ -948,7 +988,7 @@ public class AssetFileImportService {
 
         WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
         if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
-            if (siteConfig.getGenerateMethod() == 1) {
+            if (siteConfig.getGenerateMethod() == 1 || siteConfig.getGenerateMethod() == 2) {
                 autoGenerateFinancingNum = true;
             }
 

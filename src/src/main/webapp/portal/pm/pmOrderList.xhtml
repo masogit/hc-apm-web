@@ -63,15 +63,13 @@
                             <h:outputText value="#{item.ruleLevel}"/>
                         </p:column>
                         <p:column headerText="保养类型" sortBy="#{item.pmType}" filterBy="#{item.pmType}" filterMatchMode="EQ">
-                            <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
-<!--
                             <f:facet name="filter" >
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.repairType}">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{v2PmOrderController.repairTypeInt}">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true"/>
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,4)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('pmType').subList(0,3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
-                            </f:facet>-->
-
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('pmType',item.pmType)}"/>
                         </p:column>
 
                         <p:column headerText="使用科室" sortBy="#{item.assetInfo.clinicalDeptName}" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">

@@ -26,6 +26,7 @@ import com.ge.apm.domain.CaptureDataMessages;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CaptureDataMessagesService;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -51,6 +52,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private List<CaptureDataMessages> importFailedDataList;
     private String content;
     private AssetInfo assetInfo;
+    private int conentTextLength=120;
     boolean validate=true;
     
     @Override
@@ -156,6 +158,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
+    	setIndexValue();
     	if(this.selected.getType()==0){
     		if(validate){
         		super.save();
@@ -175,6 +178,25 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	}
     }
     
+    private void setIndexValue(){
+    	CaptureDataMessages captureDataMessages=null;
+    	if(this.selected.getType()==0){
+    		captureDataMessages=dao.findBySystemId(this.selected.getSystemId());
+    	}
+    	else if(this.selected.getType()==1){
+    		captureDataMessages=dao.findByGeDeviceType(this.selected.getGeDeviceType());
+    	}
+    	if(captureDataMessages!=null){
+    		Integer index=captureDataMessages.getIndex();
+    		if(index!=null){
+    			this.selected.setIndex(index+1);
+    		}
+    		else{
+    			this.selected.setIndex(0);
+    		}
+    	}
+    }
+    
     @Override
     public void delete() {
     	// TODO Auto-generated method stub
@@ -182,10 +204,36 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	this.selected=null;
     }
     
-    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+    public void handleImageUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        
+        String imageString=ImageUtils.getBase64(file.getInputstream());
+        if(imageString==null){
+        	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+        else{
+        	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
+        	this.selected.setTempImageContent(imageString);
+        	FacesMessage message = new FacesMessage("图片上传成功！");
+            FacesContext.getCurrentInstance().addMessage(null, message);
+        }
+    }
+    
+    public void upload() throws IOException, ParseException{
+    	if(file!=null){
+    		String imageString=ImageUtils.getBase64(file.getInputstream());
+    		if(imageString==null){
+            	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+            else{
+            	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
+            	this.selected.setTempImageContent(imageString);
+            	FacesMessage message = new FacesMessage("图片上传成功！");
+                FacesContext.getCurrentInstance().addMessage(null, message);
+            }
+    	}
     }
     
     public UploadedFile getFile() {

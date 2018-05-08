@@ -20,6 +20,11 @@ public interface UnstructuredDataCollectionRepository extends GenericRepositoryU
     
     public List<UnstructuredDataCollection> findByBoUuid(String boUuid);
 
+    @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type=?2",nativeQuery = true)
+    public List<UnstructuredDataCollection> findCKByBoUuid(String boUuid,String boType);
+
     @Query(value = "select u from UnstructuredDataCollection u where u.id=?1")
     public UnstructuredDataCollection findByUid(String id);
+
+
 }

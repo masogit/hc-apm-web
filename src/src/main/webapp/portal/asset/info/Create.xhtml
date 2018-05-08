@@ -185,13 +185,6 @@
                                 <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}"/>
                             </h:panelGroup>
 
-                            <!--<h:panelGroup>
-                                <label class="label">#{msg.nationalStandardCode}</label>
-                                <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" maxlength="64">
-                                    <p:ajax process="@this financingNum" update="financingNum" listener="#{assetInfoController.updateFinancingNumByNationalStandardCode()}"/>
-                                </p:inputText>
-                            </h:panelGroup>-->
-
                             <h:panelGroup>
                                 <label class="label">设备国标码</label>
                                 <!--  <p:inputText id="selectedgbName" value="#Gb{assetInfoController.selectedGb==null?'':assetInfoController.selectedGb.name}" readonly="true" />-->
@@ -238,15 +231,17 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum">
-                                    <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                                    <p:ajax event="keyup" process="@this" update="@(.financingNum) qrCode qrCodeButton departNum" listener="#{assetInfoController.onDepartNumChange('financingNum')}"/>
                                 </p:inputText>
                                 <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 4}"
-                                    process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) " icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
+                                    process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) qrCode qrCodeButton departNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
                             </h:panelGroup>
 
                             <h:panelGroup>
                                 <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInfoController.selected.departNum}"/>
+                                <p:inputText id="departNum" value="#{assetInfoController.selected.departNum}">
+                                    <p:ajax process="@this" listener="#{assetInfoController.onDepartNumChange('departNum')}" update="@(.financingNum) qrCode qrCodeButton departNum"/>
+                                </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.barcode}</label>
@@ -262,8 +257,10 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
-                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="#{not empty assetInfoController.selected.qrCode}"/>
-                                <p:commandButton actionListener="#{assetInfoController.renewQrcode()}" rendered="#{assetInfoController.selected.qrCode eq null}" update="qrCode" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this" disabled="#{not empty assetInfoController.qrCode}"/>
+                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="#{not empty assetInfoController.selected.qrCode || assetInfoController.assetCodeConfig eq DFQ}">
+                                <p:ajax process="@this" listener="#{assetInfoController.onDepartNumChange('qrCode')}" update="@(.financingNum) qrCode qrCodeButton departNum"/>
+                                </p:inputText>
+                                <p:commandButton id="qrCodeButton" actionListener="#{assetInfoController.renewQrcode()}" update="@(.financingNum) departNum qrCode qrCodeButton" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this" disabled="#{not empty assetInfoController.qrCode}"/>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
