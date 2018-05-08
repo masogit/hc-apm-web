@@ -8,7 +8,9 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.GbForm;
@@ -54,6 +56,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     AssetInfoRepository dao = null;
     AssetFileImportService importService;
+
+    AssetInfoService assetInfoService;
 
     private UserAccountRepository userDao;
 
@@ -156,6 +160,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     WorkflowConfig config;
 
+    private String deptName;
+
+    SupplierController supplierController;
+
+    List<Supplier> supplierList = Collections.emptyList();
+
     public Integer getQueryIndex() {
         return queryIndex;
     }
@@ -238,6 +248,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         configService = WebUtil.getBean(ConfigService.class);
 
         importService = WebUtil.getBean(AssetFileImportService.class);
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
+        supplierController = WebUtil.getBean(SupplierController.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
@@ -300,6 +312,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (selectedOrg != null) {
             updateParentAssetList();
         }
+
+        supplierList = supplierController.getSupplierList();
 
     }
 
@@ -681,7 +695,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                     };
                     qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
                     selected.setQrCode(null);
-                } 
+                }
                 if (!updateQrCode()) {
                     qrCode = "";
                     return "";
@@ -791,10 +805,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptChange() {
-        if (this.clinicalDept == null) {
+        OrgInfo dept = clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
+
+        if (dept == null) {
             selected.setClinicalDeptId(null);
         } else {
-            selected.setClinicalDeptId(this.clinicalDept.getId());
+            selected.setClinicalDeptId(dept.getId());
         }
 
         this.clinicalOwner = null;
@@ -826,7 +842,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    private String supplierName;
+
+    public String getSupplierName() {
+        return supplierName;
+    }
+
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
+    }
+
     public void onSupplierChange() {
+
+        Supplier supplier = supplierList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
+
         if (null != supplier) {
             selected.setSupplierId(supplier.getId());
             selected.setVendor(supplier.getName());
@@ -1299,6 +1328,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private GbCode selectedGb;
     private OrgInfo selectedOrg;
 
+    List<OrgInfo> clinicalDeptList;
+
     public TreeNode getSelectedGbNode() {
         return selectedGbNode;
     }
@@ -1338,6 +1369,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         updateSelectedOrg(orgInfo);
 
         updateParentAssetList();
+
+        clinicalDeptList = assetInfoService.getClinicalDeptList(this.selectedSiteUID);
 
     }
 
@@ -1541,6 +1574,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setSelectedSiteUID(String selectedSiteUID) {
         this.selectedSiteUID = selectedSiteUID;
+
+        clinicalDeptList = assetInfoService.getClinicalDeptList(this.selectedSiteUID);
     }
 
     public List<String> completeAssetName(String prefix) {
@@ -1859,4 +1894,26 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
+    public List<String> autoCompleteDept(String query) {
+        List<String> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
+        res.sort(new PinYinComparator());
+        return res;
+    }
+
+    public List<String> autoCompleteSupplier(String query) {
+
+        List<String> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
+        res.sort(new PinYinComparator());
+        return res;
+    }
+
+    public String getDeptName() {
+        return deptName;
+    }
+
+    public void setDeptName(String deptName) {
+        this.deptName = deptName;
+    }
 }
