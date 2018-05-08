@@ -185,6 +185,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void prepareCreateHospital(){
         orgName=null;
+        orgNameEn=null;
         if(selected==null) return;
         
         OrgInfo org = new OrgInfo();

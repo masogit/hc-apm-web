@@ -26,6 +26,7 @@ import com.ge.apm.domain.CaptureDataMessages;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CaptureDataMessagesService;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -75,8 +76,10 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
     	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
-    	this.selected.setIbStatus(assetInfo.getIbStatus());
-    	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+    	if(assetInfo!=null){
+    		this.selected.setIbStatus(assetInfo.getIbStatus());
+        	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+    	}
     }
 
     @Override
@@ -132,7 +135,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		if(assetInfo==null){
     			validate=false;
     			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
-    			FacesContext.getCurrentInstance().addMessage(null, message);
+    			FacesContext.getCurrentInstance().addMessage("systemID", message);
     		}
     		else{
     			validate=true;
@@ -142,11 +145,11 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     			OrgInfo orgInfo=assetInfo.getHospital();
     			if(orgInfo!=null && orgInfo.getName()!=null){
     				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"医院:"+orgInfo.getName()+"，设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
-        			FacesContext.getCurrentInstance().addMessage(null, message);
+        			FacesContext.getCurrentInstance().addMessage("systemID", message);
     			}
     			else{
     				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
-        			FacesContext.getCurrentInstance().addMessage(null, message);
+        			FacesContext.getCurrentInstance().addMessage("systemID", message);
     			}
     		}
     	}
@@ -168,10 +171,11 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         	}
         	else{
         		FacesMessage message = new FacesMessage("注意！保存失败");
-                FacesContext.getCurrentInstance().addMessage(null, message);
+                FacesContext.getCurrentInstance().addMessage("other", message);
         	}
     	}
     	else{
+    		this.selected.setSystemId("");
     		super.save();
     		this.selected=null;
     	}
@@ -203,10 +207,58 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	this.selected=null;
     }
     
-    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+    public void handleImageUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        
+        if(file==null || file.getInputstream()==null){
+        	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+            FacesContext.getCurrentInstance().addMessage("other", message);
+            return;
+        }
+        else{
+        	String fileName=file.getFileName();
+        	if(fileName.toLowerCase().endsWith(".jpg")|| fileName.toLowerCase().endsWith(".png")){
+        		
+        	}
+        	else{
+        		FacesMessage message = new FacesMessage("注意！请上传jpg或者png格式的图片！");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+                return;
+        	}
+        	if(file.getInputstream().available()>5242880){
+        		FacesMessage message = new FacesMessage("注意！请上传大小不超过5M的图片！");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+                return;
+        	}
+        	String imageString=ImageUtils.getBase64(file.getInputstream());
+        	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
+        	this.selected.setTempImageContent(imageString);
+        	FacesMessage message = new FacesMessage("图片上传成功！");
+            FacesContext.getCurrentInstance().addMessage("other", message);
+        }
+    }
+    
+    public void insertImage(){
+    	String temp=this.selected.getTempImageContent();
+    	if(StringUtils.isNotEmpty(temp)){
+    		this.selected.setContent(this.selected.getContent()+temp);
+    	}
+    }
+    
+    public void upload() throws IOException, ParseException{
+    	if(file!=null){
+    		String imageString=ImageUtils.getBase64(file.getInputstream());
+    		if(imageString==null){
+            	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+            }
+            else{
+            	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
+            	this.selected.setTempImageContent(imageString);
+            	FacesMessage message = new FacesMessage("图片上传成功！");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+            }
+    	}
     }
     
     public UploadedFile getFile() {
