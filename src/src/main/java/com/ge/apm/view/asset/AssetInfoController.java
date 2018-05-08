@@ -689,10 +689,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         } else {
             if (!qrCode.equals(selected.getQrCode())) {
                 if ("DFQ".equals(getAssetCodeConfig())) {
-                    if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
-                        WebUtil.addErrorMessage("二维码不正确");
-                        return "";
-                    };
+                    QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode, selected.getSiteUID());
+                    if (qrCodeLib == null) {
+                        if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
+                            WebUtil.addErrorMessage("二维码不正确");
+                            return "";
+                        };
+                    }
                     qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
                     selected.setQrCode(null);
                 }
@@ -1479,7 +1482,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             setSelectedSiteUID(selectedOrg.getUid());
             config = configService.findConfigBySite(selected.getSiteUID());
         }
-        
 
     }
 
