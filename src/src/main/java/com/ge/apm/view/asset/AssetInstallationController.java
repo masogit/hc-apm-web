@@ -75,6 +75,7 @@ public class AssetInstallationController {
 
     private List<OrgInfo> deptInfoList;
     private UaaService uaaService;
+    private WorkflowConfig config;
 
     @PostConstruct
     protected void init() {
@@ -94,6 +95,7 @@ public class AssetInstallationController {
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
 //        String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
+        WorkflowConfig config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
         }
@@ -316,6 +318,9 @@ public class AssetInstallationController {
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
+        if(config!=null && config.getGenerateMethod()!=null && config.getGenerateMethod()==2){
+            assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
+        }
         return assetDao.findBySearchFilter(assetFilters);
     }
 
@@ -404,8 +409,6 @@ public class AssetInstallationController {
     }
 
     public void onDepartNumChange(String fieldName) {
-
-        WorkflowConfig config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         if (config == null) {
             return;
         }

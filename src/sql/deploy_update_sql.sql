@@ -108,3 +108,7 @@ INSERT INTO sys_role (name, role_desc, home_page) VALUES ('LocalITAdmin','本地
 alter table asset_info drop constraint uk_asset_info_qr_code;
 update workflow_config set pm_manhour_price = 1000 where pm_manhour_price is null;
 update workflow_config set wo_manhour_price = 1000 where wo_manhour_price is null;
+
+
+--v5.1
+update table_definition set base_id=id where base_id is null;

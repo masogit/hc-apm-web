@@ -40,10 +40,10 @@
 		<f:facet name="{Toolbar}">
 			<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
 				actionListener="#{captureDataMessagesController.prepareCreate}" update=":captureDataMessagesTab:captureDataMessagesEditDlg"
-				oncomplete="PF('captureDataMessagesEditDialog').show()" />
+				oncomplete="PF('captureDataMessagesEditDialog').show()" onclick="CaptureDataMessageJS.initCaptureDataMessageParam()"/>
 			<p:commandButton id="editButton" actionListener="#{captureDataMessagesController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
 				update=":captureDataMessagesTab:captureDataMessagesEditDlg" oncomplete="PF('captureDataMessagesEditDialog').show()"
-				disabled="#{empty captureDataMessagesController.selected.id}" />
+				disabled="#{empty captureDataMessagesController.selected.id}" onclick="CaptureDataMessageJS.initCaptureDataMessageParam()"/>
 			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{captureDataMessagesController.delete}"
 				update=":captureDataMessagesTab:captureDataMessagesListForm:datalist" disabled="#{empty captureDataMessagesController.selected.id}">
 				<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
