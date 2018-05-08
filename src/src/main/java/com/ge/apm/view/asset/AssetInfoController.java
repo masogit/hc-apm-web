@@ -1477,7 +1477,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setHospitalId(selectedOrg.getId());
 
             setSelectedSiteUID(selectedOrg.getUid());
+            config = configService.findConfigBySite(selected.getSiteUID());
         }
+        
 
     }
 
