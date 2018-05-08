@@ -121,6 +121,7 @@ public class TableCreateController extends TieWebSheetBean {
             tableString = JSONObject.toJSONString(table);
             selectedTableDefinition.setSchema(tableString);
             templateDao.save(selectedTableDefinition);
+            selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
             WebUtil.addSuccessMessage("JSON已保存");
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
@@ -144,8 +145,11 @@ public class TableCreateController extends TieWebSheetBean {
                     uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
                     uploadedFileObject.setBoSubType("Excel");
                     selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
-                    selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    if(Strings.isNullOrEmpty(selectedTableDefinition.getId())){
+                        selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    }
                     uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
+                    selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
                     blobService.saveBlobObject(uploadedFileObject);
                     WebUtil.addSuccessMessage("Excel已保存");
                 }

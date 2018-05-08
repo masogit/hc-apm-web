@@ -694,10 +694,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         } else {
             if (!qrCode.equals(selected.getQrCode())) {
                 if ("DFQ".equals(getAssetCodeConfig())) {
-                    if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
-                        WebUtil.addErrorMessage("二维码不正确");
-                        return "";
-                    };
+                    QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrCode, selected.getSiteUID());
+                    if (qrCodeLib == null) {
+                        if (!qrCodeService.createSpecialQrCode(qrCode, selected.getSiteUID())) {
+                            WebUtil.addErrorMessage("二维码不正确");
+                            return "";
+                        };
+                    }
                     qrCodeService.forceRemoveQrcode(selected.getQrCode(), selected.getSiteUID());
                     selected.setQrCode(null);
                 }
@@ -777,7 +780,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onOwnerChange(SelectEvent event) {
-        Object obj = event.getSource();
+
         if (null != owner) {
             selected.setAssetOwnerId(owner.getId());
             selected.setAssetOwnerName(owner.getName());
@@ -1501,6 +1504,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setHospitalId(selectedOrg.getId());
 
             setSelectedSiteUID(selectedOrg.getUid());
+            config = configService.findConfigBySite(selected.getSiteUID());
         }
 
     }
