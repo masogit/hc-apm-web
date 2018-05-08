@@ -18,6 +18,7 @@ import com.google.common.base.Strings;
 import org.apache.commons.collections4.map.HashedMap;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.ToggleEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,8 +27,11 @@ import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import webapp.framework.web.mvc.ServerEventInterface;
+
+import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -120,6 +124,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     *
     * */
 
+    public void handleToggle(ToggleEvent event) {
+        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled", "Visibility:" + event.getVisibility());
+        FacesContext.getCurrentInstance().addMessage(null, msg);
+    }
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
@@ -139,9 +147,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         List<String> orgUids = Arrays.asList(site.getSiteUID(), site.getHospitalUID(), site.getInstitutionUID(), site.getTenantUID());
         return tableDao.getBySiteUIDIn(orgUids);
     }
-
+    List<UnstructuredDataCollection> reportList;
     public boolean hasRepairReport(){
-        List<UnstructuredDataCollection> reportList = pmOrderService.getReportList(selectedPmOrder.getId());
+        reportList = pmOrderService.getReportList(selectedPmOrder.getId());
         return reportList.stream().anyMatch(item->item.getSchemaId().equalsIgnoreCase(reportUid));
 
     }
@@ -655,6 +663,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList = getWorkOrderCoworker(selected.getId());
         // 获取picList
         picList =  blobDao.findByBoUuid(selected.getId());
+        reportList = pmOrderService.getReportList(selected.getId());
+        loadHmCheck(selected);
     }
     public List<V2_WorkOrder_Detail> getWorkOrderDetail(String woId) {
         return pmOrderService.getWorkOrderDetails(woId);
@@ -722,7 +732,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         coWorkerList = getWorkOrderCoworker(woid);
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
-        pmCheckItemList = acPmOrderUleCheckList(selectedPmOrder);
        if(pmCheckItemList!=null) {
            if (hmCheck.isEmpty()) {
                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
@@ -912,14 +921,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     List<PmOrderRuleCheckList> pmCheckList;
     PmOrderRuleCheckList pmOrderRuleCheckListData;
     private UnstructuredDataCollectionRepository reportDao;
-    public List<CheckItem>  loadHmCheck(V2_PmOrder v2PmOrder) throws Exception{
+    public List<CheckItem>  loadHmCheck(V2_PmOrder v2PmOrder) {
+        pmCheckItemList = acPmOrderUleCheckList(v2PmOrder);
         checkCollection = reportDao.findCKByBoUuid(v2PmOrder.getId(),"pm-checklist-report");
-        pmCheckList= acPmOrderUleCheckList(v2PmOrder);
         List<CheckItem> CheckItemList = new ArrayList<CheckItem>();
         if(pmCheckList==null)return null;
         for(int i=0;i<pmCheckList.size();i++){
             pmOrderRuleCheckListData = (PmOrderRuleCheckList)pmCheckList.get(i);
-            if(!checkCollection.isEmpty()){ //
+            if(checkCollection!=null){ //
                 unCollection =  (UnstructuredDataCollection)checkCollection.get(0);
                 if(unCollection!=null) {
                     List<UnstructuredData> dataList = (List<UnstructuredData>) unCollection.getData();
@@ -1299,5 +1308,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setReportUid(String reportUid) {
         this.reportUid = reportUid;
+    }
+
+    public List<UnstructuredDataCollection> getReportList() {
+        return reportList;
+    }
+
+    public void setReportList(List<UnstructuredDataCollection> reportList) {
+        this.reportList = reportList;
     }
 }
