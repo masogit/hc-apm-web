@@ -44,8 +44,8 @@
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
-                                <p:autoComplete id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter" dropdown="true" forceSelection="true" var="t" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
-                                                itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeOwnerList}">
+                                <p:autoComplete id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeOwnerList}">
                                     <p:ajax event="itemSelect" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
@@ -129,7 +129,8 @@
                             <!--</h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
-                                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoController.deptName}"  scrollHeight="300"  forceSelection="true"  requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoController.autoCompleteDept}">
+                                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoController.clinicalDept}"  scrollHeight="300"  forceSelection="true"  requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoController.autoCompleteDept}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
                                     <p:ajax event="itemSelect" listener="#{assetInfoController.onClinicalDeptChange}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
                                     <p:ajax listener="#{assetInfoController.onClinicalDeptChange}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
                                 </p:autoComplete>

@@ -21,6 +21,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -38,7 +39,7 @@ import webapp.framework.web.WebUtil;
 @Table(name = "org_info")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)
-public class OrgInfo implements Serializable {
+public class OrgInfo implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -334,5 +335,9 @@ public class OrgInfo implements Serializable {
 
     public void setLineNum(int lineNum) {
         this.lineNum = lineNum;
+    }
+
+    public String getPinYin() {
+        return namePyCode;
     }
 }
