@@ -254,13 +254,13 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                         if(timesa==null){
                                             infoVo.setClinicalDeptName(ClinicalName);
                                             infoVo.setClinicalDeptUID(ClinicalUid);
-                                            if (!"自然小时".equals(swapType.getChargingType())&&!"天".equals(swapType.getChargingType())){
+                                            if (!"自然时间".equals(swapType.getChargingType())&&!"天".equals(swapType.getChargingType())){
                                                 assetDetaiVo.setChargingBeginTime(this.setBeginTime(times));
                                             }
                                         }
                                         else{
 //                                            assetDetaiVo.setChargingBeginTime(times);
-                                            if (!"自然小时".equals(swapType.getChargingType())&&!"天".equals(swapType.getChargingType())){
+                                            if (!"自然时间".equals(swapType.getChargingType())&&!"天".equals(swapType.getChargingType())){
                                                 assetDetaiVo.setChargingBeginTime(this.setBeginTime(times));
                                                 assetDetaiVo.setChargingEndTime(this.setEndTime(timesa));
                                             }
@@ -298,7 +298,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                                             assetDetaiVo.setCountQty(countQty);
                                             assetDetaiVo.setCost(countQty*swapTypeVo.getUnitPrice()/2);
                                         }
-                                            else if("自然小时".equals(swapTypeVo.getChargingType())){
+                                            else if("自然时间".equals(swapTypeVo.getChargingType())){
                                                 long nd = 1000 * 24 * 60 * 60;
                                                 long nh = 1000 * 60 * 60;
                                                 long nm = 1000 * 60;
@@ -614,7 +614,7 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
                 countQty = (int) (day * 24 * 60 / 30 + hour * 2 + min / 30);
                 sard.setCountQty(countQty);
                 sard.setCost(countQty * sard.getUnitPrice() / 2);
-            } else if("自然小时".equals(sard.getChargingType())){
+            } else if("自然时间".equals(sard.getChargingType())){
                 long nd = 1000 * 24 * 60 * 60;
                 long nh = 1000 * 60 * 60;
                 long nm = 1000 * 60;

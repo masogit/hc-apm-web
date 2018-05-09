@@ -256,7 +256,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
-        orgUids = wfCfigDao.findDeptForSharedAsset();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        orgUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
         swapUids = swapDao.findAllUid();
 
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -410,26 +411,27 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         stus.add(3);
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String p = request.getServletPath();
-        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
+        String p=request.getServletPath();
+        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
-        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
+        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
 
         if (queryIndex == 1) {
             //正常可借用
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
-        } else if (queryIndex == 2) {
+        } else if(queryIndex == 2){
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
-        } else if (queryIndex == 3) {
+        }else if(queryIndex == 3){
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
         }
+
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
