@@ -935,21 +935,22 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> completeOwnerList(String query) {
 
+        if (ownerList == null) return Collections.emptyList();
+
         List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-
         res.sort(new PinYinComparatorByName());
-
         return res;
     }
 
     public List<UserAccount> completeClinicalOwnerList(String query) {
 
+        if (clinicalOwnerList == null) return Collections.emptyList();;
+
         List<UserAccount> res = this.clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
 
         res.sort(new PinYinComparatorByName());
-
         return res;
     }
 
@@ -1923,6 +1924,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<String> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) return Collections.emptyList();
+
         List<String> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
         res.sort(new PinYinComparator());
