@@ -8,7 +8,6 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
@@ -162,8 +161,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     WorkflowConfig config;
 
-    private String deptName;
-
     SupplierController supplierController;
 
     List<Supplier> supplierList = Collections.emptyList();
@@ -272,6 +269,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
                 updateSelectedOrg(selectedOrg);
                 config = configService.findConfigBySite(selected.getSiteUID());
+
+                getOwnerList();
+
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -814,12 +814,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptChange() {
-        OrgInfo dept = clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
 
-        if (dept == null) {
+        if (clinicalDept == null) {
             selected.setClinicalDeptId(null);
         } else {
-            selected.setClinicalDeptId(dept.getId());
+            selected.setClinicalDeptId(clinicalDept.getId());
         }
 
         this.clinicalOwner = null;
@@ -853,19 +852,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    private String supplierName;
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
-
     public void onSupplierChange() {
-
-        Supplier supplier = supplierList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
 
         if (null != supplier) {
             selected.setSupplierId(supplier.getId());
@@ -1923,32 +1910,25 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
-    public List<String> autoCompleteDept(String query) {
+    public List<OrgInfo> autoCompleteDept(String query) {
         if (clinicalDeptList == null) return Collections.emptyList();
 
-        List<String> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
         return res;
     }
 
-    public List<String> autoCompleteSupplier(String query) {
+    public List<Supplier> autoCompleteSupplier(String query) {
 
-        List<String> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
+        List<Supplier> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
         return res;
-    }
-
-    public String getDeptName() {
-        return deptName;
-    }
-
-    public void setDeptName(String deptName) {
-        this.deptName = deptName;
     }
 
     public void setOwnerList(List<UserAccount> ownerList) {
         this.ownerList = ownerList;
     }
+
 }
