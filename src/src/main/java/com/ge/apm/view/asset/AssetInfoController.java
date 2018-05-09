@@ -162,7 +162,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     WorkflowConfig config;
 
-    private String deptName;
+//    private String deptName;
 
     SupplierController supplierController;
 
@@ -814,12 +814,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptChange() {
-        OrgInfo dept = clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
+//        OrgInfo dept = clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
 
-        if (dept == null) {
+        if (clinicalDept == null) {
             selected.setClinicalDeptId(null);
         } else {
-            selected.setClinicalDeptId(dept.getId());
+            selected.setClinicalDeptId(clinicalDept.getId());
         }
 
         this.clinicalOwner = null;
@@ -1923,12 +1923,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
-    public List<String> autoCompleteDept(String query) {
+    public List<OrgInfo> autoCompleteDept(String query) {
         if (clinicalDeptList == null) return Collections.emptyList();
 
-        List<String> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
         return res;
     }
 
@@ -1940,15 +1940,16 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return res;
     }
 
-    public String getDeptName() {
-        return deptName;
-    }
-
-    public void setDeptName(String deptName) {
-        this.deptName = deptName;
-    }
+//    public String getDeptName() {
+//        return deptName;
+//    }
+//
+//    public void setDeptName(String deptName) {
+//        this.deptName = deptName;
+//    }
 
     public void setOwnerList(List<UserAccount> ownerList) {
         this.ownerList = ownerList;
     }
+
 }
