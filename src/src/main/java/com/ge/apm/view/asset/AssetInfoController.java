@@ -865,7 +865,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void onSupplierChange() {
 
-        Supplier supplier = supplierList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
+//        Supplier supplier = supplierList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
 
         if (null != supplier) {
             selected.setSupplierId(supplier.getId());
@@ -1932,11 +1932,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return res;
     }
 
-    public List<String> autoCompleteSupplier(String query) {
+    public List<Supplier> autoCompleteSupplier(String query) {
 
-        List<String> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
+        List<Supplier> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
         return res;
     }
 
