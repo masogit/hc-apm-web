@@ -116,17 +116,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
 
-    /*
-    *
-    * case reportUid
-    *   reportUid then 'xingnengbaogao'
-    *   when
-    *
-    * */
-
     public void handleToggle(ToggleEvent event) {
-        FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "Toggled", "Visibility:" + event.getVisibility());
-        FacesContext.getCurrentInstance().addMessage(null, msg);
+        //折叠保养清单后向前台传递的消息
+       /* FacesMessage msg = new FacesMessage(FacesMessage.SEVERITY_INFO, "折叠", "Visibility:" + event.getVisibility());
+        FacesContext.getCurrentInstance().addMessage(null, msg);*/
     }
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
@@ -468,6 +461,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         hmCheck = new HashMap<String,UnstructuredData>();
     }
     public void submitAppvalPmOrder() {
+        //先保存检查项
+        saveCheckItemData();
+
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         accessoryList.forEach(item -> {
             item.setCreatedDate(null);
@@ -833,6 +829,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         if(!requiredCheck()){
             return;
         }
+        saveCheckItemData();
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.forEach(item -> item.setCreatedDate(null));
@@ -840,6 +837,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         selectedPmOrder.setQualityChecking(qaStatus);
         pmOrderService.repairWorkOrder(selectedPmOrder, accessoryList, coWorkerList,endTime,selectedPmOrder.getPlanTime(),picList);
         //保养合格的话 去关单
+
         //cancel();
     }
     public void stagingPmOrder(){
