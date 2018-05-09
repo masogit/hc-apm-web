@@ -112,6 +112,10 @@ public class AssetCreateController {
             Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
         }
 
+        if(null!= createRequest.getOrgId()){
+            clinicalDept =  orgDao.findById(createRequest.getOrgId());
+        }
+        
         initGbTree();
 
     }
