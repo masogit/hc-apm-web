@@ -105,7 +105,9 @@
                             <f:facet name="filter">
                                 <p:inputText id="filterCost" widgetVar="varFilterCost" value="#{sharedAssetReqDetailForQueryController.filterCost}"/>
                             </f:facet>
-                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}"/>
+                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}">
+                                <!--<f:convertNumber pattern="0.00"/>-->
+                            </h:outputText>
                             <h:outputText value="" rendered="#{item.chargingEndTime eq null}"/>
                         </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
