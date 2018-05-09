@@ -360,4 +360,8 @@ public class AssetFileImportController {
     public void setDisplayErrorsOnly(boolean displayErrorsOnly) {
         this.displayErrorsOnly = displayErrorsOnly;
     }
+
+    public boolean isEmpty() {
+        return (importAssetMap == null || importAssetMap.isEmpty());
+    }
 }
