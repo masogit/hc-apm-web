@@ -272,6 +272,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
                 updateSelectedOrg(selectedOrg);
                 config = configService.findConfigBySite(selected.getSiteUID());
+
+                getOwnerList();
+
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
