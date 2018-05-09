@@ -156,6 +156,7 @@ public class TableCreateController extends TieWebSheetBean {
                     uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
                     selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
                     blobService.saveBlobObject(uploadedFileObject);
+                    templateDao.save(selectedTableDefinition);
                     WebUtil.addSuccessMessage("Excel已保存");
                 }
             }
