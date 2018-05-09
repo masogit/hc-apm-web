@@ -524,6 +524,7 @@ public class AssetFileImportService {
                 } else {
                     item.put("status", ImportStatus.Failure);
                     AssetRow.addErrMessage(item, financingNum);
+                    return;
                 }
 
             }

@@ -159,7 +159,7 @@
 
 
                         <h:panelGroup>
-                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{!assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
+                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
                             <!--<p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">-->
                                 <!--<p:fileDownload value="#{assetFileImportController.exportFile}" />-->
                             <!--</p:commandButton>-->
