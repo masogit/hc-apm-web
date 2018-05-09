@@ -8,7 +8,6 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
@@ -161,8 +160,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private Sort lastPageSort; //download use
 
     WorkflowConfig config;
-
-//    private String deptName;
 
     SupplierController supplierController;
 
@@ -817,7 +814,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptChange() {
-//        OrgInfo dept = clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
 
         if (clinicalDept == null) {
             selected.setClinicalDeptId(null);
@@ -856,19 +852,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    private String supplierName;
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
-
     public void onSupplierChange() {
-
-//        Supplier supplier = supplierList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
 
         if (null != supplier) {
             selected.setSupplierId(supplier.getId());
@@ -1942,14 +1926,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         res.sort(new PinYinComparatorByName());
         return res;
     }
-
-//    public String getDeptName() {
-//        return deptName;
-//    }
-//
-//    public void setDeptName(String deptName) {
-//        this.deptName = deptName;
-//    }
 
     public void setOwnerList(List<UserAccount> ownerList) {
         this.ownerList = ownerList;
