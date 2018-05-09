@@ -95,7 +95,7 @@ public class AssetInstallationController {
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
 //        String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
-        WorkflowConfig config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
+        config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
         }

@@ -112,3 +112,7 @@ update workflow_config set wo_manhour_price = 1000 where wo_manhour_price is nul
 
 --v5.1
 update table_definition set base_id=id where base_id is null;
+
+update asset_contract set tenant_uid = o.tenant_uid,institution_uid=o.institution_uid,hospital_uid=o.hospital_uid,site_uid=o.site_uid  
+    from  asset_contract ac,org_info o where ac.hospital_id=o.id and asset_contract.id=ac.id;
+alter table asset_contract alter column contract_type type  varchar(32);
