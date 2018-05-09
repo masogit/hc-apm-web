@@ -114,6 +114,10 @@ public class TableCreateController extends TieWebSheetBean {
 
     @Transactional
     public void saveTemplate() {
+        if(!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length()>64){
+            WebUtil.addErrorMessage("名称最大长度64");
+            return ;
+        }
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
             selectedTableDefinition.setName(table.getTitle());
             templateDao.save(selectedTableDefinition);
@@ -122,6 +126,7 @@ public class TableCreateController extends TieWebSheetBean {
             selectedTableDefinition.setSchema(tableString);
             templateDao.save(selectedTableDefinition);
             selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
+            templateDao.save(selectedTableDefinition);
             WebUtil.addSuccessMessage("JSON已保存");
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
