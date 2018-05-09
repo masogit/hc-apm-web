@@ -9,6 +9,20 @@
 >
 
     <ui:composition>
+<!--
+<style>
+    .ui-fieldset-toggler:hover{
+        background-color: #ffffff;
+    }
+    body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler{
+        color: #e6d023;
+        inherit;
+    }
+
+</style>
+-->
+
+
 
         <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="550" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养完成">
             <h:form id="pmrepairCompleteDialogForm" class="pmrepairCompleteDialogFormcls" >
@@ -118,7 +132,9 @@
                         </p:dataGrid>
                         <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                     </p:fieldset>
-                    <p:fieldset legend="保养清单" >
+                    <p:growl id="msgs" showDetail="true" />
+                    <p:fieldset styleClass="uigaolei" legend="保养清单333"  style="color:black;background-color: white"  toggleable="true" toggleSpeed="500">
+                        <p:ajax event="toggle" listener="#{v2PmOrderController.handleToggle}" update="msgs" />
                         <p:fieldset legend="保养报告" >
                             <h:panelGroup id="addReport">
                                 <p:selectOneMenu value="#{v2PmOrderController.reportUid}">
@@ -141,7 +157,7 @@
                             </p:dataList>
                         </p:fieldset>
                         <!---->
-                        <p:fieldset  legend="检查项" id="chkItem"   rendered="#{not empty v2PmOrderController.selectedPmOrder}">
+                        <p:fieldset  legend="检查项xxxx" id="chkItem"   rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                             <c:forEach  items="#{v2PmOrderController.pmCheckItemList}" var="item">
                                 <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                     <h:panelGroup>
@@ -231,7 +247,22 @@
                 }
             </script>
 
+            <style type="text/css">
+               /* body{
+                    color:red;
+                }*/
+                body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler{
+                    color:black;
+                    box-shadow:none;
+                    background-color:white;
+                }
+                body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler:hover {
+                    background-color:white;
+                }
 
+
+            </style>
+            <div id="1234">test</div>
 
         </p:dialog>
 
