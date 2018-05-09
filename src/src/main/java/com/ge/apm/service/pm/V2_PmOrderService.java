@@ -372,6 +372,8 @@ public class V2_PmOrderService {
         String res = srApi.invokePmOrderAction(token,formData,"转单",selectedPmOrder.getId());
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+        }else{
+            WebUtil.addSuccessMessage("转单成功");
         }
     }
 
