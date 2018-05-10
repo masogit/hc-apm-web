@@ -10,7 +10,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.pure.CustomConfigField;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
@@ -37,14 +38,14 @@ public class CustomConfigController {
 
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
-    private List<CustomConfigField> assetsListPageFields;
+    private UserCommonService userService;
+    
     private OrgInfo selectSite;
     private CustomConfigObject customConfigObject;
-    private LinkedHashMap<String, String> allFields;
     private Map<String, Boolean> selectedAddFields;
-    private CustomConfigField currentEditField;
+    private CustomConfigAssetField currentEditField;
     private CustomConfig customConfig;
-    private UserCommonService userService;
+    private LinkedHashMap<String, String> allFields;
 
     @PostConstruct
     protected void init() {
@@ -59,26 +60,25 @@ public class CustomConfigController {
 
     private void loadConfigForSite(String siteUid) {
         customConfig = ccService.getCustomConfigBySite(siteUid);
-        if(null == customConfig){
+        if (null == customConfig) {
             customConfigObject = ccService.getCurrentCustomConfig(siteUid);
-        }else{
+        } else {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
-        assetsListPageFields = customConfigObject.getAssetListPageFields();
     }
-    
-    public String getCustomConfigInfomation(){
-        if(customConfig == null){
+
+    public String getCustomConfigInfomation() {
+        if (customConfig == null) {
             return "当前院区无配置,保存后创建";
         }
         StringBuilder res = new StringBuilder();
-        if(customConfig.getCreatedBy()!=null){
+        if (customConfig.getCreatedBy() != null) {
             res.append("创建人:").append(userService.getUserByUid(customConfig.getCreatedBy()).getName());
-            res.append(" 创建时间:").append(DateUtil.formatDate(customConfig.getCreatedDate(),"yyyy-MM-dd"));
+            res.append(" 创建时间:").append(DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
         }
-        if(customConfig.getLastModifiedBy()!=null){
+        if (customConfig.getLastModifiedBy() != null) {
             res.append("; 修改人:").append(userService.getUserByUid(customConfig.getLastModifiedBy()).getName());
-            res.append(" 修改时间:").append(DateUtil.formatDate(customConfig.getLastModifiedDate(),"yyyy-MM-dd"));
+            res.append(" 修改时间:").append(DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
         return res.toString();
     }
@@ -98,7 +98,6 @@ public class CustomConfigController {
     }
 
     public void saveChange() {
-        customConfigObject.setAssetListPageFields(assetsListPageFields);
         ccService.saveConfig(selectSite, customConfigObject);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
@@ -111,21 +110,26 @@ public class CustomConfigController {
     }
 
     public void removeListPageField(String key) {
-        assetsListPageFields.removeAll(assetsListPageFields.stream().filter(item -> key.equalsIgnoreCase(item.getKey())).collect(Collectors.toList()));
+        if (customConfigObject.getAssetsListPageFields().contains(key)) {
+            customConfigObject.getAssetsListPageFields().remove(key);
+        }
+//        assetsListPageFields.removeAll(assetsListPageFields.stream().filter(item -> key.equalsIgnoreCase(item.getKey())).collect(Collectors.toList()));
     }
 
     public void prepareEditListField(String fieldKey) {
-        currentEditField = assetsListPageFields.stream().filter(item -> fieldKey.equalsIgnoreCase(item.getKey())).findAny().orElse(null);
+        currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
 
     public List<String> getListPageAddFieldList() {
-        return allFields.keySet().stream().filter(item -> !assetsListPageFields.stream().anyMatch(selectedItem -> selectedItem.getKey().equals(item))).collect(Collectors.toList());
+        return customConfigObject.getAssetFields().entrySet().stream().map(item -> item.getKey()).collect(Collectors.toList());
     }
 
     public void addFieldsForListPage() {
-        assetsListPageFields.addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue())
-                .filter(item -> !assetsListPageFields.stream().anyMatch(selectedItem -> selectedItem.getKey().equals(item.getKey())))
-                .map(item -> new CustomConfigField(item.getKey())).collect(Collectors.toList()));
+//        assetsListPageFields.addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue())
+//                .filter(item -> !assetsListPageFields.stream().anyMatch(selectedItem -> selectedItem.getKey().equals(item.getKey())))
+//                .map(item -> new CustomConfigAssetField(item.getKey())).collect(Collectors.toList()));
+        customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(Entry::getKey).collect(Collectors.toList()));
     }
 
     //getter and setter
@@ -133,23 +137,11 @@ public class CustomConfigController {
         return selectSite;
     }
 
-    public List<CustomConfigField> getAssetsListPageFields() {
-        return assetsListPageFields;
-    }
-
-    public void setAssetsListPageFields(List<CustomConfigField> assetsListPageFields) {
-        this.assetsListPageFields = assetsListPageFields;
-    }
-
-    public LinkedHashMap<String, String> getAllFields() {
-        return allFields;
-    }
-
-    public CustomConfigField getCurrentEditField() {
+    public CustomConfigAssetField getCurrentEditField() {
         return currentEditField;
     }
 
-    public void setCurrentEditField(CustomConfigField currentEditField) {
+    public void setCurrentEditField(CustomConfigAssetField currentEditField) {
         this.currentEditField = currentEditField;
     }
 

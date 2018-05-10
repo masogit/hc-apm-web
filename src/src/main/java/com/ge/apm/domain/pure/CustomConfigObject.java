@@ -5,30 +5,35 @@
  */
 package com.ge.apm.domain.pure;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
  * @author 212579464
  */
 public class CustomConfigObject {
-    List<CustomConfigField> AssetListPageFields;
-    List<CustomConfigField> AssetDetailPageFields;
+    Map<String,CustomConfigAssetField> AssetFields;
 
-    public List<CustomConfigField> getAssetListPageFields() {
-        return AssetListPageFields;
+    List<String> assetsListPageFields;
+
+    public Map<String, CustomConfigAssetField> getAssetFields() {
+        return AssetFields;
     }
 
-    public void setAssetListPageFields(List<CustomConfigField> AssetListPageFields) {
-        this.AssetListPageFields = AssetListPageFields;
+    public void setAssetFields(Map<String, CustomConfigAssetField> AssetFields) {
+        this.AssetFields = AssetFields;
     }
 
-    public List<CustomConfigField> getAssetDetailPageFields() {
-        return AssetDetailPageFields;
+    public List<String> getAssetsListPageFields() {
+        return assetsListPageFields;
     }
 
-    public void setAssetDetailPageFields(List<CustomConfigField> AssetDetailPageFields) {
-        this.AssetDetailPageFields = AssetDetailPageFields;
+    public void setAssetsListPageFields(List<String> assetsListPageFields) {
+        this.assetsListPageFields = assetsListPageFields;
     }
+
     
 }
