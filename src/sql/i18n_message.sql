@@ -1446,3 +1446,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'WoManualAndGrapMsg', '维修配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for wo manual or grap mode! ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('message', 'PmManualAndGrapMsg', '保养配置中允许抢单和允许人工至少选一个!', 'There should be at least one config for pm manual or grap mode! ', NULL, '-1');
 
+insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('capitalSource2','1','自有资金','capitalSource21','-1');
+insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('capitalSource2','2','合资公司资金','capitalSource22','-1');
+insert into i18n_message (msg_type,msg_key,value_zh,value_en,site_id)values ('field_name','capitalSource2','资金来源2','Capital Source 2','-1');
