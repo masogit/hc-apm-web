@@ -65,7 +65,7 @@
                     </p:column>
                     <p:column headerText="归还状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ">
                         <f:facet name="filter">
-                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetReturnStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
