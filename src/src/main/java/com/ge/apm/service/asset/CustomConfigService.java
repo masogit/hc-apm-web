@@ -10,15 +10,18 @@ import com.ge.apm.dao.CustomConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.pure.CustomConfigField;
+import com.ge.apm.domain.SysRole;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -36,8 +39,10 @@ public class CustomConfigService {
     OrgInfoRepository orgDao;
     @Autowired
     ConfigService configService;
+    @Autowired
+    UaaService uaaService;
 
-    public LinkedHashMap<String, String> getAllFields() {
+    static public LinkedHashMap<String, String> getAllFields() {
         LinkedHashMap<String, String> res = new LinkedHashMap();
         res.put("serialNum", WebUtil.getMessage("serialNum"));
         res.put("departNum", WebUtil.getMessage("departNum"));
@@ -99,6 +104,11 @@ public class CustomConfigService {
         res.put("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
         return res;
     }
+    
+    public List<SysRole> getConfigRoles(){
+        return uaaService.getSysRoles().stream().filter(item -> 
+                "HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff".contains(item.getName())).collect(Collectors.toList());
+    }
 
     public CustomConfig getCustomConfigBySite(String siteUID){
         return customConfigDao.findBySiteUID(siteUID);
@@ -129,20 +139,11 @@ public class CustomConfigService {
 
     private CustomConfigObject getDefalutCustomConfigObject() {
         CustomConfigObject object = new CustomConfigObject();
-        List<CustomConfigField> defaultAssetListPageFields = new ArrayList();
-        defaultAssetListPageFields.add(new CustomConfigField("name"));
-        defaultAssetListPageFields.add(new CustomConfigField("functionType"));
-        defaultAssetListPageFields.add(new CustomConfigField("serialNum"));
-        defaultAssetListPageFields.add(new CustomConfigField("departNum"));
-        defaultAssetListPageFields.add(new CustomConfigField("assetGroup"));
-        defaultAssetListPageFields.add(new CustomConfigField("clinicalDeptName"));
-        defaultAssetListPageFields.add(new CustomConfigField("manufacture"));
-        defaultAssetListPageFields.add(new CustomConfigField("vendor"));
-        defaultAssetListPageFields.add(new CustomConfigField("status"));
-        defaultAssetListPageFields.add(new CustomConfigField("warrantyDate"));
-        defaultAssetListPageFields.add(new CustomConfigField("financingNum"));
-        defaultAssetListPageFields.add(new CustomConfigField("qrCode"));
-        object.setAssetListPageFields(defaultAssetListPageFields);
+        object.setAssetFields(new HashMap());
+        List<String> allRoles = getConfigRoles().stream().map(SysRole::getName).collect(Collectors.toList());
+        getAllFields().entrySet().stream().forEach(item-> object.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(),allRoles)));
+        object.setAssetsListPageFields(Arrays.asList("name","functionType","serialNum","departNum","assetGroup","clinicalDeptName","manufacture","vendor","status","warrantyDate",
+                "financingNum","qrCode"));
         return object;
     }
 
