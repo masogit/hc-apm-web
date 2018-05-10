@@ -84,38 +84,11 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
         searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IsNull,null));
 
-        if (filterSatId != null && !filterSatId.equals("")){
-            searchFilters.add(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.EQ,filterSatId));
-        }
-        Page<AssetInfo> page1 = dao.findBySearchFilter(this.searchFilters, pageRequest);
-
-        if (queryIndex == 1 || queryIndex == 2){
+        if (queryIndex == 1){
             //2、使用科室：任意科室  所属科室：调剂中心
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.IsNotNull,null));
             this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IN,deptids));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IsNotNull,null));
-
-            if (filterSatId != null && !filterSatId.equals("")){
-                searchFilters.add(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.EQ,filterSatId));
-            }
-
-            Page<AssetInfo> page2 = dao.findBySearchFilter(this.searchFilters, pageRequest);
-            if (!page1.hasContent() || !page2.hasContent()){
-                page1 = page1.hasContent() ? page1 : page2;
-            }else {
-                page1.getContent().addAll(page2.getContent());
-            }
-        }
-
-        if (queryIndex == 2){
-            //全部1、2、合并
-//            this.removeFilterOnField("assetDeptUID");
-//            searchFilters.add(new SearchFilter("assetDeptUID",SearchFilter.Operator.IsNull,deptids,"1*2+"));
-//            searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IN,deptids,"1*2+"));
-//
-//            this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IsNotNull,null));
-//            this.removeFilterOnField("sharedAssetTypeUid");
-            return page1;
         }
 
         if (filterSatId != null && !filterSatId.equals("")){

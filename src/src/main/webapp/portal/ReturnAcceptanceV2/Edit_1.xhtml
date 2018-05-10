@@ -174,7 +174,7 @@
                             <h:outputText value="#{item.unitPrice}"/>
                         </p:column>
                         <p:column headerText="计价方式" sortBy="#{item.chargingType}">
-                            <h:outputText value="#{item.chargingType}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="费用" sortBy="#{item.cost}" >
                             <h:outputText value="#{item.cost}"/>
