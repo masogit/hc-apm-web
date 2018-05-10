@@ -114,12 +114,18 @@ public class TableCreateController extends TieWebSheetBean {
 
     @Transactional
     public void saveTemplate() {
+        if(!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length()>64){
+            WebUtil.addErrorMessage("名称最大长度64");
+            return ;
+        }
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
             selectedTableDefinition.setName(table.getTitle());
             templateDao.save(selectedTableDefinition);
             table.setSchemaId(selectedTableDefinition.getId());
             tableString = JSONObject.toJSONString(table);
             selectedTableDefinition.setSchema(tableString);
+            templateDao.save(selectedTableDefinition);
+            selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
             templateDao.save(selectedTableDefinition);
             WebUtil.addSuccessMessage("JSON已保存");
         } else {
@@ -144,9 +150,13 @@ public class TableCreateController extends TieWebSheetBean {
                     uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
                     uploadedFileObject.setBoSubType("Excel");
                     selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
-                    selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    if(Strings.isNullOrEmpty(selectedTableDefinition.getId())){
+                        selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    }
                     uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
+                    selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
                     blobService.saveBlobObject(uploadedFileObject);
+                    templateDao.save(selectedTableDefinition);
                     WebUtil.addSuccessMessage("Excel已保存");
                 }
             }

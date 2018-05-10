@@ -19,7 +19,6 @@
                         <h:panelGroup >
                             <label class="label">#{msg.assetName}*</label>
                             <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
-                           <!-- <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(v2PmOrderController, 'pmTab:ServiceRequestCreateForm')}" process="@this" icon="ui-icon-arrow-drop-down" update="selectAssetDlg assetstatus" oncomplete="PF('varSelectAssetDlg').show();"/>-->
                         </h:panelGroup>
 
                         <h:panelGroup>
@@ -47,12 +46,12 @@
                             </p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">#{msg.requestReason}</label>
+                            <label class="label">#{msg.requestReason}*</label>
                             <p:inputTextarea value="#{v2PmOrderController.newServiceRequest.requestReason}" maxlength="256" />
                             <p:outputLabel value="#{v2PmOrderController.newServiceRequest.requestReason}" />
                         </h:panelGroup>
                         <h:panelGroup id="assetstatus">
-                            <label class="label">#{msg.status}</label>
+                            <label class="label">#{msg.status}*</label>
                             <p:selectOneRadio id="status" value="#{v2PmOrderController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
                                 <p:ajax  listener="#{v2PmOrderController.onStatusChange()}"  update="assetstatus" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
@@ -64,7 +63,7 @@
 
 
                     </p:panelGrid>
-                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picListForRP}" columns="5" layout="grid">
                         <f:facet name="header">附件上传</f:facet>
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
@@ -77,12 +76,11 @@
                         </p:panel>
 
                     </p:dataGrid>
-                    <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
-                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+                    <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUploadForRP}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm:datalist" disabled="#{!v2PmOrderController.canCreateSr()}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
-                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancelsr()}" immediate="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="保存" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm" disabled="#{!v2PmOrderController.canCreateSr()}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <!--<p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancelsr()}" immediate="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>-->
                     </h:panelGroup>
 
                     <h:panelGroup >

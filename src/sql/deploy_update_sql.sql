@@ -74,13 +74,14 @@ update pm_order_rule pr  set performance_report=(select id from table_definition
 where pr.performance_report in (Select Schema from table_definition where tenant_uid=pr.tenant_uid);
 
 --data refrence change
-update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-safety-report';
+update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='safety-report';
 
-update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-performance-report';
+update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='performance-report';
 
 --end for v1.9.1 change
 
 --v2.1
+SELECT setval('"sys_role_id_seq"', 11, false);
 INSERT INTO sys_role ( name, role_desc) VALUES ( 'SharedAssetMgmt', '设备调剂管理人员');
 
 
@@ -90,9 +91,28 @@ create table qr_code_lib_bak as (select* from qr_code_lib);
 alter table qr_code_lib drop constraint uk_qr_code_lib_qrcode;
 alter table qr_code_lib alter column site_id drop not null;
 alter table qr_code_lib alter column hospital_id drop not null;
-alter table qr_code_lib drop constraint qr_code_lib_pkey;
+--alter table qr_code_lib drop constraint qr_code_lib_pkey;
 alter table qr_code_lib alter column uid set not null;
-alter table qr_code_lib alter column id drop not null;
-alter table qr_code_lib add primary key(uid);
+--alter table qr_code_lib alter column id drop not null;
+--alter table qr_code_lib add primary key(uid);
+alter table qr_code_lib add constraint uk_qr_code_lib_qrcode_site_uid unique(qr_code,site_uid);
 
-update supplier a set tenant_uid=(select uid from tenant_info o where o.id=a.site_id) where tenant_uid is null
+update supplier a set tenant_uid=(select uid from tenant_info o where o.id=a.site_id) where tenant_uid is null;
+
+INSERT INTO sys_role (name, role_desc, home_page) VALUES ('LocalITAdmin','本地后台运营管理','/portal/uaa/userAccount/List.xhtml');
+
+--alter table qr_code_lib drop constraint qr_code_lib_pkey;
+--alter table qr_code_lib alter column id set not null;
+--alter table qr_code_lib add primary key(id);
+
+alter table asset_info drop constraint uk_asset_info_qr_code;
+update workflow_config set pm_manhour_price = 1000 where pm_manhour_price is null;
+update workflow_config set wo_manhour_price = 1000 where wo_manhour_price is null;
+
+
+--v5.1
+update table_definition set base_id=id where base_id is null;
+
+update asset_contract set tenant_uid = o.tenant_uid,institution_uid=o.institution_uid,hospital_uid=o.hospital_uid,site_uid=o.site_uid  
+    from  asset_contract ac,org_info o where ac.hospital_id=o.id and asset_contract.id=ac.id;
+alter table asset_contract alter column contract_type type  varchar(32);

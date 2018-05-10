@@ -21,7 +21,8 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                             <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
@@ -70,18 +71,19 @@
                         <h:outputText value="#{item.applyQty}"/>
                     </p:column>
                     <p:column headerText="预计借用数" sortBy="#{item.exceptQty}">
-                        <p:cellEditor>
-                            <f:facet name="output"><h:outputText value="#{item.exceptQty}" /></f:facet>
-                            <f:facet name="input"><p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/></f:facet>
-                            <!--<f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>-->
-                        </p:cellEditor>
+                        <!--<p:cellEditor>-->
+                            <!--<f:facet name="output"><h:outputText value="#{item.exceptQty}" /></f:facet>-->
+                            <!--<f:facet name="input"><p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/></f:facet>-->
+                            <!--&lt;!&ndash;<f:facet name="input"><p:inputText value="#{item.exceptQty}" style="width:96%" label="Year"/></f:facet>&ndash;&gt;-->
+                        <!--</p:cellEditor>-->
+                        <p:inputNumber value="#{item.exceptQty}" decimalPlaces="0" minValue="0" maxValue="#{item.applyQty}"/>
                     </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}">
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
-                    <p:column headerText="编辑" style="width: 120px">
-                        <p:rowEditor style="float: left;margin-left: 30px;" cancelTitle="取消" saveTitle="保存" editTitle="编辑" />
-                    </p:column>
+                    <!--<p:column headerText="编辑" style="width: 120px">-->
+                        <!--<p:rowEditor style="float: left;margin-left: 30px;" cancelTitle="取消" saveTitle="保存" editTitle="编辑" />-->
+                    <!--</p:column>-->
                 </p:dataTable>
                 </p:fieldset>
                             

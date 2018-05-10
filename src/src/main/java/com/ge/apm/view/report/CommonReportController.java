@@ -13,6 +13,9 @@ import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.cxf.common.util.StringUtils;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 /*
@@ -79,6 +82,8 @@ public class CommonReportController {
 
     public String getEditLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
+        if(table==null)
+                return "";
         if (null != table.getExcelStorageId()) {
             return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
         }else{
@@ -88,6 +93,8 @@ public class CommonReportController {
 
     public String getViewLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
+        if(table==null)
+            return "";
          if (null != table.getExcelStorageId()) {
             return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
         }else{
@@ -102,4 +109,7 @@ public class CommonReportController {
     public void setReportUid(String reportUid) {
         this.reportUid = reportUid;
     }
+
+
+
 }

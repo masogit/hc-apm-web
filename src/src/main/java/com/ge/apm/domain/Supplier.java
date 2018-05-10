@@ -2,6 +2,7 @@
  */
 package com.ge.apm.domain;
 
+import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 
 import java.io.Serializable;
@@ -18,12 +19,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- *
  * @author 212547631
  */
 @Entity
 @Table(name = "supplier")
-public class Supplier implements Serializable {
+public class Supplier implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -126,7 +126,7 @@ public class Supplier implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]","");
+        this.namePyCode = name == null ? null : PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
     }
 
     public String getCity() {
@@ -202,4 +202,8 @@ public class Supplier implements Serializable {
         return "com.ge.apm.domain.Supplier[ id=" + id + " ]";
     }
 
+    @Override
+    public String getPinYin() {
+        return namePyCode;
+    }
 }

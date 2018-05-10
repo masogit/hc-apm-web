@@ -9,15 +9,19 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BrandRepository;
 import com.ge.apm.dao.GbCodeRepository;
 import com.ge.apm.dao.I18nMessageRepository;
-import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
-import com.ge.apm.service.asset.AttachmentFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.google.common.base.Strings;
+import org.apache.commons.lang.StringUtils;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.transaction.annotation.Transactional;
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -28,11 +32,6 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import webapp.framework.dao.SearchFilter;
 
 /**
  *
@@ -46,6 +45,7 @@ public class AssetCreateController {
     private QrCodeLib createRequest;
     private AssetCreateService acService;
     private BrandRepository brandDao;
+    private OrgInfoRepository orgDao;
 
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
@@ -87,6 +87,7 @@ public class AssetCreateController {
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
@@ -111,6 +112,10 @@ public class AssetCreateController {
             Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
         }
 
+        if(null!= createRequest.getOrgId()){
+            clinicalDept =  orgDao.findById(createRequest.getOrgId());
+        }
+        
         initGbTree();
 
     }
@@ -123,8 +128,6 @@ public class AssetCreateController {
 
     private AssetInfo createAssetInfo() {
         AssetInfo newAsset = new AssetInfo();
-//        newAsset.setSiteId(createRequest.getSiteId());
-//        newAsset.setHospitalId(createRequest.getHospitalId());
         newAsset.setQrCode(createRequest.getQrCode());
         newAsset.setSerialNum(createRequest.getSerialNum());
         newAsset.setFunctionType(createRequest.getModelNum());
@@ -140,6 +143,9 @@ public class AssetCreateController {
             newAsset.setClinicalDeptId(createRequest.getOrgId());
             newAsset.setClinicalDeptUID(org.getUid());
         }
+        OrgInfo siteOrg = orgDao.findByUid(createRequest.getSiteUID());
+        newAsset.setHospitalId(siteOrg.getId());
+        newAsset.setSiteId(siteOrg.getSiteId());
         newAsset.setTenantUID(createRequest.getTenantUID());
         newAsset.setHospitalUID(createRequest.getHospitalUID());
         newAsset.setInstitutionUID(createRequest.getInstitutionUID());
@@ -193,7 +199,7 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptName(clinicalDept.getName());
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
-        Boolean res = acService.CreateAeest(assetInfo, isGeneratePmOrder);
+        Boolean res = acService.createAsset(assetInfo, isGeneratePmOrder);
         if(null!=isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
             WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
         }
@@ -335,7 +341,7 @@ public class AssetCreateController {
             WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             financingNum = "";
         }
-        if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 3)) {
+        if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 4)) {
             this.assetInfo.setFinancingNum(financingNum);
         }
     }

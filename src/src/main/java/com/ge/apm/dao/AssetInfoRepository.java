@@ -1,5 +1,7 @@
 package com.ge.apm.dao;
 
+import com.ge.apm.domain.AssetFileAttachment;
+import com.ge.apm.domain.AssetInfo;
 import java.util.List;
 import java.util.Map;
 
@@ -7,10 +9,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
-
-import com.ge.apm.domain.AssetInfo;
-
 import webapp.framework.dao.GenericRepository;
+import webapp.framework.dao.SearchFilter;
 
 public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
@@ -22,15 +22,15 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select o from AssetInfo o where o.siteId = ?1 and o.isValid = true")
     public List<AssetInfo> getBySiteId(int siteId);
-    
+
     @Query("select 1 from AssetInfo o where o.systemId=?1")
     public Integer checkExistsBySystemId(String systemId);
     
     @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true limit 1",nativeQuery=true)
     public AssetInfo getBySystemId(String systemId);
 
-    @Query("select o from AssetInfo o where o.qrCode = ?1")
-    public AssetInfo getByQrCode(String qrCode);
+    @Query("select o from AssetInfo o where o.qrCode = ?1 and o.siteUID= ?2")
+    public AssetInfo getByQrCodeAndSiteUid(String qrCode,String site_uid);
     
     @Query("select o from AssetInfo o where o.name = ?1 and o.siteUID = ?2 and o.isDeleted = false and o.isValid = true and o.status in (1,2,3)")
     public List<AssetInfo> getAssetInfoByNameAndSiteUID(String name, String siteUID);
@@ -79,20 +79,17 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNames(String tenantUID);
-    
-    @Query(value = "select o.* from asset_info o where o.inventory_owner_id = ?1 and o.site_uid = ?2", nativeQuery = true)
-    public AssetInfo findByInventoryOwnerId(String inventoryOwnerId,String siteUID);
 
 	@Modifying
 	@Transactional
 	@Query(value = "update AssetInfo set clinicalDeptName=?1 where clinicalDeptUID=?2")
-	public void updateClinicalName(String name,String uid);
+	public void updateClinicalName(String name, String uid);
 
 
 	@Modifying
 	@Transactional
 	@Query(value = "update AssetInfo set nationalStandardCode=?1 where uid=?2")
-	public void updateStandardCode(String name,String uid);
+	public void updateStandardCode(String name, String uid);
 
 	public List<AssetInfo> findByUidIn(List<String> assetUids);
 
@@ -102,9 +99,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select ai from AssetInfo ai where ai.tenantUID = ?1 and ai.uid in ?2")
 	public List<AssetInfo> findByTenantUidAndUidIn(String tenantUid, List<String> uids);
 
-    public List<AssetInfo> findByDepartNumAndSiteUID(String num,String siteUID);
-    public List<AssetInfo> findByFinancingNumAndSiteUID(String num,String siteUID);
-    public List<AssetInfo> findByQrCodeAndSiteUID(String qrCode,String siteUID);
+    public List<AssetInfo> findByDepartNumAndSiteUID(String num, String siteUID);
+    public List<AssetInfo> findByFinancingNumAndSiteUID(String num, String siteUID);
+    public List<AssetInfo> findByQrCodeAndSiteUID(String qrCode, String siteUID);
 
     @Modifying
     @Transactional
@@ -126,9 +123,15 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("update AssetInfo ai set ai.inventoryStatus=?2 where ai.id in ?1")
     void updateInventoryStatusAndIdIn(List<Integer> assetIds, Integer ORDER_STATUS_DONE_FINISHED);
 
+    
+   // SELECT count(1) as counta, asset_owner_id,asset_owner_id2,asset_owner_id3 FROM "public".asset_info where asset_owner_id=479 group by asset_owner_id2,asset_owner_id3,asset_owner_id
+
 //    @Query("select count(1) as totalTimes, ai.assetOwnerId,ai.assetOwnerId2,ai.assetOwnerId3 from AssetInfo ai where ai.assetOwnerId=:assetOwnerId and ai.siteUID=:siteUID "
 //            + "group by ai.assetOwnerId2,ai.assetOwnerId3,ai.assetOwnerId ordey by totalTimes desc")
     @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
             + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
     public List<Object[]> findAssetOwnerComposition(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
+
+    @Query("select w.deptForSharedAsset from WorkflowConfig w where w.siteUID = :siteUID")
+    public List<String> getOrgId(@Param("siteUID") String siteUID);
 }

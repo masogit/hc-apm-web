@@ -35,7 +35,7 @@ public class SharedAssetReqType implements Serializable{
     @Column(name = "swap_name")
     private String swapName;//调剂设备名称
     
-    @Column(name = "shared_asset_type_id")
+    @Column(name = "shared_asset_type")
     private String sharedAssetTypeId;//调剂设备id
 
     @Column(name = "apply_qty")
