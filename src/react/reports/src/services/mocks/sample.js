@@ -1,4 +1,4 @@
-import { Orgs, AssetTypes } from './common'
+import { Orgs, AssetTypes, Hospitals } from './common'
 import { Assets } from './assetBrowser'
 import { Profit, Forecast, ForecastPUT, ForecastRate } from './assetPerf'
 import { StaffPerf } from './staffPerf'
@@ -13,6 +13,7 @@ import { details } from './ProcessAnalysis/details'
 import { grossByDept, grossBySupplier, grossByType } from './ProcessAnalysis/gross'
 import { phaseArrival, phaseRespond, phaseETTR } from './ProcessAnalysis/phase'
 import { URLs } from '../index.js'
+import { sampleSize } from 'lodash'
 
 const TAG = '[Mock]: '
 
@@ -25,9 +26,21 @@ export default function (mock) {
     return [200, AssetTypes]
   })
 
-  mock.onGet(URLs.AllDepartments).reply(function (config) {
+  mock.onGet(RegExp(URLs.AllDepartments)).reply(function (config) {
     info(config.url)
-    return [200, Orgs]
+    let orgs = JSON.parse(JSON.stringify(Orgs))
+    orgs.orgInfos = sampleSize(orgs.orgInfos, 1 + Math.random() * orgs.orgInfos.length | 0)
+    return [200, orgs]
+  })
+
+  mock.onGet(URLs.AllHospitals).reply(function (config) {
+    info(config.url)
+    return [200, Hospitals]
+  })
+
+  mock.onGet(URLs.AllHospitals).reply(function (config) {
+    info(config.url)
+    return [200, Hospitals]
   })
 
   mock.onGet(URLs.AssetBrowser_Assets).reply(function (config) {

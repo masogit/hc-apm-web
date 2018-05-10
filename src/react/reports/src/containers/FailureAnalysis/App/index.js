@@ -274,6 +274,11 @@ export class App extends Component<void, Props, void> {
     this.props.init()
   }
 
+  componentWillUnmount() {
+    EventBus.removeEventListener('failure-analysis-brief-data', this.mountBriefData )
+    EventBus.removeEventListener('failure-analysis-reason-data', this.mountReason )
+  }
+
   render() {
     let { tooltipX, tooltipY, tooltip,lastYear, selectedDevice,
       leftItems, centerItems, rightItems, leftClockwise, rightClockwise } = this.state

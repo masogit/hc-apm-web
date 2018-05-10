@@ -17,12 +17,14 @@
     <data-filter-bar
       range="{{range}}"
       dept="{{dept}}"
+      hospital="{{hospital}}"
       user="{{user}}"
       type="{{type}}"></data-filter-bar>
     <parallel-coordinates-chart
       range="{{range}}"
       sort-by="{{sortBy}}"
       dept="{{dept}}"
+      hospital="{{hospital}}"
       type="{{type}}"></parallel-coordinates-chart>
   </template>
   <script>
@@ -37,6 +39,6 @@
           FetchCachedBehavior
         ]
       })
-    })    
+    })
   </script>
 </dom-module>

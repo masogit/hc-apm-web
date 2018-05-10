@@ -34,15 +34,15 @@ public class EditExcelReportController extends TieWebSheetBean {
     private UnstructuredDataCollectionRepository udcDao;
 
     private Map<String, Object> tableValue;
-    
+
     private UnstructuredDataCollection report;
-    
+
     private BlobFileService blobService;
-    
+
     private HashMap<String, Object> context = new HashMap<String, Object>();
-    
+
     private TableDefinition tableDefinition;
-    
+
     @Override
     public void initialLoad() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
@@ -54,29 +54,35 @@ public class EditExcelReportController extends TieWebSheetBean {
         tableValue = new HashMap<String, Object>();
         List<UnstructuredData> dataList = report.getData();
         dataList.forEach(item -> {
-            try{
-                tableValue.put(item.getKey(),item.getValue());
-            }catch(ClassNotFoundException e){
-                tableValue.put(item.getKey(),item.getValueSerialized());
+            try {
+                if (item.getKey().contains("_res")) {
+                    if ("Normal".equals((String) item.getValue())) {
+                        tableValue.put(item.getKey(), WebUtil.getFieldValueMessage("TableReportResult", "Normal"));
+                    }
+                } else {
+                    tableValue.put(item.getKey(), item.getValue());
+                }
+            } catch (ClassNotFoundException e) {
+                tableValue.put(item.getKey(), item.getValueSerialized());
             }
         });
-        StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getSchema());
+        StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
-            context.put("fields", tableValue);
+            context.put("X", tableValue);
             loadWebSheet(excelFile.getStream(), context);
         } catch (Exception e) {
             WebUtil.addErrorMessage(e, "读取模版失败");
         }
     }
-    
-    public void saveData(){
+
+    public void saveData() {
         tableService.saveTableDate(report, tableValue);
         WebUtil.addSuccessMessage("已保存");
     }
-    
-    public void submit(){
-        tableService.saveTableDate(report,tableValue);
+
+    public void submit() {
+        tableService.saveTableDate(report, tableValue);
         tableService.submitReport(report);
         WebUtil.addSuccessMessage("已提交");
     }
@@ -100,6 +106,5 @@ public class EditExcelReportController extends TieWebSheetBean {
     public UnstructuredDataCollection getReport() {
         return report;
     }
-    
-    
+
 }

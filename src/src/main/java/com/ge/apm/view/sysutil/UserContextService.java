@@ -167,6 +167,18 @@ public class UserContextService implements Serializable {
     		return false;
     }
 
+    WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+
+    public boolean isHospitalUser(){
+        UserAccount loginUser = getLoginUser();
+        if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
+            //判断医院级别是否有调剂中心
+            List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
+            if (list.size() == 0) return false;
+        }
+        return true;
+    }
+
     public int getLoginUserId() {
         return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
     }
@@ -296,14 +308,6 @@ public class UserContextService implements Serializable {
     
     private Boolean needInstorageCheck = null;
 
-    public Boolean getPmDispatcher() {
-        return isPmDispatcher;
-    }
-
-    public void setPmDispatcher(Boolean pmDispatcher) {
-        isPmDispatcher = pmDispatcher;
-    }
-
     public Boolean needInstorageCheck(){
         if (needInstorageCheck == null) {
             getUserPrivilege();
@@ -365,6 +369,29 @@ public class UserContextService implements Serializable {
         orgList.add(userAccount.getSiteUID());
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         return wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
+    }
+
+    public String isActive(){
+        UserAccount currentUser = getLoginUser();
+        if(!currentUser.getIsActive() && currentUser.getId() != 0){
+            return "1";//need active
+        }else {
+            return "0";
+        }
+    }
+
+    public static boolean isOnlyLocalITAdmin() {
+
+        if(UserContext.getRoles().contains("LocalITAdmin")){
+            if(UserContext.getRoles().contains("ITAdmin") || isSuperAdmin()){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
+
     }
 
 }

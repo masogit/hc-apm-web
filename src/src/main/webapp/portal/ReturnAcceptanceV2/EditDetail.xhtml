@@ -8,13 +8,16 @@
 
     <ui:composition>
     
-        <p:dialog id="EditDlg" widgetVar="EditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还详情" width = "480">
+        <p:dialog id="EditDlg" widgetVar="EditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="归还详情" width = "520">
             <h:form id="EditForm">
-                <h:panelGroup id="display">
+                <h:panelGroup id="display2">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selectedSard != null}">
                         <h:panelGroup>
                             <label class="label">计费结束时间</label>
-                            <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm" stepMinute="30"  value="#{sharedAssetRequestV2Controller.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                            <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm" stepMinute="30"  value="#{sharedAssetRequestV2Controller.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true"
+                                        showButtonPanel="true" navigator="true" rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType == '小时(半点/整点)'}"/>
+                            <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm"  value="#{sharedAssetRequestV2Controller.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true"
+                                        showButtonPanel="true" navigator="true" rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType != '小时(半点/整点)'}"/>
                         </h:panelGroup>
                         <h:panelGroup>
 <!--                            <label class="label">设备接收人</label>

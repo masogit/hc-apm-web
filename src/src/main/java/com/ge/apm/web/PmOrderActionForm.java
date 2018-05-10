@@ -9,159 +9,160 @@ import java.util.List;
  */
 public class PmOrderActionForm {
 
-	String assetUid;
-	String actionType;
-	String assignee;
-	List<V2_BlobObject> attachments;
-	String endTime;
-	Double manHours;
-	String startTime;
-	String stepId;
-	String qualityChecking;
-	Object details;
-	Object coworkers;
-	String planTime;
-	Integer ruleLevel;
-	String desc;
-String comments;
-String pmOrderId;
+    String assetUid;
+    String actionType;
+    String assignee;
+    List<V2_BlobObject> attachments;
+    String endTime;
+    Double manHours;
+    String startTime;
+    String stepId;
+    String qualityChecking;
+    Object details;
+    Object coworkers;
+    String planTime;
+    Integer ruleLevel;
+    String desc;
+    String comments;
+    String pmOrderId;
+    Integer pmType;
 
 
 //V2_WorkOrder_Coworker[] coworkes //optional
+    public String getPmOrderId() {
+        return pmOrderId;
+    }
 
+    public void setPmOrderId(String pmOrderId) {
+        this.pmOrderId = pmOrderId;
+    }
 
-	public String getPmOrderId() {
-		return pmOrderId;
-	}
+    public String getComments() {
+        return comments;
+    }
 
-	public void setPmOrderId(String pmOrderId) {
-		this.pmOrderId = pmOrderId;
-	}
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
 
-	public String getComments() {
-		return comments;
-	}
+    public String getQualityChecking() {
+        return qualityChecking;
+    }
 
-	public void setComments(String comments) {
-		this.comments = comments;
-	}
+    public void setQualityChecking(String qualityChecking) {
+        this.qualityChecking = qualityChecking;
+    }
 
-	public String getQualityChecking() {
-		return qualityChecking;
-	}
+    public String getActionType() {
+        return actionType;
+    }
 
-	public void setQualityChecking(String qualityChecking) {
-		this.qualityChecking = qualityChecking;
-	}
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
+    }
 
-	public String getActionType() {
-		return actionType;
-	}
+    public String getAssignee() {
+        return assignee;
+    }
 
-	public void setActionType(String actionType) {
-		this.actionType = actionType;
-	}
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
 
-	public String getAssignee() {
-		return assignee;
-	}
+    public Double getManHours() {
+        return manHours;
+    }
 
-	public void setAssignee(String assignee) {
-		this.assignee = assignee;
-	}
+    public void setManHours(Double manHours) {
+        this.manHours = manHours;
+    }
 
+    public String getAssetUid() {
+        return assetUid;
+    }
 
+    public void setAssetUid(String assetUid) {
+        this.assetUid = assetUid;
+    }
 
-	public Double getManHours() {
-		return manHours;
-	}
+    public String getDesc() {
+        return desc;
+    }
 
-	public void setManHours(Double manHours) {
-		this.manHours = manHours;
-	}
+    public void setDesc(String desc) {
+        this.desc = desc;
+    }
 
+    public List<V2_BlobObject> getAttachments() {
+        return attachments;
+    }
 
-	public String getAssetUid() {
-		return assetUid;
-	}
+    public void setAttachments(List<V2_BlobObject> attachments) {
+        this.attachments = attachments;
+    }
 
-	public void setAssetUid(String assetUid) {
-		this.assetUid = assetUid;
-	}
+    public String getEndTime() {
+        return endTime;
+    }
 
-	public String getDesc() {
-		return desc;
-	}
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
 
-	public void setDesc(String desc) {
-		this.desc = desc;
-	}
+    public String getStartTime() {
+        return startTime;
+    }
 
-	public List<V2_BlobObject> getAttachments() {
-		return attachments;
-	}
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
 
-	public void setAttachments(List<V2_BlobObject> attachments) {
-		this.attachments = attachments;
-	}
+    public String getStepId() {
+        return stepId;
+    }
 
-	public String getEndTime() {
-		return endTime;
-	}
+    public void setStepId(String stepId) {
+        this.stepId = stepId;
+    }
 
-	public void setEndTime(String endTime) {
-		this.endTime = endTime;
-	}
+    public Object getDetails() {
+        return details;
+    }
 
+    public void setDetails(Object details) {
+        this.details = details;
+    }
 
+    public Object getCoworkers() {
+        return coworkers;
+    }
 
-	public String getStartTime() {
-		return startTime;
-	}
+    public void setCoworkers(Object coworkers) {
+        this.coworkers = coworkers;
+    }
 
-	public void setStartTime(String startTime) {
-		this.startTime = startTime;
-	}
+    public String getPlanTime() {
+        return planTime;
+    }
 
-	public String getStepId() {
-		return stepId;
-	}
+    public void setPlanTime(String planTime) {
+        this.planTime = planTime;
+    }
 
-	public void setStepId(String stepId) {
-		this.stepId = stepId;
-	}
+    public Integer getRuleLevel() {
+        return ruleLevel;
+    }
 
-	public Object getDetails() {
-		return details;
-	}
+    public void setRuleLevel(Integer ruleLevel) {
+        this.ruleLevel = ruleLevel;
+    }
 
-	public void setDetails(Object details) {
-		this.details = details;
-	}
+    public Integer getPmType() {
+        return pmType;
+    }
 
-	public Object getCoworkers() {
-		return coworkers;
-	}
-
-	public void setCoworkers(Object coworkers) {
-		this.coworkers = coworkers;
-	}
-
-	public String getPlanTime() {
-		return planTime;
-	}
-
-	public void setPlanTime(String planTime) {
-		this.planTime = planTime;
-	}
-
-	public Integer getRuleLevel() {
-		return ruleLevel;
-	}
-
-	public void setRuleLevel(Integer ruleLevel) {
-		this.ruleLevel = ruleLevel;
-	}
-
-
+    public void setPmType(Integer pmType) {
+        this.pmType = pmType;
+    }
+    
 }

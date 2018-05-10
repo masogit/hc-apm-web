@@ -17,4 +17,7 @@ public interface PmOrderRuleCheckListRepository extends GenericRepository<PmOrde
 	@Query("select o.itemId from PmOrderRuleCheckList o where o.ruleUID = ?1 ")
 	public List<Integer> findByRuleUID(String ruleUID);
 
+	@Query("select o from PmOrderRuleCheckList o where o.ruleUID = ?1 ")
+	public List<PmOrderRuleCheckList> findAllByRuleUID(String ruleUID);
+
 }

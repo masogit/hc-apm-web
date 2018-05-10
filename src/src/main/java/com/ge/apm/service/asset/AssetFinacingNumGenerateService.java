@@ -1,29 +1,19 @@
 package com.ge.apm.service.asset;
 
-import java.text.DecimalFormat;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections.CollectionUtils;
+import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.AssetSeriaNumConfig;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.service.pm.PmOrderRequestApiService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import com.alibaba.druid.util.StringUtils;
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.AssetSeriaNumConfigRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.AssetSeriaNumConfig;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.pm.PmOrderRequestApiService;
-import java.util.LinkedHashMap;
 import webapp.framework.web.WebUtil;
+
+import java.text.DecimalFormat;
+import java.util.LinkedHashMap;
 
 @Service
 public class AssetFinacingNumGenerateService {
@@ -33,9 +23,6 @@ public class AssetFinacingNumGenerateService {
 
     @Autowired
     private AssetInfoRepository assetInfoRepository;
-
-    @Autowired
-    private AssetSeriaNumConfigRepository assetSeriaNumConfigRepository;
 
     @Autowired
     private OrgInfoRepository orgInfoRepository;
@@ -68,38 +55,38 @@ public class AssetFinacingNumGenerateService {
         return null;
     }
 
-    public AssetSeriaNumConfig findConfigByUid(String tenantUID, String uid) {
-        List<AssetSeriaNumConfig> configs = assetSeriaNumConfigRepository.findByTenantUID(tenantUID);
-        if(CollectionUtils.isEmpty(configs)) {
-            return null;
-        }
-        Map<String,AssetSeriaNumConfig> siteMap = new HashMap<String,AssetSeriaNumConfig>();
-        Map<String,AssetSeriaNumConfig> hospitalMap = new HashMap<String,AssetSeriaNumConfig>();
-        Map<String,AssetSeriaNumConfig> institutionMap = new HashMap<String,AssetSeriaNumConfig>();
-        Map<String,AssetSeriaNumConfig> tenantMap = new HashMap<String,AssetSeriaNumConfig>();
-        for (AssetSeriaNumConfig assetSeriaNumConfig : configs) {
-            int type = getLevel(assetSeriaNumConfig);
-            if(type == 1) {
-                tenantMap.put(assetSeriaNumConfig.getTenantUID(), assetSeriaNumConfig);
-            }else if(type == 2) {
-                institutionMap.put(assetSeriaNumConfig.getInstitutionUID(), assetSeriaNumConfig);
-            }else if(type == 3) {
-                hospitalMap.put(assetSeriaNumConfig.getHospitalUID(), assetSeriaNumConfig);
-            }else if(type == 4) {
-                siteMap.put(assetSeriaNumConfig.getSiteUID(), assetSeriaNumConfig);
-            }
-        }
-        OrgInfo org = orgInfoRepository.getByUid(uid);
-        if(siteMap.get(org.getSiteUID()) != null) {
-            return siteMap.get(org.getSiteUID());
-        }else if(hospitalMap.get(org.getHospitalUID()) != null){
-            return hospitalMap.get(org.getHospitalUID());
-        }else if(institutionMap.get(org.getInstitutionUID()) != null) {
-            return institutionMap.get(org.getInstitutionUID());
-        }else {
-            return tenantMap.get(org.getTenantUID());
-        }
-    }
+//    public AssetSeriaNumConfig findConfigByUid(String tenantUID, String uid) {
+//        List<AssetSeriaNumConfig> configs = assetSeriaNumConfigRepository.findByTenantUID(tenantUID);
+//        if(CollectionUtils.isEmpty(configs)) {
+//            return null;
+//        }
+//        Map<String,AssetSeriaNumConfig> siteMap = new HashMap<String,AssetSeriaNumConfig>();
+//        Map<String,AssetSeriaNumConfig> hospitalMap = new HashMap<String,AssetSeriaNumConfig>();
+//        Map<String,AssetSeriaNumConfig> institutionMap = new HashMap<String,AssetSeriaNumConfig>();
+//        Map<String,AssetSeriaNumConfig> tenantMap = new HashMap<String,AssetSeriaNumConfig>();
+//        for (AssetSeriaNumConfig assetSeriaNumConfig : configs) {
+//            int type = getLevel(assetSeriaNumConfig);
+//            if(type == 1) {
+//                tenantMap.put(assetSeriaNumConfig.getTenantUID(), assetSeriaNumConfig);
+//            }else if(type == 2) {
+//                institutionMap.put(assetSeriaNumConfig.getInstitutionUID(), assetSeriaNumConfig);
+//            }else if(type == 3) {
+//                hospitalMap.put(assetSeriaNumConfig.getHospitalUID(), assetSeriaNumConfig);
+//            }else if(type == 4) {
+//                siteMap.put(assetSeriaNumConfig.getSiteUID(), assetSeriaNumConfig);
+//            }
+//        }
+//        OrgInfo org = orgInfoRepository.getByUid(uid);
+//        if(siteMap.get(org.getSiteUID()) != null) {
+//            return siteMap.get(org.getSiteUID());
+//        }else if(hospitalMap.get(org.getHospitalUID()) != null){
+//            return hospitalMap.get(org.getHospitalUID());
+//        }else if(institutionMap.get(org.getInstitutionUID()) != null) {
+//            return institutionMap.get(org.getInstitutionUID());
+//        }else {
+//            return tenantMap.get(org.getTenantUID());
+//        }
+//    }
 
 
     public int getLevel(AssetSeriaNumConfig config) {
@@ -188,82 +175,83 @@ public class AssetFinacingNumGenerateService {
      * @param uid
      * @return
      */
-    public String generateFinancingNum(Integer assetId, String nationalStardCode, String uid) {
-        LOGGER.info("generate finacing num begin ,assetId is {},code is {},uid is {}", assetId, nationalStardCode, uid);
-        if (assetId != null) {
-            if (StringUtils.isEmpty(nationalStardCode)) {
-                LOGGER.warn("nationalStardCode shouldn't be null !");
-                return null;
-            }
-            AssetInfo asset = assetInfoRepository.findById(assetId);
-            if (asset == null) {
-                LOGGER.error("can't find asset by {}", assetId);
-                return null;
-            }
-            OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(), asset.getTenantUID());
-            if (level == null) {
-                return null;
-            } else {
-                return getFinacingNum(nationalStardCode, level);
-            }
-        } else if (uid != null) {
-            if (StringUtils.isEmpty(nationalStardCode)) {
-                LOGGER.warn("can't find nationStandardCode !");
-                return null;
-            }
-            OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
-            if (orgInfo == null) {
-                return null;
-            }
-            OrgInfoLevel level = fetchConfig(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID());
-            if (level == null) {
-                return null;
-            } else {
-                return getFinacingNum(nationalStardCode, level);
-            }
-        }
-        return null;
+//    @Deprecated
+//    public String generateFinancingNum(Integer assetId, String nationalStardCode, String uid) {
+//        LOGGER.info("generate finacing num begin ,assetId is {},code is {},uid is {}", assetId, nationalStardCode, uid);
+//        if (assetId != null) {
+//            if (StringUtils.isEmpty(nationalStardCode)) {
+//                LOGGER.warn("nationalStardCode shouldn't be null !");
+//                return null;
+//            }
+//            AssetInfo asset = assetInfoRepository.findById(assetId);
+//            if (asset == null) {
+//                LOGGER.error("can't find asset by {}", assetId);
+//                return null;
+//            }
+//            OrgInfoLevel level = fetchConfig(asset.getSiteUID(), asset.getHospitalUID(), asset.getInstitutionUID(), asset.getTenantUID());
+//            if (level == null) {
+//                return null;
+//            } else {
+//                return getFinacingNum(nationalStardCode, level);
+//            }
+//        } else if (uid != null) {
+//            if (StringUtils.isEmpty(nationalStardCode)) {
+//                LOGGER.warn("can't find nationStandardCode !");
+//                return null;
+//            }
+//            OrgInfo orgInfo = orgInfoRepository.getByUid(uid);
+//            if (orgInfo == null) {
+//                return null;
+//            }
+//            OrgInfoLevel level = fetchConfig(orgInfo.getSiteUID(), orgInfo.getHospitalUID(), orgInfo.getInstitutionUID(), orgInfo.getTenantUID());
+//            if (level == null) {
+//                return null;
+//            } else {
+//                return getFinacingNum(nationalStardCode, level);
+//            }
+//        }
+//        return null;
+//
+//    }
 
-    }
+//    private OrgInfoLevel fetchConfig(String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
+//        AssetSeriaNumConfig config = null;
+//        config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(siteUID, 1);
+//        if (config != null) {
+//            if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
+//                return new OrgInfoLevel(1, siteUID);// 院区配置
+//            }
+//            return null;
+//        }
+//        config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(hospitalUID, 2);
+//        if (config != null) {
+//            if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
+//                return new OrgInfoLevel(2, hospitalUID);// 医院配置
+//            } else {
+//                return null;
+//            }
+//        } else {
+//            config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(institutionUID, 3);
+//            if (config != null) {
+//                if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
+//                    return new OrgInfoLevel(3, institutionUID);// 集团配置
+//                }
+//                return null;
+//            } else {
+//                config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(tenantUID, 4);
+//                if (config != null) {
+//                    if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
+//                        return new OrgInfoLevel(4, tenantUID);// 租户配置
+//                    }
+//                    return null;
+//                } else {
+//                    return null;// 未配置
+//                }
+//            }
+//        }
+//    }
 
-    private OrgInfoLevel fetchConfig(String siteUID, String hospitalUID, String institutionUID, String tenantUID) {
-        AssetSeriaNumConfig config = null;
-        config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(siteUID, 1);
-        if (config != null) {
-            if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-                return new OrgInfoLevel(1, siteUID);// 院区配置
-            }
-            return null;
-        }
-        config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(hospitalUID, 2);
-        if (config != null) {
-            if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-                return new OrgInfoLevel(2, hospitalUID);// 医院配置
-            } else {
-                return null;
-            }
-        } else {
-            config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(institutionUID, 3);
-            if (config != null) {
-                if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-                    return new OrgInfoLevel(3, institutionUID);// 集团配置
-                }
-                return null;
-            } else {
-                config = assetSeriaNumConfigRepository.findBySiteUIDAndLevel(tenantUID, 4);
-                if (config != null) {
-                    if (config.getGenerateMethod() != null && config.getGenerateMethod() == 1) {
-                        return new OrgInfoLevel(4, tenantUID);// 租户配置
-                    }
-                    return null;
-                } else {
-                    return null;// 未配置
-                }
-            }
-        }
-    }
-
-    public String getFinacingNum(String nationalStardCode, OrgInfoLevel level) {
+    private String getFinacingNum(String nationalStardCode, OrgInfoLevel level) {
         DecimalFormat df = new DecimalFormat(FORMAT_STR);
         if (level.getLevel() == 1) {
             String maxFinacingNum = assetInfoRepository.fetchMaxAssetFinacingNumWithSiteUID(level.getUid(), nationalStardCode);

@@ -6,7 +6,7 @@
   "scripts": {
     "clean": "rimraf src/main/webapp/react/* && rimraf src/main/webapp/resources/*",
     "dev": "gulp",
-    "pluck:react": "rimraf ./src/main/webapp/react/reports && cp -r ./react/reports/build ./src/main/webapp/react/reports",
+    "pluck:react": "rimraf ./src/main/webapp/react/reports && mkdir -p ./src/main/webapp/react && cp -r ./react/reports/build ./src/main/webapp/react/reports",
     "build:react": "npm run --prefix ./react/reports build",
     "symlink:react": "npm run --prefix ./react/reports symlink",
     "build": "npm run clean && gulp build && npm run build:react && npm run pluck:react"

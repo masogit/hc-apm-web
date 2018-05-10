@@ -6,6 +6,7 @@
 package com.ge.apm.domain;
 
 
+import com.ge.apm.dao.SharedAssetReqDetailRepository;
 import com.ge.apm.dao.SharedAssetReqTypeRepository;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -20,6 +21,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
+
+import org.hibernate.annotations.Formula;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -37,6 +40,9 @@ public class SharedAssetRequest implements Serializable{
     
     @Column(name = "applicant")//借用申请人
     private String applicant;
+
+    @Formula("(select a.name from user_account a where a.login_name = applicant)")
+    private String applicantName;
     
     @Column(name = "msg_end_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -52,7 +58,7 @@ public class SharedAssetRequest implements Serializable{
     @Column(name = "applicant_phone")//借用申请人虚拟电话网
     private String applicantPhone;
     
-    @Column(name = "accepter")//接收人
+    @Column(name = "accepter")//接收人\
     private String accepter;
     
     @Column(name = "accepter_number")//接收人编号
@@ -121,7 +127,7 @@ public class SharedAssetRequest implements Serializable{
     @Temporal(TemporalType.DATE)
     private Date modifyDate;//修改日期
     
-    @Column(name = "apply_asset_info")//设备信息（临时）
+    @Transient//设备信息（临时）
     private String applyAssetInfo;
     
     @Column(name = "behavior")//借用归还状态 1借用 2归还
@@ -377,6 +383,9 @@ public class SharedAssetRequest implements Serializable{
     @Transient
     SharedAssetReqTypeRepository apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
     
+    @Transient
+    SharedAssetReqDetailRepository asdDao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
+    
     public List<SharedAssetReqType> getSartList() {
         if(sartList!=null) return sartList;
         if (id != null) {
@@ -399,9 +408,14 @@ public class SharedAssetRequest implements Serializable{
 
     public List<SharedAssetReqDetail> getSardList() {
         if(sardList!=null) return sardList;
-        
-        sardList = new ArrayList<SharedAssetReqDetail>();
-        
+        if(id != null){
+            List<SharedAssetReqDetail> dataList = asdDao.findByReturnId(id);
+            if (dataList != null && dataList.size() > 0) {
+                sardList = dataList;
+            } else {
+                sardList = new ArrayList<SharedAssetReqDetail>();
+            }
+        }
         return sardList;
     }
 
@@ -478,5 +492,13 @@ public class SharedAssetRequest implements Serializable{
      */
     public void setBehavior(Integer behavior) {
         this.behavior = behavior;
+    }
+
+    public String getApplicantName() {
+        return applicantName;
+    }
+
+    public void setApplicantName(String applicantName) {
+        this.applicantName = applicantName;
     }
 }
