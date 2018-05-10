@@ -1,0 +1,135 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="盘点工单" />
+			</div>
+
+			<div class="ui-g-12 card">
+				<h:form id="inventoryOrderListForm">
+					<p:dataTable id="datalist" value="#{inventoryOrderController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+						selection="#{inventoryOrderController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+						rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+						paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+						currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+
+						<p:ajax event="filter" listener="#{inventoryOrderController.onFilter}" />
+
+						<p:column headerText="盘点科室" filterBy="#{item.assigneeOrg}" filterMatchMode="LIKE" exportable="false">
+							<a href="inventoryOrderDetailAssetInfoMain.xhtml?orderId=#{item.id}" target="_Blank"><h:outputText value="#{item.clinicalDeptLabel}" /></a>
+						</p:column>
+						<p:column headerText="盘点科室" visible="false" exportable="true">
+							<h:outputText value="#{item.clinicalDeptLabel}" />
+						</p:column>
+						<p:column headerText="计划开始时间" filterBy="#{item.planStartTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterPlanStartTime" widgetVar="varFilterPlanStartTime" />
+							</f:facet>
+							<h:outputText value="#{item.planStartTime}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="计划结束时间" filterBy="#{item.planEndTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterPlanEndTime" widgetVar="varFilterPlanEndTime" />
+							</f:facet>
+							<h:outputText value="#{item.planEndTime}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="实际开始时间" filterBy="#{item.startTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterStartTime" widgetVar="varFilterStartTime" />
+							</f:facet>
+							<h:outputText value="#{item.startTime}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="实际结束时间" filterBy="#{item.endTime}" filterMatchMode="GTE">
+							<f:facet name="filter">
+								<p:inputText id="filterEndTime" widgetVar="varFilterEndTime" />
+							</f:facet>
+							<h:outputText value="#{item.endTime}">
+								<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+							</h:outputText>
+						</p:column>
+						<p:column headerText="状态" filterBy="#{item.isFinished}" filterMatchMode="EQ">
+							<f:facet name="filter">
+				                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+				                	<f:converter converterId="javax.faces.Boolean"/>
+				                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+				                    <f:selectItem itemLabel="已完成" itemValue="true"/>
+				                    <f:selectItem itemLabel="进行中" itemValue="false"/>
+				                </p:selectOneMenu>
+				            </f:facet>
+							<h:outputText value="#{item.isFinished?'已完成':'进行中'}" />
+						</p:column>
+						<f:facet name="{Toolbar}">
+							<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+								<p:dataExporter type="xls" target="datalist" fileName="InventoryOrder_export" />
+							</p:commandButton>
+						</f:facet>
+					</p:dataTable>
+				</h:form>
+				<p:overlayPanel widgetVar="panelFilterPlanStartTime" for=":inventoryOrderListForm:datalist:filterPlanStartTime" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_PlanStartTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_PlanStartTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterPlanStartTime','varStartTimeFrom_PlanStartTime','varStartTimeTo_PlanStartTime'); PF('panelFilterPlanStartTime').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterPlanStartTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterPlanEndTime" for=":inventoryOrderListForm:datalist:filterPlanEndTime" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varEndTimeFrom_PlanEndTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varEndTimeTo_PlanEndTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterPlanEndTime','varEndTimeFrom_PlanEndTime','varEndTimeTo_PlanEndTime'); PF('panelFilterPlanEndTime').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterPlanEndTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterStartTime" for=":inventoryOrderListForm:datalist:filterStartTime" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_StartTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_StartTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterStartTime','varStartTimeFrom_StartTime','varStartTimeTo_StartTime'); PF('panelFilterStartTime').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterStartTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+				</p:overlayPanel>
+				<p:overlayPanel widgetVar="panelFilterEndTime" for=":inventoryOrderListForm:datalist:filterEndTime" dismissable="false">
+					<h:panelGrid columns="2">
+						<p:outputLabel value="#{msg.From}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varEndTimeFrom_EndTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+						<p:outputLabel value="#{msg.To}" />
+						<p:calendar timeZone="GMT+8" widgetVar="varEndTimeTo_EndTime" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+							mask="true" size="12" locale="zh" />
+					</h:panelGrid>
+					<p:commandButton
+						onclick="setDateFilter('varDataList','varFilterEndTime','varEndTimeFrom_EndTime','varEndTimeTo_EndTime'); PF('panelFilterEndTime').hide();"
+						title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+					<p:commandButton onclick="PF('panelFilterEndTime').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+				</p:overlayPanel>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

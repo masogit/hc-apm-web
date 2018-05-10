@@ -1,0 +1,18 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+	<ui:define name="content">
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="小屏消息配置" />
+			</div>
+			<div class="ui-g-12 card ">
+				<p:tabView id="captureDataMessagesTab">
+					<p:tab title="查询" id="showList">
+						<ui:include src="captureDataMessageList.xhtml" />
+					</p:tab>
+				</p:tabView>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

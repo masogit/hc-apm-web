@@ -134,12 +134,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         detailDao = WebUtil.getBean(WorkOrderDetailRepository.class);
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
-        
-        String str = WebUtil.getRequestParameter("str");
-        if(Strings.isNullOrEmpty(str)){
+
+        String query = WebUtil.getRequestParameter("query");
+        if (Strings.isNullOrEmpty(query)) {
             queryIndex = 0;
-        }else{
-            queryIndex = Integer.valueOf(str);
+        } else {
+            queryIndex = Integer.valueOf(query);
             searchList(queryIndex);
         }
         this.filterBySite = false;
@@ -157,7 +157,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao;
     }
 
-    
     /*
      * select
         *
@@ -254,10 +253,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("srId");
         removeFilterOnField("feedbackRating");
         removeFilterOnField("assetId");
-        removeFilterOnField("assetInfo.institutionUID");
-        removeFilterOnField("assetInfo.siteUID");
-        removeFilterOnField("assetInfo.hosputalUID");
-        removeFilterOnField("assetInfo.tenantUID");
         removeFilterOnField("approvalStatus");
         removeFilterOnField("assetInfo.assetOwnerId");
         removeFilterOnField("assetInfo.assetOwnerId2");
@@ -273,17 +268,19 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 4)));
-            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).distinct().collect(Collectors.toList());
-            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
-            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
 
+//            List<String> sitelist = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).distinct().collect(Collectors.toList());
+//            searchFilters.add(new SearchFilter("assetInfo.siteUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+//            searchFilters.add(new SearchFilter("assetInfo.hospitalUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+//            searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
+//            searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*2+"));
         } else if (queryIndex == 3) { //待接单
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.IN, Arrays.asList(2, 3)));
             searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(2, 3), "1*3+4*"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+"));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+B*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
@@ -295,19 +292,21 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
             //去除派工模式4且待派工的单子
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
-            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.NE, 4, "1*3+7*8+"));
-            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.NE, 2, "1*3+7*8+"));
-            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(4,5), "1*3+7*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*3+7*"));
+            //当前责任人是自己且已经派工的单子
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+9*"));
+            searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 3, "1*2+9*"));
             List<Integer> tagGroupAssets = getTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
-            }else{
+            } else {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
             }
             tagGroupAssets = getNoTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
-            }else{
+            } else {
                 searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
             }
 
@@ -334,14 +333,25 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.GTE, 6));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+            searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
         } else if (queryIndex == 8) { //已关单
+            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+                if (userContextService.hasRole("AssetStaff")) {
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+                    searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+                }
+            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 2));
         } else if (queryIndex == 9) { //已取消
+//            if (!userContextService.hasRole("AssetHead") && !userContextService.isDispatcher()) {
+//                searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId()));
+//                searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
+//            }
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 3));
         } else if (queryIndex == 10) { //审批
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
-            searchFilters.add(new SearchFilter("srId", SearchFilter.Operator.IN, woService.getSRListByStatus(Arrays.asList(1))));
+            searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
         } else {//全部
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
@@ -350,8 +360,6 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
-    
-    
     @Override
     public void setSearchFilter() {
         if (this.searchFilters == null) {
@@ -363,6 +371,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("serviceRequest.requestorId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*2+"));
             searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
@@ -371,6 +380,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            if (orgUidList == null || orgUidList.isEmpty()) {
+                orgUidList = Arrays.asList("");
+            }
             tagNoGroupAssets = dao.getAssetsByNoTagGroup(orgUidList);
         }
         return tagNoGroupAssets;
@@ -455,8 +467,17 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         prepareAct(woid);
         selectedMap = new HashMap<>();
         approvedDetails = getWorkOrderDetail(selectedWorkOrder.getId());
-        approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put((item.getId()), false));
+        approvedDetails.stream().forEach(item -> {
+            if (item.getApproved() == null) {
+                item.setApproved(false);
+            }
+            selectedMap.put(item.getId(), item.getApproved());
+        });
 
+    }
+
+    public List<V2_WorkOrder_Detail> getNeedApprovalDetails() {
+        return approvedDetails == null ? null : approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).collect(Collectors.toList());
     }
 
     public void prepareCloseOrder(String woid) {
@@ -536,6 +557,30 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void repairWorkOrder() {
+        boolean valid = true;
+        if(confirmedUpDate==null){
+            WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
+            valid=false;
+        }
+        if(null==selectedWorkOrder.getCaseType()){
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType")+WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
+            valid=false;
+        }
+        if(null==selectedWorkOrder.getRepairResult()){
+            WebUtil.addErrorMessage("维修结果"+WebUtil.getMessage("ValidationRequire"));
+            RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
+            valid=false;
+        }
+        if(null==selectedWorkOrder.getManHours()|| selectedWorkOrder.getManHours()<0.01 ){
+            WebUtil.addErrorMessage("工时不能小于0.01");
+            RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
+            valid=false;
+        }
+        if(!valid){
+            return ;
+        }
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
         coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -693,12 +738,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void addCoWokerItem() {
-        if (!coWorkerList.contains(coWorkerDetail)) {
-            UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
-            coWorkerDetail.setCowokerUserName(coWorker.getName());
-            coWorkerList.add(coWorkerDetail);
+        if (coWorkerList.contains(coWorkerDetail)) {
+            coWorkerList.remove(coWorkerDetail);
         }
-//        coWorkerDao.save(coWorkerDetail);
+        UserAccount coWorker = userDao.findById(coWorkerDetail.getCowokerUserId());
+        coWorkerDetail.setCowokerUserName(coWorker.getName());
+        coWorkerList.add(coWorkerDetail);
         cancelWorkdetail();
     }
 
@@ -762,13 +807,29 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void submitWorkOrder() {
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
-        accessoryList.forEach(item -> item.setCreatedDate(null));
+        accessoryList.forEach(item -> {
+            item.setCreatedDate(null);
+            if (null != item.getApproved() && !item.getApproved()) {
+                item.setApproved(null);
+            }
+        });
         woService.submitWorkOrder(selectedWorkOrder, accessoryList, this.comments);
         cancel();
     }
 
     public void approveWorkOrder() {
-        approvedDetails.stream().filter(item -> Optional.ofNullable(selectedMap.get(item.getId())).orElse(false)).forEach(item -> item.setApproved(selectedMap.get(item.getId())));
+        approvedDetails.stream().filter(item -> selectedMap.get(item.getId())).forEach(item -> item.setApproved(true));
+        if (approvedDetails.stream().anyMatch(item -> item.getApproved() == null || !item.getApproved()) && Strings.isNullOrEmpty(comments)) {
+            WebUtil.addErrorMessage("审核不通过原因必须填写");
+            RequestContext.getCurrentInstance().addCallbackParam("needComents", true);
+            return;
+        }
+        approvedDetails.forEach(item -> {
+            item.setCreatedDate(null);
+            if (null == item.getApproved()) {
+                item.setApproved(false);
+            }
+        });
         woService.approveAction(selectedWorkOrder, approvedDetails, comments);
         cancel();
     }
@@ -783,7 +844,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void onApprovedDetailsSelected(String id) {
         if ("All".equals(id)) {
-            approvedDetails.stream().filter(item -> item.getApproved() == null || !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
+            getNeedApprovalDetails().stream().filter(item -> !item.getApproved()).forEach(item -> selectedMap.put(item.getId(), selectedMap.get("All")));
         } else {
             selectedMap.put("All", !selectedMap.entrySet().stream().anyMatch(item -> !item.getKey().equals("All") && !item.getValue()));
         }

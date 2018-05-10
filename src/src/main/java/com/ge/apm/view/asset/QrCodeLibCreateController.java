@@ -22,10 +22,11 @@ import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
+import webapp.framework.web.mvc.GenericCRUDController;
 
 @ManagedBean
 @ViewScoped
-public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
+public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> {
 
     private static final long serialVersionUID = -1;
     QrCodeLibRepository dao = null;

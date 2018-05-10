@@ -64,7 +64,7 @@ public class OrgTreeController {
                 .stream().filter(item -> item.getOrgType()<4).collect(Collectors.toList());
         TreeNode siteTree = buildTree(siteList);
         expandedByOrgType(siteTree, 2);
-        rootNode.getChildren().add(siteTree);
+        rootNode.getChildren().addAll(siteTree.getChildren());
         return rootNode;
     }
     

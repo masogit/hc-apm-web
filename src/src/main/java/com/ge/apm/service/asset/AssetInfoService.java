@@ -92,6 +92,17 @@ public class AssetInfoService {
         return orgInfos;
     }
 
+    public List<OrgInfo> getClinicalDeptListWithEmptyValue(String siteUid) {
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        OrgInfo emptyValue = new OrgInfo();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        orgInfos.add(0, emptyValue);
+
+        return orgInfos;
+    }
+
     public List<SelectItem> getAllAccessibleOrgDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<OrgInfo> sitesList = uaaService.getUserAccessibleSiteList(user.getUid());

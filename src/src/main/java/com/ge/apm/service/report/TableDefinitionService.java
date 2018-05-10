@@ -4,7 +4,6 @@
  * and open the template in the editor.
  */
 package com.ge.apm.service.report;
-
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
@@ -28,37 +27,33 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.web.WebUtil;
-
 /**
  *
  * @author 212579464
  */
 @Component
 public class TableDefinitionService {
-
     @Autowired
     private TableDefinitionRepository templateDao;
     @Autowired
     private UnstructuredDataCollectionRepository udcDao;
     @Autowired
     private BlobFileService blobService;
-
     public Integer getCountByTemplate(String templateId) {
         return udcDao.getCountByTemplate(templateId);
     }
-
     public List<String> getItemKeyList(String tableString) {
         return getItemKeyList(JSONObject.parseObject(tableString, TableSchema.class));
     }
-
     public List<String> getItemKeyList(TableSchema table) {
         List<String> keyList = new ArrayList();
-        table.getGroups().forEach(item -> {
-            keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
-        });
+        if (table.getGroups() != null) {
+            table.getGroups().forEach(item -> {
+                keyList.addAll(Optional.ofNullable(item.getItems()).orElse(new ArrayList<TableItem>()).stream().map(filedItem -> filedItem.getKey()).collect(Collectors.toList()));
+            });
+        }
         return keyList;
     }
-
     public Boolean hasKeyChange(String oldStr, String newStr) {
         List<String> oldList = getItemKeyList(oldStr);
         List<String> newList = getItemKeyList(newStr);
@@ -75,43 +70,44 @@ public class TableDefinitionService {
             return true;
         }
     }
-
     public Boolean hasDuplicatedKey(TableSchema table) {
         List<String> keyList = getItemKeyList(table);
         return keyList.size() != keyList.stream().distinct().collect(Collectors.toList()).size();
     }
-
     public TableDefinition getTemplateById(String templateId) {
         return templateDao.findById(templateId);
     }
-
+    
+    public TableDefinition getTemplateByBaseId(String BaseId) {
+        return templateDao.findByBaseId(BaseId);
+    }
+    
     public void deleteTemplate(TableDefinition tableDefinition) {
         if (getCountByTemplate(tableDefinition.getId()) > 0) {
             WebUtil.addErrorMessage("模版使用中,不能删除");
         } else {
-            if (null != tableDefinition.getTableType() && tableDefinition.getTableType().equals(TableDefinition.TableDefinitionType.EXCEL.toString())) {
+            if (null != tableDefinition.getExcelStorageId()) {
                 blobService.deleteBlobFilesByStorageId(tableDefinition.getSchema());
             }
             templateDao.delete(tableDefinition);
         }
     }
-
     public UnstructuredDataCollection getReportById(String reportId) {
         return Strings.isNullOrEmpty(reportId) ? null : udcDao.findById(reportId);
     }
-
     public String getTableSchemaByTemplateId(String templateId) {
         TableDefinition template = Strings.isNullOrEmpty(templateId) ? null : templateDao.findById(templateId);
         return template == null ? "" : template.getSchema();
     }
-
+    public String getTableSchema(String tableId) {
+        TableDefinition template = Strings.isNullOrEmpty(tableId) ? null : templateDao.findById(tableId);
+        return template == null ? "" : template.getSchema();
+    }
     public Map<String, Object> getRuleResultData(Map<String, Object> tableValue, TableSchema table) {
         return TableResultReportService.getRuleResultData(tableValue, table);
     }
-
     @Transactional
-    public void updateExcelTemplate(TableDefinition selectedTableDefinition, UploadedFile uploadedFile) {
-        V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+    public void updateExcelTemplate(TableDefinition selectedTableDefinition, V2_BlobObject blobObject) {
         if (getCountByTemplate(selectedTableDefinition.getId()) > 0) {
             //模版下有记录
             TableDefinition newTemplate = new TableDefinition();
@@ -126,8 +122,8 @@ public class TableDefinitionService {
             newTemplate.setCreatedDate(new Date());
             newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             newTemplate.setStatus(selectedTableDefinition.getStatus());
-            newTemplate.setTableType(selectedTableDefinition.getTableType());
-            newTemplate.setSchema(blobObject.getObjectStorageId());
+            newTemplate.setExcelStorageId(blobObject.getObjectStorageId());
+            newTemplate.setSchema(selectedTableDefinition.getSchema());
             templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
@@ -139,8 +135,9 @@ public class TableDefinitionService {
             blobService.saveBlobObject(blobObject);
         } else {
             //模版下无记录
-            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getSchema())) {
-                selectedTableDefinition.setSchema(blobObject.getObjectStorageId());
+            
+            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
+                selectedTableDefinition.setExcelStorageId(blobObject.getObjectStorageId());
                 selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
                 selectedTableDefinition.setLastModifiedDate(new Date());
                 templateDao.save(selectedTableDefinition);
@@ -152,9 +149,7 @@ public class TableDefinitionService {
                 WebUtil.addErrorMessage("更新失败");
             };
         }
-
     }
-
     public void saveTableDate(UnstructuredDataCollection report, Map<String, Object> tableValue) {
         List<UnstructuredData> dataList = report.getData();
         Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item -> item));
@@ -165,6 +160,13 @@ public class TableDefinitionService {
                 dataItem.setCollectionId(report.getId());
                 dataItem.setKey(item.getKey());
                 dataItem.setValue(item.getValue());
+                if(item.getKey().contains("_res")){
+                    switch ((String)item.getValue()){
+                        case "合格" : 
+                        case "正常" : dataItem.setValue("Normal");
+                        default: 
+                    }
+                }
                 dataList.add(dataItem);
             } else {
                 dataItem.setValue(item.getValue());
@@ -174,19 +176,16 @@ public class TableDefinitionService {
         report.setCreatedDate(new Date());
         udcDao.save(report);
     }
-
     public void submitReport(UnstructuredDataCollection report) {
         report.setStatus(UnstructuredDataCollection.Status.Archived.toString());
         udcDao.save(report);
     }
-
     public void deleteReport(String reportId) {
         UnstructuredDataCollection report = udcDao.findById(reportId);
         if (null != report) {
             deleteReport(report);
         }
     }
-
     public void deleteReport(UnstructuredDataCollection report) {
         if (UnstructuredDataCollection.Status.Archived.toString().equals(report.getStatus())) {
             WebUtil.addErrorMessage("已归档报告不能删除");
@@ -194,4 +193,5 @@ public class TableDefinitionService {
             udcDao.delete(report);
         }
     }
+    
 }

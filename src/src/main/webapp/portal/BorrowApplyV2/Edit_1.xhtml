@@ -20,19 +20,23 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请科室</label>
-                            <p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}"></h:outputText>
+                            <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>虚拟网电话</label>
-                            <p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}"></h:outputText>
+                            <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>创建日期</label>
-                            <p:inputText id="createDate" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.createDate}"></h:outputText>
+                            <!--<p:inputText id="createDate" readonly="true" value="#{sharedAssetRequestV2Controller.selected.createDate}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>备注</label>
@@ -127,14 +131,15 @@
                 <h:panelGroup id="display">
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.submmit}" action="List?faces-redirect=true" value="确认借用" icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 3}"/>
-                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.refers}" action="List?faces-redirect=true" value="取消借用" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1 or sharedAssetRequestV2Controller.selected.state  eq 2 or sharedAssetRequestV2Controller.selected.state  eq 5}" />
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.refers}" action="List?faces-redirect=true" value="取消借用" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1 or sharedAssetRequestV2Controller.selected.state  eq 2 or sharedAssetRequestV2Controller.selected.state  eq 5 }" />
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true"  icon="ui-icon-arrow-back"/>
                 </h:panelGroup>
             </h:form>
                 <ui:include src="Detail_Edit.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
          </div>  
-        </div> 
+        </div>
+
     </ui:define>  
 </ui:composition>
 

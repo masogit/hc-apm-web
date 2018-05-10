@@ -1,9 +1,17 @@
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.ArrivalListItemRepository;
-import com.ge.apm.dao.ArrivalListRepository;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.StringReader;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -14,12 +22,20 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.collections.map.HashedMap;
+import org.apache.fop.apps.FOUserAgent;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
+import org.primefaces.event.data.FilterEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
+
+import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -30,26 +46,9 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.StringReader;
-import java.util.ArrayList;
-import java.util.Date;
-import java.text.SimpleDateFormat;
-import java.util.stream.Collectors;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.MimeConstants;
-import org.primefaces.event.data.FilterEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.StreamedContent;
-
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 @ManagedBean
 @ViewScoped
@@ -85,7 +84,7 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             searchFilters = new ArrayList();
         }
         if (!this.hasFilterOnField("siteUID")) {
-            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -112,6 +111,10 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
 
     public String createAction() {
         return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create");
+    }
+    
+    public String saveAsAction() {
+        return UrlEncryptController.encodeUrlParam("arrivalListEdit?action=Create".concat(selected==null?"":"&copyFrom=".concat(selected.getId())));
     }
 
     public String editAction() {
@@ -164,9 +167,31 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
         return xStream.toXML(data);
     }
 
+    private void sortArrivalList(List<ArrivalListItem> items)
+    {
+    	Collections.sort(items, new Comparator<ArrivalListItem>(){
+			/*  
+             * 返回负数表示：o1 小于o2，  
+             * 返回0 表示：o1和o2相等，  
+             * 返回正数表示：o1大于o2。  
+             */  
+			public int compare(ArrivalListItem o1, ArrivalListItem o2) {
+				//按序号升序排序  
+	            if(o1.getItemNum() > o2.getItemNum()){  
+	                return 1;  
+	            }  
+	            if(o1.getItemNum() == o2.getItemNum()){  
+	                return 0;  
+	            }  
+	            return -1;
+			}  
+		});
+        
+    }
     private void getDetails(String itemId, Map<String, Object> info) {
         List<Map<String, Object>> details = new ArrayList<Map<String, Object>>();
         List<ArrivalListItem> items = aiService.getListItem(itemId);
+        sortArrivalList(items);
         for (ArrivalListItem item : items) {
             Map<String, Object> detail = new HashedMap();
             detail.put("序号", item.getItemNum());
@@ -185,6 +210,19 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             detail.put("维保截止日期", item.getWarrantyDate());
             detail.put("质保日期", item.getFactoryWarrantyDate());
             details.add(detail);
+        }
+        if(items.size() < 11)
+        {
+        	for(int i = 0; i < 11-items.size(); i++)
+        	{
+        		Map<String, Object> detail = new HashedMap();
+        		detail.put("序号", "");
+        		detail.put("使用科室", "");
+        		detail.put("制造商序列号", "");
+        		detail.put("资产编号", "");
+        		details.add(detail);
+        	}
+        	
         }
         info.put("到货条目", details);
     }

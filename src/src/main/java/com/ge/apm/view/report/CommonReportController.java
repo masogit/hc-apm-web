@@ -13,6 +13,9 @@ import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import org.apache.cxf.common.util.StringUtils;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.WebUtil;
 
 /*
@@ -79,30 +82,24 @@ public class CommonReportController {
 
     public String getEditLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
-        if (null != table) {
-            switch (Optional.ofNullable(table.getTableType()).orElse("")) {
-                case "EXCEL":
-                    return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
-                case "JSON":
-                default:
-                    return "/portal/reporter/EditReport.xhtml?faces-redirect=true&reportId=" + report.getId();
-            }
+        if(table==null)
+                return "";
+        if (null != table.getExcelStorageId()) {
+            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+        }else{
+            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&reportId=" + report.getId();
         }
-        return "";
     }
 
     public String getViewLinkUrl(UnstructuredDataCollection report) {
         TableDefinition table = tableDao.findById(report.getSchemaId());
-        if (null != table) {
-            switch (Optional.ofNullable(table.getTableType()).orElse("")) {
-                case "EXCEL":
-                    return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
-                case "JSON":
-                default:
-                    return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&reportId=" + report.getId();
-            }
+        if(table==null)
+            return "";
+         if (null != table.getExcelStorageId()) {
+            return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+        }else{
+            return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&reportId=" + report.getId();
         }
-        return "";
     }
 
     public String getReportUid() {
@@ -112,4 +109,7 @@ public class CommonReportController {
     public void setReportUid(String reportUid) {
         this.reportUid = reportUid;
     }
+
+
+
 }

@@ -51,8 +51,8 @@
                     <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}"  filterMatchMode="LIKE">
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column headerText="申请人" sortBy="#{item.applicant}" filterBy="#{item.applicant}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.applicant}"/>
+                    <p:column headerText="申请人" sortBy="#{item.applicantName}" filterBy="#{item.applicantName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.applicantName}"/>
                     </p:column>
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
@@ -78,15 +78,15 @@
                            <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{sharedAssetRequestV2Controller.applyTimeFormatTime}"/>
                         </f:facet>
                         <h:outputText value="#{item.applyTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
                     
-                    <p:column headerText="申请失效日期" sortBy="#{item.invalidTime}">
-                        <h:outputText value="#{item.invalidTime}">
-                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
-                        </h:outputText>
-                    </p:column>
+                    <!--<p:column headerText="申请失效日期" sortBy="#{item.invalidTime}">-->
+                        <!--<h:outputText value="#{item.invalidTime}">-->
+                            <!--<f:convertDateTime pattern="yyyy/MM/dd HH:mm" />-->
+                        <!--</h:outputText>-->
+                    <!--</p:column>-->
                     <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE" >
                         <h:outputText value="#{item.remark}"/>
                     </p:column>
@@ -103,7 +103,7 @@
                  <p:overlayPanel widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="cal1" />
-                        <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{sharedAssetRequestV2Controller.applyTimeFrom}"
+                        <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold"
                                     pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
                         <p:outputLabel for="cal2"/>
                         <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
