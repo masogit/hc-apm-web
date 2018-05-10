@@ -297,6 +297,8 @@ public class CaptureDataMessages implements Serializable {
 	}
 
 	public Integer getType() {
+		if(type==null)
+			type=0;
 		return type;
 	}
 
