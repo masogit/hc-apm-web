@@ -372,6 +372,14 @@
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
+                            
+                            <h:panelGroup>
+                                <label class="label">#{msg.capitalSource2}</label>
+                                <p:selectOneMenu id="capitalSource2" value="#{assetInfoController.selected.capitalSource2}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
 
                             <h:panelGroup>
                                 <label class="label">#{msg.measureGrade}</label>
