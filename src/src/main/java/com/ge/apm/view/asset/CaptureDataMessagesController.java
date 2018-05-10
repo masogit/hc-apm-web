@@ -167,7 +167,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         		assetInfo.setIbStatus(this.selected.getIbStatus());
         		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
         		assetInfoRepository.save(assetInfo);
-        		this.selected=null;
         	}
         	else{
         		FacesMessage message = new FacesMessage("注意！保存失败");
@@ -183,9 +182,9 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     			setIndexValue();
     			this.selected.setSystemId("");
         		super.save();
-        		this.selected=null;
     		}
     	}
+    	this.selected=null;
     }
     
     private void setIndexValue(){
