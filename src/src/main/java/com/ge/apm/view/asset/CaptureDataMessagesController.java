@@ -53,7 +53,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private String content;
     private AssetInfo assetInfo;
     private int conentTextLength=120;
-    boolean validate=true;
+    boolean validate=false;
     
     @Override
     protected void init() {
@@ -160,9 +160,9 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
-    	setIndexValue();
     	if(this.selected.getType()==0){
     		if(validate){
+    			setIndexValue();
         		super.save();
         		assetInfo.setIbStatus(this.selected.getIbStatus());
         		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
@@ -175,9 +175,16 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         	}
     	}
     	else{
-    		this.selected.setSystemId("");
-    		super.save();
-    		this.selected=null;
+    		if(this.selected.getGeDeviceType()==null){
+    			FacesMessage message = new FacesMessage("注意！保存失败");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+    		}
+    		else{
+    			setIndexValue();
+    			this.selected.setSystemId("");
+        		super.save();
+        		this.selected=null;
+    		}
     	}
     }
     
@@ -198,6 +205,9 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     			this.selected.setIndex(0);
     		}
     	}
+    	else{
+    		this.selected.setIndex(0);
+    	}
     }
     
     @Override
@@ -213,6 +223,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         if(file==null || file.getInputstream()==null){
         	FacesMessage message = new FacesMessage("注意！解析图片失败！");
             FacesContext.getCurrentInstance().addMessage("other", message);
+            this.selected.setTempImageContent(null);
             return;
         }
         else{
@@ -223,11 +234,13 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         	else{
         		FacesMessage message = new FacesMessage("注意！请上传jpg或者png格式的图片！");
                 FacesContext.getCurrentInstance().addMessage("other", message);
+                this.selected.setTempImageContent(null);
                 return;
         	}
         	if(file.getInputstream().available()>5242880){
         		FacesMessage message = new FacesMessage("注意！请上传大小不超过5M的图片！");
                 FacesContext.getCurrentInstance().addMessage("other", message);
+                this.selected.setTempImageContent(null);
                 return;
         	}
         	String imageString=ImageUtils.getBase64(file.getInputstream());
@@ -287,5 +300,4 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 		}
 		return "";
 	}
-	
 }
