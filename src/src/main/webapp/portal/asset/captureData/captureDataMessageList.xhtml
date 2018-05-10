@@ -11,6 +11,7 @@
 			<div class="ui-g-12 card ">
 				<h:form id="captureDataMessagesListForm">
 					<p:growl id="growl" showDetail="true" />
+					<p:growl id="captureDataMessageGrowl" showDetail="true" autoUpdate="true" for="other"/>
 					<p:dataTable id="datalist" value="#{captureDataMessagesController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
 						selection="#{captureDataMessagesController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
 						rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
