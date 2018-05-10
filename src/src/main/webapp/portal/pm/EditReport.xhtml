@@ -1,0 +1,85 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="性能分析报告"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="PerformCheck">
+                    <c:forEach  items="#{editReportController.table.groups}" var="groupItem">
+                        <p:fieldset  legend="#{groupItem.title}" >
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                <c:forEach  items="#{groupItem.items}" var="fieldItem">
+
+                                    <c:if test="#{empty fieldItem.component or fieldItem.component eq 'Text'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <p:inputText value="#{editReportController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}" />
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Number'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <p:inputNumber value="#{editReportController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}"/>
+                                            <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Select'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <p:selectOneMenu value="#{editReportController.tableValue[fieldItem.key]}">
+                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                <f:selectItems value="#{fieldItem.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
+                                            </p:selectOneMenu>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Switch'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <p:selectBooleanButton onLabel="是" offLabel="否"  value="#{editReportController.tableValue[fieldItem.key]}"/>
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'TextArea'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <p:inputTextarea value="#{editReportController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}" />
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Date'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <p:calendar value="#{editReportController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}" />
+                                        </h:panelGroup>
+                                    </c:if>
+                                    <c:if test="#{fieldItem.component eq 'Label'}" >
+                                        <h:panelGroup>
+                                            <label class="label">#{fieldItem.label}</label>
+                                            <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
+                                        </h:panelGroup>
+                                    </c:if>
+                                </c:forEach>
+
+                            </p:panelGrid>
+
+                        </p:fieldset>
+
+                    </c:forEach>
+
+
+                    <p:commandButton actionListener="#{editReportController.save}" value="#{msg.save}" update=":EditReportForm"  disabled="#{editReportController.report.status eq 'Archived'}"/>
+                    <p:commandButton actionListener="#{editReportController.submit}" value="#{msg.submit}" update=":EditReportForm" disabled="#{editReportController.report.status eq 'Archived'}"/>
+                </h:form>
+            </div>
+
+        </div>
+
+    </ui:define>
+
+
+</ui:composition>

@@ -60,4 +60,35 @@ public class ConfigService {
         }
         return null;
     }
+
+    public boolean isNeedAssetApprover(String siteUid) {
+        OrgInfo org = orgDao.findByUid(siteUid);
+        TenantInfo tenant = tenantDao.findByuid(org.getTenantUID());
+        List<WorkflowConfig> configList = configDao.findBySiteUID(siteUid);
+        if (tenant.getInsulate()!=null && tenant.getInsulate()) {
+            if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
+                return true;
+            }else{
+                return false;
+            }
+        }
+
+        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
+            return true;
+        }
+        configList = configDao.findBySiteUID(org.getHospitalUID());
+        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
+            return true;
+        }
+        configList = configDao.findBySiteUID(org.getInstitutionUID());
+        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
+            return true;
+        }
+        configList = configDao.findBySiteUID(org.getTenantUID());
+        if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
+            return true;
+        }
+
+        return false;
+    }
 }

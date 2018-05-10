@@ -19,6 +19,7 @@ import com.ge.apm.service.asset.QrCodeService;
 import com.ge.apm.service.asset.QrCodeTemplateService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -46,6 +47,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
     OrgInfoService orgInfoService;
 
     String selectedTenantUid;
+    List<String> accessibleOrgInfoList;
 
     @Override
     protected void init() {
@@ -58,7 +60,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         tenantInfoDao = WebUtil.getBean(TenantInfoRepository.class);
         userContextService = WebUtil.getBean(UserContextService.class);
         orgInfoService = WebUtil.getBean(OrgInfoService.class);
-
+        accessibleOrgInfoList = uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid()).stream().map(OrgInfo::getUid).collect(Collectors.toList());
     }
 
     @Override
@@ -116,7 +118,7 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
             templateFilters.add(new SearchFilter("isUsing", SearchFilter.Operator.EQ, true));
             templateFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, usingTemplate.getSiteUID()));
             List<QrCodeTemplate> usingList = dao.findBySearchFilter(templateFilters);
-            usingList.forEach(item ->item.setIsUsing(false));
+            usingList.forEach(item -> item.setIsUsing(false));
             dao.save(usingList);
             usingTemplate.setIsUsing(true);
             usingTemplate.setUsingDate(new Date());
@@ -139,6 +141,10 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
         } else {
             UserAccount user = UserContextService.getCurrentUserAccount();
             orgInfoList = uaaService.getUserAccessibleSiteList(user.getUid());
+            orgInfoList.add(orgDao.getByUid(user.getHospitalUID()));
+            orgInfoList.add(orgDao.getByUid(user.getInstitutionUID()));
+            orgInfoList.add(orgDao.getByUid(user.getTenantUID()));
+            orgInfoList = orgInfoList.stream().distinct().collect(Collectors.toList());
         }
         if (orgInfoList == null) {
             return Collections.emptyList();
@@ -147,6 +153,19 @@ public class QrCodeTemplateController extends GenericCRUDUUIDController<QrCodeTe
             return orgInfoList;
         }
 
+    }
+
+    public boolean canEdit(String siteUID) {
+        if(!Strings.isNullOrEmpty(siteUID)){
+            return accessibleOrgInfoList.contains(siteUID);
+        }
+        
+        if (selected == null) {
+            return false;
+        }else{
+            siteUID = selected.getSiteUID();
+        }
+        return accessibleOrgInfoList.contains(siteUID);
     }
 
     public String getHospitalName(String orgUid) {

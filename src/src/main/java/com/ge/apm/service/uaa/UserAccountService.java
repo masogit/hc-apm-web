@@ -1,9 +1,11 @@
 package com.ge.apm.service.uaa;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -13,9 +15,11 @@ import javax.faces.context.FacesContext;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,6 +43,7 @@ import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.domain.UserRole;
 import com.ge.apm.service.utils.ExcelParser;
 import com.ge.apm.service.utils.PasswordUtil;
+import com.ge.apm.view.sysutil.UserContextService;
 
 @Component
 public class UserAccountService {
@@ -122,7 +127,7 @@ public class UserAccountService {
 		return pass;
 	}
 	private boolean handleNewUser(UserAccount newUser,String institution,String hospital,String site,String department){
-		newUser=checkLoginName(newUser);
+		checkLoginName(newUser);
 		if(checkData(newUser)){
 			setUIDs(newUser, institution, hospital, site, department);
 			if(checkData(newUser)){
@@ -140,7 +145,7 @@ public class UserAccountService {
 			//create
 			if(isExistsByLoginName(loginName)){
 				existsCount++;
-				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在有");
+				newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"用户名已存在");
 				return newUser;
 			}
 			//create finally
@@ -161,23 +166,21 @@ public class UserAccountService {
 				}
 			}
 			//update finally
-			user.setEmail(newUser.getEmail());
-			user.setLoginName(newUser.getLoginName());
-			user.setTelephone(newUser.getTelephone());
-			user.setName(newUser.getName());
-			user.setIsActive(newUser.getIsActive());
-			user.setIsLocked(newUser.getIsLocked());
-			return user;
+			newUser.setUid(user.getUid());
+			newUser.setId(user.getId());
+			newUser.setPasswordErrorCount(user.getPasswordErrorCount());
+			return newUser;
 		}
 		return newUser;
 	}
 	private void setUIDs(UserAccount newUser,String institution,String hospital,String site,String department){
 		orgInfoTemp=orgInfoRepository.getByUid(currentUser.getTenantUID());
-		if(orgInfoTemp==null){
+		TenantInfo tenantInfo=tenantInfoRepository.findByuid(currentUser.getTenantUID());
+		if(orgInfoTemp==null || tenantInfo==null){
 			newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"集团不存在;");
 			return;
 		}
-		newUser.setSiteId(orgInfoTemp.getId());
+		newUser.setSiteId(tenantInfo.getId());
 		if(isInsulate){
 			newUser.setInstitutionUID(currentUser.getInstitutionUID());
 			newUser.setHospitalUID(currentUser.getHospitalUID());
@@ -201,7 +204,7 @@ public class UserAccountService {
 		}
 		newUser.setOrgInfoUID(orgInfoTemp.getUid());
 		newUser.setOrgInfoId(orgInfoTemp.getId());
-		newUser.setHospitalId(orgInfoTemp.getId());
+		
 	}
 	
 	private boolean getInstitutionID(UserAccount newUser,String institution){
@@ -248,6 +251,7 @@ public class UserAccountService {
 			orgInfoTemp=temp;
 		}
 		newUser.setSiteUID(orgInfoTemp.getUid());
+		newUser.setHospitalId(orgInfoTemp.getId());
 		newUser.setOrgLevel(orgInfoTemp.getOrgLevel());
 		newUser.setOrgType(orgInfoTemp.getOrgType());
 		return true;
@@ -275,10 +279,23 @@ public class UserAccountService {
 		TenantInfo tenantInfo=tenantInfoRepository.findByuid(user.getTenantUID());
 		if(tenantInfo!=null && tenantInfo.getInsulate()!=null){
 			isInsulate=tenantInfo.getInsulate();
+			if(isInsulate){
+				if(!UserContextService.isOnlyLocalITAdmin()){
+					isInsulate=false;
+				}
+			}
 		}
 		List<UserAccount> importFailedDataList = new ArrayList<UserAccount>();
-		HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
-		HSSFSheet sheet = workbook.getSheetAt(0);
+		
+		Workbook workbook = null;
+		if(file.getFileName().toLowerCase().endsWith(".xls")){
+			workbook=new HSSFWorkbook(file.getInputstream());
+		}
+		else if(file.getFileName().toLowerCase().endsWith(".xlsx")){
+			workbook=new XSSFWorkbook(file.getInputstream());
+		}
+		
+		Sheet sheet = workbook.getSheetAt(0);
 		if (sheet == null) {
 			return null;
 		}
@@ -326,7 +343,7 @@ public class UserAccountService {
 		int uuidIndex=header.get(HEADER_UUID);
 
 		for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
-			HSSFRow row = sheet.getRow(j);
+			Row row = sheet.getRow(j);
 			if (row == null) {
 				continue;
 			}
@@ -375,10 +392,6 @@ public class UserAccountService {
 				roleName=ExcelParser.getCellStringValue(row, rolenameIndex);
 				UUID=ExcelParser.getCellStringValue(row, uuidIndex);
 				
-				if(StringUtils.isEmpty(loginName)){
-					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"登录名不能为空;");
-					pass=false;
-				}
 				if(!pass){
 					importFailedDataList.add(newUser);
 					failedCount++;
@@ -387,8 +400,17 @@ public class UserAccountService {
 				newUser.setLoginName(loginName);
 				newUser.setName(name);
 				newUser.setEmail(email);
+				if(StringUtils.isNotEmpty(telephone)){
+					if(StringUtils.contains(telephone, "E")){
+						BigDecimal bd = new BigDecimal(telephone);
+				        telephone=bd.toPlainString();
+					}
+				}
 				newUser.setTelephone(telephone);
 				newUser.setIsActive(isActive);
+				if(isActive){
+					newUser.setActiveTime(new Date());
+				}
 				newUser.setIsLocked(isLocked);
 //				newUser.setUserRoleList(userRoleList);
 				newUser.setUid(UUID);
@@ -396,6 +418,23 @@ public class UserAccountService {
 				newUser.setHospitalName(hospital);
 				newUser.setSiteName(site);
 				newUser.setDepartName(department);
+				
+				if(StringUtils.isEmpty(loginName)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"登录名不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(name)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"姓名不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(strActive)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"激活值不能为空;");
+					pass=false;
+				}
+				if(StringUtils.isEmpty(strLocked)){
+					newUser.setStatusDisplay(UploadFileErrorTypeEnum.OTHER_ERROR,"锁定值不能为空;");
+					pass=false;
+				}
 				if(handleNewUser(newUser, institution, hospital, site, department)==false){
 					importFailedDataList.add(newUser);
 					failedCount++;
@@ -415,7 +454,8 @@ public class UserAccountService {
 	}
 	
 	private void addWarnMessage(){
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败，其中"+existsCount+"条失败原因是用户名已存在！");
+		FacesMessage message=null;
+		message = new FacesMessage(FacesMessage.SEVERITY_WARN, "处理完毕!", "总共"+(successCount+failedCount)+"条记录，"+successCount+"条处理成功，"+failedCount+"条失败！");
         FacesContext.getCurrentInstance().addMessage(null, message);
         successCount=0;
         failedCount=0;
@@ -465,6 +505,11 @@ public class UserAccountService {
 		user.setPlainPassword(PasswordUtil.DEFAULT_PWD);
 		//TODO nickName
 		try {
+			user.setCreatedBy(currentUser.getLoginName());
+			user.setCreatedDate(new Date());
+			user.setLastModifiedBy(user.getCreatedBy());
+			user.setLastModifiedDate(user.getCreatedDate());
+			user.setPasswordErrorCount(0);
 			user.entryptPassword();
 			userAccountMapper.saveUserAccount(user);
 			UserRole userRole=new UserRole();
@@ -488,6 +533,8 @@ public class UserAccountService {
 	private void updateUser(UserAccount user) {
 		//TODO nickName
 		try {
+			user.setLastModifiedBy(currentUser.getLoginName());
+			user.setLastModifiedDate(new Date());
 			userAccountMapper.updateUserAccount(user);
 		} catch (Exception e) {
 			logger.error("update user error : {}", e.getMessage());

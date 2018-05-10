@@ -8,20 +8,24 @@
     <ui:composition><!--备件对话框-->
         <p:dialog class="pmmoreAccDialogDlgCls" id="pmmoreAccDialogDlg" widgetVar="pmmoreAccDialogDlg" modal="true" width="550"  resizable="true" draggable="true" appendTo="@(body)" header="备件">
             <h:form class="pmmoreAccDialogFormCls"  id="pmmoreAccDialogForm" >
-                <h:panelGroup id="display42" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
+                <h:panelGroup id="display42">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">备件名称*</label>
                             <p:inputText id="parts" value="#{v2PmOrderController.itemDetail.parts}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+
                         </h:panelGroup>
                         <h:panelGroup>
-
                             <label class="label">备件(数量)*</label>
-                            <p:inputNumber  maxValue="999999"  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}"/>
+                            <p:inputNumber  maxValue="999"  decimalPlaces="0"  id="apartsQuantity" value="#{v2PmOrderController.itemDetail.apartsQuantity}" required="true" requiredMessage="备件(数量) #{msg.ValidationRequire}">
+                            <f:convertNumber pattern="0" type="number"/>
+                            </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">备件单价(元)*</label>
-                            <p:inputNumber  decimalPlaces="4" maxValue="99999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}" />
+                            <p:inputNumber  decimalPlaces="0" maxValue="999999" id="partsPrice"  value="#{v2PmOrderController.itemDetail.partsPrice}" required="true" requiredMessage="备件单价(元) #{msg.ValidationRequire}">
+                            <f:convertNumber pattern="0" type="number"/>
+                        </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">类型</label>
@@ -49,7 +53,7 @@
                         </h:panelGroup>
 
                         <p:column headerText="到货">
-                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货" disabled="#{v2PmOrderController.itemDetail.arrived}"/>
+                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货"/>
                         </p:column>
 
                     </p:panelGrid>

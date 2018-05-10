@@ -24,11 +24,11 @@ import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.StreamedContent;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.GenericCRUDController;
 
 @ManagedBean
 @ViewScoped
-public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
+public class QrCodeLibController extends GenericCRUDController<QrCodeLib> {
 
     QrCodeLibRepository dao = null;
     TenantInfoRepository tenantInfoDao = null;
@@ -104,12 +104,17 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         this.removeFilterOnField("tenantUID");
         this.removeFilterOnField("institutionUID");
         this.removeFilterOnField("hospitalUID");
-        if (!userContextService.hasRole("SuperAdmin") ) {
+        Boolean d = userContextService.hasRole("ITAdmin");
+        if (!userContextService.hasRole("SuperAdmin") && !userContextService.hasRole("ITAdmin")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        }
+        
+        if(userContextService.hasRole("ITAdmin")){
+            tenantUIDFilter = userContextService.getLoginUser().getTenantUID();
         }
         
         if(!Strings.isNullOrEmpty(tenantUIDFilter)){
@@ -161,10 +166,11 @@ public class QrCodeLibController extends GenericCRUDUUIDController<QrCodeLib> {
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selectedOrg.getSiteUID())) {
             return;
         }
-        if (userContextService.hasRole("ITAdmin")) {
-            tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-            //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
-        }
+//        if (userContextService.hasRole("ITAdmin")) {
+//            tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+//            //siteUID = UserContextService.getCurrentUserAccount().getSiteUID();
+//        }
+        tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
         qrCodeService.createManyQrCode(tenantUID, selectedOrg.getSiteUID(), qrCodeNum);
         this.selectedOrg = null;
         qrCodeNum = 0;

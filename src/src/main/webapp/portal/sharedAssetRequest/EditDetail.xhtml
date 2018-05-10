@@ -16,13 +16,21 @@
                             <label class="label">设备名称</label>
                             <h:inputText value="#{sharedAssetReqDetailController.getSwapName(sharedAssetReqDetailController.selected.sharedAssetTypeId)}"/>
                         </h:panelGroup>-->
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestNewController.selectedSard.chargingType == '小时(半点/整点)'}">
                             <label class="label">计费开始时间</label>
                             <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30"  value="#{sharedAssetRequestNewController.selectedSard.chargingBeginTime}" showOn="button" readonlyInput="true"  showButtonPanel="true" navigator="true"/>
                         </h:panelGroup>
-                        <h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestNewController.selectedSard.chargingType != '小时(半点/整点)'}">
+                            <label class="label">计费开始时间</label>
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm"  value="#{sharedAssetRequestNewController.selectedSard.chargingBeginTime}" showOn="button" readonlyInput="true"  showButtonPanel="true" navigator="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup  rendered="#{sharedAssetRequestNewController.selectedSard.chargingType == '小时(半点/整点)'}">
                             <label class="label">计费结束时间</label>
                             <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm" stepMinute="30"  value="#{sharedAssetRequestNewController.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestNewController.selectedSard.chargingType != '小时(半点/整点)'}">
+                            <label class="label">计费结束时间</label>
+                            <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm"  value="#{sharedAssetRequestNewController.selectedSard.chargingEndTime}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
                         </h:panelGroup>
                        
                         <h:panelGroup>

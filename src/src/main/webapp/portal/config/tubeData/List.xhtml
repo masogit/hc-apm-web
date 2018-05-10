@@ -89,7 +89,7 @@
                             <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
                         </f:facet>
                         <h:outputText value="#{item.inputDate}">
-                            <f:convertDateTime pattern="yyyy/MM/dd HH:mm:ss" />
+                            <f:convertDateTime pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="预计报警时间">

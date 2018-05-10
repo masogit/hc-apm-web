@@ -69,12 +69,13 @@
                                     <h:panelGroup >
                                         <div style="width:630px">
                                            <label class='label'>批量输入</label>
-                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费开始时间" value="#{sharedAssetRequestNewController.selected.msgBeginTime}" required="true" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true" requiredMessage="请选择开始时间"/>
-                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费结束时间" value="#{sharedAssetRequestNewController.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"   placeholder="        计费开始时间" value="#{sharedAssetRequestNewController.selected.msgBeginTime}" required="true" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true" requiredMessage="请选择开始时间"/>
+                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"   placeholder="        计费结束时间" value="#{sharedAssetRequestNewController.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                                            <p:inputText  style="width: 100px;margin-left:10px " placeholder="设备接收人" required="true" value="#{sharedAssetRequestNewController.selected.msgAccepter}" requiredMessage="请选择设备接收人"/>
+
                                            <p:selectOneMenu style="margin-left:40px;float:right" id="clinicalDeptUid"  value="#{sharedAssetRequestNewController.selected.clinicalDeptUid}" required="true" requiredMessage="请选择科室">        
-                                           <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                           <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestNewController.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                                               <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                               <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestNewController.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                            </p:selectOneMenu>
                                         </div>   
                                    </h:panelGroup>

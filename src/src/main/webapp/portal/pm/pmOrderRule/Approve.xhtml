@@ -13,7 +13,7 @@
 				text-align: left;
 			}
 		</style>
-        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" width="750" height="450" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
+        <p:dialog id="PmOrderRuleApproveDlg" widgetVar="PmOrderRuleApproveDialog" width="750" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 审核">
             <h:form id="PmOrderRuleApproveForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
@@ -56,13 +56,13 @@
                         </h:panelGroup>
                     </p:panelGrid>
                     
-                     <p:panelGrid id="report" columns="2"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
+                     <p:panelGrid id="report" columns="1"  styleClass="ui-panelgrid-blank form-group" layout="grid" >
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu value="#{pmOrderRuleController.selected.safetyReport}"  >
 		                   			<p:ajax update="report" />
 	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
+	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
 	                       </p:selectOneMenu>
 	                        <h:outputText style="display:none" id="safetyReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}" />
 	                        &nbsp;&nbsp;
@@ -74,7 +74,7 @@
 	                     <p:selectOneMenu  value="#{pmOrderRuleController.selected.performanceReport}"  >
 	                     		<p:ajax  update="report" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                <f:selectItems value="#{pmOrderRuleController.getTableDefinition()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
                        	</p:selectOneMenu>
                                         <h:outputText style="display:none" id="performanceReport" value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.performanceReport)}"  />
                        	 &nbsp;&nbsp;

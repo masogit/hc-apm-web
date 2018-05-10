@@ -20,7 +20,8 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                             <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicant}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
@@ -29,7 +30,7 @@
                             <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                         </h:panelGroup>   
                         <h:panelGroup>
-                            <label class='label'>虚拟电话网</label>
+                            <label class='label'>虚拟网电话</label>
                             <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
                             <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
@@ -105,7 +106,8 @@
                         <h:panelGroup >
                             <label class='label'>批量输入</label>
                             <h:outputText value="计费开始时间："/>
-                            <p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                            <!--<p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>-->
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                             <h:outputText value="设备接收人："/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
                         </h:panelGroup>
@@ -115,10 +117,8 @@
                             <p:commandButton icon="ui-icon-search"  class="btn btn-sm btn-gray" update="datalistDetail datalistOperation, messages" action="#{sharedAssetRequestV2Controller.getAssetInfo(sharedAssetRequestV2Controller.selected.msgBeginTime,sharedAssetRequestV2Controller.selected.msgAccepter)}" />
                         </h:panelGroup>
                     </p:panelGrid>
-<!--                </p:fieldset>   
 
-                <p:fieldset  legend="借用设备" style="margin-bottom:20px">-->
-                    <p:dataTable id="datalistOperation" value="#{sharedAssetRequestV2Controller.selected.sardList}" 
+                    <p:dataTable id="datalistOperation" value="#{sharedAssetRequestV2Controller.selected.sardList}"
                                  var="item" widgetVar="varDataListdetail"
                         selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSard}"
                         lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
@@ -142,29 +142,19 @@
                             <h:outputText value="已归还" rendered="#{item.state eq '1'}"></h:outputText> 
                         </p:column>-->
                         <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" >
-                            <p:cellEditor>
-                                <f:facet name="output">
-                                    <h:outputText value="#{item.chargingBeginTime}">
-                                       <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
-                                    </h:outputText>
-                                </f:facet>
-                                <f:facet name="input">
-                                    <p:calendar id="bigDate" pattern="yyyy/MM/dd HH:mm" value="#{item.chargingBeginTime}" stepMinute="30"  readonlyInput="true" showButtonPanel="true" navigator="true" style="width:96%" />
-                                </f:facet>
-                            </p:cellEditor>
+                            <f:facet name="filter">
+                                <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                            </f:facet>
+                            <h:outputText value="#{item.chargingBeginTime}">
+                                <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
+                            </h:outputText>
                         </p:column>
-<!--                        <p:column headerText="附件" sortBy="#{item.accessoryList}" filterBy="#{item.accessoryList}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.getSelectedAccessory}"/>
-                        </p:column>-->
                         <p:column headerText="设备接收人" sortBy="#{item.accepter}" >
                             <h:outputText value="#{item.accepter}"/>
                         </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
                         </p:column>
-<!--                        <p:column headerText="编辑">
-                            <p:rowEditor style="float: left;margin-left: 30px;" />
-                        </p:column>-->
                         <p:column headerText="删除">
                             <p:commandButton id="deleteButton"  icon="ui-icon-trash"  actionListener="#{sharedAssetRequestV2Controller.deleteBy(item.id)}"  update=":IouEditForm:datalistDetail,datalistOperation">
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
@@ -184,23 +174,24 @@
                                      update="datalistDetail, datalistOperation, messages ,display , fSet1" value="完成交付" icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 2}"/>
                     
                     <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true"  icon="ui-icon-arrow-back"/>
-                    <script>
-                        function openSwapTypeViewWindow(xhr, status, args) {
-                            var url = args.url;
-                            if (url == "norespond") {
 
-                            } else {
-                                this.location.href = url;
-                            }
-                        }
-
-                    </script>
                 </h:panelGroup>
             </h:form>
                 <ui:include src="EditDetail.xhtml"/>
                 <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
-         </div>  
-        </div> 
+         </div>
+        </div>
+        <script>
+            function openSwapTypeViewWindow(xhr, status, args) {
+                var url = args.url;
+                if (url == "norespond") {
+
+                } else {
+                    this.location.href = url;
+                }
+            }
+
+        </script>
 
     </ui:define>  
 </ui:composition>
