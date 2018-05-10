@@ -48,11 +48,11 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private AssetInfoRepository assetInfoRepository;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
+    private int conentTextLength=120;
     private UploadedFile file;
     private List<CaptureDataMessages> importFailedDataList;
     private String content;
     private AssetInfo assetInfo;
-    private int conentTextLength=120;
     boolean validate=false;
     
     @Override
@@ -70,6 +70,13 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+    	// TODO Auto-generated method stub
+    	super.prepareCreate();
+    	resetValue();
+    }
+    
+    @Override
     public void prepareEdit() {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
@@ -80,6 +87,14 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		this.selected.setIbStatus(assetInfo.getIbStatus());
         	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
     	}
+    }
+    
+    private void resetValue(){
+    	content="";
+    	assetInfo=null;
+    	file=null;
+    	importFailedDataList=null;
+    	validate=false;
     }
 
     @Override
