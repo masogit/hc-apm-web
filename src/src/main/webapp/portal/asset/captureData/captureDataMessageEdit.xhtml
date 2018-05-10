@@ -8,7 +8,7 @@
 		header="小屏消息编辑" styleClass="fullscreen-dialog">
 		<h:form id="captureDataMessagesEditForm" rendered="#{captureDataMessagesController.selected != null}">
 			<p:messages id="messages" autoUpdate="true" closable="false" showDetail="true" for="systemID"></p:messages>
-			<p:growl id="messages2" showDetail="true" for="other" />
+			
 			<div class="ui-g">
 				<div class="ui-g-3">
 					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -39,15 +39,15 @@
 							<!-- <label class="label">序号</label>
 							<p:inputNumber minValue="1" maxValue="99" decimalPlaces="0" value="#{captureDataMessagesController.selected.index}"></p:inputNumber> -->
 							<label class="label">生效日期</label>
-							<p:calendar value="#{captureDataMessagesController.selected.startDate}" pattern="MM/dd/yyyy HH:mm:ss" />
+							<p:calendar value="#{captureDataMessagesController.selected.startDate}" pattern="MM/dd/yyyy HH:mm:ss" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 							<label class="label">截止日期</label>
-							<p:calendar value="#{captureDataMessagesController.selected.endDate}" pattern="MM/dd/yyyy HH:mm:ss" />
+							<p:calendar value="#{captureDataMessagesController.selected.endDate}" pattern="MM/dd/yyyy HH:mm:ss" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
 						</h:panelGroup>
 						<h:panelGroup>
 							<p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{captureDataMessagesController.save}"
-								update=":captureDataMessagesTab:captureDataMessagesEditDlg, :captureDataMessagesTab:captureDataMessagesListForm:datalist, :growl" icon="ui-icon-check"
+								update=":captureDataMessagesEditDlg, :captureDataMessagesListForm:datalist, :captureDataMessagesListForm:growl" icon="ui-icon-check"
 								oncomplete="handleSubmit(args, 'captureDataMessagesEditDialog');" />
-							<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('captureDataMessagesEditDialog').hide()" />
+							<p:commandButton process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('captureDataMessagesEditDialog').hide()" />
 						</h:panelGroup>
 					</p:panelGrid>
 				</div>
