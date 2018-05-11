@@ -87,8 +87,6 @@ public class CaptureDataMessages implements Serializable {
 	@Transient
 	private String otherErrorMessage;
 	
-	@Transient
-	private String tempImageContent;
 
 	@Column(name = "start_date")
 	@Temporal(TemporalType.TIMESTAMP)
@@ -315,14 +313,6 @@ public class CaptureDataMessages implements Serializable {
 
 	public void setIbStatus(Integer ibStatus) {
 		this.ibStatus = ibStatus;
-	}
-
-	public String getTempImageContent() {
-		return tempImageContent;
-	}
-
-	public void setTempImageContent(String tempImageContent) {
-		this.tempImageContent = tempImageContent;
 	}
 
 	@Override

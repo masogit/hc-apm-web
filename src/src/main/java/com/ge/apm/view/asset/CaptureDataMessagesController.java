@@ -48,10 +48,12 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private AssetInfoRepository assetInfoRepository;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
+    private String content;
     private int conentTextLength=120;
     private UploadedFile file;
+    private String fileName;
     private List<CaptureDataMessages> importFailedDataList;
-    private String content;
+    private String tempImageContent;
     private AssetInfo assetInfo;
     boolean validate=false;
     
@@ -91,9 +93,10 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     private void resetValue(){
-    	content="";
     	assetInfo=null;
     	file=null;
+    	fileName=null;
+    	tempImageContent=null;
     	importFailedDataList=null;
     	validate=false;
     }
@@ -143,6 +146,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     public void checkSystemId(){
+    	System.out.println("xxx checkSystemId");
     	String systemId=this.selected.getSystemId();
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
@@ -173,6 +177,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 
     @Override
     public void save() {
+    	System.out.println("xxx save");
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
@@ -207,6 +212,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		}
     	}
     	this.selected=null;
+    	System.out.println("xxx save end");
     }
     
     public boolean validateRequiredField(){
@@ -263,11 +269,11 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     
     public void handleImageUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
-        
+        fileName=null;
         if(file==null || file.getInputstream()==null){
         	FacesMessage message = new FacesMessage("注意！解析图片失败！");
             FacesContext.getCurrentInstance().addMessage("other", message);
-            this.selected.setTempImageContent(null);
+            tempImageContent=null;
             return;
         }
         else{
@@ -278,43 +284,27 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         	else{
         		FacesMessage message = new FacesMessage("注意！请上传jpg或者png格式的图片！");
                 FacesContext.getCurrentInstance().addMessage("other", message);
-                this.selected.setTempImageContent(null);
+                tempImageContent=null;
                 return;
         	}
         	if(file.getInputstream().available()>5242880){
         		FacesMessage message = new FacesMessage("注意！请上传大小不超过5M的图片！");
                 FacesContext.getCurrentInstance().addMessage("other", message);
-                this.selected.setTempImageContent(null);
+                tempImageContent=null;
                 return;
         	}
         	String imageString=ImageUtils.getBase64(file.getInputstream());
         	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
-        	this.selected.setTempImageContent(imageString);
+        	tempImageContent=imageString;
+        	setFileName(file.getFileName());
         	FacesMessage message = new FacesMessage("图片上传成功！");
             FacesContext.getCurrentInstance().addMessage("other", message);
         }
     }
     
     public void insertImage(){
-    	String temp=this.selected.getTempImageContent();
-    	if(StringUtils.isNotEmpty(temp)){
-    		this.selected.setContent(this.selected.getContent()+temp);
-    	}
-    }
-    
-    public void upload() throws IOException, ParseException{
-    	if(file!=null){
-    		String imageString=ImageUtils.getBase64(file.getInputstream());
-    		if(imageString==null){
-            	FacesMessage message = new FacesMessage("注意！解析图片失败！");
-                FacesContext.getCurrentInstance().addMessage("other", message);
-            }
-            else{
-            	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
-            	this.selected.setTempImageContent(imageString);
-            	FacesMessage message = new FacesMessage("图片上传成功！");
-                FacesContext.getCurrentInstance().addMessage("other", message);
-            }
+    	if(StringUtils.isNotEmpty(tempImageContent)){
+    		this.selected.setContent(this.selected.getContent()+tempImageContent);
     	}
     }
     
@@ -326,6 +316,22 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         this.file = file;
     }
 
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getTempImageContent() {
+		return tempImageContent;
+	}
+
+	public void setTempImageContent(String tempImageContent) {
+		this.tempImageContent = tempImageContent;
+	}
+
 	public List<CaptureDataMessages> getImportFailedDataList() {
 		return importFailedDataList;
 	}
@@ -333,7 +339,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 	public void setImportFailedDataList(List<CaptureDataMessages> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
-	
 	public void setContent(String id){
 		content=dao.getContentById(id);
 	}
