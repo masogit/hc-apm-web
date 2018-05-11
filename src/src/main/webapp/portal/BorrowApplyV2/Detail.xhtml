@@ -550,7 +550,7 @@
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoController.selected.qrCode}">
                         <!--<p:barcode value="#{assetInfoController.selected.qrCode}" type="qr" height="200" format="png"/>-->
-                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode)}" />
+                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode,assetInfoController.selected.siteUID)}" />
                     </p:tab>
                 </p:tabView>
             </h:form>
