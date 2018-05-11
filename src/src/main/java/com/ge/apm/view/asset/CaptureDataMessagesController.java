@@ -80,6 +80,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     public void prepareEdit() {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
+    	resetValue();
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
     	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
@@ -175,6 +176,12 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
+    	if(!validateRequiredField()){
+    		this.selected=null;
+    		FacesMessage message = new FacesMessage("注意！保存失败");
+            FacesContext.getCurrentInstance().addMessage("other", message);
+    		return;
+    	}
     	if(this.selected.getType()==0){
     		if(validate){
     			setIndexValue();
@@ -200,6 +207,29 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		}
     	}
     	this.selected=null;
+    }
+    
+    public boolean validateRequiredField(){
+    	if(this.selected.getType()==0){
+    		if(this.selected.getSystemId()==null){
+    			return false;
+    		}
+    		if(this.selected.getGeDeviceType()==null){
+    			return false;
+    		}
+    		if(this.selected.getIbStatus()==null){
+    			return false;
+    		}
+    	}
+    	else if(this.selected.getType()==1){
+    		if(this.selected.getGeDeviceType()==null){
+    			return false;
+    		}
+    	}
+    	if(StringUtils.isEmpty(this.selected.getContent())){
+    		return false;
+    	}
+    	return true;
     }
     
     private void setIndexValue(){
