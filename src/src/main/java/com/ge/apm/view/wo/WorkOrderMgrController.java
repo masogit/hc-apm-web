@@ -433,7 +433,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
-        return woService.getPicListBySrUid(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
+        return woService.getPicListBySrUid(srId).stream().filter(item -> type == 1 ^ (item.getObjectType()!=null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
