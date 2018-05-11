@@ -515,7 +515,7 @@ public class QrCodeService {
         if(null == qrCodeLib){
             return true;
         }
-        if (qrCodeLib.getStatus() != 1 || qrCodeLib.getStatus() != 2) {
+        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
             return false;
         }
         List<AssetInfo> assetList = assetDao.findByQrCodeAndSiteUID(qrCode, siteUid);
