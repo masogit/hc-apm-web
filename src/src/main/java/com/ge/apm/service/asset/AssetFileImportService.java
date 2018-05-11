@@ -94,7 +94,10 @@ public class AssetFileImportService {
 
     private OrgInfo selectedOrgToImport;
 
-    boolean isAssetCodeMerged;
+//    boolean isAssetCodeMerged;
+    private String assetCodeConfig;
+    private static final String ASSET_CODE_MERGE_THREE = "DFQ";
+    private static final String ASSET_CODE_MERGE_TWO = "DF";
     boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
@@ -535,7 +538,7 @@ public class AssetFileImportService {
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
 
-                if (isAssetCodeMerged) {
+                if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                     String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
                     if (!"Normal".equals(qrCodeStatus)) {
                         item.put("status", ImportStatus.Failure);
@@ -847,7 +850,7 @@ public class AssetFileImportService {
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
-            if (isAssetCodeMerged && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+            if ((ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
                 if (newAsset.getDepartNum().length() > 16) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
@@ -861,7 +864,11 @@ public class AssetFileImportService {
                     AssetRow.addErrMessage(item, "错误: 资产编码与设备编码不相同不允许导入");
                 } else {
                     newAsset.setFinancingNum(newAsset.getDepartNum());
-                    newAsset.setQrCode(newAsset.getDepartNum());
+
+                    if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                        newAsset.setQrCode(newAsset.getDepartNum());
+                    }
+
                 }
 
 
@@ -971,21 +978,21 @@ public class AssetFileImportService {
     /**
      * 检查是否配置三码合一
      */
-    private boolean isAssetCodeMergeConfigured() {
-
-        WorkflowConfig config = configService.findConfigBySite(selectedOrgToImport.getUid());
-        if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
+//    private boolean isAssetCodeMergeConfigured() {
+//
+//        WorkflowConfig config = configService.findConfigBySite(selectedOrgToImport.getUid());
+//        if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//
+//    }
 
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
 
-        isAssetCodeMerged = isAssetCodeMergeConfigured();
+//        isAssetCodeMerged = isAssetCodeMergeConfigured();
 
         WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
         if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
@@ -993,6 +1000,10 @@ public class AssetFileImportService {
                 autoGenerateFinancingNum = true;
             }
 
+        }
+
+        if (siteConfig != null) {
+            assetCodeConfig = siteConfig.getAssetCodeConfig();
         }
     }
 
