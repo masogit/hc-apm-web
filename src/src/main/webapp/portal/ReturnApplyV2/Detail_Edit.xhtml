@@ -23,13 +23,13 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">设备在借数*</label>
-                            <p:inputText id="broQty" value="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId)}"   readonly="true"/>
+                            <p:inputText id="broQty" value="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"   readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">归还申请数*</label>
                             <!--<p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
                             <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
-                                           decimalPlaces="0" minValue="0" maxValue="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId)}"/>
+                                           decimalPlaces="0" minValue="0" maxValue="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                         </h:panelGroup>

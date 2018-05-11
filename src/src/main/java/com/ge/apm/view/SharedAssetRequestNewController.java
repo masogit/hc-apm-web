@@ -495,9 +495,9 @@ public class SharedAssetRequestNewController extends GenericCRUDUUIDController<S
         cal.setTime(beginTime);
         cal.set(Calendar.SECOND,0);
         int minutes = cal.get(Calendar.MINUTE);
-        if (minutes>=0 && minutes <=30){
+        if (minutes>0 && minutes <=30){
             cal.set(Calendar.MINUTE,30);
-        }else {
+        }else if(minutes >30) {
             cal.set(Calendar.MINUTE,0);
             cal.add(Calendar.HOUR,1);
         }

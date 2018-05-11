@@ -95,7 +95,7 @@
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
-                        <h:outputText value="#{sharedAssetRequestV2Controller.getSwapQty2(item.sharedAssetTypeId)}"/>
+                        <h:outputText value="#{sharedAssetRequestV2Controller.getSwapQty2(item.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                     </p:column>
                     <p:column headerText="申请归还数" sortBy="#{item.applyQty}" >
                         <h:outputText value="#{item.applyQty}"/>
