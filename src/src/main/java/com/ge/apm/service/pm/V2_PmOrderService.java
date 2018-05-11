@@ -109,7 +109,7 @@ public class V2_PmOrderService {
     }
 
     public List<UnstructuredDataCollection> getReportList(String boUid) {
-        return reportDao.findByBoUuid(boUid);
+        return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();

@@ -307,6 +307,9 @@ public class CaptureDataMessages implements Serializable {
 	}
 
 	public Integer getIbStatus() {
+		if(ibStatus==null){
+			ibStatus=0;
+		}
 		return this.ibStatus;
 	}
 

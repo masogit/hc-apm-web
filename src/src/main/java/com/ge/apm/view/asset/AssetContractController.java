@@ -106,7 +106,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, Arrays.asList("1","2","3")));
+            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, Arrays.asList(1,2,3)));
         }
         
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
