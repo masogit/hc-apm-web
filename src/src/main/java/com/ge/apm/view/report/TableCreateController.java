@@ -71,7 +71,7 @@ public class TableCreateController extends TieWebSheetBean {
             CreateTemplate();
             table = new TableSchema();
         } else {
-            selectedTableDefinition = templateService.getTemplateById(templateId);
+            selectedTableDefinition = templateService.getReleasedTemplateById(templateId);
             table = JSONObject.parseObject(selectedTableDefinition.getSchema(), TableSchema.class);
             if (Strings.isNullOrEmpty(table.getSchemaId())) {
                 table.setSchemaId(selectedTableDefinition.getId());
@@ -136,40 +136,10 @@ public class TableCreateController extends TieWebSheetBean {
                 templateDao.save(selectedTableDefinition);
                 WebUtil.addSuccessMessage("JSON已保存");
             } else {
+                selectedTableDefinition = templateService.updateJSONTemplate(selectedTableDefinition, tableString);
                 WebUtil.addErrorMessage("字段有变动,JSON不能保存");
             }
 
-        }
-
-        //for excel
-        if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
-            //新建
-            if (uploadedFile != null) {
-//                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
-                if (null != uploadedFileObject) {
-                    uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
-                    uploadedFileObject.setBoSubType("Excel");
-                    selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
-                    if(Strings.isNullOrEmpty(selectedTableDefinition.getId())){
-                        selectedTableDefinition = templateDao.save(selectedTableDefinition);
-                    }
-                    uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
-                    selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
-                    blobService.saveBlobObject(uploadedFileObject);
-                    templateDao.save(selectedTableDefinition);
-                    WebUtil.addSuccessMessage("Excel已保存");
-                }
-            }
-        } else {
-            //修改
-            if (uploadedFile != null) {
-                //Eexcel 模版有变动
-                templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
-                WebUtil.addSuccessMessage("Excel已保存");
-            } else {
-                selectedTableDefinition = templateDao.save(selectedTableDefinition);
-                WebUtil.addSuccessMessage("Excel已保存");
-            }
         }
 
     }
@@ -361,6 +331,35 @@ public class TableCreateController extends TieWebSheetBean {
             StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
             table.setTitle(uploadedFileObject.getObjectName().indexOf(".")>0? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")):uploadedFileObject.getObjectName());
             loadWebSheetByStream(savedFile.getStream());
+            saveExcelTable();
+        }
+    }
+    
+    private void saveExcelTable(){
+        //for excel
+        if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
+            //新建
+//                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
+                if (null != uploadedFileObject) {
+                    uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                    uploadedFileObject.setBoSubType("Excel");
+                    selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
+                    if(Strings.isNullOrEmpty(selectedTableDefinition.getId())){
+                        selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    }
+                    uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
+                    selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
+                    blobService.saveBlobObject(uploadedFileObject);
+                    templateDao.save(selectedTableDefinition);
+                    WebUtil.addSuccessMessage("Excel已保存");
+                }
+        } else {
+            //修改
+            if (uploadedFile != null) {
+                //Eexcel 模版有变动
+                selectedTableDefinition =templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
+                WebUtil.addSuccessMessage("Excel已保存");
+            } 
         }
     }
 

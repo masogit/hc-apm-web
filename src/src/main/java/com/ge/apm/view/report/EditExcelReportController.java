@@ -5,7 +5,6 @@
  */
 package com.ge.apm.view.report;
 
-import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
@@ -31,8 +30,6 @@ public class EditExcelReportController extends TieWebSheetBean {
 
     private TableDefinitionService tableService;
 
-    private UnstructuredDataCollectionRepository udcDao;
-
     private Map<String, Object> tableValue;
 
     private UnstructuredDataCollection report;
@@ -46,7 +43,6 @@ public class EditExcelReportController extends TieWebSheetBean {
     @Override
     public void initialLoad() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
-        udcDao = WebUtil.getBean(UnstructuredDataCollectionRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         String reportId = WebUtil.getRequestParameter("reportId");
         report = tableService.getReportById(reportId);

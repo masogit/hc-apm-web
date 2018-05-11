@@ -22,4 +22,6 @@ public interface UnstructuredDataRepository extends GenericRepositoryUUID<Unstru
 	@Modifying
 	@Query(value = "update unstructured_data  set value = ?2 where id = ?1",nativeQuery =true)
 	public void updateUnData(String id,String value);
+        
+        public List<UnstructuredData> findByCollectionId(String collectionId);
 }
