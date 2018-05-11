@@ -124,6 +124,9 @@ public class V2_WorkOrderService {
     public List<UserAccount> getWorkerList(Integer assetId) {
         return ucService.getWorkerList(assetId);
     }
+    public List<UserAccount> getApproverListByAsset(String assetUid) {
+        return ucService.getApproveList(assetUid);
+    }
 
     public AssetInfo getAssetInfo(Integer assetId) {
         return assetDao.findById(assetId);
@@ -246,13 +249,14 @@ public class V2_WorkOrderService {
         }
     }
 
-    public void submitWorkOrder(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> accessoryList, String comment) {
+    public void submitWorkOrder(V2_WorkOrder selectedWorkOrder, List<V2_WorkOrder_Detail> accessoryList, String comment,String approverUid) {
         selectedWorkOrder.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         String token = UserContextService.getAccessToken();
         WorkOrderActionForm formData = new WorkOrderActionForm();
         formData.setDesc(comment);
         formData.setCurrentStepId(selectedWorkOrder.getCurrentStepId());
         formData.setStepDetail(accessoryList);
+        formData.setAssigneeId(approverUid);
         String res = srApi.invokeWorkOrderAction(token, formData, "approval", selectedWorkOrder.getId());
         if (res == null || !res.contains("success")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"), "提交");
