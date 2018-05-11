@@ -14,6 +14,7 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.service.asset.AssetInfoService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.text.MessageFormat;
@@ -41,20 +42,21 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
     
     AssetInfo selectedAsset;
 
-    private BlobFileService blobService;
+    BlobFileService blobService;
 
-    private UaaService uaaService;
+    UaaService uaaService;
     
-    private AssetInfoService assetService;
+    AssetInfoService assetService;
 
-    private String fileName;
+    String fileName;
 
-    private Integer pmCount;
+    Integer pmCount;
     
-    private V2_BlobObject blobObject;
+    V2_BlobObject blobObject;
 
-    private AssetInfoRepository assetInfoDao;
+    AssetInfoRepository assetInfoDao;
 
+    List<Integer>  contractType;
     @Override
     protected void init() {
 
@@ -86,7 +88,8 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
         this.filterBySite = false;
 
-        this.setSiteFilter();
+//        this.setSiteFilter();
+        contractType = Arrays.asList(1,2,3);
     }
 
     @Override
@@ -106,7 +109,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, Arrays.asList(1,2,3)));
+            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractType));
         }
         
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
@@ -317,4 +320,11 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
     public void setBlobObject(V2_BlobObject blobObject) {
         this.blobObject = blobObject;
     }
+
+    public List<I18nMessage> getContractTypeList(){
+        return FieldValueMessageController.doGetFieldValueList("contractType", -1).stream()
+                .filter(item -> contractType.contains(Integer.parseInt(item.getMsgKey()))).collect(Collectors.toList());
+    }
+    
+    
 }
