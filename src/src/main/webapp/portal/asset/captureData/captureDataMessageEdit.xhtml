@@ -20,7 +20,7 @@
 								<f:selectItem itemLabel="单个设备" itemValue="0"></f:selectItem>
 								<f:selectItem itemLabel="设备类型" itemValue="1"></f:selectItem>
 							</p:selectOneRadio>
-							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID</label>
+							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID*</label>
 								<p:inputText value="#{captureDataMessagesController.selected.systemId}" required="#{captureDataMessagesController.selected.type==0?true:false}" requiredMessage="请输入SystemID">
 									<p:ajax update="@this:idIbStatus,@this:idGeDeviceType" event="blur" listener="#{captureDataMessagesController.checkSystemId()}"/>
 								</p:inputText> <label class="label">是否GE IB</label> <p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
@@ -28,7 +28,7 @@
 									<f:selectItem itemLabel="是" itemValue="1" />
 								</p:selectOneMenu>
 							</span>
-							<label class="label">设备类型</label>
+							<label class="label">设备类型*</label>
 							<p:selectOneMenu id="idGeDeviceType" value="#{captureDataMessagesController.selected.geDeviceType}" required="#{captureDataMessagesController.selected.type==1?true:false}" requiredMessage="请选择设备类型">
 								<f:selectItem itemLabel="#{msg.selectOneMessage}" />
 								<f:selectItems value="#{fieldMsg.getFieldValueList('geDeviceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
@@ -63,7 +63,7 @@
 							<h:outputText id="imageName" value="#{captureDataMessagesController.fileName}"></h:outputText>
 						</div>
 						<p:inputText id="imageTextTempContent" value="#{captureDataMessagesController.tempImageContent}" style="display:none;" />
-						<label class="label">消息内容</label>
+						<label class="label">消息内容*</label>
 						<span id="idContentEditorMessage" class="ui-messages-warn" style="display: none;"></span>
 						<p:editor id="idContentEditor" value="#{captureDataMessagesController.selected.content}" required="true" requiredMessage="请输入消息内容">
 						</p:editor>
