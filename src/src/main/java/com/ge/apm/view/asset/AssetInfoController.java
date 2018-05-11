@@ -1832,6 +1832,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
+        List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+
+
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         if (!assetUids.isEmpty()) {
             assetList = assetList.stream().filter(assetInfo -> {
@@ -1843,7 +1846,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }).collect(Collectors.toList());
         }
 
-        ExcelDocument doc = importService.exportAsset(assetList, orgList, allColumns);
+        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
         streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
