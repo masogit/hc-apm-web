@@ -48,11 +48,11 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private AssetInfoRepository assetInfoRepository;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
+    private int conentTextLength=120;
     private UploadedFile file;
     private List<CaptureDataMessages> importFailedDataList;
     private String content;
     private AssetInfo assetInfo;
-    private int conentTextLength=120;
     boolean validate=false;
     
     @Override
@@ -70,9 +70,17 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+    	// TODO Auto-generated method stub
+    	super.prepareCreate();
+    	resetValue();
+    }
+    
+    @Override
     public void prepareEdit() {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
+    	resetValue();
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
     	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
@@ -80,6 +88,14 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		this.selected.setIbStatus(assetInfo.getIbStatus());
         	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
     	}
+    }
+    
+    private void resetValue(){
+    	content="";
+    	assetInfo=null;
+    	file=null;
+    	importFailedDataList=null;
+    	validate=false;
     }
 
     @Override
@@ -160,6 +176,12 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
+    	if(!validateRequiredField()){
+    		this.selected=null;
+    		FacesMessage message = new FacesMessage("注意！保存失败");
+            FacesContext.getCurrentInstance().addMessage("other", message);
+    		return;
+    	}
     	if(this.selected.getType()==0){
     		if(validate){
     			setIndexValue();
@@ -185,6 +207,29 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		}
     	}
     	this.selected=null;
+    }
+    
+    public boolean validateRequiredField(){
+    	if(this.selected.getType()==0){
+    		if(this.selected.getSystemId()==null){
+    			return false;
+    		}
+    		if(this.selected.getGeDeviceType()==null){
+    			return false;
+    		}
+    		if(this.selected.getIbStatus()==null){
+    			return false;
+    		}
+    	}
+    	else if(this.selected.getType()==1){
+    		if(this.selected.getGeDeviceType()==null){
+    			return false;
+    		}
+    	}
+    	if(StringUtils.isEmpty(this.selected.getContent())){
+    		return false;
+    	}
+    	return true;
     }
     
     private void setIndexValue(){
