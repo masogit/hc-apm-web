@@ -24,7 +24,6 @@
 									<p:ajax event="blur" update="@this:idIbStatus, @this:idGeDeviceType" listener="#{captureDataMessagesController.checkSystemId()}"
 										process="@this,@parent:idDeviceType" />
 								</p:inputText> <label class="label">是否GE IB</label> <p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
-									<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}" />
 									<f:selectItem itemLabel="否" itemValue="0" />
 									<f:selectItem itemLabel="是" itemValue="1" />
 								</p:selectOneMenu>
