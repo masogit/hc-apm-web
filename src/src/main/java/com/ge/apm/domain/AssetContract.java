@@ -64,7 +64,7 @@ public class AssetContract implements Serializable {
     private Integer hospitalId;
 
     @Column(name = "contract_type")
-    private String contractType;
+    private  Integer contractType;
     
     
     @Basic(optional = true)
@@ -195,11 +195,11 @@ public class AssetContract implements Serializable {
         this.contractAmount = contractAmount;
     }
 
-    public String getContractType() {
+    public Integer getContractType() {
         return contractType;
     }
 
-    public void setContractType(String contractType) {
+    public void setContractType(Integer contractType) {
         this.contractType = contractType;
     }
 
