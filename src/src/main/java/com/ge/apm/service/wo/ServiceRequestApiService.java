@@ -216,7 +216,7 @@ class ServiceRequestForm {
 class WorkOrderActionForm {
 
     String serviceRequestId;
-    String strDate;
+    String  strDate;
     String desc;
     String estimatedCloseTime;
     String assigneeId;
@@ -237,9 +237,17 @@ class WorkOrderActionForm {
     String equipmentTaker;
     String takeTime;
     Integer repairType;
+    String repairResult;
     Double externalExpense;
     List<V2_BlobObject> attachments;
 
+    public String getRepairResult() {
+        return repairResult;
+    }
+
+    public void setRepairResult(String repairResult) {
+        this.repairResult = repairResult;
+    }
 
     public String getServiceRequestId() {
         return serviceRequestId;
