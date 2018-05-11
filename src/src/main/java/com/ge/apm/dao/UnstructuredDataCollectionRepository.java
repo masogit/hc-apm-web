@@ -27,4 +27,7 @@ public interface UnstructuredDataCollectionRepository extends GenericRepositoryU
     public UnstructuredDataCollection findByUid(String id);
 
 
+    @Query(value = "select * from unstructured_data_collection where bo_uuid=?1 and bo_type != 'pm-checklist-report' ",nativeQuery = true)
+    public List<UnstructuredDataCollection> findByBoUuidNoPMCheckList(String boUuid);
+
 }
