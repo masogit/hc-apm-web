@@ -145,7 +145,7 @@ public class SharedAssetReqTypeController extends GenericCRUDUUIDController<Shar
         }else{
             List<AssetInfo> objectList = new ArrayList<AssetInfo>();
             UserAccount user = UserContextService.getCurrentUserAccount();
-            objectList = typeDao.findbyBorrowQty(user.getSiteUID(),user.getOrgInfoUID(),Uid);
+            objectList = typeDao.findbyBorrowQty(user.getOrgInfoUID(),Uid);
             return objectList.size();
         }
     }

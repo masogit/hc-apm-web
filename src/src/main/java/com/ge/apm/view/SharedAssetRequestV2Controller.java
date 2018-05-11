@@ -519,7 +519,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     SharedAssetType swapTypeVo = swapDao.findById(swaptypeid);
 
                                     //时间往前推
-                                    if ("小时(半点/整点)".equals(swapTypeVo.getChargingType())){
+                                    if ("2".equals(swapTypeVo.getChargingType())){
                                         sard.setChargingEndTime(this.setEndTime(times));
                                     }else {
                                         sard.setChargingEndTime(times);
@@ -692,9 +692,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         cal.setTime(date);
         cal.set(Calendar.SECOND,0);
         int minutes = cal.get(Calendar.MINUTE);
-        if (minutes>=0 && minutes <=30){
+        if (minutes>0 && minutes <=30){
             cal.set(Calendar.MINUTE,30);
-        }else {
+        }else if (minutes > 30){
             cal.set(Calendar.MINUTE,0);
             cal.add(Calendar.HOUR,1);
         }
@@ -798,7 +798,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                         assetDetaiVo.setAccepter(accepter);
                                     }
                                     //时间往后推
-                                    if ("小时(半点/整点)".equals(swapTypeVo.getChargingType())){
+                                    if ("2".equals(swapTypeVo.getChargingType())){
                                         assetDetaiVo.setChargingBeginTime(this.setBeginTime(times));
                                     }else {
                                         assetDetaiVo.setChargingBeginTime(times);
@@ -1312,13 +1312,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
     }
 
-    public int getSwapQty2(String Uid){
+    public int getSwapQty2(String Uid,String clinicalDeptUID){
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
             List<AssetInfo> objectList = new ArrayList<AssetInfo>();
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            objectList = swapDao.findbyBorrowQty(user.getSiteUID(),user.getOrgInfoUID(),Uid);
+            objectList = swapDao.findbyBorrowQty(clinicalDeptUID,Uid);
           
             return objectList.size();
         }
@@ -1330,7 +1329,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }else{
             List<AssetInfo> objectList = new ArrayList<AssetInfo>();
             UserAccount user = UserContextService.getCurrentUserAccount();
-            objectList = swapDao.findbyBorrowQty(user.getSiteUID(),user.getOrgInfoUID(),Uid);
+            objectList = swapDao.findbyBorrowQty(user.getOrgInfoUID(),Uid);
 
             return objectList.size();
         }
