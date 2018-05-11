@@ -16,13 +16,13 @@
 							<label class="label">配置级别</label>
 							<p:selectOneRadio id="idDeviceType" value="#{captureDataMessagesController.selected.type}" required="true" requiredMessage="请选择配置级别"
 								onclick="CaptureDataMessageJS.showHide(this);">
+								<p:ajax update="@this"></p:ajax>
 								<f:selectItem itemLabel="单个设备" itemValue="0"></f:selectItem>
 								<f:selectItem itemLabel="设备类型" itemValue="1"></f:selectItem>
 							</p:selectOneRadio>
 							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID</label>
 								<p:inputText value="#{captureDataMessagesController.selected.systemId}" required="#{captureDataMessagesController.selected.type==0?true:false}" requiredMessage="请输入SystemID">
-									<p:ajax event="blur" update="@this:idIbStatus, @this:idGeDeviceType" listener="#{captureDataMessagesController.checkSystemId()}"
-										process="@this,@parent:idDeviceType" />
+									<p:ajax update="@this:idIbStatus,@this:idGeDeviceType" event="blur" listener="#{captureDataMessagesController.checkSystemId()}"/>
 								</p:inputText> <label class="label">是否GE IB</label> <p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
 									<f:selectItem itemLabel="否" itemValue="0" />
 									<f:selectItem itemLabel="是" itemValue="1" />
@@ -44,7 +44,7 @@
 						</h:panelGroup>
 						<h:panelGroup>
 							<p:commandButton validateClient="false" value="#{msg.Save}" actionListener="#{captureDataMessagesController.save}"
-								update=":captureDataMessagesEditDlg, :captureDataMessagesListForm:datalist, :captureDataMessagesListForm:growl" icon="ui-icon-check"
+								update="@parent, :captureDataMessagesListForm:datalist, :captureDataMessagesListForm:growl" icon="ui-icon-check"
 								oncomplete="handleSubmit(args, 'captureDataMessagesEditDialog');"/>
 							<p:commandButton process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('captureDataMessagesEditDialog').hide()" />
 						</h:panelGroup>
@@ -55,13 +55,14 @@
 						<div class="ui-g">
 							<button type="button" onclick="CaptureDataMessageJS.triggerUpload()" class="ui-button ui-widget ui-state-default ui-corner-all ui-button-text-only">上传图片</button>
 							<p:fileUpload fileUploadListener="#{captureDataMessagesController.handleImageUpload}" mode="advanced" dragDropSupport="false" style="display:none"
-								multiple="false" auto="true" update="@this:imageTextTempContent,@this:insertImageButton" label="上传图片" />
+								multiple="false" auto="true" update="@this:imageTextTempContent,@this:insertImageButton,@this:imageName" label="上传图片" />
 							<!-- <p:fileUpload id="simpleUploadImage" label="选择图片" mode="simple" skinSimple="true" value="#{captureDataMessagesController.file}"/>
 						<p:commandButton value="上传图片" ajax="true" actionListener="#{captureDataMessagesController.upload()}" partialSubmit="true" process="simpleUploadImage"/> -->
 							<p:commandButton id="insertImageButton" value="插入图片" onclick="CaptureDataMessageJS.setImageTextTempContent()"
-								disabled="#{empty captureDataMessagesController.selected.tempImageContent}" />
+								disabled="#{empty captureDataMessagesController.tempImageContent}" />
+							<h:outputText id="imageName" value="#{captureDataMessagesController.fileName}"></h:outputText>
 						</div>
-						<p:inputText id="imageTextTempContent" value="#{captureDataMessagesController.selected.tempImageContent}" style="display:none;" />
+						<p:inputText id="imageTextTempContent" value="#{captureDataMessagesController.tempImageContent}" style="display:none;" />
 						<label class="label">消息内容</label>
 						<span id="idContentEditorMessage" class="ui-messages-warn" style="display: none;"></span>
 						<p:editor id="idContentEditor" value="#{captureDataMessagesController.selected.content}" required="true" requiredMessage="请输入消息内容">
