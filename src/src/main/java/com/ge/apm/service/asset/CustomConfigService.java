@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.CustomConfigRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.SysRoleRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
@@ -41,6 +42,8 @@ public class CustomConfigService {
     ConfigService configService;
     @Autowired
     UaaService uaaService;
+    @Autowired
+    SysRoleRepository sysRoleDao;
 
     static public LinkedHashMap<String, String> getAllFields() {
         LinkedHashMap<String, String> res = new LinkedHashMap();
@@ -106,8 +109,7 @@ public class CustomConfigService {
     }
     
     public List<SysRole> getConfigRoles(){
-        return uaaService.getSysRoles().stream().filter(item -> 
-                "HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff".contains(item.getName())).collect(Collectors.toList());
+        return sysRoleDao.getByNameIn(Arrays.asList("HospitalHead","AssetHead","DeptHead","AssetStaff","ClinicalStaff"));
     }
 
     public CustomConfig getCustomConfigBySite(String siteUID){

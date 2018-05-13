@@ -15,16 +15,16 @@ import java.util.Map;
  * @author 212579464
  */
 public class CustomConfigObject {
-    Map<String,CustomConfigAssetField> AssetFields;
+    Map<String,CustomConfigAssetField> assetFields;
 
     List<String> assetsListPageFields;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
-        return AssetFields;
+        return assetFields;
     }
 
-    public void setAssetFields(Map<String, CustomConfigAssetField> AssetFields) {
-        this.AssetFields = AssetFields;
+    public void setAssetFields(Map<String, CustomConfigAssetField> assetFields) {
+        this.assetFields = assetFields;
     }
 
     public List<String> getAssetsListPageFields() {
