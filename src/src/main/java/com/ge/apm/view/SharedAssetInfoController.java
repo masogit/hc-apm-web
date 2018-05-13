@@ -60,7 +60,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         wfcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
-        deptids = wfcDao.findDeptForSharedAsset();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
         this.selectedMap = new HashMap();
 
     }
@@ -78,12 +79,16 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         setUserSearchFilters();
 
+        //1、使用科室：调剂中心  所属科室：空
         searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
+        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IsNull,null));
 
         if (queryIndex == 1){
+            //2、使用科室：任意科室  所属科室：调剂中心
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.IsNotNull,null));
-        }else if (queryIndex == 2){
-            this.removeFilterOnField("sharedAssetTypeUid");
+            this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IN,deptids));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IsNotNull,null));
         }
 
         if (filterSatId != null && !filterSatId.equals("")){

@@ -64,13 +64,26 @@ public class AssetContract implements Serializable {
     private Integer hospitalId;
 
     @Column(name = "contract_type")
-    private Integer contractType;
+    private  Integer contractType;
     
     
     @Basic(optional = true)
     @Column(name = "object_id")
     private String objectId;
 
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
+    private String tenantUID;
+
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
+    private String institutionUID;
+
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
+    private String hospitalUID;
+
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
+    private String siteUID;
+    
+    
     @JoinColumn(insertable=false,updatable=false, name = "asset_id", referencedColumnName = "id")
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
@@ -198,6 +211,38 @@ public class AssetContract implements Serializable {
         this.objectId = objectId;
     }
 
+    public String getTenantUID() {
+        return tenantUID;
+    }
+
+    public void setTenantUID(String tenantUID) {
+        this.tenantUID = tenantUID;
+    }
+
+    public String getInstitutionUID() {
+        return institutionUID;
+    }
+
+    public void setInstitutionUID(String institutionUID) {
+        this.institutionUID = institutionUID;
+    }
+
+    public String getHospitalUID() {
+        return hospitalUID;
+    }
+
+    public void setHospitalUID(String hospitalUID) {
+        this.hospitalUID = hospitalUID;
+    }
+
+    public String getSiteUID() {
+        return siteUID;
+    }
+
+    public void setSiteUID(String siteUID) {
+        this.siteUID = siteUID;
+    }
+    
     public AssetInfo getAssetInfo() {
         return assetInfo;
     }

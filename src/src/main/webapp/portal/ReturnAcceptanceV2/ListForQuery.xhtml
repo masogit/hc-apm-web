@@ -98,14 +98,22 @@
                             </f:facet>
                             <h:outputText value="#{item.unitPrice}"/>
                         </p:column>
-                        <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.chargingType}"/>
+                        <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('chargingType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="费用" sortBy="#{item.cost}">
                             <f:facet name="filter">
                                 <p:inputText id="filterCost" widgetVar="varFilterCost" value="#{sharedAssetReqDetailForQueryController.filterCost}"/>
                             </f:facet>
-                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}"/>
+                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}">
+                                <!--<f:convertNumber pattern="0.00"/>-->
+                            </h:outputText>
                             <h:outputText value="" rendered="#{item.chargingEndTime eq null}"/>
                         </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">

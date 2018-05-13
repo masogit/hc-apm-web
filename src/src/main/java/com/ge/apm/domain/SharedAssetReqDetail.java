@@ -76,7 +76,7 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "count_qty")
     private Integer countQty;//计费数量
     
-    @Column(name = "cost")
+    @Column(name = "cost",columnDefinition = "decimal(11,2)")
     private Double cost;//费用
     
     @Column(name = "accepter")

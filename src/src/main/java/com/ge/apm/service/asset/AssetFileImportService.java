@@ -94,7 +94,9 @@ public class AssetFileImportService {
 
     private OrgInfo selectedOrgToImport;
 
-    boolean isAssetCodeMerged;
+    private String assetCodeConfig;
+    private static final String ASSET_CODE_MERGE_THREE = "DFQ";
+    private static final String ASSET_CODE_MERGE_TWO = "DF";
     boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
@@ -184,17 +186,10 @@ public class AssetFileImportService {
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
                 }
-//                asset.setName(assetName);
-
-//                String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
-//                asset.setDepartNum(departNum);
-
 
                 //keep the new finance num to prevent lose its data to use later
                 String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
                 map.put(NEW_FINANCE_NUM_KEY, financingNum);
-
-
 
                 //load asset if it is already existed in db, then update the record
                 List<AssetInfo> assetList = getAssetInfos(asset);
@@ -524,6 +519,7 @@ public class AssetFileImportService {
                 } else {
                     item.put("status", ImportStatus.Failure);
                     AssetRow.addErrMessage(item, financingNum);
+                    return;
                 }
 
             }
@@ -534,7 +530,7 @@ public class AssetFileImportService {
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
 
-                if (isAssetCodeMerged) {
+                if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
                     String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
                     if (!"Normal".equals(qrCodeStatus)) {
                         item.put("status", ImportStatus.Failure);
@@ -699,28 +695,6 @@ public class AssetFileImportService {
         } else {
             return Collections.emptyList();
 
-//            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-//            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-//            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-//        } else {
-//
-//            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-//            assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-//            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-//
-//            if (!StringUtils.isEmpty(asset.getQrCode())) {
-//                assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
-//            } else {
-//                assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
-//
-//                if (!StringUtils.isEmpty(asset.getDepartNum())) {
-//                    assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-//                }
-//
-//                if (!StringUtils.isEmpty(asset.getFinancingNum())) {
-//                    assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
-//                }
-//            }
         }
 
 
@@ -808,18 +782,6 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
-            } else {
-                //already loaded this data in the previous steps
-//                item.put("asset", assetList.get(0));
-//                item.put("status", ImportStatus.Exist);
-//                AssetInfo assetInfo = assetList.get(0);
-//
-//                if (!assetInfo.getTenantUID().equals(tenantUID)) {
-//                    item.put("status", ImportStatus.CheckFail);
-//                    result.add(Boolean.FALSE);
-//                    AssetRow.addErrMessage(item, String.format("第%d行错误: 该资产属于其他租户，不允许导入！", row));
-//                }
-
             }
 
             if (null == newAsset.getAssetGroup()) {
@@ -846,7 +808,7 @@ public class AssetFileImportService {
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
-            if (isAssetCodeMerged && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+            if ((ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
                 if (newAsset.getDepartNum().length() > 16) {
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
@@ -860,7 +822,11 @@ public class AssetFileImportService {
                     AssetRow.addErrMessage(item, "错误: 资产编码与设备编码不相同不允许导入");
                 } else {
                     newAsset.setFinancingNum(newAsset.getDepartNum());
-                    newAsset.setQrCode(newAsset.getDepartNum());
+
+                    if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                        newAsset.setQrCode(newAsset.getDepartNum());
+                    }
+
                 }
 
 
@@ -967,24 +933,8 @@ public class AssetFileImportService {
 
     }
 
-    /**
-     * 检查是否配置三码合一
-     */
-    private boolean isAssetCodeMergeConfigured() {
-
-        WorkflowConfig config = configService.findConfigBySite(selectedOrgToImport.getUid());
-        if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
-
-        isAssetCodeMerged = isAssetCodeMergeConfigured();
 
         WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
         if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
@@ -993,19 +943,10 @@ public class AssetFileImportService {
             }
 
         }
+
+        if (siteConfig != null) {
+            assetCodeConfig = siteConfig.getAssetCodeConfig();
+        }
     }
 
-    private boolean isFinanceNumWithClearMark(Map<String, Object> item) {
-
-        String financeNum = (String)item.get(NEW_FINANCE_NUM_KEY);
-        return AssetRow.DELETE_MARK.equals(financeNum);
-
-    }
-
-    private boolean isFinanceNumEmpty(Map<String, Object> item) {
-
-        String financeNum = (String)item.get(NEW_FINANCE_NUM_KEY);
-        return StringUtils.isEmpty(financeNum);
-
-    }
 }

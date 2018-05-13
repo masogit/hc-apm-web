@@ -109,7 +109,7 @@ public class V2_PmOrderService {
     }
 
     public List<UnstructuredDataCollection> getReportList(String boUid) {
-        return reportDao.findByBoUuid(boUid);
+        return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
@@ -372,6 +372,8 @@ public class V2_PmOrderService {
         String res = srApi.invokePmOrderAction(token,formData,"转单",selectedPmOrder.getId());
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"转单");
+        }else{
+            WebUtil.addSuccessMessage("转单成功");
         }
     }
 

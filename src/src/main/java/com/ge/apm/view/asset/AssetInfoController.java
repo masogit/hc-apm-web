@@ -8,7 +8,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -20,6 +20,7 @@ import org.joda.time.DateTime;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
 import org.primefaces.event.data.FilterEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
@@ -160,8 +161,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     WorkflowConfig config;
 
-    private String deptName;
-
     SupplierController supplierController;
 
     List<Supplier> supplierList = Collections.emptyList();
@@ -199,6 +198,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         selectedOrg = orgDao.getByUid(selected.getSiteUID());
 
         setSelectedSiteUID(selected.getSiteUID());
+
+        getOwnerList();
+        getClinicalOwnerList();
     }
 
     private boolean showDialog = false;
@@ -254,7 +256,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.filterBySite = false;
         this.selectedMap = new HashMap();
 
-        orgUids = wfCfigDao.findDeptForSharedAsset();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        orgUids = wfCfigDao.findDeptForSharedAsset(user.getSiteUID());
         swapUids = swapDao.findAllUid();
 
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -267,6 +270,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
                 updateSelectedOrg(selectedOrg);
                 config = configService.findConfigBySite(selected.getSiteUID());
+
+                getOwnerList();
+
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -405,26 +411,27 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         stus.add(3);
 
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        String p = request.getServletPath();
-        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
+        String p=request.getServletPath();
+        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/StockOfAsset.xhtml") || p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IN, swapUids));
         }
-        if (p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")) {
+        if(p.equalsIgnoreCase("/portal/BorrowApplyV2/ListForQuery.xhtml")){
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
         }
 
         if (queryIndex == 1) {
             //正常可借用
-            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
+            searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN,stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUids));
-        } else if (queryIndex == 2) {
+        } else if(queryIndex == 2){
             //正常已借出
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.IN, stus));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.NotIN, orgUids));
-        } else if (queryIndex == 3) {
+        }else if(queryIndex == 3){
             //故障不可借用
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.NotIN, stus));
         }
+
 
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -774,7 +781,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.owner = owner;
     }
 
-    public void onOwnerChange() {
+    public void onOwnerChange(SelectEvent event) {
+
         if (null != owner) {
             selected.setAssetOwnerId(owner.getId());
             selected.setAssetOwnerName(owner.getName());
@@ -808,12 +816,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptChange() {
-        OrgInfo dept = clinicalDeptList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
 
-        if (dept == null) {
+        if (clinicalDept == null) {
             selected.setClinicalDeptId(null);
         } else {
-            selected.setClinicalDeptId(dept.getId());
+            selected.setClinicalDeptId(clinicalDept.getId());
         }
 
         this.clinicalOwner = null;
@@ -831,6 +838,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
 
         updateParentAssetList();
+
+        getClinicalOwnerList();
     }
 
     public void onClinicalOwnerChange() {
@@ -845,19 +854,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    private String supplierName;
-
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
-
     public void onSupplierChange() {
-
-        Supplier supplier = supplierList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
 
         if (null != supplier) {
             selected.setSupplierId(supplier.getId());
@@ -920,13 +917,30 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<UserAccount> getOwnerList() {
         if (ownerList == null) {
-            ownerList = getEmptyAccountList();
-            List<UserAccount> workerList = ucService.getWorkerList(selected.getId());
-            if (null != workerList) {
-                ownerList.addAll(workerList);
-            }
+            ownerList = ucService.getWorkerList(selected.getId());
         }
         return ownerList;
+    }
+
+    public List<UserAccount> completeOwnerList(String query) {
+
+        if (ownerList == null) return Collections.emptyList();
+
+        List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<UserAccount> completeClinicalOwnerList(String query) {
+
+        if (clinicalOwnerList == null) return Collections.emptyList();;
+
+        List<UserAccount> res = this.clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
+        res.sort(new PinYinComparatorByName());
+        return res;
     }
 
     private List<UserAccount> getEmptyAccountList() {
@@ -937,12 +951,12 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         return accountList;
     }
 
-    public List<UserAccount> getClinicalOwnerList() {
-        List<UserAccount> accountList = getEmptyAccountList();
+    private List<UserAccount> clinicalOwnerList;
+
+    public void getClinicalOwnerList() {
         if (null != selected.getClinicalDeptId()) {
-            accountList.addAll(userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId()));
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId());
         }
-        return accountList;
     }
 
     public String getQrCodeImageBase64() {
@@ -1898,26 +1912,25 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.exportQrCodeTemplateId = exportQrCodeTemplateId;
     }
 
-    public List<String> autoCompleteDept(String query) {
-        List<String> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(OrgInfo::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) return Collections.emptyList();
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
         return res;
     }
 
-    public List<String> autoCompleteSupplier(String query) {
+    public List<Supplier> autoCompleteSupplier(String query) {
 
-        List<String> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
+        List<Supplier> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
         return res;
     }
 
-    public String getDeptName() {
-        return deptName;
+    public void setOwnerList(List<UserAccount> ownerList) {
+        this.ownerList = ownerList;
     }
 
-    public void setDeptName(String deptName) {
-        this.deptName = deptName;
-    }
 }

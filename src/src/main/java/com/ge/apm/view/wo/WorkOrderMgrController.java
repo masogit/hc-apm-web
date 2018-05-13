@@ -122,6 +122,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<V2_WorkOrder_Detail> approvedDetails;
     private Map<String, Boolean> selectedMap;
 
+    private String selectedApproverUid;
+
     protected void init() {
         dao = WebUtil.getBean(V2_WorkOrderRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
@@ -431,7 +433,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     private List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type) { //type 1:picture 2:audio
-        return woService.getPicListBySrUid(srId).stream().filter(item -> type == 1 ^ item.getObjectType().contains("audio")).collect(Collectors.toList());
+        return woService.getPicListBySrUid(srId).stream().filter(item -> type == 1 ^ (item.getObjectType()!=null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
     }
 
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
@@ -456,6 +458,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         confirmedUpDate = null;
         confirmedDownTime = null;
         needConfirmTime = false;
+        selectedApproverUid = null;
     }
 
     public void prepareNewWorkOrder(String woid) {
@@ -558,28 +561,28 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void repairWorkOrder() {
         boolean valid = true;
-        if(confirmedUpDate==null){
+        if (confirmedUpDate == null) {
             WebUtil.addErrorMessage("恢复时间" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("confirmedUpDate", true);
-            valid=false;
+            valid = false;
         }
-        if(null==selectedWorkOrder.getCaseType()){
-            WebUtil.addErrorMessage(WebUtil.getMessage("caseType")+WebUtil.getMessage("ValidationRequire"));
+        if (null == selectedWorkOrder.getCaseType()) {
+            WebUtil.addErrorMessage(WebUtil.getMessage("caseType") + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("caseType", true);
-            valid=false;
+            valid = false;
         }
-        if(null==selectedWorkOrder.getRepairResult()){
-            WebUtil.addErrorMessage("维修结果"+WebUtil.getMessage("ValidationRequire"));
+        if (null == selectedWorkOrder.getRepairResult()) {
+            WebUtil.addErrorMessage("维修结果" + WebUtil.getMessage("ValidationRequire"));
             RequestContext.getCurrentInstance().addCallbackParam("repairResult", true);
-            valid=false;
+            valid = false;
         }
-        if(null==selectedWorkOrder.getManHours()|| selectedWorkOrder.getManHours()<0.01 ){
+        if (null == selectedWorkOrder.getManHours() || selectedWorkOrder.getManHours() < 0.01) {
             WebUtil.addErrorMessage("工时不能小于0.01");
             RequestContext.getCurrentInstance().addCallbackParam("manHours", true);
-            valid=false;
+            valid = false;
         }
-        if(!valid){
-            return ;
+        if (!valid) {
+            return;
         }
         //gl:1表示是正常
         accessoryList.removeAll(accessoryList.stream().filter(item -> item.getId().equals("000")).collect(Collectors.toList()));
@@ -813,7 +816,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
                 item.setApproved(null);
             }
         });
-        woService.submitWorkOrder(selectedWorkOrder, accessoryList, this.comments);
+        woService.submitWorkOrder(selectedWorkOrder, accessoryList, this.comments, this.selectedApproverUid);
         cancel();
     }
 
@@ -865,6 +868,10 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             }
         }
         return true;
+    }
+
+    public List<UserAccount> getApproverList() {
+        return woService.getApproverListByAsset(selectedWorkOrder.getAssetInfo().getUid());
     }
 
     //getter and setter
@@ -1104,6 +1111,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public void setSelectedMap(Map<String, Boolean> selectedMap) {
         this.selectedMap = selectedMap;
+    }
+
+    public String getSelectedApproverUid() {
+        return selectedApproverUid;
+    }
+
+    public void setSelectedApproverUid(String selectedApproverUid) {
+        this.selectedApproverUid = selectedApproverUid;
     }
 
 }
