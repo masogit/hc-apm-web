@@ -55,12 +55,12 @@ var CaptureDataMessageJS = (function() {
 			if (initCaptureDataMessageParamBln == false) {
 				return;
 			}
-			contentEditor = $("[id='captureDataMessagesTab:captureDataMessagesEditForm:idContentEditor'] iframe")
+			contentEditor = $("[id='captureDataMessagesEditForm:idContentEditor'] iframe")
 					.contents().find("html body");
 			contentEditorMessage = $("#idContentEditorMessage");
-			contentEditorTextArea = $("[id='captureDataMessagesTab:captureDataMessagesEditForm:idContentEditor_input']");
-			imageTextTempContent = $("[id='captureDataMessagesTab:captureDataMessagesEditForm:imageTextTempContent']");
-			uploadElement = $("[id^='captureDataMessagesTab:captureDataMessagesEditForm'] .ui-fileupload input");
+			contentEditorTextArea = $("[id='captureDataMessagesEditForm:idContentEditor_input']");
+			imageTextTempContent = $("[id='captureDataMessagesEditForm:imageTextTempContent']");
+			uploadElement = $("[id^='captureDataMessagesEditForm'] .ui-fileupload input");
 			initCaptureDataMessageParamBln = false;
 		},
 		contentEditorChange : function() {

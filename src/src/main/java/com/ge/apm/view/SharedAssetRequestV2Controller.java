@@ -600,10 +600,10 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     
     public void setCost(SharedAssetReqDetail sard){
         if (sard.getChargingEndTime() != null) {
-            if ("次".equals(sard.getChargingType())) {
+            if ("1".equals(sard.getChargingType())) {
                 sard.setCountQty(1);
                 sard.setCost(sard.getUnitPrice());
-            } else if ("小时(半点/整点)".equals(sard.getChargingType())) {
+            } else if ("2".equals(sard.getChargingType())) {
                 long nd = 1000 * 24 * 60 * 60;
                 long nh = 1000 * 60 * 60;
                 long nm = 1000 * 60;
@@ -618,7 +618,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 countQty = (int) (day * 24 * 60 / 30 + hour * 2 + min / 30);
                 sard.setCountQty(countQty);
                 sard.setCost(countQty * sard.getUnitPrice() / 2);
-            }else if ("自然小时".equals(sard.getChargingType())){
+            }else if ("4".equals(sard.getChargingType())){
                 long nd = 1000 * 24 * 60 * 60;
                 long nh = 1000 * 60 * 60;
                 long nm = 1000 * 60;
@@ -1312,15 +1312,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
     }
 
-    public int getSwapQty(String TypeUid,String Uid){
-      
-        SharedAssetRequest shared = new SharedAssetRequest();
-        List<SharedAssetRequest> sharedList = dao.findByDept(Uid);
-        if(sharedList.size()==1){
-            shared = sharedList.get(0);
-        }
-//                this.selected.getClinicalDeptUid();
-        String SiteUid = UserContextService.getCurrentUserAccount().getSiteUID();
+    public int getSwapQty2(String Uid){
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{

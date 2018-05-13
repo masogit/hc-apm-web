@@ -31,7 +31,7 @@
                             <p:selectOneMenu id="contractType" value="#{assetContractController.selected.contractType}" required="false" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}">
                                 <p:ajax update="pmCount" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('contractType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                <f:selectItems value="#{assetContractController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
                         
