@@ -17,6 +17,7 @@ public class CustomConfigAssetField {
     List<String> exportRoles;
     List<String> readRoles;
     List<String> editRoles;
+    boolean required = false;
 
 
     public CustomConfigAssetField(String key,List<String> roles) {
@@ -69,5 +70,12 @@ public class CustomConfigAssetField {
         this.editRoles = editRoles;
     }
 
-    
+    public boolean isRequired() {
+        return required;
+    }
+
+    public void setRequired(boolean required) {
+        this.required = required;
+    }
+
 }

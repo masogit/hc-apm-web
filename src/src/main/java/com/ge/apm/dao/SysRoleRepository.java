@@ -4,6 +4,7 @@ import com.ge.apm.domain.SysRole;
 import javax.persistence.QueryHint;
 import org.springframework.data.jpa.repository.QueryHints;
 import webapp.framework.dao.GenericRepository;
+import java.util.List;
 
 public interface SysRoleRepository extends GenericRepository<SysRole> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
@@ -11,5 +12,7 @@ public interface SysRoleRepository extends GenericRepository<SysRole> {
 
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
     public SysRole getByRoleDesc(String name);
+    
+    public List<SysRole> getByNameIn(List<String> names);
     
 }

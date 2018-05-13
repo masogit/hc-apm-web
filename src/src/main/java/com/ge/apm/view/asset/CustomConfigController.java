@@ -9,11 +9,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -35,7 +38,7 @@ import webapp.framework.web.WebUtil;
 @ManagedBean
 @ViewScoped
 public class CustomConfigController {
-
+    
     private CustomConfigService ccService;
     private OrgInfoRepository orgDao;
     private UserCommonService userService;
@@ -46,7 +49,8 @@ public class CustomConfigController {
     private CustomConfigAssetField currentEditField;
     private CustomConfig customConfig;
     private LinkedHashMap<String, String> allFields;
-
+    private Map<String, String> configRoles;
+    
     @PostConstruct
     protected void init() {
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -54,10 +58,11 @@ public class CustomConfigController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         allFields = ccService.getAllFields();
+        configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName,SysRole::getRoleDesc));
         selectedAddFields = new HashMap();
         loadConfigForSite(selectSite.getUid());
     }
-
+    
     private void loadConfigForSite(String siteUid) {
         customConfig = ccService.getCustomConfigBySite(siteUid);
         if (null == customConfig) {
@@ -66,7 +71,28 @@ public class CustomConfigController {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
     }
-
+    
+    //使用的字段
+    public List<CustomConfigAssetField> getAssetFieldsList() {
+        return customConfigObject.getAssetFields().entrySet().stream().map(Entry::getValue).collect(Collectors.toList());
+    }
+    
+    //角色名称
+    public String getAssetFieldsRoles(List<String> roles) {
+        StringBuilder res = new StringBuilder();
+        roles.stream().forEach(item -> res.append(configRoles.get(item)).append(" "));
+        return res.toString();
+    }
+    
+    public void removeAssetField(String key) {
+        if (customConfigObject.getAssetFields().containsKey(key)) {
+            customConfigObject.getAssetFields().remove(key);
+        }
+        if (customConfigObject.getAssetsListPageFields().contains(key)) {
+            customConfigObject.getAssetsListPageFields().remove(key);
+        }
+    }
+    
     public String getCustomConfigInfomation() {
         if (customConfig == null) {
             return "当前院区无配置,保存后创建";
@@ -82,7 +108,7 @@ public class CustomConfigController {
         }
         return res.toString();
     }
-
+    
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         if (null != event) {
             if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
@@ -93,64 +119,95 @@ public class CustomConfigController {
             loadConfigForSite(selectSite.getUid());
         }
     }
-
+    
     public void onListPageFieldsReorder(ReorderEvent event) {
     }
-
+    
     public void saveChange() {
         ccService.saveConfig(selectSite, customConfigObject);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
     }
-
+    
     public void deleteConfig() {
         ccService.removeConfig(selectSite);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
     }
-
+    
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
             customConfigObject.getAssetsListPageFields().remove(key);
         }
-//        assetsListPageFields.removeAll(assetsListPageFields.stream().filter(item -> key.equalsIgnoreCase(item.getKey())).collect(Collectors.toList()));
     }
-
-    public void prepareEditListField(String fieldKey) {
+    
+    public void prepareEditAssetField(String fieldKey) {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
+    
+    //将要添加的字段
+    public List<String> getAssetFieldAddList() {
+        return allFields.keySet().stream().filter(item-> !customConfigObject.getAssetFields().containsKey(item)).collect(Collectors.toList());
+    }
+    
+    public void addAssetFields() {
+//        customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+//                && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(Entry::getKey).collect(Collectors.toList()));
 
-    public List<String> getListPageAddFieldList() {
-        return customConfigObject.getAssetFields().entrySet().stream().map(item -> item.getKey()).collect(Collectors.toList());
+        customConfigObject.getAssetFields().putAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                && !customConfigObject.getAssetFields().containsKey(item.getKey()))
+                .collect(Collectors.toMap(itemField-> itemField.getKey(),itemField->new CustomConfigAssetField(itemField.getKey(),new ArrayList<String>(configRoles.keySet())))));
+        selectedAddFields.clear();
     }
 
-    public void addFieldsForListPage() {
-//        assetsListPageFields.addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue())
-//                .filter(item -> !assetsListPageFields.stream().anyMatch(selectedItem -> selectedItem.getKey().equals(item.getKey())))
-//                .map(item -> new CustomConfigAssetField(item.getKey())).collect(Collectors.toList()));
+    public List<String> getRolesSelectItems(){
+        return new ArrayList(configRoles.keySet());
+    }
+    
+    public List<String> getListPageFieldsAddList(){
+        return customConfigObject.getAssetFields().keySet().stream().filter(item-> customConfigObject.getAssetsListPageFields().contains(item)).collect(Collectors.toList());
+    }
+    
+    public void addListPageFields(){
         customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(Entry::getKey).collect(Collectors.toList()));
+                && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item-> item.getKey()).collect(Collectors.toList()));
     }
-
+    
     //getter and setter
     public OrgInfo getSelectSite() {
         return selectSite;
     }
-
+    
     public CustomConfigAssetField getCurrentEditField() {
         return currentEditField;
     }
-
+    
     public void setCurrentEditField(CustomConfigAssetField currentEditField) {
         this.currentEditField = currentEditField;
     }
-
+    
     public Map<String, Boolean> getSelectedAddFields() {
         return selectedAddFields;
     }
-
+    
     public void setSelectedAddFields(Map<String, Boolean> selectedAddFields) {
         this.selectedAddFields = selectedAddFields;
     }
+    
+    public CustomConfigObject getCustomConfigObject() {
+        return customConfigObject;
+    }
+    
+    public void setCustomConfigObject(CustomConfigObject customConfigObject) {
+        this.customConfigObject = customConfigObject;
+    }
+    
+    public LinkedHashMap<String, String> getAllFields() {
+        return allFields;
+    }
 
+    public Map<String, String> getConfigRoles() {
+        return configRoles;
+    }
+    
 }
