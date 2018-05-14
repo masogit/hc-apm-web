@@ -166,7 +166,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public String getTableDefName(String templateId){
-        TableDefinition tb= tableDao.findById(templateId);
+        TableDefinition tb= tableDao.findByBaseId(templateId);
         if(tb !=null){
             return tb.getName();
         }else{
