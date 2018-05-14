@@ -401,7 +401,10 @@ public class AssetFileImportService {
             }
 
             String orgName = newAsset.getClinicalDeptName();
-            if (importOrgMap.containsKey(orgName)) {
+            if (StringUtils.isEmpty(orgName)) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "警告:科室为空");
+            } else if (importOrgMap.containsKey(orgName)) {
                 OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
                 if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
                     item.put("status", ImportStatus.Failure);
@@ -948,12 +951,18 @@ public class AssetFileImportService {
         final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
         final int GENERATE_BY_PREFIX_AND_SEQ = 2;
 
+        assetCodeConfig = workflowConfig.getAssetCodeConfig();
+
+        if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
+            return false;
+        }
+
         if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
             String financingNum = assetInfo.getFinancingNum();
 
             if (workflowConfig.getGenerateMethod() == GENERATE_BY_NATIONAL_STANDARD_CODE) {
 
-                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && StringUtils.isEmpty(financingNum)) {
+                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
                     return true;
                 }
 
