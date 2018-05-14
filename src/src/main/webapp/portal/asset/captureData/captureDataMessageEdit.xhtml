@@ -21,9 +21,11 @@
 								<f:selectItem itemLabel="设备类型" itemValue="1"></f:selectItem>
 							</p:selectOneRadio>
 							<span id="type0Span" style="#{captureDataMessagesController.selected.type==1?'display: none; ':' display: block;'}"> <label class="label">SystemID*</label>
-								<p:inputText value="#{captureDataMessagesController.selected.systemId}" required="#{captureDataMessagesController.selected.type==0?true:false}" requiredMessage="请输入SystemID">
-									<p:ajax update="@this:idIbStatus,@this:idGeDeviceType" event="blur" listener="#{captureDataMessagesController.checkSystemId()}"/>
-								</p:inputText> <label class="label">是否GE IB</label> <p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
+								<p:inputText id="systemId" value="#{captureDataMessagesController.selected.systemId}" required="#{captureDataMessagesController.selected.type==0?true:false}" requiredMessage="请输入SystemID">
+								</p:inputText>
+								<p:commandButton id="searchSystemId" value="查找" actionListener="#{captureDataMessagesController.checkSystemId()}" update="idIbStatus,idGeDeviceType" process="@parent"/>
+								<label class="label">是否GE IB</label> 
+								<p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
 									<f:selectItem itemLabel="否" itemValue="0" />
 									<f:selectItem itemLabel="是" itemValue="1" />
 								</p:selectOneMenu>
@@ -45,7 +47,7 @@
 						<h:panelGroup>
 							<p:commandButton validateClient="false" value="#{msg.Save}" actionListener="#{captureDataMessagesController.save}"
 								update="@parent, :captureDataMessagesListForm:datalist, :captureDataMessagesListForm:growl" icon="ui-icon-check"
-								oncomplete="handleSubmit(args, 'captureDataMessagesEditDialog');"/>
+								oncomplete="handleSubmit(args, 'captureDataMessagesEditDialog');" timeout="3000"/>
 							<p:commandButton process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('captureDataMessagesEditDialog').hide()" />
 						</h:panelGroup>
 					</p:panelGrid>
