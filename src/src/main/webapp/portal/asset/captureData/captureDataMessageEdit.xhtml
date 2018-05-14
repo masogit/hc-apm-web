@@ -30,7 +30,9 @@
 									<f:selectItem itemLabel="是" itemValue="1" />
 								</p:selectOneMenu>
 							</span>
-							<label class="label">设备类型*</label>
+							<label class="label">
+								<h:outputText id="deviceTypeLabel" value="#{captureDataMessagesController.selected.type==0?'设备类型':'设备类型*'}"></h:outputText>
+							</label>
 							<p:selectOneMenu id="idGeDeviceType" value="#{captureDataMessagesController.selected.geDeviceType}" required="#{captureDataMessagesController.selected.type==1?true:false}" requiredMessage="请选择设备类型">
 								<f:selectItem itemLabel="#{msg.selectOneMessage}" />
 								<f:selectItems value="#{fieldMsg.getFieldValueList('geDeviceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
