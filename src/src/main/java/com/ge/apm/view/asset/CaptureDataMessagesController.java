@@ -145,9 +145,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     public void checkSystemId(){
-    	System.out.println("xxx checkSystemId");
-    	System.out.println(this.selected.getType());
-    	System.out.println(this.selected.getSystemId());
     	String systemId=this.selected.getSystemId();
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
@@ -176,7 +173,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 
     @Override
     public void save() {
-    	System.out.println("xxx save");
     	if(this.selected.getType()==null){
 			this.selected.setType(0);
 		}
@@ -205,7 +201,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		}
     	}
     	this.selected=null;
-    	System.out.println("xxx save end");
     }
     
     public boolean validateRequiredField(){
