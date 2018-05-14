@@ -71,7 +71,7 @@ public class TableCreateController extends TieWebSheetBean {
             CreateTemplate();
             table = new TableSchema();
         } else {
-            selectedTableDefinition = templateService.getReleasedTemplateById(templateId);
+            selectedTableDefinition = templateService.getTemplateById(templateId);
             table = JSONObject.parseObject(selectedTableDefinition.getSchema(), TableSchema.class);
             if (Strings.isNullOrEmpty(table.getSchemaId())) {
                 table.setSchemaId(selectedTableDefinition.getId());
@@ -331,6 +331,9 @@ public class TableCreateController extends TieWebSheetBean {
             StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
             table.setTitle(uploadedFileObject.getObjectName().indexOf(".") > 0 ? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")) : uploadedFileObject.getObjectName());
             loadWebSheetByStream(savedFile.getStream());
+            if (Strings.isNullOrEmpty(selectedTableDefinition.getName())) {
+                selectedTableDefinition.setName(table.getTitle());
+            }
             saveExcelTable();
         }
     }
@@ -349,15 +352,13 @@ public class TableCreateController extends TieWebSheetBean {
                 }
                 uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
                 selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
-                if (Strings.isNullOrEmpty(selectedTableDefinition.getName())) {
-                    selectedTableDefinition.setName(table.getTitle());
-                }
                 blobService.saveBlobObject(uploadedFileObject);
                 templateDao.save(selectedTableDefinition);
                 WebUtil.addSuccessMessage("Excel已保存");
             }
         } else {
             //修改
+
             if (uploadedFile != null) {
                 //Eexcel 模版有变动
                 selectedTableDefinition = templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
