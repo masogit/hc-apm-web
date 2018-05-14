@@ -141,7 +141,7 @@
                                 <p:selectOneMenu value="#{v2PmOrderController.reportUid}">
                                     <p:ajax update="addReport" />
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{v2PmOrderController.getTablesName(v2PmOrderController.selectedPmOrder)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                    <f:selectItems value="#{v2PmOrderController.getTablesName(v2PmOrderController.selectedPmOrder)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
                                 </p:selectOneMenu>
                                 <p:commandLink value="添加报告"  class="addLink" validateClient="false" process="addReport" actionListener="#{v2PmOrderController.addReporter(v2PmOrderController.selectedPmOrder.id)}"  update="@(.rpClass) @(.addLink)" disabled="#{empty v2PmOrderController.reportUid or v2PmOrderController.hasRepairReport() }"/>
                             </h:panelGroup>
