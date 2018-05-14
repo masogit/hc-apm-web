@@ -145,7 +145,7 @@ public class TableDefinitionService {
             newTemplate.setStatus(selectedTableDefinition.getStatus());
             newTemplate.setExcelStorageId(blobObject == null ? null : blobObject.getObjectStorageId());
             newTemplate.setSchema(selectedTableDefinition.getSchema());
-            templateDao.save(newTemplate);
+            newTemplate = templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
             selectedTableDefinition.setLastModifiedDate(new Date());
