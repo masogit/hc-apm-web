@@ -56,6 +56,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private List<CaptureDataMessages> importFailedDataList;
     private String tempImageContent;
     private AssetInfo assetInfo;
+    private String checkedSystemId;
     
     @Override
     protected void init() {
@@ -87,8 +88,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		return;
     	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
     	if(assetInfo!=null){
-    		this.selected.setIbStatus(assetInfo.getIbStatus());
-        	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+    		setAssetInfoValue();
     	}
     }
     
@@ -98,6 +98,7 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	fileName=null;
     	tempImageContent=null;
     	importFailedDataList=null;
+    	checkedSystemId=null;
     }
 
     @Override
@@ -144,31 +145,40 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         }
     }
     
+    private void getAssetInfo(){
+    	checkedSystemId=this.selected.getSystemId();
+    	if(StringUtils.isNotEmpty(checkedSystemId)){
+    		assetInfo=service.getAssetInfoBySystemId(checkedSystemId);
+    	}
+    }
+    
+    private void setAssetInfoValue(){
+    	this.selected.setIbStatus(assetInfo.getIbStatus());
+		this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+		this.selected.setAssetUID(assetInfo.getUid());
+    }
+    
     public void checkSystemId(){
-    	String systemId=this.selected.getSystemId();
+    	
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
-    	if(StringUtils.isNotEmpty(systemId)){
-    		assetInfo=service.getAssetInfoBySystemId(systemId);
-    		if(assetInfo==null){
-    			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
+    	getAssetInfo();
+    	if(assetInfo==null){
+			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
+			FacesContext.getCurrentInstance().addMessage("systemID", message);
+		}
+		else{
+			setAssetInfoValue();
+			OrgInfo orgInfo=assetInfo.getHospital();
+			if(orgInfo!=null && orgInfo.getName()!=null){
+				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"医院:"+orgInfo.getName()+"，设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
     			FacesContext.getCurrentInstance().addMessage("systemID", message);
-    		}
-    		else{
-    			this.selected.setIbStatus(assetInfo.getIbStatus());
-    			this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
-    			this.selected.setAssetUID(assetInfo.getUid());
-    			OrgInfo orgInfo=assetInfo.getHospital();
-    			if(orgInfo!=null && orgInfo.getName()!=null){
-    				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"医院:"+orgInfo.getName()+"，设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
-        			FacesContext.getCurrentInstance().addMessage("systemID", message);
-    			}
-    			else{
-    				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
-        			FacesContext.getCurrentInstance().addMessage("systemID", message);
-    			}
-    		}
-    	}
+			}
+			else{
+				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
+    			FacesContext.getCurrentInstance().addMessage("systemID", message);
+			}
+		}
     }
 
     @Override
@@ -177,6 +187,9 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 			this.selected.setType(0);
 		}
     	if(this.selected.getType()==0){
+    		if(checkedSystemId==null || checkedSystemId.equals(this.selected.getSystemId())==false){
+    			getAssetInfo();
+    		}
     		if(assetInfo!=null){
     			setIndexValue();
         		super.save();
