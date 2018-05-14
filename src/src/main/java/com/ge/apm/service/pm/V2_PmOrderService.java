@@ -355,12 +355,12 @@ public class V2_PmOrderService {
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
-        String res = srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+       /* String res = srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
         }else{
             WebUtil.addSuccessMessage("批量完成成功");
-        }
+        }*/
     }
     public void reassignWorkOrder(V2_PmOrder selectedPmOrder, String assigneeId,String comments) {
         String token = UserContextService.getAccessToken();
