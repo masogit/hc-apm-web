@@ -97,10 +97,11 @@ public class AssetFileImportService {
     private String assetCodeConfig;
     private static final String ASSET_CODE_MERGE_THREE = "DFQ";
     private static final String ASSET_CODE_MERGE_TWO = "DF";
-    boolean autoGenerateFinancingNum;
+//    boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
+    private WorkflowConfig workflowConfig;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -503,7 +504,7 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (autoGenerateFinancingNum && newAsset.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+            if (needGenerateFinancingNum(newAsset)) {
 
                 //修改的时候不需要生成资产编号
                 financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -523,7 +524,6 @@ public class AssetFileImportService {
                 }
 
             }
-
 
             String qrCode = newAsset.getQrCode();
 
@@ -936,17 +936,35 @@ public class AssetFileImportService {
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
 
-        WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
-        if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
-            if (siteConfig.getGenerateMethod() == 1 || siteConfig.getGenerateMethod() == 2) {
-                autoGenerateFinancingNum = true;
+        workflowConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+
+        if (workflowConfig != null) {
+            assetCodeConfig = workflowConfig.getAssetCodeConfig();
+        }
+    }
+
+    private boolean needGenerateFinancingNum(AssetInfo assetInfo) {
+
+        final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
+        final int GENERATE_BY_PREFIX_AND_SEQ = 2;
+
+        if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
+            String financingNum = assetInfo.getFinancingNum();
+
+            if (workflowConfig.getGenerateMethod() == GENERATE_BY_NATIONAL_STANDARD_CODE) {
+
+                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && StringUtils.isEmpty(financingNum)) {
+                    return true;
+                }
+
+            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_SEQ) {
+                if (assetInfo.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+                    return true;
+                }
             }
-
         }
 
-        if (siteConfig != null) {
-            assetCodeConfig = siteConfig.getAssetCodeConfig();
-        }
+        return false;
     }
 
 }
