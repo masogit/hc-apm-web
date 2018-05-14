@@ -54,7 +54,9 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">工时</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.manHours}"></p:outputLabel>
+                            <h:outputText value="#{v2PmOrderController.selected.manHours}">
+                                <f:convertNumber minFractionDigits="2"></f:convertNumber>
+                            </h:outputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计划完成时间</label>
