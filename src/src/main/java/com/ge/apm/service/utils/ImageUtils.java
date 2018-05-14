@@ -10,15 +10,12 @@ public class ImageUtils {
 
 	public static String getBase64(InputStream input){
 		Base64.Encoder encoder = Base64.getEncoder();
-		System.out.println("xxx begin getBase64");
 		try {
 			if(input!=null){
 				byte[] b = new byte[input.available()];
-				System.out.println(input.available());
 				input.read(b);
-				String result=encoder.encodeToString(b);
-				System.out.println(result);
-				return result;
+				input.close();
+				return encoder.encodeToString(b);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

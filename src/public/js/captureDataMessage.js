@@ -94,8 +94,11 @@ var CaptureDataMessageJS = (function() {
 		setImageTextTempContent : function() {
 			initCaptureDataMessageParamBln = true;
 			this.setCaptureDataMessageValue();
-			contentEditor.html(contentEditor.html() + imageTextTempContent.val());
-			contentEditorTextArea.val(contentEditorTextArea.val() + imageTextTempContent.val());
+			var htmlStr=imageTextTempContent.html();
+			htmlStr=htmlStr.replace(/&lt;/,'<');
+			htmlStr=htmlStr.replace(/&gt;/,'>');
+			contentEditor.html(contentEditor.html() + htmlStr);
+			contentEditorTextArea.val(contentEditorTextArea.val() + htmlStr);
 		},
 		triggerUpload : function() {
 			initCaptureDataMessageParamBln = true;
