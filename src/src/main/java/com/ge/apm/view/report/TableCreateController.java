@@ -114,9 +114,9 @@ public class TableCreateController extends TieWebSheetBean {
 
     @Transactional
     public void saveTemplate() {
-        if(!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length()>64){
+        if (!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length() > 64) {
             WebUtil.addErrorMessage("名称最大长度64");
-            return ;
+            return;
         }
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
             selectedTableDefinition.setName(table.getTitle());
@@ -329,37 +329,40 @@ public class TableCreateController extends TieWebSheetBean {
     public void finishUpload() {
         if (null != uploadedFileObject) {
             StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
-            table.setTitle(uploadedFileObject.getObjectName().indexOf(".")>0? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")):uploadedFileObject.getObjectName());
+            table.setTitle(uploadedFileObject.getObjectName().indexOf(".") > 0 ? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")) : uploadedFileObject.getObjectName());
             loadWebSheetByStream(savedFile.getStream());
             saveExcelTable();
         }
     }
-    
-    private void saveExcelTable(){
+
+    private void saveExcelTable() {
         //for excel
         if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
             //新建
 //                V2_BlobObject blobObject = blobService.uploadFile(uploadedFile);
-                if (null != uploadedFileObject) {
-                    uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
-                    uploadedFileObject.setBoSubType("Excel");
-                    selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
-                    if(Strings.isNullOrEmpty(selectedTableDefinition.getId())){
-                        selectedTableDefinition = templateDao.save(selectedTableDefinition);
-                    }
-                    uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
-                    selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
-                    blobService.saveBlobObject(uploadedFileObject);
-                    templateDao.save(selectedTableDefinition);
-                    WebUtil.addSuccessMessage("Excel已保存");
+            if (null != uploadedFileObject) {
+                uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                uploadedFileObject.setBoSubType("Excel");
+                selectedTableDefinition.setExcelStorageId(uploadedFileObject.getObjectStorageId());
+                if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
+                    selectedTableDefinition = templateDao.save(selectedTableDefinition);
                 }
+                uploadedFileObject.setBoUuid(selectedTableDefinition.getId());
+                selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
+                if (Strings.isNullOrEmpty(selectedTableDefinition.getName())) {
+                    selectedTableDefinition.setName(table.getTitle());
+                }
+                blobService.saveBlobObject(uploadedFileObject);
+                templateDao.save(selectedTableDefinition);
+                WebUtil.addSuccessMessage("Excel已保存");
+            }
         } else {
             //修改
             if (uploadedFile != null) {
                 //Eexcel 模版有变动
-                selectedTableDefinition =templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
+                selectedTableDefinition = templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
                 WebUtil.addSuccessMessage("Excel已保存");
-            } 
+            }
         }
     }
 
