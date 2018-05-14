@@ -948,6 +948,12 @@ public class AssetFileImportService {
         final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
         final int GENERATE_BY_PREFIX_AND_SEQ = 2;
 
+        assetCodeConfig = workflowConfig.getAssetCodeConfig();
+
+        if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
+            return false;
+        }
+
         if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
             String financingNum = assetInfo.getFinancingNum();
 
