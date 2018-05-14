@@ -143,34 +143,40 @@ public class TableDefinitionService {
             newTemplate.setCreatedDate(new Date());
             newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             newTemplate.setStatus(selectedTableDefinition.getStatus());
-            newTemplate.setExcelStorageId(blobObject.getObjectStorageId());
+            newTemplate.setExcelStorageId(blobObject == null ? null : blobObject.getObjectStorageId());
             newTemplate.setSchema(selectedTableDefinition.getSchema());
             templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
             selectedTableDefinition.setLastModifiedDate(new Date());
             templateDao.save(selectedTableDefinition);
-            blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
-            blobObject.setBoSubType("Excel");
-            blobObject.setBoUuid(selectedTableDefinition.getId());
-            blobService.saveBlobObject(blobObject);
-            return newTemplate;
-        } else {
-            //模版下无记录
-            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
-                selectedTableDefinition.setExcelStorageId(blobObject.getObjectStorageId());
-                selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
-                selectedTableDefinition.setLastModifiedDate(new Date());
-                selectedTableDefinition = templateDao.save(selectedTableDefinition);
+            if (null != blobObject) {
                 blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
                 blobObject.setBoSubType("Excel");
                 blobObject.setBoUuid(selectedTableDefinition.getId());
                 blobService.saveBlobObject(blobObject);
+            }
+            return newTemplate;
+        } else {
+            //模版下无记录
+            if (blobService.deleteBlobFilesByStorageId(selectedTableDefinition.getExcelStorageId())) {
+                selectedTableDefinition.setExcelStorageId(blobObject == null ? null : blobObject.getObjectStorageId());
+                selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
+                selectedTableDefinition.setLastModifiedDate(new Date());
+                selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                if (null != blobObject) {
+                    blobObject.setBoType(V2_BlobObject.BO_TYPE_TableDefinition);
+                    blobObject.setBoSubType("Excel");
+                    blobObject.setBoUuid(selectedTableDefinition.getId());
+                    blobService.saveBlobObject(blobObject);
+                }
             } else {
                 WebUtil.addErrorMessage("更新失败");
             }
+
             return selectedTableDefinition;
         }
+
     }
 
     public void saveTableDate(UnstructuredDataCollection report, Map<String, Object> tableValue) {

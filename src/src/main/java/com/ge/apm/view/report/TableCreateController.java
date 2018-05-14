@@ -19,6 +19,7 @@ import com.google.common.base.Strings;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -320,6 +321,11 @@ public class TableCreateController extends TieWebSheetBean {
             }
         }
     }
+    
+    public void removeExcelTemplate(){
+        this.uploadedFile = null;
+        saveExcelTable();
+    }
 
     public void uploadDataFile(FileUploadEvent event) {
         this.uploadedFile = event.getFile();
@@ -331,14 +337,25 @@ public class TableCreateController extends TieWebSheetBean {
             StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
             table.setTitle(uploadedFileObject.getObjectName().indexOf(".") > 0 ? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")) : uploadedFileObject.getObjectName());
             loadWebSheetByStream(savedFile.getStream());
-            if (Strings.isNullOrEmpty(selectedTableDefinition.getName())) {
-                selectedTableDefinition.setName(table.getTitle());
-            }
+            
             saveExcelTable();
         }
     }
 
     private void saveExcelTable() {
+        
+        if (Strings.isNullOrEmpty(selectedTableDefinition.getName())) {
+                selectedTableDefinition.setName(table.getTitle());
+            }
+        if(Strings.isNullOrEmpty(selectedTableDefinition.getSchema())){
+            if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
+                    selectedTableDefinition = templateDao.save(selectedTableDefinition);
+                    table.setSchemaId(selectedTableDefinition.getId());
+                }
+            tableString = JSONObject.toJSONString(table);
+            selectedTableDefinition.setSchema(tableString);
+        }
+        
         //for excel
         if (Strings.isNullOrEmpty(selectedTableDefinition.getExcelStorageId())) {
             //新建
@@ -363,6 +380,9 @@ public class TableCreateController extends TieWebSheetBean {
                 //Eexcel 模版有变动
                 selectedTableDefinition = templateService.updateExcelTemplate(selectedTableDefinition, uploadedFileObject);
                 WebUtil.addSuccessMessage("Excel已保存");
+            }else{
+                //删除Excel
+                selectedTableDefinition = templateService.updateExcelTemplate(selectedTableDefinition, null);
             }
         }
     }
