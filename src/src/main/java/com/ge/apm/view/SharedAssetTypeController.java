@@ -251,13 +251,12 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         return objectList;
     }
     
-    public int getSwapQty(String Uid){
+    public int getSwapQty(String Uid,String clinicalDeptUid){
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
             List<AssetInfo> objectList = new ArrayList<AssetInfo>();
-            UserAccount user = UserContextService.getCurrentUserAccount();
-            objectList = dao.findbyBorrowQty(user.getSiteUID(),user.getOrgInfoUID(),Uid);
+            objectList = dao.findbyBorrowQty(clinicalDeptUid,Uid);
 
             return objectList.size();
         }
