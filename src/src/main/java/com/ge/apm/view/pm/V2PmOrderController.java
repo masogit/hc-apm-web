@@ -143,9 +143,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     List<UnstructuredDataCollection> reportList;
     public boolean hasRepairReport(){
+        List<TableDefinition> tdList;
+        List<TableDefinition> tdListTotal = new ArrayList<TableDefinition>();
         reportList = pmOrderService.getReportList(selectedPmOrder.getId());
-        return reportList.stream().anyMatch(item->item.getSchemaId().equalsIgnoreCase(reportUid));
-
+        if(reportList!=null) {
+            for (int i = 0; i < reportList.size(); i++) {
+                tdList = tableDao.getByBaseId(tableDao.findById(reportList.get(i).getSchemaId()).getBaseId());
+                tdListTotal.addAll(tdList);
+            }
+        }
+        return tdListTotal.stream().anyMatch(item->item.getId().equalsIgnoreCase(reportUid));//reportUId: tableDefinition-id
     }
 
     public boolean isChecked() {
@@ -157,7 +164,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return false;
     }
-
 
     public String getTableDefName(String templateId){
         TableDefinition tb= tableDao.findById(templateId);
@@ -716,7 +722,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
        if(pmCheckItemList!=null) {
-           if (hmCheck.isEmpty()) {
+           if (hmCheck.isEmpty()){
                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
                    UnstructuredData unData = new UnstructuredData();
                    unData.setValue("pass");
@@ -916,15 +922,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return CheckItemList;
     }
-    ///////////////new
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
-   /* public List<PmOrderRuleCheckList> loadCheckItem(V2_PmOrder v2PmOrder){
-        pmOrderRuleCheckList = acPmOrderUleCheckList(v2PmOrder);
-        return pmOrderRuleCheckList;
-    }*/
-
-
-
 
     //map : item.uid(pmorderrulecheck.uid) value: unstrundata
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails(){
