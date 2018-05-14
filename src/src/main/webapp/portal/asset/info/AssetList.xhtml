@@ -4,14 +4,14 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml">
-    <ui:define name="preRenderView">
+<!--    <ui:define name="preRenderView">
         <f:metadata>
-            <f:viewParam name="assetStatus" value="#{assetInfoController.filterAssetStatus}"/>
-            <f:viewParam name="model" value="#{assetInfoController.filterWarrantyDate}"/>
-            <f:viewParam name="assetId" value="#{assetInfoController.assetId}"/>
+            <f:viewParam name="assetStatus" value="#{assetInfoListController.filterAssetStatus}"/>
+            <f:viewParam name="model" value="#{assetInfoListController.filterWarrantyDate}"/>
+            <f:viewParam name="assetId" value="#{assetInfoListController.assetId}"/>
         </f:metadata>
-        <f:event type="preRenderView" listener="#{assetInfoController.setAssetStatusFilter()}"/>
-    </ui:define>
+        <f:event type="preRenderView" listener="#{assetInfoListController.setAssetStatusFilter()}"/>
+    </ui:define>-->
 
     <ui:define name="content">
         <style>
@@ -23,7 +23,7 @@
         </style>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value=" #{assetInfoController.getAssetListTitle()}"/>
+                <p:outputLabel class="pageTitle" value=" #{assetInfoListController.terminate? msg.TerminateAssetInfo:msg.AssetInfo}"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -31,11 +31,11 @@
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="3">
                         <h:panelGroup >
-                            <p:commandButton id="btnOrg" value="#{empty assetInfoController.selectSite? msg.AllHospitals:assetInfoController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
+                            <p:commandButton id="btnOrg" value="#{empty assetInfoListController.selectSite? msg.AllHospitals:assetInfoListController.selectSite.name}" type="button" icon="fa fa-angle-down" iconPos="right"/>
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm :idVarPanelDeptOrg" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm :idVarPanelDeptOrg" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -45,19 +45,19 @@
                                 </p:scrollPanel>
                             </p:overlayPanel>
                         </h:panelGroup>
-                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                        <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
                             <p:ajax event="keyup" update=":AssetInfoListForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg searchButtons " />
                         </p:inputText>
 
                         <h:panelGroup id='searchButtons'>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg"  rendered="#{empty assetInfoController.oneSearchStr}"/>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm :idPanelFilterWarrantyDate :idVarPanelDeptOrg" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
                 <h:form id="AssetInfoListForm">
-                    <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" resizeMode="expand"
-                                 selectionMode="single" selection="#{assetInfoController.selected}" scrollable="true" scrollWidth="98%"
+                    <p:dataTable id="datalist" value="#{assetInfoListController.lazyModel}" var="item" widgetVar="varDataList" resizableColumns="true" resizeMode="expand"
+                                 selectionMode="single" selection="#{assetInfoListController.selected}" scrollable="true" scrollWidth="98%"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}" 
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -65,32 +65,31 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,90,200">
 
-                        <p:ajax  event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton editButton viewButton deleteButton "/>
-                        <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc2();"/>
+                        <p:ajax  event="rowSelect" listener="#{assetInfoListController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton  deleteButton "/>
+                        <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="rc2();"/>
                         <p:ajax event="page" oncomplete="rc2();" />
 
                         <p:column width="36">
-                            <p:selectBooleanCheckbox value="#{assetInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
-                                <p:ajax listener="#{assetInfoController.onItemSelected}"  update="@this @(.selectCheckBoxHeader) @(.batch-terminated)"/>
+                            <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
+                                <p:ajax listener="#{assetInfoListController.onItemSelected}"  update="@this @(.selectCheckBoxHeader) @(.batch-terminated)"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
-                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetInfoController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
-                                    <p:ajax  listener="#{assetInfoController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton :AssetInfoListForm:datalist:batchToTerminatedButton"/>
+                                <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{assetInfoListController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
+                                    <p:ajax  listener="#{assetInfoListController.onSelectAllOfPage}" update="@(.selectCheckBox) :AssetInfoListForm:datalist:batchToBeTerminatedButton :AssetInfoListForm:datalist:batchToTerminatedButton"/>
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
                         <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}">
-                            <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
-                            <h:panelGroup rendered="#{empty assetInfoController.filterWarrantyDate}">
-                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">
+                            <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
                                 </p:link>
-                                <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoController.deleteAsset(item)}" update="datalist">
+                                <p:commandLink rendered="#{userContextService.hasRole('AssetHead')}" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoListController.deleteAsset(item)}" update="datalist">
                                     <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandLink>
                             </h:panelGroup>
-                            <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoController.cancleWarranty(item.id)}" update="datalist" rendered="#{!empty assetInfoController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
+                            <p:commandButton id="cancleWarranty" style="zoom:0.65;" process="@this" title="取消保修提醒" actionListener="#{assetInfoListController.cancleWarranty(item.uid)}" update="datalist" rendered="#{!empty assetInfoListController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
                                 <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </p:column>
@@ -119,7 +118,7 @@
                         <p:column headerText="#{msg.clinicalDeptName}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
-                                <p:inputText id="clinicalDept"  value="#{assetInfoController.fileterOrg.name}"  readonly="true"/>
+                                <p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
@@ -136,9 +135,9 @@
                         <p:column headerText="#{msg.vendor}" sortBy="#{item.vendor}" filterBy="#{item.vendor}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.vendor}"/>
                         </p:column>
-                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{!assetInfoController.isTerminate()}">
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoController.filterAssetStatus}" >
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -147,7 +146,7 @@
                         </p:column>
                         <p:column headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
                             <f:facet name="filter">
-                                <p:inputText id="filterWarrantyDate" widgetVar="varFilterWarrantyDate" value="#{assetInfoController.warrantyFormatTime}"/>
+                                <p:inputText id="filterWarrantyDate" widgetVar="varFilterWarrantyDate" value="#{assetInfoListController.warrantyFormatTime}"/>
                             </f:facet>
                             <h:outputText value="#{item.warrantyDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
@@ -159,7 +158,7 @@
                         <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
-                        <p:column headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoController.needShowAssetApproval}">
+                        <p:column headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
                             <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
@@ -169,24 +168,18 @@
                             </f:facet>
                         </p:column>
                         <f:facet name="{Toolbar}">
-                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoController.isTerminate() and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
-                            <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
-                            <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  actionListener="#{assetInfoController.getViewPage('Create','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoController.exportExcel}" update=":growl"
+                            <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoListController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoListController.exportExcel}" update=":growl"
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.excelFile}" />
+                                <p:fileDownload value="#{assetInfoListController.excelFile}" />
                             </p:commandButton>
-                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
-<!--                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
-                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.zipFile}" />
-                            </p:commandButton>-->
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
 
-                            <ui:fragment rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}">
-                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
+                            <ui:fragment rendered="#{!assetInfoListController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}">
+                                <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoListController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
-                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray batch-terminated" title="批量报废" actionListener="#{assetInfoController.batchProcessToTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
+                                <p:commandButton id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray batch-terminated" title="批量报废" actionListener="#{assetInfoListController.batchProcessToTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoListController.isChecked()}">
                                     <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
                             </ui:fragment>
@@ -194,7 +187,7 @@
                         </f:facet>
                     </p:dataTable>
                     <div style="display:none">
-                        <p:dataTable  id="exportTable" value="#{assetInfoController.getExportList()}" var="item" lazy="true" paginator="false" rows="1">
+                        <p:dataTable  id="exportTable" value="#{assetInfoListController.getExportList()}" var="item" lazy="true" paginator="false" rows="1">
                             <p:column headerText="ID" visible="false" exportable="true">
                                 <h:outputText value="#{item.uid}"/>
                             </p:column>
@@ -228,7 +221,7 @@
                             <p:column headerText="#{msg.vendor}" visible="false" exportable="true">
                                 <h:outputText value="#{item.vendor}"/>
                             </p:column>
-                            <p:column headerText="#{msg.status}" visible="false" exportable="true" rendered="#{!assetInfoController.isTerminate()}">
+                            <p:column headerText="#{msg.status}" visible="false" exportable="true" rendered="#{!assetInfoListController.terminate}">
                                 <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
                             </p:column>
                             <p:column headerText="#{msg.warrantyDate}" visible="false" exportable="true">
@@ -291,10 +284,10 @@
                                 <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
                             </p:column>
                             <p:column headerText="#{msg.hospitalId}" visible="false" exportable="true">
-                                <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
+                                <h:outputText value="#{assetInfoListController.getSiteOrgName(item.siteUID)}"/>
                             </p:column>
                             <p:column headerText="#{msg.parentAsset}" visible="false" exportable="true">
-                                <h:outputText value="#{assetInfoController.getParentAssetNameByAssetId(item.id)}"/>
+                                <h:outputText value="#{assetInfoListController.getParentAssetNameByAssetId(item.id)}"/>
                             </p:column>
                             <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
                                 <h:outputText value="#{item.systemId}"/>
@@ -401,7 +394,7 @@
                         </p:dataTable>
                     </div>
 
-                    <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton " immediate="true"/>
+                    <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:deleteButton " immediate="true"/>
                     <p:remoteCommand name="rc2" update="@(.selectCheckBoxHeader)"/>
                 </h:form>
             </div>
@@ -420,8 +413,8 @@
 
         <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
             <p:scrollPanel style="height:300px;border: 0" mode="native">
-                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
-                    <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg :idPanelFilterWarrantyDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoListController.selectSite==null? '':assetInfoListController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg :idPanelFilterWarrantyDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
                     <p:ajax process="@this" event="expand"/>
                     <p:ajax process="@this" event="collapse"/>
                     <p:treeNode type="org">
@@ -434,20 +427,20 @@
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display" >
                     <label class="label">选择导出模版</label>
-                    <p:selectOneMenu  value="#{assetInfoController.exportQrCodeTemplateId}">
+                    <p:selectOneMenu  value="#{assetInfoListController.exportQrCodeTemplateId}">
                         <p:ajax update="preview" />
                         <f:selectItem itemLabel="默认使用中模版" itemValue="#{null}" noSelectionOption="true" />
-                        <f:selectItems value="#{assetInfoController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                        <f:selectItems value="#{assetInfoListController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                     </p:selectOneMenu>
                     <h:panelGrid columns="1" style="width:100%" id="preview">
-                        <h:panelGroup rendered="#{not empty assetInfoController.exportQrCodeTemplateId}">
-                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId,'')}" />
+                        <h:panelGroup rendered="#{not empty assetInfoListController.exportQrCodeTemplateId}">
+                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoListController.exportQrCodeTemplateId,'')}" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>
-                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
+                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoListController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.zipFile}" />
+                                <p:fileDownload value="#{assetInfoListController.zipFile}" />
                 </p:commandButton>
                 <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>
