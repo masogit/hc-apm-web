@@ -401,7 +401,10 @@ public class AssetFileImportService {
             }
 
             String orgName = newAsset.getClinicalDeptName();
-            if (importOrgMap.containsKey(orgName)) {
+            if (StringUtils.isEmpty(orgName)) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "警告:科室为空");
+            } else if (importOrgMap.containsKey(orgName)) {
                 OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
                 if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
                     item.put("status", ImportStatus.Failure);
