@@ -1861,9 +1861,9 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onDepartNumChange(String fieldName) {
-        if (!Strings.isNullOrEmpty(config.getAssetCodeConfig())) {
+        if (!Strings.isNullOrEmpty(getAssetCodeConfig())) {
             String num = null;
-            switch (config.getAssetCodeConfig()) {
+            switch (getAssetCodeConfig()) {
                 case "DFQ":
                     switch (fieldName) {
                         case "financingNum":

@@ -354,6 +354,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 4));
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
+            searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
         } else {//全部
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
