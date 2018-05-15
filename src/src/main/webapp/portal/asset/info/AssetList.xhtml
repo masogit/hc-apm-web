@@ -93,20 +93,20 @@
                                 <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
                             </p:commandButton>
                         </p:column>
-                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                        <p:column binding="#{assetInfoListController.customColumns['name']}" headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
-                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                        <p:column binding="#{assetInfoListController.customColumns['functionType']}" headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.functionType}"/>
                         </p:column>
-                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE" >
+                        <p:column binding="#{assetInfoListController.customColumns['serialNum']}" headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.serialNum}"/>
                         </p:column>
-                        <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
+                        <p:column binding="#{assetInfoListController.customColumns['departNum']}" headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE" >
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                        <p:column binding="#{assetInfoListController.customColumns['assetGroup']}" headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
@@ -115,7 +115,7 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" >
+                        <p:column binding="#{assetInfoListController.customColumns['clinicalDeptName']}" headerText="#{msg.clinicalDeptName}" >
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                 <p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>
@@ -125,10 +125,6 @@
                         <p:column headerText="#{msg.nationalStandardCode}"  visible="false" exportable="true">
                             <h:outputText value="#{item.nationalStandardCode}"/>
                         </p:column>
-
-                        <!--<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">-->
-                            <!--<h:outputText value="#{item.brand.name}"/>-->
-                        <!--</p:column>-->
                         <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.manufacture}"/>
                         </p:column>

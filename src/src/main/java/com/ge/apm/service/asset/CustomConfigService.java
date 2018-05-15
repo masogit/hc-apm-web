@@ -12,6 +12,7 @@ import com.ge.apm.dao.SysRoleRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
+import com.ge.apm.domain.UserRole;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
@@ -22,6 +23,7 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -175,4 +177,14 @@ public class CustomConfigService {
         }
     }
 
+    public boolean hasAssetFieldPermissionByRole(CustomConfigObject config, String key, List<Object> userRoles){
+        
+        return true;
+    }
+    
+    public List<String> getReadAssetFieldsByRoles(CustomConfigObject config,List<String> userRoles){
+       return config.getAssetFields().entrySet().stream()
+               .filter(item-> item.getValue().getReadRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+               .map(Entry::getKey).collect(Collectors.toList());
+    }
 }

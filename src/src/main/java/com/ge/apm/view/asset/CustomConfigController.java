@@ -165,7 +165,7 @@ public class CustomConfigController {
     }
     
     public List<String> getListPageFieldsAddList(){
-        return customConfigObject.getAssetFields().keySet().stream().filter(item-> customConfigObject.getAssetsListPageFields().contains(item)).collect(Collectors.toList());
+        return customConfigObject.getAssetFields().keySet().stream().filter(item-> !customConfigObject.getAssetsListPageFields().contains(item)).collect(Collectors.toList());
     }
     
     public void addListPageFields(){
