@@ -125,7 +125,9 @@
                                      <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                                  </p:column>
                                <p:column headerText="费用" sortBy="#{item.cost}" >
-                                    <h:outputText value="#{item.cost}"/>
+                                   <h:outputText value="#{item.cost}">
+                                       <f:convertNumber pattern="0.00"/>
+                                   </h:outputText>
                                </p:column>
                                <p:column headerText="备注" sortBy="#{item.remark}" >
                                     <h:outputText value="#{item.remark}"/>
