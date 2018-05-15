@@ -2,10 +2,12 @@ package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
+import com.ge.apm.view.asset.components.CustomColumns;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -28,6 +30,7 @@ import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -43,6 +46,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private AssetFileImportService importService;
     private QrCodeService qrCodeService;
     private UaaService uaaService;
+    private CustomConfigService ccService;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -77,6 +81,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<AssetInfo> currentPageAssets;
 
     private Sort lastPageSort; //export use
+    
+    //custom config
+    private Map<String,CustomColumns> customColumns;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -92,15 +99,26 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         uaaService = WebUtil.getBean(UaaService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
         acService = WebUtil.getBean(AssetCreateService.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
 
         importService = WebUtil.getBean(AssetFileImportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
+        loadCustomConfig();
 
     }
 
+    private void loadCustomConfig(){
+        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        customColumns =CustomConfigService.getAllFields().entrySet().stream().collect(Collectors.toMap(Entry::getKey,
+                item-> new CustomColumns(item.getKey(),customConfig.getAssetsListPageFields().contains(item.getKey()) && 
+                        readFields.contains(item.getKey()))));
+    }
+    
+    
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
@@ -289,13 +307,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public boolean isChecked() {
-//        Map<String, Boolean> map = this.selectedMap;
-//        for (Map.Entry<String, Boolean> entry : map.entrySet()) {
-//            if (entry.getValue()) {
-//                return true;
-//            }
-//        }
-//        return false;
         return selectedMap.containsValue(true);
     }
 
@@ -487,6 +498,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public Boolean needAssetApproval(String siteUid) {
         return acService.needAssetApproval(siteUid);
+    }
+
+    public Map<String, CustomColumns> getCustomColumns() {
+        return customColumns;
     }
 
 }
