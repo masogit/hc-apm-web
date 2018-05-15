@@ -951,6 +951,8 @@ public class AssetFileImportService {
         final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
         final int GENERATE_BY_PREFIX_AND_SEQ = 2;
 
+        if (workflowConfig == null) return false;
+
         assetCodeConfig = workflowConfig.getAssetCodeConfig();
 
         if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
