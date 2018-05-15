@@ -441,10 +441,10 @@
                     </p:fieldset>
 <!--                                                            <p:fieldset legend="相关报告" >
                                                                 <h:panelGroup id="addReport">
-                                                                    <p:selectOneMenu value="#{commonReportController.reportUid}">
+                                                                    <p:selectOneMenu value="#{commonReportController.reportBaseUid}">
                                                                         <p:ajax update="addReport" />
                                                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                                        <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                                                        <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
                                                                     </p:selectOneMenu>
                                                                     <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
                                                                 </h:panelGroup>

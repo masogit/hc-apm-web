@@ -31,7 +31,7 @@ import webapp.framework.web.WebUtil;
 @ViewScoped
 public class CommonReportController {
 
-    private String reportUid;
+    private String reportBaseUid;
 
     private TableDefinitionRepository tableDao;
 
@@ -66,9 +66,10 @@ public class CommonReportController {
     }
 
     public void addReporter(String boUid) {
+        TableDefinition table = tableDao.findByBaseId(reportBaseUid);
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
-        newReport.setSchemaId(reportUid);
+        newReport.setSchemaId(table.getId());
         reportDao.save(newReport);
     }
 
@@ -102,14 +103,13 @@ public class CommonReportController {
         }
     }
 
-    public String getReportUid() {
-        return reportUid;
+    public String getReportBaseUid() {
+        return reportBaseUid;
     }
 
-    public void setReportUid(String reportUid) {
-        this.reportUid = reportUid;
+    public void setReportBaseUid(String reportBaseUid) {
+        this.reportBaseUid = reportBaseUid;
     }
-
 
 
 }

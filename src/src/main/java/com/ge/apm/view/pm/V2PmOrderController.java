@@ -107,7 +107,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private  String head;
-    private String reportUid;
+    
+    private String reportUid; //selected table base uid
     public String getHead() {
         return head;
     }
@@ -124,8 +125,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
-        TableDefinition tbd = tableDao.findById(reportUid);
-        newReport.setSchemaId(reportUid);
+        TableDefinition tbd = tableDao.findByBaseId(reportUid);
+        newReport.setSchemaId(tbd.getId());
         PmOrderRule pmOrderRule= pmOrderService.acqPmOrderRule(selectedPmOrder);
         if(tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getPerformanceReport()))
             newReport.setBoType("pm-performance-report");
