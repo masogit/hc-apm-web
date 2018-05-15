@@ -122,3 +122,6 @@ delete from unstructured_data where id in (select id from unstructured_data ud,(
    where ud.collection_id=b.collection_id and ud."key"=b.key and ud.id not in (SELECT max(id) FROM "public".unstructured_data  group by collection_id, key ));
 
 alter table unstructured_data add constraint uk_collection_id_key unique(collection_id,key);
+
+update v2_work_order as wo set approver_id = sr.requestor_id, approver_name = sr.requestor_name 
+	from v2_service_request as sr where sr.id = wo.sr_id and approval_status != '0' and approver_id is null;
