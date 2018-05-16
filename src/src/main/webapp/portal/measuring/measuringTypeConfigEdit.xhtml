@@ -29,7 +29,9 @@
 
                     <h:panelGroup >
                         <label class="label">计量周期(月)*</label>
-                        <p:inputNumber id="measureCycle" decimalPlaces="0" minValue="1" maxValue="9999" value="#{measuringTypeConfigController.selected.measureCycle}" required="true" requiredMessage="计量周期不能为空"/>
+                        <p:inputNumber id="measureCycle"  decimalPlaces="0" minValue="1" maxValue="9999" value="#{measuringTypeConfigController.selected.measureCycle}" required="true" requiredMessage="计量周期不能为空">
+                            <f:convertNumber pattern="0" type="number"/>
+                        </p:inputNumber>
                     </h:panelGroup>
 
                 </p:panelGrid>

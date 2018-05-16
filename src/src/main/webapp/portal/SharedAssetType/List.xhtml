@@ -21,7 +21,7 @@
 
                
                 <div class="ui-g-12 card cardTitle">
-                    <p:outputLabel class="pageTitle" value="调剂设备"/>
+                    <p:outputLabel class="pageTitle" value="调剂设备配置"/>
                 </div>
                 <div class="ui-g-12 card">
             <h:form id="SwapTypeListForm">
@@ -44,11 +44,20 @@
                     <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" filterBy="#{item.swapName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
-                    <p:column headerText="单价" sortBy="#{item.unitPrice}" filterBy="#{item.unitPrice}" filterMatchMode="GTE">
+                    <p:column headerText="单价" sortBy="#{item.unitPrice}">
+                        <f:facet name="filter">
+                            <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetTypeController.filterUnitPrice}"/>
+                        </f:facet>
                         <h:outputText value="#{item.unitPrice}"/>
                     </p:column>
-                    <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.chargingType}"/>
+                    <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('chargingType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                     </p:column>
                     <p:column headerText="创建人" sortBy="#{item.createBy}" filterBy="#{item.createBy}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.createBy}"/>
@@ -78,7 +87,8 @@
                        
                        </f:facet>
                 </p:dataTable>
-                <p:overlayPanel widgetVar="panelFilterCreateDate" for=":SwapTypeListForm:datalist:filterCreateDate" dismissable="false">
+
+                <p:overlayPanel id="panelForFilterDate" widgetVar="panelFilterCreateDate" for=":SwapTypeListForm:datalist:filterCreateDate" dismissable="false">
                     <h:panelGrid columns="2">
                         <p:outputLabel for="cal1" />
                         <p:calendar id="cal1" widgetVar="varCreateDateFrom" effect="fold"
@@ -89,6 +99,18 @@
                     </h:panelGrid>
                     <p:commandButton onclick="PF('panelFilterCreateDate').hide();setDateFilter('varDataList', 'varFilterCreateDate', 'varCreateDateFrom', 'varCreateDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
                     <p:commandButton onclick="PF('panelFilterCreateDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+
+                <p:overlayPanel id="panelForFilterPrice" widgetVar="panelFilterUnitPrice" for=":SwapTypeListForm:datalist:filterUnitPrice" showCloseIcon="true" dismissable="false">
+                    <h:panelGrid columns="3">
+                        <p:inputNumber placeholder="最小值" value="#{sharedAssetTypeController.filterUnitPriceFrom}" decimalPlaces="0" minValue="0">
+                            <p:ajax update=":SwapTypeListForm:datalist ,panelForFilterPrice ,panelForFilterDate"/>
+                        </p:inputNumber>
+                        --
+                        <p:inputNumber placeholder="最大值" value="#{sharedAssetTypeController.filterUnitPriceTo}" decimalPlaces="0" minValue="0">
+                            <p:ajax update=":SwapTypeListForm:datalist ,panelForFilterPrice ,panelForFilterDate"/>
+                        </p:inputNumber>
+                    </h:panelGrid>
                 </p:overlayPanel>
             </h:form>
             </div>

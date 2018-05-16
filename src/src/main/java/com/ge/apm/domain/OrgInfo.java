@@ -21,6 +21,7 @@ import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -32,14 +33,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import webapp.framework.web.WebUtil;
 
 /**
- *
  * @author 212547631
  */
 @Entity
 @Table(name = "org_info")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)
-public class OrgInfo implements Serializable {
+public class OrgInfo implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -52,7 +52,7 @@ public class OrgInfo implements Serializable {
     private String uid;
 
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
-    @Size(max=32)
+    @Size(max = 32)
     private String tenantUID;
 
     @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
@@ -66,13 +66,13 @@ public class OrgInfo implements Serializable {
 
     @Column(name = "parent_uid", columnDefinition = "CHAR(32)")
     private String parentUID;
-    
+
     @Column(name = "org_level")
     private Integer orgLevel;
 
     @Column(name = "org_type")
     private Integer orgType;
-    
+
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
@@ -83,8 +83,8 @@ public class OrgInfo implements Serializable {
     private String nameEn;
     @Column(name = "name_py_code")
     private String namePyCode;
-    
-    @JoinColumn(name = "parent_uid", referencedColumnName = "uid",insertable = false, updatable = false)
+
+    @JoinColumn(name = "parent_uid", referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     @JsonBackReference
     private OrgInfo parentOrg;
@@ -97,9 +97,12 @@ public class OrgInfo implements Serializable {
     @Column(name = "site_id")
     private Integer siteId;
 
+    @Transient
+    private int lineNum;
+
     @PrePersist
     public void initializeUid() {
-        if(uid==null)
+        if (uid == null)
             uid = UUID.randomUUID().toString().replace("-", "");
     }
 
@@ -192,7 +195,7 @@ public class OrgInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]","");
+        this.namePyCode = name == null ? null : PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
     }
 
     public String getNameEn() {
@@ -212,20 +215,20 @@ public class OrgInfo implements Serializable {
     }
 
     @JsonIgnore
-    public OrgInfo getHospital(){
+    public OrgInfo getHospital() {
         OrgInfo org = this;
-        while(org!=null){
-            if(org.getParentOrg()!=null)
+        while (org != null) {
+            if (org.getParentOrg() != null)
                 org = org.getParentOrg();
             else
                 break;
         }
-        
+
         return org;
     }
 
     public Integer getHospitalId() {
-        if(hospitalId==null)
+        if (hospitalId == null)
             return id;
         else
             return hospitalId;
@@ -284,13 +287,13 @@ public class OrgInfo implements Serializable {
         return name;
     }
 
-    public String getOrgTypeName(){
-        if(this.orgType == null)  return "";
-        
-        if(this.orgType.equals(1))  return WebUtil.getMessage("Institution");
-        else if(this.orgType.equals(2))  return WebUtil.getMessage("Hospital");
-        else if(this.orgType.equals(3))  return WebUtil.getMessage("Site");
-        else if(this.orgType.equals(4))  return WebUtil.getMessage("Department");
+    public String getOrgTypeName() {
+        if (this.orgType == null) return "";
+
+        if (this.orgType.equals(1)) return WebUtil.getMessage("Institution");
+        else if (this.orgType.equals(2)) return WebUtil.getMessage("Hospital");
+        else if (this.orgType.equals(3)) return WebUtil.getMessage("Site");
+        else if (this.orgType.equals(4)) return WebUtil.getMessage("Department");
         else return "";
     }
 
@@ -309,8 +312,8 @@ public class OrgInfo implements Serializable {
     public void setAssetOwnerId2(Integer assetOwnerId2) {
         this.assetOwnerId2 = assetOwnerId2;
     }
-    
-    public String getOrgFullName(){
+
+    public String getOrgFullName() {
         String name = this.name;
 
         OrgInfo org = this;
@@ -318,12 +321,23 @@ public class OrgInfo implements Serializable {
             String oName = org.getName();
             org = org.getParentOrg();
             String pName = org.getName();
-            
-            if(!(pName.contains(oName) || oName.contains(pName) || name.contains(pName)))
+
+            if (!(pName.contains(oName) || oName.contains(pName) || name.contains(pName)))
                 name = org.getName() + " " + name;
         }
 
         return name;
     }
-    
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
+    }
+
+    public String getPinYin() {
+        return namePyCode;
+    }
 }

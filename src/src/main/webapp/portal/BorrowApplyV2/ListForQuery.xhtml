@@ -46,7 +46,7 @@
                         <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
                         <p:ajax event="page" oncomplete="rc2();"/>
                         <p:column headerText="借用详情">
-                            <p:commandButton  class="btn btn-sm btn-gray" title="查看" action="#{sharedAssetRequestV2Controller.queryBorrowInfo(item.uid)}" 
+                            <p:commandButton  class="btn btn-sm btn-gray" title="查看" action="#{sharedAssetRequestV2Controller.queryBorrowInfo(item.uid,item.clinicalDeptUID)}"
                             oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                         </p:column>
                         <p:column rendered="false" exportable="false" width="#{userContextService.hasRole('AssetHead')?130:53}">
@@ -86,12 +86,10 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
-                        <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptUID}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
-                                </p:selectOneMenu>
+                        <p:column headerText="#{msg.clinicalDeptName}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:inputText id="clinicalDept"  value="#{assetInfoController.fileterOrg.name}"  readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
@@ -99,9 +97,9 @@
                             <h:outputText value="#{item.nationalStandardCode}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.brand.name}"/>
-                        </p:column>
+                        <!--<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">-->
+                            <!--<h:outputText value="#{item.brand.name}"/>-->
+                        <!--</p:column>-->
                         <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.manufacture}"/>
                         </p:column>
@@ -131,6 +129,11 @@
                         <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.qrCode}"/>
                         </p:column>
+
+                        <p:column headerText="调剂设备名称" sortBy="#{item.sharedAssetTypeUid}">
+                            <h:outputText value="#{sharedAssetInfoController.getSwapName(item.sharedAssetTypeUid)}"/>
+                        </p:column>
+
                         <f:facet name="{Toolbar}">
                             <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoController.isTerminate() and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>-->
                             <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
@@ -368,7 +371,7 @@
             </div>
         </div>
 
-        <p:overlayPanel widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false">
+        <p:overlayPanel id="panelFilterforDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false">
             <h:panelGrid columns="2">
                 <p:outputLabel value="#{msg.From}"/>
                 <p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
@@ -377,6 +380,19 @@
             </h:panelGrid>
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
+            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg panelFilterforDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
         </p:overlayPanel>
 
         <script>

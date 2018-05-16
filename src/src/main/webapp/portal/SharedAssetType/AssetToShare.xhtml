@@ -28,9 +28,9 @@
                 <h:form id="AssetInfoListForm">
 
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(2)}" rendered="true" />
-                        <p:commandButton value="已配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" />
-                        <p:commandButton value="未配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" />
+                        <!--<p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(2)}" rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 2}"/>-->
+                        <p:commandButton value="已配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 1}"/>
+                        <p:commandButton value="未配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == -1}"/>
                     </h:panelGrid>
 
                     <p:dataTable id="datalist" value="#{sharedAssetInfoController.lazyModel}" var="item" widgetVar="varDataList"
@@ -47,7 +47,7 @@
                         <p:ajax event="page" oncomplete="rc2();" />
 
                         <p:column width="50">
-                            <p:selectBooleanCheckbox value="#{sharedAssetInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
+                            <p:selectBooleanCheckbox value="#{sharedAssetInfoController.selectedMap[item.uid]}" rendered="#{!sharedAssetInfoController.isBorrow(item.uid)}"  class="selectCheckBox">
                                 <p:ajax listener="#{sharedAssetInfoController.onItemSelected}" update="@this @(.selectCheckBoxHeader) @(.btn-gray)"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
@@ -59,10 +59,14 @@
 
                         <p:column exportable="false" width="50" headerText="编辑">
                             <h:panelGroup>
-                                <p:commandButton icon="ui-icon-pencil" class="btn btn-sm btn-gray" style="width: 10px; height: 25px;"
+                                <p:commandButton icon="ui-icon-pencil" class="btn btn-sm btn-gray" style="width: 10px; height: 25px;" disabled="#{sharedAssetInfoController.isBorrow(item.uid)}"
                                                  actionListener="#{sharedAssetInfoController.prepareEditOne(item.uid)}" title="编辑" update=":AssetEditDlg, datalist" oncomplete="PF('AssetEditDialog').show()" />
                             </h:panelGroup>
                         </p:column>
+
+                        <!--<p:column colspan="2" width="100" rendered="#{sharedAssetInfoController.isBorrow(item.uid)}">-->
+                            <!--<h:outputText value="在借中" />-->
+                        <!--</p:column>-->
 
                         <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>

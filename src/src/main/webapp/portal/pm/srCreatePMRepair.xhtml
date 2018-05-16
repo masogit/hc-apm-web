@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition>
+
+        <p:dialog id="createSRDialogRepair" widgetVar="createSRDialogRepair" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修" >
+
+            <h:form id="ServiceRequestCreateFormRepair">
+                <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" >
+                    <!--rendered="#{not empty v2PmOrderController.newServiceRequest}"-->
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                        <h:panelGroup >
+                            <label class="label">#{msg.assetName}*</label>
+                            <p:inputText id="assetName" readonly="true" value="#{v2PmOrderController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                        <label class="label">资产当前位置</label>
+                        <p:inputText id="dptName"  value="#{v2PmOrderController.dptName}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.requestorName}</label>
+                            <p:outputLabel value="#{v2PmOrderController.newServiceRequest.requestorName}" />
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.casePriority}*</label>
+                            <p:selectOneMenu value="#{v2PmOrderController.newServiceRequest.casePriority}" >
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item"
+                                               itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.requestTime}</label>
+                            <p:outputLabel value="#{v2PmOrderController.newServiceRequest.requestTime}" >
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                            </p:outputLabel>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.requestReason}</label>
+                            <p:inputTextarea value="#{v2PmOrderController.newServiceRequest.requestReason}" maxlength="256" />
+                            <p:outputLabel value="#{v2PmOrderController.newServiceRequest.requestReason}" />
+                        </h:panelGroup>
+                        <h:panelGroup id="assetstatus">
+                            <label class="label">#{msg.status}</label>
+                            <p:selectOneRadio id="status" value="#{v2PmOrderController.currentStatus}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                                <p:ajax  listener="#{v2PmOrderController.onStatusChange()}"  update="assetstatus" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus').subList(1, 3)}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+
+                            </p:selectOneRadio>
+                            <p:calendar timeZone="GMT+8" label="#{msg.confirmedDownTime}" rendered="#{v2PmOrderController.needConfirmTime}"  id="confirmedDownTime" pattern="yyyy/MM/dd HH:mm" value="#{v2PmOrderController.newServiceRequest.confirmedDownTime}" showOn="button"
+                                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.confirmedDownTime} #{msg.ValidationRequire}"/>
+                        </h:panelGroup>
+
+
+                    </p:panelGrid>
+                    <p:dataGrid id="pictureList" var="fileitem" value="#{v2PmOrderController.picList}" columns="5" layout="grid">
+                        <f:facet name="header">附件上传</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%" >
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
+                                <p:commandButton actionListener="#{v2PmOrderController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>   
+                            </h:panelGrid>
+
+                        </p:panel>
+
+                    </p:dataGrid>
+                    <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+
+                    <h:panelGroup >
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.saveServiceRequest()}" update="pmTab:pmOrderListForm:datalist" disabled="#{!v2PmOrderController.canCreateSr()}" validateClient="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancelsr()}" immediate="true" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                    </h:panelGroup>
+
+                    <h:panelGroup >
+                        <h:outputText style="color:red; font-size:18px" value="该设备可以外修,报修电话:4008128188" rendered="#{!v2PmOrderController.canCreateSr() or (v2PmOrderController.selectedAsset.ibStatus eq 1 and v2PmOrderController.selectedAsset.repairForm eq 3)}"/>
+                    </h:panelGroup>
+                </p:fieldset>
+            </h:form>
+
+            <ui:include src="/portal/asset/selectAssetDialogRepair.xhtml"/>
+        </p:dialog>
+    </ui:composition>
+</html>

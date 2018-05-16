@@ -24,11 +24,13 @@
                         
                         <h:panelGroup>
                             <label class='label'>申请人</label>
-                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"></h:outputText>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.applicant}"></h:outputText>-->
                             <!--<p:inputText id="applicant" value="#{sharedAssetRequestV2Controller.selected.applicant}" readonly="true"/>-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>科室名称</label>
+                            <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                             <p:selectOneMenu id="clinicalDeptUid" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptUid}" required="true" requiredMessage="科室 #{msg.ValidationRequire}" >
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{assetInfoService.getClinicalDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
@@ -75,7 +77,7 @@
                         <h:outputText value="#{item.sharedAssetTypeId}"/>
                     </p:column>
                     <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
-                        <h:outputText value="#{sharedAssetTypeController.getSwapQty(item.sharedAssetTypeId)}"/>
+                        <h:outputText value="#{sharedAssetTypeController.getSwapQty(item.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                     </p:column>
                     <p:column headerText="申请归还数" sortBy="#{item.applyQty}" >
                         <h:outputText value="#{item.applyQty}"/>

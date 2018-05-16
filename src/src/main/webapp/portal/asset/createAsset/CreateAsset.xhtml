@@ -236,7 +236,7 @@
 
                                     <h:panelGroup>
                                         <label class="label">设备国标码</label>
-                                        <p:autoComplete id="gbname" value="#{assetCreateController.assetInfo.nationalStandardCode}" completeMethod="#{assetCreateController.completeGbName}" class="gbname">
+                                        <p:autoComplete id="gbname" value="#{assetCreateController.assetInfo.nationalStandardCode}" completeMethod="#{assetCreateController.completeGbName}" class="gbname financingNum">
                                             <!--<p:ajax process="@this"/>-->
                                         </p:autoComplete>
                                         <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
@@ -287,9 +287,9 @@
                                     <h:panelGroup >
                                         <label class="label">#{msg.financingNum}</label>
                                         <p:inputText  value="#{assetCreateController.assetInfo.financingNum}" class="financingNum">
-                                            <p:ajax process="@this" update="#{empty assetCreateController.assetInfo.financingNum? '':'@(.financingNum)'}"/>
+                                            <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                         </p:inputText>
-                                        <p:commandButton validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 3}" 
+                                        <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetCreateController.gennerateFinancingNum()}" disabled="#{assetCreateController.assetInfo.financingNum.length() gt 4}" 
                                                          update="@(.financingNum) :growl" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                                     </h:panelGroup>
                                     <h:panelGroup>

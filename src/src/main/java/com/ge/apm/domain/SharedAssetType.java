@@ -30,7 +30,7 @@ public class SharedAssetType implements Serializable{
     private String swapName;//调剂设备名称
     
     @Column(name = "charging_type")
-    private String chargingType;//计价方式
+    private String chargingType;//计价方式  1.次  2.小时（整点半点） 3.天  4. 自然时间
     
     @Column(name = "unit_price")
     private Double unitPrice;//单价

@@ -53,8 +53,10 @@
                             <p:outputLabel value="#{v2PmOrderController.selected.currentStepName}"></p:outputLabel>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">工时</label>
-                            <p:outputLabel value="#{v2PmOrderController.selected.manHours}"></p:outputLabel>
+                            <label class="label">工时(小时)</label>
+                            <h:outputText value="#{v2PmOrderController.selected.manHours}">
+                                <f:convertNumber minFractionDigits="2"></f:convertNumber>
+                            </h:outputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">计划完成时间</label>
@@ -92,7 +94,7 @@
                         </p:column>
                     </p:dataTable>
 
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{v2PmOrderController.accessoryList.size()>0}">
                         <label class="label">备件信息</label><!--增加备件-->
                         <p:dataTable id="accessList" class="uiTransparent" value="#{v2PmOrderController.accessoryList}" var="item" widgetVar="varAccessListList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.accessory}">
@@ -137,10 +139,9 @@
 
                         </p:dataTable>
                     </h:panelGroup>
-                    <h:panelGroup>
+                    <h:panelGroup rendered="#{v2PmOrderController.coWorkerList.size()>0}">
                         <label class="label">协作人信息</label>
-                        <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false"
-                                     rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
+                        <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}"  var="item" widgetVar="pmcoworkerList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                             <p:column headerText="#{msg.coworker}">
                                 <h:outputText value="#{item.cowokerUserName}"/>
                             </p:column>
@@ -162,9 +163,39 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+                    <p:growl id="msgs" showDetail="true" />
+                    <p:fieldset legend="保养清单">
+                        <p:fieldset legend="保养报告">
+                            <p:dataList class="rpClass"  value="#{v2PmOrderController.reportList}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                                #{v2PmOrderController.getTableDefName(reportItem.schemaId)}
+                                <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                                <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                            </p:dataList>
+
+                        </p:fieldset>
+                        <p:fieldset legend="检查项" id="chkItem"   rendered="#{not empty v2PmOrderController.selected}">
+                            <c:forEach  items="#{v2PmOrderController.pmCheckItemList}" var="item">
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <label class="label" style="word-wrap: break-word">#{item.name}</label>
+                                        <p:selectOneMenu disabled="true" value="#{v2PmOrderController.hmCheck[item.uid].value}">
+                                            <p:ajax listener="#{v2PmOrderController.hmCheckSet(item.uid)}"></p:ajax>
+                                            <f:selectItem itemValue="#{'pass'}" itemLabel="#{fieldMsg.fieldValue('checkItem','pass')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'n/a'}" itemLabel="#{fieldMsg.fieldValue('checkItem','n/a')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
+                                        </p:selectOneMenu>
+                                        <p:inputTextarea rows="3" style="width:100%;height:100px" readonly="true" value="#{item.remark}"></p:inputTextarea><br/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </c:forEach>
+                        </p:fieldset>
+                    </p:fieldset>
+
 
                     <h:panelGroup >
-                        <label class="label">审批通知消息</label>
+                        <label class="label">保养工单消息</label>
                         <p:dataList value="#{v2PmOrderController.getServiceRequestMessageList(v2PmOrderController.selected.id)}" var="msgItem" rendered="#{not empty v2PmOrderController.getServiceRequestMessageList(v2PmOrderController.selected.id)}">
                             <h:outputText value="#{msgItem.sendTime}" >
                                 <f:convertDateTime pattern="MM/dd HH:mm:ss"/>
