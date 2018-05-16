@@ -139,7 +139,7 @@ public class TableCreateController extends TieWebSheetBean {
                 WebUtil.addSuccessMessage("JSON已保存");
             } else {
                 selectedTableDefinition = templateService.updateJSONTemplate(selectedTableDefinition, tableString);
-                WebUtil.addErrorMessage("字段有变动,JSON不能保存");
+                WebUtil.addErrorMessage("字段变动, JSON已保存为新版本");
             }
 
         }
