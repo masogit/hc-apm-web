@@ -360,7 +360,7 @@
             </h:form>
         </p:dialog>
 <!--接单对话框-->
-        <p:dialog class ="t1" id="takeOrderDialog"  widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{v2PmOrderController.head}00">
+        <p:dialog class ="t1" id="takeOrderDialog"  widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{v2PmOrderController.head}">
             <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
