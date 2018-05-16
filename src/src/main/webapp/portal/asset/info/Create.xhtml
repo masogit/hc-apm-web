@@ -257,7 +257,8 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText value="#{assetInfoController.selected.financingNum}" class="financingNum">
-                                    <p:ajax event="keyup" process="@this" update="@(.financingNum) qrCode qrCodeButton departNum" listener="#{assetInfoController.onDepartNumChange('financingNum')}"/>
+                                    <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                                    <p:ajax listener="#{assetInfoController.onDepartNumChange('financingNum')}" update="@(.financingNum) qrCode qrCodeButton departNum" />
                                 </p:inputText>
                                 <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoController.generateFinancialNum()}"  disabled="#{assetInfoController.selected.financingNum.length() gt 4}"
                                     process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) qrCode qrCodeButton departNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
