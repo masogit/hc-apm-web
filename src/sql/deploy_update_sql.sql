@@ -142,3 +142,7 @@ ALTER TABLE public.shared_asset_request ALTER COLUMN apply_time TYPE timestamp U
 ALTER TABLE public.shared_asset_request ALTER COLUMN create_date TYPE timestamp USING create_date::timestamp;
 ALTER TABLE public.shared_asset_request ALTER COLUMN msg_begin_time TYPE timestamp USING msg_begin_time::timestamp;
 ALTER TABLE public.shared_asset_request ALTER COLUMN msg_end_time TYPE timestamp USING msg_end_time::timestamp;
+
+alter table capture_data_messages alter start_date type timestamp(4) without time zone
+alter table capture_data_messages alter end_date type timestamp(4) without time zone
+
