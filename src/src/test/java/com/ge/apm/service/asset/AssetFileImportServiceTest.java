@@ -25,9 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebAppConfiguration
@@ -87,7 +85,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
 
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
@@ -113,7 +111,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
 
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
@@ -213,7 +211,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -232,7 +230,7 @@ public class AssetFileImportServiceTest {
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -256,7 +254,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -275,7 +273,7 @@ public class AssetFileImportServiceTest {
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -299,7 +297,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -318,7 +316,7 @@ public class AssetFileImportServiceTest {
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false, false);
+        service.importData(orgMap, assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 

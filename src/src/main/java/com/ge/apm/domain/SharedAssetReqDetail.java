@@ -39,7 +39,7 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "asset_info_id")
     private String assetInfoId;//资产设备id
     
-    @Column(name = "shared_asset_type_id")
+    @Column(name = "shared_asset_type")
     private String sharedAssetTypeId;//调剂设备id 
     
     @Column(name = "asset_number")
@@ -76,7 +76,7 @@ public class SharedAssetReqDetail implements Serializable{
     @Column(name = "count_qty")
     private Integer countQty;//计费数量
     
-    @Column(name = "cost")
+    @Column(name = "cost",columnDefinition = "decimal(11,2)")
     private Double cost;//费用
     
     @Column(name = "accepter")

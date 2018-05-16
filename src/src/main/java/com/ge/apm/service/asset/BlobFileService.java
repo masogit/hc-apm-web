@@ -116,9 +116,10 @@ public class BlobFileService {
     public Boolean deleteBlobFilesByStorageId(String objectId) {
         List<V2_BlobObject> objects = getBlobObjectsByStorageId(objectId);
         for (V2_BlobObject object: objects) {
-            deleteBlobFile(object);
+            if(!deleteBlobFile(object)){
+                return false;
+            }
         }
-
         return true;
     }
 

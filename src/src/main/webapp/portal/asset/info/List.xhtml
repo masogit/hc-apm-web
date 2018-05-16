@@ -269,6 +269,9 @@
                             <p:column headerText="#{msg.capitalSource}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
                             </p:column>
+                            <p:column headerText="#{msg.capitalSource2}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('capitalSource2', item.capitalSource2)}"/>
+                            </p:column>
                             <p:column headerText="#{msg.measureGrade}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
                             </p:column>
@@ -441,13 +444,13 @@
                     </p:selectOneMenu>
                     <h:panelGrid columns="1" style="width:100%" id="preview">
                         <h:panelGroup rendered="#{not empty assetInfoController.exportQrCodeTemplateId}">
-                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId)}" />
+                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId,'')}" />
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:panelGroup>
                 <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
-                                <p:fileDownload value="#{assetInfoController.zipFile}" contentDisposition="inline" />
+                                <p:fileDownload value="#{assetInfoController.zipFile}" />
                 </p:commandButton>
                 <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
             </h:form>

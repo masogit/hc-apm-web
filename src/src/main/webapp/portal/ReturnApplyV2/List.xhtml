@@ -57,15 +57,15 @@
                         </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
-                    <p:column headerText="申请人" sortBy="#{item.applicant}" filterBy="#{item.applicant}" filterMatchMode="LIKE">
-                        <h:outputText value="#{item.applicant}"/>
+                    <p:column headerText="申请人" sortBy="#{item.applicantName}" filterBy="#{item.applicantName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.applicantName}"/>
                     </p:column>
                     <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.applicantPhone}"/>
                     </p:column>
                     <p:column headerText="归还状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ">
                         <f:facet name="filter">
-                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetReturnStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>

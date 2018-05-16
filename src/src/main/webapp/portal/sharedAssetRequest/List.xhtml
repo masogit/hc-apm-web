@@ -18,7 +18,7 @@
                 <p:dataTable id="datalist" value="#{sharedAssetRequestNewController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{sharedAssetRequestNewController.selected}"
                     lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
-                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.createDate}"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.applyTime}"
                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                     rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -37,12 +37,12 @@
                         <h:outputText value="归还已完成" rendered="#{item.state eq 12}"/>
                         <h:outputText value="借用已完成" rendered="#{item.state eq 6}"/>
                     </p:column>-->
-                    <p:column headerText="创建日期" sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="GTE">
-                        <f:facet name="filter">
-                            <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
+                    <p:column headerText="申请日期" sortBy="#{item.applyTime}" filterBy="#{item.applyTime}" filterMatchMode="LIKE">
+                       <f:facet name="filter">
+                           <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{sharedAssetRequestNewController.applyTimeFormatTime}"/>
                         </f:facet>
-                        <h:outputText value="#{item.createDate}">
-                            <f:convertDateTime pattern="yyyy/MM/dd "/>
+                        <h:outputText value="#{item.applyTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                         </h:outputText>
                     </p:column>
                     <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
@@ -57,6 +57,18 @@
                         <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestNewController.prepareDelete}"  disabled="#{empty sharedAssetRequestNewController.selected}"/>
                     </f:facet>
                 </p:dataTable>
+                <p:overlayPanel id="filterTime" widgetVar="panelFilterApplyTime" for=":SharedAssetRequestListForm:datalist:filterApplyTime" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="cal1" />
+                        <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{sharedAssetRequestV2Controller.applyTimeFrom}"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                        <p:outputLabel for="cal2"/>
+                        <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                </p:overlayPanel>
             </h:form>
             </div>
         </div>

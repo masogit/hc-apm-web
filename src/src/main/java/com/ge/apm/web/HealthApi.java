@@ -1,6 +1,8 @@
 package com.ge.apm.web;
 
 import com.ge.apm.dao.AssetFaultTypeRepository;
+import com.ge.apm.dao.TenantInfoRepository;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.api.HealthService;
 import com.google.common.collect.ImmutableList;
@@ -36,6 +38,9 @@ public class HealthApi {
   
   @Autowired
   AssetFaultTypeRepository assetTypeRepository;
+
+  @Autowired
+  private TenantInfoRepository tenantInfoDao;
   
   private static final String redirect_1 = "/portal/woMgr/workOrderList.xhtml";
   private static final String redirect_2 = "/portal/asset/info/List.xhtml?assetStatus=2";
@@ -55,10 +60,16 @@ public class HealthApi {
                                                             @Min(0) @RequestParam(value = "start", required = false, defaultValue = "0") Integer start) {
 
     UserAccount user = UserContext.getCurrentLoginUser();
-    int site_id = user.getSiteId();
-    int hospital_id = user.getHospitalId();
+    Integer site_id = user.getSiteId();
+    Integer hospital_id = user.getHospitalId();
     String tenantUID = user.getTenantUID();
     String siteUID = user.getSiteUID();
+
+   TenantInfo tempTenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+   if(tempTenantInfo.getInsulate() != null && tempTenantInfo.getInsulate()){
+       hospital_id = null;
+       siteUID = null;
+   }
 
     if (Option.of(category).isEmpty())
       category = 0;

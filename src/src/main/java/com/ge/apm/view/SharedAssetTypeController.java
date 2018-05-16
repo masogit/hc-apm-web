@@ -8,10 +8,7 @@ package com.ge.apm.view;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetType;
-import com.ge.apm.domain.SharedAssetTypeAccesssory;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
@@ -51,6 +48,11 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     OrgInfoRepository orgInfoDao = null;
     private String operation;
     private String createDateFormatTime = null;
+
+    private String filterUnitPrice;
+    private Double filterUnitPriceFrom;
+    private Double filterUnitPriceTo;
+
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
@@ -115,6 +117,17 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 //       setSearchFilter();
        
        setUserSearchFilters();
+
+        this.removeFilterOnField("unitPrice");
+
+        if (this.getFilterUnitPrice() != null && this.getFilterUnitPrice() != ""){
+           String[] split = this.getFilterUnitPrice().split("~");
+           searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.GTE,split[0]));
+           if (split.length == 2) {
+               if (!split[1].equals(""))
+                   searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.LTE, split[1]));
+           }
+       }
         
        if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
@@ -177,15 +190,15 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
     @Override
     public void delete() {
         if(dao.findAssetIsExist(this.selected.getId()).isEmpty()){
-            String name = selected.getSwapName();
-            super.delete();
-            WebUtil.addSuccessMessage("’已成功删除 ‘"+name+"’");
+            dao.delete(selected);
+            WebUtil.addSuccessMessage("已成功删除: "+selected.getSwapName());
+            selected = null;
         }
         else{
             WebUtil.addErrorMessage("此调剂设备已在使用，请核实！");
         }
     }
-    
+
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
         UserAccount user = UserContextService.getCurrentUserAccount();
@@ -238,14 +251,12 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         return objectList;
     }
     
-    public int getSwapQty(String Uid){
+    public int getSwapQty(String Uid,String clinicalDeptUid){
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            objectList = dao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
+            List<AssetInfo> objectList = new ArrayList<AssetInfo>();
+            objectList = dao.findbyBorrowQty(clinicalDeptUid,Uid);
 
             return objectList.size();
         }
@@ -308,5 +319,33 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
 
     public void setCreateDateFormatTime(String createDateFormatTime) {
         this.createDateFormatTime = createDateFormatTime;
+    }
+
+    public String getFilterUnitPrice() {
+        double from = filterUnitPriceFrom != null ? filterUnitPriceFrom : 0;
+        String s = (filterUnitPriceTo != null && filterUnitPriceTo != 0) ? filterUnitPriceTo + "" : "";
+        if (filterUnitPriceFrom == null && filterUnitPriceTo == null)
+            return null;
+        return from + "~" + s;
+    }
+
+    public void setFilterUnitPrice(String filterUnitPrice) {
+        this.filterUnitPrice = filterUnitPrice;
+    }
+
+    public Double getFilterUnitPriceFrom() {
+        return filterUnitPriceFrom;
+    }
+
+    public void setFilterUnitPriceFrom(Double filterUnitPriceFrom) {
+        this.filterUnitPriceFrom = filterUnitPriceFrom;
+    }
+
+    public Double getFilterUnitPriceTo() {
+        return filterUnitPriceTo;
+    }
+
+    public void setFilterUnitPriceTo(Double filterUnitPriceTo) {
+        this.filterUnitPriceTo = filterUnitPriceTo;
     }
 }

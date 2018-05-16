@@ -52,6 +52,9 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
         }
         if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            orgUidList.add(UserContextService.getCurrentUserAccount().getHospitalUID());
+            orgUidList.add(UserContextService.getCurrentUserAccount().getInstitutionUID());
+            orgUidList.add(UserContextService.getCurrentUserAccount().getTenantUID());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));

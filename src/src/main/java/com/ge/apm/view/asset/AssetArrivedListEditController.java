@@ -84,7 +84,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-    private String vendorName;
+    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
 
@@ -127,6 +127,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
+                supplierName = supplier==null? null:supplier.getName();
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
@@ -160,6 +161,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void applyChange() {
+        onSupplierChange(null);
         this.save();
     }
 
@@ -192,8 +194,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void submitArrivalList() {
-        onBeforeSave(selected);
-        dao.save(selected);
+        saveArrivalList();
         if (aiService.submitArrivalList(selected.getId())) {
             WebUtil.addSuccessMessage("到货清单已经提交");
         } else {
@@ -209,12 +210,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selectedOrg = (OrgInfo) node.getData();
     }
 
-    public void onSupplierChange() {
-        if (null != supplier) {
-            selected.setSupplierId(supplier.getId());
-            selected.setVendor(supplier.getName());
-        }
-    }
+//    public void onSupplierChange() {
+//        if (null != supplier) {
+//            selected.setSupplierId(supplier.getId());
+//            selected.setVendor(supplier.getName());
+//        }
+//    }
 
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
@@ -519,10 +520,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         return res;
     }
 
-    public void onVendorChange(SelectEvent event) {
-        Supplier vendor = suppliersList.stream().filter(item -> item.getName().equals(vendorName)).findFirst().orElse(null);
-        if (vendor != null) {
-            selected.setVendor(vendor.getId().toString());
+    public void onSupplierChange(SelectEvent event) {
+        Supplier selectedSupplier = suppliersList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
+        if (selectedSupplier != null) {
+            selected.setSupplierId(selectedSupplier.getId());
+            selected.setVendor(selectedSupplier.getName());
         }
     }
 
@@ -625,12 +627,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.generatePmorder = generatePmorder;
     }
 
-    public String getVendorName() {
-        return vendorName;
+    public String getSupplierName() {
+        return supplierName;
     }
 
-    public void setVendorName(String vendorName) {
-        this.vendorName = vendorName;
+    public void setSupplierName(String supplierName) {
+        this.supplierName = supplierName;
     }
 
 }

@@ -20,6 +20,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -41,7 +42,34 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetRequestRepository sharedDao = null;
     OrgInfoRepository orgInfoDao = null;
     WorkflowConfigRepository wfCfigDao = null;
-    
+
+    private Date filterBeginTime;
+    private Date filterEndTime;
+
+    private String filterUnitPrice;
+    private Double filterUnitPriceFrom;
+    private Double filterUnitPriceTo;
+
+    private String filterCost;
+    private Double filterCostFrom;
+    private Double filterCostTo;
+
+    public Date getFilterBeginTime() {
+        return filterBeginTime;
+    }
+
+    public void setFilterBeginTime(Date filterBeginTime) {
+        this.filterBeginTime = filterBeginTime;
+    }
+
+    public Date getFilterEndTime() {
+        return filterEndTime;
+    }
+
+    public void setFilterEndTime(Date filterEndTime) {
+        this.filterEndTime = filterEndTime;
+    }
+
     @Override
     protected void init() {
         dao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
@@ -79,7 +107,36 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (wfCfigList == null || wfCfigList.size() == 0) {
             sharedList = sharedDao.findSharedIdByOrgUidforQuery(orgUid);
         } else {
-            sharedList = sharedDao.findSharedIdforQuery();
+            sharedList = sharedDao.findSharedIdforQuery(userOrg.getSiteUID());
+        }
+
+        if (filterBeginTime != null){
+            searchFilters.add(new SearchFilter("chargingBeginTime", SearchFilter.Operator.GTE,filterBeginTime));
+        }
+        if (filterEndTime != null){
+            searchFilters.add(new SearchFilter("chargingEndTime", SearchFilter.Operator.LTE,filterEndTime));
+        }
+
+        this.removeFilterOnField("unitPrice");
+
+        if (this.getFilterUnitPrice() != null && this.getFilterUnitPrice() != ""){
+            String[] split = this.getFilterUnitPrice().split("~");
+            searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.GTE,split[0]));
+            if (split.length == 2) {
+                if (!split[1].equals(""))
+                    searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.LTE, split[1]));
+            }
+        }
+
+        this.removeFilterOnField("cost");
+
+        if (this.getFilterCost() != null && this.getFilterCost() != ""){
+            String[] split = this.getFilterCost().split("~");
+            searchFilters.add(new SearchFilter("cost", SearchFilter.Operator.GTE,split[0]));
+            if (split.length == 2) {
+                if (!split[1].equals(""))
+                    searchFilters.add(new SearchFilter("cost", SearchFilter.Operator.LTE, split[1]));
+            }
         }
       
         searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
@@ -102,5 +159,68 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             }
         }
     }
-    
+
+    public String getFilterUnitPrice() {
+        double from = filterUnitPriceFrom != null ? filterUnitPriceFrom : 0;
+        String s = (filterUnitPriceTo != null && filterUnitPriceTo != 0) ? filterUnitPriceTo + "" : "";
+        if (filterUnitPriceFrom == null && filterUnitPriceTo == null)
+            return null;
+        return from + "~" + s;
+    }
+
+    public void setFilterUnitPrice(String filterUnitPrice) {
+        this.filterUnitPrice = filterUnitPrice;
+    }
+
+    public Double getFilterUnitPriceFrom() {
+        return filterUnitPriceFrom;
+    }
+
+    public void setFilterUnitPriceFrom(Double filterUnitPriceFrom) {
+        this.filterUnitPriceFrom = filterUnitPriceFrom;
+    }
+
+    public Double getFilterUnitPriceTo() {
+        return filterUnitPriceTo;
+    }
+
+    public void setFilterUnitPriceTo(Double filterUnitPriceTo) {
+        this.filterUnitPriceTo = filterUnitPriceTo;
+    }
+
+    public SharedAssetReqDetailRepository getDao() {
+        return dao;
+    }
+
+    public void setDao(SharedAssetReqDetailRepository dao) {
+        this.dao = dao;
+    }
+
+    public String getFilterCost() {
+        double from = filterCostFrom != null ? filterCostFrom : 0;
+        String s = (filterCostTo != null && filterCostTo != 0) ? filterCostTo + "" : "";
+        if (filterCostFrom == null && filterCostTo == null)
+            return null;
+        return from + "~" + s;
+    }
+
+    public void setFilterCost(String filterCost) {
+        this.filterCost = filterCost;
+    }
+
+    public Double getFilterCostFrom() {
+        return filterCostFrom;
+    }
+
+    public void setFilterCostFrom(Double filterCostFrom) {
+        this.filterCostFrom = filterCostFrom;
+    }
+
+    public Double getFilterCostTo() {
+        return filterCostTo;
+    }
+
+    public void setFilterCostTo(Double filterCostTo) {
+        this.filterCostTo = filterCostTo;
+    }
 }

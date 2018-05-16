@@ -52,14 +52,13 @@ public interface UserAccountMapper {
 	@Select("select id from user_account where uid =#{uid}")
 	public UserAccount getUserByUId(String uid);
 
-	@Insert("insert into user_account(telephone,site_id,hospital_id,hospital_uid,org_id,login_name,name,pwd_salt,password,institution_uid,site_uid,tenant_uid,org_level,org_uid,uid,email,is_super_admin,is_site_admin,is_local_admin,is_active,is_locked,wechat_id) "+
+	@Insert("insert into user_account(telephone,site_id,hospital_id,hospital_uid,org_id,login_name,name,pwd_salt,password,institution_uid,site_uid,tenant_uid,org_level,org_uid,uid,email,is_super_admin,is_site_admin,is_local_admin,is_active,is_locked,wechat_id,created_by,created_date,password_error_count,active_time,name_py_code,last_modified_by,last_modified_date) "+
 			 " values "+
-			" (#{telephone},#{siteId},#{hospitalId},#{hospitalUID},#{orgInfoId},#{loginName},#{name},#{pwdSalt},#{password},#{institutionUID},#{siteUID},#{tenantUID},#{orgLevel},#{orgInfoUID},#{uid},#{email},false,false,false,true,false,#{weChatId})")
+			" (#{telephone},#{siteId},#{hospitalId},#{hospitalUID},#{orgInfoId},#{loginName},#{name},#{pwdSalt},#{password},#{institutionUID},#{siteUID},#{tenantUID},#{orgLevel},#{orgInfoUID},#{uid},#{email},false,false,false,#{isActive},#{isLocked},#{weChatId},#{createdBy},#{createdDate},0,#{activeTime},#{namePyCode},#{lastModifiedBy},#{lastModifiedDate})")
 	@Options(useGeneratedKeys=true)
 	public Integer saveUserAccount(UserAccount user);
 	
-	
-	@Update("update user_account set telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked} where uid=#{uid}")
+	@Update("update user_account set telephone=#{telephone},org_id=#{orgInfoId},login_name=#{loginName},name=#{name},org_uid=#{orgInfoUID},email=#{email},is_active=#{isActive},is_locked=#{isLocked},last_modified_by=#{lastModifiedBy},last_modified_date=#{lastModifiedDate},password_error_count=#{passwordErrorCount},active_time=#{activeTime},name_py_code=#{namePyCode} where uid=#{uid}")
 	public void updateUserAccount(UserAccount user);
 
 	@Insert("insert into user_role(user_id,role_id) values (#{userId},#{roleId})")

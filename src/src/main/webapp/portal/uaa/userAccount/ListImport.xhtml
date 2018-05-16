@@ -9,13 +9,13 @@
 			<p:fieldset legend="批量导入 用户账号信息" id="uploaderContainer">
 				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
 					<p:fileUpload fileUploadListener="#{userAccountImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
-						invalidFileMessage="只支持xls格式的文件" invalidSizeMessage="文件大小不得超过5M" update=":userAccountTab:dataListForm, :userAccountTab:UserAccountListForm"
-						sizeLimit="5242880" allowTypes="/(\.|\/)(xls)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+						invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M" update=":userAccountTab:dataListForm, :userAccountTab:UserAccountListForm"
+						sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
 				</p:panelGrid>
 				<h:panelGroup>
 					<p>说明</p>
 					<p>
-						1. <a href="UserAccountImport_Template.xls" title="download">#{msg.downloadTemplateFile}</a>
+						1. <a href="UserAccountImport_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
 					</p>
 					<p>2. 文件中填入要导入的用户数据</p>
 					<p>3. 上传文件进行导入</p>
@@ -68,12 +68,6 @@
 					</p:column>
 					<p:column headerText="#{msg.Locked}?">
 						<h:outputText value="#{item.isLocked? msg.True2Yes : msg.False2No }" />
-					</p:column>
-					<p:column headerText="#{msg.roleId}">
-						<h:outputText value="#{item.userRoleNames}" />
-					</p:column>
-					<p:column headerText="UUID">
-						<h:outputText value="#{item.uid}" />
 					</p:column>
 					<p:column headerText="备注">
 						<h:outputText value="#{item.statusDisplay}" />

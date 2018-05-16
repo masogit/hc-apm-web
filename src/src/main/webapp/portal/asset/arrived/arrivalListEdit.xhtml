@@ -96,9 +96,9 @@
                                     </h:panelGroup>-->
                                     <h:panelGroup>
                                         <label class="label">#{msg.vendor}</label>
-                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.vendorName}"  scrollHeight="300"  forceSelection="true" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}">
-                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onVendorChange}" />
-                                            <p:ajax listener="#{assetArrivedListEditController.onVendorChange(null)}" />
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplierName}"  scrollHeight="300"  forceSelection="true" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}">
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" />
+                                            <p:ajax listener="#{assetArrivedListEditController.onSupplierChange(null)}" />
                                         </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
@@ -119,7 +119,7 @@
 
                                 </p:panelGrid>
                                 <h:panelGroup rendered="#{assetArrivedListEditController.selected.status eq 2 and assetArrivedListEditController.getInstalledCount() eq 0}">
-                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":easyInstallDialogForm :growl"/>
+                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveArrivalList()}" process="arrivalListHeader"  update=":growl"/>
                                 </h:panelGroup>
 
                             </p:fieldset>
@@ -181,12 +181,6 @@
                                         <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetArrivedListEditController.easyInstallItem.purchasePrice}" />
                                     </h:panelGroup>
 
-                                    <!--                                    <h:panelGroup>
-                                                                            <label class="label">#{msg.terminateDate}</label>
-                                                                            <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.terminateDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
-                                                                        </h:panelGroup>-->
-
-
                                 </p:panelGrid>
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
@@ -207,10 +201,10 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-                                        <label class="label">#{msg.measureGrade}</label>
-                                        <p:selectOneMenu id="measureGrade" value="#{assetArrivedListEditController.easyInstallItem.measureGrade}">
+                                        <label class="label">#{msg.measuringItemCategory}</label>
+                                        <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
 
@@ -237,15 +231,13 @@
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-
                                     <h:panelGroup>
-                                        <label class="label">#{msg.measuringItemCategory}</label>
-                                        <p:selectOneMenu id="measuringItemCategory" value="#{assetArrivedListEditController.easyInstallItem.measuringItemCategory}">
+                                        <label class="label">#{msg.measureGrade}</label>
+                                        <p:selectOneMenu id="measureGrade" value="#{assetArrivedListEditController.easyInstallItem.measureGrade}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                            <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
-
                                     <h:panelGroup>
                                         <label class="label">#{msg.accountingCategory}</label>
                                         <p:selectOneMenu id="accountingCategory" value="#{assetArrivedListEditController.easyInstallItem.accountingCategory}">
@@ -324,7 +316,7 @@
                                                                       multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
                                                     </p:fieldset>-->
                                 <h:panelGroup>
-                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":easyInstallDialogForm :growl"/>
+                                    <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":growl"/>
                                 </h:panelGroup>
                             </p:fieldset>
 
@@ -332,7 +324,7 @@
                                          selectionMode="single" rowKey="#{item.id}" sortBy="#{item.itemNum}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          rowsPerPageTemplate="5,10,15"  value="#{assetArrivedListEditController.arrivalItemList}" var="item">
-                                <p:ajax event="rowSelect" update=":ItemDetailViewForm" />
+                                <p:ajax event="rowSelect" listener="#{assetArrivedItemsController.onRowSelect}" update=":ItemDetailViewForm" />
                                 <p:column headerText="#{msg.arrivalListItemNum}" >
                                     <h:outputText value="#{item.itemNum}"/>
                                 </p:column>
@@ -359,7 +351,7 @@
                                 </p:column>
                                 <p:column width="90" >
                                     <p:commandLink actionListener="#{assetArrivedListEditController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update="itemList" >接单
-                                        <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
+                                        <p:confirm header="接单" message="确认?" icon="ui-icon-warning"/>
                                     </p:commandLink>
                                     <p:commandLink    action="#{assetArrivedItemsController.getInstallUrl(item.id,'arrivalListEdit')}" disabled="#{item.installStatus ne 'new'}" rendered="#{assetArrivedItemsController.isAssignToMe(item.currentPersonUID) or item.installStatus ne 'new'}" value="#{item.installStatus eq 'new'? '安装': fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
                                 </p:column>
@@ -375,7 +367,7 @@
                     </p:fieldset>
                 </h:form>
                 <ui:include src="ItemDetailView.xhtml"/>
-                <ui:include src="easyInstallDlg.xhtml"/>
+                <!--<ui:include src="easyInstallDlg.xhtml"/>-->
             </div>
         </div>
     </ui:define>

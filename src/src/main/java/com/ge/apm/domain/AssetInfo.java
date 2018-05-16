@@ -14,8 +14,6 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
-import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.Optional;
 import java.util.UUID;
@@ -130,6 +128,9 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "asset_dept_id")
     private Integer assetDeptId;//所属设备科
+
+    @Column(name = "asset_dept_uid", columnDefinition = "CHAR(32)") // 所属科室UID
+    private String assetDeptUID;
 
     @Column(name = "asset_owner_id")
     private Integer assetOwnerId;//维修负责人
@@ -339,6 +340,10 @@ public class AssetInfo implements Serializable {
     //资金来源[1:科研,2:教学,3:医疗,4:干保]
     @Column(name = "capital_source")
     private Integer capitalSource;
+    
+  //资金来源[1:自有资金,2:合资公司资金]
+    @Column(name = "capital_source2")
+    private Integer capitalSource2;
 
     //风险等级[1:1类A,2:1类B,3:2类,4:3类]
     @Column(name = "risk_grade")
@@ -439,6 +444,9 @@ public class AssetInfo implements Serializable {
     @Column(name = "clinical_dept_name_py_code")
     private String clinicalDeptNamePyCode;
 
+    @Transient
+    private int lineNum;
+
     public Integer getAssetUsage() {
         return assetUsage;
     }
@@ -455,7 +463,15 @@ public class AssetInfo implements Serializable {
         this.capitalSource = capitalSource;
     }
 
-    public Integer getRiskGrade() {
+    public Integer getCapitalSource2() {
+		return capitalSource2;
+	}
+
+	public void setCapitalSource2(Integer capitalSource2) {
+		this.capitalSource2 = capitalSource2;
+	}
+
+	public Integer getRiskGrade() {
         return riskGrade;
     }
 
@@ -676,7 +692,10 @@ public class AssetInfo implements Serializable {
 
     public void setName(String name) {
         this.name = name;
-        this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        if (!StringUtils.isEmpty(name)) {
+            this.namePyCode = PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        }
+
     }
 
     public String getAliasName() {
@@ -733,7 +752,10 @@ public class AssetInfo implements Serializable {
 
     public void setManufacture(String manufacture) {
         this.manufacture = manufacture;
-        this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        if (!StringUtils.isEmpty(manufacture)) {
+            this.manufacturePyCode = PinyinUtil.getShortPinyin(manufacture).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
+        }
+
     }
 
     public String getVendor() {
@@ -1369,6 +1391,22 @@ public class AssetInfo implements Serializable {
 
     public void setClinicalDeptNamePyCode(String clinicalDeptNamePyCode) {
         this.clinicalDeptNamePyCode = clinicalDeptNamePyCode;
+    }
+
+    public String getAssetDeptUID() {
+        return assetDeptUID;
+    }
+
+    public void setAssetDeptUID(String assetDeptUID) {
+        this.assetDeptUID = assetDeptUID;
+    }
+
+    public int getLineNum() {
+        return lineNum;
+    }
+
+    public void setLineNum(int lineNum) {
+        this.lineNum = lineNum;
     }
 
     @Override
