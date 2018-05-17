@@ -8,6 +8,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.components.CustomColumns;
+import com.ge.apm.view.asset.components.CustomDataTable;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -84,6 +85,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     
     //custom config
     private Map<String,CustomColumns> customColumns;
+    private CustomConfigObject customConfig;
+    private CustomDataTable customTable;
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -107,11 +110,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         loadCustomConfig();
+        customTable = new CustomDataTable();
+        customTable.setCustomedColumn(customConfig.getAssetsListPageFields());
 
     }
 
     private void loadCustomConfig(){
-        CustomConfigObject customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         customColumns =CustomConfigService.getAllFields().entrySet().stream().collect(Collectors.toMap(Entry::getKey,
                 item-> new CustomColumns(item.getKey(),customConfig.getAssetsListPageFields().contains(item.getKey()) && 
@@ -502,6 +507,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public Map<String, CustomColumns> getCustomColumns() {
         return customColumns;
+    }
+
+    public CustomDataTable getCustomTable() {
+        return customTable;
+    }
+
+    public void setCustomTable(CustomDataTable customTable) {
+        this.customTable = customTable;
     }
 
 }
