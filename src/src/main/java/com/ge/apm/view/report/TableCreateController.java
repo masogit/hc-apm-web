@@ -310,7 +310,7 @@ public class TableCreateController extends TieWebSheetBean {
     public void cancelUpload() {
         this.uploadedFile = null;
         if (null != uploadedFileObject) {
-            blobService.deleteBlobFile(uploadedFileObject);
+//            blobService.deleteBlobFile(uploadedFileObject);
             uploadedFileObject = null;
         }
         if (null != selectedTableDefinition.getExcelStorageId()) {
