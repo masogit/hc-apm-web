@@ -284,7 +284,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.qrCode}</label>
-                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="#{not empty assetInfoController.selected.qrCode or assetInfoController.assetCodeConfig eq DFQ}">
+                                <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="#{not empty assetInfoController.selected.qrCode or assetInfoController.assetCodeConfig eq 'DFQ'}">
                                 <p:ajax process="@this" listener="#{assetInfoController.onDepartNumChange('qrCode')}" update="@(.financingNum) qrCode qrCodeButton departNum"/>
                                 </p:inputText>
                                 <p:commandButton id="qrCodeButton" actionListener="#{assetInfoController.renewQrcode()}" update="@(.financingNum) departNum qrCode qrCodeButton" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this" disabled="#{not empty assetInfoController.qrCode}"/>
