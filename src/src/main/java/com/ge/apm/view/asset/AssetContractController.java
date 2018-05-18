@@ -39,31 +39,32 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
     AssetContractRepository dao = null;
 
     AssetDepreciationRepository depredao = null;
-    
+
     AssetInfo selectedAsset;
 
     BlobFileService blobService;
 
     UaaService uaaService;
-    
+
     AssetInfoService assetService;
 
     String fileName;
 
     Integer pmCount;
-    
+
     V2_BlobObject blobObject;
 
     AssetInfoRepository assetInfoDao;
 
-    List<Integer>  contractType;
+    List<Integer> contractType;
+
     @Override
     protected void init() {
 
         dao = WebUtil.getBean(AssetContractRepository.class);
         depredao = WebUtil.getBean(AssetDepreciationRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
-        assetService = WebUtil.getBean(AssetInfoService.class); 
+        assetService = WebUtil.getBean(AssetInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -76,6 +77,13 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
                     this.selected.setAssetId(Integer.parseInt(requestAssetId));
                     this.selectedAsset = assetService.getAssetInfo(Integer.parseInt(requestAssetId));
                     this.selected.setHospitalId(selectedAsset.getHospitalId());
+                    this.selected.setSiteId(selectedAsset.getSiteId());
+                    this.selected.setAssetId(selectedAsset.getId());
+                    this.selected.setHospitalId(selectedAsset.getHospitalId());
+                    this.selected.setTenantUID(selectedAsset.getTenantUID());
+                    this.selected.setInstitutionUID(selectedAsset.getInstitutionUID());
+                    this.selected.setHospitalUID(selectedAsset.getHospitalUID());
+                    this.selected.setSiteUID(selectedAsset.getSiteUID());
                 } catch (InstantiationException ex) {
                     Logger.getLogger(AssetContractController.class.getName()).log(Level.SEVERE, null, ex);
                 } catch (IllegalAccessException ex) {
@@ -89,7 +97,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         this.filterBySite = false;
 
 //        this.setSiteFilter();
-        contractType = Arrays.asList(1,2,3);
+        contractType = Arrays.asList(1, 2, 3);
     }
 
     @Override
@@ -99,11 +107,11 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
 
     @Override
     protected Page<AssetContract> loadData(PageRequest pageRequest) {
-        if(searchFilters == null){
+        if (searchFilters == null) {
             searchFilters = new ArrayList();
         }
-        
-        if(!this.hasFilterOnField("siteUID")){
+
+        if (!this.hasFilterOnField("siteUID")) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -111,7 +119,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractType));
         }
-        
+
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
     }
 
@@ -120,8 +128,6 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         //删除附件的时候清空
         selected.setObjectId(null);
     }
-
-
 
     @Override
     public void onFilter(FilterEvent event) {
@@ -139,6 +145,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         object.setSiteId(UserContextService.getSiteId());
         this.selectedAsset = null;
     }
+
     @Override
     public void save() {
         if (selected.getEndDate().before(selected.getStartDate())) {
@@ -157,15 +164,12 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             saveDepreciation();
             //结束时间晚于维保时间，那么就更新维保时间
 
-
-
             udpateAssetInfoWarranty();
 //            if (this.selected.getContractType() == 5) {
 //                pmOrderService.savePmOrder(selectedAsset, this.selected.getStartDate(), this.selected.getEndDate(), pmCount, null);
 //            }
             cancel();
         }
-
 
     }
 
@@ -182,15 +186,16 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         }
     }
 
-    private void udpateAssetInfoWarranty(){
-        if(null==selectedAsset.getWarrantyDate()){
+    private void udpateAssetInfoWarranty() {
+        if (null == selectedAsset.getWarrantyDate()) {
             selectedAsset.setWarrantyDate(selected.getEndDate());
             assetInfoDao.save(selectedAsset);
-        }else if(selected.getEndDate().after(selectedAsset.getWarrantyDate())){
+        } else if (selected.getEndDate().after(selectedAsset.getWarrantyDate())) {
             selectedAsset.setWarrantyDate(selected.getEndDate());
             assetInfoDao.save(selectedAsset);
         }
     }
+
     private void saveDepreciation() {
         List<AssetDepreciation> depreList = depredao.getByContractId(selected.getId());
         depredao.delete(depreList);
@@ -225,7 +230,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
     @Override
     public void delete() {
         List<V2_BlobObject> blobList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
-        if(blobList== null || blobList.size()!=1){
+        if (blobList == null || blobList.size() != 1) {
             WebUtil.addErrorMessage("不能删除");
             return;
         }
@@ -236,6 +241,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         }
         this.selected = null;
     }
+
     public void handleFileUpload(FileUploadEvent event) {
 
         blobObject = blobService.uploadFile(event);
@@ -246,8 +252,6 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
             WebUtil.addErrorMessage("fail to upload file");
         }
     }
-
-
 
     public void onAssetSelected(SelectEvent event) {
         onServerEvent("assetSelected", event.getObject());
@@ -263,6 +267,7 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         if (this.selected == null) {
             return;
         }
+        this.selected.setSiteId(asset.getSiteId());
         this.selected.setAssetId(asset.getId());
         this.selected.setHospitalId(asset.getHospitalId());
         this.selected.setTenantUID(asset.getTenantUID());
@@ -275,13 +280,13 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
     public void onSelectedChange() {
         selectedAsset = assetService.getAssetInfo(selected.getAssetId());
         List<V2_BlobObject> fileObjectList = blobService.getBlobObjectsByStorageId(selected.getObjectId());
-        if(fileObjectList== null || fileObjectList.size()!=1){
+        if (fileObjectList == null || fileObjectList.size() != 1) {
             WebUtil.addErrorMessage("找不到附件");
             return;
         }
         V2_BlobObject fileObject = fileObjectList.get(0);
-        blobObject=fileObject;
-        fileName = fileObject==null?"":fileObject.getObjectName();
+        blobObject = fileObject;
+        fileName = fileObject == null ? "" : fileObject.getObjectName();
         crudActionName = "Edit";
     }
 
@@ -321,10 +326,9 @@ public class AssetContractController extends JpaCRUDController<AssetContract> {
         this.blobObject = blobObject;
     }
 
-    public List<I18nMessage> getContractTypeList(){
+    public List<I18nMessage> getContractTypeList() {
         return FieldValueMessageController.doGetFieldValueList("contractType", -1).stream()
                 .filter(item -> contractType.contains(Integer.parseInt(item.getMsgKey()))).collect(Collectors.toList());
     }
-    
-    
+
 }

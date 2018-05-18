@@ -318,7 +318,7 @@ public class AssetInstallationController {
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
         }
-        if(config!=null && config.getGenerateMethod()!=null && config.getGenerateMethod()==2){
+        if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
             assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
         }
         return assetDao.findBySearchFilter(assetFilters);
@@ -451,8 +451,17 @@ public class AssetInstallationController {
                             break;
                         default:
                     }
+
+                    if (!Strings.isNullOrEmpty(num) && num.length() > 16) {
+                        num = num.substring(0, 16);
+                        if (null != arrivalListItem.getQrCode()) {
+                            arrivalListItem.setQrCode(num);
+                            WebUtil.addErrorMessage("二维码超长,最大16位");
+                        }
+                    }
                     arrivalListItem.setFinancingNum(num);
                     arrivalListItem.setDepartNum(num);
+
                     break;
                 case "DF":
                     switch (fieldName) {
@@ -478,19 +487,19 @@ public class AssetInstallationController {
             case "technical":
                 if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getTechnicalAckStatus())) {
                     arrivalListItem.setTechnicalAckDate(new Date());
-                }else{
+                } else {
                     arrivalListItem.setTechnicalAckDate(null);
                 }
             case "clinical":
                 if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getClinicalAckStatus())) {
                     arrivalListItem.setClinicalAckDate(new Date());
-                }else{
+                } else {
                     arrivalListItem.setClinicalAckDate(null);
                 }
             case "business":
                 if (ArrivalListItem.ACK_STATUS_PASS.equals(arrivalListItem.getBusinessAckStatus())) {
                     arrivalListItem.setBusinessAckDate(new Date());
-                }else{
+                } else {
                     arrivalListItem.setBusinessAckDate(null);
                 }
         }

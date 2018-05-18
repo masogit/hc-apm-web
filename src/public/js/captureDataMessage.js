@@ -43,11 +43,14 @@ var CaptureDataMessageJS = (function() {
 		},
 		showHide : function(a) {
 			var type0Span = document.getElementById("type0Span");
+			var deviceTypeLable=$("[id='captureDataMessagesEditForm:deviceTypeLabel']");
 			if (a.value) {
 				if (a.value == 0) {
 					type0Span.setAttribute("style", "display:block;");
+					deviceTypeLable.html('设备类型');
 				} else {
 					type0Span.setAttribute("style", "display:none;");
+					deviceTypeLable.html('设备类型*');
 				}
 			}
 		},
@@ -94,8 +97,11 @@ var CaptureDataMessageJS = (function() {
 		setImageTextTempContent : function() {
 			initCaptureDataMessageParamBln = true;
 			this.setCaptureDataMessageValue();
-			contentEditor.html(contentEditor.html() + imageTextTempContent.val());
-			contentEditorTextArea.val(contentEditorTextArea.val() + imageTextTempContent.val());
+			var htmlStr=imageTextTempContent.html();
+			htmlStr=htmlStr.replace(/&lt;/,'<');
+			htmlStr=htmlStr.replace(/&gt;/,'>');
+			contentEditor.html(contentEditor.html() + htmlStr);
+			contentEditorTextArea.val(contentEditorTextArea.val() + htmlStr);
 		},
 		triggerUpload : function() {
 			initCaptureDataMessageParamBln = true;

@@ -107,7 +107,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private  String head;
-    private String reportUid;
+    
+    private String reportUid; //selected table base uid
     public String getHead() {
         return head;
     }
@@ -124,8 +125,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     public void addReporter(String boUid) {
         UnstructuredDataCollection newReport = new UnstructuredDataCollection();
         newReport.setBoUuid(boUid);
-        TableDefinition tbd = tableDao.findById(reportUid);
-        newReport.setSchemaId(reportUid);
+        TableDefinition tbd = tableDao.findByBaseId(reportUid);
+        newReport.setSchemaId(tbd.getId());
         PmOrderRule pmOrderRule= pmOrderService.acqPmOrderRule(selectedPmOrder);
         if(tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getPerformanceReport()))
             newReport.setBoType("pm-performance-report");
@@ -143,9 +144,16 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     List<UnstructuredDataCollection> reportList;
     public boolean hasRepairReport(){
+        List<TableDefinition> tdList;
+        List<TableDefinition> tdListTotal = new ArrayList<TableDefinition>();
         reportList = pmOrderService.getReportList(selectedPmOrder.getId());
-        return reportList.stream().anyMatch(item->item.getSchemaId().equalsIgnoreCase(reportUid));
-
+        if(reportList!=null) {
+            for (int i = 0; i < reportList.size(); i++) {
+                tdList = tableDao.getByBaseId(tableDao.findById(reportList.get(i).getSchemaId()).getBaseId());
+                tdListTotal.addAll(tdList);
+            }
+        }
+        return tdListTotal.stream().anyMatch(item->item.getId().equalsIgnoreCase(reportUid));//reportUId: tableDefinition-id
     }
 
     public boolean isChecked() {
@@ -157,7 +165,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return false;
     }
-
 
     public String getTableDefName(String templateId){
         TableDefinition tb= tableDao.findById(templateId);
@@ -699,6 +706,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 }
             });
             pmOrderService.approvePMorder(selectedPmOrder,approvedDetails,this.comments);
+            this.comments=null;
         }
     }
 
@@ -716,7 +724,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = new ArrayList<V2_BlobObject>();
         loadHmCheck(selectedPmOrder);
        if(pmCheckItemList!=null) {
-           if (hmCheck.isEmpty()) {
+           if (hmCheck.isEmpty()){
                for (PmOrderRuleCheckList pmList : pmCheckItemList) {
                    UnstructuredData unData = new UnstructuredData();
                    unData.setValue("pass");
@@ -916,15 +924,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         return CheckItemList;
     }
-    ///////////////new
     List<PmOrderRuleCheckList> pmOrderRuleCheckList;
-   /* public List<PmOrderRuleCheckList> loadCheckItem(V2_PmOrder v2PmOrder){
-        pmOrderRuleCheckList = acPmOrderUleCheckList(v2PmOrder);
-        return pmOrderRuleCheckList;
-    }*/
-
-
-
 
     //map : item.uid(pmorderrulecheck.uid) value: unstrundata
     public List<V2_WorkOrder_Detail> getNeedApprovalDetails(){

@@ -53,6 +53,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     
     public List<OrgInfo> getByTenantUID(String tenantUID);
 
+    @Query("select o from OrgInfo o where orgType<>4 and tenantUID=?1")
+    public List<OrgInfo> getSitesByTenantUID(String tenantUID);
+
     public List<OrgInfo> findByTenantUIDAndOrgType(String tenantUID, Integer orgType);
 
     public List<OrgInfo> findByParentUIDAndOrgTypeOrderByNameAsc(String parentUID, Integer orgType);

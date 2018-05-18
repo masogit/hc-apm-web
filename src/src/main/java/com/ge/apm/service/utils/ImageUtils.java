@@ -14,12 +14,14 @@ public class ImageUtils {
 			if(input!=null){
 				byte[] b = new byte[input.available()];
 				input.read(b);
+				input.close();
 				return encoder.encodeToString(b);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			log.error(e.getMessage());
 		}
+		System.out.println("xxx end getBase64");
 		return null;
 	}
 }

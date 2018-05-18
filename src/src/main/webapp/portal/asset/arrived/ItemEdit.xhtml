@@ -218,14 +218,17 @@
                             <h:panelGroup >
                                 <label class="label">#{msg.financingNum}</label>
                                 <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
-                                    <p:ajax event="keyup" process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum"/>
+                                    <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum @(.financingNum)"/>
                                 </p:inputText>
                                 <p:commandButton id="generateFinancingNum" validateClient="false" actionListener="#{assetInstallationController.gennerateFinancingNum()}" disabled="#{assetInstallationController.arrivalListItem.financingNum.length() gt 4}" 
                                                  update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                             </h:panelGroup>
                             <h:panelGroup id="qrCode" class="financingNum">
                                 <label class="label">#{msg.qrCode}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}"/>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}">
+                                    <p:ajax listener="#{assetInstallationController.onDepartNumChange('qrCode')}" update="@(.financingNum)" />
+                                </p:inputText>
                                 <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                                 <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
                             </h:panelGroup>
@@ -439,12 +442,12 @@
 
 
                     </p:fieldset>
-                                                            <p:fieldset legend="相关报告" >
+<!--                                                            <p:fieldset legend="相关报告" >
                                                                 <h:panelGroup id="addReport">
-                                                                    <p:selectOneMenu value="#{commonReportController.reportUid}">
+                                                                    <p:selectOneMenu value="#{commonReportController.reportBaseUid}">
                                                                         <p:ajax update="addReport" />
                                                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                                        <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                                                        <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
                                                                     </p:selectOneMenu>
                                                                     <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
                                                                 </h:panelGroup>
@@ -458,7 +461,7 @@
                     <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                     <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
                 </p:dataList>
-            </p:fieldset>
+            </p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <!--                            <h:panelGroup>

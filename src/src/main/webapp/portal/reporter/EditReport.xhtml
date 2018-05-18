@@ -28,7 +28,9 @@
                                     <c:if test="#{fieldItem.component eq 'Number'}" >
                                         <h:panelGroup>
                                             <label class="label">#{fieldItem.label}</label>
-                                            <p:inputNumber value="#{editReportController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}"/>
+                                            <p:inputNumber value="#{editReportController.tableValue[fieldItem.key]}" placeholder="#{fieldItem.ref}">
+                                                <p:ajax update="@this" process="@this" />
+                                            </p:inputNumber>
                                             <h:outputText value="#{fieldMsg.fieldValue('TableReportResult',editReportController.tableValue[fieldItem.resKey])}" style="#{editReportController.tableValue[fieldItem.resKey] eq 'Normal'?'':'color:red'}" />
                                         </h:panelGroup>
                                     </c:if>

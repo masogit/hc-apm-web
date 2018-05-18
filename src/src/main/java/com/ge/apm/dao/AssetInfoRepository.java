@@ -110,8 +110,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Modifying
     @Transactional
-    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid where ai.uid in :assetUids")
-    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids);
+    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid,ai.assetDeptUID = :orgId where ai.uid in :assetUids")
+    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids, @Param("orgId") String orgId);
 
     public List<AssetInfo> findByClinicalDeptUIDIn(List<String> clinicalDeptUIDs);
 

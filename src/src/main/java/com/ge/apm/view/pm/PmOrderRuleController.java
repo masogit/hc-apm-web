@@ -402,9 +402,9 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         }
     }
 
-    public String getJsonValueById(String id) {
-        if (!Strings.isNullOrEmpty(id)) {
-            TableDefinition schema = templateDao.findById(id);
+    public String getJsonValueById(String baseId) {
+        if (!Strings.isNullOrEmpty(baseId)) {
+            TableDefinition schema = templateDao.findByBaseId(baseId);
             return schema == null ? null : schema.getSchema();
         } else {
             return null;
