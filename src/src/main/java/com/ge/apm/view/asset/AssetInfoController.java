@@ -8,6 +8,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
@@ -1604,6 +1605,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         } else {
             names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
         }
+
+        names.sort(new PinYinComparator());
 
         return names;
 
