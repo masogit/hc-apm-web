@@ -112,6 +112,10 @@ public class AssetCreateController {
             Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
         }
 
+        if(null!= createRequest.getOrgId()){
+            clinicalDept =  orgDao.findById(createRequest.getOrgId());
+        }
+        
         initGbTree();
 
     }
@@ -337,7 +341,7 @@ public class AssetCreateController {
             WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             financingNum = "";
         }
-        if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 3)) {
+        if (financingNum != null && (StringUtils.isEmpty(this.assetInfo.getFinancingNum()) || this.assetInfo.getFinancingNum().length() <= 4)) {
             this.assetInfo.setFinancingNum(financingNum);
         }
     }

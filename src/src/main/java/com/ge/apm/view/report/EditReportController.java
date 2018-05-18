@@ -6,6 +6,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
 import com.ge.apm.service.report.TableDefinitionService;
@@ -42,7 +43,8 @@ public class EditReportController {
         String reportId = WebUtil.getRequestParameter("reportId");
         
         report = tableService.getReportById(reportId);
-        table = JSONObject.parseObject(tableService.getTableSchemaByTemplateId(report.getSchemaId()), TableSchema.class);
+        TableDefinition tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
         tableValue = new HashMap<String, Object>();
         List<UnstructuredData> dataList = report.getData();
         dataList.forEach(item -> {
@@ -59,7 +61,8 @@ public class EditReportController {
         tableService.saveTableDate(report,tableValue);
         WebUtil.addSuccessMessage("已保存");
     }
-    
+
+
     public void submit(){
         tableValue.putAll(tableService.getRuleResultData(tableValue,table));
         tableService.saveTableDate(report,tableValue);

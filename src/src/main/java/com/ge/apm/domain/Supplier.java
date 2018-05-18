@@ -2,6 +2,7 @@
  */
 package com.ge.apm.domain;
 
+import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 
 import java.io.Serializable;
@@ -22,7 +23,7 @@ import javax.validation.constraints.Size;
  */
 @Entity
 @Table(name = "supplier")
-public class Supplier implements Serializable {
+public class Supplier implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -201,4 +202,8 @@ public class Supplier implements Serializable {
         return "com.ge.apm.domain.Supplier[ id=" + id + " ]";
     }
 
+    @Override
+    public String getPinYin() {
+        return namePyCode;
+    }
 }

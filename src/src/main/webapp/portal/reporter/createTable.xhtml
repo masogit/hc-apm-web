@@ -112,10 +112,10 @@
                                 </p:inputText>
                             </div>
                             <h:panelGroup id="importExcel">
-                                <p:commandButton value="导入模版"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.uploadedFile}"/>
+                                <p:commandButton value="导入模版"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
                                 <h:outputText value="#{tableCreateController.uploadedFile.fileName}" />
-                                <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.cancelUpload}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.uploadedFile}"/>
                                 <p:link href="#{fileDownloadService.getFileUrl(tableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}">#{tableCreateController.selectedTableDefinition.name}</p:link>
+                                <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
                             </h:panelGroup>
                             <p:fieldset legend="预览" id="preview">
                                     <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>

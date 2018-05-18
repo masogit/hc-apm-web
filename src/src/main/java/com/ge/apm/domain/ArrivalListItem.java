@@ -90,15 +90,30 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "business_ack_status")
     private String businessAckStatus = ACK_STATUS_NONE;
     
+    //商务验收日期
+    @Column(name = "business_ack_date")
+    @Temporal(TemporalType.DATE)
+    private Date businessAckDate;
+    
     //技术验收状态 [none:待验收,pass:验收通过,reject:验收不通过]
     @Size(max = 64)
     @Column(name = "technical_ack_status")
     private String technicalAckStatus = ACK_STATUS_NONE;
     
+    //技术验收日期
+    @Column(name = "technical_ack_date")
+    @Temporal(TemporalType.DATE)
+    private Date technicalAckDate;
+    
     //临床验收状态 [none:待验收,pass:验收通过,reject:验收不通过]
     @Size(max = 64)
     @Column(name = "clinical_ack_status")
     private String clinicalAckStatus = ACK_STATUS_NONE;
+    
+    //技术验收日期
+    @Column(name = "clinical_ack_date")
+    @Temporal(TemporalType.DATE)
+    private Date clinicalAckDate;
     
     //安装流程状态 [new:安装中,instorage:已入库,rejected:已退货]
     @Size(max = 64)
@@ -879,6 +894,30 @@ public class ArrivalListItem implements Serializable {
 
     public void setWarrantyYear(Double warrantyYear) {
         this.warrantyYear = warrantyYear;
+    }
+
+    public Date getBusinessAckDate() {
+        return businessAckDate;
+    }
+
+    public void setBusinessAckDate(Date businessAckDate) {
+        this.businessAckDate = businessAckDate;
+    }
+
+    public Date getTechnicalAckDate() {
+        return technicalAckDate;
+    }
+
+    public void setTechnicalAckDate(Date technicalAckDate) {
+        this.technicalAckDate = technicalAckDate;
+    }
+
+    public Date getClinicalAckDate() {
+        return clinicalAckDate;
+    }
+
+    public void setClinicalAckDate(Date clinicalAckDate) {
+        this.clinicalAckDate = clinicalAckDate;
     }
     
     @Override

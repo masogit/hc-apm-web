@@ -4,6 +4,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
@@ -60,7 +61,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         wfcDao = WebUtil.getBean(WorkflowConfigRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
-        deptids = wfcDao.findDeptForSharedAsset();
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        deptids = wfcDao.findDeptForSharedAsset(user.getSiteUID());
         this.selectedMap = new HashMap();
 
     }
@@ -78,12 +80,16 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         }
         setUserSearchFilters();
 
+        //1、使用科室：调剂中心  所属科室：空
         searchFilters.add(new SearchFilter("sharedAssetTypeUid", SearchFilter.Operator.IsNull,null));
+        searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN,deptids));
+        searchFilters.add(new SearchFilter("assetDeptUID", SearchFilter.Operator.IsNull,null));
 
         if (queryIndex == 1){
+            //2、使用科室：任意科室  所属科室：调剂中心
             this.updateSearchFilter(new SearchFilter("sharedAssetTypeUid",SearchFilter.Operator.IsNotNull,null));
-        }else if (queryIndex == 2){
-            this.removeFilterOnField("sharedAssetTypeUid");
+            this.updateSearchFilter(new SearchFilter("assetDeptUID",SearchFilter.Operator.IN,deptids));
+            this.updateSearchFilter(new SearchFilter("clinicalDeptUID",SearchFilter.Operator.IsNotNull,null));
         }
 
         if (filterSatId != null && !filterSatId.equals("")){
@@ -184,8 +190,17 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void batchSave(){
+
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids);
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgIds = dao.getOrgId(user.getSiteUID());
+        if (orgIds.size() > 0){
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,orgIds.get(0));
+        }else{
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,null);
+        }
+
         this.batchSharedAssetTypeUid = null;
         this.selectedMap.clear();
     }
@@ -200,7 +215,7 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<String> orgIds = dao.getOrgId(user.getSiteUID());
         if (orgIds.size() > 0) {
-            selected.setClinicalDeptUID(orgIds.get(0));
+//            selected.setClinicalDeptUID(orgIds.get(0));
             selected.setAssetDeptUID(orgIds.get(0));
         }
     }
@@ -209,9 +224,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         AssetInfo a = dao.findByUid(uid);
         String sharedAssetTypeUid = a.getSharedAssetTypeUid();
         String clinicalDeptUID = a.getClinicalDeptUID();
-        if (sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID))
-            return true;
-        return false;
+
+        return sharedAssetTypeUid != null && !deptids.contains(clinicalDeptUID);
 
     }
 

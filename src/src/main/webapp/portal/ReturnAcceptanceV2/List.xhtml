@@ -31,12 +31,11 @@
                 <div class="ui-g-12 card">
             <h:form id="IouListForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" />
-                        <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" />
-                        <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true"/>
+                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(-3)}" rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == -3}"/>
+                        <p:commandButton value="归还待受理"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(7)}"  rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == 7}"/>
+                        <p:commandButton value="归还待交付"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(8)}"  rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == 8}"/>
                         <!--<p:commandButton value="归还已搁置"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetRequestV2Controller.searchList(11)}"  rendered="true"/>-->
-
-                        <p:commandButton value="归还已完成"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(12)}"  rendered="true"/>
+                        <p:commandButton value="归还已完成"  process="@this" update="datalist buttonSet filterTime" oncomplete="PF('varDataList').filter()" actionListener="#{sharedAssetRequestV2Controller.searchList(12)}"  rendered="true" disabled="#{sharedAssetRequestV2Controller.queryIndex == 12}"/>
                 </h:panelGrid>
                 
                 <p:dataTable id="datalist" value="#{sharedAssetRequestV2Controller.lazyModel}" var="item" widgetVar="varDataList"

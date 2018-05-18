@@ -53,13 +53,17 @@
                         <p:column headerText="#{msg.functionType}" sortBy="#{item.arrivalList.functionType}" filterBy="#{item.arrivalList.functionType}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.arrivalList.functionType}"/>
                         </p:column>
-                        <p:column width="90"  headerText="操作" filterBy="#{item.installStatus}" filterMatchMode="EQ">
+                        <p:column headerText="#{msg.status}" filterBy="#{item.installStatus}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{assetArrivedItemsController.getInstallStatusList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus', item.installStatus)}"/>
+                        </p:column>
+                        <p:column width="90"  headerText="操作">
+                            
                             <p:commandLink actionListener="#{assetArrivedItemsController.takeWorkOrder(item.id)}" rendered="#{item.installStatus eq 'new' and not assetArrivedItemsController.isAssignToMe(item.currentPersonUID)}"  update=":AssetArrivalItemListForm:datalist" >接单
                                 <p:confirm header="接单" message="确认接单?" icon="ui-icon-warning"/>  
                             </p:commandLink>

@@ -21,8 +21,10 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
+import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -61,6 +63,8 @@ public class AssetFileImportController {
     private TreeNode orgTree;
     private TreeNode selectedNode;
     private OrgInfo selectedOrg;
+
+    private boolean displayErrorsOnly;
 
     @PostConstruct
     protected void init() {
@@ -102,6 +106,8 @@ public class AssetFileImportController {
             
             canbeImported = aiService.checkData(importOrgMap,importAssetMap);
 
+            filterErrorRecords();
+
         } catch (IOException ex) {
             WebUtil.addErrorMessage("File can not be read!");
             Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
@@ -119,6 +125,8 @@ public class AssetFileImportController {
         if (null != importAssetMap) {
             aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
+
+            filterErrorRecords();
 
             try {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
@@ -191,6 +199,76 @@ public class AssetFileImportController {
         }
 
         aiService.setSelectedOrgToImport(selectedOrg);
+
+    }
+
+    public void switchAssetCheckStatus(AjaxBehaviorEvent event) {
+
+        filterErrorRecords();
+    }
+
+    public void filterErrorRecords() {
+
+        if (!displayErrorsOnly) return;
+
+        if (importAssetMap == null) return;
+
+        Map<String, Map<String, Object>> result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Map<String, Object>> entry: importAssetMap.entrySet()) {
+            Map<String, Object> map = entry.getValue();
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+
+        displayAssets = result;
+
+        if (importOrgMap == null) return;
+
+        result = new LinkedHashMap<>();
+
+        for (Map.Entry<String, Map<String, Object>> entry: importOrgMap.entrySet()) {
+            Map<String, Object> map = entry.getValue();
+
+            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+            if (importStatus == null) continue;
+
+            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+                result.put(entry.getKey(), entry.getValue());
+            }
+
+        }
+
+        displayOrgs = result;
+    }
+
+    Map<String, Map<String, Object>> displayAssets;
+
+    public Map<String, Map<String, Object>> getDisplayAssets() {
+
+        if (displayErrorsOnly) {
+            return displayAssets;
+        } else {
+            return importAssetMap;
+        }
+
+    }
+
+    Map<String, Map<String, Object>> displayOrgs;
+
+    public Map<String, Map<String, Object>> getDisplayOrgs() {
+
+        if (displayErrorsOnly) {
+            return displayOrgs;
+        } else {
+            return importOrgMap;
+        }
 
     }
 
@@ -273,5 +351,17 @@ public class AssetFileImportController {
 
     public void setSelectedNode(TreeNode selectedNode) {
         this.selectedNode = selectedNode;
+    }
+
+    public boolean isDisplayErrorsOnly() {
+        return displayErrorsOnly;
+    }
+
+    public void setDisplayErrorsOnly(boolean displayErrorsOnly) {
+        this.displayErrorsOnly = displayErrorsOnly;
+    }
+
+    public boolean isEmpty() {
+        return (importAssetMap == null || importAssetMap.isEmpty());
     }
 }

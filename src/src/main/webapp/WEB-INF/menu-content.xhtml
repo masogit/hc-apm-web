@@ -29,8 +29,7 @@
 
             </p:submenu>
 
-            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o"
-                       rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt') and userContextService.isHospitalUser()}">
+            <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt') and userContextService.isHospitalUser()}">
                 <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,AssetStaff,AssetHead,ClinicalStaff')}"/>
                 <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,AssetStaff,AssetHead,ClinicalStaff')}"/>
@@ -165,7 +164,7 @@
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin')}"/>
-                <p:menuitem id="um503" value="小屏消息配置" outcome="/portal/asset/captureData/captureDataMessageMain.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
+                <p:menuitem id="um503" value="小屏消息配置" outcome="/portal/asset/captureData/captureDataMessageList.xhtml" rendered="#{userContextService.hasRole('SuperAdmin')}"/>
                 
             </p:submenu>
 

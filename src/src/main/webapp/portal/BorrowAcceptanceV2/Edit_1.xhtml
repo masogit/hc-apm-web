@@ -106,7 +106,8 @@
                         <h:panelGroup >
                             <label class='label'>批量输入</label>
                             <h:outputText value="计费开始时间："/>
-                            <p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                            <!--<p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>-->
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.msgBeginTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                             <h:outputText value="设备接收人："/>
                             <p:inputText value="#{sharedAssetRequestV2Controller.selected.msgAccepter}" />
                         </h:panelGroup>

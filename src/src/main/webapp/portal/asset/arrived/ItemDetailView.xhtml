@@ -238,10 +238,18 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <p:fieldset  legend="#{msg.AssetArrivalListAckInfo}" rendered="#{not empty assetArrivedItemsController.selected and assetArrivedItemsController.selected.arrivalList.processType ne 'Easy'}">
-                    <h:panelGroup>
-                        <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
-                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.businessAckStatus)}" />
-                    </h:panelGroup>
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.AssetArrivalListBusinessAck}</label>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.businessAckStatus)}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}">
+                            <label class="label">#{msg.AssetArrivalListBusinessAckDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.businessAckDate}"  readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
                     <p:dataGrid var="businessPicItem" value="#{assetArrivedItemsController.getAckPicList('business')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.businessAckStatus ne 'none'}">
                         <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
                         <p:panel  style="text-align:center">
@@ -250,10 +258,19 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <h:panelGroup>
-                        <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
-                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.clinicalAckStatus)}" />
-                    </h:panelGroup>
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+                        <h:panelGroup>
+                            <label class="label">#{msg.AssetArrivalListClinicalAck}</label>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.clinicalAckStatus)}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.clinicalAckDate}">
+                            <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.clinicalAckDate}"  readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
                     <p:dataGrid var="clinicalPicItem" value="#{assetArrivedItemsController.getAckPicList('clinical')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.clinicalAckStatus ne 'none'}">
                         <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
                         <p:panel  style="text-align:center">
@@ -262,10 +279,18 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
-                    <h:panelGroup>
-                        <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
-                        <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.technicalAckStatus)}" />
-                    </h:panelGroup>
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <h:panelGroup>
+                            <label class="label">#{msg.AssetArrivalListTechnicalAck}</label>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListAckStatus',assetArrivedItemsController.selected.technicalAckStatus)}" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{not empty assetArrivedItemsController.selected.technicalAckDate}">
+                            <label class="label">#{msg.AssetArrivalListTechnicalAckDate}</label>
+                            <p:inputText  value="#{assetArrivedItemsController.selected.technicalAckDate}" rendered="#{not empty assetArrivedItemsController.selected.businessAckDate}" readonly="true">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                            </p:inputText>
+                        </h:panelGroup>
+                    </p:panelGrid>
                     <p:dataGrid var="technicalPicItem" value="#{assetArrivedItemsController.getAckPicList('technical')}" columns="4" layout="grid"  rendered="#{assetArrivedItemsController.selected.technicalAckStatus ne 'none'}">
                         <f:facet name="header">#{msg.AssetArrivalListPic}</f:facet>
                         <p:panel  style="text-align:center">
