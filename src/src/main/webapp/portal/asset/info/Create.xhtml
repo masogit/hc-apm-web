@@ -358,6 +358,20 @@
                                 </p:selectOneRadio>
                             </h:panelGroup>
                             <h:panelGroup >
+                                <label class="label">是否PM</label>
+                                <p:selectOneRadio value="#{assetInfoController.selected.pm}">
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">是否盘点</label>
+                                <p:selectOneRadio value="#{assetInfoController.selected.checked}">
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                            <h:panelGroup >
                                 <label class="label">#{msg.comments}</label>
                                 <p:inputTextarea value="#{assetInfoController.selected.comments}"  maxlength="256"/>
                             </h:panelGroup>
