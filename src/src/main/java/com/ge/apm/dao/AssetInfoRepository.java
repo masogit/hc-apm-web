@@ -26,7 +26,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select 1 from AssetInfo o where o.systemId=?1")
     public Integer checkExistsBySystemId(String systemId);
     
-    @Query("select o from AssetInfo o where o.systemId=?1")
+    @Query(value="select o.* from asset_info o where o.system_id=?1 and o.is_deleted = false and o.is_valid = true limit 1",nativeQuery=true)
     public AssetInfo getBySystemId(String systemId);
 
     @Query("select o from AssetInfo o where o.qrCode = ?1 and o.siteUID= ?2")
@@ -110,8 +110,8 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Modifying
     @Transactional
-    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid where ai.uid in :assetUids")
-    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids);
+    @Query("update AssetInfo ai set ai.sharedAssetTypeUid = :batchSharedAssetTypeUid,ai.assetDeptUID = :orgId where ai.uid in :assetUids")
+    public void batchUpdateAssetInfoSwapType(@Param("batchSharedAssetTypeUid") String batchSharedAssetTypeUid, @Param("assetUids") List<String> assetUids, @Param("orgId") String orgId);
 
     public List<AssetInfo> findByClinicalDeptUIDIn(List<String> clinicalDeptUIDs);
 

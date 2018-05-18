@@ -16,12 +16,12 @@
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">#{msg.recoveryTime}*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd HH:mm:ss"  value="#{workOrderMgrController.confirmedUpDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="恢复时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar timeZone="GMT+8" id="confirmedUpDate" pattern="yyyy/MM/dd HH:mm:ss"  value="#{workOrderMgrController.confirmedUpDate}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="false" requiredMessage="恢复时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.caseType}*</label>
-                            <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="true" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                            <p:selectOneMenu id="caseType" value="#{workOrderMgrController.selectedWorkOrder.caseType}" required="false" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{workOrderMgrController.getAssetFaultType()}" var="item" itemLabel="#{item.faultName}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
@@ -29,7 +29,7 @@
 
                         <h:panelGroup>
                             <label class="label">维修结果*</label>
-                            <p:selectOneMenu  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="true" requiredMessage="维修结果 #{msg.ValidationRequire}">
+                            <p:selectOneMenu id="repairResult"  value="#{workOrderMgrController.selectedWorkOrder.repairResult}" required="false" requiredMessage="维修结果 #{msg.ValidationRequire}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('repairResult')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -81,11 +81,11 @@
 
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="3" styleClass="ui-panelgrid-blank form-group">
-                            <h:panelGroup>
+                            <h:panelGroup >
                                 <label class="label">#{msg.manhours}*</label>
 
-                                <p:inputNumber validatorMessage="工时不能小于0.01" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}">
-                                    <f:validateDoubleRange minimum="0.01"/>
+                                <p:inputNumber id="manHours" maxValue="999" value="#{workOrderMgrController.selectedWorkOrder.manHours}"  required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}">
+                                    <!--<f:validateDoubleRange minimum="0.01"/>-->
                                 </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -174,8 +174,8 @@
                     </p:fieldset>
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
-                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
+                        <p:commandButton validateClient="false" actionListener="#{workOrderMgrController.saveRepairWorkOrder()}" value="#{msg.save}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');"/>
+                        <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.repairWorkOrder()}" value="#{msg.workcomplete}" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleValidFields(xhr, status, args);"/>
                         <p:commandButton validateClient="false" immediate="true" onclick="PF('submitCommentsDlg').show()" value="提交审核" update="woTab:submitCommentsDialogForm" icon="ui-icon-check" />
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{workOrderMgrController.cancel()}" icon="ui-icon-cancel" onclick="PF('repairCompleteDialog').hide()"/>
                     </h:panelGroup>
@@ -184,18 +184,56 @@
             </h:form>
 
         </p:dialog>
-        <p:dialog id="submitCommentsDlg" widgetVar="submitCommentsDlg" modal="true" height="100" width="300"  resizable="false" draggable="true" appendTo="@(body)" header="提交审核">
+        <p:dialog id="submitCommentsDlg" widgetVar="submitCommentsDlg" modal="true" height="200" width="300"  resizable="false" draggable="true" appendTo="@(body)" header="提交审核">
             <h:form id="submitCommentsDialogForm" >
-                <h:panelGroup>
-                    <label class="label">申请审核原因</label>
-                    <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
+
+                <h:panelGroup rendered="#{not empty workOrderMgrController.selectedWorkOrder}">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+
+
+                        <h:panelGroup>
+                            <label class="label">申请审核原因</label>
+                            <p:inputTextarea value="#{workOrderMgrController.comments}" maxlength="256" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">审核人*</label>
+                            <p:selectOneMenu  value="#{workOrderMgrController.selectedApproverUid}" required="true" requiredMessage="审核人#{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{workOrderMgrController.getApproverList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton validateClient="true" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
                 </h:panelGroup>
-                <p:commandButton validateClient="false" actionListener="#{workOrderMgrController.submitWorkOrder()}" value="提交审核" update=":growl woTab:woMgrListForm:datalist" icon="ui-icon-check" oncomplete="handleSubmit(args, 'repairCompleteDialog');PF('submitCommentsDlg').hide()" />
             </h:form>
         </p:dialog>
         <!--<ui:include src="expenseDialogforComplete.xhtml"/>-->
         <ui:include src="moreAccDialog.xhtml"/>
         <ui:include src="coWorkDialog.xhtml"/>
 
+        <script type="text/javascript">
+            function handleValidFields(xhr, status, args) {
+                var valid = true;
+                if (args.confirmedUpDate) {
+                    $('#woTab\\:repairCompleteDialogForm\\:confirmedUpDate_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.caseType) {
+                    $('#woTab\\:repairCompleteDialogForm\\:caseType').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.repairResult) {
+                    $('#woTab\\:repairCompleteDialogForm\\:repairResult').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.manHours) {
+                    $('#woTab\\:repairCompleteDialogForm\\:manHours_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (valid) {
+                    handleSubmit(args, 'repairCompleteDialog');
+                }
+            }
+        </script>
     </ui:composition>
 </html>

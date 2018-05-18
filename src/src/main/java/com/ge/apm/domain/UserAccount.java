@@ -2,34 +2,10 @@
  */
 package com.ge.apm.domain;
 
-import java.io.Serializable;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import javax.persistence.Basic;
-import javax.persistence.Cacheable;
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
-import javax.persistence.PrePersist;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.Digests;
+import com.ge.apm.service.utils.PinyinUtil;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -40,9 +16,16 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ge.apm.service.utils.Digests;
-import com.ge.apm.service.utils.PinyinUtil;
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 /**
  *
@@ -53,7 +36,7 @@ import com.ge.apm.service.utils.PinyinUtil;
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @Cacheable(true)
 @NamedQueries({ @NamedQuery(name = "UserAccount.findAll", query = "SELECT u FROM UserAccount u") })
-public class UserAccount implements Serializable {
+public class UserAccount implements ChineseName, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -859,5 +842,9 @@ public class UserAccount implements Serializable {
 
 	public void setLastModifiedDate(Date lastModifiedDate) {
 		this.lastModifiedDate = lastModifiedDate;
+	}
+
+	public String getPinYin() {
+		return getNamePyCode();
 	}
 }

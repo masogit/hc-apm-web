@@ -14,7 +14,7 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="SharedAssetRequestEditForm">
-                    <p:fieldset legend="借用维护信息" style="margin-bottom:20px">
+                    <p:fieldset legend="借还维护信息" style="margin-bottom:20px">
                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestNewController.selected != null}">
 <!--                            <h:panelGroup>
                                 <label class='label'>#{msg.clinicalDeptName}</label>
@@ -64,13 +64,13 @@
                         <br/>
                      </p:fieldset>
                         
-                     <p:fieldset legend="借用维护明细信息" style="margin-bottom:20px">
+                     <p:fieldset legend="借还维护明细信息" style="margin-bottom:20px">
                              <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                     <h:panelGroup >
                                         <div style="width:630px">
                                            <label class='label'>批量输入</label>
-                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费开始时间" value="#{sharedAssetRequestNewController.selected.msgBeginTime}" required="true" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true" requiredMessage="请选择开始时间"/>
-                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"  stepMinute="30" placeholder="        计费结束时间" value="#{sharedAssetRequestNewController.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
+                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"   placeholder="        计费开始时间" value="#{sharedAssetRequestNewController.selected.msgBeginTime}" required="true" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true" requiredMessage="请选择开始时间"/>
+                                           <p:calendar  pattern="yyyy/MM/dd HH:mm"   placeholder="        计费结束时间" value="#{sharedAssetRequestNewController.selected.msgEndTime}" readonlyInput="true" showOn="button" showButtonPanel="true" navigator="true"/>
                                            <p:inputText  style="width: 100px;margin-left:10px " placeholder="设备接收人" required="true" value="#{sharedAssetRequestNewController.selected.msgAccepter}" requiredMessage="请选择设备接收人"/>
 
                                            <p:selectOneMenu style="margin-left:40px;float:right" id="clinicalDeptUid"  value="#{sharedAssetRequestNewController.selected.clinicalDeptUid}" required="true" requiredMessage="请选择科室">        
@@ -102,30 +102,18 @@
 
                                <p:ajax event="rowSelect"  listener="#{sharedAssetRequestNewController.prepareEditSard}" update=":EditDlg,editButton" oncomplete="PF('EditDialog').show()"/>
                                <p:ajax event="filter" listener="#{sharedAssetReqDetailController.onFilter}" />
-                               <p:column headerText="设备编号" sortBy="#{item.assetNumber}" filterBy="#{item.assetNumber}" filterMatchMode="LIKE">
+                               <p:column headerText="设备编号" sortBy="#{item.assetNumber}">
                                    <h:outputText value="#{item.assetNumber}"/>
                                </p:column>
-                               <p:column headerText="调剂设备名称" sortBy="#{item.assetNumber}" filterBy="#{item.assetNumber}" filterMatchMode="LIKE">
+                               <p:column headerText="调剂设备名称" sortBy="#{item.assetNumber}">
                                    <h:outputText value="#{sharedAssetReqDetailController.getSwapName(item.sharedAssetTypeId)}"/>
                                </p:column>
-<!--                               <p:column headerText="#{msg.assetName}" sortBy="#{item.assetName}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
-                                   <h:outputText value="#{item.assetName}"/>
-                               </p:column>
-                               <p:column headerText="#{msg.state}" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
-                                   <h:outputText value="#{item.state}"/>
-                               </p:column>-->
-                               <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}" filterBy="#{item.chargingBeginTime}" filterMatchMode="GTE">
-                                   <f:facet name="filter">
-                                       <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
-                                   </f:facet>
+                               <p:column headerText="计费开始时间" sortBy="#{item.chargingBeginTime}">
                                    <h:outputText value="#{item.chargingBeginTime}">
                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                    </h:outputText>
                                </p:column>
-                               <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}" filterBy="#{item.chargingEndTime}" filterMatchMode="GTE">
-                                   <f:facet name="filter">
-                                       <p:inputMask mask="9999-99-99 #{msg.filterTo} 9999-99-99" onkeyup="filterByDateField(event, this, 'varDataList', ' #{msg.filterTo} ');" onblur="filterByDateFieldOnBlur(this, ' #{msg.filterTo} ');"/>
-                                   </f:facet>
+                               <p:column headerText="计费结束时间" sortBy="#{item.chargingEndTime}">
                                    <h:outputText value="#{item.chargingEndTime}">
                                        <f:convertDateTime pattern="yyyy/MM/dd HH:mm" />
                                    </h:outputText>
@@ -133,11 +121,13 @@
                                <p:column headerText="单价" sortBy="#{item.unitPrice}" >
                                     <h:outputText value="#{item.unitPrice}"/>
                                </p:column>
-                               <p:column headerText="计价方式" sortBy="#{item.chargingType}">
-                                    <h:outputText value="#{item.chargingType}"/>
-                               </p:column>
+                                 <p:column headerText="计价方式" sortBy="#{item.chargingType}">
+                                     <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
+                                 </p:column>
                                <p:column headerText="费用" sortBy="#{item.cost}" >
-                                    <h:outputText value="#{item.cost}"/>
+                                   <h:outputText value="#{item.cost}">
+                                       <f:convertNumber pattern="0.00"/>
+                                   </h:outputText>
                                </p:column>
                                <p:column headerText="备注" sortBy="#{item.remark}" >
                                     <h:outputText value="#{item.remark}"/>

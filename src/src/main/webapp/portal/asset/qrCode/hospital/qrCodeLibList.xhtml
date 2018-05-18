@@ -33,7 +33,7 @@
                                 <h:outputText value="医院"/><br/>
                                 <p:overlayPanel widgetVar="varPanelSiteFilter" for="filterOrg" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
                                             <p:ajax process="@this" event="select" listener="#{qrCodeLibController.onSiteFilterChange}" update=":qrCodeLibListForm:datalist" oncomplete="PF('varPanelSiteFilter').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>

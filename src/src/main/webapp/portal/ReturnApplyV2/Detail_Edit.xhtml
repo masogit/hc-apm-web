@@ -14,7 +14,7 @@
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                         <h:panelGroup>
-                            <label class="label">调剂设备名称</label>
+                            <label class="label">调剂设备名称*</label>
                             <p:selectOneMenu id="swapTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}"  required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}">
                                 <p:ajax  update="broQty applyQty" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
@@ -22,14 +22,14 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">设备在借数</label>
-                            <p:inputText id="broQty" value="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId)}"   readonly="true"/>
+                            <label class="label">设备在借数*</label>
+                            <p:inputText id="broQty" value="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"   readonly="true"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">归还申请数</label>
+                            <label class="label">归还申请数*</label>
                             <!--<p:inputText value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
                             <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
-                                           decimalPlaces="0" minValue="0" maxValue="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId)}"/>
+                                           decimalPlaces="0" minValue="0" maxValue="#{sharedAssetTypeController.getSwapQty(sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                         </h:panelGroup>
                         <h:panelGroup>
                         </h:panelGroup>

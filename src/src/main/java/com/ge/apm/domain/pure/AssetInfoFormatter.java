@@ -16,10 +16,12 @@ import java.util.Map;
 public class AssetInfoFormatter {
 
     private AssetInfo assetInfo;
+    private List<OrgInfo> sites;
     private AssetFileImportService importService;
 
-    public AssetInfoFormatter(AssetInfo assetInfo, AssetFileImportService importService) {
+    public AssetInfoFormatter(AssetInfo assetInfo, List<OrgInfo> sites, AssetFileImportService importService) {
         this.assetInfo = assetInfo;
+        this.sites = sites;
         this.importService = importService;
     }
 
@@ -193,6 +195,16 @@ public class AssetInfoFormatter {
 
     public int getSiteId() {
         return assetInfo.getSiteId();
+    }
+
+    public String getSiteName() {
+        for (OrgInfo orgInfo: sites) {
+            if (this.getSiteUID().equals(orgInfo.getUid())) {
+                return orgInfo.getName();
+            }
+        }
+
+        return null;
     }
 
     public String getName() {
@@ -608,6 +620,7 @@ public class AssetInfoFormatter {
         map.put("维修负责人", this.getAssetOwnerName());
         map.put("维修负责人2", this.getAssetOwnerName2());
         map.put("维修负责人3", this.getAssetOwnerName3());
+        map.put("院区", this.getSiteName());
         map.put("使用科室", this.getClinicalDeptName());
         map.put("制造商", this.getManufacture());
         map.put("品牌/制造商简称", this.getMakerShortName());

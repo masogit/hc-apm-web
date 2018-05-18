@@ -482,7 +482,7 @@ public class QrCodeService {
 
     }
 
-    private Boolean createSpecialQrCode(String qrcode, String siteUid) {
+    public boolean createSpecialQrCode(String qrcode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode,siteUid);
         if (null != qrCodeLib) {
             return false;
@@ -502,12 +502,20 @@ public class QrCodeService {
         return true;
     }
 
+    public void forceRemoveQrcode(String qrCode, String siteUid){
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if(null == qrCodeLib){
+            return ;
+        }
+        qrCodeLibDao.delete(qrCodeLib);
+    }
+    
     public boolean deleteQrcode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
         if(null == qrCodeLib){
             return true;
         }
-        if (qrCodeLib.getStatus() != 1 || qrCodeLib.getStatus() != 2) {
+        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
             return false;
         }
         List<AssetInfo> assetList = assetDao.findByQrCodeAndSiteUID(qrCode, siteUid);
@@ -523,6 +531,20 @@ public class QrCodeService {
         //TODO v2_blobObject
         qrCodeLibDao.delete(qrCodeLib);
         return true;
+    }
+
+    public boolean isQrcodeAvailableInStatus(String qrCode, String siteUid, int status) {
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
+        if(null == qrCodeLib){
+            return false;
+        }
+
+        if (status == qrCodeLib.getStatus()) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     public boolean updateExistingQrCodeNotUsed(String qrCode, OrgInfo currentOrg) {

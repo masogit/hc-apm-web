@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jfree.util.Log;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.TabChangeEvent;
 import org.primefaces.model.UploadedFile;
@@ -26,6 +27,7 @@ import com.ge.apm.domain.CaptureDataMessages;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.CaptureDataMessagesService;
+import com.ge.apm.service.utils.ImageUtils;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.GenericRepositoryUUID;
@@ -47,11 +49,14 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     private AssetInfoRepository assetInfoRepository;
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
-    private UploadedFile file;
-    private List<CaptureDataMessages> importFailedDataList;
     private String content;
+    private int conentTextLength=120;
+    private UploadedFile file;
+    private String fileName;
+    private List<CaptureDataMessages> importFailedDataList;
+    private String tempImageContent;
     private AssetInfo assetInfo;
-    boolean validate=true;
+    private String checkedSystemId;
     
     @Override
     protected void init() {
@@ -68,14 +73,32 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     }
     
     @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+    	// TODO Auto-generated method stub
+    	super.prepareCreate();
+    	resetValue();
+    }
+    
+    @Override
     public void prepareEdit() {
     	// TODO Auto-generated method stub
     	super.prepareEdit();
+    	resetValue();
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
     	assetInfo=service.getAssetInfoBySystemId(this.selected.getSystemId());
-    	this.selected.setIbStatus(assetInfo.getIbStatus());
-    	this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+    	if(assetInfo!=null){
+    		setAssetInfoValue();
+    	}
+    }
+    
+    private void resetValue(){
+    	assetInfo=null;
+    	file=null;
+    	fileName=null;
+    	tempImageContent=null;
+    	importFailedDataList=null;
+    	checkedSystemId=null;
     }
 
     @Override
@@ -122,33 +145,40 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         }
     }
     
+    private void getAssetInfo(){
+    	checkedSystemId=this.selected.getSystemId();
+    	if(StringUtils.isNotEmpty(checkedSystemId)){
+    		assetInfo=service.getAssetInfoBySystemId(checkedSystemId);
+    	}
+    }
+    
+    private void setAssetInfoValue(){
+    	this.selected.setIbStatus(assetInfo.getIbStatus());
+		this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
+		this.selected.setAssetUID(assetInfo.getUid());
+    }
+    
     public void checkSystemId(){
-    	String systemId=this.selected.getSystemId();
+    	
     	if(this.selected.getType()!=null && this.selected.getType()==1)
     		return;
-    	if(StringUtils.isNotEmpty(systemId)){
-    		assetInfo=service.getAssetInfoBySystemId(systemId);
-    		if(assetInfo==null){
-    			validate=false;
-    			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
-    			FacesContext.getCurrentInstance().addMessage(null, message);
-    		}
-    		else{
-    			validate=true;
-    			this.selected.setIbStatus(assetInfo.getIbStatus());
-    			this.selected.setGeDeviceType(assetInfo.getGeDeviceType());
-    			this.selected.setAssetUID(assetInfo.getUid());
-    			OrgInfo orgInfo=assetInfo.getHospital();
-    			if(orgInfo!=null && orgInfo.getName()!=null){
-    				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"医院:"+orgInfo.getName()+"，设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
-        			FacesContext.getCurrentInstance().addMessage(null, message);
-    			}
-    			else{
-    				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
-        			FacesContext.getCurrentInstance().addMessage(null, message);
-    			}
-    		}
-    	}
+    	getAssetInfo();
+    	if(assetInfo==null){
+			FacesMessage message = new FacesMessage("注意", "找不到输入SystemId对应的设备");
+			FacesContext.getCurrentInstance().addMessage("systemID", message);
+		}
+		else{
+			setAssetInfoValue();
+			OrgInfo orgInfo=assetInfo.getHospital();
+			if(orgInfo!=null && orgInfo.getName()!=null){
+				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"医院:"+orgInfo.getName()+"，设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
+    			FacesContext.getCurrentInstance().addMessage("systemID", message);
+			}
+			else{
+				FacesMessage message = new FacesMessage("注意", "该systemID对应"+"设备名："+assetInfo.getName()+"，对应使用科室："+assetInfo.getClinicalDeptName());
+    			FacesContext.getCurrentInstance().addMessage("systemID", message);
+			}
+		}
     }
 
     @Override
@@ -157,21 +187,74 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 			this.selected.setType(0);
 		}
     	if(this.selected.getType()==0){
-    		if(validate){
+    		if(checkedSystemId==null || checkedSystemId.equals(this.selected.getSystemId())==false){
+    			getAssetInfo();
+    		}
+    		if(assetInfo!=null){
+    			setIndexValue();
         		super.save();
         		assetInfo.setIbStatus(this.selected.getIbStatus());
         		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
         		assetInfoRepository.save(assetInfo);
-        		this.selected=null;
         	}
         	else{
-        		FacesMessage message = new FacesMessage("注意！保存失败");
-                FacesContext.getCurrentInstance().addMessage(null, message);
+        		FacesMessage message = new FacesMessage("注意！保存失败,SystemID对应设备未找到");
+                FacesContext.getCurrentInstance().addMessage("other", message);
         	}
     	}
     	else{
-    		super.save();
-    		this.selected=null;
+    		if(this.selected.getGeDeviceType()==null){
+    			FacesMessage message = new FacesMessage("注意！保存失败，设备类型不能为空");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+    		}
+    		else{
+    			setIndexValue();
+    			this.selected.setSystemId("");
+        		super.save();
+    		}
+    	}
+    	this.selected=null;
+    }
+    
+    public boolean validateRequiredField(){
+    	if(this.selected.getType()==0){
+    		if(this.selected.getSystemId()==null){
+    			return false;
+    		}
+    		if(this.selected.getIbStatus()==null){
+    			return false;
+    		}
+    	}
+    	else if(this.selected.getType()==1){
+    		if(this.selected.getGeDeviceType()==null){
+    			return false;
+    		}
+    	}
+    	if(StringUtils.isEmpty(this.selected.getContent())){
+    		return false;
+    	}
+    	return true;
+    }
+    
+    private void setIndexValue(){
+    	CaptureDataMessages captureDataMessages=null;
+    	if(this.selected.getType()==0){
+    		captureDataMessages=dao.findBySystemId(this.selected.getSystemId());
+    	}
+    	else if(this.selected.getType()==1){
+    		captureDataMessages=dao.findByGeDeviceType(this.selected.getGeDeviceType());
+    	}
+    	if(captureDataMessages!=null){
+    		Integer index=captureDataMessages.getIndex();
+    		if(index!=null){
+    			this.selected.setIndex(index+1);
+    		}
+    		else{
+    			this.selected.setIndex(0);
+    		}
+    	}
+    	else{
+    		this.selected.setIndex(0);
     	}
     }
     
@@ -182,10 +265,56 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	this.selected=null;
     }
     
-    public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+    public void handleImageUpload(FileUploadEvent event) {
         this.file = event.getFile();
-        FacesContext.getCurrentInstance().addMessage(null, message);
+        fileName=null;
+        try {
+        	if(file==null || file.getInputstream()==null){
+            	FacesMessage message = new FacesMessage("注意！解析图片失败！");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+                tempImageContent=null;
+                return;
+            }
+            else{
+            	String fileName=file.getFileName();
+            	if(fileName.toLowerCase().endsWith(".jpg")|| fileName.toLowerCase().endsWith(".png")){
+            		
+            	}
+            	else{
+            		FacesMessage message = new FacesMessage("注意！请上传jpg或者png格式的图片！");
+                    FacesContext.getCurrentInstance().addMessage("other", message);
+                    tempImageContent=null;
+                    return;
+            	}
+            	//780831
+            	if(file.getInputstream().available()>5242880){
+            		FacesMessage message = new FacesMessage("注意！请上传大小不超过5M的图片！");
+                    FacesContext.getCurrentInstance().addMessage("other", message);
+                    tempImageContent=null;
+                    return;
+            	}
+            	String imageString=ImageUtils.getBase64(file.getInputstream());
+            	imageString="<img src=\"data:image/jpeg;base64,"+imageString+"\">";
+            	tempImageContent=imageString;
+            	setFileName(file.getFileName());
+            	FacesMessage message = new FacesMessage("图片上传成功！");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+            }
+		} catch (Exception e) {
+			// TODO: handle exception
+			Log.error(e.getMessage());
+			FacesMessage message = new FacesMessage("注意！解析图片失败！");
+            FacesContext.getCurrentInstance().addMessage("other", message);
+            tempImageContent=null;
+            return;
+		}
+        
+    }
+    
+    public void insertImage(){
+    	if(StringUtils.isNotEmpty(tempImageContent)){
+    		this.selected.setContent(this.selected.getContent()+tempImageContent);
+    	}
     }
     
     public UploadedFile getFile() {
@@ -196,6 +325,22 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
         this.file = file;
     }
 
+	public String getFileName() {
+		return fileName;
+	}
+
+	public void setFileName(String fileName) {
+		this.fileName = fileName;
+	}
+
+	public String getTempImageContent() {
+		return tempImageContent;
+	}
+
+	public void setTempImageContent(String tempImageContent) {
+		this.tempImageContent = tempImageContent;
+	}
+
 	public List<CaptureDataMessages> getImportFailedDataList() {
 		return importFailedDataList;
 	}
@@ -203,7 +348,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 	public void setImportFailedDataList(List<CaptureDataMessages> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
-	
 	public void setContent(String id){
 		content=dao.getContentById(id);
 	}
@@ -214,5 +358,4 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
 		}
 		return "";
 	}
-	
 }

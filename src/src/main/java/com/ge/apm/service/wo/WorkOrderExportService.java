@@ -170,7 +170,7 @@ public class WorkOrderExportService {
                 workOrderMap.put("接单时间", acceptStep.getStartTime() != null ? sdf.format(acceptStep.getStartTime()) : "");
             }
             if(workStep != null){
-                workOrderMap.put("维修完成时间", workStep.getStartTime() != null ? sdf.format(workStep.getStartTime()) : "");
+                workOrderMap.put("维修完成时间", workStep.getEndTime() != null ? sdf.format(workStep.getEndTime()) : "");
             }
             workOrderMap.put("签到时间", workOrder.getCheckinTime() != null ? sdf.format(workOrder.getCheckinTime()) : "");
             workOrderMap.put("维修工时", workOrder.getTotalManHour());
@@ -242,8 +242,13 @@ public class WorkOrderExportService {
             workOrderMap.put("备注", workOrder.getComment());
             workOrderMap.put("二维码", assetInfo.getQrCode());
             workOrderMap.put("设备分类", assetInfo.getAssetGroup() != null ? FieldValueMessageController.fieldValue("assetGroup",assetInfo.getAssetGroup().toString()) : "");
-            workOrderMap.put("医疗器械分类", assetInfo.getFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType",assetInfo.getFunctionGroup().toString()) : "");
-            workOrderMap.put("医疗器械子分类", assetInfo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(assetInfo.getFunctionGroup().toString(),assetInfo.getAssetCode68().toString()) : "");
+            if(assetInfo.getFunctionGroup() != null){
+                workOrderMap.put("医疗器械分类", assetInfo.getFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType",assetInfo.getFunctionGroup().toString()) : "");
+                workOrderMap.put("医疗器械子分类", assetInfo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(assetInfo.getFunctionGroup().toString(),assetInfo.getAssetCode68().toString()) : "");
+            }else{
+                workOrderMap.put("医疗器械分类", "");
+                workOrderMap.put("医疗器械子分类", "");
+            }
             workOrderMap.put("设备型号", assetInfo.getFunctionType());
             workOrderMap.put("距上次报修天数", serviceRequest.getNearestSrDays());
             workOrderMap.put("停机时间", serviceRequest.getConfirmedDownTime() != null ? sdf.format(serviceRequest.getConfirmedDownTime()) : "");

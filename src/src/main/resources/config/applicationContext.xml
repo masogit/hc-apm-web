@@ -36,7 +36,7 @@
     <context:exclude-filter type="regex" expression="webapp/framework/web/.*,com/ge/apm/web/.*"/>
   </context:component-scan>
   <context:property-placeholder
-    location="classpath*:database.properties,classpath*:hibernate.properties,classpath*:risPacs.properties"/>
+          location="classpath*:database.properties,classpath*:hibernate.properties,classpath*:risPacs.properties"/>
 
   <!-- security -->
   <security:authentication-manager>
@@ -50,54 +50,54 @@
   <bean id="cloudCfg" class="com.ge.apm.service.utils.CloudCfg"/>
 
   <!-- datasource -->
-    <bean id="risDataSource" class="org.apache.commons.dbcp.BasicDataSource"
-          destroy-method="close"
-          lazy-init="true"
-          p:defaultAutoCommit="true"
-          p:initialSize="1"
-          p:maxActive="20"
-          p:maxIdle="5"
-          p:maxWait="10000"
-          p:poolPreparedStatements="true"
-          p:removeAbandoned="true"
-          p:removeAbandonedTimeout="60"
-          p:testOnBorrow="true" p:testOnReturn="true" p:testWhileIdle="true"
-          p:validationQuery="select 1" p:timeBetweenEvictionRunsMillis="1000" p:minEvictableIdleTimeMillis="1000">
-        <property name="driverClassName" value="org.postgresql.Driver" />
-        <property name="url" value="#{cloudCfg.jdbcUrl}"/>
-        <property name="username" value="#{cloudCfg.jdbcUserName}"/>
-        <property name="password" value="#{cloudCfg.jdbcPassword}"/>
-    </bean>
-  
-<!--  
-  <bean id="risDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+  <bean id="risDataSource" class="org.apache.commons.dbcp.BasicDataSource"
+        destroy-method="close"
+        lazy-init="true"
+        p:defaultAutoCommit="true"
+        p:initialSize="1"
+        p:maxActive="20"
+        p:maxIdle="5"
+        p:maxWait="10000"
+        p:poolPreparedStatements="true"
+        p:removeAbandoned="true"
+        p:removeAbandonedTimeout="60"
+        p:testOnBorrow="true" p:testOnReturn="true" p:testWhileIdle="true"
+        p:validationQuery="select 1" p:timeBetweenEvictionRunsMillis="1000" p:minEvictableIdleTimeMillis="1000">
+    <property name="driverClassName" value="org.postgresql.Driver" />
     <property name="url" value="#{cloudCfg.jdbcUrl}"/>
     <property name="username" value="#{cloudCfg.jdbcUserName}"/>
     <property name="password" value="#{cloudCfg.jdbcPassword}"/>
-    <property name="initialSize" value="1"/>
-    <property name="minIdle" value="1"/>
-    <property name="maxActive" value="50"/>
-    <!- -<property name="maxWait" value="60000"/>- ->
-    <property name="timeBetweenEvictionRunsMillis" value="60000"/>
-    <property name="minEvictableIdleTimeMillis" value="300000"/>
-    <property name="validationQuery" value="SELECT 'x'"/>
-    <property name="testWhileIdle" value="true"/>
-    <property name="testOnBorrow" value="false"/>
-    <property name="testOnReturn" value="false"/>
-    <property name="removeAbandoned" value="true"/>
-    <property name="removeAbandonedTimeout" value="10"/>
-    <property name="logAbandoned" value="true"/>
-    <property name="poolPreparedStatements" value="true"/>
-    <property name="maxPoolPreparedStatementPerConnectionSize" value="5000"/>
-    <property name="proxyFilters">
-      <list>
-        <ref bean="statFilter"/>
-        <ref bean="wallFilter"/>
-        <ref bean="slf4jLogFilter"/>
-      </list>
-    </property>
   </bean>
--->
+
+  <!--
+    <bean id="risDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init" destroy-method="close">
+      <property name="url" value="#{cloudCfg.jdbcUrl}"/>
+      <property name="username" value="#{cloudCfg.jdbcUserName}"/>
+      <property name="password" value="#{cloudCfg.jdbcPassword}"/>
+      <property name="initialSize" value="1"/>
+      <property name="minIdle" value="1"/>
+      <property name="maxActive" value="50"/>
+      <!- -<property name="maxWait" value="60000"/>- ->
+      <property name="timeBetweenEvictionRunsMillis" value="60000"/>
+      <property name="minEvictableIdleTimeMillis" value="300000"/>
+      <property name="validationQuery" value="SELECT 'x'"/>
+      <property name="testWhileIdle" value="true"/>
+      <property name="testOnBorrow" value="false"/>
+      <property name="testOnReturn" value="false"/>
+      <property name="removeAbandoned" value="true"/>
+      <property name="removeAbandonedTimeout" value="10"/>
+      <property name="logAbandoned" value="true"/>
+      <property name="poolPreparedStatements" value="true"/>
+      <property name="maxPoolPreparedStatementPerConnectionSize" value="5000"/>
+      <property name="proxyFilters">
+        <list>
+          <ref bean="statFilter"/>
+          <ref bean="wallFilter"/>
+          <ref bean="slf4jLogFilter"/>
+        </list>
+      </property>
+    </bean>
+  -->
 
   <bean id="statFilter" class="com.alibaba.druid.filter.stat.StatFilter">
     <property name="logSlowSql" value="true"/>
@@ -195,7 +195,7 @@
         <prop key="hibernate.format_sql">true</prop>
         <prop key="hibernate.generate_statistics">false</prop>
         <prop key="hibernate.use_sql_comments">false</prop>
-		<prop key="hibernate.hbm2ddl.auto">update</prop>
+        <prop key="hibernate.hbm2ddl.auto">update</prop>
       </props>
     </property>
   </bean>
@@ -236,15 +236,15 @@
     <property name="basePackage" value="com.ge.apm.dao.mapper"/>
     <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory"></property>
   </bean>
-    
-    <bean id="httpClientFactory"
-        class="org.springframework.http.client.SimpleClientHttpRequestFactory">
-        <property name="connectTimeout" value="10000" />
-        <property name="readTimeout" value="100000" />
-    </bean>
 
-    <!--RestTemplate -->
-    <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
-        <constructor-arg ref="httpClientFactory" />
-    </bean>
+  <bean id="httpClientFactory"
+        class="org.springframework.http.client.SimpleClientHttpRequestFactory">
+    <property name="connectTimeout" value="10000" />
+    <property name="readTimeout" value="100000" />
+  </bean>
+
+  <!--RestTemplate -->
+  <bean id="restTemplate" class="org.springframework.web.client.RestTemplate">
+    <constructor-arg ref="httpClientFactory" />
+  </bean>
 </beans>

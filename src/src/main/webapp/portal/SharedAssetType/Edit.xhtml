@@ -23,24 +23,24 @@
                     <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetTypeController.selected != null}">
                         
                         <h:panelGroup>
-                            <label class='label'>调剂设备名称</label>
+                            <label class='label'>调剂设备名称*</label>
                             <p:inputText id="swapName" value="#{sharedAssetTypeController.selected.swapName}"  required="true" requiredMessage="调剂设备名称 #{msg.ValidationRequire}" />
                         </h:panelGroup>
                         
                         <h:panelGroup>
-                            <label class='label'>单价</label>
+                            <label class='label'>单价*</label>
                             <p:inputNumber id="unitPrice" value="#{sharedAssetTypeController.selected.unitPrice}" minValue="0" decimalPlaces="2"
                                            required="true" requiredMessage="单价 #{msg.ValidationRequire}" />
                             <!--<p:inputText id="unitPrice" value="#{sharedAssetTypeController.selected.unitPrice}"  required="true" requiredMessage="单价 #{msg.ValidationRequire}" />-->
                         </h:panelGroup>
                         
                         <h:panelGroup>
-                            <label class='label'>计价方式</label>
+                            <label class='label'>计价方式*</label>
                             <p:selectOneRadio id="chargingType" required="true"  value="#{sharedAssetTypeController.selected.chargingType}" requiredMessage="计价方式 #{msg.ValidationRequire}">
-                                <f:selectItem itemLabel="小时(半点/整点)" itemValue="小时(半点/整点)" />
-                                <!--<f:selectItem itemLabel="自然小时" itemValue="自然小时" />-->
-                                <f:selectItem itemLabel="天" itemValue="天" />
-                                <f:selectItem itemLabel="次" itemValue="次" />
+                                <f:selectItem itemLabel="小时(半点/整点)" itemValue="2" />
+                                <f:selectItem itemLabel="自然时间" itemValue="4" />
+                                <f:selectItem itemLabel="天" itemValue="3" />
+                                <f:selectItem itemLabel="次" itemValue="1" />
                             </p:selectOneRadio>
                         </h:panelGroup>
                         

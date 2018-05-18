@@ -59,11 +59,21 @@
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="importDataForm">
+                    <h:panelGroup >
+                        <p:selectOneRadio id="status" value="#{assetFileImportController.displayErrorsOnly}">
+                            <p:ajax event="change" process="@this" update=":importDataForm" listener="#{assetFileImportController.switchAssetCheckStatus}"/>
+                            <f:selectItem itemValue="false" itemLabel="全部记录"/>
+                            <f:selectItem itemValue="true" itemLabel="错误记录"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
                     <p:tabView>
                         <p:tab title="资产导入">
-                            <p:dataTable id="assetTable" value="#{assetFileImportController.importAssetMap.values()}" var="item" rows="10" paginator="true"
+                            <p:dataTable id="assetTable" value="#{assetFileImportController.displayAssets.values()}" var="item" rows="10" paginator="true"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          rowsPerPageTemplate="5,10,15" >
+                                <p:column headerText="Excel行数" >
+                                    <h:outputText value="#{item.get('asset').lineNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.assetName}" >
                                     <h:outputText value="#{item.get('asset').name}"/>
                                 </p:column>
@@ -109,7 +119,10 @@
                             </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
-                            <p:dataTable  value="#{assetFileImportController.importOrgMap.values()}" var="item" >
+                            <p:dataTable  value="#{assetFileImportController.displayOrgs.values()}" var="item" >
+                                <p:column headerText="Excel行数" >
+                                    <h:outputText value="#{item.get('org').lineNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.Department}" >
                                     <h:outputText value="#{item.get('org').name}"/>
                                 </p:column>
@@ -146,19 +159,19 @@
 
 
                         <h:panelGroup>
-                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{!assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
-                            <p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">
-                                <p:fileDownload value="#{assetFileImportController.exportFile}" />
-                            </p:commandButton>
+                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
+                            <!--<p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">-->
+                                <!--<p:fileDownload value="#{assetFileImportController.exportFile}" />-->
+                            <!--</p:commandButton>-->
                             <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="assetImport?faces-redirect=true"  update=":growl"/>
                         </h:panelGroup>
-                        <h:panelGroup >
-                            <h:outputText value="#{assetFileImportController.assetErrorCounts}资产导入数据有错误,请检查" rendered="#{assetFileImportController.assetErrorCounts>0}" />
-                            <h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />
-                            <c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">
-                                <h:outputText value="#{item}" />
-                            </c:forEach>
-                        </h:panelGroup>
+                        <!--<h:panelGroup >-->
+                            <!--<h:outputText value="#{assetFileImportController.assetErrorCounts}资产导入数据有错误,请检查" rendered="#{assetFileImportController.assetErrorCounts>0}" />-->
+                            <!--<h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />-->
+                            <!--<c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">-->
+                                <!--<h:outputText value="#{item}" />-->
+                            <!--</c:forEach>-->
+                        <!--</h:panelGroup>-->
                     </p:panelGrid>
                 </h:form>
             </div>

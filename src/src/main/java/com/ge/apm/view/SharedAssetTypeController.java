@@ -8,10 +8,7 @@ package com.ge.apm.view;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.SharedAssetType;
-import com.ge.apm.domain.SharedAssetTypeAccesssory;
-import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
@@ -254,14 +251,12 @@ public class SharedAssetTypeController extends GenericCRUDUUIDController<SharedA
         return objectList;
     }
     
-    public int getSwapQty(String Uid){
+    public int getSwapQty(String Uid,String clinicalDeptUid){
         if(null == Uid||Uid.equalsIgnoreCase("")){
             return 0;
         }else{
-            List<SharedAssetType> objectList = new ArrayList<SharedAssetType>();
-            String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-            OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
-            objectList = dao.findbyBorrowQty(UserContextService.getCurrentUserAccount().getSiteUID(),userOrg.getUid(),Uid);
+            List<AssetInfo> objectList = new ArrayList<AssetInfo>();
+            objectList = dao.findbyBorrowQty(clinicalDeptUid,Uid);
 
             return objectList.size();
         }

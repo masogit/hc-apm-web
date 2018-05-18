@@ -28,9 +28,9 @@
                 <h:form id="AssetInfoListForm">
 
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(2)}" rendered="true" />
-                        <p:commandButton value="已配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" />
-                        <p:commandButton value="未配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" />
+                        <!--<p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(2)}" rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 2}"/>-->
+                        <p:commandButton value="已配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == 1}"/>
+                        <p:commandButton value="未配置调剂名称"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetInfoController.searchList(-1)}"  rendered="true" disabled="#{sharedAssetInfoController.queryIndex == -1}"/>
                     </h:panelGrid>
 
                     <p:dataTable id="datalist" value="#{sharedAssetInfoController.lazyModel}" var="item" widgetVar="varDataList"
