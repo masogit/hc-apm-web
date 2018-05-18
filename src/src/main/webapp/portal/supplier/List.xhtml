@@ -44,6 +44,15 @@
                         <p:column headerText="#{msg.tel}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.tel}"/>
                         </p:column>
+                        <p:column headerText="供应商类型" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('supplierType',item.supplierType)}"/>
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{supplierController.prepareEdit}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()" disabled="#{empty supplierController.selected}"/>
