@@ -69,7 +69,7 @@
                         <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="rc2();"/>
                         <p:ajax event="page" oncomplete="rc2();" />
 
-                        <p:column width="36">
+                        <p:column width="36" id="checkBocColumn">
                             <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
                                 <p:ajax listener="#{assetInfoListController.onItemSelected}"  update="@this @(.selectCheckBoxHeader) @(.batch-terminated)"/>
                             </p:selectBooleanCheckbox>
@@ -79,7 +79,7 @@
                                 </p:selectBooleanCheckbox>
                             </f:facet>
                         </p:column>
-                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}">
+                        <p:column exportable="false" width="#{userContextService.hasRole('AssetHead')?60:30}" id="operatorColumn">
                             <h:panelGroup rendered="#{empty assetInfoListController.filterWarrantyDate}">
                                 <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoListController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">
                                     <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
@@ -302,7 +302,7 @@
                             <p:column binding="#{assetInfoListController.customColumns['comments']}" headerText="#{msg.comments}"  visible="false" exportable="true">
                                 <h:outputText value="#{item.comments}"/>
                             </p:column>
-                        <p:column headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
+                        <p:column id="usageStatus" headerText="#{msg.usageStatus}" visible="true" exportable="false" filterBy="#{item.usageStatus}" filterMatchMode="EQ" rendered="#{assetInfoListController.needShowAssetApproval}">
                             <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
