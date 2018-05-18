@@ -1612,6 +1612,17 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     }
 
+    public List<String> completeManufacture(String prefix) {
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+
+        List<String> names = dao.findDistinctManufacturesByPrefix(tenantUID, prefix);
+
+        names.sort(new PinYinComparator());
+
+        return names;
+
+    }
+
     public List<String> completeGbName(String prefix) {
         List<String> names = null;
         if (!StringUtils.isEmpty(prefix)) {
