@@ -119,12 +119,12 @@ public class V2_WorkOrder implements Serializable {
     private List<V2_WorkOrder_Step> v2_workOrder_step_list;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name="wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrder_Detail> v2_workOrder_detail_list;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JoinColumn(name="wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
+    @JoinColumn(name = "wo_id", referencedColumnName = "id", foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT))
     @Fetch(FetchMode.SUBSELECT)
     @org.hibernate.annotations.ForeignKey(name = "none")
     private List<V2_WorkOrderCoworker> v2_workOrder_coworker_list;
@@ -135,7 +135,7 @@ public class V2_WorkOrder implements Serializable {
     @Column(name = "repair_type")
     private Integer repairType;
 
-    @Column(name="repair_result", length = 2)
+    @Column(name = "repair_result", length = 2)
     private String repairResult;
 
     @Column(name = "checkin_time")
@@ -177,6 +177,11 @@ public class V2_WorkOrder implements Serializable {
      */
     @Column(name = "dispatch_mode")
     private Integer dispatchMode;
+
+    @Column(name = "approver_id")
+    private Integer approverId;
+    @Column(name = "approver_name")
+    private String approverName;
 
     public Integer getDispatchMode() {
         return dispatchMode;
@@ -505,6 +510,24 @@ public class V2_WorkOrder implements Serializable {
     public void setRepairResult(String repairResult) {
         this.repairResult = repairResult;
     }
+
+    public Integer getApproverId() {
+        return approverId;
+    }
+
+    public void setApproverId(Integer approverId) {
+        this.approverId = approverId;
+    }
+
+    public String getApproverName() {
+        return approverName;
+    }
+
+    public void setApproverName(String approverName) {
+        this.approverName = approverName;
+    }
+    
+    
 
     @Override
     public int hashCode() {

@@ -122,3 +122,27 @@ delete from unstructured_data where id in (select id from unstructured_data ud,(
    where ud.collection_id=b.collection_id and ud."key"=b.key and ud.id not in (SELECT max(id) FROM "public".unstructured_data  group by collection_id, key ));
 
 alter table unstructured_data add constraint uk_collection_id_key unique(collection_id,key);
+
+update v2_work_order as wo set approver_id = sr.requestor_id, approver_name = sr.requestor_name 
+	from v2_service_request as sr where sr.id = wo.sr_id and approval_status != '0' and approver_id is null;
+
+
+update shared_asset_type set charging_type='1' where charging_type='次';
+update shared_asset_req_detail set charging_type='1' where charging_type='次';
+update shared_asset_type set charging_type='2' where charging_type='小时(半点/整点)';
+update shared_asset_req_detail set charging_type='2' where charging_type='小时(半点/整点)';
+update shared_asset_type set charging_type='3' where charging_type='天';
+update shared_asset_req_detail set charging_type='3' where charging_type='天';
+update shared_asset_type set charging_type='4' where charging_type='自然时间';
+update shared_asset_req_detail set charging_type='4' where charging_type='自然时间';
+
+ALTER TABLE public.shared_asset_req_detail ALTER COLUMN charging_begin_time TYPE timestamp USING charging_begin_time::timestamp;
+ALTER TABLE public.shared_asset_req_detail ALTER COLUMN charging_end_time TYPE timestamp USING charging_end_time::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN apply_time TYPE timestamp USING apply_time::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN create_date TYPE timestamp USING create_date::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN msg_begin_time TYPE timestamp USING msg_begin_time::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN msg_end_time TYPE timestamp USING msg_end_time::timestamp;
+
+alter table capture_data_messages alter start_date type timestamp(4) without time zone
+alter table capture_data_messages alter end_date type timestamp(4) without time zone
+

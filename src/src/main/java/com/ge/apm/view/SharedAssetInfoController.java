@@ -4,6 +4,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.SharedAssetTypeRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SharedAssetType;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
@@ -189,8 +190,17 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public void batchSave(){
+
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids);
+
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgIds = dao.getOrgId(user.getSiteUID());
+        if (orgIds.size() > 0){
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,orgIds.get(0));
+        }else{
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,null);
+        }
+
         this.batchSharedAssetTypeUid = null;
         this.selectedMap.clear();
     }

@@ -59,7 +59,7 @@
 						</f:facet>
 					</p:dataTable>
 				</h:form>
-				<p:dialog header="消息内容" widgetVar="captureDataMessagesDlg" modal="true" resizable="false" draggable="true" appendTo="@(body)">
+				<p:dialog header="消息内容" widgetVar="captureDataMessagesDlg" modal="true" resizable="false" draggable="true" appendTo="@(body)" height="450" width="700">
 					<p:outputPanel id="displayCaptureDataMessagesContent">
 						<h:outputText value="#{captureDataMessagesController.getContent()}" escape="false" />
 					</p:outputPanel>

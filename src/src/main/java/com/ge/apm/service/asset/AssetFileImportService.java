@@ -97,10 +97,11 @@ public class AssetFileImportService {
     private String assetCodeConfig;
     private static final String ASSET_CODE_MERGE_THREE = "DFQ";
     private static final String ASSET_CODE_MERGE_TWO = "DF";
-    boolean autoGenerateFinancingNum;
+//    boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
+    private WorkflowConfig workflowConfig;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
@@ -400,7 +401,10 @@ public class AssetFileImportService {
             }
 
             String orgName = newAsset.getClinicalDeptName();
-            if (importOrgMap.containsKey(orgName)) {
+            if (StringUtils.isEmpty(orgName)) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "警告:科室为空");
+            } else if (importOrgMap.containsKey(orgName)) {
                 OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
                 if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
                     item.put("status", ImportStatus.Failure);
@@ -503,7 +507,7 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (autoGenerateFinancingNum && newAsset.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+            if (needGenerateFinancingNum(newAsset)) {
 
                 //修改的时候不需要生成资产编号
                 financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -523,7 +527,6 @@ public class AssetFileImportService {
                 }
 
             }
-
 
             String qrCode = newAsset.getQrCode();
 
@@ -853,7 +856,7 @@ public class AssetFileImportService {
      * @return
      * @throws IOException
      */
-    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> orgInfoList, boolean allColumns) throws IOException {
+    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, boolean allColumns) throws IOException {
 
         InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
@@ -866,7 +869,7 @@ public class AssetFileImportService {
 
         int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
-            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo, this);
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this);
             Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(allColumns);
 
             doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
@@ -876,7 +879,7 @@ public class AssetFileImportService {
 
         String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
 
-        String sumFormula = String.format("SUM('Asset List'!$Y$7:$Y$%d)", assetList.size() + 6);
+        String sumFormula = String.format("SUM('Asset List'!$Z$7:$Z$%d)", assetList.size() + 6);
 
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
         doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
@@ -889,7 +892,7 @@ public class AssetFileImportService {
         }
 
         startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW;
-        for (OrgInfo orgInfo: orgInfoList) {
+        for (OrgInfo orgInfo: clinicalDeptList) {
             doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, orgInfo.getName());
 
             ++startRow;
@@ -936,17 +939,43 @@ public class AssetFileImportService {
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
 
-        WorkflowConfig siteConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
-        if (siteConfig != null && siteConfig.getGenerateMethod() != null) {
-            if (siteConfig.getGenerateMethod() == 1 || siteConfig.getGenerateMethod() == 2) {
-                autoGenerateFinancingNum = true;
+        workflowConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+
+        if (workflowConfig != null) {
+            assetCodeConfig = workflowConfig.getAssetCodeConfig();
+        }
+    }
+
+    private boolean needGenerateFinancingNum(AssetInfo assetInfo) {
+
+        final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
+        final int GENERATE_BY_PREFIX_AND_SEQ = 2;
+
+        if (workflowConfig == null) return false;
+
+        assetCodeConfig = workflowConfig.getAssetCodeConfig();
+
+        if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
+            return false;
+        }
+
+        if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
+            String financingNum = assetInfo.getFinancingNum();
+
+            if (workflowConfig.getGenerateMethod() == GENERATE_BY_NATIONAL_STANDARD_CODE) {
+
+                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+                    return true;
+                }
+
+            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_SEQ) {
+                if (assetInfo.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+                    return true;
+                }
             }
-
         }
 
-        if (siteConfig != null) {
-            assetCodeConfig = siteConfig.getAssetCodeConfig();
-        }
+        return false;
     }
 
 }

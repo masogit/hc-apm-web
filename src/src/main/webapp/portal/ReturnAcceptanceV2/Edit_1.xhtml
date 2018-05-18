@@ -95,7 +95,7 @@
                         <h:outputText value="#{item.swapName}"/>
                     </p:column>
                     <p:column headerText="设备在借数" sortBy="#{item.sharedAssetTypeId}" >
-                        <h:outputText value="#{sharedAssetRequestV2Controller.getSwapQty2(item.sharedAssetTypeId)}"/>
+                        <h:outputText value="#{sharedAssetRequestV2Controller.getSwapQty2(item.sharedAssetTypeId,sharedAssetRequestV2Controller.selected.clinicalDeptUid)}"/>
                     </p:column>
                     <p:column headerText="申请归还数" sortBy="#{item.applyQty}" >
                         <h:outputText value="#{item.applyQty}"/>
@@ -177,7 +177,9 @@
                             <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="费用" sortBy="#{item.cost}" >
-                            <h:outputText value="#{item.cost}"/>
+                            <h:outputText value="#{item.cost}">
+                                <f:convertNumber pattern="0.00"/>
+                            </h:outputText>
                         </p:column>
                         <p:column headerText="备注" sortBy="#{item.remark}" >
                             <h:outputText value="#{item.remark}"/>
