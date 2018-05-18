@@ -60,9 +60,8 @@
                             <label class="label">#{msg.patTests}</label>
                             <p:inputTextarea value="#{workOrderMgrController.selectedWorkOrder.patTests}" rows="3"  cols="40"   maxlength="500" />
                         </h:panelGroup>
-
                     </p:panelGrid>
-                    <p:dataGrid id="pictureList" var="fileitem" value="#{workOrderMgrController.picList}" columns="7" layout="grid">
+                    <p:dataGrid id="pictureList" class="pictureListCls" var="fileitem" value="#{workOrderMgrController.picList}" columns="7" layout="grid">
                         <f:facet name="header">#{msg.addPic}</f:facet><!--增加图片-->
                         <p:panel  style="text-align:center">
                             <h:panelGrid columns="1" style="width:100%" >
@@ -71,12 +70,24 @@
                                     <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                 </p:commandButton>   
                             </h:panelGrid>
-
                         </p:panel>
-
                     </p:dataGrid>
-                    <p:fileUpload id="type1" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                  multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+
+                    <p:fileUpload id="type1" fileUploadListener="#{workOrderMgrController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
+
+
+
+                    <p:dataGrid id="attachList" var="fileitem" value="#{workOrderMgrController.attachList}" columns="7" layout="grid">
+                        <f:facet name="header">添加文档</f:facet>
+                            <h:panelGrid columns="1" style="width:100%" >
+                                #{fileitem.objectName}
+                                <p:commandButton actionListener="#{workOrderMgrController.removeAttachmentByIdPDF(fileitem.id)}" update="attachList" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </h:panelGrid>
+                       <!-- </p:panel>-->
+                    </p:dataGrid>
+                    <p:fileUpload id="type2" fileUploadListener="#{workOrderMgrController.handleFileUploadPDF}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="attachList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
 
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->

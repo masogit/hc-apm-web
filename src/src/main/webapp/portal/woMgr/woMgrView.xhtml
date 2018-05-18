@@ -104,6 +104,19 @@
                             </h:panelGrid>
                         </p:panel>
                     </p:dataGrid>
+
+
+                    <p:dataGrid var="woAttachItem" value="#{workOrderMgrController.attachList}" columns="4" layout="grid" rendered="#{not empty workOrderMgrController.attachList}">
+                        <f:facet name="header">维修附件</f:facet>
+                        <p:panel  style="text-align:center">
+                            <h:panelGrid columns="1" style="width:100%">
+                                #{woAttachItem.objectName}
+                                <p:link href="#{fileDownloadService.getFileUrl(woAttachItem.objectStorageId)}" process="@this"> 下载文件</p:link>
+                            </h:panelGrid>
+                        </p:panel>
+                    </p:dataGrid>
+
+
                     <p:dataGrid var="audioItem" value="#{workOrderMgrController.audioList}" columns="2" layout="grid" rendered="#{not empty workOrderMgrController.audioList}">
                         <f:facet name="header">报修语音</f:facet>
                         <p:panel  style="text-align:center">
@@ -208,10 +221,7 @@
                                 <p:column headerText="#{msg.description}">
                                     <h:outputText value="#{stepItem.comments}"  style="word-wrap: break-word;"/>
                                 </p:column>
-
                             </p:dataTable>
-
-
                             <br/>
 
                             <h:panelGroup rendered="#{not empty workOrderMgrController.getWorkOrderDetail(woItem.id)}">
