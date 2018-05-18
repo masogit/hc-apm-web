@@ -214,6 +214,12 @@ public class AssetInstallationController {
             calender.add(Calendar.MONTH, monthLong);
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
+        
+        if(configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())){
+            //待审核
+            arrivalListItem.setUsageStatus(2);
+        }
+        
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
