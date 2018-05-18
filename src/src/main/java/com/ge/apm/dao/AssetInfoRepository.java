@@ -74,7 +74,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select a from AssetInfo a where a.isDeleted = false and a.serialNum = ?1 and a.tenantUID=?2 order by a.id desc ")
     public List<AssetInfo> findBySerialNumAndTenantUID(String serialNum, String tenantUID);
 
-    @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and a.name like concat('%',?2,'%') order by a.name fetch first 20 rows only", nativeQuery = true)
+    @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and (a.name like concat('%',?2,'%') or a.name_py_code like concat('%',?2,'%'))order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 order by a.name fetch first 20 rows only", nativeQuery = true)
