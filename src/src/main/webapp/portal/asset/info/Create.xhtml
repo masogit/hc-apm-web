@@ -178,7 +178,7 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.manufacture}</label>
-                                <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}"/>
+                                <p:autoComplete id="manufacture" value="#{assetInfoController.selected.manufacture}" completeMethod="#{assetInfoController.completeManufacture}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.makerShortName}</label>
