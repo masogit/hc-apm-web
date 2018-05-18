@@ -128,7 +128,7 @@
                                 <!--</p:selectOneMenu>-->
                             <!--</h:panelGroup>-->
                             <h:panelGroup>
-                                <label class="label">#{msg.clinicalDeptName}*</label>
+                                <label class="label">#{msg.clinicalDeptName}</label>
                                 <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoController.clinicalDept}"  scrollHeight="300"  forceSelection="true"  requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoController.autoCompleteDept}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
                                     <p:ajax event="itemSelect" listener="#{assetInfoController.onClinicalDeptChange}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
@@ -185,7 +185,7 @@
                                 <p:inputText id="makerShortName" value="#{assetInfoController.selected.makerShortName}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.vendor}</label>
+                                <label class="label">设备#{msg.vendor}</label>
                                 <!--<p:selectOneMenu id="vendor" value="#{assetInfoController.supplier}" converter="supplierConverter" var="t"  filter="true" filterMatchMode="startsWith" required="false" requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" >-->
                                     <!--<p:ajax  listener="#{assetInfoController.onSupplierChange()}" process="@parent"/>-->
                                     <!--<f:selectItem itemLabel=""/>-->
@@ -203,9 +203,17 @@
 
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.maitanance}</label>
-                                <p:inputText id="maitanance" value="#{assetInfoController.selected.maitanance}"/>
+                                <label class="label">维修供应商</label>
+                                <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoController.maintainer}" scrollHeight="300"  forceSelection="true"  requiredMessage="维修供应商 #{msg.ValidationRequire}" completeMethod="#{assetInfoController.autoCompleteMaintainer}"
+                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                    <p:ajax event="itemSelect" listener="#{assetInfoController.onMaintainerChange}"/>
+                                    <p:ajax listener="#{assetInfoController.onMaintainerChange}"/>
+                                </p:autoComplete>
                             </h:panelGroup>
+                            <!--<h:panelGroup>-->
+                                <!--<label class="label">#{msg.maitanance}</label>-->
+                                <!--<p:inputText id="maitanance" value="#{assetInfoController.selected.maitanance}"/>-->
+                            <!--</h:panelGroup>-->
                             <h:panelGroup>
                                 <label class="label">#{msg.maitananceTel}</label>
                                 <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}"/>

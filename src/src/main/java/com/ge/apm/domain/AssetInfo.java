@@ -73,6 +73,9 @@ public class AssetInfo implements Serializable {
     @Column(name = "supplier_id")
     private Integer supplierId; //供应商Id =Supplier.id
 
+    @Column(name = "maitanance_id")
+    private String maitananceId;
+
     @Size(max = 64)
     @Column(name = "maitanance")
     private String maitanance;//维修商
@@ -1407,6 +1410,14 @@ public class AssetInfo implements Serializable {
 
     public void setLineNum(int lineNum) {
         this.lineNum = lineNum;
+    }
+
+    public String getMaitananceId() {
+        return maitananceId;
+    }
+
+    public void setMaitananceId(String maitananceId) {
+        this.maitananceId = maitananceId;
     }
 
     @Override
