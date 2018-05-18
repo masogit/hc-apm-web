@@ -69,7 +69,7 @@
                         <p:ajax event="filter" listener="#{assetInfoListController.onFilter}" oncomplete="rc2();"/>
                         <p:ajax event="page" oncomplete="rc2();" />
 
-                        <p:column width="36" id="checkBocColumn">
+                        <p:column width="36"  id="checkBocColumn">
                             <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
                                 <p:ajax listener="#{assetInfoListController.onItemSelected}"  update="@this @(.selectCheckBoxHeader) @(.batch-terminated)"/>
                             </p:selectBooleanCheckbox>
@@ -132,12 +132,12 @@
                             <h:outputText value="#{item.vendor}"/>
                         </p:column>
                         <p:column binding="#{assetInfoListController.customColumns['status']}" headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{!assetInfoListController.terminate}">
-                            <f:facet name="filter">
+<!--                            <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoListController.filterAssetStatus}" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
-                            </f:facet>
+                            </f:facet>-->
                             <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
                         </p:column>
                         <p:column binding="#{assetInfoListController.customColumns['warrantyDate']}" headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">

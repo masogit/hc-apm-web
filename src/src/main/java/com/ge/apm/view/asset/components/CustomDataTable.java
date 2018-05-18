@@ -8,6 +8,7 @@ package com.ge.apm.view.asset.components;
 import java.util.ArrayList;
 import java.util.List;
 import org.primefaces.component.api.UIColumn;
+import org.primefaces.component.column.Column;
 import org.primefaces.component.datatable.DataTable;
 
 /**
@@ -18,21 +19,24 @@ public class CustomDataTable extends DataTable {
 
     List<String> customedColumn;
 
+    private List<UIColumn> CustomColumnsList = new ArrayList();
     @Override
     public List<UIColumn> getColumns() {
-        List<UIColumn> resultList = new ArrayList();
+        if(CustomColumnsList.isEmpty()){
+//        List<UIColumn> resultList = new ArrayList();
         List<UIColumn> sourceList = super.getColumns();
-        resultList.add(sourceList.stream().filter(columItem -> "checkBocColumn".equals(columItem.getClientId())).findAny().get());
-        resultList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(columItem.getClientId())).findAny().get());
+        CustomColumnsList.add(sourceList.stream().filter(columItem -> "checkBocColumn".equals(((Column)columItem).getId())).findAny().get());
+        CustomColumnsList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(((Column)columItem).getId())).findAny().get());
         customedColumn.forEach(item -> {
-            UIColumn col = sourceList.stream().filter(columItem-> columItem instanceof CustomColumns).filter(sourceItem -> ((CustomColumns) sourceItem).getColumnKey().equalsIgnoreCase(item)).findAny().orElse(null);
+            UIColumn col = sourceList.stream().filter(columItem-> columItem instanceof CustomColumns).filter(sourceItem -> ((CustomColumns) sourceItem).getFieldKey().equalsIgnoreCase(item)).findAny().orElse(null);
             if (null != col) {
-                resultList.add(col);
+                CustomColumnsList.add(col);
             }
+            
         });
-        resultList.add(sourceList.stream().filter(columItem -> "usageStatus".equals(columItem.getClientId())).findAny().get());
-        
-        return resultList;
+        CustomColumnsList.add(sourceList.stream().filter(columItem -> "usageStatus".equals(((Column)columItem).getId())).findAny().get());
+        }
+        return CustomColumnsList;
 
     }
 
