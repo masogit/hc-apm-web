@@ -22,13 +22,16 @@ public class CustomDataTable extends DataTable {
     public List<UIColumn> getColumns() {
         List<UIColumn> resultList = new ArrayList();
         List<UIColumn> sourceList = super.getColumns();
+        resultList.add(sourceList.stream().filter(columItem -> "checkBocColumn".equals(columItem.getClientId())).findAny().get());
+        resultList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(columItem.getClientId())).findAny().get());
         customedColumn.forEach(item -> {
             UIColumn col = sourceList.stream().filter(columItem-> columItem instanceof CustomColumns).filter(sourceItem -> ((CustomColumns) sourceItem).getColumnKey().equalsIgnoreCase(item)).findAny().orElse(null);
             if (null != col) {
                 resultList.add(col);
             }
         });
-
+        resultList.add(sourceList.stream().filter(columItem -> "usageStatus".equals(columItem.getClientId())).findAny().get());
+        
         return resultList;
 
     }
