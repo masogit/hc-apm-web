@@ -187,4 +187,11 @@ public class CustomConfigService {
                .filter(item-> item.getValue().getReadRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
                .map(Entry::getKey).collect(Collectors.toList());
     }
+
+    public List<String> getExportAssetFieldsByRoles(CustomConfigObject config, List<String> userRoles) {
+        return config.getAssetFields().entrySet().stream()
+               .filter(item-> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+               .map(Entry::getKey).collect(Collectors.toList());
+    }
+    
 }

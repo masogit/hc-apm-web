@@ -20,21 +20,20 @@ public class CustomDataTable extends DataTable {
     List<String> customedColumn;
 
     private List<UIColumn> CustomColumnsList = new ArrayList();
+
     @Override
     public List<UIColumn> getColumns() {
-        if(CustomColumnsList.isEmpty()){
-//        List<UIColumn> resultList = new ArrayList();
-        List<UIColumn> sourceList = super.getColumns();
-        CustomColumnsList.add(sourceList.stream().filter(columItem -> "checkBocColumn".equals(((Column)columItem).getId())).findAny().get());
-        CustomColumnsList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(((Column)columItem).getId())).findAny().get());
-        customedColumn.forEach(item -> {
-            UIColumn col = sourceList.stream().filter(columItem-> columItem instanceof CustomColumns).filter(sourceItem -> ((CustomColumns) sourceItem).getFieldKey().equalsIgnoreCase(item)).findAny().orElse(null);
-            if (null != col) {
-                CustomColumnsList.add(col);
-            }
-            
-        });
-        CustomColumnsList.add(sourceList.stream().filter(columItem -> "usageStatus".equals(((Column)columItem).getId())).findAny().get());
+        if (CustomColumnsList.isEmpty()) {
+            List<UIColumn> sourceList = super.getColumns();
+            CustomColumnsList.add(sourceList.stream().filter(columItem -> "checkBoxColumn".equals(((Column) columItem).getId())).findAny().get());
+            CustomColumnsList.add(sourceList.stream().filter(columItem -> "operatorColumn".equals(((Column) columItem).getId())).findAny().get());
+            customedColumn.forEach(item -> {
+                UIColumn itemColumn = sourceList.stream().filter(columItem -> item.equals(((Column) columItem).getId())).findAny().get();
+                ((Column) itemColumn).setVisible(true);
+                ((Column) itemColumn).setRendered(true);
+                CustomColumnsList.add(itemColumn);
+            });
+            CustomColumnsList.add(sourceList.stream().filter(columItem -> "usageStatus".equals(((Column) columItem).getId())).findAny().get());
         }
         return CustomColumnsList;
 
@@ -47,5 +46,5 @@ public class CustomDataTable extends DataTable {
     public void setCustomedColumn(List<String> customedColumn) {
         this.customedColumn = customedColumn;
     }
-    
+
 }
