@@ -30,7 +30,6 @@ import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -61,8 +60,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private String oneSearchStr;
 
     private boolean terminate = false;
-
-//    private boolean isSelectedCurrentPage = false;
 
     private String filterWarrantyDate = null;
 
@@ -226,15 +223,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onItemSelected(String id) {
-        //TODO remove this ?
         if (!Strings.isNullOrEmpty(id)) {
             selectedMap.put(id, selectedMap.get(id) == null ? true : !selectedMap.get(id));
         }
-//        selectedMap.put("all", !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid())));
     }
 
     public void onSelectAllOfPage() {
-//        selectedMap.put("all", selectedMap.get("all") == null ? true : !selectedMap.get("all"));
         boolean isSelectedAll =  !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
         for (AssetInfo item : currentPageAssets) {
             selectedMap.put(item.getUid(), !isSelectedAll);
@@ -273,23 +267,25 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
 
-        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
+//        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
 
         List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
         orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
         List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-        if (!assetUids.isEmpty()) {
-            assetList = assetList.stream().filter(assetInfo -> {
-                Boolean exists = this.selectedMap.get(assetInfo.getUid());
-                if (exists == null) {
-                    return false;
-                }
-                return exists.booleanValue();
-            }).collect(Collectors.toList());
-        }
+//        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
+//        if (!assetUids.isEmpty()) {
+//            assetList = assetList.stream().filter(assetInfo -> {
+//                Boolean exists = this.selectedMap.get(assetInfo.getUid());
+//                if (exists == null) {
+//                    return false;
+//                }
+//                return exists.booleanValue();
+//            }).collect(Collectors.toList());
+//        }
+        
+        List<AssetInfo> assetList = getExportList();
 
         ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
 
@@ -449,19 +445,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.filterAssetStatus = filterAssetStatus;
     }
 
-//    public boolean getIsSelectedCurrentPage() {
-//        if (null == currentPageAssets) {
-//            return false;
-//        } else {
-//            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
-//            return isSelectedCurrentPage;
-//        }
-//    }
-//
-//    public void setIsSelectedCurrentPage(boolean isSelectedCurrentPage) {
-////        this.isSelectedCurrentPage = isSelectedCurrentPage;
-//    }
-
     public StreamedContent getExcelFile() {
         return excelFile;
     }
@@ -502,9 +485,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return selectedMap;
     }
 
-//    public void setSelectedMap(Map<String, Boolean> selectedMap) {
-//        this.selectedMap = selectedMap;
-//    }
     public Boolean needAssetApproval(String siteUid) {
         return acService.needAssetApproval(siteUid);
     }
