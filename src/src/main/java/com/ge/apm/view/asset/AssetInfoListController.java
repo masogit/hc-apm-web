@@ -7,7 +7,6 @@ import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.asset.components.CustomColumns;
 import com.ge.apm.view.asset.components.CustomDataTable;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -63,7 +62,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     private boolean terminate = false;
 
-    private boolean isSelectedCurrentPage = false;
+//    private boolean isSelectedCurrentPage = false;
 
     private String filterWarrantyDate = null;
 
@@ -82,9 +81,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<AssetInfo> currentPageAssets;
 
     private Sort lastPageSort; //export use
-    
+
+    private List<AssetInfo> selectedAssets;
     //custom config
-    private Map<String,CustomColumns> customColumns;
     private CustomConfigObject customConfig;
     private CustomDataTable customTable;
 
@@ -110,20 +109,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         loadCustomConfig();
-        customTable = new CustomDataTable();
-        customTable.setCustomedColumn(customConfig.getAssetsListPageFields());
 
     }
 
-    private void loadCustomConfig(){
+    private void loadCustomConfig() {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        customColumns =CustomConfigService.getAllFields().entrySet().stream().collect(Collectors.toMap(Entry::getKey,
-                item-> new CustomColumns(item.getKey(),customConfig.getAssetsListPageFields().contains(item.getKey()) && 
-                        readFields.contains(item.getKey()))));
+        customTable = new CustomDataTable();
+        customTable.setCustomedColumn(customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList()));
     }
-    
-    
+
     @Override
     protected Page<AssetInfo> loadData(PageRequest pageRequest) {
         lastPageSort = pageRequest.getSort(); //export excel use
@@ -230,14 +225,19 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         requestContext.addCallbackParam("url", url);
     }
 
-    public void onItemSelected() {
+    public void onItemSelected(String id) {
         //TODO remove this ?
-//        isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        if (!Strings.isNullOrEmpty(id)) {
+            selectedMap.put(id, selectedMap.get(id) == null ? true : !selectedMap.get(id));
+        }
+//        selectedMap.put("all", !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid())));
     }
 
     public void onSelectAllOfPage() {
+//        selectedMap.put("all", selectedMap.get("all") == null ? true : !selectedMap.get("all"));
+        boolean isSelectedAll =  !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
         for (AssetInfo item : currentPageAssets) {
-            selectedMap.put(item.getUid(), this.isSelectedCurrentPage);
+            selectedMap.put(item.getUid(), !isSelectedAll);
         }
     }
 
@@ -259,9 +259,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(ai);
         }
     }
-
+    
     public void exportExcel() throws IOException {
 
+        
+        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        
         //非设备科的人导出的时候，导出部分数据
         boolean allColumns = false;
         if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
@@ -276,7 +279,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
         List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-
 
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
         if (!assetUids.isEmpty()) {
@@ -447,18 +449,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         this.filterAssetStatus = filterAssetStatus;
     }
 
-    public boolean getIsSelectedCurrentPage() {
-        if (null == currentPageAssets) {
-            return false;
-        } else {
-            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
-            return isSelectedCurrentPage;
-        }
-    }
-
-    public void setIsSelectedCurrentPage(boolean isSelectedCurrentPage) {
-        this.isSelectedCurrentPage = isSelectedCurrentPage;
-    }
+//    public boolean getIsSelectedCurrentPage() {
+//        if (null == currentPageAssets) {
+//            return false;
+//        } else {
+//            this.isSelectedCurrentPage = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+//            return isSelectedCurrentPage;
+//        }
+//    }
+//
+//    public void setIsSelectedCurrentPage(boolean isSelectedCurrentPage) {
+////        this.isSelectedCurrentPage = isSelectedCurrentPage;
+//    }
 
     public StreamedContent getExcelFile() {
         return excelFile;
@@ -500,16 +502,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return selectedMap;
     }
 
-    public void setSelectedMap(Map<String, Boolean> selectedMap) {
-        this.selectedMap = selectedMap;
-    }
-
+//    public void setSelectedMap(Map<String, Boolean> selectedMap) {
+//        this.selectedMap = selectedMap;
+//    }
     public Boolean needAssetApproval(String siteUid) {
         return acService.needAssetApproval(siteUid);
-    }
-
-    public Map<String, CustomColumns> getCustomColumns() {
-        return customColumns;
     }
 
     public CustomDataTable getCustomTable() {
@@ -518,6 +515,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void setCustomTable(CustomDataTable customTable) {
         this.customTable = customTable;
+    }
+
+    public List<AssetInfo> getSelectedAssets() {
+        return selectedAssets;
+    }
+
+    public void setSelectedAssets(List<AssetInfo> selectedAssets) {
+        this.selectedAssets = selectedAssets;
     }
 
 }
