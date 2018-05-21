@@ -18,6 +18,8 @@ public class CustomConfigObject {
     Map<String,CustomConfigAssetField> assetFields;
 
     List<String> assetsListPageFields;
+    List<String> assetsDetailpageBasicFields;
+    List<String> assetsDetailpageDetailFields;
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
         return assetFields;
@@ -35,5 +37,20 @@ public class CustomConfigObject {
         this.assetsListPageFields = assetsListPageFields;
     }
 
+    public List<String> getAssetsDetailpageBasicFields() {
+        return assetsDetailpageBasicFields;
+    }
+
+    public void setAssetsDetailpageBasicFields(List<String> assetsDetailpageBasicFields) {
+        this.assetsDetailpageBasicFields = assetsDetailpageBasicFields;
+    }
+
+    public List<String> getAssetsDetailpageDetailFields() {
+        return assetsDetailpageDetailFields;
+    }
+
+    public void setAssetsDetailpageDetailFields(List<String> assetsDetailpageDetailFields) {
+        this.assetsDetailpageDetailFields = assetsDetailpageDetailFields;
+    }
     
 }

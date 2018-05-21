@@ -148,6 +148,9 @@ public class CustomConfigService {
         getAllFields().entrySet().stream().forEach(item-> object.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(),allRoles)));
         object.setAssetsListPageFields(Arrays.asList("name","functionType","serialNum","departNum","assetGroup","clinicalDeptName","manufacture","vendor","status","warrantyDate",
                 "financingNum","qrCode"));
+        object.setAssetsDetailpageBasicFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName","assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3",
+                "siteUID","clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor","maitanance","maitananceTel","nationalStandardCode"));
+        
         return object;
     }
 
@@ -192,6 +195,21 @@ public class CustomConfigService {
         return config.getAssetFields().entrySet().stream()
                .filter(item-> item.getValue().getExportRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
                .map(Entry::getKey).collect(Collectors.toList());
+    }
+
+    public void removeAssetField(CustomConfigObject customConfigObject, String key) {
+        if (customConfigObject.getAssetFields().containsKey(key)) {
+            customConfigObject.getAssetFields().remove(key);
+        }
+        if (customConfigObject.getAssetsListPageFields().contains(key)) {
+            customConfigObject.getAssetsListPageFields().remove(key);
+        }
+        if (customConfigObject.getAssetsDetailpageBasicFields().contains(key)) {
+            customConfigObject.getAssetsDetailpageBasicFields().remove(key);
+        }
+        if (customConfigObject.getAssetsDetailpageDetailFields().contains(key)) {
+            customConfigObject.getAssetsDetailpageDetailFields().remove(key);
+        }
     }
     
 }
