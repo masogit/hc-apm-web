@@ -13,7 +13,7 @@
                     <p:tab title="#{msg.searchAssetByDept}">
                         <p:scrollPanel style="width:98%;height:400px;border: 0" mode="native">
                             <p:tree id="assetTree" class="tree" style="border:0;" value="#{selectAssetController.orgAssetTree}" var="node" dynamic="true" cache="true" selectionMode="single" selection="#{selectAssetController.selectedNode}" highlight="true">
-                                <p:ajax event="select" listener="#{selectAssetController.onSelectTreeNodePMAssets}" update="assetTree"/>
+                                <p:ajax event="select" listener="#{selectAssetController.onSelectTreeNodePMAssets}" update="assetTree @(.confirmCls)"/>
                                 <p:ajax process="@this" event="expand"  listener="#{selectAssetController.onOrgExpand}"  update="assetTree"/>
                                 <p:ajax process="@this" event="collapse"/>
 

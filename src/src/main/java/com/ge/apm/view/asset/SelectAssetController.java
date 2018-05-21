@@ -141,8 +141,10 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         Object nodeData = node.getData();
         if (nodeData instanceof AssetInfo) {
             selectedAsset = (AssetInfo) nodeData;
+            selected =(AssetInfo) nodeData;
         } else {
             selectedAsset = null;
+            selected = null;
         }
     }
 
