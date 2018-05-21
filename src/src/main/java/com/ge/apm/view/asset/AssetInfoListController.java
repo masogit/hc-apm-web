@@ -216,7 +216,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 + selected.getId().toString()
                 + "&asset_name=" + selected.getName()
                 + "&terminate=" + this.terminate;
-        url = "Detail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+        url = "AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
 
         RequestContext requestContext = RequestContext.getCurrentInstance();
         requestContext.addCallbackParam("url", url);
