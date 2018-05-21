@@ -54,7 +54,7 @@
                                      currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
                                      rows="5" emptyMessage="#{msg.noRecordFound}">
 
-                            <p:ajax event="rowSelect" listener="#{selectAssetController.onSelectRow()}" update=""/>
+                            <p:ajax event="rowSelect" listener="#{selectAssetController.onSelectRow()}" update="@(.confirmCls)"/>
 
                             <p:column headerText="#{msg.name}" sortBy="#{item.name}">
                                 <h:outputText value="#{item.name}"/>
@@ -99,7 +99,7 @@
                     </p:tab>
                 </p:tabView>
                 <br/>
-                <p:commandButton value="#{msg.Confirm}" icon="ui-icon-check" update="growl #{selectAssetController.updateViewIDs}" actionListener="#{selectAssetController.confirmSelection()}" oncomplete="handleSubmit(args, 'varSelectAssetDlgPM');"/>
+                <p:commandButton value="#{msg.Confirm}" class="confirmCls" icon="ui-icon-check" update="growl #{selectAssetController.updateViewIDs}" actionListener="#{selectAssetController.confirmSelection()}" disabled="#{selectAssetController.getConfirm()}" oncomplete="handleSubmit(args, 'varSelectAssetDlgPM');"/>
                 <p:commandButton immediate="true" value="#{msg.Cancel}" type="button" icon="ui-icon-cancel" onclick="PF('varSelectAssetDlgPM').hide()"/>
             </h:form>
         </p:dialog>
