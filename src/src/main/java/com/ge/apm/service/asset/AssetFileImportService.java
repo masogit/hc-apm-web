@@ -274,7 +274,8 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map, null);
                 assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
-
+                assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
+                assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
 
                 asset.setUsageStatus(3); //已建档
 
