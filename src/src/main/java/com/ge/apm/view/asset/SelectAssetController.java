@@ -46,9 +46,9 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
     public Boolean getConfirm(){
         if(selected==null)
             return true;
-        else if(selected.getPm()==null){
+        else if(selected.getIsPm()==null){
             return false;
-        }else if(selected.getPm()==true) {
+        }else if(selected.getIsPm()==true) {
             return false;
         }else{
             return true;
