@@ -265,6 +265,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         easyInstallItem = getNewInstallAssetList().stream().findAny().orElse(new ArrivalListItem());
         if (selected.getContractPrice() != null) {
             easyInstallItem.setPurchasePrice(selected.getContractPrice() / selected.getQuantity());
+            easyInstallItem.setIsPm(true);
+            easyInstallItem.setIsChecked(true);
         }
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
@@ -327,8 +329,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setSalvageValue(easyInstallItem.getSalvageValue());
             item.setLifecycleInYear(easyInstallItem.getLifecycleInYear());
             item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
-            item.setIsPm(true);
-            item.setIsChecked(true);
+            item.setIsPm(easyInstallItem.getIsPm());
+            item.setIsChecked(easyInstallItem.getIsChecked());
         });
         itemDao.save(saveList);
         WebUtil.addSuccessMessage("已保存");
