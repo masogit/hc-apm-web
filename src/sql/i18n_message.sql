@@ -1509,5 +1509,5 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '设备供应/维修商', 'vendor and maintainer', NULL, '-1');
 
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'isAssetPMed', '是否PM', 'need PM?', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'isAssetChecked', '是否盘点', 'need store check?', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isAssetPMed', '是否PM', 'need PM?', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isAssetChecked', '是否盘点', 'need store check?', NULL, '-1');

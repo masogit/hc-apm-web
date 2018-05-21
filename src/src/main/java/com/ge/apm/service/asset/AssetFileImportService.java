@@ -38,7 +38,7 @@ import java.util.*;
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
-    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.1";
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.2";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -274,7 +274,8 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map, null);
                 assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
-
+                assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
+                assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
 
                 asset.setUsageStatus(3); //已建档
 
@@ -391,14 +392,6 @@ public class AssetFileImportService {
 
         importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
-
-            //if site uid not match, ignore update
-            if (newAsset.getUid() != null) {
-                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
-                    return ;
-                }
-
-            }
 
             //if site uid not match, ignore update
             if (newAsset.getUid() != null) {
@@ -926,6 +919,7 @@ public class AssetFileImportService {
 
             String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
             if (StringUtils.isEmpty(oldQrCode)) return;
+            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
 
             boolean releaseable = true;
             if (!StringUtils.isEmpty(newAsset.getQrCode())) {
@@ -946,7 +940,10 @@ public class AssetFileImportService {
     public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
         this.selectedOrgToImport = selectedOrgToImport;
 
-            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
+        workflowConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+
+        if (workflowConfig != null) {
+            assetCodeConfig = workflowConfig.getAssetCodeConfig();
         }
     }
 
@@ -982,8 +979,4 @@ public class AssetFileImportService {
         return false;
     }
 
-        workflowConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
-
-        if (workflowConfig != null) {
-            assetCodeConfig = workflowConfig.getAssetCodeConfig();
 }
