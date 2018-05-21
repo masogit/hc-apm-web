@@ -405,10 +405,10 @@ public class AssetInfo implements Serializable {
     private Integer repairForm; //1和null是纯内修。 2，纯外修。3，先内修再外修
 
     @Column(name = "is_pm")
-    private Boolean isPm = Boolean.TRUE;//是否PM
+    private Boolean isPm;//是否保养
 
     @Column(name = "is_checked")
-    private Boolean isChecked = Boolean.TRUE;//是否盘点
+    private Boolean isChecked;//是否盘点
 
 //    public Integer getAssetCategory() {
 //        return assetCategory;
