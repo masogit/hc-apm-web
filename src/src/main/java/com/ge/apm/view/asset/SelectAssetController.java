@@ -119,6 +119,32 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             selectedAsset = null;
         }
     }
+    
+    public void onSelectTreeNodePMAssets(NodeSelectEvent event){
+        TreeNode node = event.getTreeNode();
+        if (node.getType().equals("org")) {
+            addAssetToOrgNode(node);
+            node.setExpanded(true);
+            node.getChildren().forEach(item ->{
+                if(item.getData() instanceof AssetInfo){
+                    if(((AssetInfo)item.getData()).getIsPm()!=null && !((AssetInfo)item.getData()).getIsPm()){
+                        item.setSelectable(false);
+                    }
+                };
+            
+            });
+            
+            return;
+        }
+        node.setExpanded(true);
+
+        Object nodeData = node.getData();
+        if (nodeData instanceof AssetInfo) {
+            selectedAsset = (AssetInfo) nodeData;
+        } else {
+            selectedAsset = null;
+        }
+    }
 
     private AssetInfo selectedAsset = null;
 
