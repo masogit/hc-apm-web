@@ -98,6 +98,7 @@ public class AssetInstallationController {
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
+            onAssetOwnerNameChange();
         }
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             OrgInfo org = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());
