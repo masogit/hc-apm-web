@@ -44,6 +44,7 @@ public class AssetRowTest {
         rowMap.put("医疗器械分类", "Option1");
         rowMap.put("最终残值", "1.6");
         rowMap.put("功能等级", "1");
+        rowMap.put("是否PM", "否");
 
         AssetRow assetRow = new AssetRow(assetInfo, true, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
@@ -51,12 +52,14 @@ public class AssetRowTest {
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
+        assetRow.setFieldBooleanValue("是否PM", "setIsPm", null);
 
         assertEquals("CT", assetInfo.getAliasName());
         assertEquals("2017-12-12", df.format(assetInfo.getManufactDate()));
         assertEquals(1, assetInfo.getFunctionGroup().intValue());
         assertEquals(1.6, assetInfo.getSalvageValue().doubleValue(), 0.1);
         assertEquals(1, assetInfo.getFunctionGrade().intValue());
+        assertFalse(assetInfo.getIsPm());
 
     }
 
@@ -69,12 +72,14 @@ public class AssetRowTest {
         assetInfo.setFunctionGroup(1);
         assetInfo.setSalvageValue(1.6);
         assetInfo.setFunctionGrade(1);
+        assetInfo.setIsPm(true);
 
         assertNotNull(assetInfo.getAliasName());
         assertNotNull(assetInfo.getManufactDate());
         assertNotNull(assetInfo.getFunctionGroup());
         assertNotNull(assetInfo.getSalvageValue());
         assertNotNull(assetInfo.getFunctionGrade());
+        assertNotNull(assetInfo.getIsPm());
 
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("设备别名", "#");
@@ -82,6 +87,7 @@ public class AssetRowTest {
         rowMap.put("医疗器械分类", "#");
         rowMap.put("最终残值", "#");
         rowMap.put("功能等级", "#");
+        rowMap.put("是否PM", "#");
 
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
@@ -89,12 +95,14 @@ public class AssetRowTest {
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
+        assetRow.setFieldBooleanValue("是否PM", "setIsPm", null);
 
         assertNull(assetInfo.getAliasName());
         assertNull(assetInfo.getManufactDate());
         assertNull(assetInfo.getFunctionGroup());
         assertNull(assetInfo.getSalvageValue());
         assertNull(assetInfo.getFunctionGrade());
+        assertNull(assetInfo.getIsPm());
     }
 
     @Test
@@ -106,6 +114,7 @@ public class AssetRowTest {
         assetInfo.setFunctionGroup(1);
         assetInfo.setSalvageValue(1.6);
         assetInfo.setFunctionGrade(1);
+        assetInfo.setIsPm(true);
 
         Map<String, Object> rowMap = new HashMap<>();
         rowMap.put("设备别名", "New CT");
@@ -113,6 +122,7 @@ public class AssetRowTest {
         rowMap.put("医疗器械分类", "Option2");
         rowMap.put("最终残值", "10.6");
         rowMap.put("功能等级", "2");
+        rowMap.put("是否PM", "否");
 
         AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
         assetRow.setFieldStringValue("设备别名", "setAliasName");
@@ -120,12 +130,14 @@ public class AssetRowTest {
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
+        assetRow.setFieldBooleanValue("是否PM", "setIsPm", null);
 
         assertEquals("New CT", assetInfo.getAliasName());
         assertEquals("2017-12-01", df.format(assetInfo.getManufactDate()));
         assertEquals(2, assetInfo.getFunctionGroup().intValue());
         assertEquals(10.6, assetInfo.getSalvageValue().doubleValue(), 0.1);
         assertEquals(2, assetInfo.getFunctionGrade().intValue());
+        assertFalse(assetInfo.getIsPm());
 
     }
 
@@ -138,6 +150,7 @@ public class AssetRowTest {
         assetInfo.setFunctionGroup(1);
         assetInfo.setSalvageValue(1.6);
         assetInfo.setFunctionGrade(1);
+        assetInfo.setIsPm(true);
 
         Map<String, Object> rowMap = new HashMap<>();
 //        rowMap.put("设备别名", "");
@@ -148,13 +161,14 @@ public class AssetRowTest {
         assetRow.setFieldDropdownValue("医疗器械分类", "setFunctionGroup", list, null, null);
         assetRow.setFieldDoubleValue("最终残值", "setSalvageValue");
         assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
+        assetRow.setFieldBooleanValue("是否PM", "setIsPm", null);
 
         assertEquals("CT", assetInfo.getAliasName());
         assertEquals(today, assetInfo.getManufactDate());
         assertEquals(1, assetInfo.getFunctionGroup().intValue());
         assertEquals(1.6, assetInfo.getSalvageValue().doubleValue(), 0.1);
         assertEquals(1, assetInfo.getFunctionGrade().intValue());
-
+        assertTrue(assetInfo.getIsPm());
     }
 
 }

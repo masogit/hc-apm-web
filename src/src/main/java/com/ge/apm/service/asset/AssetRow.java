@@ -166,6 +166,38 @@ public class AssetRow {
 
     }
 
+    public void setFieldBooleanValue(String fieldName, String methodName, Boolean defaultValue) {
+        String fieldValueOfString = null;
+        try {
+            fieldValueOfString = ExcelDocument.getCellStringValue(rowMap.get(fieldName));
+            Boolean fieldValueOfBoolean = null;
+            if (!StringUtils.isEmpty(fieldValueOfString) && !DELETE_MARK.equals(fieldValueOfString)) {
+                fieldValueOfBoolean = "否".equals(fieldValueOfString) ? false : true;
+            }
+
+            if (fieldValueOfBoolean == null) {
+                fieldValueOfBoolean = defaultValue;
+            }
+
+            Method method = AssetInfo.class.getMethod(methodName, Boolean.class);
+            if (isNew) {
+                method.invoke(assetInfo, fieldValueOfBoolean);
+            } else {
+                if (!StringUtils.isEmpty(fieldValueOfString)) {
+                    if (DELETE_MARK.equals(fieldValueOfString)) {
+                        Boolean empty = null;
+                        method.invoke(assetInfo, empty);
+                    } else {
+                        method.invoke(assetInfo, fieldValueOfBoolean);
+                    }
+                }
+
+            }
+        } catch (Exception e) {
+            throw new IllegalStateException(fieldName + "[" + fieldValueOfString + "]" + e.getMessage());
+        }
+    }
+
     private void validateDate(String fieldName, String fieldValue) throws Exception {
 
         if (StringUtils.isEmpty(fieldValue)) {
