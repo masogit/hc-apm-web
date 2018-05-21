@@ -106,7 +106,7 @@
                     <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
                         <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
                         <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
 
                         <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
                     </p:column>

@@ -57,6 +57,8 @@ public class Supplier implements Serializable, ChineseName {
     @Size(max = 16)
     @Column(name = "tel")
     private String tel;
+    @Column(name = "supplier_type")
+    private String supplierType;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -175,6 +177,14 @@ public class Supplier implements Serializable, ChineseName {
 
     public void setNamePyCode(String namePyCode) {
         this.namePyCode = namePyCode;
+    }
+
+    public String getSupplierType() {
+        return supplierType;
+    }
+
+    public void setSupplierType(String supplierType) {
+        this.supplierType = supplierType;
     }
 
     @Override

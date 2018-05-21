@@ -8,6 +8,7 @@ import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
@@ -79,6 +80,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private OrgInfo clinicalDept;
 
     private Supplier supplier;
+
+    private Supplier maintainer;
 
     private Brand brand;
 
@@ -191,6 +194,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (null != selected.getSupplierId()) {
             SupplierRepository supplierDao = WebUtil.getBean(SupplierRepository.class);
             supplier = supplierDao.findById(selected.getSupplierId());
+        }
+
+        if (null != selected.getMaitananceId()) {
+            SupplierRepository supplierDao = WebUtil.getBean(SupplierRepository.class);
+            maintainer = supplierDao.findById(Integer.parseInt(selected.getMaitananceId()));
         }
 
         qrCode = selected.getQrCode();
@@ -862,6 +870,13 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void onMaintainerChange() {
+        if (null != maintainer) {
+            selected.setMaitananceId(maintainer.getId()+"");
+            selected.setMaitanance(maintainer.getName());
+        }
+    }
+
     public void onBrandChange() {
         if (null != brand) {
             selected.setBrand(brandDao.findById(brand.getId()));
@@ -1141,6 +1156,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
+    }
+
+    public Supplier getMaintainer() {
+        return maintainer;
+    }
+
+    public void setMaintainer(Supplier maintainer) {
+        this.maintainer = maintainer;
     }
 
     public Brand getBrand() {
@@ -1605,6 +1628,19 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             names = dao.findDistinctAssetNamesByPrefix(tenantUID, prefix);
         }
 
+        names.sort(new PinYinComparator());
+
+        return names;
+
+    }
+
+    public List<String> completeManufacture(String prefix) {
+        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
+
+        List<String> names = dao.findDistinctManufacturesByPrefix(tenantUID, prefix);
+
+        names.sort(new PinYinComparator());
+
         return names;
 
     }
@@ -1926,7 +1962,15 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
     public List<Supplier> autoCompleteSupplier(String query) {
 
-        List<Supplier> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("1","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<Supplier> autoCompleteMaintainer(String query) {
+
+        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("2","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
