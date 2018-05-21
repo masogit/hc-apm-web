@@ -331,10 +331,10 @@ public class ArrivalListItem implements Serializable {
     private Boolean isGeneratePmOrder;
     
     @Column(name = "is_pm")
-    private Boolean isPm;//是否保养
+    private Boolean isPm =true;//是否保养
 
     @Column(name = "is_checked")
-    private Boolean isChecked;//是否盘点
+    private Boolean isChecked=true;//是否盘点
     
     public String getId() {
         return id;
