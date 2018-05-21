@@ -202,6 +202,11 @@ public class CustomConfigService {
     }
 
     public void removeAssetField(CustomConfigObject customConfigObject, String key) {
+        
+        if(getSysTemFields().contains(key)){
+            WebUtil.addErrorMessage("系统必填字段,不能删除");
+            return;
+        }
         if (customConfigObject.getAssetFields().containsKey(key)) {
             customConfigObject.getAssetFields().remove(key);
         }
