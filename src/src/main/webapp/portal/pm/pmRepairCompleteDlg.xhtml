@@ -78,6 +78,11 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="申请时间">
+                                        <h:outputText value="#{item.applyTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH"/>
+                                        </h:outputText>
+                                    </p:column>
 
                                     <p:column headerText="到货">
                                         <h:outputText value="#{item.arrived?'已到货':''}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
