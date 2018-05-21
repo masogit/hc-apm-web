@@ -42,6 +42,18 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         this.filterByHospital = false;
     }
 
+
+    public Boolean getConfirm(){
+        if(selected==null)
+            return true;
+        else if(selected.getIsPm()==null){
+            return false;
+        }else if(selected.getIsPm()==true) {
+            return false;
+        }else{
+            return true;
+        }
+    }
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -68,12 +80,15 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         return super.loadData(pageRequest);
     }
 
+
+
     private TreeNode orgAssetTree;
 
     public TreeNode getOrgAssetTree() {
         return orgAssetTree;
     }
 
+    public boolean x1;
     public void onSelectRow() {
         selectedAsset = this.selected;
     }
