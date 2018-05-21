@@ -1426,20 +1426,20 @@ public class AssetInfo implements Serializable {
         this.maitananceId = maitananceId;
     }
 
-    public Boolean getPm() {
+   public Boolean getIsPm() {
         return isPm;
     }
 
-    public void setPm(Boolean pm) {
-        isPm = pm;
+    public void setIsPm(Boolean isPm) {
+        this.isPm = isPm;
     }
 
-    public Boolean getChecked() {
+    public Boolean getIsChecked() {
         return isChecked;
     }
 
-    public void setChecked(Boolean checked) {
-        isChecked = checked;
+    public void setIsChecked(Boolean isChecked) {
+        this.isChecked = isChecked;
     }
 
     @Override
