@@ -683,8 +683,8 @@ public class AssetInfoFormatter {
         map.put("是否进口设备", this.getImportEquipmentAsString());
         map.put("当前状态", this.getStatusAsString());
         map.put("核算类别", this.getAccountingCategoryAsString());
-        map.put("是否PM", assetInfo.getIsPm() ? "是" : "否");
-        map.put("是否盘点", assetInfo.getIsChecked() ? "是" : "否");
+        map.put("是否PM", assetInfo.getIsPm() == null || assetInfo.getIsPm() ? "是" : "否");
+        map.put("是否盘点", assetInfo.getIsChecked() ==  null || assetInfo.getIsChecked() ? "是" : "否");
 
         map.put("UUID", this.getUid());
 
