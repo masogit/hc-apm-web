@@ -38,7 +38,7 @@ import java.util.*;
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
-    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.1";
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.2";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
