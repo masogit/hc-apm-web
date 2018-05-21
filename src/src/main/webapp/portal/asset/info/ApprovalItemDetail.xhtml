@@ -335,9 +335,9 @@
                         </p:dataGrid>
                     </p:fieldset>
                     <h:panelGroup>
-                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.rejectCreate()}" action="ApprovalList" value="审核不通过" update=":approvalAssetDialogForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
-                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.approveCreate()}" action="ApprovalList" value="审核通过" update=":approvalAssetDialogForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetInfoApprovalController.cancel()}" action="ApprovalList" icon="ui-icon-cancel" onclick="PF('easyInstallDialog').hide()"/>
+                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.rejectCreate()}" action="ApprovalList?faces-redirect=true" value="审核不通过" update=":approvalAssetDialogForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
+                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.approveCreate()}" action="ApprovalList?faces-redirect=true" value="审核通过" update=":approvalAssetDialogForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetInfoApprovalController.cancel()}" action="ApprovalList?faces-redirect=true" icon="ui-icon-cancel" onclick="PF('easyInstallDialog').hide()"/>
                     </h:panelGroup>
 
                     <br/>
