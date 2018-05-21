@@ -970,7 +970,7 @@ public class AssetFileImportService {
                 }
 
             } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_SEQ) {
-                if (assetInfo.getUid() == null && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+                if (assetInfo.getUid() == null && (!StringUtils.isEmpty(financingNum) && financingNum.length() < 5)) {
                     return true;
                 }
             }
