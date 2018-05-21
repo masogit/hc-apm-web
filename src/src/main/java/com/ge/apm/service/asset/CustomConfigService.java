@@ -154,7 +154,8 @@ public class CustomConfigService {
                 "financingNum","qrCode"));
         object.setAssetsDetailpageBasicFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName","assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3",
                 "siteUID","clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor","maitanance","maitananceTel","nationalStandardCode"));
-        
+        object.setAssetsDetailpageDetailFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName","assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3",
+                "siteUID","clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor","maitanance","maitananceTel","nationalStandardCode"));
         return object;
     }
 
