@@ -76,6 +76,11 @@ public class CustomConfigController {
 
     public void prepareAddAssetField(String type) {
         addFieldsType = type;
+        if (null == addFieldsList) {
+            addFieldsList = new ArrayList();
+        } else {
+            addFieldsList.clear();
+        }
         switch (type) {
             case "BasicFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
@@ -93,15 +98,15 @@ public class CustomConfigController {
                 addFieldsList = allFields.keySet().stream().filter(item -> !customConfigObject.getAssetFields().containsKey(item)).collect(Collectors.toList());
                 break;
             case "RemoveBasicFields":
-                addFieldsList = customConfigObject.getAssetsDetailpageBasicFields();
+                addFieldsList.addAll(customConfigObject.getAssetsDetailpageBasicFields());
                 break;
             case "RemoveDetailFields":
-                addFieldsList = customConfigObject.getAssetsDetailpageDetailFields();
+                addFieldsList.addAll(customConfigObject.getAssetsDetailpageDetailFields());
                 break;
         }
     }
-    
-    public String getAddFieldsUpdateString(){
+
+    public String getAddFieldsUpdateString() {
         switch (addFieldsType) {
             case "BasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
@@ -112,45 +117,47 @@ public class CustomConfigController {
             case "UsingFields":
                 return ":customConfigForm:tabView:assetFieldsTable";
             case "RemoveBasicFields":
-                return ":customConfigForm:tabView:assetFieldsTable";
+                return ":customConfigForm:tabView:BasicFieldsList";
             case "RemoveDetailFields":
                 return ":customConfigForm:tabView:DetailFieldsList";
-            default: return "";
+            default:
+                return "";
         }
     }
-    
-    public void addAssetFields(){
+
+    public void addAssetFields() {
         switch (addFieldsType) {
             case "BasicFields":
                 customConfigObject.getAssetsDetailpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                        && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "DetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                        && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "ListPageFields":
                 customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                        && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "UsingFields":
                 customConfigObject.getAssetFields().putAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetFields().containsKey(item.getKey()))
-                .collect(Collectors.toMap(itemField -> itemField.getKey(), itemField -> new CustomConfigAssetField(itemField.getKey(), new ArrayList<String>(configRoles.keySet())))));
+                        && !customConfigObject.getAssetFields().containsKey(item.getKey()))
+                        .collect(Collectors.toMap(itemField -> itemField.getKey(), itemField -> new CustomConfigAssetField(itemField.getKey(), new ArrayList<String>(configRoles.keySet())))));
                 break;
             case "RemoveBasicFields":
-                customConfigObject.getAssetsDetailpageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                List<String> removeList = selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList());
+                customConfigObject.getAssetsDetailpageBasicFields().removeAll(removeList);
                 break;
             case "RemoveDetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                        && customConfigObject.getAssetsDetailpageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
         }
         cancelAddFields();
     }
-    
-    public void cancelAddFields(){
+
+    public void cancelAddFields() {
         addFieldsType = "";
         addFieldsList.clear();
         selectedAddFields.clear();
@@ -227,7 +234,6 @@ public class CustomConfigController {
     public List<String> getRolesSelectItems() {
         return new ArrayList(configRoles.keySet());
     }
-
 
     //getter and setter
     public OrgInfo getSelectSite() {

@@ -85,7 +85,6 @@
                                 <p:orderList id="DetailFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
                                 <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('DetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
                                 <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
-                                
                             </p:fieldset>
                             
                         </p:tab>
