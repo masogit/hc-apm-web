@@ -17,4 +17,8 @@ public interface UserScheduleRepository extends GenericRepositoryUUID<UserSchedu
 
     public List<UserSchedule> findByTypeAndScheduleDateAndTenantUID(String type, Date scheduleDate, String tenantUID);
 
+    public List<UserSchedule> findByTypeAndScheduleDateAndSiteUID(String type, Date scheduleDate, String siteUID);
+
+    public void deleteByTypeAndScheduleDateAndSiteUID(String type, Date scheduleDate, String siteUID);
+
 }
