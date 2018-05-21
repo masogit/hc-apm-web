@@ -210,13 +210,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         selectedOrg = (OrgInfo) node.getData();
     }
 
-//    public void onSupplierChange() {
-//        if (null != supplier) {
-//            selected.setSupplierId(supplier.getId());
-//            selected.setVendor(supplier.getName());
-//        }
-//    }
-
     public UserAccount getUserAccountByUid(String uid) {
         return aiService.getUserAccountByUid(uid);
     }
@@ -235,85 +228,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         saveEasyItem();
     }
 
-//    private Boolean isAvailableQrcode(String qrcode) {
-//        if (Strings.isNullOrEmpty(qrcode)) {
-//            return true;
-//        }
-//
-//        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
-//        if (qrCodeLib == null) {
-//            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
-//            return false;
-//        }
-//        if (!qrCodeLib.getSiteUID().equals(selected.getSiteUID())) {
-//            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
-//            return false;
-//        }
-//        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
-//            WebUtil.addErrorMessage("错误:" + WebUtil.getMessage("AlreadyUsingQrCode"));
-//            return false;
-//        }
-//
-//        return true;
-//    }
-//    public void submitEasyInstall() {
-//        if (installCount == 1 && !Strings.isNullOrEmpty(easyInstallItem.getQrCode())) {
-//            if (!isAvailableQrcode(easyInstallItem.getQrCode())) {
-//                return;
-//            }
-//        }
-//
-//        StringBuilder financingNumErrorMsg = new StringBuilder();
-//
-//        String prefix = easyInstallItem.getFinancingNum();
-//        List<ArrivalListItem> submitItem = getNewInstallAssetList().subList(0, installCount);
-//        for (ArrivalListItem item : submitItem) {
-//            item.setClinicalDeptUID(easyInstallItem.getClinicalDeptUID());
-//            item.setAliasName(easyInstallItem.getAliasName());
-//            item.setAssetOwnerUID(easyInstallItem.getAssetOwnerUID());
-//            item.setAssetOwnerUID2(easyInstallItem.getAssetOwnerUID2());
-//            item.setAssetOwnerUID3(easyInstallItem.getAssetOwnerUID3());
-//            item.setClinicalOwnerUid(easyInstallItem.getClinicalOwnerUid());
-//            item.setLocationCode(easyInstallItem.getLocationCode());
-//            item.setLocationName(easyInstallItem.getLocationName());
-//            item.setComments(easyInstallItem.getComments());
-//            item.setFinancingNum(easyInstallItem.getFinancingNum());
-//            item.setSerialNum(easyInstallItem.getSerialNum());
-//            item.setDepartNum(easyInstallItem.getDepartNum());
-//
-//            if (installCount == 1) {
-//                item.setQrCode(easyInstallItem.getQrCode());
-//                item.setFinancingNum(easyInstallItem.getFinancingNum());
-//            } else {
-//                if (generateMap.get("generateQrCode")) {
-//                    item.setQrCode(aiService.getNewQrcode(easyInstallItem.getArrivalList().getTenantUID(), easyInstallItem.getArrivalList().getSiteUID()).getQrCode());
-//                }
-//                if (generateMap.get("generateFinancingNum")) {
-//                    String financingNum = gennerateFinancingNum(easyInstallItem, prefix);
-//                    if (null != financingNum && financingNum.startsWith("error:")) {
-//                        String errorMsg = financingNum.replace("error:", "");
-//                        if (financingNumErrorMsg.lastIndexOf(errorMsg) < 0) {
-//                            financingNumErrorMsg.append(errorMsg).append("\r\n");
-//                        }
-//                        financingNum = "";
-//                    }
-//                    item.setFinancingNum(financingNum);
-//                }
-//            }
-//
-//            aiService.saveOrUpdateItem(item);
-//            if (!aiService.submitInstallItem(item.getId(), true, generatePmorder)) {
-//                WebUtil.addErrorMessage("提交失败");
-//                break;
-//            }
-//        }
-//        if (financingNumErrorMsg.length() > 0) {
-//            WebUtil.addErrorMessage(financingNumErrorMsg.toString());
-//        }
-//        WebUtil.addSuccessMessage("提交成功");
-//        arrivalItemList = itemDao.findByArrivalListId(selected.getId());
-//        initEasyInstallItem();
-//    }
     public String gennerateFinancingNum(ArrivalListItem item, String prifix) {
         if (prifix != null) {
             if (prifix.length() > 3) {
@@ -413,6 +327,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setSalvageValue(easyInstallItem.getSalvageValue());
             item.setLifecycleInYear(easyInstallItem.getLifecycleInYear());
             item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
+            item.setIsPm(true);
+            item.setIsChecked(true);
         });
         itemDao.save(saveList);
         WebUtil.addSuccessMessage("已保存");
