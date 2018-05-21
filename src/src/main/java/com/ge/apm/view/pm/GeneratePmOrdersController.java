@@ -183,6 +183,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		}
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
+		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
 		return filter;
 	}
 
