@@ -55,6 +55,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Date startTime;
     private Date endTime;
     private Date planTime;
+    private Date applyTime;
     private Date planTimeForBatch;
     private String currentPersonIdBatch;
     private String qualityCheckingBatch;
@@ -1300,5 +1301,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     public void setPmOrderRuleCheckList(List<PmOrderRuleCheckList> pmOrderRuleCheckList) {
         this.pmOrderRuleCheckList = pmOrderRuleCheckList;
+    }
+
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
     }
 }

@@ -64,6 +64,11 @@ public class V2_WorkOrder_Detail implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date warrantyDate;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @Column(name = "apply_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date applyTime;
+
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "estimated_arrive_time")
     @Temporal(TemporalType.TIMESTAMP)
@@ -209,7 +214,16 @@ public class V2_WorkOrder_Detail implements Serializable {
     public void setApproved(Boolean approved) {
         this.approved = approved;
     }
-    
+
+
+    public Date getApplyTime() {
+        return applyTime;
+    }
+
+    public void setApplyTime(Date applyTime) {
+        this.applyTime = applyTime;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;
