@@ -42,6 +42,18 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         this.filterByHospital = false;
     }
 
+
+    public Boolean getConfirm(){
+        if(selected==null)
+            return true;
+        else if(selected.getPm()==null){
+            return false;
+        }else if(selected.getPm()==true) {
+            return false;
+        }else{
+            return true;
+        }
+    }
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -64,10 +76,11 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
-            searchFilters.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
         }
         return super.loadData(pageRequest);
     }
+
+
 
     private TreeNode orgAssetTree;
 
@@ -75,6 +88,7 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         return orgAssetTree;
     }
 
+    public boolean x1;
     public void onSelectRow() {
         selectedAsset = this.selected;
     }
