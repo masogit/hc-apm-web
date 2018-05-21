@@ -110,6 +110,10 @@ public class CustomConfigService {
         return res;
     }
     
+    static public List<String> getSysTemFields(){
+        return Arrays.asList("name","assetGroup");
+    }
+    
     public List<SysRole> getConfigRoles(){
         return sysRoleDao.getByNameIn(Arrays.asList("HospitalHead","AssetHead","DeptHead","AssetStaff","ClinicalStaff"));
     }
