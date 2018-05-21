@@ -330,6 +330,12 @@ public class ArrivalListItem implements Serializable {
     @Column(name = "is_generate_pmorder")
     private Boolean isGeneratePmOrder;
     
+    @Column(name = "is_pm")
+    private Boolean isPm;//是否保养
+
+    @Column(name = "is_checked")
+    private Boolean isChecked;//是否盘点
+    
     public String getId() {
         return id;
     }
@@ -919,6 +925,23 @@ public class ArrivalListItem implements Serializable {
     public void setClinicalAckDate(Date clinicalAckDate) {
         this.clinicalAckDate = clinicalAckDate;
     }
+
+    public Boolean getIsPm() {
+        return isPm;
+    }
+
+    public void setIsPm(Boolean isPm) {
+        this.isPm = isPm;
+    }
+
+    public Boolean getIsChecked() {
+        return isChecked;
+    }
+
+    public void setIsChecked(Boolean isChecked) {
+        this.isChecked = isChecked;
+    }
+    
     
     @Override
     public int hashCode() {
