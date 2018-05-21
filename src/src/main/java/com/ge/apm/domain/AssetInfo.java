@@ -73,6 +73,9 @@ public class AssetInfo implements Serializable {
     @Column(name = "supplier_id")
     private Integer supplierId; //供应商Id =Supplier.id
 
+    @Column(name = "maitanance_id")
+    private String maitananceId;
+
     @Size(max = 64)
     @Column(name = "maitanance")
     private String maitanance;//维修商
@@ -400,6 +403,12 @@ public class AssetInfo implements Serializable {
 
     @Column(name = "repair_form")
     private Integer repairForm; //1和null是纯内修。 2，纯外修。3，先内修再外修
+
+    @Column(name = "is_pm")
+    private Boolean isPm;//是否删除
+
+    @Column(name = "is_checked")
+    private Boolean isChecked;//是否删除
 
 //    public Integer getAssetCategory() {
 //        return assetCategory;
@@ -1407,6 +1416,30 @@ public class AssetInfo implements Serializable {
 
     public void setLineNum(int lineNum) {
         this.lineNum = lineNum;
+    }
+
+    public String getMaitananceId() {
+        return maitananceId;
+    }
+
+    public void setMaitananceId(String maitananceId) {
+        this.maitananceId = maitananceId;
+    }
+
+    public Boolean getPm() {
+        return isPm;
+    }
+
+    public void setPm(Boolean pm) {
+        isPm = pm;
+    }
+
+    public Boolean getChecked() {
+        return isChecked;
+    }
+
+    public void setChecked(Boolean checked) {
+        isChecked = checked;
     }
 
     @Override
