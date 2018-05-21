@@ -171,4 +171,17 @@ public class AssetRowTest {
         assertTrue(assetInfo.getIsPm());
     }
 
+    @Test
+    public void testSetFieldValue_use_default_value() {
+
+        AssetInfo assetInfo = new AssetInfo();
+
+        Map<String, Object> rowMap = new HashMap<>();
+
+        AssetRow assetRow = new AssetRow(assetInfo, false, rowMap);
+        assetRow.setFieldBooleanValue("是否PM", "setIsPm", null);
+
+        assertTrue(assetInfo.getIsPm());
+    }
+
 }
