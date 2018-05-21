@@ -81,12 +81,22 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
+            case "DetailFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
+                break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsListPageFields().contains(item)).collect(Collectors.toList());
                 break;
             case "UsingFields":
                 addFieldsList = allFields.keySet().stream().filter(item -> !customConfigObject.getAssetFields().containsKey(item)).collect(Collectors.toList());
+                break;
+            case "RemoveBasicFields":
+                addFieldsList = customConfigObject.getAssetsDetailpageBasicFields();
+                break;
+            case "RemoveDetailFields":
+                addFieldsList = customConfigObject.getAssetsDetailpageDetailFields();
                 break;
         }
     }
@@ -95,10 +105,16 @@ public class CustomConfigController {
         switch (addFieldsType) {
             case "BasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
+            case "DetailFields":
+                return ":customConfigForm:tabView:DetailFieldsList";
             case "ListPageFields":
                 return ":customConfigForm:tabView:assetListPageTable";
             case "UsingFields":
                 return ":customConfigForm:tabView:assetFieldsTable";
+            case "RemoveBasicFields":
+                return ":customConfigForm:tabView:assetFieldsTable";
+            case "RemoveDetailFields":
+                return ":customConfigForm:tabView:DetailFieldsList";
             default: return "";
         }
     }
@@ -109,6 +125,10 @@ public class CustomConfigController {
                 customConfigObject.getAssetsDetailpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                 && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
+            case "DetailFields":
+                customConfigObject.getAssetsDetailpageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
             case "ListPageFields":
                 customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                 && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
@@ -117,6 +137,14 @@ public class CustomConfigController {
                 customConfigObject.getAssetFields().putAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                 && !customConfigObject.getAssetFields().containsKey(item.getKey()))
                 .collect(Collectors.toMap(itemField -> itemField.getKey(), itemField -> new CustomConfigAssetField(itemField.getKey(), new ArrayList<String>(configRoles.keySet())))));
+                break;
+            case "RemoveBasicFields":
+                customConfigObject.getAssetsDetailpageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveDetailFields":
+                customConfigObject.getAssetsDetailpageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                && !customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
         }
         cancelAddFields();
@@ -196,27 +224,10 @@ public class CustomConfigController {
         currentEditField = customConfigObject.getAssetFields().get(fieldKey);
     }
 
-    //将要添加的字段
-//    public List<String> getAssetFieldAddList() {
-//        return allFields.keySet().stream().filter(item -> !customConfigObject.getAssetFields().containsKey(item)).collect(Collectors.toList());
-//    }
-
-//    public void addAssetFields() {
-//        selectedAddFields.clear();
-//    }
-
     public List<String> getRolesSelectItems() {
         return new ArrayList(configRoles.keySet());
     }
 
-//    public List<String> getListPageFieldsAddList() {
-//        return customConfigObject.getAssetFields().keySet().stream().filter(item -> !customConfigObject.getAssetsListPageFields().contains(item)).collect(Collectors.toList());
-//    }
-
-//    public void addListPageFields() {
-//        customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-//                && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
-//    }
 
     //getter and setter
     public OrgInfo getSelectSite() {

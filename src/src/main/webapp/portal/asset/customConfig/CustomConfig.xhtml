@@ -77,14 +77,14 @@
                         </p:tab>
                         <p:tab title="资产详细页面">
                             <p:fieldset legend="基本信息字段">
-                                <p:orderList id="BasicFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}">
-                                    <!--<p:ajax event="select" listener="#{customConfigController.onAssetsDetailpageBasicFieldsSelect}" update=":growl"/>-->
-                                </p:orderList>
+                                <p:orderList id="BasicFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
                                 <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('BasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
-                                <p:commandLink value="删除"  update="BasicFieldsList"/>
+                                <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                             </p:fieldset>
                             <p:fieldset legend="详细信息字段">
-                                
+                                <p:orderList id="DetailFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('DetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 
                             </p:fieldset>
                             
@@ -163,7 +163,7 @@
                     </h:form>
                 </p:dialog>
                 
-                <p:dialog id="FieldsAddDialog" widgetVar="FieldsAddDialog" modal="true" width="900"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.Add}">
+                <p:dialog id="FieldsAddDialog" widgetVar="FieldsAddDialog" modal="true" width="900"  resizable="true" draggable="true" appendTo="@(body)" header="选择字段">
                     <h:form id="FieldsAddForm" >
                         <h:panelGroup id="display" rendered="#{not empty customConfigController.addFieldsType}">
                             <h:outputText value="无可添加字段" rendered="#{empty customConfigController.addFieldsList}" />
