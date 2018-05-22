@@ -2,13 +2,14 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.mock.FacesContextTestExecutionListener;
+import com.ge.apm.mock.FakeData;
 import com.ge.apm.service.utils.ExcelDocument;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,10 +48,23 @@ public class AssetFileImportServiceTest {
     OrgInfoRepository orgInfoDao;
 
     @Autowired
+    TenantInfoRepository tenantInfoDao;
+
+    @Autowired
     PlatformTransactionManager transactionManager;
+
+    TenantInfo tenantInfo;
+
+    OrgInfo defaultImportSite;
 
     @Before
     public void setUp() throws Exception {
+        List<TenantInfo> tenantInfoList = (List<TenantInfo>) tenantInfoDao.findAll();
+        assertTrue(tenantInfoList.size() == 1);
+
+        tenantInfo = tenantInfoList.get(0);
+
+        defaultImportSite = orgInfoDao.findByTenantUIDAndName(tenantInfo.getUid(), FakeData.DEFAULT_SITE_NAME);
 
         clearData();
     }
@@ -73,7 +87,7 @@ public class AssetFileImportServiceTest {
     public void getAssetMapFromTemplate() throws Exception {
     }
 
-    @Ignore
+//    @Ignore
     @Test
     public void importData_performance_test() throws Exception {
 
@@ -81,6 +95,8 @@ public class AssetFileImportServiceTest {
 
         logger.info("start to import excel");
         long startTime = System.currentTimeMillis();
+
+        service.setSelectedOrgToImport(defaultImportSite);
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
@@ -93,6 +109,7 @@ public class AssetFileImportServiceTest {
         logger.info("total time: {}", (endTime - startTime) / 1000);
     }
 
+    @Ignore
     @Test
     public void importData_add_new_data() throws Exception {
 
@@ -196,6 +213,7 @@ public class AssetFileImportServiceTest {
 
     }
 
+    @Ignore
     @Test
     public void importData_update_data() throws Exception {
         //insert
@@ -239,6 +257,7 @@ public class AssetFileImportServiceTest {
 
     }
 
+    @Ignore
     @Test
     public void importData_clean_data() throws Exception {
         //insert
@@ -282,6 +301,7 @@ public class AssetFileImportServiceTest {
 
     }
 
+    @Ignore
     @Test
     public void importData_keep_old_data() throws Exception {
         //insert
