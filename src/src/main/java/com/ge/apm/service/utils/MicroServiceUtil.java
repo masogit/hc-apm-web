@@ -12,6 +12,8 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
+
+import com.ge.apm.domain.remote.GatewayURL;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,22 +34,13 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class MicroServiceUtil extends MicroServiceInvoker {
 
-    @Value("#{urlProperties.url_getAuthenticateByOpenId}")
-    private String url_getAuthenticateByOpenId;
-    @Value("#{urlProperties.url_getAuthenticateByUserPassword}")
-    private String url_getAuthenticateByUserPassword;
-    @Value("#{urlProperties.url_uploadSingleFileByUrl}")
-    private String url_uploadSingleFileByUrl;
-    @Value("#{urlProperties.url_uploadSingleFile}")
-    private String url_uploadSingleFile;
-    @Value("#{urlProperties.url_deleteFile}")
-    private String url_deleteFile;
-    @Value("#{urlProperties.url_downloadFile}")
-    private String url_downloadFile;
+    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
+    private String baseURL;
 
     public StreamedContent downloadSingleFile(String fileId) {
         HttpHeaders headers = new HttpHeaders();
-        ResponseEntity<byte[]> response = template.exchange(url_downloadFile.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+        String gatewayURL = GatewayURL.DOWNLOAD_FILE.toGatewayURL(baseURL);
+        ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
         HttpHeaders responseHeader = response.getHeaders();
         byte[] result = response.getBody();
         InputStream ins = new ByteArrayInputStream(result);
@@ -67,8 +60,10 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         headers.add("Authorization", token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
 
+        String gatewayURL = GatewayURL.DELETE_FILE.toGatewayURL(baseURL);
+
         try {
-            ResponseEntity<LinkedHashMap> response = template.exchange(url_deleteFile.concat("/").concat(objectId), HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
+            ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL.concat("/").concat(objectId), HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
             return isOkay(response);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -86,7 +81,10 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         body.add("file", resource);
 
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(body, headers);
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_uploadSingleFile, requestEntity, LinkedHashMap.class);
+
+        String gatewayURL = GatewayURL.UPLOAD_SINGLE_FILE.toGatewayURL(baseURL);
+
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
@@ -106,7 +104,10 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         postParameters.put("urlFile", url);
         postParameters.put("fileName", fileName);
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(postParameters, headers);
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_uploadSingleFileByUrl, requestEntity, LinkedHashMap.class);
+
+        String gatewayURL = GatewayURL.UPLOAD_SINGLE_FILE_BY_URL.toGatewayURL(baseURL);
+
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
@@ -125,7 +126,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(
                 postParameters, headers);
 
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_getAuthenticateByOpenId, requestEntity, LinkedHashMap.class);
+        String gatewayURL = GatewayURL.GET_AUTHENTICATE_BY_OPEN_ID.toGatewayURL(baseURL);
+
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -154,7 +157,9 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(
                 postParameters, headers);
 
-        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_getAuthenticateByUserPassword, requestEntity, LinkedHashMap.class);
+        String gatewayURL = GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD.toGatewayURL(baseURL);
+
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -172,7 +177,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public String getUrl_downloadFile() {
-        return url_downloadFile;
+        return GatewayURL.DOWNLOAD_FILE.toGatewayURL(baseURL);
     }
 
 }
