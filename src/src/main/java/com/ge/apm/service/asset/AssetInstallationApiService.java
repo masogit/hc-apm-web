@@ -5,7 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
-import com.ge.apm.domain.remote.GatewayURL;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import java.util.LinkedHashMap;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,14 +20,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class AssetInstallationApiService extends MicroServiceInvoker{
 
-    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
     
     public String submitArrivalList(String token, String arrivalListId){
         
         HttpEntity<String> requestEntity = new HttpEntity<String>(arrivalListId, createHttpHeaders(token));
 
-        String gatewayURL = GatewayURL.SUBMIT_ARRIVAL_LIST.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.SUBMIT_ARRIVAL_LIST);
         String url = gatewayURL.replace("{arrivalListId}", arrivalListId);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -42,7 +40,7 @@ public class AssetInstallationApiService extends MicroServiceInvoker{
         header.add("type", isFinish?"install":"reject");
         HttpEntity<String> requestEntity = new HttpEntity<String>(itemId, header);
 
-        String gatewayURL = GatewayURL.SUBMIT_ARRIVAL_LIST_ITEM.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.SUBMIT_ARRIVAL_LIST_ITEM);
         String url = gatewayURL.replace("{arrivalListItemId}", itemId);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -56,7 +54,7 @@ public class AssetInstallationApiService extends MicroServiceInvoker{
         HttpHeaders header = createHttpHeaders(token);
         header.add("assignee", currentPersonUID);
         HttpEntity<String> requestEntity = new HttpEntity<String>(itemId, header);
-        String gatewayURL = GatewayURL.REASSIGN_ARRIVAL_LIST_ITEM_OWNER.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.REASSIGN_ARRIVAL_LIST_ITEM_OWNER);
         String url = gatewayURL.replace("{arrivalListItemId}", itemId);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {

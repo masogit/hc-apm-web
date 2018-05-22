@@ -8,7 +8,7 @@ package com.ge.apm.service.wo;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.remote.GatewayURL;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -33,14 +33,12 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
 
     public Map<String, Object> getReponserByAsset(String token, Integer assetid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
 
-        String gatewayURL = GatewayURL.GET_RESPONSER_BY_ASSET.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.GET_RESPONSER_BY_ASSET);
         String url = gatewayURL.replace("{assetId}", assetid.toString());
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -63,7 +61,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
         formData.setAttachments(picList);
         formData.setAssetLocation(newServiceRequest.getAssetLocation());
         HttpEntity<ServiceRequestForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.SERVICE_REQUEST_CREATE.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.SERVICE_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -75,7 +73,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
 
     public String invokeWorkOrderAction(String token, WorkOrderActionForm formData, String actionName, String woId) {
         HttpEntity<WorkOrderActionForm> requestEntity = new HttpEntity<WorkOrderActionForm>(formData, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.WORK_ORDER_ACTION.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.WORK_ORDER_ACTION);
         String url = gatewayURL.replace("{workOrderId}", woId).concat("?type=").concat(actionName);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -89,7 +87,7 @@ public class ServiceRequestApiService extends MicroServiceInvoker {
 
     String createWorkOrder(String token, WorkOrderForm formData) {
         HttpEntity<WorkOrderForm> requestEntity = new HttpEntity<WorkOrderForm>(formData, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.CREATE_WORK_ORDER.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.CREATE_WORK_ORDER);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();

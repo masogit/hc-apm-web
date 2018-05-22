@@ -1,4 +1,5 @@
-package com.ge.apm.domain.remote;
+package com.ge.apm.service.common;
+
 
 public enum GatewayURL {
 
@@ -40,12 +41,12 @@ public enum GatewayURL {
         this.url = url;
     }
 
-    public String toGatewayURL(String baseURL) {
-        return baseURL + url;
-    }
+//    public String toGatewayURL(String baseURL) {
+//        return baseURL + url;
+//    }
 
     @Override
     public String toString() {
-        return "http://<gateway>" + url;
+        return url;
     }
 }
