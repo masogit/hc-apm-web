@@ -25,10 +25,11 @@
                 <br/>
             </h:panelGroup>
 
+            <h:inputHidden id="BasicFields" value="#{assetInfoDetailController.customConfig.assetsDetailpageBasicFields}" />
             <div style="display:none">
                 <h:panelGroup class="customFields" id="serialNum">
                     <label class="label">#{msg.serialNum}</label>
-                    <p:inputText id="serialNum" value="#{assetInfoDetailController.selected.serialNum}" readonly="true"/>
+                    <p:inputText value="#{assetInfoDetailController.selected.serialNum}" readonly="true"/>
                 </h:panelGroup>
                 <h:panelGroup>
                     <label class="label">#{msg.name}</label>
@@ -522,7 +523,6 @@
                         </p:dataList>
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoDetailController.selected.qrCode}">
-                        <!--<p:barcode value="#{assetInfoDetailController.selected.qrCode}" type="qr" height="200" format="png"/>-->
                         <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoDetailController.selected.qrCode,assetInfoDetailController.selected.siteUID)}" />
                     </p:tab>
                 </p:tabView>
@@ -550,7 +550,19 @@
         <script>
             window.onload = function () {
                 $(".jqplot-table-legend").css("display", "none");
+                showBasicFields();
             }
+            
+            function showBasicFields(){
+                var allFields = $(".customFields");
+//                var allFields2 = $("#BasicFields").val().parseJSON();
+                var allFields3 = eval('(' +  $("#BasicFields").val() + ')');
+                
+                allFields3.each(function(){
+                    alert("ddd");
+                });
+            }
+            
             function showthis(pic) {
                 var s = $('#shwoPicDialogImg')[0]
                 s.src = pic.src;
