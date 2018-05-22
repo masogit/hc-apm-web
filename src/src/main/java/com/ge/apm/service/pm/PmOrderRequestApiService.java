@@ -8,7 +8,7 @@ package com.ge.apm.service.pm;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.V2_ServiceRequest;
-import com.ge.apm.domain.remote.GatewayURL;
+import com.ge.apm.service.common.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import com.ge.apm.service.utils.TimeUtils;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -36,13 +36,11 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
 	
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
-    private String baseURL;
 
     public Map<String, Object> getApproveByAsset(String token, String assetUid) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-        String gatewayURL = GatewayURL.GET_APPROVE_BY_ASSET.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.GET_APPROVE_BY_ASSET);
         String url = gatewayURL.replace("{assetUid}",assetUid);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -56,7 +54,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     public Map<String, Object> getPmOrderSteps(String token, String pmOrderId) {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
-        String gatewayURL = GatewayURL.PM_ORDER_STEPS.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.PM_ORDER_STEPS);
         String url = gatewayURL.replace("{pmOrderId}",pmOrderId);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
@@ -69,7 +67,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
 
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.PM_ORDER_ACTION.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.PM_ORDER_ACTION);
         String url = gatewayURL.replace("{pmOrderId}", woId);
 
         ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
@@ -84,7 +82,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
 
     public String invokePmOrderActionBatch(String token, ArrayList<PmOrderActionForm> formDataList, String actionName) {
         HttpEntity<ArrayList<PmOrderActionForm>> requestEntity = new HttpEntity<ArrayList<PmOrderActionForm>>(formDataList, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.BATCH_TAKE_ORDER.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.BATCH_TAKE_ORDER);
         ResponseEntity<LinkedHashMap> response = template.exchange(gatewayURL,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -97,7 +95,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
 
     public Map<String, Object> createPmRequest(String token,PmOrderActionForm formData ){
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.PM_REQUEST_CREATE.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.PM_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
@@ -110,7 +108,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     @Async
     public void createPmOrdersByBatch(String token,String requestBody){
         HttpEntity<String> requestEntity = new HttpEntity<>(requestBody, createHttpHeaders(token));
-        String gatewayURL = GatewayURL.CREATE_PM_ORDER_BY_BATCH.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.CREATE_PM_ORDER_BY_BATCH);
         ResponseEntity<String> response = template.postForEntity(gatewayURL, requestEntity, String.class);
         if (response.getStatusCode() == HttpStatus.OK) {
 	        	String result = (String) response.getBody();
@@ -123,7 +121,7 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     @SuppressWarnings({ "unchecked", "rawtypes" })
 	public String autoGenerateFinacingNum(LinkedHashMap<String,Object> requestBody){
         HttpEntity<LinkedHashMap> requestEntity = new HttpEntity<LinkedHashMap>(requestBody);
-        String gatewayURL = GatewayURL.AUTO_GENERATE_FINANCING_NUM.toGatewayURL(baseURL);
+        String gatewayURL = getGatewayURL(GatewayURL.AUTO_GENERATE_FINANCING_NUM);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
         if (response.getStatusCode() == HttpStatus.OK) {
         		LinkedHashMap<String, Object> responseMap =  response.getBody();
@@ -134,7 +132,6 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         		return null;
         }
     } 
-//http://apm-dev.hcdigital.com.cn:8090/hcapmworkflowservice/api/apm/pmOrders/ff8080815f525e84015f5764de610000/action?type=accept
 }
 
 
