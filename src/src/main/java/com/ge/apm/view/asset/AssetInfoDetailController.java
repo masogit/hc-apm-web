@@ -5,6 +5,7 @@
  */
 package com.ge.apm.view.asset;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -108,6 +109,10 @@ public class AssetInfoDetailController {
         return "";
     }
 
+    public String getCustomConfigString(){
+        return JSONObject.toJSONString(customConfig);
+    }
+    
     //getter and setter
     public Boolean getTerminate() {
         return terminate;
