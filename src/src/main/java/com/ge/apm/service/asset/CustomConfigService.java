@@ -122,11 +122,6 @@ public class CustomConfigService {
         return customConfigDao.findBySiteUID(siteUID);
     }
     
-//    public CustomConfigObject getCustomConfigBySite(String siteUID) {
-//        CustomConfig res = customConfigDao.findBySiteUID(siteUID);
-//        return res == null ? null : JSONObject.parseObject(res.getConfig(), CustomConfigObject.class);
-//    }
-
     public CustomConfigObject getCurrentCustomConfig(String siteUid) {
         OrgInfo org = orgDao.findByUid(siteUid);
         if (configService.isInsulateTenant(org.getTenantUID())) {
