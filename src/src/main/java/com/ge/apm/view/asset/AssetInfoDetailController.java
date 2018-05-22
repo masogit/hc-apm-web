@@ -13,7 +13,10 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmScheduleData;
 import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,9 +39,12 @@ public class AssetInfoDetailController {
     private OrgInfoRepository orgDao;
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
+    private CustomConfigService ccService;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
+    
+    private CustomConfigObject customConfig;
 
     @PostConstruct
     protected void init() {
@@ -46,11 +52,13 @@ public class AssetInfoDetailController {
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        ccService = WebUtil.getBean(CustomConfigService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         selected = assetDao.findById(Integer.parseInt(selectedId));
+        customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
     public OrgInfo getOrgInfoByUid(String uid) {
@@ -107,6 +115,10 @@ public class AssetInfoDetailController {
 
     public AssetInfo getSelected() {
         return selected;
+    }
+
+    public CustomConfigObject getCustomConfig() {
+        return customConfig;
     }
 
 }
