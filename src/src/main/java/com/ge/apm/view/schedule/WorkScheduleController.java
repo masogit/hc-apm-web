@@ -41,6 +41,7 @@ public class WorkScheduleController{
     private ScheduleModel eventModel;
     private ScheduleEvent event;
 
+    private String userScheduleID;
     private String userUID;
     private String scheduleDateStage;
     private Date scheduleDate;
@@ -215,6 +216,7 @@ public class WorkScheduleController{
     public void onEventSelect(SelectEvent selectEvent) {
         event = (ScheduleEvent) selectEvent.getObject();
 
+        this.userScheduleID = ((UserSchedule)event.getData()).getId();
         this.scheduleDate = ((UserSchedule)event.getData()).getScheduleDate();
         this.scheduleDateStage = ((UserSchedule)event.getData()).getScheduleDateStage();
         this.userUID = ((UserSchedule)event.getData()).getUserUID();
@@ -235,6 +237,7 @@ public class WorkScheduleController{
         tempEvent.setData(null);
         event = tempEvent;
 
+        this.userScheduleID = null;
         this.scheduleDate = (Date) selectEvent.getObject();
         this.scheduleDateStage = null;
         this.userUID = null;
@@ -250,7 +253,7 @@ public class WorkScheduleController{
     }
 
     public void onScheduleValidate(){
-        if(userScheduleService.isBeforeTagetDate(this.scheduleDate, new Date()) || !userScheduleService.isValidateWorkSchedule(this.scheduleDate, this.scheduleDateStage, currentUser)){
+        if(userScheduleService.isBeforeTagetDate(this.scheduleDate, new Date()) || !userScheduleService.isValidateWorkSchedule(this.scheduleDate, this.scheduleDateStage, currentUser) || !userScheduleService.isValidateUser(this.scheduleDate, this.userUID, this.scheduleDateStage, this.userScheduleID)){
             this.isDisableSave = true;
         }else {
             this.isDisableSave = false;
