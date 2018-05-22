@@ -134,7 +134,6 @@ public class AssetInstallationService {
 
     public void saveOrUpdateItem(ArrivalListItem arrivalListItem) {
         arrivalListItem.setLastModifiedDate(new Date());
-        arrivalListItem.setUsageStatus(3);
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
             qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID(), 2);
