@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.domain.remote.GatewayURL;
 import com.ge.apm.service.utils.MicroServiceInvoker;
 import java.util.LinkedHashMap;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,22 +19,16 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class AssetInstallationApiService extends MicroServiceInvoker{
-    
-    
-    @Value("#{urlProperties.url_submitArrivalList}")
-    private String submitArrivalListUrl;
-    
-    @Value("#{urlProperties.url_submitArrivalListItem}")
-    private String submitArrivalListItemUrl;
-    
-    @Value("#{urlProperties.url_reAssignArrivalListItemOwner}")
-    private String reAssignArrivalListItemOwnerUrl;
-    
+
+    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
+    private String baseURL;
     
     public String submitArrivalList(String token, String arrivalListId){
         
         HttpEntity<String> requestEntity = new HttpEntity<String>(arrivalListId, createHttpHeaders(token));
-        String url = submitArrivalListUrl.replace("{arrivalListId}", arrivalListId);
+
+        String gatewayURL = GatewayURL.SUBMIT_ARRIVAL_LIST.toGatewayURL(baseURL);
+        String url = gatewayURL.replace("{arrivalListId}", arrivalListId);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             return response.getBody().toString();
@@ -46,7 +41,9 @@ public class AssetInstallationApiService extends MicroServiceInvoker{
         HttpHeaders header = createHttpHeaders(token);
         header.add("type", isFinish?"install":"reject");
         HttpEntity<String> requestEntity = new HttpEntity<String>(itemId, header);
-        String url = submitArrivalListItemUrl.replace("{arrivalListItemId}", itemId);
+
+        String gatewayURL = GatewayURL.SUBMIT_ARRIVAL_LIST_ITEM.toGatewayURL(baseURL);
+        String url = gatewayURL.replace("{arrivalListItemId}", itemId);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             return response.getBody().toString();
@@ -59,7 +56,8 @@ public class AssetInstallationApiService extends MicroServiceInvoker{
         HttpHeaders header = createHttpHeaders(token);
         header.add("assignee", currentPersonUID);
         HttpEntity<String> requestEntity = new HttpEntity<String>(itemId, header);
-        String url = reAssignArrivalListItemOwnerUrl.replace("{arrivalListItemId}", itemId);
+        String gatewayURL = GatewayURL.REASSIGN_ARRIVAL_LIST_ITEM_OWNER.toGatewayURL(baseURL);
+        String url = gatewayURL.replace("{arrivalListItemId}", itemId);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(url, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             return response.getBody().toString();
