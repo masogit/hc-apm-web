@@ -87,6 +87,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
+    private boolean needInstorageCheck;
 
     @Override
     protected void init() {
@@ -141,6 +142,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
 
         suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        needInstorageCheck=userContextService.needInstorageCheck();
     }
 
     @Override
@@ -153,7 +156,8 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         UserAccount user = UserContextService.getCurrentUserAccount();
         object.setCreatorUID(user.getUid());
         object.setStatus(1);
-        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
+        //remove default value
+//        object.setProcessType(ArrivalList.ProcessType.Normal.toString());
         object.setAgent(user.getName());
         object.setArrivalDate(new Date());
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
@@ -552,5 +556,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void setSupplierName(String supplierName) {
         this.supplierName = supplierName;
     }
+
+	public boolean isNeedInstorageCheck() {
+		return needInstorageCheck;
+	}
+
+	public void setNeedInstorageCheck(boolean needInstorageCheck) {
+		this.needInstorageCheck = needInstorageCheck;
+	}
 
 }
