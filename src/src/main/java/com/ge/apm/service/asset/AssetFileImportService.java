@@ -277,14 +277,18 @@ public class AssetFileImportService {
                 assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
                 assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
 
-                asset.setUsageStatus(3); //已建档
 
-                boolean isNeedApprover = configService.isNeedAssetApprover(selectedOrgToImport.getSiteUID());
-                if(isNeedApprover){
-                    asset.setUsageStatus(2); //待审核
-                }
 
                 if (isNewAsset) {
+
+                    //only new asset need to set this
+                    asset.setUsageStatus(3); //已建档
+
+                    boolean isNeedApprover = configService.isNeedAssetApprover(selectedOrgToImport.getSiteUID());
+                    if(isNeedApprover){
+                        asset.setUsageStatus(2); //待审核
+                    }
+
                     asset.setSiteId(selectedOrgToImport.getSiteId());
                     asset.setHospitalId(selectedOrgToImport.getId());
 
