@@ -36,6 +36,7 @@ import org.springframework.data.domain.PageRequest;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -59,13 +60,11 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
     private AssetInstallationService aiService;
     private UaaService uaaService;
     private StreamedContent exportPdf;
-
     private Date varArrivalDateTo = null;
     private String arrivalFormatTime = null;
 
     @Override
     protected void init() {
-
         dao = WebUtil.getBean(ArrivalListRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -90,7 +89,48 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
-        return dao.findBySearchFilter(this.searchFilters, pageRequest);
+        Page<ArrivalList> result=dao.findBySearchFilter(this.searchFilters, pageRequest);
+        setCanDeleted(result);
+        return result;
+    }
+    
+    private void setCanDeleted(Page<ArrivalList> result){
+    	if(result!=null){
+    		for(ArrivalList arrivalList: result){
+        		Integer status=arrivalList.getStatus();
+        		if(status!=null){
+        			if(status==1){
+        				arrivalList.setCannotDeleted(false);
+        			}
+        			else if(status==2){
+        				List<ArrivalListItem> items = aiService.getListItem(arrivalList.getId());
+        				if(items!=null){
+        					boolean installed=false;
+            				for(ArrivalListItem item: items){
+            					if(item.getInstallStatus()!=null && (!item.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW))){
+            						installed=true;
+            						break;
+            					}
+            				}
+            				if(installed){
+            					arrivalList.setCannotDeleted(true);
+            				}
+            				else{
+            					if(UserContextService.checkRole("AssetHead")){
+            						arrivalList.setCannotDeleted(false);
+            					}
+            					else{
+            						arrivalList.setCannotDeleted(true);
+            					}
+            				}
+        				}
+        			}
+        			else{
+        				arrivalList.setCannotDeleted(true);
+        			}
+        		}
+        	}
+    	}
     }
 
     @Override
