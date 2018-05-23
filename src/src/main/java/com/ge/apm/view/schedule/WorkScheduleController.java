@@ -206,7 +206,7 @@ public class WorkScheduleController{
         if(currentUser.getOrgLevel() == 2){
             userAccountList = userAccountDao.findByHospitalUIDAndStaffRole(currentUser.getHospitalUID());
         }
-        if(currentUser.getOrgLevel() == 2){
+        if(currentUser.getOrgLevel() == 3){
             userAccountList = userAccountDao.findBySiteUIDAndStaffRole(currentUser.getSiteUID());
         }
 
