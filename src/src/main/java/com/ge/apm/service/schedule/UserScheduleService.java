@@ -302,10 +302,10 @@ public class UserScheduleService {
 
     public boolean isValidateUser(Date scheduleDate, String userUID, String scheduleDateStage, String userScheduleID){
 
-        UserSchedule us = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndScheduleDateStage(SCHEDULE_TYPE_WORK, userUID, scheduleDate, scheduleDateStage);
+        List<UserSchedule> usList = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndScheduleDateStage(SCHEDULE_TYPE_WORK, userUID, scheduleDate, scheduleDateStage);
 
-        if(us != null){
-            if(userScheduleID != null && userScheduleID.equals(us.getId())){
+        if(!usList.isEmpty()){
+            if(userScheduleID != null && userScheduleID.equals(usList.get(0).getId())){
                 return true;
             }
             return false;

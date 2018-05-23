@@ -199,14 +199,11 @@ public class WorkScheduleController{
         List<UserAccount> userAccountList = new ArrayList<>();
         if(currentUser.getOrgLevel() == 0){
             userAccountList = userAccountDao.findByTenantUIDAndStaffRole(currentUser.getTenantUID());
-        }
-        if(currentUser.getOrgLevel() == 1){
+        }else if(currentUser.getOrgLevel() == 1){
             userAccountList = userAccountDao.findByInstitutionUIDAndStaffRole(currentUser.getInstitutionUID());
-        }
-        if(currentUser.getOrgLevel() == 2){
+        }else if(currentUser.getOrgLevel() == 2){
             userAccountList = userAccountDao.findByHospitalUIDAndStaffRole(currentUser.getHospitalUID());
-        }
-        if(currentUser.getOrgLevel() == 3){
+        }else if(currentUser.getOrgLevel() == 3){
             userAccountList = userAccountDao.findBySiteUIDAndStaffRole(currentUser.getSiteUID());
         }
 
