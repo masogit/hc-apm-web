@@ -11,7 +11,8 @@
 
             
             <p:submenu id="um02" label="#{msg.AssetMDM}" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}">
-                <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>
+                <!--<p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/List"/>-->
+                <p:menuitem id="um03" value="#{msg.AssetList}" outcome="/portal/asset/info/AssetList"/>
                 <p:menuitem id="um04" value="#{msg.AssetInventory}" rendered="false" outcome="/portal/asset/AssetInventory.xhtml" />
                 <p:menuitem id="um05" value="#{msg.AssetDocumentMgmt}" rendered="false"
                             outcome="/portal/asset/fileAttachment/List"/>
@@ -21,7 +22,8 @@
                 <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/List" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
 
-                <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/List.xhtml?terminate=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <!--<p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/List.xhtml?terminate=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>-->
+                <p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/AssetList.xhtml?terminate=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um083" value="#{msg.Create}#{msg.BuildAsset}" outcome="/portal/asset/createAsset/RequestsList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem value="资产审核" outcome="/portal/asset/info/ApprovalList.xhtml" rendered="#{userContextService.needAssetApproval() and (userContextService.hasAnyRole('AssetHead') or userContextService.isAssetApprover())}"/>
                 <p:menuitem id="um087" value="#{msg.ImportAssetDataFile}" outcome="/portal/asset/assetImport/assetImport.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
@@ -161,6 +163,7 @@
                 <p:menuitem id="um497" value="#{msg.AssetTag}" outcome="/portal/asset/tag/List.xhtml"/>
                 <p:menuitem id="um498" value="#{msg.BiomedGroup}" outcome="/portal/uaa/biomedGroup/List.xhtml"/>
                 <p:menuitem id="um499" value="#{msg.SystemConfig}" outcome="/portal/config/v3_workflowConfig/List.xhtml"/>
+                <p:menuitem id="um499" value="自定义配置" outcome="/portal/asset/customConfig/CustomConfig.xhtml"/>
                 <!--<p:menuitem id="um500" value="#{msg.V2_WorkOrderWorkflowConfig}" outcome="/portal/config/workFlowConfig/Wo_Edit.xhtml"/>-->
                 <!--<p:menuitem id="um501" value="#{msg.AssetSeriaNumConfig}" outcome="/portal/config/assetSeriaNumConfig/List.xhtml"/>-->
                 <p:menuitem id="um502" value="#{msg.QRCodeMgmt}" outcome="/portal/asset/qrCode/hospital/qrCodeLibList.xhtml" rendered="#{(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin')) and !userContextService.hasRole('SuperAdmin')}"/>
