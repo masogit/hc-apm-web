@@ -28,20 +28,20 @@
                         <p:column headerText="#{msg.assetName}" >
                             <h:outputText value="#{item['设备名称']}"/>
                         </p:column>
-                        <p:column headerText="#{msg.departNum}" >
-                            <h:outputText value="#{item['设备编号（院方）']}"/>
+                        <p:column headerText="设备编号" >
+                            <h:outputText value="#{item['设备编号']}"/>
                         </p:column>
-                        <p:column headerText="#{msg.financingNum}" >
-                            <h:outputText value="#{item['资产编号']}"/>
+                        <p:column headerText="规格型号" >
+                            <h:outputText value="#{item['规格型号']}"/>
                         </p:column>
-                        <p:column headerText="#{msg.serialNum}" >
-                            <h:outputText value="#{item['制造商序列号']}"/>
+                        <p:column headerText="出厂编号" >
+                            <h:outputText value="#{item['出厂编号']}"/>
                         </p:column>
-                        <p:column headerText="#{msg.qrCode}" >
-                            <h:outputText value="#{item['二维码']}"/>
+                        <p:column headerText="使用单位" >
+                            <h:outputText value="#{item['使用单位']}"/>
                         </p:column>
                         <p:column headerText="资产建档信息" >
-                            <h:outputText value="#{empty item['asset'] ? '未匹配':'已建档'}" />
+                            <h:outputText value="#{empty item['asset'] ? '未匹配':'已匹配'}" />
                         </p:column>
                         <p:column headerText="设备安装信息" >
                             <h:outputText value="#{empty item['arrivalListItem']? '未匹配': fieldMsg.fieldValue('arrivalListItemStatus',item['arrivalListItem'].installStatus)}"/>

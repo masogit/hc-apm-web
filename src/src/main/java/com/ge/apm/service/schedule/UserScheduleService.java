@@ -300,4 +300,19 @@ public class UserScheduleService {
         return flag;
     }
 
+    public boolean isValidateUser(Date scheduleDate, String userUID, String scheduleDateStage, String userScheduleID){
+
+        UserSchedule us = userScheduleDao.findByTypeAndUserUIDAndScheduleDateAndScheduleDateStage(SCHEDULE_TYPE_WORK, userUID, scheduleDate, scheduleDateStage);
+
+        if(us != null){
+            if(userScheduleID != null && userScheduleID.equals(us.getId())){
+                return true;
+            }
+            return false;
+        }else {
+            return true;
+        }
+
+    }
+
 }
