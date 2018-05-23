@@ -166,13 +166,18 @@ public class CustomConfigService {
                 "usageStatus","accountingCategory","manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
                 "warrantyDate","terminateDate","purchasePrice","salvageValue","lifecycle","depreciationMethod","lastPmDate",
                 "lastQaDate","lastMeteringDate","warranty"));
-//        object.setAssetsDetailpageDetailFields(Arrays.asList("parentAssetId","deviceName","systemId","financingNum","departNum",
-//                "barcode","registrationNo","modalityId","qrCode","functionType","functionGroup","assetCode68","functionGrade",
-//                "repairForm","locationCode","locationName","status","deviceStatus","isPm","isChecked","comments","assetUsage",
-//                "capitalSource","capitalSource2","measureGrade","riskGrade","emergencyEquipment","importEquipment","measuringItemCategory",
-//                "usageStatus","accountingCategory","manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
-//                "warrantyDate","terminateDate","purchasePrice","salvageValue","lifecycle","depreciationMethod","lastPmDate",
-//                "lastQaDate","lastMeteringDate","warranty"));
+        
+        object.setAssetsEditpageBasicFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName",
+                "assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3","siteUID","clinicalDeptName",
+                "clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor","maitanance","maitananceTel","nationalStandardCode"));
+        object.setAssetsEditpageCodesFields(Arrays.asList("parentAssetId","deviceName","systemId","financingNum","departNum",
+                "barcode","registrationNo","modalityId","qrCode"));
+        object.setAssetsEditpageStatusFields(Arrays.asList("functionType","functionGroup","assetCode68","functionGrade","repairForm",
+                "locationCode","locationName","status","deviceStatus","isPm","isChecked","comments","manufactDate","purchaseDate","arriveDate",
+                "installDate","factoryWarrantyDate","warrantyDate","terminateDate","warranty"));
+        object.setAssetsEditpageCatalogFields(Arrays.asList("assetUsage","capitalSource","capitalSource2","measureGrade","riskGrade",
+                "emergencyEquipment","importEquipment","measuringItemCategory","accountingCategory"));
+        object.setAssetsEditpageFinicialFields(Arrays.asList("purchasePrice","salvageValue","lifecycle","depreciationMethod"));
         return object;
     }
 
