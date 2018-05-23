@@ -386,7 +386,6 @@ public class AssetFileImportService {
                 OrgInfo existingOrgInfo = orgs.get(0);
                 existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
                 item.put("org", existingOrgInfo);
-                item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
             }
         });
