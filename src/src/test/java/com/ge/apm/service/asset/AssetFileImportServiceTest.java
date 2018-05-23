@@ -99,7 +99,7 @@ public class AssetFileImportServiceTest {
         service.setSelectedOrgToImport(defaultImportSite);
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
         service.importData(orgMap, assetMap, false, false);
 
@@ -126,7 +126,7 @@ public class AssetFileImportServiceTest {
         long startTime = System.currentTimeMillis();
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
         service.importData(orgMap, assetMap, false, false);
 
@@ -227,7 +227,7 @@ public class AssetFileImportServiceTest {
         );
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
         service.importData(orgMap, assetMap, false, false);
 
@@ -271,7 +271,7 @@ public class AssetFileImportServiceTest {
         );
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
         service.importData(orgMap, assetMap, false, false);
 
@@ -315,7 +315,7 @@ public class AssetFileImportServiceTest {
         );
 
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
-        Map<String, Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
+        List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
         service.importData(orgMap, assetMap, false, false);
 

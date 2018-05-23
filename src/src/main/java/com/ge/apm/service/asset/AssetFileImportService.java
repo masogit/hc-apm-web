@@ -160,13 +160,13 @@ public class AssetFileImportService {
 //        }
 //        return result;
 //    }
-    public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
+    public List<Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         Date now = new Date();
 
-        Map<String, Map<String, Object>> result = new LinkedHashMap();
+        List<Map<String, Object>> result = new ArrayList<>();
         int keyRow = 6;
         int dataRow = 7;
 
@@ -318,7 +318,7 @@ public class AssetFileImportService {
                 map.put("status", isNewAsset ? ImportStatus.New : ImportStatus.Exist);
                 map.put("rowData", rowMap);
 
-                result.put(getAssetKey(asset), map);
+                result.add(map);
 
             }catch(Exception e){
                 throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
@@ -368,7 +368,7 @@ public class AssetFileImportService {
 
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
+    public void importData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
@@ -394,7 +394,7 @@ public class AssetFileImportService {
         //release qrcode in use in order to exchange qrcode in two different asset
         releaseQRCodeInUse(importAssetMap);
 
-        importAssetMap.values().forEach(item -> {
+        importAssetMap.forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             //if site uid not match, ignore update
@@ -637,7 +637,7 @@ public class AssetFileImportService {
         return true;
     }
 
-    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
+    public Boolean exportFailData(ExcelDocument doc, Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
         Integer keyRowOrg = 4;
         Integer dataRowOrg = 5;
         Boolean hasFailData = false;
@@ -655,8 +655,8 @@ public class AssetFileImportService {
 //        }
         Integer keyRowAsset = 6;
         Integer dataRowAsset = 7;
-        doc.clearRowsData(SHEET_ASSET, 7, 6 + importAssetMap.values().size());
-        for (Map<String, Object> item : importAssetMap.values()) {
+        doc.clearRowsData(SHEET_ASSET, 7, 6 + importAssetMap.size());
+        for (Map<String, Object> item : importAssetMap) {
             if (item.get("status").equals(ImportStatus.Failure)) {
                 doc.writeRowData(SHEET_ASSET, keyRowAsset, dataRowAsset++, (Map<String, Object>) item.get("rowData"));
                 hasFailData = true;
@@ -738,7 +738,7 @@ public class AssetFileImportService {
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
+    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
@@ -761,7 +761,7 @@ public class AssetFileImportService {
         });
 
         int row = 0;
-        for (Map<String, Object> item: importAssetMap.values()) {
+        for (Map<String, Object> item: importAssetMap) {
             ++row;
 
             AssetInfo newAsset = (AssetInfo) item.get("asset");
@@ -908,9 +908,9 @@ public class AssetFileImportService {
 
     }
 
-    private void releaseQRCodeInUse(Map<String, Map<String, Object>> importAssetMap) {
+    private void releaseQRCodeInUse(List<Map<String, Object>> importAssetMap) {
 
-        importAssetMap.values().forEach(item -> {
+        importAssetMap.forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             //if site uid not match, ignore update

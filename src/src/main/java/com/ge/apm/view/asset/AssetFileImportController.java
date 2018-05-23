@@ -24,6 +24,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class AssetFileImportController {
     private UploadedFile file;
 
     private Map<String, Map<String, Object>> importOrgMap;
-    private Map<String, Map<String, Object>> importAssetMap;
+    private List<Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
 
@@ -147,7 +148,7 @@ public class AssetFileImportController {
     
     public Integer getAssetErrorCounts(){
         if(null!=importAssetMap && !importAssetMap.isEmpty()){
-           return Integer.parseInt(String.valueOf(importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+           return Integer.parseInt(String.valueOf(importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
         }else{
             return 0;
         }
@@ -157,8 +158,8 @@ public class AssetFileImportController {
         if(null == importAssetMap) {
             return null;
         }
-        List<String> errors = importAssetMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
-                .map(item -> item.getValue().get("errmsg").toString()).collect(Collectors.toList());
+        List<String> errors = importAssetMap.stream().filter(item -> item.get("status").equals(AssetFileImportService.ImportStatus.CheckFail))
+                .map(item -> item.get("errmsg").toString()).collect(Collectors.toList());
         return errors;
     }
     
@@ -213,16 +214,15 @@ public class AssetFileImportController {
 
         if (importAssetMap == null) return;
 
-        Map<String, Map<String, Object>> result = new LinkedHashMap<>();
+        List<Map<String, Object>> result = new ArrayList<>();
 
-        for (Map.Entry<String, Map<String, Object>> entry: importAssetMap.entrySet()) {
-            Map<String, Object> map = entry.getValue();
+        for (Map<String, Object> map: importAssetMap) {
 
             AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
             if (importStatus == null) continue;
 
             if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                result.put(entry.getKey(), entry.getValue());
+                result.add(map);
             }
 
         }
@@ -231,7 +231,7 @@ public class AssetFileImportController {
 
         if (importOrgMap == null) return;
 
-        result = new LinkedHashMap<>();
+        Map<String, Map<String, Object>> resultMap = new LinkedHashMap<>();
 
         for (Map.Entry<String, Map<String, Object>> entry: importOrgMap.entrySet()) {
             Map<String, Object> map = entry.getValue();
@@ -240,17 +240,17 @@ public class AssetFileImportController {
             if (importStatus == null) continue;
 
             if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                result.put(entry.getKey(), entry.getValue());
+                resultMap.put(entry.getKey(), entry.getValue());
             }
 
         }
 
-        displayOrgs = result;
+        displayOrgs = resultMap;
     }
 
-    Map<String, Map<String, Object>> displayAssets;
+    List<Map<String, Object>> displayAssets;
 
-    public Map<String, Map<String, Object>> getDisplayAssets() {
+    public List<Map<String, Object>> getDisplayAssets() {
 
         if (displayErrorsOnly) {
             return displayAssets;
@@ -277,7 +277,7 @@ public class AssetFileImportController {
         return importOrgMap;
     }
 
-    public Map<String, Map<String, Object>> getImportAssetMap() {
+    public List<Map<String, Object>> getImportAssetMap() {
         return importAssetMap;
     }
 
