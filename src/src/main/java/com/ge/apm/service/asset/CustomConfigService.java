@@ -90,6 +90,7 @@ public class CustomConfigService {
         res.put("comments", WebUtil.getMessage("comments"));
         res.put("assetUsage", WebUtil.getMessage("assetUsage"));
         res.put("capitalSource", WebUtil.getMessage("capitalSource"));
+        res.put("capitalSource2", WebUtil.getMessage("capitalSource"));
         res.put("measureGrade", WebUtil.getMessage("measureGrade"));
         res.put("riskGrade", WebUtil.getMessage("riskGrade"));
         res.put("emergencyEquipment", WebUtil.getMessage("emergencyEquipment"));
@@ -107,6 +108,13 @@ public class CustomConfigService {
         res.put("salvageValue", WebUtil.getMessage("salvageValue"));
         res.put("lifecycle", WebUtil.getMessage("lifecycle"));
         res.put("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
+        res.put("usageStatus", WebUtil.getMessage("usageStatus"));
+        res.put("isPm", WebUtil.getMessage("isAssetPMed"));
+        res.put("isChecked", WebUtil.getMessage("isAssetChecked"));
+        res.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
+        res.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
+        res.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
+        res.put("warranty", "是否对质保到期进行提醒");
         return res;
     }
     
@@ -145,12 +153,26 @@ public class CustomConfigService {
         object.setAssetFields(new HashMap());
         List<String> allRoles = getConfigRoles().stream().map(SysRole::getName).collect(Collectors.toList());
         getAllFields().entrySet().stream().forEach(item-> object.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(),allRoles)));
-        object.setAssetsListPageFields(Arrays.asList("name","functionType","serialNum","departNum","assetGroup","clinicalDeptName","manufacture","vendor","status","warrantyDate",
-                "financingNum","qrCode"));
-        object.setAssetsDetailpageBasicFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName","assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3",
-                "siteUID","clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor","maitanance","maitananceTel","nationalStandardCode"));
-        object.setAssetsDetailpageDetailFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName","assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3",
-                "siteUID","clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor","maitanance","maitananceTel","nationalStandardCode"));
+        object.setAssetsListPageFields(Arrays.asList("name","functionType","serialNum","departNum","assetGroup",
+                "clinicalDeptName","manufacture","vendor","status","warrantyDate","financingNum","qrCode"));
+        object.setAssetsDetailpageBasicFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName",
+                "assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3","siteUID",
+                "clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor",
+                "maitanance","maitananceTel","nationalStandardCode"));
+        object.setAssetsDetailpageDetailFields(Arrays.asList("parentAssetId","deviceName","systemId","financingNum","departNum",
+                "barcode","registrationNo","modalityId","qrCode","functionType","functionGroup","assetCode68","functionGrade",
+                "repairForm","locationCode","locationName","status","deviceStatus","isPm","isChecked","comments","assetUsage",
+                "capitalSource","capitalSource2","measureGrade","riskGrade","emergencyEquipment","importEquipment","measuringItemCategory",
+                "usageStatus","accountingCategory","manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
+                "warrantyDate","terminateDate","purchasePrice","salvageValue","lifecycle","depreciationMethod","lastPmDate",
+                "lastQaDate","lastMeteringDate","warranty"));
+//        object.setAssetsDetailpageDetailFields(Arrays.asList("parentAssetId","deviceName","systemId","financingNum","departNum",
+//                "barcode","registrationNo","modalityId","qrCode","functionType","functionGroup","assetCode68","functionGrade",
+//                "repairForm","locationCode","locationName","status","deviceStatus","isPm","isChecked","comments","assetUsage",
+//                "capitalSource","capitalSource2","measureGrade","riskGrade","emergencyEquipment","importEquipment","measuringItemCategory",
+//                "usageStatus","accountingCategory","manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
+//                "warrantyDate","terminateDate","purchasePrice","salvageValue","lifecycle","depreciationMethod","lastPmDate",
+//                "lastQaDate","lastMeteringDate","warranty"));
         return object;
     }
 
