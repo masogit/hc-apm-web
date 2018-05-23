@@ -56,7 +56,6 @@ public class AssetFileImportController {
     
     private Boolean canbeImported = false;
     private Boolean autoGenerateQrcode = true;
-//    private Boolean autoGenerateFinancingNum;
     private Boolean isGeneratePmOrder;
 
     private StreamedContent exportFile;
@@ -72,11 +71,6 @@ public class AssetFileImportController {
         aiService = WebUtil.getBean(AssetFileImportService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
-
-//        String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-//        Long configuredCount = assetSeriaNumConfigRepository.countAssetSeriaNumConfigByTenantUID(tenantUID);
-
-//        autoGenerateFinancingNum = configuredCount > 0L;
 
         selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
         aiService.setSelectedOrgToImport(selectedOrg);
@@ -131,7 +125,6 @@ public class AssetFileImportController {
 
             try {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
-//                InputStream stream = this.file.getInputstream();
                 ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
                 hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
@@ -312,14 +305,6 @@ public class AssetFileImportController {
     public void setAutoGenerateQrcode(Boolean autoGenerateQrcode) {
         this.autoGenerateQrcode = autoGenerateQrcode;
     }
-
-//    public Boolean getAutoGenerateFinancingNum() {
-//        return autoGenerateFinancingNum;
-//    }
-//
-//    public void setAutoGenerateFinancingNum(Boolean autoGenerateFinancingNum) {
-//        this.autoGenerateFinancingNum = autoGenerateFinancingNum;
-//    }
 
     public Boolean getIsGeneratePmOrder() {
         return isGeneratePmOrder;
