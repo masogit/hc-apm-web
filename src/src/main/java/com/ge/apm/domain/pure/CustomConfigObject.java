@@ -20,6 +20,13 @@ public class CustomConfigObject {
     List<String> assetsListPageFields;
     List<String> assetsDetailpageBasicFields;
     List<String> assetsDetailpageDetailFields;
+    
+    List<String> assetsEditpageBasicFields;
+    List<String> assetsEditpageCodesFields;
+    List<String> assetsEditpageStatusFields;
+    List<String> assetsEditpageCatalogFields;
+    List<String> assetsEditpageFinicialFields;
+    
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
         return assetFields;
@@ -51,6 +58,46 @@ public class CustomConfigObject {
 
     public void setAssetsDetailpageDetailFields(List<String> assetsDetailpageDetailFields) {
         this.assetsDetailpageDetailFields = assetsDetailpageDetailFields;
+    }
+
+    public List<String> getAssetsEditpageBasicFields() {
+        return assetsEditpageBasicFields;
+    }
+
+    public void setAssetsEditpageBasicFields(List<String> assetsEditpageBasicFields) {
+        this.assetsEditpageBasicFields = assetsEditpageBasicFields;
+    }
+
+    public List<String> getAssetsEditpageCodesFields() {
+        return assetsEditpageCodesFields;
+    }
+
+    public void setAssetsEditpageCodesFields(List<String> assetsEditpageCodesFields) {
+        this.assetsEditpageCodesFields = assetsEditpageCodesFields;
+    }
+
+    public List<String> getAssetsEditpageStatusFields() {
+        return assetsEditpageStatusFields;
+    }
+
+    public void setAssetsEditpageStatusFields(List<String> assetsEditpageStatusFields) {
+        this.assetsEditpageStatusFields = assetsEditpageStatusFields;
+    }
+
+    public List<String> getAssetsEditpageCatalogFields() {
+        return assetsEditpageCatalogFields;
+    }
+
+    public void setAssetsEditpageCatalogFields(List<String> assetsEditpageCatalogFields) {
+        this.assetsEditpageCatalogFields = assetsEditpageCatalogFields;
+    }
+
+    public List<String> getAssetsEditpageFinicialFields() {
+        return assetsEditpageFinicialFields;
+    }
+
+    public void setAssetsEditpageFinicialFields(List<String> assetsEditpageFinicialFields) {
+        this.assetsEditpageFinicialFields = assetsEditpageFinicialFields;
     }
     
 }

@@ -103,23 +103,63 @@ public class CustomConfigController {
             case "RemoveDetailFields":
                 addFieldsList.addAll(customConfigObject.getAssetsDetailpageDetailFields());
                 break;
+            case "EditpageBasicFields":
+            case "EditpageCodesFields":
+            case "EditpageStatusFields":
+            case "EditpageCatalogFields":
+            case "EditpageFinicialFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getAssetsEditpageBasicFields().contains(item)
+                        && !customConfigObject.getAssetsEditpageCodesFields().contains(item)
+                        && !customConfigObject.getAssetsEditpageStatusFields().contains(item)
+                        && !customConfigObject.getAssetsEditpageCatalogFields().contains(item)
+                        && !customConfigObject.getAssetsEditpageFinicialFields().contains(item)).collect(Collectors.toList());
+                break;
+            case "RemoveEditpageBasicFields":
+                addFieldsList.addAll(customConfigObject.getAssetsEditpageBasicFields());
+                break;
+            case "RemoveEditpageCodesFields":
+                addFieldsList.addAll(customConfigObject.getAssetsEditpageCodesFields());
+                break;
+            case "RemoveEditpageStatusFields":
+                addFieldsList.addAll(customConfigObject.getAssetsEditpageStatusFields());
+                break;
+            case "RemoveEditpageCatalogFields":
+                addFieldsList.addAll(customConfigObject.getAssetsEditpageCatalogFields());
+                break;
+            case "RemoveEditpageFinicialFields":
+                addFieldsList.addAll(customConfigObject.getAssetsEditpageFinicialFields());
+                break;
         }
     }
 
     public String getAddFieldsUpdateString() {
         switch (addFieldsType) {
             case "BasicFields":
+            case "RemoveBasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
             case "DetailFields":
+            case "RemoveDetailFields":
                 return ":customConfigForm:tabView:DetailFieldsList";
             case "ListPageFields":
                 return ":customConfigForm:tabView:assetListPageTable";
             case "UsingFields":
                 return ":customConfigForm:tabView:assetFieldsTable";
-            case "RemoveBasicFields":
-                return ":customConfigForm:tabView:BasicFieldsList";
-            case "RemoveDetailFields":
-                return ":customConfigForm:tabView:DetailFieldsList";
+            case "EditpageBasicFields":
+            case "RemoveEditpageBasicFields":
+                return "customConfigForm:tabView:EditpageBasicFields";
+            case "EditpageCodesFields":
+            case "RemoveEditpageCodesFields":
+                return "customConfigForm:tabView:EditpageCodesFields";
+            case "EditpageStatusFields":
+            case "RemoveEditpageStatusFields":
+                return "customConfigForm:tabView:EditpageStatusFields";
+            case "EditpageCatalogFields":
+            case "RemoveEditpageCatalogFields":
+                return "customConfigForm:tabView:EditpageCatalogFields";
+            case "EditpageFinicialFields":
+            case "RemoveEditpageFinicialFields":
+                return "customConfigForm:tabView:EditpageFinicialFields";
             default:
                 return "";
         }
@@ -152,6 +192,46 @@ public class CustomConfigController {
             case "RemoveDetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsDetailpageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "EditpageBasicFields":
+                customConfigObject.getAssetsEditpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsEditpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveEditpageBasicFields":
+                customConfigObject.getAssetsEditpageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsEditpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "EditpageCodesFields":
+                customConfigObject.getAssetsEditpageCodesFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsEditpageCodesFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveEditpageCodesFields":
+                customConfigObject.getAssetsEditpageCodesFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsEditpageCodesFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "EditpageStatusFields":
+                customConfigObject.getAssetsEditpageStatusFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsEditpageStatusFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveEditpageStatusFields":
+                customConfigObject.getAssetsEditpageStatusFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsEditpageStatusFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "EditpageCatalogFields":
+                customConfigObject.getAssetsEditpageCatalogFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsEditpageCatalogFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveEditpageCatalogFields":
+                customConfigObject.getAssetsEditpageCatalogFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsEditpageCatalogFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "EditpageFinicialFields":
+                customConfigObject.getAssetsEditpageFinicialFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveEditpageFinicialFields":
+                customConfigObject.getAssetsEditpageFinicialFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsEditpageFinicialFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
         }
         cancelAddFields();
