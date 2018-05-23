@@ -192,6 +192,10 @@
                                 <p:inputText id="capitalSource" value="#{fieldMsg.fieldValue('capitalSource', assetInfoApprovalController.selected.capitalSource)}" readonly="true"/>
                             </h:panelGroup>
                             <h:panelGroup>
+                                <label class="label">#{msg.capitalSource2}</label>
+                                <p:inputText id="capitalSource2" value="#{fieldMsg.fieldValue('capitalSource2', assetInfoApprovalController.selected.capitalSource2)}" readonly="true"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
                                 <label class="label">#{msg.measureGrade}</label>
                                 <p:inputText id="measureGrade" value="#{fieldMsg.fieldValue('measureGrade', assetInfoApprovalController.selected.measureGrade)}" readonly="true"/>
                             </h:panelGroup>
@@ -298,10 +302,24 @@
                                     <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                 </p:inputText>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.isAssetPMed}</label>
+                                <p:selectOneRadio value="#{assetInfoApprovalController.selected.isPm}">
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <label class="label">#{msg.isAssetChecked}</label>
+                                <p:selectOneRadio value="#{assetInfoApprovalController.selected.isChecked}">
+                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                    <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                </p:selectOneRadio>
+                            </h:panelGroup>
+<!--                            <h:panelGroup>
                                 <label class="label">是否对质保到期进行提醒</label>
                                 <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoApprovalController.selected.warranty}"  disabled="true"/>
-                            </h:panelGroup>
+                            </h:panelGroup>-->
 
 
                         </p:panelGrid>
@@ -317,9 +335,9 @@
                         </p:dataGrid>
                     </p:fieldset>
                     <h:panelGroup>
-                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.rejectCreate()}" action="ApprovalList" value="审核不通过" update=":approvalAssetDialogForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
-                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.approveCreate()}" action="ApprovalList" value="审核通过" update=":approvalAssetDialogForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetInfoApprovalController.cancel()}" action="ApprovalList" icon="ui-icon-cancel" onclick="PF('easyInstallDialog').hide()"/>
+                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.rejectCreate()}" action="ApprovalList?faces-redirect=true" value="审核不通过" update=":approvalAssetDialogForm" icon="ui-icon-clear" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
+                        <p:commandButton validateClient="false" actionListener="#{assetInfoApprovalController.approveCreate()}" action="ApprovalList?faces-redirect=true" value="审核通过" update=":approvalAssetDialogForm" icon="ui-icon-check" oncomplete="handleSubmit(args, 'approvalAssetDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{assetInfoApprovalController.cancel()}" action="ApprovalList?faces-redirect=true" icon="ui-icon-cancel" onclick="PF('easyInstallDialog').hide()"/>
                     </h:panelGroup>
 
                     <br/>

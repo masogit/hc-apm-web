@@ -1,0 +1,419 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="preRenderView">
+        <f:metadata>
+            <f:viewParam name="assetStatus" value="#{assetInfoController.filterAssetStatus}"/>
+            <f:viewParam name="model" value="#{assetInfoController.filterWarrantyDate}"/>
+            <f:viewParam name="assetId" value="#{assetInfoController.assetId}"/>
+        </f:metadata>
+        <f:event type="preRenderView" listener="#{assetInfoController.setAssetStatusFilter()}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="在借设备列表"/>
+            </div>
+
+            <div class="ui-g-12 card">
+                <h:form id="searchForm">
+                    <h:panelGrid id="searchPanel" columns="2">
+                        <p:inputText id="searchText" value="#{assetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
+                            <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
+                        </p:inputText>
+
+                        <h:panelGroup id='searchButtons'>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm"  rendered="#{empty assetInfoController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm" actionListener="#{assetInfoController.setOneSearchStr('')}" rendered="#{not empty assetInfoController.oneSearchStr}"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:form>
+                <h:form id="AssetInfoListForm">
+                    <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList"
+                                 selectionMode="single" selection="#{assetInfoController.selected}"
+                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}" 
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} 转到 {JumpToPageDropdown} 页 #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 rows="20" emptyMessage="#{msg.noRecordFound}"
+                                 rowsPerPageTemplate="20,40,60,90">
+
+                        <p:ajax  event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="editButton viewButton deleteButton "/>
+                        <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc();"/>
+                        <p:ajax event="page" oncomplete="rc2();"/>
+                        <p:column headerText="借用详情">
+                            <p:commandButton  class="btn btn-sm btn-gray" title="查看" action="#{sharedAssetRequestV2Controller.queryBorrowInfo(item.uid,item.clinicalDeptUID)}"
+                            oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
+                        </p:column>
+                        <p:column rendered="false" exportable="false" width="#{userContextService.hasRole('AssetHead')?130:53}">
+                            <!--<p:commandButton icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" action="#{assetInfoController.getDetailPage(item.id,item.name)}" style="width:26px;height: 26px"/>-->
+                            <h:panelGroup rendered="#{empty assetInfoController.filterWarrantyDate}">
+                                <p:link target="_new" title="#{msg.Edit}" outcome="#{assetInfoController.getEditPage(item.id,item.name)}" rendered="#{userContextService.hasAnyRole('AssetHead,AssetStaff')}">
+                                    <p:graphicImage name="icons/edit.png" style="width: 30px; height: 30px;"/>
+                                </p:link>
+                                <p:commandLink rendered="false" id="deleteButton" title="#{msg.Delete}"  actionListener="#{assetInfoController.deleteAsset(item)}" update="datalist">
+                                    <p:graphicImage name="icons/delete.png" style="width: 30px; height: 30px;"/>
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandLink>
+                            </h:panelGroup>
+                            <p:commandButton id="cancleWarranty" process="@this" title="取消保修提醒" actionListener="#{assetInfoController.cancleWarranty(item.id)}" update="datalist" rendered="#{!empty assetInfoController.filterWarrantyDate and item.warranty}" icon="ui-icon-notifications-off">
+                                <p:confirm header="取消保修提醒" message="确定取消该设备保修提醒？" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                        </p:column>
+                        <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.serialNum}" sortBy="#{item.serialNum}" filterBy="#{item.serialNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.serialNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.departNum}" sortBy="#{item.departNum}" filterBy="#{item.departNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.departNum}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
+                            <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()"  autoWidth="false" style="max-width: 150px;" height="200">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                        </p:column>
+                        <p:column headerText="#{msg.clinicalDeptName}" >
+                            <f:facet name="header">
+                                <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                <p:inputText id="clinicalDept"  value="#{assetInfoController.fileterOrg.name}"  readonly="true"/>
+                            </f:facet>
+                            <h:outputText value="#{item.clinicalDeptName}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.nationalStandardCode}"  visible="false" exportable="true">
+                            <h:outputText value="#{item.nationalStandardCode}"/>
+                        </p:column>
+
+                        <!--<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">-->
+                            <!--<h:outputText value="#{item.brand.name}"/>-->
+                        <!--</p:column>-->
+                        <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.manufacture}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.vendor}" sortBy="#{item.vendor}" filterBy="#{item.vendor}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.vendor}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ" rendered="#{!assetInfoController.isTerminate()}">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{assetInfoController.filterAssetStatus}" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.warrantyDate}" sortBy="#{item.warrantyDate}" filterBy="#{item.warrantyDate}" filterMatchMode="GTE">
+                            <f:facet name="filter">
+                                <p:inputText id="filterWarrantyDate" widgetVar="varFilterWarrantyDate" value="#{assetInfoController.warrantyFormatTime}"/>
+                            </f:facet>
+                            <h:outputText value="#{item.warrantyDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.financingNum}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.QRCode}" visible="true" exportable="true" width="150" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.qrCode}"/>
+                        </p:column>
+
+                        <p:column headerText="调剂设备名称" sortBy="#{item.sharedAssetTypeUid}">
+                            <h:outputText value="#{sharedAssetInfoController.getSwapName(item.sharedAssetTypeUid)}"/>
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoController.isTerminate() and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>-->
+                            <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
+                            <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  actionListener="#{assetInfoController.getViewPage('Create','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target=":AssetInfoListForm:exportTable" fileName="AssetInfo_export"/>
+                            </p:commandButton>
+<!--                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                <p:fileDownload value="#{assetInfoController.zipFile}" />
+                            </p:commandButton>-->
+
+                            <ui:fragment rendered="#{!assetInfoController.terminate}">
+                                <p:commandButton rendered="false" id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm">
+                                    <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                                <p:commandButton rendered="false" id="batchToTerminatedButton" icon="ui-icon-delete-forever" class="btn btn-sm btn-gray" title="批量报废" actionListener="#{assetInfoController.batchProcessToTerminated}" update=":AssetInfoListForm">
+                                    <p:confirm header="批量报废确认" message="您确定要报废选定的记录么?" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </ui:fragment>
+
+                        </f:facet>
+                    </p:dataTable>
+                    <div style="display:none">
+                        <p:dataTable  id="exportTable" value="#{assetInfoController.getExportList()}" var="item" lazy="true" paginator="false" rows="1">
+                            <p:column headerText="ID" visible="false" exportable="true">
+                                <h:outputText value="#{item.uid}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.preventiveMaintenanceAnalysis_deviceName}" visible="false" exportable="true">
+                                <h:outputText value="#{item.name}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.functionType}" visible="false" exportable="true">
+                                <h:outputText value="#{item.functionType}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.serialNum}" visible="false" exportable="true">
+                                <h:outputText value="#{item.serialNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.departNum}" visible="false" exportable="true">
+                                <h:outputText value="#{item.departNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetGroup}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.clinicalDeptName}" visible="false" exportable="true">
+                                <h:outputText value="#{item.clinicalDeptName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.nationalStandardCode}"  visible="false" exportable="true">
+                                <h:outputText value="#{item.nationalStandardCode}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.brand}" visible="false" exportable="true">
+                                <h:outputText value="#{item.brand.name}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.manufacture}" visible="false" exportable="true">
+                                <h:outputText value="#{item.manufacture}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.vendor}" visible="false" exportable="true">
+                                <h:outputText value="#{item.vendor}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.status}" visible="false" exportable="true" rendered="#{!assetInfoController.isTerminate()}">
+                                <h:outputText value="#{fieldMsg.fieldValue('assetStatus',item.status)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.warrantyDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.warrantyDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.aliasName}" visible="false" exportable="true">
+                                <h:outputText value="#{item.aliasName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerName}" visible="false" exportable="true">
+                                <h:outputText value="#{item.assetOwnerName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerTel}" visible="false" exportable="true">
+                                <h:outputText value="#{item.assetOwnerTel}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerName2}" visible="false" exportable="true">
+                                <h:outputText value="#{item.assetOwnerName2}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerTel2}" visible="false" exportable="true">
+                                <h:outputText value="#{item.assetOwnerTel2}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerName3}" visible="false" exportable="true">
+                                <h:outputText value="#{item.assetOwnerName3}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetOwnerTel3}" visible="false" exportable="true">
+                                <h:outputText value="#{item.assetOwnerTel3}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.clinicalOwnerName}" visible="false" exportable="true">
+                                <h:outputText value="#{item.clinicalOwnerName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.clinicalOwnerTel}" visible="false" exportable="true">
+                                <h:outputText value="#{item.clinicalOwnerTel}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetUsage}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('assetUsage', item.assetUsage)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.capitalSource}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.measureGrade}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.riskGrade}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('riskGrade', item.riskGrade)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.emergencyEquipment}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('emergencyEquipment', item.emergencyEquipment)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.importEquipment}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('importEquipment', item.importEquipment)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.measuringItemCategory}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('measuringItemCategory', item.measuringItemCategory)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.usageStatus}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('usageStatus', item.usageStatus)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.accountingCategory}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.hospitalId}" visible="false" exportable="true">
+                                <h:outputText value="#{assetInfoController.getSiteOrgName(item.siteUID)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.parentAsset}" visible="false" exportable="true">
+                                <h:outputText value="#{assetInfoController.getParentAssetNameByAssetId(item.id)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.systemId}" visible="false" exportable="true">
+                                <h:outputText value="#{item.systemId}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.functionGroup}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('assetFunctionType',item.functionGroup)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.assetCode68}"  visible="false" exportable="true">
+                                <h:outputText value="#{item.assetCode68}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.functionGrade}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('assetFunctionGrade',item.functionGrade)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.maitanance}" visible="false" exportable="true">
+                                <h:outputText value="#{item.maitanance}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.maitananceTel}" visible="false" exportable="true">
+                                <h:outputText value="#{item.maitananceTel}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.financingNum}" visible="false" exportable="true">
+                                <h:outputText value="#{item.financingNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.barcode}" visible="false" exportable="true">
+                                <h:outputText value="#{item.barcode}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.modalityId}" visible="false" exportable="true">
+                                <h:outputText value="#{item.modalityId}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.locationCode}" visible="false" exportable="true">
+                                <h:outputText value="#{item.locationCode}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.locationName}" visible="false" exportable="true">
+                                <h:outputText value="#{item.locationName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.registrationNo}" visible="false" exportable="true">
+                                <h:outputText value="#{item.registrationNo}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.deviceStatus}" visible="false" exportable="true">
+                                <h:outputText value=" #{fieldMsg.fieldValue('deviceStatus',item.deviceStatus)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.manufactDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.manufactDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.purchaseDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.purchaseDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.arriveDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.arriveDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.installDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.installDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.terminateDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.terminateDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.lastPmDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.lastPmDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.lastMeteringDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.lastMeteringDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.lastQaDate}" visible="false" exportable="true">
+                                <h:outputText value="#{item.lastQaDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="质保日期" visible="false" exportable="true">
+                                <h:outputText value="#{item.factoryWarrantyDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.purchasePrice}" visible="false" exportable="true">
+                                <h:outputText value="#{item.purchasePrice}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.salvageValue}" visible="false" exportable="true">
+                                <h:outputText value="#{item.salvageValue}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.lifecycle}" visible="false" exportable="true">
+                                <h:outputText value="#{item.lifecycle}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.depreciationMethod}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('depreciationMethodList',item.depreciationMethod)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.QRCode}" visible="false" exportable="true">
+                                <h:outputText value="#{item.qrCode}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.comments}"  visible="false" exportable="true">
+                                <h:outputText value="#{item.comments}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </div>
+
+                    <p:remoteCommand name="rc" update="datalist:editButton datalist:viewButton  " immediate="true"/>
+                    <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
+                </h:form>
+            </div>
+        </div>
+
+        <p:overlayPanel id="panelFilterforDate" widgetVar="panelFilterWarrantyDate" for=":AssetInfoListForm:datalist:filterWarrantyDate" dismissable="false">
+            <h:panelGrid columns="2">
+                <p:outputLabel value="#{msg.From}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateFrom" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+                <p:outputLabel value="#{msg.To}"/>
+                <p:calendar timeZone="GMT+8"  widgetVar="varWarrantyDateTo" value="#{assetInfoController.varWarrantyDateTo}" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true" mask="true" size="12" locale="zh"/>
+            </h:panelGrid>
+            <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+            <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
+        </p:overlayPanel>
+
+        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
+            <p:scrollPanel style="height:300px;border: 0" mode="native">
+                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
+                    <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg panelFilterforDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
+        </p:overlayPanel>
+
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+</ui:composition>

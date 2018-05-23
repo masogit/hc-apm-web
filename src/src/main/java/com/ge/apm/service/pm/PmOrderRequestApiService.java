@@ -23,10 +23,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  *
@@ -53,8 +50,15 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
     @Value("#{urlProperties.url_createPmOrdersByBatch}")
     private String url_createPmOrdersByBatch;
     
+    @Value("#{urlProperties.url_batchTakeOrder}")
+    private  String url_batchTakeOrder;
+
+
     @Value("#{urlProperties.url_autoGenerateFinancingNum}")
     private  String url_autoGenerateFinancingNum;
+
+
+
 
     public Map<String, Object> getApproveByAsset(String token, String assetUid) {
         HttpHeaders header = createHttpHeaders(token);
@@ -82,12 +86,23 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         }
     }
 
-
     public String invokePmOrderAction(String token, PmOrderActionForm formData, String actionName, String woId) {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<PmOrderActionForm>(formData, createHttpHeaders(token));
         String url = url_pmOrderAction.replace("{pmOrderId}", woId);
 
         ResponseEntity<LinkedHashMap> response = template.exchange(url,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
+        if (isOkay(response)) {
+            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
+            logger.info("Invoke PmOrderAction "+actionName+" has finished "+responseMap.get("data"));
+            return (String) responseMap.get("bizStatusCode");
+        } else {
+            return null;
+        }
+    }
+
+    public String invokePmOrderActionBatch(String token, ArrayList<PmOrderActionForm> formDataList, String actionName) {
+        HttpEntity<ArrayList<PmOrderActionForm>> requestEntity = new HttpEntity<ArrayList<PmOrderActionForm>>(formDataList, createHttpHeaders(token));
+        ResponseEntity<LinkedHashMap> response = template.exchange(url_batchTakeOrder,HttpMethod.PUT,requestEntity,LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             logger.info("Invoke PmOrderAction "+actionName+" has finished "+responseMap.get("data"));

@@ -1,0 +1,30 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui" template="/WEB-INF/template.xhtml" xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+	<ui:define name="content">
+
+
+		<div class="ui-g">
+			<div class="ui-g-12 card cardTitle">
+				<p:outputLabel class="pageTitle" value="盘点详情" />
+			</div>
+
+			<div class="ui-g-12 card ">
+				<p:tabView id="inventoryOrderDetailAssetInfoTab" activeIndex="0">
+					<p:ajax event="tabChange"/>
+					<p:tab title="未盘点" id="tab0">
+						<ui:include src="inventoryOrderDetailAssetInfo.xhtml" />
+					</p:tab>
+					<p:tab title="已盘点" id="tab1">
+						<ui:include src="inventoryOrderDetailAssetInfo2.xhtml" />
+					</p:tab>
+					<p:tab title="无台账" id="tab2">
+						<ui:include src="inventoryOrderDetailAssetInfo3.xhtml" />
+					</p:tab>
+					<p:tab title="有问题" id="tab3">
+						<ui:include src="inventoryOrderDetailAssetInfoIssue.xhtml" />
+					</p:tab>
+				</p:tabView>
+			</div>
+		</div>
+	</ui:define>
+</ui:composition>

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+	<p:dialog id="smallAssetPerformanceEditDlg" widgetVar="smallAssetPerformanceEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)"
+		header="设备绩效报表">
+		<h:form id="smallAssetPerformanceEditForm">
+			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{smallAssetPerformanceController.selected != null}">
+				<h:panelGroup>
+					<label class="label">科室</label>
+					<p:inputText value="#{smallAssetPerformanceController.selected.department}" required="true" requiredMessage="科室名称不能为空" />
+
+					<label class="label">费别</label>
+					<p:inputText value="#{smallAssetPerformanceController.selected.costType}" required="true" requiredMessage="费别不能为空" />
+
+					<label class="label">编码</label>
+					<p:inputText value="#{smallAssetPerformanceController.selected.code}" required="true" requiredMessage="编码不能为空" />
+
+					<label class="label">项目名称</label>
+					<p:inputText value="#{smallAssetPerformanceController.selected.projectName}" required="true" requiredMessage="项目名称不能为空" />
+
+					<label class="label">项目编号</label>
+					<p:inputText value="#{smallAssetPerformanceController.selected.projectNumber}" />
+
+					<label class="label">一类标准</label>
+					<p:inputNumber value="#{smallAssetPerformanceController.selected.standard}" />
+
+					<label class="label">数量</label>
+					<p:inputNumber value="#{smallAssetPerformanceController.selected.quantity}" required="true" requiredMessage="数量不能为空" />
+
+					<label class="label">金额</label>
+					<p:inputNumber value="#{smallAssetPerformanceController.selected.amount}" required="true" requiredMessage="金额不能为空" />
+
+					<label class="label">日期</label>
+					<p:calendar id="button" value="#{smallAssetPerformanceController.selected.happenDate}" showOn="button" required="true" requiredMessage="日期不能为空" />
+				</h:panelGroup>
+
+			</p:panelGrid>
+			<br />
+			<p:commandButton validateClient="true" value="#{msg.Save}" actionListener="#{smallAssetPerformanceController.save}"
+				update=":smallAssetPerformanceTab:smallAssetPerformanceEditDlg, :smallAssetPerformanceTab:smallAssetPerformanceListForm:datalist, :growl"
+				icon="ui-icon-check" oncomplete="handleSubmit(args, 'smallAssetPerformanceEditDialog');" />
+
+			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('smallAssetPerformanceEditDialog').hide()" />
+		</h:form>
+	</p:dialog>
+
+</ui:composition>
+
+</html>

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+     <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+               
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="调剂设备配置"/>
+                </div>
+                <div class="ui-g-12 card">
+            <h:form id="SwapTypeListForm">
+                <p:dataTable id="datalist" value="#{sharedAssetTypeController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{sharedAssetTypeController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="ascending" sortBy="#{item.unitPrice}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                    rows="20" emptyMessage="#{msg.noRecordFound}" 
+                    rowsPerPageTemplate="20,40,60,90">
+                   
+<!--                    <p:ajax event="rowSelect" update="createButton editButton deleteButton" 
+                            listener="#{sharedAssetTypeController.onSelectSwapType}" 
+                            oncomplete="openSwapTypeViewWindow(xhr, status, args)" />-->
+                           
+                    <p:ajax event="rowSelect" listener="#{sharedAssetTypeController.onChanged}"  update="createButton editButton deleteButton"/>
+                    <p:ajax event="filter" listener="#{sharedAssetTypeController.onFilter}" update="createButton editButton deleteButton"/>
+
+                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" filterBy="#{item.swapName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.swapName}"/>
+                    </p:column>
+                    <p:column headerText="单价" sortBy="#{item.unitPrice}">
+                        <f:facet name="filter">
+                            <p:inputText id="filterUnitPrice" widgetVar="varFilterUnitPrice" value="#{sharedAssetTypeController.filterUnitPrice}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.unitPrice}"/>
+                    </p:column>
+                    <p:column headerText="计价方式" sortBy="#{item.chargingType}" filterBy="#{item.chargingType}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('chargingType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
+                    </p:column>
+                    <p:column headerText="创建人" sortBy="#{item.createBy}" filterBy="#{item.createBy}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.createBy}"/>
+                    </p:column>
+                    <p:column headerText="创建时间" sortBy="#{item.createDate}" filterBy="#{item.createDate}" filterMatchMode="LIKE">
+                        <f:facet name="filter">
+                            <p:inputText id="filterCreateDate" widgetVar="varFilterCreateDate" value="#{sharedAssetTypeController.createDateFormatTime}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.createDate}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+   
+                       <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="SwapType_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.getViewPageA('Edit','Edit')}" action="#{urlEncryptController.encodeUrlParam(sharedAssetTypeController.operation)}"  disabled="#{empty sharedAssetTypeController.selected}"/>
+                         
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetTypeController.delete}" update="datalist" disabled="#{empty sharedAssetTypeController.selected}">
+                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                            </p:commandButton>
+                       
+                       </f:facet>
+                </p:dataTable>
+
+                <p:overlayPanel id="panelForFilterDate" widgetVar="panelFilterCreateDate" for=":SwapTypeListForm:datalist:filterCreateDate" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="cal1" />
+                        <p:calendar id="cal1" widgetVar="varCreateDateFrom" effect="fold"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                        <p:outputLabel for="cal2"/>
+                        <p:calendar id="cal2" widgetVar="varCreateDateTo" effect="fold"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="PF('panelFilterCreateDate').hide();setDateFilter('varDataList', 'varFilterCreateDate', 'varCreateDateFrom', 'varCreateDateTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterCreateDate').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+
+                <p:overlayPanel id="panelForFilterPrice" widgetVar="panelFilterUnitPrice" for=":SwapTypeListForm:datalist:filterUnitPrice" showCloseIcon="true" dismissable="false">
+                    <h:panelGrid columns="3">
+                        <p:inputNumber placeholder="最小值" value="#{sharedAssetTypeController.filterUnitPriceFrom}" decimalPlaces="0" minValue="0">
+                            <p:ajax update=":SwapTypeListForm:datalist ,panelForFilterPrice ,panelForFilterDate"/>
+                        </p:inputNumber>
+                        --
+                        <p:inputNumber placeholder="最大值" value="#{sharedAssetTypeController.filterUnitPriceTo}" decimalPlaces="0" minValue="0">
+                            <p:ajax update=":SwapTypeListForm:datalist ,panelForFilterPrice ,panelForFilterDate"/>
+                        </p:inputNumber>
+                    </h:panelGrid>
+                </p:overlayPanel>
+            </h:form>
+            </div>
+            </div>
+        </div>
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+
+            function openSwapTypeViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+
+</ui:composition>
+    </html>

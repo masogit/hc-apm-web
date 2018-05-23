@@ -23,6 +23,21 @@
         </px-rangepicker>
       </div>
       <template is="dom-if" if="[[isHead]]">
+        <div class="u-mh+ u-mb flex--item flex flex--row flex--middle" style="padding-left:1em;">
+            <label class="flex--item" for="device-filter">院区</label>
+            <px-dropdown
+              id="dept-filter"
+              class="flex--item u-mh+"
+              display-value="{{hospitalName}}"
+              selected-key="{{hospital}}">
+              <px-dropdown-content
+                class="px-dropdown-content"
+                max-cont-character-width="5"
+                extend-dropdown="true"
+                items="[[hospitalOpts]]">
+              </px-dropdown-content>
+            </px-dropdown>
+          </div>
         <div class="u-mh+ u-mb flex--item flex flex--row flex--middle">
           <label class="flex--item" for="device-filter">科室</label>
           <px-dropdown
@@ -32,10 +47,9 @@
             selected-key="{{dept}}">
             <px-dropdown-content
               class="px-dropdown-content"
-              max-cont-character-width="10"
+              max-cont-character-width="5"
               extend-dropdown="true"
-              extend-dropdown-by="15"
-              items="[[deptOpts]]">
+              items="{{deptOpts}}">
             </px-dropdown-content>
           </px-dropdown>
         </div>
@@ -87,7 +101,11 @@
           type: {
             type: String,
             notify: true
-          },          
+          },
+          hospital: {
+            type: String,
+            notify: true,
+          },
           user: Object,
           // private properties
           isHead: {
@@ -95,9 +113,17 @@
             computed: '_chargeIsHead(user)'
           },
           typeOpts: Array,
-          deptOpts: Array,         
-          deptName: String,
+          deptOpts: {
+            type: Array,
+            notify: true,
+          },
+          hospitalOpts: Array,
+          deptName: {
+            type: String,
+            notify: true,
+          },
           typeName: String,
+          hospitalName: String,
           _queryUrl: {
             type: String,
             computed: '_getQueryUrl()'
@@ -114,7 +140,9 @@
         },
         observers: [
           'saveOptsInURI("type", type)',
-          'saveOptsInURI("dept", dept)'
+          'saveOptsInURI("dept", dept)',
+          'saveOptsInURI("hospital", hospital)',
+          'reloadDepts(hospital)',
         ],
         behaviors: [
           ContextBehavior,
@@ -131,6 +159,7 @@
           }
           if (queries.dept) this.dept = queries.dept;
           if (queries.type) this.type = queries.type;
+          if (queries.hospital) this.hospital = queries.hospital;
         },
         ready: function() {
           var _this = this;
@@ -138,10 +167,10 @@
           var defaultVal = { key: 0, val: '全部'};
           // setup data from location hash
           var queries = this.restoreOptsFromURI();
-
+          this.hospital = String(document.querySelector('#user-context #hospitalId').value)
           this.setDefaultProps(queries);
 
-          this.fetchPage(this.resolveApiUrl('/api/org/all'))
+          this.fetchPage(this.resolveApiUrl('/api/org/dept?orgId=' + this.hospital))
           .then(function(response) {
             var list = Array.isArray(response.orgInfos)
               ? response.orgInfos.map(function(n, index) {
@@ -151,7 +180,7 @@
                 }
               })
               : [];
-            
+
             list = [defaultVal].concat(list);
             _this.deptOpts = list;
             if (!_this.dept) {
@@ -159,7 +188,25 @@
               _this.deptName = defaultVal.val;
             } else {
               _this.deptName = _this.getName(_this.dept, list);
-            }              
+            }
+          });
+          this.fetchPage(this.resolveApiUrl('/api/org/allOrg'))
+          .then(function(response) {
+            var list = Array.isArray(response)
+              ? response.map(function(n, index) {
+                return {
+                  key: n.id,
+                  val: n.name,
+                }
+              })
+              : [];
+            _this.hospitalOpts = list;
+            if (!_this.hospital) {
+              _this.hospital = defaultVal.key;
+              _this.hospitalName = defaultVal.val;
+            } else {
+              _this.hospitalName = _this.getName(_this.hospital, list);
+            }
           });
 
           this.fetchPage(this._getQueryUrl()).then(function(res) {
@@ -191,11 +238,29 @@
           return options;
         },
         saveOptsInURI: function(name, val) {
-          if (!val) return;
+          if (val === undefined || val === 0) return;
+          console.log(val);
           var options = URI().query(URI().fragment()).query(true);
           options[name] = val;
           location.hash = '#' + URI().query(options).query();
-        }
+        },
+        reloadDepts: function(hospital) {
+          let _this = this
+          this.fetchPage(this.resolveApiUrl('/api/org/dept?orgId=' + hospital))
+          .then(function(response) {
+            var list = Array.isArray(response.orgInfos)
+              ? response.orgInfos.map(function(n, index) {
+                return {
+                  key: n.id,
+                  val: n.name
+                }
+              })
+              : [];
+            _this.set('deptOpts', list);
+            _this.set('deptName', '全部');
+            _this.set('dept', 0);
+          });
+        },
       });
     });
   </script>

@@ -66,7 +66,8 @@
                                  rowsPerPageTemplate="20,40,90,200">
 
                         <p:ajax  event="rowSelect" listener="#{assetInfoController.onSelectAsset}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)" update="createButton editButton viewButton deleteButton "/>
-                        <p:ajax event="filter" listener="#{assetInfoController.onFilter}"/>
+                        <p:ajax event="filter" listener="#{assetInfoController.onFilter}" oncomplete="rc2();"/>
+                        <p:ajax event="page" oncomplete="rc2();" />
 
                         <p:column width="36">
                             <p:selectBooleanCheckbox value="#{assetInfoController.selectedMap[item.uid]}"  class="selectCheckBox">
@@ -126,9 +127,9 @@
                             <h:outputText value="#{item.nationalStandardCode}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.brand.name}"/>
-                        </p:column>
+                        <!--<p:column headerText="#{msg.brand}" sortBy="#{item.brand.name}" filterBy="#{item.brand.name}" filterMatchMode="LIKE">-->
+                            <!--<h:outputText value="#{item.brand.name}"/>-->
+                        <!--</p:column>-->
                         <p:column headerText="#{msg.manufacture}" sortBy="#{item.manufacture}" filterBy="#{item.manufacture}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.manufacture}"/>
                         </p:column>
@@ -171,15 +172,17 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{assetInfoController.prepareCreate}" action="#{urlEncryptController.encodeUrlParam('Create.xhtml?actionName=Create')}" rendered="#{!assetInfoController.isTerminate() and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
                             <p:commandButton rendered="false" id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{assetInfoController.getDetailPage()}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
                             <p:commandButton rendered="false" id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}"  actionListener="#{assetInfoController.getViewPage('Create','Edit')}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"  disabled="#{empty assetInfoController.selected}" />
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                <p:dataExporter type="xls" target=":AssetInfoListForm:exportTable" fileName="AssetInfo_export"/>
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" actionListener="#{assetInfoController.exportExcel}" update=":growl"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                <p:fileDownload value="#{assetInfoController.excelFile}" />
                             </p:commandButton>
-                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
+                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" oncomplete="PF('exportQrCodeDialog').show()" rendered="#{userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}"/>
+<!--                            <p:commandButton id="exportButton" icon="ui-icon-arrow-1-s" title="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
                                              onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
                                 <p:fileDownload value="#{assetInfoController.zipFile}" />
-                            </p:commandButton>
+                            </p:commandButton>-->
 
-                            <ui:fragment rendered="#{!assetInfoController.terminate}">
+                            <ui:fragment rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('HospitalHead,AssetHead,AssetStaff')}">
                                 <p:commandButton id="batchToBeTerminatedButton" icon="ui-icon-delete" class="btn btn-sm btn-gray batch-terminated" title="批量待报废" actionListener="#{assetInfoController.batchProcessToBeTerminated}" update=":AssetInfoListForm" disabled="#{not assetInfoController.isChecked()}">
                                     <p:confirm header="批量待报废确认" message="您确定要待报废选定的记录么?" icon="ui-icon-warning"/>
                                 </p:commandButton>
@@ -265,6 +268,9 @@
                             </p:column>
                             <p:column headerText="#{msg.capitalSource}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('capitalSource', item.capitalSource)}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.capitalSource2}" visible="false" exportable="true">
+                                <h:outputText value="#{fieldMsg.fieldValue('capitalSource2', item.capitalSource2)}"/>
                             </p:column>
                             <p:column headerText="#{msg.measureGrade}" visible="false" exportable="true">
                                 <h:outputText value="#{fieldMsg.fieldValue('measureGrade', item.measureGrade)}"/>
@@ -399,7 +405,7 @@
                     </div>
 
                     <p:remoteCommand name="rc" update=":AssetInfoListForm:datalist datalist:createButton datalist:editButton datalist:viewButton datalist:deleteButton " immediate="true"/>
-                    <p:remoteCommand name="rc2" update=":AssetInfoListForm:datalist"/>
+                    <p:remoteCommand name="rc2" update="@(.selectCheckBoxHeader)"/>
                 </h:form>
             </div>
         </div>
@@ -414,19 +420,41 @@
             <p:commandButton onclick="setDateFilter('varDataList', 'varFilterWarrantyDate', 'varWarrantyDateFrom', 'varWarrantyDateTo'); PF('panelFilterWarrantyDate').hide();" title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
             <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
-        
+
         <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;">
             <p:scrollPanel style="height:300px;border: 0" mode="native">
                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoController.selectSite==null? '':assetInfoController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
                     <p:ajax process="@this" event="select"  listener="#{assetInfoController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg :idPanelFilterWarrantyDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
-                <p:ajax process="@this" event="expand"/>
-                <p:ajax process="@this" event="collapse"/>
-                <p:treeNode type="org">
-                    <h:outputText value="#{node.name}"/>
-                </p:treeNode>
-            </p:tree>
-        </p:scrollPanel>
+                    <p:ajax process="@this" event="expand"/>
+                    <p:ajax process="@this" event="collapse"/>
+                    <p:treeNode type="org">
+                        <h:outputText value="#{node.name}"/>
+                    </p:treeNode>
+                </p:tree>
+            </p:scrollPanel>
         </p:overlayPanel>
+        <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="导出二维码">
+            <h:form id="exportQrCodeForm" >
+                <h:panelGroup id="display" >
+                    <label class="label">选择导出模版</label>
+                    <p:selectOneMenu  value="#{assetInfoController.exportQrCodeTemplateId}">
+                        <p:ajax update="preview" />
+                        <f:selectItem itemLabel="默认使用中模版" itemValue="#{null}" noSelectionOption="true" />
+                        <f:selectItems value="#{assetInfoController.getQrCodeTemplates()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                    </p:selectOneMenu>
+                    <h:panelGrid columns="1" style="width:100%" id="preview">
+                        <h:panelGroup rendered="#{not empty assetInfoController.exportQrCodeTemplateId}">
+                        <img src="#{qrCodeShowController.getQrCodeImageWithTemplate('8888888888888888',assetInfoController.exportQrCodeTemplateId,'')}" />
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </h:panelGroup>
+                <p:commandButton id="exportButton" value="#{msg.exportQrCode}" actionListener="#{assetInfoController.exportQrCode}" update=":growl" 
+                                             onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">
+                                <p:fileDownload value="#{assetInfoController.zipFile}" />
+                </p:commandButton>
+                <p:commandButton  immediate="true" value="#{msg.Close}" icon="ui-icon-cancel" onclick="PF('exportQrCodeDialog').hide()" />
+            </h:form>
+        </p:dialog>
 
         <script>
             window.onload = function () {
@@ -435,6 +463,10 @@
                         e.preventDefault();
                     }
                 });
+                var isActive = "#{userContextService.isActive()}";
+                if(isActive == '1'){
+                    PF('ActiveDlg').show();
+                }
             }
             var newWin;
             function prepareAssetViewWindow() {
@@ -444,6 +476,8 @@
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
             }
+
+
         </script>
     </ui:define>
 </ui:composition>

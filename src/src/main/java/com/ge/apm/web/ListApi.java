@@ -47,6 +47,7 @@ public class ListApi {
                                                      @RequestParam(value = "from", required = true) Date from,
                                                      @RequestParam(value = "to", required = true) Date to,
                                                      @Pattern(regexp = "rating|exam|usage|rate|fix") @RequestParam(value = "orderby", required = false, defaultValue = "rating") String orderby,
+                                                     @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                      @Min(0) @RequestParam(value = "dept", required = false) Integer dept,
                                                      @Min(0) @RequestParam(value = "type", required = false) Integer type,
                                                      @Min(1) @RequestParam(value = "limit", required = false ) Integer limit,
@@ -54,7 +55,10 @@ public class ListApi {
 
     UserAccount user = UserContext.getCurrentLoginUser();
     int site_id = user.getSiteId();
-    int hospital_id = user.getHospitalId();
+    Integer hospital_id = user.getHospitalId();
+    if(hospital != null){
+      hospital_id = hospital;
+    }
     if (Option.of(limit).isEmpty()) limit = Integer.MAX_VALUE;
 
     if (Option.of(from).isDefined() && Option.of(to).isDefined())

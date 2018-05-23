@@ -12,16 +12,24 @@ import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 /**
  *
- * @author 212579464
+ * @author 212579464Un
  */
 public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDefinition>{
     
-//    @Query("select o from TableDefinition o where o.baseId = ?1 and versionNum=(select max(versionNum) from TableDefinition o2 where o2.baseId=?1)")
-//    public TableDefinition getLatestTemplateByBaseId(String baseId);
     
     @Query("select o from TableDefinition o where o.siteUID in ?1 and o.status='Released'")
     public List<TableDefinition> getBySiteUIDIn(Collection<String> orgUids);
 
     @Query("select o from TableDefinition o where o.tenantUID = ?1 and o.status='Released'")
 	public List<TableDefinition> findByTenantUID(String tenantUID);
+
+        @Query("select o from TableDefinition o where o.baseId = ?1 and o.status='Released'")
+        public TableDefinition findByBaseId(String baseId);
+    public TableDefinition findById(String ID);
+
+    public List<TableDefinition> getByBaseId(String baseId);
+
+	@Query(value = "select td.* from table_definition td where td.status='Released' and td.base_id in (\n" +
+			"\tselect performance_report from pm_order_rule where uid=?1 union select safety_report from pm_order_rule where uid=?1)",nativeQuery = true)
+	public List<TableDefinition> findTableName(String pmOrderRuleId);
 }

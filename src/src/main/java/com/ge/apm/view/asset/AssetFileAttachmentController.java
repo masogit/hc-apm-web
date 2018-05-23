@@ -234,13 +234,13 @@ public class AssetFileAttachmentController extends GenericCRUDUUIDController<V2_
         if(selectedOrg != null && selectedOrg.getOrgLevel() != null){
             if(selectedOrg.getOrgLevel() == 1){
                 queryAsset.setInstitutionUID(selectedOrg.getInstitutionUID());
-                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getInstitutionUID(), 4);
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getInstitutionUID(), 4);
             }else if(selectedOrg.getOrgLevel() == 2){
                 queryAsset.setHospitalUID(selectedOrg.getHospitalUID());
-                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getHospitalUID(), 4);
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getHospitalUID(), 4);
             }else if(selectedOrg.getOrgLevel() == 3){
                 queryAsset.setSiteUID(selectedOrg.getSiteUID());
-                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgType(selectedOrg.getSiteUID(), 4);
+                clinicalDeptList = orgInfoDao.findByParentUIDAndOrgTypeOrderByNameAsc(selectedOrg.getSiteUID(), 4);
             }
         }
 

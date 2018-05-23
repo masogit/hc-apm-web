@@ -22,10 +22,11 @@ import com.ge.apm.service.uaa.UaaService;
 import com.google.common.base.Strings;
 import java.util.stream.Collectors;
 import org.primefaces.event.NodeSelectEvent;
+import webapp.framework.web.mvc.GenericCRUDController;
 
 @ManagedBean
 @ViewScoped
-public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
+public class QrCodeLibCreateController extends GenericCRUDController<QrCodeLib> {
 
     private static final long serialVersionUID = -1;
     QrCodeLibRepository dao = null;
@@ -40,7 +41,7 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
 
     private OrgInfo fileterDeptOrg;
     private OrgInfo fileterSiteOrg;
-
+    
     @Override
     protected void init() {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
@@ -110,6 +111,13 @@ public class QrCodeLibCreateController extends JpaCRUDController<QrCodeLib> {
         return dao.find();
     }
 
+    
+    public void showMsg(){
+        String pageMsg = WebUtil.getGrowlMsg();
+        if(!Strings.isNullOrEmpty(pageMsg)){
+            WebUtil.addErrorMessage(pageMsg);
+        }
+    }
 //    public List<TenantInfo> getSiteList() {
 //
 //        List<TenantInfo> res = new ArrayList();

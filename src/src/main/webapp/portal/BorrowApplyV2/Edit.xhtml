@@ -1,0 +1,129 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <h:outputStylesheet name="css/inspection.css"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="借用申请"/>
+            </div>
+            <div class="ui-g-12 card">
+            <h:form id="SharedAssetRequestBorrowEditForm">
+                   
+                <p:fieldset legend="借用申请信息" style="margin-bottom:30px">      
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selected != null}">
+                        
+                        <h:panelGroup>
+                            <label class='label'>申请人</label>
+                            <!--<p:inputText id="applicant" value="#{sharedAssetRequestV2Controller.selected.applicant}" readonly="true"/>-->
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class='label'>科室名称</label>
+                            <p:selectOneMenu id="clinicalDeptUid" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptUid}" required="true" requiredMessage="#科室 #{msg.ValidationRequire}">        
+<!--                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+                                <f:selectItems value="#{assetInfoService.getClinicalDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
+<!--                                <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>-->
+                            </p:selectOneMenu>
+                            
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class='label'>虚拟网电话</label>
+                            <p:inputText id="applicantPhone" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class='label'>申请日期</label>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.selected.applyTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                            <!--<p:calendar id="applyTime"  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selected.applyTime}" mindate="#{sharedAssetRequestV2Controller.selected.applyTime}"-->
+                                        <!--maxdate="#{sharedAssetRequestV2Controller.selected.applyTime}" timeOnly="true" readonlyInput="true" showButtonPanel="false"/>-->
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class='label'>备注</label>
+                            <p:inputTextarea id="remark" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selected.remark}" />
+                        </h:panelGroup>
+                        
+                    </p:panelGrid>
+                </p:fieldset>
+                
+                <p:fieldset legend="借用申请明细信息" style="margin-bottom:20px">
+                    <p:dataTable id="datalistDetail" value="#{sharedAssetRequestV2Controller.selected.sartList}" 
+                                 var="item" widgetVar="varDataListDetail" 
+                        selectionMode="single" selection="#{sharedAssetRequestV2Controller.selectedSart}"
+                        paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                        lazy="true" rowKey="#{item.swapName.hashCode()}" 
+                        sortMode="single" sortOrder="descending" sortBy="#{item.swapName.hashCode()}"
+                        paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                        rows="20" emptyMessage="#{msg.noRecordFound}"
+                        rowsPerPageTemplate="20,40,60,90">
+                
+                    <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                    <!--<p:ajax event="filter" listener="#{sharedAssetReqTypeController.onFilter}" update="createButton editButton deleteButton"/>-->
+
+                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" >
+                        <h:outputText value="#{item.swapName}"/>
+                    </p:column>
+                    <p:column headerText="申请数" sortBy="#{item.applyQty}" >
+                        <h:outputText value="#{item.applyQty}"/>
+                    </p:column>
+<!--                    <p:column headerText="借用数" sortBy="#{item.actualQty}" filterBy="#{item.actualQty}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.actualQty}"/>
+                    </p:column>-->
+                    <p:column headerText="备注" sortBy="#{item.remark}" >
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+                    
+                    <f:facet name="{Toolbar}">
+                       <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalistDetail" fileName="SharedAssetReqType_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{sharedAssetRequestV2Controller.prepareCreateSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" />
+                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.prepareEditSart}" update=":SharedAssetReqTypeEditDlg, datalistDetail" oncomplete="PF('SharedAssetReqTypeEditDialog').show()" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" />
+                        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close"  class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestV2Controller.deleteSart}" update="datalistDetail" disabled="#{empty sharedAssetRequestV2Controller.selectedSart}" >
+                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+                </p:fieldset>
+
+                <h:panelGroup id="display">
+                    <br/>
+                   
+                    <!--<p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.save}" value="#{msg.Save}"  style="float:left"  icon="ui-icon-check" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 0 }"/>-->
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.submmit0}"  oncomplete="openSwapTypeViewWindow(xhr, status, args)" 
+                                     update="datalistDetail ,display" value="提交"  style="float:left"  icon="ui-icon-check" />
+<!--                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.refers}" action="List?faces-redirect=true" value="取消借用" icon="ui-icon-cancel" rendered="#{sharedAssetRequestV2Controller.selected.state  eq 1 or sharedAssetRequestV2Controller.selected.state  eq 2}"/>-->
+                    <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true" icon="ui-icon-arrow-back"/>
+                    <script>
+                        function openSwapTypeViewWindow(xhr, status, args) {
+                            var url = args.url;
+                            if (url == "norespond") {
+
+                            } else {
+                                this.location.href = url;
+                            }
+                        }
+
+                    </script>
+                </h:panelGroup>
+            </h:form>
+                <ui:include src="Detail_Edit.xhtml"/>
+                <!--<ui:include src="/portal/asset/selectAssetDialog.xhtml"/>-->
+         </div>  
+        </div> 
+
+    </ui:define>  
+</ui:composition>
+

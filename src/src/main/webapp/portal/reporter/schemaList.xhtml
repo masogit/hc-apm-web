@@ -50,6 +50,7 @@
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="createTable.xhtml?faces-redirect=true" />
+                            <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  oncomplete="PF('createDialog').show()"/>-->
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{tableDefinitionController.getEditUrl()}"  disabled="#{empty tableDefinitionController.selected}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{tableDefinitionController.deleteTemplate}" update="datalist, :growl" >
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
@@ -63,5 +64,19 @@
                 </h:form>
             </div>
         </div>
+        <p:dialog id="createDialog" widgetVar="createDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="选择类型">
+            <h:form id="createForm" >
+                <h:panelGroup id="display" >
+                    <!--action="createTable.xhtml?faces-redirect=true"-->
+                    <label class="label">类型</label>
+                                <p:selectOneRadio id="type" value="#{tableDefinitionController.createType}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="JSON模版" itemValue="JSON"/>
+                                    <f:selectItem itemLabel="Excel模版" itemValue="Excel"/>
+                                </p:selectOneRadio>
+                </h:panelGroup>
+                <p:commandButton  value="确定" action="#{tableDefinitionController.getCreateUrl()}"/>
+                <p:commandButton  immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('createDialog').hide()" />
+            </h:form>
+        </p:dialog>
     </ui:define>
 </ui:composition>

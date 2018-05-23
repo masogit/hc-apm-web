@@ -10,7 +10,7 @@ const Handle = Slider.Handle
 const handleWrapper = (max, unit, showTooltip) => (
    function handle(props) {
     let { value, index, dragging, ...restProps } = props //eslint-disable-line
-    value = HumanizeDurationLabel(max - value, unit)
+    value = HumanizeDurationLabel(max - value, [unit])
     return (
       <Tooltip
         prefixCls="rc-slider-tooltip"

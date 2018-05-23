@@ -167,6 +167,18 @@ public class UserContextService implements Serializable {
     		return false;
     }
 
+    WorkflowConfigRepository wfCfigDao = WebUtil.getBean(WorkflowConfigRepository.class);
+
+    public boolean isHospitalUser(){
+        UserAccount loginUser = getLoginUser();
+        if (loginUser.getSiteUID().equals(loginUser.getHospitalUID())){
+            //判断医院级别是否有调剂中心
+            List<WorkflowConfig> list = wfCfigDao.findHospitalLevel(loginUser.getHospitalUID());
+            if (list.size() == 0) return false;
+        }
+        return true;
+    }
+
     public int getLoginUserId() {
         return Option.of(getLoginUser()).map(UserAccount::getId).getOrElse(-1);
     }
@@ -288,10 +300,20 @@ public class UserContextService implements Serializable {
     }
 
     private Boolean isDispatcher = null;
+    private Boolean isPmDispatcher = null;
 
     private Boolean isAssetApprover = null;
     
     private Boolean needAssetApproval = null;
+    
+    private Boolean needInstorageCheck = null;
+
+    public Boolean needInstorageCheck(){
+        if (needInstorageCheck == null) {
+            getUserPrivilege();
+        }
+        return needInstorageCheck;
+    }
     
     public Boolean needAssetApproval(){
         if (needAssetApproval == null) {
@@ -307,6 +329,15 @@ public class UserContextService implements Serializable {
         return isDispatcher;
     }
 
+
+    public Boolean isPmDispatcher(){
+        if (isPmDispatcher == null) {
+            getUserPrivilege();
+        }
+        return isPmDispatcher;
+
+    }
+
     public Boolean isAssetApprover() {
         if (isAssetApprover == null) {
             getUserPrivilege();
@@ -315,6 +346,21 @@ public class UserContextService implements Serializable {
     }
 
     private void getUserPrivilege() {
+        List<WorkflowConfig> wcList = getSiteConfigurations();
+        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item. getDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+
+        isPmDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getPmDispatchUserId()).orElse(0).equals(userAccount.getId())
+                || Optional.ofNullable(item.getPmDispatchUserId2()).orElse(0).equals(userAccount.getId()));
+
+        isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
+        
+        needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
+        
+        needInstorageCheck = wcList.stream().anyMatch(item -> null!=item.getNeedInstorageCheck() && item.getNeedInstorageCheck());
+    }
+    
+    private List<WorkflowConfig> getSiteConfigurations(){
         UaaService uuaService = WebUtil.getBean(UaaService.class);
         List<String> orgList = uuaService.getUserAccessibleSiteList(userAccount.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
         orgList.add(userAccount.getTenantUID());
@@ -322,12 +368,30 @@ public class UserContextService implements Serializable {
         orgList.add(userAccount.getHospitalUID());
         orgList.add(userAccount.getSiteUID());
         WorkflowConfigRepository wcDao = WebUtil.getBean(WorkflowConfigRepository.class);
-        List<WorkflowConfig> wcList = wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
-        isDispatcher = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getDispatchUserId()).orElse(0).equals(userAccount.getId())
-                || Optional.ofNullable(item.getDispatchUserId2()).orElse(0).equals(userAccount.getId()));
-        isAssetApprover = wcList.stream().anyMatch(item -> Optional.ofNullable(item.getAssetApprover()).orElse("").equals(userAccount.getUid()));
-        
-        needAssetApproval = wcList.stream().anyMatch(item -> !Strings.isNullOrEmpty(item.getAssetApprover()));
+        return wcDao.getBySiteUIDList(orgList.stream().distinct().collect(Collectors.toList()));
+    }
+
+    public String isActive(){
+        UserAccount currentUser = getLoginUser();
+        if(!currentUser.getIsActive() && currentUser.getId() != 0){
+            return "1";//need active
+        }else {
+            return "0";
+        }
+    }
+
+    public static boolean isOnlyLocalITAdmin() {
+
+        if(UserContext.getRoles().contains("LocalITAdmin")){
+            if(UserContext.getRoles().contains("ITAdmin") || isSuperAdmin()){
+                return false;
+            }else{
+                return true;
+            }
+        }else{
+            return false;
+        }
+
     }
 
 }

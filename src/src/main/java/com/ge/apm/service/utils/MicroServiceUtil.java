@@ -30,7 +30,7 @@ import org.springframework.util.MultiValueMap;
  * @author 212579464
  */
 @Component
-public class MicroServiceUtil extends MicroServiceInvoker{
+public class MicroServiceUtil extends MicroServiceInvoker {
 
     @Value("#{urlProperties.url_getAuthenticateByOpenId}")
     private String url_getAuthenticateByOpenId;
@@ -67,8 +67,13 @@ public class MicroServiceUtil extends MicroServiceInvoker{
         headers.add("Authorization", token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(headers);
 
-        ResponseEntity<LinkedHashMap> response = template.exchange(url_deleteFile.concat("/").concat(objectId), HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
-        return isOkay(response);
+        try {
+            ResponseEntity<LinkedHashMap> response = template.exchange(url_deleteFile.concat("/").concat(objectId), HttpMethod.DELETE, requestEntity, LinkedHashMap.class);
+            return isOkay(response);
+        } catch (Throwable e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 
     public Map<String, Object> uploadSingleFile(String token, File file) {
@@ -81,7 +86,7 @@ public class MicroServiceUtil extends MicroServiceInvoker{
         body.add("file", resource);
 
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(body, headers);
-        ResponseEntity<LinkedHashMap> response =  template.postForEntity(url_uploadSingleFile, requestEntity, LinkedHashMap.class);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_uploadSingleFile, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
@@ -101,7 +106,7 @@ public class MicroServiceUtil extends MicroServiceInvoker{
         postParameters.put("urlFile", url);
         postParameters.put("fileName", fileName);
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(postParameters, headers);
-        ResponseEntity<LinkedHashMap> response =  template.postForEntity(url_uploadSingleFileByUrl, requestEntity, LinkedHashMap.class);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_uploadSingleFileByUrl, requestEntity, LinkedHashMap.class);
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             LinkedHashMap<String, Object> data = (LinkedHashMap<String, Object>) responseMap.get("data");
@@ -109,8 +114,6 @@ public class MicroServiceUtil extends MicroServiceInvoker{
         }
         return null;
     }
-
-    
 
     public String getAuthenticateByOpenId(String code, String weChatId) {
         HttpHeaders headers = new HttpHeaders();
@@ -122,7 +125,7 @@ public class MicroServiceUtil extends MicroServiceInvoker{
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(
                 postParameters, headers);
 
-        ResponseEntity<LinkedHashMap> response =  template.postForEntity(url_getAuthenticateByOpenId, requestEntity, LinkedHashMap.class);
+        ResponseEntity<LinkedHashMap> response = template.postForEntity(url_getAuthenticateByOpenId, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {
             LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();

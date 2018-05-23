@@ -1,0 +1,102 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+     <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+        
+        <style type="text/css">      
+        .ui-chkbox .ui-chkbox-box .ui-icon-check {
+            color: gray!important;
+        }
+        </style>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+                <p align="center">
+                    <b>借用申请</b>
+                </p>
+            <h:form id="BorrowApplyListForm">
+                
+                <h:panelGroup id="display">
+
+                    <!--<p:commandButton value="借用申请" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />-->
+                        
+                    <p:commandButton value="确认借用" icon="ui-icon-check" update="growl #{borrowApplyController.updateViewIDs}" actionListener="#{borrowApplyController.confirmBorrow}" action="ListForApply?faces-redirect=true" oncomplete="handleSubmit(args, 'varDataList');"/>
+                
+                    <p:commandButton value="取消借用" icon="ui-icon-check" update="growl #{borrowApplyController.updateViewIDs}" actionListener="#{borrowApplyController.unconfirmBorrow}" action="ListForApply?faces-redirect=true" oncomplete="handleSubmit(args, 'varDataList');"/>
+                    
+                </h:panelGroup>
+                
+                <p:dataTable id="datalist" value="#{borrowApplyController.lazyModel}" var="item" widgetVar="varDataList"
+                     selection="#{borrowApplyController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                    rows="20" emptyMessage="#{msg.noRecordFound}" 
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <!--<p:ajax event="filter" listener="#{borrowApplyController.onFilter}" update="createButton editButton deleteButton"/>-->
+                    
+                    <p:column selectionMode="multiple" style="width:32px;text-align: center" />
+                    
+                    <p:column headerText="科室名称">
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+                    
+                    <p:column headerText="调剂设备名称">
+                        <h:outputText value="#{item.swapTypeId}"/>
+                    </p:column>
+                    <p:column headerText="申请人">
+                        <h:outputText value="#{item.applier}"/>
+                    </p:column>
+                    <p:column headerText="申请数">
+                        <h:outputText value="#{item.applyNumber}"/>
+                    </p:column>
+                    <p:column headerText="借用数">
+                        <h:outputText value="#{item.borrowNumber}"/>
+                    </p:column>
+                    
+                    <p:column headerText="借用状态">
+                        <h:outputText value="待提交" rendered="#{item.borrowState eq '0'}"></h:outputText> 
+                        <h:outputText value="等待借用受理" rendered="#{item.borrowState eq '1'}"></h:outputText> 
+                        <h:outputText value="取消借用" rendered="#{item.borrowState eq '2'}"></h:outputText> 
+                        <h:outputText value="等待归还受理" rendered="#{item.borrowState eq '3'}"></h:outputText> 
+                        <h:outputText value="取消归还" rendered="#{item.borrowState eq '4'}"></h:outputText> 
+                        <h:outputText value="借用受理" rendered="#{item.borrowState eq '5'}"></h:outputText> 
+                        <h:outputText value="归还受理" rendered="#{item.borrowState eq '6'}"></h:outputText> 
+                    </p:column>
+                    
+                    <p:column headerText="申请日期">
+                        <h:outputText value="#{item.applyDate}"/>
+                    </p:column>
+                    
+                    <p:column headerText="申请失效日期">
+                        <h:outputText value="#{item.invalidDate}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="BorrowApply_export"/>
+                        </p:commandButton>
+                        <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />-->
+                        <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{borrowApplyController.getViewPageA('Edit','Edit')}" action="#{urlEncryptController.encodeUrlParam(borrowApplyController.operation)}"  disabled="#{empty borrowApplyController.selected}"/>-->
+                        <!--<p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{borrowApplyController.prepareDelete}" update="datalist"  disabled="#{empty borrowApplyController.selected}"/>-->
+                    </f:facet>
+                </p:dataTable>
+                
+                
+                
+            </h:form>
+            </div>
+        </div>
+        
+    </ui:define>
+
+</ui:composition>

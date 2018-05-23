@@ -31,7 +31,7 @@
 
         <div class="ui-g-12 card">
             <h:form id="dataListForm">
-                <p:fieldset  legend="（设备序列号或资产编号）没有匹配到设备的数据">
+                <p:fieldset  legend="导入失败数据(设备序列号SN和资产编号不能全为空并且需要匹配到设备台账,检定日期不能为空)">
                     <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
@@ -42,7 +42,7 @@
                         <p:column headerText="证书编号">
                             <h:outputText value="#{item.certificateNo}" />
                         </p:column>
-                        <p:column headerText="器具名称">
+                        <!--<p:column headerText="器具名称">
                             <h:outputText value="#{item.assetName}" />
                         </p:column>
                         <p:column headerText="制造厂">
@@ -50,6 +50,9 @@
                         </p:column>
                         <p:column headerText="型号">
                             <h:outputText value="#{item.assetModel}" />
+                        </p:column>-->
+                        <p:column headerText="设备序列号SN">
+                            <h:outputText value="#{item.assetSN}" />
                         </p:column>
                         <p:column headerText="资产编号">
                             <h:outputText value="#{item.financeNo}" />
@@ -57,9 +60,9 @@
                         <p:column headerText="器具编号">
                             <h:outputText value="#{item.assetNo}" />
                         </p:column>
-                        <p:column headerText="付款否">
+                        <!--<p:column headerText="付款否">
                             <h:outputText value="#{item.pay}" />
-                        </p:column>
+                        </p:column>-->
                         <p:column headerText="检定结论">
                             <h:outputText value="#{item.statusDisplay}" />
                         </p:column>
@@ -88,12 +91,12 @@
                         <p:column headerText="送检单位">
                             <h:outputText value="#{item.department}" />
                         </p:column>
-                        <p:column headerText="备注">
+                        <!--<p:column headerText="备注">
                             <h:outputText value="#{item.comments}" />
                         </p:column>
                         <p:column headerText="过期否">
                             <h:outputText value="#{true.equals(item.expired) ? '已检' : '待检'}" />
-                        </p:column>
+                        </p:column>-->
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="MeasuringFailed_export"/>

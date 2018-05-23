@@ -76,7 +76,30 @@ public class PinyinUtil {
         }
     }
 
-    public String getShortPinyin(String str){
+    public static String getNameShortPinyin(String name){
+        if(name==null) return null;
+        name = name.trim();
+        if("".equals(name)) return "";
+        
+        String firtName;
+        String pinyinFirstName;
+        String lastName;
+        firtName = name.substring(0, 1);
+        pinyinFirstName = specialFirstNameMap1.get(firtName);
+        if(pinyinFirstName!=null){
+            lastName = name.substring(1, name.length());
+            try {
+                return pinyinFirstName.substring(0, 1) + PinyinHelper.getShortPinyin(lastName);
+            } catch (PinyinException ex) {
+                Logger.getLogger(PinyinUtil.class.getName()).log(Level.SEVERE, null, ex);
+                return pinyinFirstName;
+            }
+        }
+        else
+            return getShortPinyin(name);
+    }
+
+    public static String getShortPinyin(String str){
         try {
             return PinyinHelper.getShortPinyin(str);
         } catch (PinyinException ex) {

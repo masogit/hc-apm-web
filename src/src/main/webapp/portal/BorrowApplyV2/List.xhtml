@@ -1,0 +1,140 @@
+<!--<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">-->
+
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+     <ui:define name="preRenderView">
+         <h:outputScript name="js/main.js"/>
+         <f:metadata>
+            <!--<f:viewParam name="assetStatus" value="#{sharedAssetRequestV2Controller.filterAssetStatus}"/>-->
+            <f:viewParam name="model" value="#{sharedAssetRequestV2Controller.filterApplyTime}"/>
+            <!--<f:viewParam name="assetId" value="#{sharedAssetRequestV2Controller.assetId}"/>-->
+        </f:metadata>
+        <f:event type="preRenderView" listener="#{sharedAssetRequestV2Controller.setStatusFilter()}"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+                <div class="ui-g-12 card cardTitle">
+                    <p:outputLabel class="pageTitle" value="借用申请"/>
+                </div>
+                 <div class="ui-g-12 card">
+            <h:form id="IouListForm">
+                
+                <p:dataTable id="datalist" value="#{sharedAssetRequestV2Controller.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{sharedAssetRequestV2Controller.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.applyTime}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                    rows="20" emptyMessage="#{msg.noRecordFound}" 
+                    rowsPerPageTemplate="20,40,60,90">
+
+<!--                    <p:ajax event="rowSelect" listener="#{iouApplyDetailController.onChanged}"  update="createButton "/>
+                    <p:ajax event="rowSelect" listener="#{iouAssetDetailController.onChanged}"  update="createButton "/>
+                    -->
+                    <p:ajax event="rowSelect" update="createButton  " 
+                            listener="#{sharedAssetRequestV2Controller.onSelectB}" 
+                            oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
+                    <p:ajax event="filter" listener="#{sharedAssetRequestV2Controller.onFilter}" update="createButton "/>
+                    
+                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}"  filterMatchMode="LIKE">
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+                    <p:column headerText="申请人" sortBy="#{item.applicantName}" filterBy="#{item.applicantName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.applicantName}"/>
+                    </p:column>
+                    <p:column headerText="虚拟网电话" sortBy="#{item.applicantPhone}" filterBy="#{item.applicantPhone}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.applicantPhone}"/>
+                    </p:column>
+                    <p:column headerText="借用状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{sharedAssetRequestV2Controller.filterState}" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('assetBorrowStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('assetBorrowStatus',item.state)}"/>
+                         
+<!--                        <h:outputText value="借用待受理" rendered="#{item.state eq '1'}"></h:outputText> 
+                        <h:outputText value="借用待交付" rendered="#{item.state eq '2'}"></h:outputText> 
+                        <h:outputText value="借用待确认" rendered="#{item.state eq '3'}"></h:outputText>
+                        <h:outputText value="借用已取消" rendered="#{item.state eq '4'}"></h:outputText> 
+                        <h:outputText value="借用已搁置" rendered="#{item.state eq '5'}"></h:outputText> 
+                        <h:outputText value="借用已完成" rendered="#{item.state eq '6'}"></h:outputText> -->
+                    </p:column>
+                    <p:column headerText="申请日期" sortBy="#{item.applyTime}" filterBy="#{item.applyTime}" filterMatchMode="GTE">
+                       <f:facet name="filter">
+                           <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{sharedAssetRequestV2Controller.applyTimeFormatTime}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.applyTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    
+                    <!--<p:column headerText="申请失效日期" sortBy="#{item.invalidTime}">-->
+                        <!--<h:outputText value="#{item.invalidTime}">-->
+                            <!--<f:convertDateTime pattern="yyyy/MM/dd HH:mm" />-->
+                        <!--</h:outputText>-->
+                    <!--</p:column>-->
+                    <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE" >
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}" />
+                        
+                        <!--<p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestV2Controller.getViewPageA('Edit')}" action="#{urlEncryptController.encodeUrlParam(sharedAssetRequestV2Controller.operation)}"  disabled="#{empty sharedAssetRequestV2Controller.selected}"/>-->
+                    </f:facet>
+                </p:dataTable>
+                
+                 <p:overlayPanel widgetVar="panelFilterApplyTime" for=":IouListForm:datalist:filterApplyTime" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="cal1" />
+                        <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                        <p:outputLabel for="cal2"/>
+                        <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+                
+            </h:form>
+            </div>
+            </div>
+        </div>
+        
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+
+            function openSwapTypeViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+    
+
+</ui:composition>
+    <!--</html>-->

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+
+        <p:dialog id="SharedAssetReqTypeEditDlg" widgetVar="SharedAssetReqTypeEditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{sharedAssetRequestV2Controller.CRUDActionName} 借用设备">
+            <h:form id="SharedAssetReqTypeEditForm">
+                <h:panelGroup id="display2">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        
+                        <h:panelGroup>                                    
+                            <label class="label">调剂设备名称*</label>
+                            <p:selectOneMenu id="sharedAssetTypeId" value="#{sharedAssetRequestV2Controller.selectedSart.sharedAssetTypeId}" required="true" requiredMessage="调剂设备 #{msg.ValidationRequire}">                     
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{sharedAssetTypeController.getSwapNameList()}" var="item" itemLabel="#{item.swapName}" itemValue="#{item.id}"/>                 
+                            </p:selectOneMenu>                        
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class="label">借用申请数*</label>
+                            <!--<p:inputText id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}" />-->
+                            <p:inputNumber id="applyQty" value="#{sharedAssetRequestV2Controller.selectedSart.applyQty}"
+                                           decimalPlaces="0" minValue="0"/>
+                        </h:panelGroup>
+                        
+<!--                        <h:panelGroup>
+                            <label class='label'>预计归还日期</label>
+                            <p:calendar id="expectDate" pattern="yyyy/MM/dd" value="#{sharedAssetRequestV2Controller.selectedSart.expectDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                        </h:panelGroup>-->
+
+                        <h:panelGroup>
+                            <label class='label'>备注</label>
+                            <p:inputTextarea id="remark" rows="1"  cols="47"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestV2Controller.selectedSart.remark}" />
+                        </h:panelGroup>
+                        
+                    </p:panelGrid>
+                    <br/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSart}" value="#{msg.Save}"
+                                     update=" :SharedAssetRequestBorrowEditForm:datalistDetail" icon="ui-icon-check" oncomplete="openSwapTypeViewWindow2(xhr, status, args)" />
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('SharedAssetReqTypeEditDialog').hide()"/>
+                    <script>
+
+                        function openSwapTypeViewWindow2(xhr, status, args) {
+                            var message = args.message;
+                            if (message == "wrong") {
+
+                            } else {
+                                PF('SharedAssetReqTypeEditDialog').hide();
+                            }
+                        }
+
+                    </script>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

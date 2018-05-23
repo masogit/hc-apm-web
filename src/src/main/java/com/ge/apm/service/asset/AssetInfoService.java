@@ -92,6 +92,17 @@ public class AssetInfoService {
         return orgInfos;
     }
 
+    public List<OrgInfo> getClinicalDeptListWithEmptyValue(String siteUid) {
+        List<OrgInfo> orgInfos = orgDao.findBySiteUIDAndOrgTypeOrderByNameAsc(siteUid, 4);
+        orgInfos.sort(TreeNodeUtil.orgInfoComparator);
+
+        OrgInfo emptyValue = new OrgInfo();
+        emptyValue.setName(WebUtil.getMessage("selectOneMessage"));
+        orgInfos.add(0, emptyValue);
+
+        return orgInfos;
+    }
+
     public List<SelectItem> getAllAccessibleOrgDeptList() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<OrgInfo> sitesList = uaaService.getUserAccessibleSiteList(user.getUid());
@@ -110,6 +121,19 @@ public class AssetInfoService {
     public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevel() {
         UserAccount user = UserContextService.getCurrentUserAccount();
         TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelected(user.getSiteUID(), user.getUid());
+
+        TreeNodeUtil.sortTreeNodeByName(rootNode);
+
+        List<SelectItem> dropdownList = new ArrayList<>();
+        if (rootNode != null) {
+            traverse(rootNode, dropdownList);
+        }
+
+        return dropdownList;
+    }
+    public List<SelectItem> getAllAccessibleOrgDeptListNestedByOrgLevelForReturn() {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        TreeNode rootNode = uaaService.getOrgTreeByParentIdWithClinicalDeptsSelectedForReturn(user.getSiteUID(), user.getUid());
 
         TreeNodeUtil.sortTreeNodeByName(rootNode);
 

@@ -20,7 +20,7 @@
                     <p:dataTable id="datalist" value="#{qrCodeLibController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{qrCodeLibController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.issueDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -31,9 +31,9 @@
                         <p:column headerText="医院" style="word-wrap: break-word;" exportable="false">
                             <f:facet name="header">
                                 <h:outputText value="医院"/><br/>
-                                <p:overlayPanel widgetVar="varPanelSiteFilter" for="filterOrg" hideEffect="fade" dynamic="false" modal="false">
+                                <p:overlayPanel widgetVar="varPanelSiteFilter" for="filterOrg" hideEffect="fade" dynamic="false" modal="false" style="text-align: left;">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.tenantOrgTree}"  var="node" selectionMode="single" dynamic="true">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{userContextService.hasRole('ITAdmin')?orgTreeController.tenantOrgTree:orgTreeController.siteOrgTree}"  var="node" selectionMode="single" dynamic="true">
                                             <p:ajax process="@this" event="select" listener="#{qrCodeLibController.onSiteFilterChange}" update=":qrCodeLibListForm:datalist" oncomplete="PF('varPanelSiteFilter').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
@@ -43,7 +43,7 @@
                                         </p:tree>
                                     </p:scrollPanel>
                                 </p:overlayPanel>
-                                <p:inputText id="filterOrg"  value="#{qrCodeLibController.siteUIDFilter==null?'':qrCodeLibController.siteUIDFilter.name}"  readonly="true"/>
+                                <p:inputText id="filterOrg"  value="#{qrCodeLibController.siteUIDFilter==null?'':qrCodeLibController.getHospitalName(qrCodeLibController.siteUIDFilter)}"  readonly="true"/>
                             </f:facet>
                             <h:outputText value="#{qrCodeLibController.getHospitalName(item.siteUID)}"/>
                         </p:column>

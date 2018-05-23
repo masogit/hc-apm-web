@@ -1,6 +1,7 @@
 package webapp.framework.dao;
 
 import java.io.Serializable;
+import org.springframework.data.domain.Sort;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,7 +10,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
-
+import org.springframework.data.jpa.domain.Specification;
 /**
  * Shared base repository providing query by example and pattern.
  */
@@ -22,6 +23,12 @@ public interface GenericRepository<E> extends PagingAndSortingRepository<E, Long
     Page<E> findWithExample(E example, Pageable pageable);
 
     Page<E> findWithExample(E example, List<Range<E, ?>> ranges, Pageable pageable);
+    
+    Page<E> findBySpecification(final Specification<E> spec, Pageable pageable);
+    
+    List<E> findBySpecification(final Specification<E> spec, Sort sort);
+    
+    List<E> findBySpecification(final Specification<E> spec);
 
     List<E> find();
 

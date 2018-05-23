@@ -9,7 +9,7 @@
         <div class="ui-g">
             <div class="ui-g-12">
 				<div class="ui-g-12 card cardTitle">
-                	<p:outputLabel class="pageTitle" value="#{msg.V3_WorkFlowConfig}"/>
+                	<p:outputLabel class="pageTitle" value="#{msg.SystemConfig}"/>
             	</div>
             <h:form id="V2_WorkflowConfigListForm">
                 <p:dataTable id="datalist" value="#{v2_WorkflowConfigController.lazyModel}" var="item" widgetVar="varDataList"
@@ -28,21 +28,21 @@
                         <h:outputText value="#{v2_WorkflowConfigController.getTenantName(item.tenantUID)}"/>
                     </p:column>
                      <p:column headerText="集团" sortBy="#{item.institutionUID}" filterBy="#{item.institutionUID}" filterMatchMode="EQ">
-                        <h:outputText value="#{v2_WorkflowConfigController.getOrgNameByUId(item.institutionUID)}"/>
+                        <h:outputText value="#{v2_WorkflowConfigController.getInsNameByUId(item.institutionUID)}"/>
                     </p:column>
                     <p:column headerText="医院" sortBy="#{item.hospitalUID}" filterBy="#{item.hospitalUID}" filterMatchMode="EQ">
-                        <h:outputText value="#{v2_WorkflowConfigController.getOrgNameByUId(item.hospitalUID)}"/>
+                        <h:outputText value="#{v2_WorkflowConfigController.getHospitalNameByUId(item.hospitalUID)}"/>
                     </p:column>
                     <p:column headerText="院区" sortBy="#{item.siteUID}" filterBy="#{item.siteUID}" filterMatchMode="EQ" >
-                        <h:outputText value="#{v2_WorkflowConfigController.getOrgNameByUId(item.siteUID)}" />
+                        <h:outputText value="#{v2_WorkflowConfigController.getSiteNameByUId(item.siteUID)}" />
                     </p:column>
 <!--                      <p:column headerText="#{msg.dispatchMode}" sortBy="#{item.dispatchMode}" filterBy="#{item.dispatchMode}" filterMatchMode="EQ">
                          <h:outputText value="#{fieldMsg.fieldValue('dispatchMode',item.dispatchMode)}"/>
                     </p:column> -->
-                    <p:column headerText="#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
+                    <p:column headerText="维修#{msg.dispatchUserName}" sortBy="#{item.dispatchUserName}" filterBy="#{item.dispatchUserName}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.dispatchUserName}"/>
                     </p:column>
-                     <p:column headerText="#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
+                     <p:column headerText="维修#{msg.dispatchUserName}2" sortBy="#{item.dispatchUserName2}" filterBy="#{item.dispatchUserName2}" filterMatchMode="LIKE">
                         <h:outputText value="#{item.dispatchUserName2}"/>
                     </p:column>
                     <p:column headerText="#{msg.timeoutDispatch}" sortBy="#{item.timeoutDispatch}" filterBy="#{item.timeoutDispatch}" filterMatchMode="EQ">

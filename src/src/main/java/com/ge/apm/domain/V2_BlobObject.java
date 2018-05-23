@@ -27,6 +27,12 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_QRCodeLib = "QRCodeLib";
     public static final String BO_TYPE_PmOrder = "PmOrder";
     public static final String BO_TYPE_ArrivalListItem = "ArrivalListItem";
+    public static final String BO_TYPE_ArrivalList = "ArrivalList";
+    public static final String BO_TYPE_TableDefinition = "TableDefinition";
+    public static final String BO_SUB_TYPE_DOCS = "Docs";
+    public static final String BO_SUB_TYPE_IMG = "Image";
+
+
 
     @Id
     @GeneratedValue(generator = "uuid")

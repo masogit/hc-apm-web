@@ -5,28 +5,19 @@
  */
 package com.ge.apm.service.utils;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.StringUtils;
 import org.apache.poi.hssf.usermodel.HSSFCell;
 import org.apache.poi.hssf.usermodel.HSSFDateUtil;
+import org.apache.poi.hssf.usermodel.HSSFFormulaEvaluator;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import java.io.*;
+import java.text.DecimalFormat;
+import java.util.*;
 
 /**
  *
@@ -41,6 +32,9 @@ public class ExcelDocument {
     ExcelType documentType;
 
     Workbook workBook;
+
+    final CellStyle DEFAULT_CELL_STYLE_DATE;
+    final CellStyle DEFAULT_CELL_STYLE_DECIMAL;
 
     public static ExcelType parseTypeByFileName(String path) {
         if (path.endsWith(".xls")) {
@@ -64,6 +58,14 @@ public class ExcelDocument {
             workBook = new XSSFWorkbook(input);
         }
 
+        CreationHelper createHelper = workBook.getCreationHelper();
+
+        DEFAULT_CELL_STYLE_DATE = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DATE.setDataFormat(createHelper.createDataFormat().getFormat("mm/dd/yyyy"));
+
+        DEFAULT_CELL_STYLE_DECIMAL = workBook.createCellStyle();
+        DEFAULT_CELL_STYLE_DECIMAL.setDataFormat(createHelper.createDataFormat().getFormat("0.00"));
+
         input.close();
     }
 
@@ -84,8 +86,7 @@ public class ExcelDocument {
             ++rowNum;
         }
 
-
-        return rowNum -1;
+        return rowNum - 1;
     }
 
     public boolean exceedMaxRowNum(String sheetName, int maxRowNum) {
@@ -127,15 +128,52 @@ public class ExcelDocument {
         return result;
     }
 
+    public Map<String, String> getStringDataRowMap(String sheetName, int keyRowNum, Integer dataRowNum) {
+        String[] rowKey = getKeyRow(sheetName, keyRowNum);
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(dataRowNum - 1);
+        Map<String, String> dataMap = new LinkedHashMap();
+        if (dataRow == null) {
+            return dataMap;
+        }
+        for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
+            Cell cell = dataRow.getCell(cellIndex);
+            if (cell == null) {
+                continue;
+            }
+            switch (cell.getCellTypeEnum()) {
+                case NUMERIC:
+                    if (DateUtil.isCellDateFormatted(cell)) {
+                        Date date = cell.getDateCellValue();
+                        dataMap.put(rowKey[cellIndex], TimeUtils.getStrDate(date, "yyyy-MM-dd HH:mm:ss"));
+                    } else {
+                        dataMap.put(rowKey[cellIndex], new DecimalFormat("##############.#####").format(cell.getNumericCellValue()));
+                    }
+                    break;
+                case BOOLEAN:
+                    dataMap.put(rowKey[cellIndex], (String.valueOf(cell.getBooleanCellValue())));
+                    break;
+                case STRING:
+                case BLANK:
+                    dataMap.put(rowKey[cellIndex], cell.getStringCellValue());
+                    break;
+                case FORMULA:
+                default:
+                    dataMap.put(rowKey[cellIndex], "");
+            }
+        }
+        return dataMap;
+    }
+
     public Map<String, Object> getDataRowMap(String sheetName, String[] rowKey, Integer dataRowNum) {
         Sheet sheet = workBook.getSheet(sheetName);
         Row dataRow = sheet.getRow(dataRowNum - 1);
         Map<String, Object> dataMap = new LinkedHashMap();
-        
-        if(dataRow==null){
+
+        if (dataRow == null) {
             return dataMap;
         }
-        
+
         for (int cellIndex = 0; cellIndex < rowKey.length; cellIndex++) {
             Cell cell = dataRow.getCell(cellIndex);
             if (cell == null) {
@@ -242,7 +280,7 @@ public class ExcelDocument {
                 }
 
                 if (cell instanceof XSSFCell) {
-                    return ((XSSFCell)cell).getRawValue();
+                    return ((XSSFCell) cell).getRawValue();
                 }
                 if (cell instanceof HSSFCell) {
                     cell.setCellType(CellType.STRING);
@@ -394,9 +432,6 @@ public class ExcelDocument {
     }
 
     public void writeRowData(String sheetName, String[] rowKey, Integer dataRowNum, Map<String, Object> data) {
-        Sheet sheet = workBook.getSheet(sheetName);
-        //Row dataRow = sheet.getRow(dataRowNum - 1);
-        Row dataRow = sheet.createRow(dataRowNum - 1);
 
         for (int index = 0; index < rowKey.length; index++) {
             String key = rowKey[index];
@@ -404,10 +439,8 @@ public class ExcelDocument {
                 continue;
             }
             Object value = data.get(key);
-            if (null == dataRow.getCell(index)) {
-                dataRow.createCell(index);
-            }
-            writeCellData(dataRow.getCell(index), value);
+
+            writeCellData(sheetName, dataRowNum, index + 1, value);
         }
     }
 
@@ -427,6 +460,8 @@ public class ExcelDocument {
         }
         if (data instanceof Date) {
             cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DATE);
+
             cell.setCellValue((Date) data);
         }
         if (data instanceof Integer) {
@@ -435,7 +470,76 @@ public class ExcelDocument {
         }
         if (data instanceof Double) {
             cell.setCellType(CellType.NUMERIC);
+            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+
             cell.setCellValue((Double) data);
+        }
+
+    }
+
+    public void writeCellData(String sheetName, int rowNum, int colNum, Object value) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        writeCellData(cell, value);
+
+    }
+
+    public void writeCellFormula(String sheetName, int rowNum, int colNum, String formula) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow == null) {
+            dataRow = sheet.createRow(rowNum - 1);
+        }
+
+        Cell cell = dataRow.getCell(colNum - 1);
+        if (null == cell) {
+            cell = dataRow.createCell(colNum - 1);
+        }
+
+        cell.setCellFormula(formula);
+
+    }
+
+    public void removeRow(String sheetName, int rowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow != null) {
+            sheet.removeRow(dataRow);
+        }
+
+    }
+
+    public void clearRow(String sheetName, int rowNum) {
+        Sheet sheet = workBook.getSheet(sheetName);
+        Row dataRow = sheet.getRow(rowNum - 1);
+        if (dataRow != null) {
+            int firstCellNum = dataRow.getFirstCellNum();
+            int lastCellNum = dataRow.getLastCellNum();
+            for (int col = firstCellNum; col < lastCellNum; col++) {
+                Cell cell = dataRow.getCell(col);
+                if (cell.getCellTypeEnum() != CellType.BLANK) {
+                    cell.setCellType(CellType.BLANK);
+                }
+            }
+        }
+
+    }
+
+    public void calculateFormula() {
+
+        if (documentType.equals(ExcelType.XLS)) {
+            HSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
+        } else if (documentType.equals(ExcelType.XLSX)) {
+            XSSFFormulaEvaluator.evaluateAllFormulaCells(workBook);
         }
 
     }
@@ -457,6 +561,7 @@ public class ExcelDocument {
     }
 
     public static class ValueWrapper {
+
         public Object value;
         public String rawValue;
 
@@ -477,4 +582,7 @@ public class ExcelDocument {
         }
     }
 
+    public Workbook getWorkBook() {
+        return workBook;
+    }
 }

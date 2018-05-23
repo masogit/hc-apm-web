@@ -5,21 +5,28 @@
  */
 package com.ge.apm.service.asset;
 
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.pure.AssetInfoFormatter;
+import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
+import javax.faces.context.FacesContext;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.Duration;
 import java.time.LocalDateTime;
-import java.time.ZonedDateTime;
 import java.util.*;
 
 /**
@@ -29,6 +36,9 @@ import java.util.*;
 @Component
 @Scope("prototype")
 public class AssetFileImportService {
+    private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
+
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.2";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -45,22 +55,21 @@ public class AssetFileImportService {
 
     private Integer siteId = UserContextService.getCurrentUserAccount().getSiteId();
     private String tenantUID = UserContextService.getCurrentUserAccount().getTenantUID();
-    private String orgUid = UserContextService.getCurrentUserAccount().getSiteUID();
-    private List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
-    private List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
-    private List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
-    private List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
-    private List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
-    private List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
-    private List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
-    private List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
-    private List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
-    private List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
+    public List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
+    public List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
+    public List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
+    public List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
+    public List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
+    public List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
+    public List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
+    public List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
+    public List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
+    public List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
 //    private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
-    private List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
-    private List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
-    private List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
-    private List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
+    public List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
+    public List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
+    public List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
+    public List<I18nMessage> assetStatusList = FieldValueMessageController.getFieldValueList("assetStatus", siteId);
 
     @Autowired
     private AssetInfoRepository assetDao;
@@ -78,13 +87,27 @@ public class AssetFileImportService {
     private QrCodeService qrCodeService;
     @Autowired
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+    @Autowired
+    ConfigService configService;
+
+    private UserContextService userContextService=WebUtil.getBean(UserContextService.class);
+
+    private OrgInfo selectedOrgToImport;
+
+    private String assetCodeConfig;
+    private static final String ASSET_CODE_MERGE_THREE = "DFQ";
+    private static final String ASSET_CODE_MERGE_TWO = "DF";
+//    boolean autoGenerateFinancingNum;
+
+    private final String OLD_QRCODE_KEY = "old_qrcode";
+    private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
+    private WorkflowConfig workflowConfig;
 
     public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 4;
         int dataRow = 5;
-        OrgInfo currentOrg = orgDao.getByUid(orgUid);
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ORG, keyRow, ++dataRow)) {
             OrgInfo org = new OrgInfo();
@@ -96,17 +119,19 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-            org.setHospitalId(currentOrg.getHospitalId());
-            org.setParentOrg(currentOrg);
-            org.setSiteId(currentOrg.getSiteId());
+            org.setHospitalId(selectedOrgToImport.getId());
+            org.setParentOrg(selectedOrgToImport);
+            org.setSiteId(selectedOrgToImport.getSiteId());
 
-            org.setParentUID(orgUid);
-            org.setHospitalUID(currentOrg.getHospitalUID());
-            org.setTenantUID(currentOrg.getTenantUID());
-            org.setInstitutionUID(currentOrg.getInstitutionUID());
-            org.setSiteUID(currentOrg.getSiteUID());
-            org.setOrgLevel(currentOrg.getOrgLevel());
+            org.setParentUID(selectedOrgToImport.getUid());
+            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            org.setTenantUID(selectedOrgToImport.getTenantUID());
+            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            org.setSiteUID(selectedOrgToImport.getSiteUID());
+            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
             org.setOrgType(4);
+
+            org.setLineNum(dataRow);
 
             Map<String, Object> map = new LinkedHashMap();
             map.put("org", org);
@@ -137,13 +162,13 @@ public class AssetFileImportService {
 //    }
     public Map<String, Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
 
+        LocalDateTime startTime = LocalDateTime.now();
+
         Date now = new Date();
 
         Map<String, Map<String, Object>> result = new LinkedHashMap();
         int keyRow = 6;
         int dataRow = 7;
-
-        OrgInfo currentOrg = orgDao.getByUid(orgUid);
 
         for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_ASSET, keyRow, ++dataRow)) {
             try{
@@ -152,29 +177,34 @@ public class AssetFileImportService {
                 boolean isNewAsset = true; //flag an asset is new or existing.
 
                 AssetInfo asset = new AssetInfo();
+
+                String uuid = ExcelDocument.getCellStringValue(rowMap.get("UUID"));
+                if (!StringUtils.isEmpty(uuid)) {
+                    asset.setUid(uuid);
+                }
+
                 String assetName = ExcelDocument.getCellStringValue(rowMap.get("设备名称"));
                 if (StringUtils.isEmpty(assetName)) {
                     break; //return if go beyond the valid cell range
                 }
-                asset.setName(assetName);
 
-                String departNum = ExcelDocument.getCellStringValue(rowMap.get("设备编号"));
-                asset.setDepartNum(departNum);
-
-
-                String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
-                if (!StringUtils.isEmpty(inputQrcode)) {
-                    asset.setQrCode(inputQrcode.replace("-", ""));
-                }
-
+                //keep the new finance num to prevent lose its data to use later
                 String financingNum = ExcelDocument.getCellStringValue(rowMap.get("资产编号"));
-                asset.setFinancingNum(financingNum);
+                map.put(NEW_FINANCE_NUM_KEY, financingNum);
 
                 //load asset if it is already existed in db, then update the record
                 List<AssetInfo> assetList = getAssetInfos(asset);
                 if (assetList != null && assetList.size() == 1) {
                     asset = assetList.get(0);
                     isNewAsset = false;
+                    map.put(OLD_QRCODE_KEY, asset.getQrCode());
+                }
+
+                asset.setLineNum(dataRow);
+
+                String inputQrcode = ExcelDocument.getCellStringValue(rowMap.get("二维码"));
+                if (!StringUtils.isEmpty(inputQrcode)) {
+                    asset.setQrCode(inputQrcode.replace("-", ""));
                 }
 
                 AssetRow assetRow = new AssetRow(asset, isNewAsset, rowMap);
@@ -244,16 +274,24 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("是否进口设备", "setImportEquipment", importEquipmentList, map, null);
                 assetRow.setFieldDropdownValue("当前状态", "setStatus", assetStatusList, map, 1);
                 assetRow.setFieldDropdownValue("核算类别", "setAccountingCategory", accountingCategoryList, map, null);
+                assetRow.setFieldBooleanValue("是否PM", "setIsPm", true);
+                assetRow.setFieldBooleanValue("是否盘点", "setIsChecked", true);
 
+                asset.setUsageStatus(3); //已建档
+
+                boolean isNeedApprover = configService.isNeedAssetApprover(selectedOrgToImport.getSiteUID());
+                if(isNeedApprover){
+                    asset.setUsageStatus(2); //待审核
+                }
 
                 if (isNewAsset) {
-                    asset.setSiteId(currentOrg.getSiteId());
-                    asset.setHospitalId(currentOrg.getId());
+                    asset.setSiteId(selectedOrgToImport.getSiteId());
+                    asset.setHospitalId(selectedOrgToImport.getId());
 
-                    asset.setTenantUID(currentOrg.getTenantUID());
-                    asset.setHospitalUID(currentOrg.getHospitalUID());
-                    asset.setInstitutionUID(currentOrg.getInstitutionUID());
-                    asset.setSiteUID(currentOrg.getSiteUID());
+                    asset.setTenantUID(selectedOrgToImport.getTenantUID());
+                    asset.setHospitalUID(selectedOrgToImport.getHospitalUID());
+                    asset.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+                    asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
                     asset.setIsValid(true);
 //                    asset.setStatus(1);
@@ -282,6 +320,10 @@ public class AssetFileImportService {
                 throw new Exception("第"+dataRow+"行数据错误" + e.getMessage());
             }
         }
+
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for getAssetMapFromTemplate: {} seconds", duration.getSeconds());
 
         return result;
     }
@@ -323,10 +365,13 @@ public class AssetFileImportService {
     }
 
     public void importData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap,
-                           Boolean autoGenerateQrcode, Boolean autoGenerateFinancingNum, Boolean isGeneratePmOrder) {
-        OrgInfo currentOrg = orgDao.getByUid(orgUid);
+                           Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
+
+        LocalDateTime startTime = LocalDateTime.now();
+
         importOrgMap.values().forEach(item -> {
-            List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
             if (null == orgs || orgs.isEmpty()) {
                 orgDao.save((OrgInfo) item.get("org"));
                 item.put("status", ImportStatus.Created);
@@ -334,16 +379,33 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
             } else {
+                OrgInfo existingOrgInfo = orgs.get(0);
+                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+                item.put("org", existingOrgInfo);
                 item.put("org", orgs.get(0));
                 item.put("status", ImportStatus.Exist);
             }
         });
 
+        //release qrcode in use in order to exchange qrcode in two different asset
+        releaseQRCodeInUse(importAssetMap);
+
         importAssetMap.values().forEach(item -> {
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
+            //if site uid not match, ignore update
+            if (newAsset.getUid() != null) {
+                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                    return ;
+                }
+
+            }
+
             String orgName = newAsset.getClinicalDeptName();
-            if (importOrgMap.containsKey(orgName)) {
+            if (StringUtils.isEmpty(orgName)) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "警告:科室为空");
+            } else if (importOrgMap.containsKey(orgName)) {
                 OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
                 if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
                     item.put("status", ImportStatus.Failure);
@@ -423,17 +485,19 @@ public class AssetFileImportService {
                 List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
                 if (null == supplierList || supplierList.isEmpty()) {
                     Supplier newSupplier = new Supplier();
-                    newSupplier.setSiteId(currentOrg.getSiteId());
+                    newSupplier.setSiteId(selectedOrgToImport.getSiteId());
                     newSupplier.setName(newAsset.getVendor());
-                    newSupplier.setTenantUID(currentOrg.getTenantUID());
-                    newSupplier.setHospitalUID(currentOrg.getHospitalUID());
-                    newSupplier.setInstitutionUID(currentOrg.getInstitutionUID());
-                    newSupplier.setSiteUID(currentOrg.getSiteUID());
+                    newSupplier.setTenantUID(selectedOrgToImport.getTenantUID());
+                    newSupplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+                    newSupplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+                    newSupplier.setSiteUID(selectedOrgToImport.getSiteUID());
                     supplierDao.save(newSupplier);
                     newAsset.setSupplierId(newSupplier.getId());
+                    newAsset.setVendor(newAsset.getVendor());
                 } else if (supplierList.size() == 1) {
                     Supplier supplier = supplierList.get(0);
                     newAsset.setSupplierId(supplier.getId());
+                    newAsset.setVendor(supplier.getName());
                 } else {
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
                     newAsset.setVendor(null);
@@ -444,50 +508,106 @@ public class AssetFileImportService {
             String financingNum = newAsset.getFinancingNum();
             String nationalStandardCode = newAsset.getNationalStandardCode();
 
-            if (StringUtils.isEmpty(financingNum) && !StringUtils.isEmpty(nationalStandardCode) && autoGenerateFinancingNum) {
-                financingNum = assetFinacingNumGenerateService.generateFinancingNum(
+            if (needGenerateFinancingNum(newAsset)) {
+
+                //修改的时候不需要生成资产编号
+                financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
                         null,
                         nationalStandardCode,
-                        newAsset.getSiteUID()
+                        newAsset.getSiteUID(),
+                        null,
+                        financingNum
                 );
-                newAsset.setFinancingNum(financingNum);
+
+                if (!financingNum.startsWith("error:")) {
+                    newAsset.setFinancingNum(financingNum);
+                } else {
+                    item.put("status", ImportStatus.Failure);
+                    AssetRow.addErrMessage(item, financingNum);
+                    return;
+                }
+
             }
+
+            String qrCode = newAsset.getQrCode();
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
-                String qrCode = newAsset.getQrCode();
 
-                if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
-                    QrCodeLib newCode = qrCodeService.createOneQrCode(currentOrg, 3);
-                    newAsset.setQrCode(newCode.getQrCode());
+                if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                    String qrCodeStatus = qrCodeService.isAvailableQrcode(qrCode, selectedOrgToImport.getUid());
+                    if (!"Normal".equals(qrCodeStatus)) {
+                        item.put("status", ImportStatus.Failure);
+                        AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage(qrCodeStatus));
+                    }
+
                     if(createAsset(newAsset,isGeneratePmOrder)){
                         item.put("status", ImportStatus.Created);
                     }else{
                         item.put("status", ImportStatus.Failure);
                     }
-                } else if (isAvailableQrcode(qrCode, item)) {
-                    if(createAsset(newAsset,isGeneratePmOrder)){
-                        item.put("status", ImportStatus.Created);
-                    }else{
-                        item.put("status", ImportStatus.Failure);
-                    }
+
                 } else {
-                    item.put("status", ImportStatus.Failure);
+
+                    if ((qrCode == null || qrCode.isEmpty()) && autoGenerateQrcode) {
+                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
+                        newAsset.setQrCode(newCode.getQrCode());
+                        if(createAsset(newAsset,isGeneratePmOrder)){
+                            item.put("status", ImportStatus.Created);
+                        }else{
+                            item.put("status", ImportStatus.Failure);
+                        }
+                    } else if (isAvailableQrcode(qrCode, item)) {
+                        if(createAsset(newAsset,isGeneratePmOrder)){
+                            item.put("status", ImportStatus.Created);
+                        }else{
+                            item.put("status", ImportStatus.Failure);
+                        }
+                    } else {
+                        item.put("status", ImportStatus.Failure);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
+                    }
                 }
+
 
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
             } else {
-//                item.put("asset", assetList.get(0));
+
+                if (StringUtils.isEmpty(qrCode)) {
+                    if (autoGenerateQrcode) {
+                        QrCodeLib newCode = qrCodeService.createOneQrCode(selectedOrgToImport, 3);
+                        newAsset.setQrCode(newCode.getQrCode());
+                    }
+
+                } else {
+                    String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+                    if (!qrCode.equals(oldQrCode)) {
+//                        if (!StringUtils.isEmpty(oldQrCode)) {
+//                            qrCodeService.updateQrCodeStatus(oldQrCode, selectedOrgToImport.getUid(), 1);
+//                        }
+
+                        boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
+                        if (!qrCodeUpdated) {
+                            item.put("status", ImportStatus.Failure);
+                            AssetRow.addErrMessage(item, "错误: 无效二维码");
+                            return;
+                        }
+
+                    }
+                }
+
                 item.put("status", ImportStatus.Exist);
-//                item.put("assetFromExcel", newAsset);
                 assetDao.save(newAsset);
 
             }
 
         });
+
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for importData: {} seconds", duration.getSeconds());
 
     }
 
@@ -496,12 +616,12 @@ public class AssetFileImportService {
             return true;
         }
 
-        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode);
+        QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(qrcode,selectedOrgToImport.getUid());
         if (qrCodeLib == null) {
             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("InvalidQRCode") + qrcode);
             return false;
         }
-        if (!qrCodeLib.getSiteUID().equals(orgUid)) {
+        if (!qrCodeLib.getSiteUID().equals(selectedOrgToImport.getUid())) {
             AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("WrongHospitalQRCode"));
             return false;
         }
@@ -546,11 +666,11 @@ public class AssetFileImportService {
 
     @Transactional
     Boolean createAsset(AssetInfo asset, Boolean isGeneratePmOrder) {
-        if(!assetCreateService.CreateAeest(asset,isGeneratePmOrder)){
+        if(!assetCreateService.createAsset(asset,isGeneratePmOrder)){
             return false;
         }
         if (null != asset.getQrCode() && !asset.getQrCode().isEmpty()) {
-            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode());
+            QrCodeLib qrCodeLib = qrcodeDao.findByQrCode(asset.getQrCode(),asset.getSiteUID());
             if (qrCodeLib != null) {
                 qrCodeLib.setStatus(3);
                 qrcodeDao.save(qrCodeLib);
@@ -561,7 +681,7 @@ public class AssetFileImportService {
 
     private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
-        OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+        OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrgToImport.getUid()));
         OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, org.getName()));
         return orgDao.findBySearchFilter(OrgInfoFilters);
@@ -569,27 +689,34 @@ public class AssetFileImportService {
 
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
 
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
 
-        if (!StringUtils.isEmpty(asset.getQrCode())) {
-            assetFilters.add(new SearchFilter("qrCode", SearchFilter.Operator.EQ, asset.getQrCode()));
+        if (!StringUtils.isEmpty(asset.getUid())) {
+            List<SearchFilter> assetFilters = new ArrayList<>();
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.EQ, asset.getUid()));
+            assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
+            List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
+            return tempList;
         } else {
-            assetFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, asset.getName()));
+            return Collections.emptyList();
 
-            if (!StringUtils.isEmpty(asset.getDepartNum())) {
-                assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
-            }
-
-            if (!StringUtils.isEmpty(asset.getFinancingNum())) {
-                assetFilters.add(new SearchFilter("financingNum", SearchFilter.Operator.EQ, asset.getFinancingNum()));
-            }
         }
 
-        List<AssetInfo> tempList = assetDao.findBySearchFilter(assetFilters);
-        return tempList;
+
+    }
+
+    private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
+        List<SearchFilter> assetFilters = new ArrayList<>();
+        String orgUid = selectedOrgToImport.getUid();
+        assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+        List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
+        if (resultList.size() > 0) {
+            return true;
+        } else {
+            return false;
+        }
+
     }
 
     private List<UserAccount> getUserInfosByName(String userName) {
@@ -609,9 +736,12 @@ public class AssetFileImportService {
 
     public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, Map<String, Map<String, Object>> importAssetMap) {
 
+        LocalDateTime startTime = LocalDateTime.now();
+
         HashSet<Boolean> result = new HashSet<>();
         importOrgMap.values().forEach(item -> {
-            List<OrgInfo> orgs = getOrgInfoByName((OrgInfo) item.get("org"));
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
             if (null == orgs || orgs.isEmpty()) {
                 item.put("status", ImportStatus.New);
             } else if (orgs.size() > 1) {
@@ -619,33 +749,43 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
                 result.add(Boolean.FALSE);
             } else {
-                item.put("org", orgs.get(0));
+                OrgInfo existingOrgInfo = orgs.get(0);
+                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+                item.put("org", existingOrgInfo);
                 item.put("status", ImportStatus.Exist);
             }
         });
 
-        importAssetMap.values().forEach(item -> {
+        int row = 0;
+        for (Map<String, Object> item: importAssetMap.values()) {
+            ++row;
+
             AssetInfo newAsset = (AssetInfo) item.get("asset");
 
             List<AssetInfo> assetList = getAssetInfos(newAsset);
             if (null == assetList || assetList.isEmpty()) {
-                String qrCode = newAsset.getQrCode();
-                if (isAvailableQrcode(qrCode, item)) {
-                    item.put("status", ImportStatus.New);
-                } else {
+
+                if (!StringUtils.isEmpty(newAsset.getUid())) {
+                    //检查是否输入非法UUID
                     item.put("status", ImportStatus.CheckFail);
                     result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, String.format("第%d行错误: 非法UUID！", row));
+
+                } else {
+                    String qrCode = newAsset.getQrCode();
+                    if (isAvailableQrcode(qrCode, item)) {
+                        item.put("status", ImportStatus.New);
+                    } else {
+                        item.put("status", ImportStatus.CheckFail);
+                        result.add(Boolean.FALSE);
 //                    addErrMessage(item, WebUtil.getMessage("InvalidParameter") +WebUtil.getMessage("qrCode")+ qrCode);
+                    }
                 }
 
             } else if (assetList.size() > 1) {
                 item.put("status", ImportStatus.CheckFail);
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("AssetInfo") + newAsset.getName() + "/" + newAsset.getDepartNum() + "/" + newAsset.getFinancingNum());
-            } else {
-                //already loaded this data in the previous steps
-//                item.put("asset", assetList.get(0));
-//                item.put("status", ImportStatus.Exist);
             }
 
             if (null == newAsset.getAssetGroup()) {
@@ -654,13 +794,189 @@ public class AssetFileImportService {
                 AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("assetGroup") + WebUtil.getMessage("ValidationRequire"));
             }
 
-        });
+            if (StringUtils.isEmpty(newAsset.getDepartNum()) && StringUtils.isEmpty(newAsset.getUid())) {
+                item.put("status", ImportStatus.CheckFail);
+                result.add(Boolean.FALSE);
+                AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
+                continue;
+            }
+
+            if (newAsset.getUid() == null) {
+                //check depart num to avoid duplicate when update
+                boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+                if (isDuplicate) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 设备编号重复");
+                }
+            }
+
+            //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
+            if ((ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) && !StringUtils.isEmpty(newAsset.getDepartNum())) {
+                if (newAsset.getDepartNum().length() > 16) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 设备编号不能超过16位");
+                    continue;
+                }
+
+                if (!newAsset.getDepartNum().equals(newAsset.getFinancingNum()) && !StringUtils.isEmpty(newAsset.getFinancingNum())) {
+                    item.put("status", ImportStatus.CheckFail);
+                    result.add(Boolean.FALSE);
+                    AssetRow.addErrMessage(item, "错误: 资产编码与设备编码不相同不允许导入");
+                } else {
+                    newAsset.setFinancingNum(newAsset.getDepartNum());
+
+                    if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig)) {
+                        newAsset.setQrCode(newAsset.getDepartNum());
+                    }
+
+                }
+
+
+            }
+
+
+        }
+
+        LocalDateTime endTime = LocalDateTime.now();
+        Duration duration = Duration.between(startTime, endTime);
+        logger.info("Duration for checkData: {} seconds", duration.getSeconds());
+
         return result.isEmpty();
     }
 
     public boolean checkDocVersion(ExcelDocument doc) {
         String inputVersion = ExcelDocument.getCellStringValue(doc.getCellValue(SHEET_ASSET, 2, 3));
-        return "v2.0".equalsIgnoreCase(inputVersion);
+        return EXCEL_ASSET_TEMPLATE_VERSION.equalsIgnoreCase(inputVersion);
+    }
+
+    /**
+     * export asset based on the asset import excel template
+     * @param assetList
+     * @return
+     * @throws IOException
+     */
+    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, boolean allColumns) throws IOException {
+
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+        //fix template version
+        doc.writeCellData(AssetFileImportService.SHEET_ASSET, 2, 3, AssetFileImportService.EXCEL_ASSET_TEMPLATE_VERSION);
+        //remove fake data row
+        doc.clearRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_DATA_ROW);
+
+        String[] columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
+
+        int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
+        for (AssetInfo assetInfo: assetList) {
+            AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(allColumns);
+
+            doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
+
+            ++startRow;
+        }
+
+        String countFormula = String.format("COUNTA('Asset List'!$B$7:$B$%d)", assetList.size() + 6);
+
+        String sumFormula = String.format("SUM('Asset List'!$Z$7:$Z$%d)", assetList.size() + 6);
+
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 1, countFormula);
+        doc.writeCellFormula(AssetFileImportService.SHEET_ASSET, 5, 2, sumFormula);
+        doc.getWorkBook().setForceFormulaRecalculation(true);
+        doc.calculateFormula();
+
+        //export org info list
+        for (startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW; startRow < 20; startRow++) {
+            doc.clearRow(AssetFileImportService.SHEET_ORG, startRow);
+        }
+
+        startRow = AssetFileImportService.EXCEL_ORG_DATA_ROW;
+        for (OrgInfo orgInfo: clinicalDeptList) {
+            doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, orgInfo.getName());
+
+            ++startRow;
+        }
+        doc.writeCellData(AssetFileImportService.SHEET_ORG, startRow, 1, "#");
+
+        return doc;
+
+    }
+
+    private void releaseQRCodeInUse(Map<String, Map<String, Object>> importAssetMap) {
+
+        importAssetMap.values().forEach(item -> {
+            AssetInfo newAsset = (AssetInfo) item.get("asset");
+
+            //if site uid not match, ignore update
+            if (newAsset.getUid() != null) {
+                if (!selectedOrgToImport.getUid().equals(newAsset.getSiteUID())) {
+                    return ;
+                }
+
+            }
+
+            String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
+            if (StringUtils.isEmpty(oldQrCode)) return;
+            if (oldQrCode.equals(newAsset.getQrCode())) return;  //qrCode not changed
+
+            boolean releaseable = true;
+            if (!StringUtils.isEmpty(newAsset.getQrCode())) {
+                boolean exists = qrCodeService.isQrcodeAvailableInStatus(newAsset.getQrCode(), selectedOrgToImport.getUid(), 1);
+                if (!exists) {
+                    releaseable = false;
+                }
+            }
+
+            if (releaseable) {
+                qrCodeService.releaseQrCodeInUse(oldQrCode, selectedOrgToImport.getUid());
+            }
+
+        });
+
+    }
+
+    public void setSelectedOrgToImport(OrgInfo selectedOrgToImport) {
+        this.selectedOrgToImport = selectedOrgToImport;
+
+        workflowConfig = configService.findConfigBySite(selectedOrgToImport.getSiteUID());
+
+        if (workflowConfig != null) {
+            assetCodeConfig = workflowConfig.getAssetCodeConfig();
+        }
+    }
+
+    private boolean needGenerateFinancingNum(AssetInfo assetInfo) {
+
+        final int GENERATE_BY_NATIONAL_STANDARD_CODE = 1;
+        final int GENERATE_BY_PREFIX_AND_SEQ = 2;
+
+        if (workflowConfig == null) return false;
+
+        assetCodeConfig = workflowConfig.getAssetCodeConfig();
+
+        if (ASSET_CODE_MERGE_THREE.equals(assetCodeConfig) || ASSET_CODE_MERGE_TWO.equals(assetCodeConfig)) {
+            return false;
+        }
+
+        if (workflowConfig != null && workflowConfig.getGenerateMethod() != null) {
+            String financingNum = assetInfo.getFinancingNum();
+
+            if (workflowConfig.getGenerateMethod() == GENERATE_BY_NATIONAL_STANDARD_CODE) {
+
+                if (assetInfo.getUid() == null && !StringUtils.isEmpty(assetInfo.getNationalStandardCode()) && (StringUtils.isEmpty(financingNum) || financingNum.length() < 5)) {
+                    return true;
+                }
+
+            } else if (workflowConfig.getGenerateMethod() == GENERATE_BY_PREFIX_AND_SEQ) {
+                if (assetInfo.getUid() == null && (!StringUtils.isEmpty(financingNum) && financingNum.length() < 5)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

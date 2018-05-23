@@ -51,12 +51,9 @@ export function formatKey(asset, dimension, ruler) {
     return year === -1 ? '未知年份' : year + '年'
   }
   if (ruler) {
-    const range = ruler.get('ticks').reduce((prev, cur) => {
-      if (cur > asset.get(dimension) && cur < prev[1]) prev[1] = cur
-      if (cur < asset.get(dimension) && cur > prev[0]) prev[0] = cur
-      return prev
-    }, [-Infinity, +Infinity])
-    return range.join('~')
+    let assetValue = asset.get(dimension)
+    let ticks = ruler.get('ticks')
+    return ticks.find(t => assetValue >= t.get(0) && assetValue < t.get(1)).join('~')
   }
   return asset.get(dimension)
 }
@@ -191,7 +188,7 @@ export default {
             }),
             rulers: [{
               dimension: 'price',
-              ticks: [ 1e4, 1e5, 5e5, 1e6, 5e6, 1e7]
+              ticks: [[-Infinity, 1e4], [1e4, 1e5], [1e5, 5e5], [5e5, 1e6], [1e6, 5e6], [5e6, 1e7], [1e7, Infinity]]
             }],
             // As Jianbin's request, remove 'func' for good, hide 'supplier' for the time being
             // dimensions: ['func', 'type', 'dept', 'supplier', 'price', 'yoi']

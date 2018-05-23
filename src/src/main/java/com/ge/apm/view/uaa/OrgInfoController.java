@@ -8,6 +8,7 @@ import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -30,7 +31,9 @@ import webapp.framework.web.WebUtil;
 import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.QrCodeLib;
+import org.primefaces.util.TreeUtils;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.service.UserContext;
 
 @ManagedBean
 @ViewScoped
@@ -47,6 +50,10 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     private String orgName;
     private String orgNameEn;
     private String retrieval;
+    private UserAccount loginUser;
+
+    private UserCommonService userCommonService;
+
     @Override
     protected void init() {
         filterBySite = false;
@@ -56,8 +63,9 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         userAccount = new UserAccount();
 		assetInfoRepository  = WebUtil.getBean(AssetInfoRepository.class);
         orgInfoRepository  = WebUtil.getBean(OrgInfoRepository.class);
+        userCommonService = WebUtil.getBean(UserCommonService.class);
         findPerson();
-        UserAccount loginUser = UserContextService.getCurrentUserAccount();
+        loginUser = UserContextService.getCurrentUserAccount();
         setTenantId(loginUser.getSiteId());
         buildOrdTree();
     }
@@ -100,7 +108,14 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         return userList;
     }
     public void buildOrdTree(){
-        orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+
+        //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+        if(UserContextService.isOnlyLocalITAdmin()){
+            orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
+        }else{
+            orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+        }
+        TreeNodeUtil.sortTreeNodeByName(orgTree);
         try{
             this.selectedNode = (TreeNode)orgTree.getData();
            // this.selectedNode.setExpanded(true);
@@ -110,10 +125,17 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
     public void filterNode(){
       if(!StringUtils.isEmpty(retrieval)) {
-          orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+          //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+          if(UserContextService.isOnlyLocalITAdmin()){
+              orgTree = uaaService.getFilterOrgTreeByYuanQu(loginUser.getSiteUID(), retrieval);
+          }else{
+              orgTree = uaaService.getFilterOrgTreeByYuanQu(selectedTenant == null ? UserContextService.getCurrentUserAccount().getTenantUID() : selectedTenant.getUid(), retrieval);
+          }
+
           TreeNodeUtil.expandTreeNode(orgTree);
       }else{//列出所有机构
- orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+          //orgTree = uaaService.getOrgFullTreeByTenant(selectedTenant==null?UserContextService.getCurrentUserAccount().getTenantUID():selectedTenant.getUid());
+          this.buildOrdTree();
       }
 
 
@@ -163,6 +185,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 
     public void prepareCreateHospital(){
         orgName=null;
+        orgNameEn=null;
         if(selected==null) return;
         
         OrgInfo org = new OrgInfo();
@@ -170,7 +193,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         org.setParentUID(selected.getUid());
 
         org.setSiteId(selected.getSiteId());
-        org.setHospitalId(selected.getHospitalId());
+        org.setHospitalId(selected.getId());
 
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -194,7 +217,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         org.setParentUID(selected.getUid());
 
         org.setSiteId(selected.getSiteId());
-        org.setHospitalId(selected.getHospitalId());
+        org.setHospitalId(selected.getId());
 
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -218,7 +241,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         org.setParentUID(selected.getUid());
 
         org.setSiteId(selected.getSiteId());
-        org.setHospitalId(selected.getHospitalId());
+        org.setHospitalId(selected.getId());
 
         //UIDs
         org.setUid(UUID.randomUUID().toString().replace("-", ""));
@@ -259,6 +282,11 @@ return true;
     }
 
     public void saveSelectedOrg(){
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)){
+            return;
+        }
+
         //重复增加不被允许
       //  String orgName =selected.getName();
         List<OrgInfo> orgTypeList = orgInfoRepository.findByParentUID(selected.getParentUID());
@@ -309,6 +337,11 @@ return true;
     }
 
     private Boolean canDelete(){
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)){
+            return false;
+        }
+
         List<SearchFilter> checkFilters = new ArrayList<>();
         checkFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
         checkFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, selected.getUid(),"1+"));
@@ -390,7 +423,7 @@ return true;
     }
 
     public boolean getIsCreateInstitutionDisabled(){
-        return selected.getId()==null;
+        return UserContextService.isOnlyLocalITAdmin();
     }
     
     public boolean getIsCreateHospitalDisabled(){

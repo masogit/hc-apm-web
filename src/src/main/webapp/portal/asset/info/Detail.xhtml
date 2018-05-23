@@ -17,7 +17,7 @@
         </div>
 
         <div class="ui-g-12 card" >
-            <h:panelGroup rendered="#{!assetInfoController.terminate}">
+            <h:panelGroup rendered="#{!assetInfoController.terminate and userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff,DeptHead')}">
                 <p:link outcome="/portal/analysis/assetUsageSingle.xhtml" value="#{msg.DeviceUtilizationAnalysis}">
                     <f:param name="asset_name" value="#{assetInfoController.selected.name}" />
                     <f:param name="asset_id" value="#{assetInfoController.selected.id}" />
@@ -208,14 +208,30 @@
                                         <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                     </p:selectOneRadio>
                                 </h:panelGroup>
-
+                                <h:panelGroup >
+                                    <label class="label">#{msg.isAssetPMed}</label>
+                                    <p:selectOneRadio value="#{assetInfoController.selected.isPm}" disabled="true">
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup >
+                                    <label class="label">#{msg.isAssetChecked}</label>
+                                    <p:selectOneRadio value="#{assetInfoController.selected.isChecked}" disabled="true">
+                                        <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                        <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.comments}</label>
                                     <p:inputText  value="#{assetInfoController.selected.comments}" readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                 </h:panelGroup>
-
+                                <h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                </h:panelGroup>
 
                                 <h:panelGroup>
                                     <label class="label">#{msg.assetUsage}</label>
@@ -224,6 +240,10 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.capitalSource}</label>
                                     <p:inputText id="capitalSource" value="#{fieldMsg.fieldValue('capitalSource', assetInfoController.selected.capitalSource)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.capitalSource2}</label>
+                                    <p:inputText id="capitalSource2" value="#{fieldMsg.fieldValue('capitalSource2', assetInfoController.selected.capitalSource2)}" readonly="true"/>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                     <label class="label">#{msg.measureGrade}</label>
@@ -252,8 +272,6 @@
                                 <h:panelGroup>
                                     <label class="label">#{msg.accountingCategory}</label>
                                     <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoController.selected.accountingCategory)}" readonly="true"/>
-                                </h:panelGroup>
-                                <h:panelGroup>
                                 </h:panelGroup>
                                 <h:panelGroup>
                                 </h:panelGroup>
@@ -308,19 +326,19 @@
                                 </h:panelGroup>
                                 <h:panelGroup></h:panelGroup>
 
-                                <h:panelGroup >
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.purchasePrice}</label>
                                     <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.salvageValue}</label>
-                                    <p:inputText id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
+                                    <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.lifecycle}</label>
                                     <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
                                 </h:panelGroup>
-                                <h:panelGroup>
+                                <h:panelGroup rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}">
                                     <label class="label">#{msg.depreciationMethod}</label>
                                     <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
                                 </h:panelGroup>
@@ -345,11 +363,13 @@
                                         <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                                     </p:inputText>
                                 </h:panelGroup>
-                                <h:panelGroup>
-                                    <label class="label">是否对质保到期进行提醒</label>
-                                    <p:selectBooleanButton title="是否对质保到期进行提醒"    onLabel="是" offLabel="否"  value="#{assetInfoController.selected.warranty}"  disabled="true"/>
-                                </h:panelGroup>
-
+								<h:panelGroup >
+	                                <label class="label">是否对质保到期进行提醒</label>
+		                            <p:selectOneRadio value="#{assetInfoController.selected.warranty}" disabled="true">
+	                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                   		<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+	                                </p:selectOneRadio>
+	                            </h:panelGroup>
 
                             </p:panelGrid>
                         </div>
@@ -359,32 +379,6 @@
 
             <h:form>
                 <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
-                    <p:panel  header="#{msg.InspectionOrder}">
-                        <f:facet name="actions">
-                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/insp/InspOrderList?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/InspOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
-                        </f:facet>
-
-                        <p:dataTable var="item" value="#{inspectionServiceController.getInspectionOrderList(assetInfoController.selected.id, 1, 3)}" emptyMessage="#{msg.noRecordFound}">
-                            <p:column headerText="#{msg.createTime}">
-                                <h:outputText value="#{item.createTime}" />
-                            </p:column>
-                            <p:column headerText="#{msg.creatorName}">
-                                <h:outputText value="#{item.creatorName}" />
-                            </p:column>
-                            <p:column headerText="#{msg.ownerId}">
-                                <h:outputText value="#{item.ownerName}" />
-                            </p:column>
-                            <p:column headerText="#{msg.examStartTime}">
-                                <h:outputText value="#{item.startTime}" >
-                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                                </h:outputText>
-                            </p:column>
-                            <p:column headerText="#{msg.endTime}">
-                                <h:outputText value="#{item.endTime}" />
-                            </p:column>
-                        </p:dataTable>
-                    </p:panel>
 
                     <p:panel  header="#{msg.MaintainanceRecord}">
                         <f:facet name="actions">
@@ -412,7 +406,7 @@
 
                     <p:panel  header="#{msg.MetrologyMonitor}">
                         <f:facet name="actions">
-                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/insp/MetrologyOrderList?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/measuring/measuringResultMain?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                             <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/MetrologyOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                         </f:facet>
 
@@ -475,7 +469,7 @@
                 </p:panelGrid>
             </h:form>
 
-            <p:fieldset  style="margin-bottom:20px">
+            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceExpo.series}">
                 <!-- Chart 2: Device Exposure -->
                 <div class="ui-g-12">
                     <div class="block">
@@ -485,7 +479,7 @@
                     </div>
                 </div>
             </p:fieldset>
-            <p:fieldset  style="margin-bottom:20px">
+            <p:fieldset  style="margin-bottom:20px" rendered="#{assetInfoController.selected.assetGroup eq 1 and not empty assetUsageSingleController.deviceScan.series}">
                 <!-- Chart 1: Device Scan --> 
                 <div class="ui-g-12">
                     <div class="block">
@@ -548,7 +542,7 @@
                     </p:tab>
                     <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoController.selected.qrCode}">
                         <!--<p:barcode value="#{assetInfoController.selected.qrCode}" type="qr" height="200" format="png"/>-->
-                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode)}" />
+                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode,assetInfoController.selected.siteUID)}" />
                     </p:tab>
                 </p:tabView>
             </h:form>

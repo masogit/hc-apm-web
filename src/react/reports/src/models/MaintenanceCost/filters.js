@@ -1,5 +1,7 @@
 import moment from 'moment'
 import { ranges } from '#/constants'
+import { getHospitalId } from '#/utils'
+const hospitalId = getHospitalId()
 
 export default {
   namespace: 'MaintenanceCost_filters',
@@ -10,6 +12,7 @@ export default {
       to: ranges.oneYear.end.format('YYYY-MM-DD')
     },
     dept: undefined,
+    hospital: hospitalId,
     assetType: undefined,
     groupBy: 'type',
     MSA: undefined,
@@ -18,6 +21,11 @@ export default {
   },
   effects: {
     *['field/set']({ payload }, { select, put }) {
+      if (payload.key === 'hospital') {
+        yield put({ type: 'depts/update/selectedHospital', payload: payload.value })
+        yield put({ type: 'depts/get/depts', payload: payload.value })
+        yield put({ type: 'field/set', payload: { key: 'dept', value: undefined } })
+      }
       if (payload.key === 'groupBy') yield put({
         type: 'cursor/toggle',
         payload: undefined,

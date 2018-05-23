@@ -1,0 +1,588 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <h:outputStylesheet name="css/assetUsageAll.css"/>
+        <h:outputScript name="js/assetUsageAll.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{assetInfoController.getAssetDetailTitle()}"/>
+            </div>
+
+        </div>
+
+        <div class="ui-g-12 card" >
+            <h:panelGroup rendered="#{!assetInfoController.terminate}">
+                <p:link outcome="/portal/analysis/assetUsageSingle.xhtml" value="#{msg.DeviceUtilizationAnalysis}">
+                    <f:param name="asset_name" value="#{assetInfoController.selected.name}" />
+                    <f:param name="asset_id" value="#{assetInfoController.selected.id}" />
+                </p:link>
+                <br/>
+            </h:panelGroup>
+
+
+            <p:accordionPanel id="accordion" multiple="false" >
+                <p:tab title="#{msg.BasicInfo}">
+                    <div class="ui-g">
+                        <div class="ui-g-8 ui-g-nopad">
+                            <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.serialNum}</label>
+                                    <p:inputText id="serialNum" value="#{assetInfoController.selected.serialNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.name}</label>
+                                    <p:inputText value="#{assetInfoController.selected.name}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.aliasName}</label>
+                                    <p:inputText id="aliasName" value="#{assetInfoController.selected.aliasName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetGroup}</label>
+                                    <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup', assetInfoController.selected.assetGroup)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerName}</label>
+                                    <p:inputText id="assetOwnerName" value="#{assetInfoController.selected.assetOwnerName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerTel}</label>
+                                    <p:inputText id="assetOwnerTel" value="#{assetInfoController.selected.assetOwnerTel}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerName2}</label>
+                                    <p:inputText id="assetOwnerName2" value="#{assetInfoController.selected.assetOwnerName2}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerTel2}</label>
+                                    <p:inputText id="assetOwnerTel2" value="#{assetInfoController.selected.assetOwnerTel2}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerName3}</label>
+                                    <p:inputText id="assetOwnerName3" value="#{assetInfoController.selected.assetOwnerName3}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetOwnerTel3}</label>
+                                    <p:inputText id="assetOwnerTel3" value="#{assetInfoController.selected.assetOwnerTel3}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.hospitalId}</label>
+                                    <p:inputText id="hospitalId" value="#{assetInfoController.getHospitalName(assetInfoController.selected.siteUID)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalDeptName}</label>
+                                    <p:inputText value="#{assetInfoController.selected.clinicalDeptName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalOwnerName}</label>
+                                    <p:inputText id="clinicalOwnerName" value="#{assetInfoController.selected.clinicalOwnerName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.clinicalOwnerTel}</label>
+                                    <p:inputText id="clinicalOwnerTel" value="#{assetInfoController.selected.clinicalOwnerTel}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup rendered="false">
+                                    <label class="label">#{msg.brand}</label>
+                                    <p:inputText id="brand" value="#{assetInfoController.selected.brand.name}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.manufacture}</label>
+                                    <p:inputText id="manufacture" value="#{assetInfoController.selected.manufacture}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">品牌/制造商简称</label>
+                                    <p:inputText id="makerShortName" value="#{assetInfoController.selected.makerShortName}"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.vendor}</label>
+                                    <p:inputText value="#{assetInfoController.selected.vendor}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.maitanance}</label>
+                                    <p:inputText id="maitanance" value="#{assetInfoController.selected.maitanance}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.maitananceTel}</label>
+                                    <p:inputText id="maitananceTel" value="#{assetInfoController.selected.maitananceTel}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.nationalStandardCode}</label>
+                                    <p:inputText id="nationalStandardCode" value="#{assetInfoController.selected.nationalStandardCode}" readonly="true"/>
+                                </h:panelGroup>
+
+                            </p:panelGrid>
+                        </div>
+                        <div class="ui-g-4">
+                            <p:galleria value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,1)}" var="attach" panelWidth="300" panelHeight="200" showCaption="false" rendered="#{!empty assetInfoController.getAttachList(assetInfoController.selected.uid,1)}">
+                                <p:graphicImage url="#{fileDownloadService.getFileUrl(attach.objectStorageId)}" style="max-width: auto;height: 100%;" onclick="javascript:showthis(this);"/>
+                            </p:galleria>
+                        </div>
+                    </div>
+                </p:tab>
+            </p:accordionPanel>
+            <p:accordionPanel id="accordion2">
+                <p:tab title="#{msg.AssetInfoDetail}">
+                    <div class="ui-g">
+                        <div class="ui-g-12 ui-g-nopad">
+                            <p:panelGrid columns="4"  layout="grid" styleClass="ui-panelgrid-blank">
+                                <h:panelGroup>
+                                    <label class="label">#{msg.parentAsset}</label>
+                                    <p:inputText id="parentAssetId" value="#{assetInfoController.getParentAssetName()}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.deviceName}</label>
+                                    <p:inputText id="deviceName" value="#{assetInfoController.selected.deviceName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.systemId}</label>
+                                    <p:inputText id="systemId" value="#{assetInfoController.selected.systemId}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.financingNum}</label>
+                                    <p:inputText id="financingNum2" value="#{assetInfoController.selected.financingNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.departNum}</label>
+                                    <p:inputText value="#{assetInfoController.selected.departNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.barcode}</label>
+                                    <p:inputText id="barcode" value="#{assetInfoController.selected.barcode}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.registrationNo}</label>
+                                    <p:inputText id="registrationNo" value="#{assetInfoController.selected.registrationNo}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.modalityId}</label>
+                                    <p:inputText id="modalityId" value="#{assetInfoController.selected.modalityId}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.qrCode}</label>
+                                    <p:inputText id="qrCode" value="#{assetInfoController.qrCode}" readonly="true"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionType}</label>
+                                    <p:inputText id="functionType" value="#{assetInfoController.selected.functionType}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionGroup}</label>
+                                    <p:inputText id="functionGroup" value="#{fieldMsg.fieldValue('assetFunctionType', assetInfoController.selected.functionGroup)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetCode68}</label>
+                                    <p:inputText id="assetCode68" value="#{fieldMsg.fieldValue(assetInfoController.selected.functionGroup, assetInfoController.selected.assetCode68)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.functionGrade}</label>
+                                    <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoController.selected.functionGrade)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.repairForm}</label>
+                                    <p:inputText id="repairForm" value="#{fieldMsg.fieldValue('repairForm', assetInfoController.selected.repairForm)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationCode}</label>
+                                    <p:inputText id="locationCode" value="#{assetInfoController.selected.locationCode}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.locationName}</label>
+                                    <p:inputText id="locationName" value="#{assetInfoController.selected.locationName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.status}</label>
+                                    <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoController.selected.status}" disabled="true">
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.deviceStatus}</label>
+                                    <p:selectOneRadio id="deviceStatus"  label="#{msg.status}" value="#{assetInfoController.selected.deviceStatus}" disabled="true">
+                                        <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    </p:selectOneRadio>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.comments}</label>
+                                    <p:inputText  value="#{assetInfoController.selected.comments}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                </h:panelGroup>
+
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.assetUsage}</label>
+                                    <p:inputText id="assetUsage" value="#{fieldMsg.fieldValue('assetUsage', assetInfoController.selected.assetUsage)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.capitalSource}</label>
+                                    <p:inputText id="capitalSource" value="#{fieldMsg.fieldValue('capitalSource', assetInfoController.selected.capitalSource)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.measureGrade}</label>
+                                    <p:inputText id="measureGrade" value="#{fieldMsg.fieldValue('measureGrade', assetInfoController.selected.measureGrade)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.riskGrade}</label>
+                                    <p:inputText id="riskGrade" value="#{fieldMsg.fieldValue('riskGrade', assetInfoController.selected.riskGrade)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.emergencyEquipment}</label>
+                                    <p:inputText id="emergencyEquipment" value="#{fieldMsg.fieldValue('emergencyEquipment', assetInfoController.selected.emergencyEquipment)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.importEquipment}</label>
+                                    <p:inputText id="importEquipment" value="#{fieldMsg.fieldValue('importEquipment', assetInfoController.selected.importEquipment)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.measuringItemCategory}</label>
+                                    <p:inputText id="measuringItemCategory" value="#{fieldMsg.fieldValue('measuringItemCategory', assetInfoController.selected.measuringItemCategory)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.usageStatus}</label>
+                                    <p:inputText id="usageStatus" value="#{fieldMsg.fieldValue('usageStatus', assetInfoController.selected.usageStatus)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.accountingCategory}</label>
+                                    <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoController.selected.accountingCategory)}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.manufactDate}</label>
+                                    <p:inputText id="manufactDate" value="#{assetInfoController.selected.manufactDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.manufactDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.purchaseDate}</label>
+                                    <p:inputText value="#{assetInfoController.selected.purchaseDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.arriveDate}</label>
+                                    <p:inputText id="arriveDate" value="#{assetInfoController.selected.arriveDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.installDate}</label>
+                                    <p:inputText id="installDate" value="#{assetInfoController.selected.installDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.installDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.factoryWarrantyDate}</label>
+                                    <p:inputText id="factoryWarrantyDate" value="#{assetInfoController.selected.factoryWarrantyDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.factoryWarrantyDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.warrantyDate}</label>
+                                    <p:inputText value="#{assetInfoController.selected.warrantyDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.terminateDate}</label>
+                                    <p:inputText id="terminateDate" value="#{assetInfoController.selected.terminateDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.terminateDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true" />-->
+                                </h:panelGroup>
+                                <h:panelGroup></h:panelGroup>
+
+                                <h:panelGroup >
+                                    <label class="label">#{msg.purchasePrice}</label>
+                                    <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoController.selected.purchasePrice}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.salvageValue}</label>
+                                    <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoController.selected.salvageValue}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lifecycle}</label>
+                                    <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoController.selected.lifecycleInYear}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.depreciationMethod}</label>
+                                    <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoController.selected.depreciationMethod)}" readonly="true"/>
+                                </h:panelGroup>
+
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lastPmDate}</label>
+                                    <p:inputText id="lastPmDate" value="#{assetInfoController.selected.lastPmDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  id="lastPmDate" pattern="yyyy/MM/dd" value="#{assetInfoController.selected.lastPmDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lastQaDate}</label>
+                                    <p:inputText id="lastQaDate" value="#{assetInfoController.selected.lastQaDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                    <!--<p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInfoController.selected.lastQaDate}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>-->
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.lastMeteringDate}</label>
+                                    <p:inputText id="lastMeteringDate" value="#{assetInfoController.selected.lastMeteringDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+								<h:panelGroup >
+	                                <label class="label">是否对质保到期进行提醒</label>
+		                            <p:selectOneRadio value="#{assetInfoController.selected.warranty}" disabled="true">
+	                                    <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                                   		<f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+	                                </p:selectOneRadio>
+	                            </h:panelGroup>
+
+                            </p:panelGrid>
+                        </div>
+                    </div>
+                </p:tab>
+            </p:accordionPanel>
+
+            <h:form>
+                <p:panelGrid columns="2"  layout="grid" styleClass="ui-panelgrid-blank">
+                    <p:panel  header="#{msg.InspectionOrder}">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/insp/InspOrderList?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/InspOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
+                        </f:facet>
+
+                        <p:dataTable var="item" value="#{inspectionServiceController.getInspectionOrderList(assetInfoController.selected.id, 1, 3)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.createTime}">
+                                <h:outputText value="#{item.createTime}" />
+                            </p:column>
+                            <p:column headerText="#{msg.creatorName}">
+                                <h:outputText value="#{item.creatorName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.ownerId}">
+                                <h:outputText value="#{item.ownerName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.examStartTime}">
+                                <h:outputText value="#{item.startTime}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.endTime}">
+                                <h:outputText value="#{item.endTime}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+
+                    <p:panel  header="#{msg.MaintainanceRecord}">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" actionListener="#{assetInfoController.assembleMaintainList}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" actionListener="#{assetInfoController.assembleMaintainData(assetInfoController.selected.uid)}"  action="#{urlEncryptController.encodeUrlParam(assetInfoController.operation)}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
+                        </f:facet>
+
+                        <p:dataTable var="item" value="#{inspectionServiceController.getWorkOrderList(assetInfoController.selected.id, 3)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" >
+                                <h:outputText value="#{item.casePriority}" class="priorityItem priorityItem#{item.casePriority}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.requestTime}" >
+                                <h:outputText value="#{item.requestTime}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.requestReason}" >
+                                <h:outputText value="#{item.requestReason}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.requestorName}" >
+                                <h:outputText value="#{item.requestorName}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+
+                    <p:panel  header="#{msg.MetrologyMonitor}">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/insp/MetrologyOrderList?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                            <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/insp/MetrologyOrderCreate?faces-redirect=true&amp;actionName=Create')}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
+                        </f:facet>
+
+                        <p:dataTable var="item" value="#{inspectionServiceController.getInspectionOrderList(assetInfoController.selected.id, 2, 3)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="#{msg.createTime}">
+                                <h:outputText value="#{item.createTime}" />
+                            </p:column>
+                            <p:column headerText="#{msg.creatorName}">
+                                <h:outputText value="#{item.creatorName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.ownerId}">
+                                <h:outputText value="#{item.ownerName}" />
+                            </p:column>
+                            <p:column headerText="#{msg.examStartTime}">
+                                <h:outputText value="#{item.startTime}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.endTime}">
+                                <h:outputText value="#{item.endTime}" />
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+<!--test-->
+                    <p:panel  header="内部保养记录">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                        </f:facet>
+                        <p:dataTable var="item" value="#{inspectionServiceController.getPmOrderList(assetInfoController.selected.uid,3)}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="创建人" >
+                                <h:outputText value="#{item.creatorName}"/>
+                            </p:column>
+                            <p:column headerText="保养编号" >
+                                <h:outputText value="#{item.pmNum}"/>
+                            </p:column>
+                            <p:column headerText="当前处理步骤" >
+                                <h:outputText value="#{item.currentStepName}"/>
+                            </p:column>
+                            <p:column headerText="当前处理人" >
+                                <h:outputText value="#{item.currentPersonName}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                    <p:panel  header="远程保养记录">
+                        <f:facet name="actions">
+                            <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="/portal/pm/pmOrderListAll?faces-redirect=true"><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                        </f:facet>
+                        <p:dataTable var="item" value="#{assetInfoController.getPmScheduleData('epm')}" emptyMessage="#{msg.noRecordFound}">
+                            <p:column headerText="保养编号" >
+                                <h:outputText value="#{item.assetNum}"/>
+                            </p:column>
+                            <p:column headerText="关单日期" >
+                                <h:outputText value="#{item.closeDate}"/>
+                            </p:column>
+                            <p:column headerText="当前处理步骤" >
+                                <h:outputText value="#{item.scheduleDate}"/>
+                            </p:column>
+                        </p:dataTable>
+                    </p:panel>
+                </p:panelGrid>
+            </h:form>
+
+            <p:fieldset  style="margin-bottom:20px">
+                <!-- Chart 2: Device Exposure -->
+                <div class="ui-g-12">
+                    <div class="block">
+                        <h3 class="block-title">#{msg.deviceExpohd}</h3>
+                        <p:chart id="exposure_bar" type="line" model="#{assetUsageSingleController.deviceExpo}" 
+                                 responsive="true"/>
+                    </div>
+                </div>
+            </p:fieldset>
+            <p:fieldset  style="margin-bottom:20px">
+                <!-- Chart 1: Device Scan --> 
+                <div class="ui-g-12">
+                    <div class="block">
+                        <h3 class="block-title">#{msg.deviceScanhd}</h3>
+                        <p:chart id="scan_bar" type="line"
+                                 model="#{assetUsageSingleController.deviceScan}" responsive="true"/>
+                    </div>
+                </div>
+            </p:fieldset>
+
+            <h:form>
+                <p:panel  header="#{msg.deviceContract}">
+                    <f:facet name="actions">
+                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam(assetInfoController.getContractListLink())}" ><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
+                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam(assetInfoController.getContractAddLink())}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
+                    </f:facet>
+                    <p:dataTable var="item" value="#{assetInfoService.getContractList(assetInfoController.selected.id)}" emptyMessage="#{msg.noRecordFound}">
+                        <p:column headerText="#{msg.name}" >
+                            <h:outputText value="#{item.name}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.startTime}"  >
+
+                            <h:outputText value="#{item.startDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.endTime}" >
+
+                            <h:outputText value="#{item.endDate}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            </h:outputText>
+                        </p:column>
+                        <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.contractAmount}" >
+                            <h:outputText value="#{item.contractAmount}"/>
+                        </p:column>
+                        <p:column headerText="#{msg.AssetContractAttachment}"  >
+                            <p:commandButton value="#{msg.download}"  onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download" rendered="#{item.fileId > 0}" ajax="false">
+                                <p:fileDownload value="#{attachmentFileService.getFile(item.fileId)}" />
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+
+
+                <p:tabView>
+                    <p:tab title="#{fieldMsg.fieldValue('attachmentType', 1)}">
+                        <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,1)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                        </p:dataList>
+                    </p:tab>
+                    <p:tab title="#{fieldMsg.fieldValue('attachmentType', 2)}">
+                        <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,2)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                        </p:dataList>
+                    </p:tab>
+                    <p:tab title="#{fieldMsg.fieldValue('attachmentType', 3)}">
+                        <p:dataList value="#{assetInfoController.getAttachList(assetInfoController.selected.uid,3)}" var="fileitem" type="ordered" emptyMessage="#{msg.noRecordFound}">
+                            <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}">#{fileitem.objectName}</p:link>
+                        </p:dataList>
+                    </p:tab>
+                    <p:tab title="#{msg.QRCode}" rendered="#{not empty assetInfoController.selected.qrCode}">
+                        <!--<p:barcode value="#{assetInfoController.selected.qrCode}" type="qr" height="200" format="png"/>-->
+                        <img src="#{qrCodeShowController.getQrCodeImageBase64(assetInfoController.selected.qrCode,assetInfoController.selected.siteUID)}" />
+                    </p:tab>
+                </p:tabView>
+            </h:form>
+
+            <h:panelGroup >
+                <!--<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>-->
+            </h:panelGroup>
+        </div>
+        <div id="shwoPicDialog" class="ui-dialog ui-widget ui-widget-content ui-corner-all ui-shadow ui-hidden-container" style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
+            <div class="ui-dialog-titlebar ui-widget-header ui-helper-clearfix ui-corner-top">
+                <span id="shwoPicDialog_title" class="ui-dialog-title">图片</span><a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-close ui-corner-all" aria-label="Close">
+                    <span class="ui-icon ui-icon-closethick"></span></a>
+                <a href="#" class="ui-dialog-titlebar-icon ui-dialog-titlebar-maximize ui-corner-all"><span class="ui-icon ui-icon-extlink"></span></a>
+            </div>
+            <div class="ui-dialog-content ui-widget-content"  style="max-width: 800px;max-height:600px;min-width:800px;min-height:600px">
+
+                <image id="shwoPicDialogImg" src="" ></image>
+            </div>
+        </div>
+        <script id="shwoPicDialog_s" type="text/javascript">$(function () {
+                PrimeFaces.cw("Dialog", "shwoPicDialog", {id: "shwoPicDialog", modal: true, appendTo: "@(body)"});
+            });
+        </script>
+        <script>
+            window.onload = function () {
+                $(".jqplot-table-legend").css("display", "none");
+            }
+            function showthis(pic) {
+                var s = $('#shwoPicDialogImg')[0]
+                s.src = pic.src;
+                PF('shwoPicDialog').show();
+            }
+        </script>
+    </ui:define>
+</ui:composition>

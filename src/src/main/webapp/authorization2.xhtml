@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+
+    <p:dialog id="ActiveDlg2" widgetVar="ActiveDlg2" width="450" height="220" modal="true" resizable="true" draggable="true" header="欢迎登陆APM管理平台！" closable="false">
+        <h:form id = "ActiveForm">
+            Helloworld!
+            <p:column>Helloworld!</p:column>
+            <!--<p:fieldset id="changePassword" legend="用户首次登陆激活" style="margin-top:20px;">
+                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    &lt;!&ndash;<h3 style="margin-top:0px"></h3>   <a href='http://www.baidu.com'>用户协议</a>   &ndash;&gt;
+                    <p:link href="http://www.baidu.com" value="查看用户协议" target="_new"/>
+                    <p:selectManyCheckbox id="basic" value="#{loginController.items}">
+                        <p:ajax update="ActiveForm" listener="#{loginController.updateAgree()}"/>
+                        <f:selectItem itemLabel="我已阅读相关用户协议并确认激活账号" itemValue="1" />
+                    </p:selectManyCheckbox>
+                </p:panelGrid>
+            </p:fieldset>
+
+            <p:commandButton value="激活" actionListener="#{loginController.confirmActivation()}" icon="ui-icon-home"
+                             oncomplete="handleSubmit(args, 'ActiveDlg');" disabled="#{!loginController.agree}"/>
+            &nbsp;&nbsp;
+            &lt;!&ndash;action="#{facesContext.externalContext.requestContextPath}/logout.xhtml?uid=#{userContextService.loginUserId}"  actionListener="#{loginController.logout()}"&ndash;&gt;
+            <p:commandButton value="#{msg.Logout}" icon="ui-icon-power-settings-new"/>-->
+        </h:form>
+
+    </p:dialog>
+
+<!--    <script>
+        window.onload = function () {
+            var isActive = "#{userContextService.isActive()}";
+            if(isActive == '1'){
+                PF('ActiveDlg').show();
+            }
+        }
+    </script>-->
+</ui:composition>
+</html>

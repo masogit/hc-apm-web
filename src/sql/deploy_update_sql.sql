@@ -74,8 +74,75 @@ update pm_order_rule pr  set performance_report=(select id from table_definition
 where pr.performance_report in (Select Schema from table_definition where tenant_uid=pr.tenant_uid);
 
 --data refrence change
-update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-safety-report';
+update unstructured_data_collection uc set schema_id=(select safety_report from pm_order_rule where uid=uc.schema_id) where bo_type='safety-report';
 
-update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='pm-performance-report';
+update unstructured_data_collection uc set schema_id=(select performance_report from pm_order_rule where uid=uc.schema_id) where bo_type='performance-report';
 
 --end for v1.9.1 change
+
+--v2.1
+SELECT setval('"sys_role_id_seq"', 11, false);
+INSERT INTO sys_role ( name, role_desc) VALUES ( 'SharedAssetMgmt', '设备调剂管理人员');
+
+
+--v4.2
+update qr_code_lib set uid = replace('' || uuid_generate_v4(),'-','') where uid is null;
+create table qr_code_lib_bak as (select* from qr_code_lib);
+alter table qr_code_lib drop constraint uk_qr_code_lib_qrcode;
+alter table qr_code_lib alter column site_id drop not null;
+alter table qr_code_lib alter column hospital_id drop not null;
+--alter table qr_code_lib drop constraint qr_code_lib_pkey;
+alter table qr_code_lib alter column uid set not null;
+--alter table qr_code_lib alter column id drop not null;
+--alter table qr_code_lib add primary key(uid);
+alter table qr_code_lib add constraint uk_qr_code_lib_qrcode_site_uid unique(qr_code,site_uid);
+
+update supplier a set tenant_uid=(select uid from tenant_info o where o.id=a.site_id) where tenant_uid is null;
+
+INSERT INTO sys_role (name, role_desc, home_page) VALUES ('LocalITAdmin','本地后台运营管理','/portal/uaa/userAccount/List.xhtml');
+
+--alter table qr_code_lib drop constraint qr_code_lib_pkey;
+--alter table qr_code_lib alter column id set not null;
+--alter table qr_code_lib add primary key(id);
+
+alter table asset_info drop constraint uk_asset_info_qr_code;
+update workflow_config set pm_manhour_price = 1000 where pm_manhour_price is null;
+update workflow_config set wo_manhour_price = 1000 where wo_manhour_price is null;
+
+
+--v5.1
+update table_definition set base_id=id where base_id is null;
+
+update asset_contract set tenant_uid = o.tenant_uid,institution_uid=o.institution_uid,hospital_uid=o.hospital_uid,site_uid=o.site_uid  
+    from  asset_contract ac,org_info o where ac.hospital_id=o.id and asset_contract.id=ac.id;
+
+create table unstructured_data_bak as (select* from unstructured_data);
+
+delete from unstructured_data where id in (select id from unstructured_data ud,(select * from (SELECT count(*) as count1,collection_id,key  FROM "public".unstructured_data  group by collection_id, key ) a where count1 >1) b
+   where ud.collection_id=b.collection_id and ud."key"=b.key and ud.id not in (SELECT max(id) FROM "public".unstructured_data  group by collection_id, key ));
+
+alter table unstructured_data add constraint uk_collection_id_key unique(collection_id,key);
+
+update v2_work_order as wo set approver_id = sr.requestor_id, approver_name = sr.requestor_name 
+	from v2_service_request as sr where sr.id = wo.sr_id and approval_status != '0' and approver_id is null;
+
+
+update shared_asset_type set charging_type='1' where charging_type='次';
+update shared_asset_req_detail set charging_type='1' where charging_type='次';
+update shared_asset_type set charging_type='2' where charging_type='小时(半点/整点)';
+update shared_asset_req_detail set charging_type='2' where charging_type='小时(半点/整点)';
+update shared_asset_type set charging_type='3' where charging_type='天';
+update shared_asset_req_detail set charging_type='3' where charging_type='天';
+update shared_asset_type set charging_type='4' where charging_type='自然时间';
+update shared_asset_req_detail set charging_type='4' where charging_type='自然时间';
+
+ALTER TABLE public.shared_asset_req_detail ALTER COLUMN charging_begin_time TYPE timestamp USING charging_begin_time::timestamp;
+ALTER TABLE public.shared_asset_req_detail ALTER COLUMN charging_end_time TYPE timestamp USING charging_end_time::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN apply_time TYPE timestamp USING apply_time::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN create_date TYPE timestamp USING create_date::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN msg_begin_time TYPE timestamp USING msg_begin_time::timestamp;
+ALTER TABLE public.shared_asset_request ALTER COLUMN msg_end_time TYPE timestamp USING msg_end_time::timestamp;
+
+alter table capture_data_messages alter start_date type timestamp(4) without time zone
+alter table capture_data_messages alter end_date type timestamp(4) without time zone
+

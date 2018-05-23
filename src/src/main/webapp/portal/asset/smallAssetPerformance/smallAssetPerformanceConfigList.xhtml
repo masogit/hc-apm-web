@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:form id="smallAssetPerformanceConfigListForm">
+	<p:dataTable id="datalist" value="#{smallAssetPerformanceConfigController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+		selection="#{smallAssetPerformanceConfigController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+
+		<p:ajax event="rowSelect" update="editButton deleteButton" />
+		<p:ajax event="filter" listener="#{smallAssetPerformanceConfigController.onFilter}" />
+
+		<p:column headerText="项目名称" filterBy="#{item.projectName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.projectName}" />
+		</p:column>
+		<p:column headerText="项目编号" filterBy="#{item.projectNumber}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.projectNumber}" />
+		</p:column>
+		<p:column headerText="科室名称" filterBy="#{item.department}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.department}" />
+		</p:column>
+		<p:column headerText="设备名称" filterBy="#{item.assetName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetName}" />
+		</p:column>
+		<p:column headerText="占比" sortBy="#{item.rate}" >
+            <h:outputText value="#{item.rate}" />
+		</p:column>
+		<p:column headerText="校验结果" filterBy="#{item.statusCode}" filterMatchMode="EQ">
+			<f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{fieldMsg.getFieldValueList('measuringStatus')}" var="entry" itemLabel="#{entry.value}" itemValue="#{entry.msgKey}"/>
+                </p:selectOneMenu>
+            </f:facet>
+			<h:outputText value="#{fieldMsg.fieldValue('measuringStatus', item.statusCode)}" />
+		</p:column>
+		<p:column headerText="备注">
+			<h:outputText value="#{item.statusDisplay}" />
+		</p:column>
+
+		<f:facet name="{Toolbar}">
+			<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"
+				actionListener="#{smallAssetPerformanceConfigController.prepareCreate}" update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigEditDlg"
+				oncomplete="PF('smallAssetPerformanceConfigEditDialog').show()" />
+			<p:commandButton id="editButton" actionListener="#{smallAssetPerformanceConfigController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"
+				update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigEditDlg" oncomplete="PF('smallAssetPerformanceConfigEditDialog').show()"
+				disabled="#{empty smallAssetPerformanceConfigController.selected.id}" />
+			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
+				actionListener="#{smallAssetPerformanceConfigController.delete}" update=":smallAssetPerformanceConfigTab:smallAssetPerformanceConfigListForm:datalist"
+				disabled="#{empty smallAssetPerformanceConfigController.selected.id}">
+				<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+</h:form>
+<ui:include src="smallAssetPerformanceConfigEdit.xhtml" />
+
+</html>

@@ -1,0 +1,87 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.Import}安装完成设备"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="importForm">
+                    <h:panelGroup >
+                        <p:commandButton value="导入数据"  process="@this" update=":importForm" oncomplete="PF('uploadDialog').show()" rendered="#{empty compareImportController.file}"/>
+                        <h:outputText value="#{compareImportController.file.fileName}" />
+                        <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{compareImportController.cancelUpload}" update=":importForm :uploadDialogForm :ItemViewForm" rendered="#{not empty compareImportController.file}"/>
+                    </h:panelGroup>
+                    <p:dataTable id="assetTable" value="#{compareImportController.importAssetMap.values()}" var="item" rows="10" paginator="true" 
+                                 selection="#{compareImportController.selectedItem}" rowKey="#{item['RowIndex']}"  selectionMode="single" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                 paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                 rowsPerPageTemplate="5,10,15" >
+                        
+                        <p:ajax event="rowSelect" listener="#{compareImportController.onSelectedChange}" update=":ItemViewForm"/>
+                        <p:column headerText="#{msg.assetName}" >
+                            <h:outputText value="#{item['设备名称']}"/>
+                        </p:column>
+                        <p:column headerText="设备编号" >
+                            <h:outputText value="#{item['设备编号']}"/>
+                        </p:column>
+                        <p:column headerText="规格型号" >
+                            <h:outputText value="#{item['规格型号']}"/>
+                        </p:column>
+                        <p:column headerText="出厂编号" >
+                            <h:outputText value="#{item['出厂编号']}"/>
+                        </p:column>
+                        <p:column headerText="使用单位" >
+                            <h:outputText value="#{item['使用单位']}"/>
+                        </p:column>
+                        <p:column headerText="资产建档信息" >
+                            <h:outputText value="#{empty item['asset'] ? '未匹配':'已匹配'}" />
+                        </p:column>
+                        <p:column headerText="设备安装信息" >
+                            <h:outputText value="#{empty item['arrivalListItem']? '未匹配': fieldMsg.fieldValue('arrivalListItemStatus',item['arrivalListItem'].installStatus)}"/>
+                        </p:column>
+                        <p:column headerText="操作" >
+                            <p:commandLink  value="入库" actionListener="#{compareImportController.instorage(item['arrivalListItem'])}" update="assetTable :ItemViewForm"
+                                            rendered="#{not empty item['arrivalListItem']}" disabled="#{item['arrivalListItem'].installStatus ne 'finished'}"/>
+                            
+                        </p:column>
+                    </p:dataTable>
+                </h:form>
+                <ui:include src="compareDetails.xhtml"/>
+            </div>
+
+        </div>
+
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传数据文件">
+            <h:form id="uploadDialogForm" >
+                <h:panelGroup id="display" >
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <h:outputText   value="#{compareImportController.file.fileName}"  rendered="#{not empty compareImportController.file}"/>
+                            <p:fileUpload  fileUploadListener="#{compareImportController.uploadDataFile}" value="#{compareImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                           multiple="false" sizeLimit="10000000" update=":uploadDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty compareImportController.file}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <!--<p>1. <a href="APM_Asset_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a> </p>-->
+                            <p>1. 文件中填入要导入的资产数据</p>
+                            <p>2. 上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton immediate="false" validateClient="true" actionListener="#{compareImportController.finishUpload()}" disabled="#{empty compareImportController.file}" value="#{msg.Confirm}" update=":uploadDialogForm :importForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{compareImportController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('rateDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:define>
+
+</ui:composition>

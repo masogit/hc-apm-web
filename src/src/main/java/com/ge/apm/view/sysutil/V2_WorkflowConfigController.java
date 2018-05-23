@@ -9,7 +9,17 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.alibaba.druid.util.StringUtils;
+import com.ge.apm.domain.*;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
+import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,11 +30,6 @@ import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.V2_WorkflowConfigRepository;
 import com.ge.apm.dao.WorkflowConfigRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_DeviceType;
-import com.ge.apm.domain.V2_WorkflowConfig;
-import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.UserCommonService;
 
 import webapp.framework.dao.SearchFilter;
@@ -49,6 +54,21 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private OrgInfoRepository orgInfoRepository;
 	private TenantInfoRepository tenantInfoRepository;
 	private UserCommonService ucService;
+	private Boolean isInsulate;
+	private Integer loginUserOrgType;
+	private UserCommonService userCommonService;
+
+	private OrgInfo selectedUserOrg;
+	private TenantInfo selectedTenant;
+	private TreeNode orgTree;
+	private TreeNode selectedNode;
+	private String tenantUid;
+	private UaaService uaaService;
+	private OrgInfo selectedOrg;
+	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
+	private String newFormat;
+	private List<OrgInfo> dispatherClinical = new ArrayList<OrgInfo>();
+
 	@Override
 	protected void init() {
 		user = UserContextService.getCurrentUserAccount();
@@ -56,61 +76,89 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		userDao = WebUtil.getBean(UserAccountRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-		ucService = WebUtil.getBean(UserCommonService.class);
-		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);
-		initDispatchUserList();
+		userCommonService = WebUtil.getBean(UserCommonService.class);
+		uaaService = WebUtil.getBean(UaaService.class);
+		isInsulate = UserContextService.isOnlyLocalITAdmin();
+		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
+		/*user.getUserRoleList().stream().anyMatch( userRole -> (userRole.getRoleId() == 11));
+		isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+		isInsulate = (isInsulate == null || isInsulate == false) ? false : true;
+		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);*/
+		/*updateDispater();
+		updateApproverlList();*/
+		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
+		setTenantUid(user.getTenantUID());
+
 	}
 
-	public void initDispatchUserList() {
-		dispatchUserList = userDao.getByTenantUID(user.getTenantUID());
-		/*
-		dispatchUserList.clear();
-		Set<String> uids = new HashSet<String>();
-		String tenantUID = user.getTenantUID();
-		if(selected == null){
-			*//**
-			 * 默认级别：租户
-			 *//*
-			dispatchUserList = userDao.getByTenantUID(tenantUID);
-			return;
-		}else{
-			uids.add(selected.getTenantUID());
-			selected.setTenantUID(tenantUID);
-			
-			*//***
-			 * 租户级别
-			 *//*
-			if(isNullOrBelongs(selected.getInstitutionUID(),uids) || selected.getTenantUID().equals(selected.getInstitutionUID())){
-				System.out.println("租户级别");
-				dispatchUserList = userDao.getByTenantUID(tenantUID);
-				return;
-			}else{
-				*//***
-				 * 集团级别
-				 *//*
-				uids.add(selected.getInstitutionUID());
-				if(isNullOrBelongs(selected.getHospitalUID(),uids) || selected.getInstitutionUID().equals(selected.getHospitalUID())){
-					System.out.println("集团级别");
-					dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
-					return;
-				}else{
-					*//***
-					 * 医院级别
-					 *//*
-					uids.add(selected.getHospitalUID());
-					if(isNullOrBelongs(selected.getSiteUID(),uids) || selected.getHospitalUID().equals(selected.getSiteUID())){
-						System.out.println("医院级别");
-						dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
-						return;
-					}else{
-						System.out.println("院区级别");
-						dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
-						return;
-					}
-				}
-			}
+	public String getOrgFullName(OrgInfo org) {
+		if (null == org || org.getId() == -1) {
+			return null;
 		}
-	*/}
+		String name = org.getName();
+		while (org.getParentOrg() != null) {
+			org = org.getParentOrg();
+			name = org.getName() + "/" + name;
+		}
+
+		return name;
+	}
+
+	public void onSelectOrgForUser(NodeSelectEvent event) {
+		TreeNode node = event.getTreeNode();
+		selectedUserOrg = (OrgInfo) node.getData();
+		updateDispater();
+		updateApproverList();
+		updateDispatherClinical();
+		selected.setSiteUID(selectedUserOrg.getSiteUID());
+	}
+
+	private void updateDispatherClinical() {
+		dispatherClinical.clear();
+		if(selected == null || selectedUserOrg == null){
+			return;
+		}
+		if(isInsulate){
+			Integer orgType = selectedUserOrg.getOrgType();
+			dispatherClinical = orgInfoRepository.findBySiteUIDAndOrgType(selectedUserOrg.getSiteUID(),4);
+			/*if(orgType == 0){
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getTenantUID(),4);
+			}else if(orgType == 1) {
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getInstitutionUID(),4);
+			}else if(orgType == 2){
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getHospitalUID(),4);
+			}else if(orgType == 3){
+				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+			}*/
+		}else{
+			dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selectedUserOrg.getSiteUID(),4);
+		}
+	}
+
+	public void setTenantUid(String tenantUid) {
+		//searchFilters.clear();
+		//this.tenantUid = tenantUid;
+		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
+		//判断登陆用户是否是LocalITAdmin(本地后台运营管理)
+		if(UserContextService.isOnlyLocalITAdmin()){
+			selectedTenant = tempTenantInfo;
+			orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
+		}else{
+			selectedTenant = tenantInfoRepository.findByuid(tenantUid);
+			OrgInfo rootOrg = new OrgInfo();
+			rootOrg.setId(-1);
+			rootOrg.setName(WebUtil.getMessage("AllHospitals"));
+			orgTree = new DefaultTreeNode("root", null, null);
+			TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
+			rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
+		}
+
+		TreeNode selectedUserOrg = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
+		if (null != selectedUserOrg) {
+			selectedUserOrg.setSelected(true);
+			TreeNodeUtil.expandParentsNodes(selectedUserOrg);
+		}
+	}
 	
 	private boolean isNullOrBelongs(String uid,Set<String> uids){
 		if(uid == null){
@@ -122,8 +170,53 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return false;
 	}
 
-	public List<OrgInfo> getIncludeOrgInfo(String parentUID,Integer orgType){
-		return orgInfoRepository.findByParentUIDAndOrgType(parentUID,orgType);
+	public List<OrgInfo> getIncludeOrgInfo(String uid,String parentUID,Integer orgType){
+		return userCommonService.getIncludeOrgInfo(isInsulate,loginUserOrgType,uid,parentUID,orgType);
+	}
+
+	public void updateDispater(){
+		dispatchUserList.clear();
+		if(selected == null || selectedUserOrg == null){
+			return;
+		}
+		if(isInsulate){
+			Integer orgType = selectedUserOrg.getOrgType();
+			if(orgType == 0){
+                dispatchUserList = userDao.getByTenantUIDStaff(selectedUserOrg.getTenantUID());
+            }else if(orgType == 1) {
+                dispatchUserList = userDao.getByInstitutionUID(selectedUserOrg.getInstitutionUID());
+            }else if(orgType == 2){
+                dispatchUserList = userDao.getByHospitalUID(selectedUserOrg.getHospitalUID());
+            }else if(orgType == 3){
+                dispatchUserList = userDao.getBySiteUID(selectedUserOrg.getSiteUID());
+            }
+		}else{
+			dispatchUserList = userDao.getByTenantUIDStaff(user.getTenantUID());
+		}
+	}
+
+	public void updateApproverList(){
+		approveUserList.clear();
+		if(selectedUserOrg == null || selected == null){
+			return;
+		}
+		if(isInsulate){
+			Integer orgType = selectedUserOrg.getOrgType();
+			if(orgType == 0){
+				approveUserList = userDao.getAssetHeadAndStaffByTenantUID(selectedUserOrg.getTenantUID());
+			}else if(orgType == 1) {
+				approveUserList = userDao.getAssetHeadAndStaffByInstitutionUID(selectedUserOrg.getInstitutionUID());
+			}else if(orgType == 2){
+				approveUserList = userDao.getAssetHeadAndStaffByHospitalUID(selectedUserOrg.getHospitalUID());
+			}else if(orgType == 3){
+				approveUserList = userDao.getAssetHeadAndStaffBySiteUID(selectedUserOrg.getSiteUID());
+			}
+			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
+		}else{
+			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
+			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
+			//return userCommonService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
+		}
 	}
 	
 	public List<UserInfo> getUserList() {
@@ -147,25 +240,54 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		return oi.getName();
 	}
 	
-	public String getOrgNameByUId(String uid){
+	public String getInsNameByUId(String uid){
 		OrgInfo oi =  orgInfoRepository.getByUid(uid);
 		if(oi == null){
 			return null;
 		}
-		return oi.getName();
+		if(oi.getOrgLevel() == 1){
+			return oi.getName();
+		}
+		return null;
 	}
-	
+
+	public String getHospitalNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		if(oi.getOrgLevel() == 2){
+			return oi.getName();
+		}
+		return null;
+	}
+
+	public String getSiteNameByUId(String uid){
+		OrgInfo oi =  orgInfoRepository.getByUid(uid);
+		if(oi == null){
+			return null;
+		}
+		if(oi.getOrgLevel() == 3){
+			return oi.getName();
+		}
+		return null;
+	}
+
 	public String getTenantName(String tenantUID){
 		return tenantInfoRepository.findByuid(tenantUID).getName();
 	}
 
-        public List<UserAccount> getAssetCreateApproverlList(){
-            return ucService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
-        }
+/*   	public List<OrgInfo> getDispatherClinical(){
+		OrgInfo org = orgInfoRepository.findByUid(selected.getSiteUID());
+		if(org.getOrgLevel() != 3){
+			return null;
+		}
+		return orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
+	}*/
+
 	@Override
 	protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
-        List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+		List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
         return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
 
@@ -209,20 +331,21 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	@Transactional
 	@Override
 	public void onBeforeSave(WorkflowConfig config) {
-		selected.setTenantUID(user.getTenantUID());
+		selected.setTenantUID(selectedUserOrg.getTenantUID());
 		selected.setSiteId(user.getSiteId());
 		selected.setHospitalId(user.getHospitalId());
-		if(selected.getInstitutionUID() == null){//租户级别
-			selected.setInstitutionUID(selected.getTenantUID());
-			selected.setHospitalUID(selected.getTenantUID());
-			selected.setSiteUID(selected.getTenantUID());
-		}
-		if(selected.getHospitalUID() == null){//集团级别
-			selected.setHospitalUID(selected.getInstitutionUID());
-			selected.setSiteUID(selected.getInstitutionUID());
-		}
-		if(selected.getSiteUID() == null){//医院级别
-			selected.setSiteUID(selected.getHospitalUID());
+		selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
+		selected.setHospitalUID(selectedUserOrg.getHospitalUID());
+		selected.setSiteUID(selectedUserOrg.getSiteUID());
+		int orgType = selectedUserOrg.getOrgType();
+		if(orgType == 0){
+			selected.setAssetSeriaNumLevel(4);//租户级别
+		}else if(orgType == 1){
+			selected.setAssetSeriaNumLevel(3);//集团级别
+		}else if(orgType == 2){
+			selected.setAssetSeriaNumLevel(2);//医院级别
+		}else if(orgType == 3){
+			selected.setAssetSeriaNumLevel(1);//科室级别
 		}
 
 		UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
@@ -242,35 +365,157 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setDispatchUserName2(null);
 		}
-		dao.deleteBySiteUID(selected.getSiteUID());
+
+		//pm
+		if (selected.getPmDispatchUserId() != null) {
+			UserAccount pmDispather1 = uaDao.getById(config.getPmDispatchUserId());
+			if (pmDispather1 != null) {
+				selected.setPmDispatchUserName(pmDispather1.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName(null);
+		}
+		if (selected.getPmDispatchUserId2() != null) {
+			UserAccount pmDispather2 = uaDao.getById(config.getPmDispatchUserId2());
+			if (pmDispather2 != null) {
+				selected.setPmDispatchUserName2(pmDispather2.getName());
+			}
+		}else{
+			selected.setPmDispatchUserName2(null);
+		}
 	}
 	
 	@Transactional
     public void applyChange() {
+		if(selectedUserOrg == null){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
+			return;
+		}
     	Boolean isManual = selected.getIsManualEnabled();
     	Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
+		Boolean isPmManual = selected.getIsPmManualEnabled();
+		Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
+
     	if(isManual != null && isManual){
     		if(selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null){
     			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-       		 	WebUtil.addErrorMessage(WebUtil.getMessage("NeedDispather"));
+       		 	WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
        		 	return;
     		}
     	}
+    	if(isPmManual != null && isPmManual){
+			if(selected.getPmDispatchUserId() == null && selected.getPmDispatchUserId2() == null){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("PmNeedDispather"));
+				return;
+			}
+		}
+
+
     	if(isManual != null && isTakeOrder != null && !isManual && !isTakeOrder){
     		RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-    		 WebUtil.addErrorMessage(WebUtil.getMessage("ManualAndGrapMsg"));
+    		 WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
     		 return;
     	}
-    	onBeforeSave(selected);
-    	super.save();
+
+    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
+			return;
+		}
+
+		if(selected.getId() != null){
+    		if(selected.getFormat() != null && newFormat != null){
+    			if(selected.getFormat().length() > newFormat.length()){
+					RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+					WebUtil.addErrorMessage(WebUtil.getMessage("FormatIllegal"));
+					return;
+				}
+			}
+		}
+
+		if(selected.getGenerateMethod() != null && selected.getGenerateMethod() == 1){
+    		if(StringUtils.isEmpty(selected.getPrefix())){
+				RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+				WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
+				return;
+			}else{
+    			List<WorkflowConfig> prefixList = dao.findAllPrefixByTenantUID(user.getTenantUID());
+    			if(CollectionUtils.isNotEmpty(prefixList)){
+					for (WorkflowConfig temp:prefixList) {
+						if((!temp.equals(selected)) && temp.getPrefix().equals(selected.getPrefix())){
+							RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+							WebUtil.addErrorMessage(WebUtil.getMessage("prefixExistsAlready"));
+							return;
+						}
+					}
+					/*boolean isExist = prefixList.stream().anyMatch(config -> config.getPrefix().equals(selected.getPrefix()));
+					if(isExist){
+						RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+						WebUtil.addErrorMessage(WebUtil.getMessage("prefixExistsAlready"));
+						return;
+					}*/
+				}
+			}
+
+		}
+
+
+		if(newFormat != null){
+    		selected.setFormat(newFormat);
+		}
+        onBeforeSave(selected);
+
+        //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+//        if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+//            return;
+//        }
+
+        dao.deleteBySiteUID(selected.getSiteUID());
+        super.save();
+		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
+		newFormat = null;
     }
-	
+
+	@Override
+	public void delete() {
+		//判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
+//		if(!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected.getSiteUID())){
+//			return;
+//		}
+		super.delete();
+		selectedUserOrg = null;
+		dispatchUserList.clear();
+	}
+
 	@Override
 	public void prepareEdit(){
-		if(selected != null){
-			initDispatchUserList();
-		}
+		dispatchUserList.clear();
+		approveUserList.clear();
+		dispatchUserList.clear();
 		super.prepareEdit();
+		selectedUserOrg = orgInfoRepository.getByUid(selected.getSiteUID());
+		updateDispater();
+		updateApproverList();
+		updateDispatherClinical();
+		newFormat = selected.getFormat();
+	}
+
+	public void prepareCreate(){
+		dispatchUserList.clear();
+		approveUserList.clear();
+		dispatchUserList.clear();
+		try {
+			super.prepareCreate();
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+		}
+		selectedUserOrg = null;
+/*		updateDispater();
+		updateApproverList();*/
 	}
 	
 	public void onSelect(){
@@ -279,20 +524,20 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}
 	}
 	
-	public void updateHospitalAndSite(){
+	/*public void updateHospitalAndSite(){
 		selected.setHospitalUID(null);
 		selected.setSiteUID(null);
 		dispatchUserList = userDao.getByInstitutionUID(selected.getInstitutionUID());
 	}
-	
+
 	public void updateSite(){
 		selected.setSiteUID(null);
 		dispatchUserList = userDao.getByHospitalUID(selected.getHospitalUID());
 	}
-	
+
 	public void updateDispaters(){
 		dispatchUserList = userDao.getBySiteUID(selected.getSiteUID());
-	}
+	}*/
 
 	public UserAccount getOwner() {
 		return owner;
@@ -333,5 +578,72 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void setSiteList(List<OrgInfo> siteList) {
 		this.siteList = siteList;
 	}
-	
+
+	public OrgInfo getSelectedUserOrg() {
+		return selectedUserOrg;
+	}
+
+	public void setSelectedUserOrg(OrgInfo selectedUserOrg) {
+		this.selectedUserOrg = selectedUserOrg;
+	}
+
+	public TreeNode getOrgTree() {
+		return orgTree;
+	}
+
+	public void setOrgTree(TreeNode orgTree) {
+		this.orgTree = orgTree;
+	}
+
+	public TreeNode getSelectedNode() {
+		return selectedNode;
+	}
+
+	public void setSelectedNode(TreeNode selectedNode) {
+		this.selectedNode = selectedNode;
+	}
+
+	public String getTenantUid() {
+		return tenantUid;
+	}
+
+	public TenantInfo getSelectedTenant() {
+		return selectedTenant;
+	}
+
+	public void setSelectedTenant(TenantInfo selectedTenant) {
+		this.selectedTenant = selectedTenant;
+	}
+
+	public OrgInfo getSelectedOrg() {
+		return selectedOrg;
+	}
+
+	public void setSelectedOrg(OrgInfo selectedOrg) {
+		this.selectedOrg = selectedOrg;
+	}
+
+	public List<UserAccount> getApproveUserList() {
+		return approveUserList;
+	}
+
+	public void setApproveUserList(List<UserAccount> approveUserList) {
+		this.approveUserList = approveUserList;
+	}
+
+	public String getNewFormat() {
+		return newFormat;
+	}
+
+	public void setNewFormat(String newFormat) {
+		this.newFormat = newFormat;
+	}
+
+	public void setDispatherClinical(List<OrgInfo> dispatherClinical) {
+		this.dispatherClinical = dispatherClinical;
+	}
+
+	public List<OrgInfo> getDispatherClinical() {
+		return dispatherClinical;
+	}
 }
