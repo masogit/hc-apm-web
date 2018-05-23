@@ -1,0 +1,92 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <h:outputScript name="js/main.js"/>
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12">
+
+                <p align="center">
+                    <b>借还维护</b>
+                </p>
+            <h:form id="SharedAssetRequestListForm">
+                <p:dataTable id="datalist" value="#{sharedAssetRequestNewController.lazyModel}" var="item" widgetVar="varDataList"
+                    selectionMode="single" selection="#{sharedAssetRequestNewController.selected}"
+                    lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                    rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.applyTime}"
+                    paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                    currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                    rows="20" emptyMessage="#{msg.noRecordFound}"
+                    rowsPerPageTemplate="20,40,60,90">
+
+                    <p:ajax event="rowSelect" update="createButton  deleteButton" listener="#{sharedAssetRequestNewController.onRowEdit()}" oncomplete="openViewWindow(xhr, status, args)"/>
+                    <p:ajax event="filter" listener="#{sharedAssetRequestNewController.onFilter}" update="createButton  deleteButton"/>
+                    
+                    <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.clinicalDeptName}"/>
+                    </p:column>
+<!--                    <p:column headerText="类型" sortBy="#{item.type}" filterBy="#{item.type}" filterMatchMode="LIKE">
+                        <h:outputText value="#{sharedAssetTypeController.getSharedAssetType(item.type)}"/>
+                    </p:column>-->
+<!--                    <p:column headerText="状态" sortBy="#{item.state}" filterBy="#{item.state}" filterMatchMode="LIKE">
+                        <h:outputText value="归还已完成" rendered="#{item.state eq 12}"/>
+                        <h:outputText value="借用已完成" rendered="#{item.state eq 6}"/>
+                    </p:column>-->
+                    <p:column headerText="申请日期" sortBy="#{item.applyTime}" filterBy="#{item.applyTime}" filterMatchMode="LIKE">
+                       <f:facet name="filter">
+                           <p:inputText id="filterApplyTime" widgetVar="varFilterApplyTime" value="#{sharedAssetRequestNewController.applyTimeFormatTime}"/>
+                        </f:facet>
+                        <h:outputText value="#{item.applyTime}">
+                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="SharedAssetRequest_export"/>
+                        </p:commandButton>
+                        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{urlEncryptController.encodeUrlParam('Edit?actionName=Create')}"/>
+<!--                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" actionListener="#{sharedAssetRequestNewController.prepareEdit}"   disabled="#{empty sharedAssetRequestNewController.selected}"/>-->
+                        <p:commandButton id="deleteButton" icon="ui-icon-trash" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{sharedAssetRequestNewController.prepareDelete}"  disabled="#{empty sharedAssetRequestNewController.selected}"/>
+                    </f:facet>
+                </p:dataTable>
+                <p:overlayPanel id="filterTime" widgetVar="panelFilterApplyTime" for=":SharedAssetRequestListForm:datalist:filterApplyTime" dismissable="false">
+                    <h:panelGrid columns="2">
+                        <p:outputLabel for="cal1" />
+                        <p:calendar id="cal1" widgetVar="varApplyTimeFrom" effect="fold" value="#{sharedAssetRequestV2Controller.applyTimeFrom}"
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="开始时间"/>
+                        <p:outputLabel for="cal2"/>
+                        <p:calendar id="cal2" widgetVar="varApplyTimeTo" effect="fold" 
+                                    pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" placeholder="结束时间"/>
+                    </h:panelGrid>
+                    <p:commandButton onclick="PF('panelFilterApplyTime').hide();setDateFilter('varDataList', 'varFilterApplyTime', 'varApplyTimeFrom', 'varApplyTimeTo'); " title="#{msg.Confirm}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;"/>
+                    <p:commandButton onclick="PF('panelFilterApplyTime').hide()" title="#{msg.Close}" icon="ui-icon-close" style="zoom: 0.8;"/>
+                </p:overlayPanel>
+            </h:form>
+            </div>
+        </div>
+        <script>
+            window.onload = function () {
+                $("#searchForm\\:searchText").keypress(function (e) {
+                    if (e.keyCode == 13) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+
+            function openViewWindow(xhr, status, args) {
+                this.location.href = args.url;
+            }
+
+        </script>
+    </ui:define>
+
+</ui:composition>

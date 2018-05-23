@@ -4,6 +4,7 @@
                 xmlns:ui="http://java.sun.com/jsf/facelets"
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
+                xmlns:tie="http://tiefaces.org/tiefaces"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
 
@@ -19,7 +20,7 @@
 
                             <div class="ui-g-12 card cardTitle">
                                 <p:inputText id="pageTitle1" class="pageTitle" value="#{tableCreateController.table.title}"  required="true" requiredMessage="#{msg.name}#{msg.ValidationRequire}" >
-                                    <p:ajax update=":CreateTemplateForm:tabView"  listener="#{tableCreateController.onTitleChange}"/>
+                                    <p:ajax update=":CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle3"  listener="#{tableCreateController.onTitleChange}"/>
                                 </p:inputText>
                             </div>
                             <c:forEach  items="#{tableCreateController.table.groups}" var="groupItem" varStatus="groupIndex">
@@ -82,6 +83,8 @@
                                 <h:panelGroup>
 
                                     <p:commandLink process="@this" actionListener="#{tableCreateController.prepareAddGroup}" value="添加Group"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" />
+                                    <br/>
+                                    <p:commandLink immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                                 </h:panelGroup>
                             </p:panelGrid>
 
@@ -96,11 +99,31 @@
                                 </h:panelGroup>
                                 <h:panelGroup id="jsonString">
                                     <label class="label">#{msg.jsonString}</label>
-                                    <p:inputTextarea  value="#{tableCreateController.tableString}" cols="100"  readonly="#{!tableCreateController.isStringEditable}" />
+                                    <p:inputTextarea id="jsonStringText"  value="#{tableCreateController.tableString}" cols="100"  readonly="#{!tableCreateController.isStringEditable}" />
                                     <p:commandButton  value="编辑" actionListener="#{tableCreateController.onStringEdit()}" process="jsonString" update="jsonString :growl" rendered="#{!tableCreateController.isStringEditable}"/>
                                     <p:commandButton  value="保存" actionListener="#{tableCreateController.onStringSave()}" process="jsonString" update=":CreateTemplateForm jsonString :growl" rendered="#{tableCreateController.isStringEditable}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
+                        </p:tab>
+                        <p:tab title="Excel查看">
+                            <div class="ui-g-12 card cardTitle">
+                                <p:inputText id="pageTitle3" class="pageTitle" value="#{tableCreateController.table.title}"  required="true" requiredMessage="#{msg.name}#{msg.ValidationRequire}" >
+                                    <p:ajax update=":CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle1"  listener="#{tableCreateController.onTitleChange}"/>
+                                </p:inputText>
+                            </div>
+                            <h:panelGroup id="importExcel">
+                                <p:commandButton value="导入模版"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
+                                <h:outputText value="#{tableCreateController.uploadedFile.fileName}" />
+                                <p:link href="#{fileDownloadService.getFileUrl(tableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}">#{tableCreateController.selectedTableDefinition.name}</p:link>
+                                <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
+                            </h:panelGroup>
+                            <p:fieldset legend="预览" id="preview">
+                                    <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
+                                    <p:panel rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId }">
+                                        <p:commandButton value="测试"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
+                                        <h:outputText value="#{tableCreateController.tableFields}" />
+                                    </p:panel>
+                            </p:fieldset>
                         </p:tab>
                     </p:tabView>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -120,7 +143,9 @@
 
                     </p:panelGrid>
                     <h:panelGroup>
-                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":CreateTemplateForm :growl"/>
+                        <!--<p:commandButton icon="ui-icon-remove-red-eye" immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>-->
+                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":CreateTemplateForm :growl" />
+                        <!--<p:remoteCommand name="saveExcel" actionListener="#{excelTableCreateController.saveTemplate}" update=":CreateTemplateForm :growl" />-->
                         <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="schemaList.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
                     </h:panelGroup>
                 </h:form>
@@ -279,15 +304,15 @@
                                     <label class="label">设定值(X)*</label>
                                     <p:inputNumber   value="#{tableCreateController.editTableItem.exp['norm']}" required="true" requiredMessage="设定值(X)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
-<!--                                <h:panelGroup >
-                                    <label class="label">量程(FS)*</label>
-                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['FS']}" required="true" requiredMessage="量程(FS)#{msg.ValidationRequire}" />
-                                </h:panelGroup>-->
-                                 <h:panelGroup  >
+                                <!--                                <h:panelGroup >
+                                                                    <label class="label">量程(FS)*</label>
+                                                                    <p:inputNumber   value="#{tableCreateController.editTableItem.exp['FS']}" required="true" requiredMessage="量程(FS)#{msg.ValidationRequire}" />
+                                                                </h:panelGroup>-->
+                                <h:panelGroup  >
                                     <label class="label">设备显示值Key(Y)*</label>
                                     <p:inputText   value="#{tableCreateController.editTableItem.exp['Y_Key']}" required="true" requiredMessage="设备显示值Key(Y)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
-                                 <h:panelGroup  >
+                                <h:panelGroup  >
                                     <label class="label">仪表显示值Key(Z)*</label>
                                     <p:inputText   value="#{tableCreateController.editTableItem.exp['Z_Key']}" required="true" requiredMessage="仪表显示值Key(Z)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
@@ -318,17 +343,17 @@
                             </p:panelGrid>
                         </p:fieldset>
                         <p:fieldset legend="偏差校验"  rendered="#{'DeltaRule' eq tableCreateController.editTableItem.exp['rule']}" >
-                                <p class="label">合格: |Y-Z|≤最大偏差 </p>
+                            <p class="label">合格: |Y-Z|≤最大偏差 </p>
                             <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                 <h:panelGroup  >
                                     <label class="label">计算结果Key*</label>
                                     <p:inputText   value="#{tableCreateController.editTableItem.resKey}" required="true" requiredMessage="计算结果Key#{msg.ValidationRequire}" />
                                 </h:panelGroup> 
-                                 <h:panelGroup  >
+                                <h:panelGroup  >
                                     <label class="label">设备显示值Key(Y)*</label>
                                     <p:inputText   value="#{tableCreateController.editTableItem.exp['Y_Key']}" required="true" requiredMessage="设备显示值Key(Y)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
-                                 <h:panelGroup  >
+                                <h:panelGroup  >
                                     <label class="label">仪表显示值Key(Z)*</label>
                                     <p:inputText   value="#{tableCreateController.editTableItem.exp['Z_Key']}" required="true" requiredMessage="仪表显示值Key(Z)#{msg.ValidationRequire}" />
                                 </h:panelGroup>
@@ -399,6 +424,47 @@
             </h:form>
         </p:dialog>
 
+        <p:dialog id="PmOrderPreviewDlg" widgetVar="PmOrderPreviewDlg" height="500" width="400" modal="true" resizable="false" draggable="true" appendTo="@(body)" header="预览">
+            <h:form id="PmOrderPreviewForm" >
+                <iframe src="/wx/form/preview/"  width="100%"  height="490"/>
+            </h:form>
+
+        </p:dialog>
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传模版文件">
+            <h:form id="uploadDialogForm" >
+                <h:panelGroup id="display" >
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <h:outputText   value="#{tableCreateController.uploadedFile.fileName}"  rendered="#{not empty tableCreateController.uploadedFile}"/>
+                            <p:fileUpload  fileUploadListener="#{tableCreateController.uploadDataFile}" value="#{tableCreateController.uploadedFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                           multiple="false" sizeLimit="10000000" update=":uploadDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty tableCreateController.uploadedFile}" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <p>说明</p>
+                            <p>上传文件进行导入</p>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton immediate="false" validateClient="true" actionListener="#{tableCreateController.finishUpload()}" disabled="#{empty tableCreateController.uploadedFile}" value="#{msg.Confirm}" 
+                                         update=":CreateTemplateForm:tabView:importExcel :uploadDialogForm :growl :CreateTemplateForm:tabView:pageTitle1 :CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle3 :CreateTemplateForm:tabView:preview" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{tableCreateController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('rateDialog').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+        <script>
+            function preparePreview() {
+                var $jasonText;
+                $jasonText = $("#CreateTemplateForm\\:tabView\\:jsonStringText")[0];
+                if ('localStorage' in window) {
+                    localStorage.setItem("hc-apm-form-preview", $jasonText.innerText || ''); // # for test/dev perpose
+                    localStorage.setItem("hc-apm-token-expireAt", Date.now() + 8640000)
+                }
+
+            }
+
+        </script>
     </ui:define>
 
 

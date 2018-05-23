@@ -46,6 +46,8 @@
                         <p:selectBooleanCheckbox id="wfAutoStep6" value="#{tenantInfoController.selected.wfAutoStep6}" disabled="true" rendered="false"/>
                         <h:outputLabel value="#{msg.tenantType}" for="type" />
                         <h:outputText value="#{empty tenantInfoController.selected.type ? '普通租户' : fieldMsg.fieldValue('tenantType',tenantInfoController.selected.type) }"/>
+                        <h:outputLabel value="院区隔离" for="insulate"/>
+                        <p:selectBooleanCheckbox id="insulate" value="#{tenantInfoController.selected.insulate}" disabled="true"/>
                     </p:panelGrid>
                     <br/>
                     <p:commandButton rendered="#{tenantInfoController.deleteAction}" icon="ui-icon-trash" actionListener="#{tenantInfoController.delete}" value="#{msg.Delete}" update=":SiteInfoListForm:datalist, :growl" oncomplete="handleSubmit(args, 'SiteInfoViewDialog');"/>

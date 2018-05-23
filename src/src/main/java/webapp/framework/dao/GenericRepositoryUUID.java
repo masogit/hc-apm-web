@@ -1,6 +1,7 @@
 package webapp.framework.dao;
 
 import java.io.Serializable;
+import org.springframework.data.jpa.domain.Specification;
 import java.util.Collection;
 import java.util.List;
 
@@ -9,27 +10,34 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.PagingAndSortingRepository;
-
+import org.springframework.data.domain.Sort;
 /**
  * Shared base repository providing query by example and pattern.
  */
 @NoRepositoryBean
-public interface GenericRepositoryUUID<E> extends PagingAndSortingRepository<E, String>,
-        JpaSpecificationExecutor<E> {
+public interface GenericRepositoryUUID<E> extends PagingAndSortingRepository<E, String>, JpaSpecificationExecutor<E> {
 
-    E findById(String id);
-    
-    Page<E> findWithExample(E example, Pageable pageable);
+	E findById(String id);
 
-    Page<E> findWithExample(E example, List<Range<E, ?>> ranges, Pageable pageable);
+	Page<E> findWithExample(E example, Pageable pageable);
 
-    List<E> find();
+	Page<E> findWithExample(E example, List<Range<E, ?>> ranges, Pageable pageable);
 
-    Page<E> findBySearchFilter(final List<SearchFilter> filterFilter, Pageable pageable);
-    List<E> findBySearchFilter(final List<SearchFilter> filterFilter);
+	List<E> find();
 
-    /**
-     * Lookup entities having at least one String attribute matching the passed pattern. Mostly used from autocomplete components.
-     */
-    List<E> find(String pattern);
+	Page<E> findBySearchFilter(final List<SearchFilter> filterFilter, Pageable pageable);
+
+	List<E> findBySearchFilter(final List<SearchFilter> filterFilter);
+
+	/**
+	 * Lookup entities having at least one String attribute matching the passed
+	 * pattern. Mostly used from autocomplete components.
+	 */
+	List<E> find(String pattern);
+
+	Page<E> findBySpecification(final Specification<E> spec, Pageable pageable);
+
+	List<E> findBySpecification(final Specification<E> spec, Sort sort);
+
+	List<E> findBySpecification(final Specification<E> spec);
 }

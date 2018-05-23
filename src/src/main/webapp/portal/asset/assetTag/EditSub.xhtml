@@ -12,11 +12,10 @@
             <h:form id="AssetTagSubscribEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{tagSubscriberController.selected != null}">
-
-                        <!--<h:panelGroup disabled="#{userContextService.hasRole('ITAdmin')}">-->
                         <h:panelGroup >
-                            <label class="label" >关注人*</label>
-                            <p:selectOneMenu disabled="#{!userContextService.hasRole('ITAdmin')}" value="#{tagSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
+                            <label class="label" >关注人</label>
+                            <p:selectOneMenu disabled="#{!(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin'))}" value="#{tagSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
+                            <!--<p:selectOneMenu disabled="#{!userContextService.hasRole('ITAdmin') or !userContextService.hasRole('LocalITAdmin')}" value="#{tagSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">-->
                                 <p:ajax update=":AssetTagSubscribEditForm:assetTag" event="change" listener="#{tagSubscriberController.takeAssetTags()}"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>

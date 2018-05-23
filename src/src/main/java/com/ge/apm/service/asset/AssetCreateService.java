@@ -12,7 +12,6 @@ import com.ge.apm.service.common.WechatSendMsgService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TimeUtils;
-import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -20,7 +19,6 @@ import webapp.framework.dao.SearchFilter;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import webapp.framework.web.WebUtil;
 
 /**
  *
@@ -64,12 +62,12 @@ public class AssetCreateService {
     @Autowired
     private V2_PmOrderService pmService;
 
-    public String getTenantName(Integer siteId) {
-        TenantInfo si = tenantDao.findById(siteId);
+    public String getTenantName(String uid) {
+        TenantInfo si = tenantDao.findByuid(uid);
         if (si != null) {
             return si.getName();
         } else {
-            return siteId.toString();
+            return uid.toString();
         }
     }
 
@@ -100,8 +98,8 @@ public class AssetCreateService {
         }
     }
 
-    public QrCodeLib getCreateRequest(String qrCode) {
-        return qrLibDao.findByQrCode(qrCode);
+    public QrCodeLib getCreateRequest(String qrCode,String siteUid) {
+        return qrLibDao.findByQrCode(qrCode,siteUid);
     }
 
     public List<OrgInfo> getClinicalDeptList(String siteUid) {
@@ -118,15 +116,15 @@ public class AssetCreateService {
         return orgDao.findBySearchFilter(OrgInfoFilters);
     }
 
-    public Boolean CreateAeest(AssetInfo assetInfo,Boolean isGeneratePmOrder) {
+    public Boolean createAsset(AssetInfo assetInfo, Boolean isGeneratePmOrder) {
         boolean isNew = assetInfo.getId()==null;
         if(null == assetDao.save(assetInfo)){
             return false;
         }
         assetDepreciationService.saveAssetDerpeciation(assetInfo);
-        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
-            pmService.createPMrequest(assetInfo.getUid(), null);
-        }
+//        if(isNew && isGeneratePmOrder && !Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+//            pmService.createPMrequest(assetInfo.getUid(), null);
+//        }
         return true;
     }
 
@@ -157,8 +155,8 @@ public class AssetCreateService {
         return picsList;
     }
 
-    public void updateQrLib(String qrCode, int i) {
-        QrCodeLib qrLibItem = qrLibDao.findByQrCode(qrCode);
+    public void updateQrLib(String qrCode, int i,String siteUid) {
+        QrCodeLib qrLibItem = qrLibDao.findByQrCode(qrCode,siteUid);
         qrLibItem.setStatus(i);
         qrLibDao.save(qrLibItem);
     }

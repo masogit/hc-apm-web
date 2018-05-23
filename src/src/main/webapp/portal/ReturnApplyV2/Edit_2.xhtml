@@ -1,0 +1,128 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+    <ui:define name="head">
+        <h:outputStylesheet name="css/inspection.css"/>
+    </ui:define>
+
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="归还申请"/>
+            </div>
+            <div class="ui-g-12 card">
+            
+            <h:form id="IouEditForm">
+                
+                    
+                <p:fieldset legend="归还申请信息" style="margin-bottom:60px">
+                        
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestController.selected != null}">
+                        
+                        <h:panelGroup>
+                            <label class='label'>申请人</label>
+                            <h:outputText value="#{sharedAssetRequestV2Controller.getNameByLoginName2()}"></h:outputText>
+                            <!--<h:outputText value="#{sharedAssetRequestController.selected.applicant}"/>-->
+                            <!--<p:inputText id="applicant" readonly="true" value="#{sharedAssetRequestController.selected.applicant}" />-->
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class='label'>申请科室</label>
+                            <h:outputText value="#{sharedAssetRequestController.selected.clinicalDeptName}"/>
+                            <!--<p:inputText id="clinicalDeptName" readonly="true" value="#{sharedAssetRequestController.selected.clinicalDeptName}" />-->
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class='label'>虚拟网电话</label>
+                            <h:outputText value="#{sharedAssetRequestController.selected.applicantPhone}"/>
+                            <!--<p:inputText id="applicantPhone" readonly="true" value="#{sharedAssetRequestController.selected.applicantPhone}" />-->
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class='label'>创建日期</label>
+                            <h:outputText value="#{sharedAssetRequestController.selected.createDate}"/>
+                            <!--<p:inputText id="createDate" readonly="true" value="#{sharedAssetRequestController.selected.createDate}" />-->
+                        </h:panelGroup>
+                        
+                        <h:panelGroup>
+                            <label class='label'>备注</label>
+                            <p:inputTextarea id="remark" readonly="true" rows="1"  cols="100"  queryDelay="750" minQueryLength="4" value="#{sharedAssetRequestController.selected.remark}" />
+                        </h:panelGroup>
+                        
+                    </p:panelGrid>
+                        
+                </p:fieldset>
+              
+                
+                <p:fieldset legend="归还申请明细信息" style="margin-bottom:20px">
+                    <p:dataTable id="datalistDetail" value="#{sharedAssetReqTypeController.lazyModel}" var="item" widgetVar="varDataListDetail"
+                        selectionMode="single" selection="#{sharedAssetReqTypeController.selected}"
+                        lazy="true" paginator="true" paginatorPosition="top" paginatorAlwaysVisible="true"
+                        rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                        paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                        currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                        rows="20" emptyMessage="#{msg.noRecordFound}"
+                        rowsPerPageTemplate="20,40,60,90" editable="true"> 
+                
+                     <p:ajax event="rowEdit" listener="#{sharedAssetReqTypeController.onCellEditRegist}" update=""  />
+                    <p:ajax event="rowSelect" />
+                    <p:ajax event="filter" listener="#{sharedAssetReqTypeController.onFilter}" />
+                    
+
+
+                    <p:column headerText="调剂设备名称" sortBy="#{item.swapName}" >
+                        <h:outputText value="#{item.swapName}"/>
+                    </p:column>
+<!--                    <p:column headerText="申请数" sortBy="#{item.expectDate}" filterBy="#{item.expectDate}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.applyQty}"/>
+                    </p:column>-->
+                    <p:column headerText="借用数" sortBy="#{item.actualQty}" >
+                        <h:outputText value="#{item.actualQty}"/>
+                    </p:column>
+                        
+                    <p:column headerText="归还数" sortBy="#{item.returnQty}" >
+                         <p:cellEditor>
+                            <f:facet name="output"><h:outputText value="#{item.returnQty}" /></f:facet>
+                            <f:facet name="input"><p:inputText   value="#{item.returnQty}" style="width:96%" label="Year"/></f:facet>
+                            </p:cellEditor>
+                    </p:column>
+
+                    <p:column headerText="备注" sortBy="#{item.remark}" >
+                        <h:outputText value="#{item.remark}"/>
+                    </p:column>
+                    
+                    
+                    
+                   <p:column headerText="编辑">
+                            <p:rowEditor style="float: left;margin-left: 30px;" />
+                       
+                        </p:column>
+                    
+                    
+                </p:dataTable>
+                </p:fieldset>
+                
+                
+                
+                <h:panelGroup id="display">
+                    <br/>
+                    
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestController.submmit0}" action="List?faces-redirect=true" value="申请归还" icon="ui-icon-pencil" rendered="#{sharedAssetRequestController.selected.state  eq 3  or sharedAssetRequestController.selected.state  eq 4}"/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestController.submmit0}" action="List?faces-redirect=true" value="确认归还" icon="ui-icon-check" rendered="#{sharedAssetRequestController.selected.state  eq 6}"/>
+                    <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestController.refers2}" action="List?faces-redirect=true" value="取消归还" icon="ui-icon-cancel" rendered="#{sharedAssetRequestController.selected.state  eq 5  or sharedAssetRequestController.selected.state  eq 6}"/>
+                    
+                    <p:commandButton value="#{msg.Return}" action="List?faces-redirect=true" immediate="true" style="float:left" icon="ui-icon-arrow-back"/>
+
+                   
+                </h:panelGroup>
+            </h:form>
+                <ui:include src="Detail_Edit.xhtml"/>
+                <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
+         </div>  
+        </div> 
+    </ui:define>  
+</ui:composition>
+

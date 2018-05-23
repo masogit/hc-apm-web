@@ -17,6 +17,8 @@ import javax.persistence.Table;
 @Table(name = "workflow_config")
 public class WorkflowConfig implements Serializable {
 
+    public enum AssetCodeConfigType { DFQ , DF} 
+    
     private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -78,9 +80,6 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "auto_close")
     private Boolean autoClose;// 自动关单
     
-    @Column(name = "pm_reminder_time")
-    private Integer pmReminderTime;//保养提醒时间，单位‘天’
-    
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
     
@@ -94,19 +93,223 @@ public class WorkflowConfig implements Serializable {
     private String siteUID;
     
     //扫码建档审核人UID, null 表示不需要审核
-    @Column(name="asset_approver",columnDefinition = "CHAR(32)")
+    @Column(name="asset_approver" ,columnDefinition = "CHAR(32)")
     private String assetApprover;
+    
+    //设备编码组合  [null:不需要, DFQ:资产编号,设备编号,二维码 ,DF:资产编号,设备编号]
+    @Column(name="asset_code_config")
+    private String assetCodeConfig;
     
     @Column(name = "warranty_remind_days")
     private Integer warrantyRemindDays;//维保提前通知时间，单位：天
 
-    @Column(name="pm_simplify")
-    private Boolean pmSimplify; // 简化保养
     
     @Column(name = "warranty_remind_times")
     private Integer warrantyRemindTimes;//维保提醒次数
+
+    @Column(name = "dept_for_shared_asset",columnDefinition = "CHAR(32)")
+    private String deptForSharedAsset;
+
+    @Column(name = "wo_manhour_price")
+    private Double woManhourPrice;
+
+    /****for pm *****/
+    @Column(name = "pm_manhour_price")
+    private Double pmManhourPrice;
+
+    @Column(name="pm_simplify")
+    private Boolean pmSimplify; // 简化保养
+
+    @Column(name = "is_pm_take_order_enabled")
+    private Boolean isPmTakeOrderEnabled; //是否允许抢单
+
+    @Column(name = "is_pm_manual_enabled")
+    private Boolean isPmManualEnabled; //是否人工派工
+
+    @Column(name = "is_pm_auto_enabled")
+    private Boolean isPmAutoEnabled; //是否自动派工
+
+    @Column(name = "pm_dispatch_user_id")
+    private Integer pmDispatchUserId;
+
+    @Column(name = "pm_dispatch_user_name")
+    private String pmDispatchUserName;
+
+    @Column(name = "pm_dispatch_user_id2")
+    private Integer pmDispatchUserId2;
+
+    @Column(name = "pm_dispatch_user_name2")
+    private String pmDispatchUserName2;
+
+    @Column(name = "pm_reminder_time")
+    private Integer pmReminderTime;//计划开始时间之前提醒时间，单位'天'
+
+    @Column(name = "pm_reminder_times")
+    private Integer pmReminderTimes;//提醒次数
     
-	public Integer getAutoAckDays() {
+    @Column(name = "need_instorage_check")
+    private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
+
+    /***
+     * 资产编码配置
+     */
+
+    @Column(name = "generate_method")
+    private Integer generateMethod;//资产编码生成方式 1、国标码+设备数 2、
+
+    @Column(name="format")
+    private String format;//初始流水号
+
+    @Column(name = "asset_seria_num_level")
+    private Integer assetSeriaNumLevel;//资产编码level 租户：4 集团：3，医院：2 院区：1
+
+    private String prefix;//国标码前缀
+
+    public String getPrefix() {
+        return prefix;
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    /***
+     * 紧急工单配置
+     */
+
+    @Column(name = "emergency_timeout_dispatch")
+    private Integer emergencyTimeoutDispatch;
+
+    @Column(name = "emergency_timeout_accept")
+    private Integer emergencyTimeoutAccept;
+
+    @Column(name = "emergency_timeout_close")
+    private Integer emergencyTimeoutClose;
+
+    @Column(name="emergency_max_message_count")
+    private Integer emergencyMaxMessageCount;//推送消息的次数上限
+
+    public Integer getEmergencyTimeoutDispatch() {
+        return emergencyTimeoutDispatch;
+    }
+
+    public void setEmergencyTimeoutDispatch(Integer emergencyTimeoutDispatch) {
+        this.emergencyTimeoutDispatch = emergencyTimeoutDispatch;
+    }
+
+    public Integer getEmergencyTimeoutAccept() {
+        return emergencyTimeoutAccept;
+    }
+
+    public void setEmergencyTimeoutAccept(Integer emergencyTimeoutAccept) {
+        this.emergencyTimeoutAccept = emergencyTimeoutAccept;
+    }
+
+    public Integer getEmergencyTimeoutClose() {
+        return emergencyTimeoutClose;
+    }
+
+    public void setEmergencyTimeoutClose(Integer emergencyTimeoutClose) {
+        this.emergencyTimeoutClose = emergencyTimeoutClose;
+    }
+
+    public Integer getEmergencyMaxMessageCount() {
+        return emergencyMaxMessageCount;
+    }
+
+    public void setEmergencyMaxMessageCount(Integer emergencyMaxMessageCount) {
+        this.emergencyMaxMessageCount = emergencyMaxMessageCount;
+    }
+
+    public Integer getAssetSeriaNumLevel() {
+        return assetSeriaNumLevel;
+    }
+
+    public void setAssetSeriaNumLevel(Integer assetSeriaNumLevel) {
+        this.assetSeriaNumLevel = assetSeriaNumLevel;
+    }
+
+    public Integer getGenerateMethod() {
+        return generateMethod;
+    }
+
+    public void setGenerateMethod(Integer generateMethod) {
+        this.generateMethod = generateMethod;
+    }
+
+    public String getFormat() {
+        return format;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
+    public Integer getPmReminderTimes() {
+        return pmReminderTimes;
+    }
+
+    public void setPmReminderTimes(Integer pmReminderTimes) {
+        this.pmReminderTimes = pmReminderTimes;
+    }
+
+    public Integer getPmDispatchUserId() {
+        return pmDispatchUserId;
+    }
+
+    public void setPmDispatchUserId(Integer pmDispatchUserId) {
+        this.pmDispatchUserId = pmDispatchUserId;
+    }
+
+    public String getPmDispatchUserName() {
+        return pmDispatchUserName;
+    }
+
+    public void setPmDispatchUserName(String pmDispatchUserName) {
+        this.pmDispatchUserName = pmDispatchUserName;
+    }
+
+    public Integer getPmDispatchUserId2() {
+        return pmDispatchUserId2;
+    }
+
+    public void setPmDispatchUserId2(Integer pmDispatchUserId2) {
+        this.pmDispatchUserId2 = pmDispatchUserId2;
+    }
+
+    public String getPmDispatchUserName2() {
+        return pmDispatchUserName2;
+    }
+
+    public void setPmDispatchUserName2(String pmDispatchUserName2) {
+        this.pmDispatchUserName2 = pmDispatchUserName2;
+    }
+
+    public Boolean getIsPmTakeOrderEnabled() {
+        return isPmTakeOrderEnabled;
+    }
+
+    public void setIsPmTakeOrderEnabled(Boolean isPmTakeOrderEnabled) {
+        this.isPmTakeOrderEnabled = isPmTakeOrderEnabled;
+    }
+
+    public Boolean getIsPmManualEnabled() {
+        return isPmManualEnabled;
+    }
+
+    public void setIsPmManualEnabled(Boolean isPmManualEnabled) {
+        this.isPmManualEnabled = isPmManualEnabled;
+    }
+
+    public Boolean getIsPmAutoEnabled() {
+        return isPmAutoEnabled;
+    }
+
+    public void setIsPmAutoEnabled(Boolean isPmAutoEnabled) {
+        this.isPmAutoEnabled = isPmAutoEnabled;
+    }
+
+    public Integer getAutoAckDays() {
 		return autoAckDays;
 	}
 
@@ -375,6 +578,46 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmSimplify(Boolean pmSimplify) {
         this.pmSimplify = pmSimplify;
+    }
+
+    public String getDeptForSharedAsset() {
+        return deptForSharedAsset;
+    }
+
+    public void setDeptForSharedAsset(String deptForSharedAsset) {
+        this.deptForSharedAsset = deptForSharedAsset;
+    }
+
+    public Boolean getNeedInstorageCheck() {
+        return needInstorageCheck;
+    }
+
+    public void setNeedInstorageCheck(Boolean needInstorageCheck) {
+        this.needInstorageCheck = needInstorageCheck;
+    }
+
+    public String getAssetCodeConfig() {
+        return assetCodeConfig;
+    }
+
+    public void setAssetCodeConfig(String assetCodeConfig) {
+        this.assetCodeConfig = assetCodeConfig;
+    }
+
+    public Double getWoManhourPrice() {
+        return woManhourPrice;
+    }
+
+    public void setWoManhourPrice(Double woManhourPrice) {
+        this.woManhourPrice = woManhourPrice;
+    }
+
+    public Double getPmManhourPrice() {
+        return pmManhourPrice;
+    }
+
+    public void setPmManhourPrice(Double pmManhourPrice) {
+        this.pmManhourPrice = pmManhourPrice;
     }
 
     @Override

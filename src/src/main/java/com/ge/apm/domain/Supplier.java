@@ -2,6 +2,9 @@
  */
 package com.ge.apm.domain;
 
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.PinyinUtil;
+
 import java.io.Serializable;
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -16,12 +19,11 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 /**
- *
  * @author 212547631
  */
 @Entity
 @Table(name = "supplier")
-public class Supplier implements Serializable {
+public class Supplier implements Serializable, ChineseName {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -38,6 +40,8 @@ public class Supplier implements Serializable {
     @Size(min = 1, max = 64)
     @Column(name = "name")
     private String name;
+    @Column(name = "name_py_code")
+    private String namePyCode;
     @Size(max = 32)
     @Column(name = "city")
     private String city;
@@ -53,6 +57,8 @@ public class Supplier implements Serializable {
     @Size(max = 16)
     @Column(name = "tel")
     private String tel;
+    @Column(name = "supplier_type")
+    private String supplierType;
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -122,6 +128,7 @@ public class Supplier implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.namePyCode = name == null ? null : PinyinUtil.getShortPinyin(name).toLowerCase().replaceAll("[^0-9a-zA-Z]", "");
     }
 
     public String getCity() {
@@ -164,6 +171,22 @@ public class Supplier implements Serializable {
         this.tel = tel;
     }
 
+    public String getNamePyCode() {
+        return namePyCode;
+    }
+
+    public void setNamePyCode(String namePyCode) {
+        this.namePyCode = namePyCode;
+    }
+
+    public String getSupplierType() {
+        return supplierType;
+    }
+
+    public void setSupplierType(String supplierType) {
+        this.supplierType = supplierType;
+    }
+
     @Override
     public int hashCode() {
         int hash = 0;
@@ -189,4 +212,8 @@ public class Supplier implements Serializable {
         return "com.ge.apm.domain.Supplier[ id=" + id + " ]";
     }
 
+    @Override
+    public String getPinYin() {
+        return namePyCode;
+    }
 }

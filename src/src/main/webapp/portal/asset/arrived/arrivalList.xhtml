@@ -17,13 +17,13 @@
                     <p:dataTable id="datalist" value="#{assetArrivedListController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetArrivedListController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.arrivalDate}"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
-                        <p:ajax event="rowSelect" update="createButton deleteButton viewButton exportPdfButton" />
-                        <p:ajax event="filter" listener="#{assetArrivedListController.onFilter}" update="createButton deleteButton " />
+                        <p:ajax event="rowSelect" update="createButton deleteButton viewButton exportPdfButton saveAsButton" />
+                        <p:ajax event="filter" listener="#{assetArrivedListController.onFilter}" update="createButton deleteButton" />
                         <p:column headerText="到货单名称/编号" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.name}"/>
                         </p:column>
@@ -47,6 +47,15 @@
                         <p:column headerText="#{msg.quantity}" sortBy="#{item.quantity}">
                             <h:outputText value="#{item.quantity}"/>
                         </p:column>
+                        <p:column headerText="#{msg.ArrivalProcessType}" sortBy="#{item.processType}" filterBy="#{item.processType}" filterMatchMode="EQ">
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{fieldMsg.fieldValue('arrivalListProcessType',item.processType)}"/>
+                        </p:column>
                         <p:column headerText="#{msg.status}" sortBy="#{item.status}" filterBy="#{item.status}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('arrivalListStatus', item.status)}"/>
                             <f:facet name="filter">
@@ -59,13 +68,14 @@
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{assetArrivedListController.createAction}" update="datalist"  />
                             <p:commandButton id="viewButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{assetArrivedListController.editAction}" update="datalist " disabled="#{empty assetArrivedListController.selected}"/>
+                            <p:commandButton id="saveAsButton" icon="ui-icon-save" class="btn btn-sm btn-gray" title="另存为" action="#{assetArrivedListController.saveAsAction}" update="datalist" disabled="#{empty assetArrivedListController.selected}"/>
                             <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetArrivedListController.delete}" update=":AssetArrivalListForm:datalist, :growl"  disabled="#{empty assetArrivedListController.selected or assetArrivedListController.selected.status ne 1}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist" fileName="AssetContract_export"/>
                             </p:commandButton>
-                            <p:commandButton id="exportPdfButton" title="导出选中记录到PDF" icon="ui-icon-arrowstop-1-s" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportSelectedToPdf()}" update="datalist" disabled="#{empty assetArrivedListController.selected}">
+                            <p:commandButton id="exportPdfButton" title="导出选中记录到PDF" icon="ui-icon-document" ajax="false" class="btn btn-sm btn-gray" actionListener="#{assetArrivedListController.exportSelectedToPdf()}" update="datalist" disabled="#{empty assetArrivedListController.selected}">
                                 <p:fileDownload value="#{assetArrivedListController.exportPdf}" />
                             </p:commandButton>
                             

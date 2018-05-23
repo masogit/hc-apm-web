@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="selectAssetDlg" widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" appendTo="@(body)" width="80%" showHeader="false">
+        <p:dialog id="selectAssetDlg" widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" appendTo="@this" width="80%" showHeader="false">
             <h:form id="selectAssetForm" rendered="#{selectAssetController.showDialog}">
                 <p:tabView style="height:460px; overflow: auto;">
                     <p:tab title="#{msg.searchAssetByDept}">
@@ -34,10 +34,10 @@
                             <p:inputText id="search_LIKE_name" placeholder="#{msg.assetName}"/>
                             <p:inputText id="search_LIKE_financingNum" placeholder="#{msg.financingNum}"/>
 
-                            <p:selectOneMenu id="search_EQ_assetOwnerId">
+<!--                            <p:selectOneMenu id="search_EQ_assetOwnerId">
                                 <f:selectItem itemLabel="#{msg.selectAssetOwner}"/>
                                 <f:selectItems value="#{selectAssetController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
-                            </p:selectOneMenu>
+                            </p:selectOneMenu>-->
                             
                             <p:commandButton value="#{msg.Search}" actionListener="#{selectAssetController.setSearchFilter}" update="selectAssetDatalist"/>
                             <p:commandButton value="#{msg.Reset}" actionListener="#{selectAssetController.setSearchFilter}" update="selectAssetDatalist searchGrid">

@@ -80,6 +80,16 @@ export function getOrgId() {
   return undefined
 }
 
+export function getHospitalId() {
+  if (!IsHead()) {
+    try {
+      return parseInt(document.querySelector('#user-context #hospitalId').value)
+    } catch (error) {
+    }
+  }
+  return undefined
+}
+
 export const add = (a: number, b: number): number => a + b
 
 export function round (value: number, precision:number = 1): number {

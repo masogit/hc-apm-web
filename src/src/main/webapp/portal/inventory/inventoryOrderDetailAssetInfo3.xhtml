@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:form id="inventoryOrderDetailAssetInfo3ListForm">
+	<p:dataTable id="datalist3" value="#{inventoryOrderDetailAssetInfoController3.lazyModel}" var="item" widgetVar="varDataList3" selectionMode="single"
+		selection="#{inventoryOrderDetailAssetInfoController3.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoController3.onFilter}" />
+		<!-- <p:column headerText="设备名" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE" exportable="false">
+            <a href="inventoryAssetInfo.xhtml?assetInfoID=#{item.assetInfo.id}" target="_Blank"><h:outputText value="#{item.assetInfo.name}" /></a>
+        </p:column>
+        <p:column headerText="设备名" exportable="true" visible="false">
+            <h:outputText value="#{item.assetInfo.name}" />
+        </p:column> -->
+        <p:column headerText="设备二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.qrCode}" />
+        </p:column>
+        <p:column headerText="设备类型" filterBy="#{item.assetGroupName}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.assetGroupName}" />
+        </p:column>
+        <p:column headerText="使用科室" filterBy="#{item.orgName}" filterMatchMode="EQ">
+            <f:facet name="filter">
+                <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
+                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                    <f:selectItems value="#{inventoryOrderDetailAssetInfoController3.listClinicalDeptName}" />
+                </p:selectOneMenu>
+            </f:facet>
+            <h:outputText value="#{item.orgName}" />
+        </p:column>
+        <p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.comment}" />
+        </p:column>
+        <p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+            <h:outputText value="#{item.lastModifiedBy}" />
+        </p:column>
+        <p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+            <f:facet name="filter">
+                <p:inputText id="filterLastModifiedDate3" widgetVar="varFilterLastModifiedDate3" />
+            </f:facet>
+            <h:outputText value="#{item.lastModifiedDate}">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+            </h:outputText>
+        </p:column>
+		<f:facet name="{Toolbar}">
+			<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+				<p:dataExporter type="xls" target="datalist3" fileName="InventoryOrderDetailAssetInfo3_export" />
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+</h:form>
+<p:overlayPanel widgetVar="panelFilterLastModifiedDate3" for=":inventoryOrderDetailAssetInfoTab:inventoryOrderDetailAssetInfo3ListForm:datalist3:filterLastModifiedDate3" dismissable="false">
+	<h:panelGrid columns="2">
+		<p:outputLabel value="#{msg.From}" />
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeFrom_LastModifiedDate3" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+			mask="true" size="12" locale="zh" />
+		<p:outputLabel value="#{msg.To}" />
+		<p:calendar timeZone="GMT+8" widgetVar="varStartTimeTo_LastModifiedDate3" pattern="yyyy/MM/dd" showOn="button" showButtonPanel="false" navigator="true"
+			mask="true" size="12" locale="zh" />
+	</h:panelGrid>
+	<p:commandButton
+		onclick="setDateFilter('varDataList3','varFilterLastModifiedDate3','varStartTimeFrom_LastModifiedDate3','varStartTimeTo_LastModifiedDate3'); PF('panelFilterLastModifiedDate3').hide();"
+		title="#{msg.Save}" icon="ui-icon-check" immediate="true" style="zoom: 0.8;" />
+	<p:commandButton onclick="PF('panelFilterLastModifiedDate3').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;" />
+</p:overlayPanel>
+</html>

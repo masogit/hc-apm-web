@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<div class="ui-g">
+	<div class="ui-g-12 card">
+		<h:form enctype="multipart/form-data">
+			<p:fieldset legend="批量导入 设备绩效报表" id="uploaderContainer">
+				<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+					<p:fileUpload fileUploadListener="#{smallAssetPerformanceController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+						invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M"
+						update=":smallAssetPerformanceTab:dataListForm, :smallAssetPerformanceTab:smallAssetPerformanceListForm" sizeLimit="5242880"
+						allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+					<p:growl id="messages" showDetail="true" />
+				</p:panelGrid>
+				<h:panelGroup>
+					<p>说明</p>
+					<p>
+						1. <a href="APM_SmallAssetPerformance_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+					</p>
+					<p>2. 文件中填入要导入的数据，其中[项目名称]和[日期]必填</p>
+					<p>3. 上传文件进行导入</p>
+				</h:panelGroup>
+			</p:fieldset>
+		</h:form>
+	</div>
+
+	<div class="ui-g-12 card">
+		<h:form id="dataListForm">
+			<p:fieldset legend="导入失败的数据">
+				<p:dataTable id="datalist" rendered="#{not empty smallAssetPerformanceController.importFailedDataList}"
+					value="#{smallAssetPerformanceController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both"
+					paginatorAlwaysVisible="true"
+					paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+					currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
+					<p:column headerText="EXCEL行数">
+						<h:outputText value="#{item.excelIdex}" />
+					</p:column>
+					<p:column headerText="科室">
+						<h:outputText value="#{item.department}" />
+					</p:column>
+					<p:column headerText="费别">
+						<h:outputText value="#{item.costType}" />
+					</p:column>
+					<p:column headerText="编码">
+						<h:outputText value="#{item.code}" />
+					</p:column>
+					<p:column headerText="项目名称">
+						<h:outputText value="#{item.projectName}" />
+					</p:column>
+					<p:column headerText="项目编号">
+						<h:outputText value="#{item.projectNumber}" />
+					</p:column>
+					<p:column headerText="一类标准">
+						<h:outputText value="#{item.standard}" />
+					</p:column>
+					<p:column headerText="数量">
+						<h:outputText value="#{item.quantity}" />
+					</p:column>
+					<p:column headerText="金额">
+						<h:outputText value="#{item.amount}" />
+					</p:column>
+					<p:column headerText="日期">
+						<h:outputText value="#{item.happenDate}">
+							<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+						</h:outputText>
+					</p:column>
+					<p:column headerText="备注">
+						<h:outputText value="#{item.statusDisplay}" />
+					</p:column>
+					<f:facet name="{Toolbar}">
+						<p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+							<p:dataExporter type="xls" target="datalist" fileName="SmallAssetPerformanceFailed_export" />
+						</p:commandButton>
+					</f:facet>
+				</p:dataTable>
+			</p:fieldset>
+		</h:form>
+	</div>
+</div>
+</html>

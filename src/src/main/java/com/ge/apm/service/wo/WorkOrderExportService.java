@@ -170,7 +170,7 @@ public class WorkOrderExportService {
                 workOrderMap.put("接单时间", acceptStep.getStartTime() != null ? sdf.format(acceptStep.getStartTime()) : "");
             }
             if(workStep != null){
-                workOrderMap.put("维修完成时间", workStep.getStartTime() != null ? sdf.format(workStep.getStartTime()) : "");
+                workOrderMap.put("维修完成时间", workStep.getEndTime() != null ? sdf.format(workStep.getEndTime()) : "");
             }
             workOrderMap.put("签到时间", workOrder.getCheckinTime() != null ? sdf.format(workOrder.getCheckinTime()) : "");
             workOrderMap.put("维修工时", workOrder.getTotalManHour());
@@ -178,11 +178,13 @@ public class WorkOrderExportService {
             double infoTotalPrice = 0;
             List<Map<String, Object>> parts = new ArrayList<Map<String, Object>>();
             for (V2_WorkOrder_Detail workOrderDetail:workOrderDetailList) {
-                Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
-                Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
-                info += workOrderDetail.getParts()+",数量："+ tempQuantity +",单价:"+ tempPrice +";";
-                infoTotalPrice += tempQuantity * tempPrice;
-                
+                if(workOrderDetail.getApproved() == null || workOrderDetail.getApproved()){
+                    Integer tempQuantity = workOrderDetail.getApartsQuantity() != null ? workOrderDetail.getApartsQuantity() : 0;
+                    Double tempPrice = workOrderDetail.getPartsPrice() != null ? workOrderDetail.getPartsPrice() : 0;
+                    info += workOrderDetail.getParts()+",数量："+ tempQuantity +",单价:"+ tempPrice +";";
+                    infoTotalPrice += tempQuantity * tempPrice;
+                }
+
                 Map<String,Object> part = new HashedMap();
                 part.put("备件名", workOrderDetail.getParts());
                 part.put("单价", workOrderDetail.getPartsPrice());
@@ -238,22 +240,34 @@ public class WorkOrderExportService {
             workOrderMap.put("解决方案", workOrder.getPatActions());
             workOrderMap.put("交付前检测", workOrder.getPatTests());
             workOrderMap.put("备注", workOrder.getComment());
+            workOrderMap.put("二维码", assetInfo.getQrCode());
+            workOrderMap.put("设备分类", assetInfo.getAssetGroup() != null ? FieldValueMessageController.fieldValue("assetGroup",assetInfo.getAssetGroup().toString()) : "");
+            if(assetInfo.getFunctionGroup() != null){
+                workOrderMap.put("医疗器械分类", assetInfo.getFunctionGroup() != null ? FieldValueMessageController.fieldValue("assetFunctionType",assetInfo.getFunctionGroup().toString()) : "");
+                workOrderMap.put("医疗器械子分类", assetInfo.getAssetCode68() != null ? FieldValueMessageController.fieldValue(assetInfo.getFunctionGroup().toString(),assetInfo.getAssetCode68().toString()) : "");
+            }else{
+                workOrderMap.put("医疗器械分类", "");
+                workOrderMap.put("医疗器械子分类", "");
+            }
+            workOrderMap.put("设备型号", assetInfo.getFunctionType());
+            workOrderMap.put("距上次报修天数", serviceRequest.getNearestSrDays());
+            workOrderMap.put("停机时间", serviceRequest.getConfirmedDownTime() != null ? sdf.format(serviceRequest.getConfirmedDownTime()) : "");
+            workOrderMap.put("恢复时间", serviceRequest.getConfirmedUpTime() != null ? sdf.format(serviceRequest.getConfirmedUpTime()) : "");
+
             //added columns for pdf export
             workOrderMap.put("联系电话", (userAccountDao.getById(serviceRequest.getRequestorId()) != null) ? userAccountDao.getById(serviceRequest.getRequestorId()).getTelephone():null);
-            workOrderMap.put("设备型号", assetInfo.getFunctionType());
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
-            workOrderMap.put("二维码", assetInfo.getQrCode());
 			workOrderMap.put("当前位置", serviceRequest.getAssetLocation() == null ? assetInfo.getLocationName()
 					: serviceRequest.getAssetLocation());
 			workOrderMap.put("报修状态", getPdfStatus(serviceRequest.getStatus()));
-			if(serviceRequest.getStatus() == 2)
+			/*if(serviceRequest.getStatus() == 2)
 			{
 				workOrderMap.put("停机时间", (serviceRequest.getConfirmedDownTime() != null ? serviceRequest.getConfirmedDownTime():null));
 			}
 			else
 			{
 				workOrderMap.put("停机时间", "未停机");
-			}
+			}*/
 			
 			workOrderMap.put("备件信息", parts);
 			workOrderMap.put("维修流程", null);

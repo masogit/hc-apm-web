@@ -4,35 +4,47 @@
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+>
 
     <ui:composition>
+<!--
+<style>
+    .ui-fieldset-toggler:hover{
+        background-color: #ffffff;
+    }
+    body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler{
+        color: #e6d023;
+        inherit;
+    }
 
-        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="400" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养对话框">
+</style>
+-->
+
+
+
+        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="550" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养完成">
             <h:form id="pmrepairCompleteDialogForm" class="pmrepairCompleteDialogFormcls" >
-                <h:panelGroup  id="display5" style="height:500px">
+                <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
                             <label class="label">计划完成时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar  timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.selectedPmOrder.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间#{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">结束保养时间*</label>
-                            <p:calendar timeZone="GMT+8" id="fillDate1" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                            <p:calendar timeZone="GMT+8" id="fillDate1" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.endTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
-
                     </p:panelGrid>
 
                     <p:fieldset legend="#{msg.expensedetail}" ><!--费用明细-->
                         <p:panelGrid columns="2" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
-
                                 <label class="label">#{msg.manhours}*</label>
-                                <p:inputText value="#{v2PmOrderController.selectedPmOrder.manHours}" required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}"/>
-
-
+                                <p:inputNumber id="manHoursId" validatorMessage="工时不能小于0.01" value="#{v2PmOrderController.selectedPmOrder.manHours}"  required="true" requiredMessage="工时(小时) #{msg.ValidationRequire}">
+                                </p:inputNumber>
                             </h:panelGroup>
-
                         </p:panelGrid>
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <h:panelGroup>
@@ -66,10 +78,12 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="申请时间">
+                                        <h:outputText value="#{item.applyTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH"/>
+                                        </h:outputText>
+                                    </p:column>
 
-                                   <!-- <p:column headerText="审批通过">
-                                        <h:outputText value="#{item.approved ?'通过':''}"/>
-                                    </p:column>-->
                                     <p:column headerText="到货">
                                         <h:outputText value="#{item.arrived?'已到货':''}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                         <p:commandLink process="@this"  actionListener="#{v2PmOrderController.accessoryArrival(item.id)}" class="arrivalItem" rendered="#{item.id ne '000' and !item.arrived}" update="accessList">未到货</p:commandLink>
@@ -81,20 +95,17 @@
 
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}"  oncomplete="PF('pmmoreAccDialogDlg').show()" update="@(.pmmoreAccDialogDlgCls)" rendered="#{item.id eq '000'}" />
-                                        <!-- <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}"  oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and ( empty item.approved? true:not item.approved)}"/>-->
+
                                         <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and (item.approved? false:true)}"/>
                                          <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="accessList @(.cmd1)" actionListener="#{v2PmOrderController.removeWoDetail(item.id,1)}"   rendered="#{item.id ne '000' and (item.approved?false:true)}">
                                              <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-
                                          </p:commandButton>
                                         <h:outputText value="已审核" rendered="#{item.id ne '000' and (item.approved?true:false)}" />
                                     </p:column>
-
-
                                 </p:dataTable>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.addworker}</label>
+                                <label class="label">增加协作人</label>
                                 <p:dataTable id="pmcoworkerList" class="uiTransparent" value="#{v2PmOrderController.coWorkerList}" var="item" widgetVar="pmcoworkerDataList" lazy="false" paginator="false" rowKey="#{item.id}" rows="1000" emptyMessage="#{msg.noRecordFound}">
                                     <p:column headerText="#{msg.coworker}">
                                         <h:outputText value="#{item.cowokerUserName}"/>
@@ -104,7 +115,7 @@
                                     </p:column>
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" style="zoom:0.8;" title="#{msg.Create}"  actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail('new')}" update="@(.pmcoworkerDlgClass) pmTab:pmcoworkerDlgForm" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id eq '000'}"/>
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail(item.id)}" update="@(.pmcoworkerDlgClass)" oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditCoWorkerDetail(item.id)}" update="@(.pmcoworkerDlgClass)"  oncomplete="PF('pmcoworkerDlg').show()" rendered="#{item.id ne '000'}" />
                                         <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" actionListener="#{v2PmOrderController.removeWoDetail(item.id,2)}" update="@(.pmcoworkerList) pmTab:pmrepairCompleteDialogForm:pmcoworkerList" rendered="#{item.id ne '000'}">
                                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                         </p:commandButton>
@@ -122,20 +133,65 @@
                                         <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
                                     </p:commandButton>
                                 </h:panelGrid>
-
                             </p:panel>
-
                         </p:dataGrid>
                         <p:fileUpload id="type1" fileUploadListener="#{v2PmOrderController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-
                     </p:fieldset>
+
+                    <p:growl id="msgs" showDetail="true" />
+                    <p:fieldset legend="保养清单"  toggleable="true" toggleSpeed="500">
+                        <p:ajax event="toggle" listener="#{v2PmOrderController.handleToggle}" update="msgs" />
+                        <p:fieldset legend="保养报告" >
+                            <h:panelGroup id="addReport">
+                                <p:selectOneMenu value="#{v2PmOrderController.reportUid}">
+                                    <p:ajax update="addReport" />
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{v2PmOrderController.getTablesName(v2PmOrderController.selectedPmOrder)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
+                                </p:selectOneMenu>
+                                <p:commandLink value="添加报告"  class="addLink" validateClient="false" process="addReport" actionListener="#{v2PmOrderController.addReporter(v2PmOrderController.selectedPmOrder.id)}"  update="@(.rpClass) @(.addLink)" disabled="#{empty v2PmOrderController.reportUid or v2PmOrderController.hasRepairReport() }"/>
+                            </h:panelGroup>
+                            <p:dataList class="rpClass"  value="#{v2PmOrderController.findByBoUuidNoPMCheckList(v2PmOrderController.selectedPmOrder.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                                #{v2PmOrderController.getTableDefName(reportItem.schemaId)}
+                                <h:outputText id="installDate" value="#{reportItem.createdDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                                <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
+                                <h:outputLabel> | </h:outputLabel>
+                                <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
+                                <h:outputLabel> | </h:outputLabel>
+                                <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="@(.rpClass) @(.addLink)" disabled="#{reportItem.status eq 'Archived'}"/>
+                            </p:dataList>
+                        </p:fieldset>
+                        <p:fieldset  legend="检查项"  rendered="#{not empty v2PmOrderController.selectedPmOrder}">
+                            <c:forEach  items="#{v2PmOrderController.pmCheckItemList}" var="item">
+                                <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                                    <h:panelGroup>
+                                        <label class="label" style="word-wrap: break-word">#{item.name}</label>
+                                        <p:selectOneMenu  value="#{v2PmOrderController.hmCheck[item.uid].value}">
+                                            <p:ajax listener="#{v2PmOrderController.hmCheckSet(item.uid)}"></p:ajax>
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItem itemValue="#{'pass'}" itemLabel="#{fieldMsg.fieldValue('checkItem','pass')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'n/a'}" itemLabel="#{fieldMsg.fieldValue('checkItem','n/a')}"></f:selectItem>
+                                            <f:selectItem itemValue="#{'fail'}" itemLabel="#{fieldMsg.fieldValue('checkItem','fail')}"></f:selectItem>
+                                        </p:selectOneMenu>
+                                        <p:inputTextarea rows="3" style="width:100%;height:100px" readonly="true" value="#{item.remark}"></p:inputTextarea><br/>
+                                    </h:panelGroup>
+                                </p:panelGrid>
+                            </c:forEach>
+                        </p:fieldset>
+                    </p:fieldset>
+                    <p:selectOneRadio id="console"  value="#{v2PmOrderController.qaStatus}" >
+                        <p:ajax process="console"  update="@(.rpb) @(.rpt) @(.x3) @(.buttonG)"></p:ajax>
+                        <f:selectItems value="#{fieldMsg.getFieldValueList('qaStatus')}"  var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"></f:selectItems>
+                    </p:selectOneRadio>
+
                     <!--维修完成 转单 新建工单-->
-                    <h:panelGroup>
-                        <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
+                    <h:panelGroup class="buttonG">
+                        <p:commandButton class="rpb" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '1'}" actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
+                        <p:commandButton class="rpt" disabled="#{v2PmOrderController.qaStatus eq '0'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder,1)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm pmTab:pmOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleToRepair(xhr, status, args)"/>
+
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
-
-
-                        <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1 or v2PmOrderController.x2()}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
+                        <p:commandButton id="cmd1" class="cmd1" validateClient="false" disabled="#{v2PmOrderController.selectedPmOrder.approvalStatus==1 or v2PmOrderController.accessoryListEmpty()}" immediate="true"  value= "提交审核" icon="ui-icon-check" update=":growl @(.approveDialogClass)" oncomplete="PF('approveDialog').show()"/>
                         <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmrepairCompleteDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -166,6 +222,52 @@
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>
+
+            <script>
+                function handleToRepair(xhr, status, args) {
+                    if(args.needManhours){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:manHoursId').addClass("ui-state-error");
+                    }
+                    else if(args.needendtime){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate1').addClass("ui-state-error");
+                    }else{
+                        handleSubmit(args, 'pmrepairCompleteDialog');
+                        PF('createSRDialog').show()
+                    }
+                }
+                function handleRepairComplete(xhr, status, args) {
+                    if(args.needManhours){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:manHoursId').addClass("ui-state-error");
+                    }else if(args.needendtime){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate1').addClass("ui-state-error");
+                    }
+                    else if(args.needplanTime){
+                        $('#pmTab\\:pmrepairCompleteDialogForm\\:fillDate').addClass("ui-state-error");
+                    }else{
+                        handleSubmit(args, 'pmrepairCompleteDialog');
+                    }
+                }
+            </script>
+
+            <style type="text/css">
+               /* body{
+                    color:red;
+                }*/
+                body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler{
+                    color:black;
+                    box-shadow:none;
+                    background-color:white;
+                }
+                body .ui-fieldset .ui-fieldset-legend .ui-fieldset-toggler:hover{
+                    background-color:white;
+                }
+               /*body.layout-compact .ui-fieldset .ui-fieldset-legend{
+                   text-align: center;
+                   font-weight: 600;
+               }*/
+            </style>
+
+
         </p:dialog>
 
         <!--PF('pmrepairCompleteDialog').hide()

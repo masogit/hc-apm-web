@@ -53,6 +53,7 @@ public class FailureAnalysisApi {
                                                               @Past @RequestParam(name = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") DateTime from,
                                                               @Past @RequestParam(name = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") DateTime to,
                                                               @Pattern(regexp = "dept|type|supplier|asset") @RequestParam(name = "groupby", required = true) String groupBy,
+                                                              @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                               @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                               @Min(1) @RequestParam(name = "type", required = false) Integer type,
                                                               @Min(1) @RequestParam(name = "supplier", required = false) Integer supplier,
@@ -63,11 +64,15 @@ public class FailureAnalysisApi {
                                                               @Min(1) @Max(Integer.MAX_VALUE) @RequestParam(name = "limit", required = false) Integer limit,
                                                               @Min(0) @RequestParam(name = "start", required = false, defaultValue = "0") Integer start) {
     UserAccount user = UserContext.getCurrentLoginUser();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     Map<Integer, String> types = Observable.from(commonService.findFields(user.getSiteId(), "assetGroup").entrySet()).filter(e -> Option.of(Ints.tryParse(e.getKey())).isDefined()).toMap(e -> Ints.tryParse(e.getKey()), Map.Entry::getValue).toBlocking().single();
-    Map<Integer, String> depts = commonService.findDepts(user.getSiteId(), user.getHospitalId());
+    Map<Integer, String> depts = commonService.findDepts(user.getSiteId(), hospitalId);
     Map<Integer, String> suppliers = commonService.findSuppliers(user.getSiteId());
-    Map<Integer, Tuple7<Integer, Integer, Integer, Integer, Integer, Integer, String>> assets = commonService.findAssets(user.getSiteId(), user.getHospitalId());
-    Observable<Tuple4<Integer, Double, Double, Integer>> report = faService.briefs(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), Match(groupBy).of(Case("dept", "clinical_dept_id"), Case("type", "asset_group"), Case("supplier", "supplier_id"), Case("asset", "id")), dept, type, supplier, asset, pmv);
+    Map<Integer, Tuple7<Integer, Integer, Integer, Integer, Integer, Integer, String>> assets = commonService.findAssets(user.getSiteId(), hospitalId);
+    Observable<Tuple4<Integer, Double, Double, Integer>> report = faService.briefs(user.getSiteId(), hospitalId, from.toDate(), to.toDate(), Match(groupBy).of(Case("dept", "clinical_dept_id"), Case("type", "asset_group"), Case("supplier", "supplier_id"), Case("asset", "id")), dept, type, supplier, asset, pmv);
     Observable<Tuple4<Integer, Double, Double, Integer>> filteredReport = Option.of(Tuple.of(report, keys)).filter(a -> Option.of(a._2).isDefined()).map(b -> Tuple.of(b._1, Arrays.asList(b._2))).map(c -> c._1.filter((t -> c._2.contains(t._1)))).getOrElse(report);
     return Match(Tuple.of(groupBy, filteredReport.sorted((l, r) -> Match(orderby).of(Case("avail", Double.compare(r._2, l._2)), Case("ftfr", Double.compare(r._3, l._3)), Case("fix", r._4 - l._4))).skip(start).limit(Option.of(limit).getOrElse(Integer.MAX_VALUE)).cache(), depts, types, suppliers, assets)).of(
       Case($(t -> "dept".equals(t._1)), t -> ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(new ImmutableMap.Builder<String, Object>()
@@ -142,6 +147,7 @@ public class FailureAnalysisApi {
   public ResponseEntity<? extends Map<String, Object>> reasons(HttpServletRequest request,
                                                                @Past @RequestParam(name = "from", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") DateTime from,
                                                                @Past @RequestParam(name = "to", required = true) @DateTimeFormat(pattern = "yyyy-MM-dd") DateTime to,
+                                                               @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                                @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                                @Min(1) @RequestParam(name = "type", required = false) Integer type,
                                                                @Min(1) @RequestParam(name = "supplier", required = false) Integer supplier,
@@ -149,9 +155,13 @@ public class FailureAnalysisApi {
                                                                @Min(1) @Max(Integer.MAX_VALUE) @RequestParam(name = "limit", required = false) Integer limit,
                                                                @Min(0) @RequestParam(name = "start", required = false, defaultValue = "0") Integer start) {
     UserAccount user = UserContext.getCurrentLoginUser();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     Map<Integer, Tuple3<Integer, Integer, String>> reasons = commonService.findFaults();
     return ResponseEntity.ok().cacheControl(CacheControl.maxAge(1, TimeUnit.DAYS)).body(new ImmutableMap.Builder<String, Object>()
-      .put("reasons", faService.reasons(user.getSiteId(), user.getHospitalId(), from.toDate(), to.toDate(), dept, type, supplier, asset).skip(start).limit(Option.of(limit).getOrElse(Integer.MAX_VALUE))
+      .put("reasons", faService.reasons(user.getSiteId(), hospitalId, from.toDate(), to.toDate(), dept, type, supplier, asset).skip(start).limit(Option.of(limit).getOrElse(Integer.MAX_VALUE))
         .map(t -> new ImmutableMap.Builder<String, Object>().put("id", t._1).put("name", Try.of(() -> reasons.get(t._1)._3).getOrElse("")).put("count", t._2).build()).toBlocking().toIterable()).build());
   }
 

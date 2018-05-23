@@ -30,4 +30,16 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
 	 @Transactional
 	public void deleteBySiteUID(String siteUID);
 
+    public List<WorkflowConfig> findByDeptForSharedAsset(String orgUid);
+
+    @Query(value="select distinct dept_for_shared_asset from workflow_config WHERE site_uid = ?1 AND dept_for_shared_asset IS NOT NULL",nativeQuery = true)
+    public List<String> findDeptForSharedAsset(String siteUID);
+
+    @Query("select w from WorkflowConfig w where w.siteUID = :hostId and w.hospitalUID =:hostId and dept_for_shared_asset is not null ")
+    public List<WorkflowConfig> findHospitalLevel(@Param("hostId") String hostId);
+
+    List<WorkflowConfig> findByTenantUID(String tenantUID);
+
+    @Query(value="select * from workflow_config where generate_method = 1 and prefix is not null and tenant_uid = ?1",nativeQuery = true)
+    List<WorkflowConfig> findAllPrefixByTenantUID(String tenantUID);
 }

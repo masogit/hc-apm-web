@@ -1,0 +1,29 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:tie="http://tiefaces.org/tiefaces"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{editExcelReportController.tableDefinition.name}"/>
+            </div>
+            <div class="ui-g-12 card ">
+                <h:form id="EditReportForm">
+                    <tie:websheet id="sheet1" webSheetBean="#{editExcelReportController}"  maxRowsPerPage="30"/>
+                    <p:commandButton actionListener="#{editExcelReportController.saveData}" value="#{msg.save}" update=":EditReportForm"  disabled="#{editExcelReportController.report.status eq 'Archived'}" />
+                    <!--<p:commandButton actionListener="#{editExcelReportController.submit}" value="#{msg.submit}" update=":EditReportForm" disabled="#{editExcelReportController.report.status eq 'Archived'}"/>-->
+                </h:form>
+            </div>
+
+        </div>
+
+    </ui:define>
+
+
+</ui:composition>

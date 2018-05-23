@@ -15,10 +15,11 @@
             </div>
             <div class="ui-g-12 card">
                 <h:form id="QrCodeLibListForm">
+                    <p:remoteCommand name="outputMsg" actionListener="#{qrCodeLibCreateController.showMsg}" update=":growl"/>
                     <p:dataTable id="datalist" value="#{qrCodeLibCreateController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{qrCodeLibCreateController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+                                 rowKey="#{item.uid}" sortMode="single" sortOrder="descending" sortBy="#{item.submitDate}"
                                  paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
@@ -36,13 +37,13 @@
                             <h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>
                         </p:column>
                         <p:column headerText="#{msg.clinicalDeptName}" sortBy="#{item.orgId}" filterBy="#{item.orgId}" filterMatchMode="EQ" >
-	                        <f:facet name="filter">
+                                <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()"  id="clinicalDeptName">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{qrCodeLibCreateController.getOrgList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
-	                         </f:facet>
-                        	<h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
+                                 </f:facet>
+                                <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
                         </p:column>-->
                         <p:column headerText="#{msg.hospitalId}">
                             <f:facet name="header">
@@ -51,7 +52,7 @@
                             </f:facet>
                             <h:outputText value="#{qrCodeLibCreateController.getHospitalName(item.siteUID)}"/>
                         </p:column>
-                        
+
                         <p:column headerText="#{msg.clinicalDeptName}">
                             <f:facet name="header">
                                 <h:outputText value="#{msg.clinicalDeptName}"/><br/>
@@ -59,7 +60,7 @@
                             </f:facet>
                             <h:outputText value="#{qrCodeLibCreateController.getOrgName(item.orgId)}"/>
                         </p:column>
-                        
+
                         <p:column headerText="#{msg.name}" sortBy="#{item}" filterBy="#{item.assetName}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.assetName}"/>
                         </p:column>
@@ -79,6 +80,7 @@
                         <p:column headerText="创建" >
                             <p:link   outcome="CreateAsset" >#{msg.Create}
                                 <f:param name="qrCode" value="#{item.qrCode}" />
+                                <f:param name="siteUid" value="#{item.siteUID}" />
                             </p:link >
                         </p:column>
 
@@ -117,6 +119,11 @@
                 </p:tree>
             </p:scrollPanel>
         </p:overlayPanel>
+    <script>
+        window.onload = function () {
+            outputMsg();
+        };
+    </script>
     </ui:define>
 
 </ui:composition>

@@ -42,6 +42,18 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         this.filterByHospital = false;
     }
 
+
+    public Boolean getConfirm(){
+        if(selected==null)
+            return true;
+        else if(selected.getIsPm()==null){
+            return false;
+        }else if(selected.getIsPm()==true) {
+            return false;
+        }else{
+            return true;
+        }
+    }
     @Override
     protected AssetInfoRepository getDAO() {
         return dao;
@@ -68,12 +80,15 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
         return super.loadData(pageRequest);
     }
 
+
+
     private TreeNode orgAssetTree;
 
     public TreeNode getOrgAssetTree() {
         return orgAssetTree;
     }
 
+    public boolean x1;
     public void onSelectRow() {
         selectedAsset = this.selected;
     }
@@ -102,6 +117,34 @@ public class SelectAssetController extends JpaCRUDController<AssetInfo> {
             selectedAsset = (AssetInfo) nodeData;
         } else {
             selectedAsset = null;
+        }
+    }
+    
+    public void onSelectTreeNodePMAssets(NodeSelectEvent event){
+        TreeNode node = event.getTreeNode();
+        if (node.getType().equals("org")) {
+            addAssetToOrgNode(node);
+            node.setExpanded(true);
+            node.getChildren().forEach(item ->{
+                if(item.getData() instanceof AssetInfo){
+                    if(((AssetInfo)item.getData()).getIsPm()!=null && !((AssetInfo)item.getData()).getIsPm()){
+                        item.setSelectable(false);
+                    }
+                };
+            
+            });
+            
+            return;
+        }
+        node.setExpanded(true);
+
+        Object nodeData = node.getData();
+        if (nodeData instanceof AssetInfo) {
+            selectedAsset = (AssetInfo) nodeData;
+            selected =(AssetInfo) nodeData;
+        } else {
+            selectedAsset = null;
+            selected = null;
         }
     }
 

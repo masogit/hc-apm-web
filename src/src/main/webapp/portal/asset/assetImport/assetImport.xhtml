@@ -19,12 +19,31 @@
                         <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                             <h:panelGroup>
+                                <label class="label">#{msg.hospitalId}</label><!--所属医院-->
+                                <p:inputText id="selectedUserOrgName" value="#{assetFileImportController.selectedOrg==null?'':assetFileImportController.selectedOrg.name}" readonly="true" />
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetFileImportController.orgTree}" selection="#{assetFileImportController.selectedNode}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":importForm:selectedUserOrgName" listener="#{assetFileImportController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
+
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+
+                            <h:panelGroup>
                                 <label class="label">#{msg.choseFileToUpload}</label>
                                 <h:outputText   value="#{assetFileImportController.file.fileName}"  rendered="#{not empty assetFileImportController.file}"/>
                                 <p:fileUpload  fileUploadListener="#{assetFileImportController.uploadDataFile}" value="#{assetFileImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
                                                multiple="false" sizeLimit="10000000" update="uploaderContainer :importDataForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty assetFileImportController.file}" />
-
                             </h:panelGroup>
+
                             <h:panelGroup>
                                 <p>说明</p>
                                 <p>1. <a href="APM_Asset_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a> </p>
@@ -33,17 +52,28 @@
                                 <!--<p><a href="APM_Asset_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a></p>-->
 
                             </h:panelGroup>
+
                         </p:panelGrid>
                     </p:fieldset>
                 </h:form>
             </div>
             <div class="ui-g-12 card ">
                 <h:form id="importDataForm">
+                    <h:panelGroup >
+                        <p:selectOneRadio id="status" value="#{assetFileImportController.displayErrorsOnly}">
+                            <p:ajax event="change" process="@this" update=":importDataForm" listener="#{assetFileImportController.switchAssetCheckStatus}"/>
+                            <f:selectItem itemValue="false" itemLabel="全部记录"/>
+                            <f:selectItem itemValue="true" itemLabel="错误记录"/>
+                        </p:selectOneRadio>
+                    </h:panelGroup>
                     <p:tabView>
                         <p:tab title="资产导入">
-                            <p:dataTable id="assetTable" value="#{assetFileImportController.importAssetMap.values()}" var="item" rows="10" paginator="true"
+                            <p:dataTable id="assetTable" value="#{assetFileImportController.displayAssets.values()}" var="item" rows="10" paginator="true"
                                          paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                                          rowsPerPageTemplate="5,10,15" >
+                                <p:column headerText="Excel行数" >
+                                    <h:outputText value="#{item.get('asset').lineNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.assetName}" >
                                     <h:outputText value="#{item.get('asset').name}"/>
                                 </p:column>
@@ -76,20 +106,23 @@
                                         <label class="label">当二维码为空时自动生成</label>
                                         <p:selectBooleanButton   value="#{assetFileImportController.autoGenerateQrcode}" onLabel="是" offLabel="否" disabled="#{assetFileImportController.isImported}"/>
                                     </h:panelGroup>
-                                    <h:panelGroup>
+<!--                                    <h:panelGroup>
                                         <label class="label">同时生成保养工单*</label>
                                         <p:selectOneMenu  value="#{assetFileImportController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
                                             <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItem itemLabel="是" itemValue="true"/>
                                             <f:selectItem itemLabel="否" itemValue="false"/>
                                         </p:selectOneMenu>
-                                    </h:panelGroup>
+                                    </h:panelGroup>-->
                                 </h:panelGrid>
 
                             </h:panelGroup>
                         </p:tab>
                         <p:tab title="部门导入">
-                            <p:dataTable  value="#{assetFileImportController.importOrgMap.values()}" var="item" >
+                            <p:dataTable  value="#{assetFileImportController.displayOrgs.values()}" var="item" >
+                                <p:column headerText="Excel行数" >
+                                    <h:outputText value="#{item.get('org').lineNum}"/>
+                                </p:column>
                                 <p:column headerText="#{msg.Department}" >
                                     <h:outputText value="#{item.get('org').name}"/>
                                 </p:column>
@@ -126,19 +159,19 @@
 
 
                         <h:panelGroup>
-                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{!assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
-                            <p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">
-                                <p:fileDownload value="#{assetFileImportController.exportFile}" />
-                            </p:commandButton>
+                            <p:commandButton validateClient="true" actionListener="#{assetFileImportController.importData()}" value="#{msg.Import}" update=":importDataForm :growl" icon="ui-icon-check" disabled="#{assetFileImportController.isEmpty() or !assetFileImportController.canbeImported or assetFileImportController.isImported}"/>
+                            <!--<p:commandButton validateClient="true"  ajax="false" value="#{msg.Export}" update=" :growl" icon="ui-icon-arrowthick-1-s" onclick="PrimeFaces.monitorDownload(start, stop);" disabled="#{!assetFileImportController.isImported}" rendered="#{assetFileImportController.hasExportData}">-->
+                                <!--<p:fileDownload value="#{assetFileImportController.exportFile}" />-->
+                            <!--</p:commandButton>-->
                             <p:commandButton immediate="true" value="#{msg.Return}" icon="ui-icon-arrow-back" action="assetImport?faces-redirect=true"  update=":growl"/>
                         </h:panelGroup>
-                        <h:panelGroup >
-                            <h:outputText value="#{assetFileImportController.assetErrorCounts}资产导入数据有错误,请检查" rendered="#{assetFileImportController.assetErrorCounts>0}" />
-                            <h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />
-                            <c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">
-                                <h:outputText value="#{item}" />
-                            </c:forEach>
-                        </h:panelGroup>
+                        <!--<h:panelGroup >-->
+                            <!--<h:outputText value="#{assetFileImportController.assetErrorCounts}资产导入数据有错误,请检查" rendered="#{assetFileImportController.assetErrorCounts>0}" />-->
+                            <!--<h:outputText value="#{assetFileImportController.orgErrorCounts}部门导入数据有错误,请检查" rendered="#{assetFileImportController.orgErrorCounts>0}" />-->
+                            <!--<c:forEach items="#{assetFileImportController.getAssetErrorList()}" var="item">-->
+                                <!--<h:outputText value="#{item}" />-->
+                            <!--</c:forEach>-->
+                        <!--</h:panelGroup>-->
                     </p:panelGrid>
                 </h:form>
             </div>

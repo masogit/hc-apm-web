@@ -1,3 +1,42 @@
+export const Hospitals = [
+  {
+    "name": "陆家嘴",
+    "id": "18"
+  },
+  {
+    "name": "曙光集团",
+    "id": "186"
+  },
+  {
+    "name": "曙光集团/曙光医院",
+    "id": "400"
+  },
+  {
+    "name": "曙光集团/曙光医院/曙光院区",
+    "id": "401"
+  },
+  {
+    "name": "张江集团",
+    "id": "9"
+  },
+  {
+    "name": "张江集团/宝山医院",
+    "id": "192"
+  },
+  {
+    "name": "张江集团/宝山医院/宝山院区",
+    "id": "193"
+  },
+  {
+    "name": "张江集团/张江医院",
+    "id": "188"
+  },
+  {
+    "name": "张江集团/张江医院/张江院区",
+    "id": "189"
+  }
+]
+
 export const AssetTypes = {
   "1": "CT类",
   "2": "磁共振MRI类",
@@ -27,13 +66,6 @@ export const AssetTypes = {
 
 export const Orgs = {
   "orgInfos": [{
-    "id": 169,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区9",
-    "name_en": ""
-  }, {
     "id": 77,
     "parent_id": 40,
     "site_id": 7,
@@ -83,13 +115,6 @@ export const Orgs = {
     "name": "儿科",
     "name_en": "Pediatric laboratory"
   }, {
-    "id": 128,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室3",
-    "name_en": "Outpatient department of Dermatology"
-  }, {
     "id": 130,
     "parent_id": 40,
     "site_id": 7,
@@ -103,13 +128,6 @@ export const Orgs = {
     "hospital_id": 40,
     "name": "胃镜室",
     "name_en": "Gastroscopy Room"
-  }, {
-    "id": 133,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室4",
-    "name_en": "Department of Ophthalmology and ophthalmology"
   }, {
     "id": 134,
     "parent_id": 40,
@@ -125,62 +143,6 @@ export const Orgs = {
     "name": "住院病区1",
     "name_en": ""
   }, {
-    "id": 135,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室4",
-    "name_en": "Plastic laser beauty center"
-  }, {
-    "id": 136,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室5",
-    "name_en": "Moving plate"
-  }, {
-    "id": 137,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室6",
-    "name_en": "electromyogram"
-  }, {
-    "id": 142,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室7",
-    "name_en": ""
-  }, {
-    "id": 143,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室8",
-    "name_en": ""
-  }, {
-    "id": 144,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室9",
-    "name_en": ""
-  }, {
-    "id": 146,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室10",
-    "name_en": ""
-  }, {
-    "id": 147,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室11",
-    "name_en": ""
-  }, {
     "id": 148,
     "parent_id": 40,
     "site_id": 7,
@@ -193,55 +155,6 @@ export const Orgs = {
     "site_id": 7,
     "hospital_id": 40,
     "name": "住院病区3",
-    "name_en": ""
-  }, {
-    "id": 150,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区4",
-    "name_en": ""
-  }, {
-    "id": 151,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区5",
-    "name_en": ""
-  }, {
-    "id": 152,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区6",
-    "name_en": ""
-  }, {
-    "id": 153,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区7",
-    "name_en": ""
-  }, {
-    "id": 166,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "门诊科室12",
-    "name_en": ""
-  }, {
-    "id": 167,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区8",
-    "name_en": ""
-  }, {
-    "id": 170,
-    "parent_id": 40,
-    "site_id": 7,
-    "hospital_id": 40,
-    "name": "住院病区10",
     "name_en": ""
   }, {
     "id": 180,

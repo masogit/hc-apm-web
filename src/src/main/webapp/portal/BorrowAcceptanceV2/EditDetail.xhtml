@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+    
+        <p:dialog id="EditDlg" widgetVar="EditDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="编辑详情" width="520">
+            <h:form id="EditForm">
+                <h:panelGroup id="display2">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{sharedAssetRequestV2Controller.selectedSard != null}">
+<!--                        <h:panelGroup>
+                            <label class="label">设备名称</label>
+                            <h:inputText value="#{sharedAssetReqDetailController.getSwapName(sharedAssetReqDetailController.selected.sharedAssetTypeId)}"/>
+                        </h:panelGroup>-->
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType == '小时(半点/整点)'}">
+                            <label class="label">计费开始时间</label>
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" stepMinute="30" value="#{sharedAssetRequestV2Controller.selectedSard.chargingBeginTime}" readonlyInput="true" showOn="button"
+                                         showButtonPanel="true" navigator="true" />
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{sharedAssetRequestV2Controller.selectedSard.chargingType != '小时(半点/整点)'}">
+                            <label class="label">计费开始时间</label>
+                            <p:calendar  pattern="yyyy/MM/dd HH:mm" value="#{sharedAssetRequestV2Controller.selectedSard.chargingBeginTime}" readonlyInput="true" showOn="button"
+                                         showButtonPanel="true" navigator="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">设备接收人</label>
+                            <p:inputTextarea value="#{sharedAssetRequestV2Controller.selectedSard.accepter}" rows="1"/>
+                        </h:panelGroup>
+                       <h:panelGroup>
+                            <label class="label">附件</label>
+
+                            <p:selectManyCheckbox id="grid" value="#{sharedAssetRequestV2Controller.selectedBorrowAccessoryList}" layout="grid" columns="1">
+<!--                                <f:selectItems value="#{sharedAssetTypeController.getAccessoriesById(sharedAssetReqDetailV2Controller.selected.sharedAssetTypeId).accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />-->
+                                 <f:selectItems value="#{sharedAssetRequestV2Controller.selectedSard.accessoryList}" var="accessories" itemLabel="#{accessories.name}" itemValue="#{accessories.name}" />
+                            </p:selectManyCheckbox>
+                        </h:panelGroup>
+                        <br/>
+                        <h:panelGroup>
+                            <label class="label">备注</label>
+                            <p:inputTextarea value="#{sharedAssetRequestV2Controller.selectedSard.remark}" rows="1"  cols="53"  queryDelay="5" minQueryLength="4"/>
+                        </h:panelGroup>
+                        
+<!--                        <h:panelGroup>
+                            <label class="label">计费结束时间</label>
+                            <p:calendar class="endtime" pattern="yyyy/MM/dd HH:mm" stepMinute="30"  value="#{sharedAssetReqDetailV2Controller.selected.chargingEndTime}" showOn="button" readonlyInput="true" showButtonPanel="true" navigator="true"/>
+                        </h:panelGroup>-->
+                    </p:panelGrid>
+                    <br/>
+<!--                    <p:commandButton validateClient="true" actionListener="#{sharedAssetReqDetailV2Controller.saves('借用')}" value="#{msg.Save}" update=":IouEditForm:datalistOperation" icon="ui-icon-check" oncomplete="handleSubmit(args, 'EditDialog');"/>-->
+                        <p:commandButton validateClient="true" actionListener="#{sharedAssetRequestV2Controller.saveSard('借用')}" value="#{msg.Save}" update=":IouEditForm:datalistOperation" icon="ui-icon-check" oncomplete="handleSubmit(args, 'EditDialog');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('EditDialog').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+<!--    <script>
+        function time(){
+            
+        }
+    </script>    -->
+    </ui:composition>
+    
+     
+</html>

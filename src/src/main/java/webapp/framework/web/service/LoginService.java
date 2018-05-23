@@ -63,17 +63,12 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 	private UsernamePasswordAuthenticationFilter usernamePasswordAuthenticationFilter;
 	private SessionAuthenticationStrategy sessionAuthenticationStrategy;
 	private SecurityContextRepository securityContextRepository;
-
 	private MessageUtil messageUtil;
 	private UserAccountRepository userAccountDao;
-
 	private ApplicationEventPublisher applicationEventPublisher;
-        
-        private MicroServiceUtil msUtil;
-
+	private MicroServiceUtil msUtil;
 	static {
 		IdFuzzyResolver.registerResolver();
-
 		// Global setting: change default timezone to UTC+0
 		// TimeZone.setDefault(TimeZone.getTimeZone("GMT+8"));
 	}
@@ -86,7 +81,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 		sessionAuthenticationStrategy = ctx.getBean(SessionAuthenticationStrategy.class);
 		securityContextRepository = ctx.getBean(SecurityContextRepository.class);
 		messageUtil = ctx.getBean(MessageUtil.class);
-                msUtil = ctx.getBean(MicroServiceUtil.class);
+		msUtil = ctx.getBean(MicroServiceUtil.class);
 	}
 
 	public void setSessionExpired(String value) {
@@ -117,7 +112,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 		return plainPassword;
 	}
 
-	protected void afterLogin() {
+	protected void afterLogin(String userName,String password) {
 
 	}
 
@@ -168,6 +163,62 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 		return "";
 	}
 
+	public Authentication authenticate(HttpServletRequest request,HttpServletResponse response){
+		String userName = request.getParameter("j_username");
+		if(userName == null ){
+			logger.error("userName can't be null !");
+			return null;
+		}
+		try {
+			Authentication authResult = usernamePasswordAuthenticationFilter.attemptAuthentication(request, response);
+			if (authResult == null) {
+				updateLoginStatus(userName, false);
+				messageUtil.error("security_error");
+			}
+			return authResult;
+		} catch (UsernameNotFoundException e) {
+			messageUtil.error("security_username_not_found");
+		} catch (DisabledException e) {
+			messageUtil.error("security_account_disabled");
+		} catch (LockedException e) {
+			messageUtil.error("AccountLocked");
+		} catch (AccountExpiredException e) {
+			messageUtil.error("security_account_expired");
+		} catch (CredentialsExpiredException e) {
+			messageUtil.error("security_account_credentials_expired");
+		} catch (AccountStatusException e) {
+			messageUtil.error("security_account_status_invalid");
+		} catch (BadCredentialsException e) {
+			updateLoginStatus(userName, false);
+			//messageUtil.error("security_bad_credentials");
+		} catch (AuthenticationException e) {
+            updateLoginStatus(userName, false);
+            //messageUtil.error("security_error");
+        }
+        return null;
+	}
+
+	public void saveToContext(HttpServletRequest request,HttpServletResponse response,Authentication authResult){
+		HttpRequestResponseHolder holder = new HttpRequestResponseHolder(request, response);
+		SecurityContextRepository securityContextRepository = FacesContextUtils.getWebApplicationContext(FacesContext.getCurrentInstance()).getBean(SecurityContextRepository.class);
+		SecurityContext securityContext = securityContextRepository.loadContext(holder);
+		SecurityContextHolder.setContext(securityContext);
+		String userName = request.getParameter("j_username");
+		String originPwd = request.getParameter("j_password");
+		try{
+			sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+		}
+		catch(Exception ex){
+			logger.error(ex.getMessage());
+		}
+		securityContext.setAuthentication(authResult);
+		securityContextRepository.saveContext(securityContext, holder.getRequest(), holder.getResponse());
+		usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
+		if (applicationEventPublisher != null) {
+			applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
+		}
+	}
+
 	public void doLogin() {
 		ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
 		HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
@@ -206,11 +257,12 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 				messageUtil.error("security_error");
 				return;
 			}
-                        try{
-                            sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
-                        }
-                        catch(Exception ex){
-                        }
+			try{
+				sessionAuthenticationStrategy.onAuthentication(authResult, request, response);
+			}
+			catch(Exception ex){
+
+			}
 			// below : do the same thing as in
 			// AbstractAuthenticationProcessingFilter.successfulAuthentication(),
 			// except for the redirection to the login success URL that is
@@ -218,19 +270,17 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 			securityContext.setAuthentication(authResult);
 			usernamePasswordAuthenticationFilter.getRememberMeServices().loginSuccess(request, response, authResult);
 			if (applicationEventPublisher != null) {
-				applicationEventPublisher
-						.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
+				applicationEventPublisher.publishEvent(new InteractiveAuthenticationSuccessEvent(authResult, getClass()));
 			}
 //			try {
 //				setCookieForUser(response, userName, originPwd);
 //			} catch (Exception e) {
 //				messageUtil.error("security_cookie_error");
 //			}
-			afterLogin();
-
-                        updateLoginStatus(userName, true);
-                        String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
-                        request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+			afterLogin(userName,originPwd);
+			updateLoginStatus(userName, true);
+			/*String accessToken = msUtil.getAuthenticateByUserPassword(userName, originPwd);
+			request.getSession().setAttribute("ACCESS_TOKEN", accessToken);*/
 			// redirects to the home page
 			/*
 			 * FacesContext context = FacesContext.getCurrentInstance();
@@ -262,7 +312,7 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 		}
 	}
 
-	private void updateLoginStatus(String userName, boolean loginStatus) {
+	public void updateLoginStatus(String userName, boolean loginStatus) {
 		if(userName ==  null || StringUtils.isEmpty(userName)){
 			logger.error("loginName:{} invalid !", userName);
 			messageUtil.error("security_bad_credentials");
@@ -274,19 +324,18 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 			logger.error("can't find user by loginName:{}", userName);
 			return;
 		}
-                if(!user.getIsActive()){
-                    messageUtil.error("AccountNotActivated");
-                    return;
-                }
-                if(user.getIsLocked()!=null && user.getIsLocked().booleanValue()==true){
-                    messageUtil.error("AccountLocked");
-                    return;
-                }
-
+/*		if(!user.getIsActive()){
+			messageUtil.error("AccountNotActivated");
+			return;
+		}*/
+		if(user.getIsLocked()!=null && user.getIsLocked().booleanValue()==true){
+			messageUtil.error("AccountLocked");
+			return;
+		}
 		if (loginStatus) {
 			user.setLastLoginTime(new Date());
 			user.setPasswordErrorCount(0);
-                        user.setIsLocked(false);
+			user.setIsLocked(false);
 			userAccountDao.save(user);
 		} else {
 			Integer errorTimes = user.getPasswordErrorCount();
@@ -298,16 +347,15 @@ public class LoginService implements Serializable, ApplicationEventPublisherAwar
 			errorTimes = ai.get();
 			if (errorTimes >= PASSWORD_ERROR_TIME_LIMIT) {
 				user.setIsLocked(true);
-                                user.setLockTime(new Date());
-        			userAccountDao.save(user);
+				user.setLockTime(new Date());
+				userAccountDao.save(user);
 				logger.error("user:{} is locked because of password error times reach the limit !", userName);
 				messageUtil.error("AccountLocked");
 				return;
 			}
 			user.setPasswordErrorCount(errorTimes);
 			userAccountDao.save(user);
-
-                        messageUtil.error("security_bad_credentials");
+			messageUtil.error("security_bad_credentials");
 		}
 	}
 }

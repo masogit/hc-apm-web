@@ -53,6 +53,7 @@ public class MaApi {
                                                                   @RequestParam(name = "from", required = true) Date from,
                                                                   @RequestParam(name = "to", required = true) Date to,
                                                                   @Pattern(regexp = "type|dept|supplier") @RequestParam(name = "groupby", required = false) String groupBy,
+                                                                  @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                                   @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                                   @Min(1) @RequestParam(name = "type", required = false) Integer type,
                                                                   @Min(1) @RequestParam(name = "supplier", required = false) Integer supplier,
@@ -62,7 +63,10 @@ public class MaApi {
     log.info("inputs: from {}, to {}, groupBy {}, dept {}, type {}, supplier {}", from, to, groupBy, dept, type, supplier);
     UserAccount user = UserContext.getCurrentLoginUser();
     int siteId = user.getSiteId();
-    int hospitalId = user.getHospitalId();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     Map<Integer, String> groups = Observable.from(commonService.findFields(user.getSiteId(), "assetGroup").entrySet()).filter(e -> Option.of(Ints.tryParse(e.getKey())).isDefined()).toMap(e -> Ints.tryParse(e.getKey()), Map.Entry::getValue).toBlocking().single();
     Map<Integer, String> depts = commonService.findDepts(siteId, hospitalId);
     Map<Integer, String> suppliers = commonService.findSuppliers(siteId);
@@ -101,6 +105,7 @@ public class MaApi {
                                                               @RequestParam(name = "from", required = true) Date from,
                                                               @RequestParam(name = "to", required = true) Date to,
                                                               @Pattern(regexp = "type|dept|supplier") @RequestParam(name = "groupby", required = true) String groupBy,
+                                                              @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                               @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                               @Min(1) @RequestParam(name = "type", required = false) Integer type,
                                                               @Min(1) @RequestParam(name = "supplier", required = false) Integer supplier,
@@ -115,7 +120,10 @@ public class MaApi {
     }
     UserAccount user = UserContext.getCurrentLoginUser();
     int siteId = user.getSiteId();
-    int hospitalId = user.getHospitalId();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     java.util.List<Double> threshold1 = Try.of(() -> ConfigFactory.parseString(inputJson)
       .getDoubleList("threshold.condition1")).getOrElseThrow(() -> new IllegalArgumentException("wrong parameter for condition1"));
     java.util.List<Double> threshold2 = Try.of(() -> ConfigFactory.parseString(inputJson)
@@ -149,6 +157,7 @@ public class MaApi {
                                                       @RequestParam(name = "from", required = true) Date from,
                                                       @RequestParam(name = "to", required = true) Date to,
                                                       @Pattern(regexp = "type|dept|supplier") @RequestParam(name = "groupby", required = false) String groupBy,
+                                                      @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                       @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                       @Min(1) @RequestParam(name = "type", required = false) Integer type,
                                                       @Min(1) @RequestParam(name = "supplier", required = false) Integer supplier,
@@ -164,7 +173,10 @@ public class MaApi {
     }
     UserAccount user = UserContext.getCurrentLoginUser();
     int siteId = user.getSiteId();
-    int hospitalId = user.getHospitalId();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     java.util.List<Double> threshold1 = Try.of(() -> ConfigFactory.parseString(inputJson)
       .getDoubleList("threshold.condition1")).getOrElseThrow(() -> new IllegalArgumentException("wrong parameter for condition1"));
     java.util.List<Double> threshold2 = Try.of(() -> ConfigFactory.parseString(inputJson)
@@ -212,6 +224,7 @@ public class MaApi {
   public ResponseEntity<Map<String, Object>> forecastrate(HttpServletRequest request,
                                                           @RequestParam(name = "from", required = true) Date from,
                                                           @RequestParam(name = "to", required = true) Date to,
+                                                          @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                           @Min(1) @RequestParam(name = "dept", required = false) Integer dept,
                                                           @Min(1) @RequestParam(name = "type", required = false) Integer type,
                                                           @Min(1) @RequestParam(name = "supplier", required = false) Integer supplier,
@@ -227,7 +240,10 @@ public class MaApi {
     }
     UserAccount user = UserContext.getCurrentLoginUser();
     int siteId = user.getSiteId();
-    int hospitalId = user.getHospitalId();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     java.util.List<Double> threshold1 = Try.of(() -> ConfigFactory.parseString(inputJson)
       .getDoubleList("threshold.condition1")).getOrElseThrow(() -> new IllegalArgumentException("wrong parameter for condition1"));
     java.util.List<Double> threshold2 = Try.of(() -> ConfigFactory.parseString(inputJson)
@@ -269,6 +285,7 @@ public class MaApi {
                                                                                     @RequestParam(name = "to", required = true) Date to,
                                                                                     @Pattern(regexp = "acyman|mtpm") @RequestParam(name = "rltgrp", required = true) String rltGrp,
                                                                                     @Min(1) @PathVariable(value = "id") Integer id,
+                                                                                    @Min(1) @RequestParam(name = "hospital", required = false) Integer hospital,
                                                                                     @RequestBody(required = true) String inputJson) {
     int year = from.toLocalDate().getYear();
     log.info("inputs: year {}, rltGrp {}, id {}, inputJson {}", year, rltGrp, id, inputJson);
@@ -280,7 +297,10 @@ public class MaApi {
     Map<Integer, Double> cost2 = CommonService.parseInputJson(inputJson, "items", "id", "cost2_increase");
     UserAccount user = UserContext.getCurrentLoginUser();
     int siteId = user.getSiteId();
-    int hospitalId = user.getHospitalId();
+    Integer hospitalId = user.getHospitalId();
+    if(hospital != null){
+      hospitalId = hospital;
+    }
     Seq<Tuple2<Tuple5<Integer, String, Integer, Integer, Integer>, Tuple4<Double, Double, Double, Double>>> assets =
       MaForecastService.userPredict(MaForecastService.virtualSqlSingle(id, rltGrp,
         maForecastService.predict(siteId, hospitalId, Date.valueOf(LocalDate.now().minusYears(2).withDayOfYear(1)), Date.valueOf(LocalDate.now()), year)),

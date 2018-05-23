@@ -6,135 +6,139 @@
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui"
       xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-<ui:composition>
-            <div class="ui-g-12 card">
-                <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
+    <ui:composition>
+        <div class="ui-g-12 card">
+            <!--<p:messages autoUpdate="true" closable="true" showDetail="false"/>-->
 
-                <h:form id="woMgrListForm">
-                    <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
-                        <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(0)}" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true"/>
-                        
-                        <p:commandButton value="报修"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
-                        <p:commandButton value="#{msg.repaired}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(1)}" disabled="#{workOrderMgrController.queryIndex==1}" rendered="true"/>
-                        <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(10)}" disabled="#{workOrderMgrController.queryIndex==10}" rendered="true"/>
-                        <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(2)}" disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/>
-                        <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(3)}" disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                        <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                        <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}" rendered="true"/>
-                        <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(6)}" disabled="#{workOrderMgrController.queryIndex==6}" rendered="true"/>
-                        <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(7)}" disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
-                        <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(8)}" disabled="#{workOrderMgrController.queryIndex==8}" rendered="true"/>
-                        <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.searchList(9)}" disabled="#{workOrderMgrController.queryIndex==9}" rendered="true"/>
+            <h:form id="woMgrListForm">
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="待办"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true" action="workOrderList.xhtml?faces-redirect=true&amp;query=0" />
+                    <p:commandButton value="报修"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
+                    <p:commandButton value="#{msg.repaired}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"  disabled="#{workOrderMgrController.queryIndex==1}" rendered="true" onclick="onButtonChange()" action="workOrderList.xhtml?faces-redirect=true&amp;query=1" />
+                    <p:commandButton value="#{msg.tobeReview}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=10"  disabled="#{workOrderMgrController.queryIndex==10}" rendered="true"/>
+                    <p:commandButton value="#{msg.waitDispatch}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=2"  disabled="#{workOrderMgrController.queryIndex==2}" rendered="#{userContextService.isDispatcher() or userContextService.hasRole('AssetHead')}"/>
+                    <p:commandButton value="#{msg.waitTake}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=3"  disabled="#{workOrderMgrController.queryIndex==3}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                    <p:commandButton value="#{msg.repairing}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=4"  disabled="#{workOrderMgrController.queryIndex==4}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                    <p:commandButton value="#{msg.waitAck}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=5"  disabled="#{workOrderMgrController.queryIndex==5}" rendered="true"/>
+                    <p:commandButton value="#{msg.waitFeedback}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=6"  disabled="#{workOrderMgrController.queryIndex==6}" rendered="true"/>
+                    <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=7"  disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
+                    <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}" rendered="true"/>
+                    <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=9"  disabled="#{workOrderMgrController.queryIndex==9}" rendered="true"/>
 <!--                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(3)}"  disabled="#{workOrderMgrController.queryIndex==3}" />
-                        <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
-                        <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
-                        <p:remoteCommand id="createSR" name="createSR" update="woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
-                    </h:panelGrid>
-                    <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList"
-                                 selectionMode="single" selection="#{workOrderMgrController.selected}"
-                                 lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                                 rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
-                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
-                                 rows="10" emptyMessage="#{msg.noRecordFound}"
-                                 rowsPerPageTemplate="10,20,30,90">
+                    <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
+                    <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
+                    <p:remoteCommand id="createSR" name="createSR" update="woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" oncomplete="PF('createSRDialog').show()" />
+                </h:panelGrid>
 
-                        <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
-                        <p:ajax event="filter" listener="#{workOrderMgrController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
+                <p:dataTable id="datalist" value="#{workOrderMgrController.lazyModel}" var="item" widgetVar="varDataList"
+                             selectionMode="single" selection="#{workOrderMgrController.selected}"
+                             lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                             rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.serviceRequest.requestTime}"
+                             paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                             currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
+                             rows="10" emptyMessage="#{msg.noRecordFound}"
+                             rowsPerPageTemplate="10,20,30,90" >
 
-                        <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.assetInfo.departNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
-                            <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.serviceRequest.srNum}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}">
-                            <h:outputText value="#{item.serviceRequest.requestorName}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}">
-                            <h:outputText value="#{item.serviceRequest.requestTime}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
-                            </h:outputText>
-                        </p:column>
-                        <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
-                            <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItems value="#{fieldMsg.getFieldValueList('woSteps').subList(0,6)}" var="item" itemLabel="#{item.value}" itemValue="#{item.value}"/>
-                                </p:selectOneMenu>
-                            </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.intExtType}">
-                            <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
-                        </p:column>
-<!--                        <p:column headerText="#{msg.currentPersonName}">
-                            <h:outputText value="#{item.currentPersonName}"/>
-                        </p:column>-->
-                        <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                            <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.comment)}"/>
-                        </p:column>
-                        <p:column headerText="#{msg.Cancel}" rendered="#{workOrderMgrController.queryIndex==1}">
-                            <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
-                        </p:column>
-                        <p:column headerText="#{msg.dispatchWorkOrder}" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
-                            <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
-                        </p:column>
-                        <p:column headerText="#{msg.takeOrtrans}" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
-                            <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
-                            <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
-                        </p:column>
-                        <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
-                            <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
-                            <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                            <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                    <p:ajax event="rowSelect" listener="#{workOrderMgrController.onSelectWorkOrder}" update="woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"/>
+                    <p:ajax event="filter" listener="#{workOrderMgrController.onFilter}" update="datalist woTab:woMgrDetailForm"/>
 
-                            <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
-                        </p:column>
-                        <p:column headerText="审批" rendered="#{workOrderMgrController.queryIndex==10}">
-                            <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
-                        </p:column>
-                        <p:column headerText="#{msg.Acknowledge}" rendered="#{workOrderMgrController.queryIndex==5}">
-                            <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
-                        </p:column>
-                        <p:column headerText="#{msg.feedback}" rendered="#{workOrderMgrController.queryIndex eq 6}">
-                            <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
-                        </p:column>
-                        <p:column headerText="#{msg.closeWo}" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}">
-                            <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
-                        </p:column>
-
-                        <f:facet name="{Toolbar}">
-                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
-                                <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
-                            </p:commandButton>
+                    <p:column styleClass="textCenter"  headerText="#{msg.casePriority}" sortBy="#{item.serviceRequest.casePriority}" filterBy="#{item.serviceRequest.casePriority}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" >
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('casePriority')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                            </p:selectOneMenu>
                         </f:facet>
-                    </p:dataTable>
-                </h:form>
-                <ui:include src="woMgrView.xhtml"/>
-                <ui:include src="srCreate.xhtml"/>
-                <ui:include src="takeOrderDialog.xhtml"/>
-                <ui:include src="transferDialog.xhtml"/>
-                <ui:include src="repairCompleteDlg.xhtml"/>
-                <ui:include src="newOrderDialog.xhtml"/>
-                <ui:include src="toCloseDlg.xhtml"/>
-                <ui:include src="approveDlg.xhtml"/>
-            </div>
+                        <h:outputText value="#{item.serviceRequest.casePriority}" class="priorityItem priorityItem#{item.serviceRequest.casePriority}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.assetName}" sortBy="#{item.assetInfo.name}" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.departNum}" sortBy="#{item.assetInfo.departNum}" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.assetInfo.departNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.clinicaldepart}" sortBy="#{item.serviceRequest.fromDeptUID}">
+                        <h:outputText value="#{workOrderMgrController.getOrgInfoByUid(item.serviceRequest.fromDeptUID).name}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.srNum}" sortBy="#{item.serviceRequest.srNum}" filterBy="#{item.serviceRequest.srNum}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.serviceRequest.srNum}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestorName}" sortBy="#{item.serviceRequest.requestorName}">
+                        <h:outputText value="#{item.serviceRequest.requestorName}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.requestTime}" sortBy="#{item.serviceRequest.requestTime}">
+                        <h:outputText value="#{item.serviceRequest.requestTime}">
+                            <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                        </h:outputText>
+                    </p:column>
+                    <p:column headerText="#{msg.currentStep}" sortBy="#{item.currentStepId}" filterBy="#{item.currentStepName}" filterMatchMode="EQ">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" value="#{workOrderMgrController.stepFileter}"  rendered="#{workOrderMgrController.queryIndex eq 0}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 2)}" itemValue="#{fieldMsg.fieldValue('woSteps', 2)}"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 3)}" itemValue="#{fieldMsg.fieldValue('woSteps', 3)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 4)}" itemValue="#{fieldMsg.fieldValue('woSteps', 4)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 5)}" itemValue="#{fieldMsg.fieldValue('woSteps', 5)}" />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('woSteps', 6)}" itemValue="#{fieldMsg.fieldValue('woSteps', 6)}" />
+                            </p:selectOneMenu>
+                        </f:facet>
+                        <h:outputText value="#{fieldMsg.fieldValue('woSteps', item.currentStepId)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.intExtType}">
+                        <h:outputText value="#{fieldMsg.fieldValue('intExtType',item.intExtType)}"/>
+                    </p:column>
+<!--                        <p:column headerText="#{msg.currentPersonName}">
+                        <h:outputText value="#{item.currentPersonName}"/>
+                    </p:column>-->
+                    <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
+                        <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.comment)}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
+                        <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==2 and (userContextService.isDispatcher() or userContextService.hasRole('AssetHead'))}">
+                        <p:commandButton value="#{msg.dispatchWorkOrder}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:dispatchDialogForm" oncomplete="PF('dispatchDialog').show()"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==3 and (userContextService.hasRole('AssetStaff') or userContextService.hasRole('AssetHead'))}">
+                        <p:commandButton value="#{item.currentPersonId==userContextService.loginUserId and item.currentStepId==3? msg.takeorder:'抢单'}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:takeOrderDialogForm" oncomplete="PF('takeOrderDialog').show()"/>
+                        <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==4 and userContextService.hasRole('AssetStaff')}">
+                        <p:commandButton value="#{msg.signon}" actionListener="#{workOrderMgrController.checkIn(item.id)}" update="woTab:woMgrListForm"  disabled="#{not empty item.checkinTime}"/>
+                        <p:commandButton value="#{msg.transfer}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:transferOrderDialogForm" oncomplete="PF('transferOrderDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                        <p:commandButton value="#{msg.repair}" actionListener="#{workOrderMgrController.prepareCompleteOrder(item.id)}" update="@(.pictureListCls) woTab:repairCompleteDialogForm" oncomplete="PF('repairCompleteDialog').show()" disabled="#{item.approvalStatus eq '1'}"/>
+
+                        <p:commandButton  value="#{msg.new}" actionListener="#{workOrderMgrController.prepareNewWorkOrder(item.id)}" update="woTab:newWorkorderDlgForm  :growl"  oncomplete="PF('newWorkorderDlg').show()" disabled="#{item.approvalStatus eq '1'}"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==10}">
+                        <p:commandButton value="#{msg.audit}" actionListener="#{workOrderMgrController.prepareAproval(item.id)}" update="woTab:approveDialogForm" oncomplete="PF('approveDialog').show()"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex==5}">
+                        <p:commandButton value="#{msg.Acknowledge}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:ackDialogForm" oncomplete="PF('ackDialog').show()"/>
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{workOrderMgrController.queryIndex eq 6}">
+                        <p:commandButton value="#{msg.feedback}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:rateDialogForm" oncomplete="PF('rateDialog').show()"  disabled="#{item.feedbackRating gt 0}" />
+                    </p:column>
+                    <p:column headerText="#{msg.Actions}" exportable="false" rendered="#{userContextService.hasRole('AssetStaff') and workOrderMgrController.queryIndex==7}">
+                        <p:commandButton value="#{msg.closeWo}" actionListener="#{workOrderMgrController.prepareCloseOrder(item.id)}" update="woTab:toCloseDialogForm" oncomplete="PF('toCloseDialog').show()" disabled="#{item.serviceRequest.status eq 2}"/>
+                    </p:column>
+
+                    <f:facet name="{Toolbar}">
+                        <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" ajax="false">
+                            <p:dataExporter type="xls" target="datalist" fileName="WorkOrder_export"/>
+                        </p:commandButton>
+                    </f:facet>
+                </p:dataTable>
+            </h:form>
+            <ui:include src="woMgrView.xhtml"/>
+            <ui:include src="srCreate.xhtml"/>
+            <ui:include src="takeOrderDialog.xhtml"/>
+            <ui:include src="transferDialog.xhtml"/>
+            <ui:include src="repairCompleteDlg.xhtml"/>
+            <ui:include src="newOrderDialog.xhtml"/>
+            <ui:include src="toCloseDlg.xhtml"/>
+            <ui:include src="approveDlg.xhtml"/>
+        </div>
 
         <p:dialog id="dispatchDialog" widgetVar="dispatchDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="#{msg.dispatchWorkOrder}">
             <h:form id="dispatchDialogForm" >
@@ -243,10 +247,15 @@
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
                 if (requestAssetUid != "") {
                     createSR();
+                };
+
+                var isActive = "#{userContextService.isActive()}";
+                if(isActive == '1'){
+                    PF('ActiveDlg').show();
                 }
             }
         </script>
 
 
-</ui:composition>
+    </ui:composition>
 </html>

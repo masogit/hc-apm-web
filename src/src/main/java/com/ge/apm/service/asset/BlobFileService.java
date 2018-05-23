@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.web.WebUtil;
@@ -37,36 +39,15 @@ public class BlobFileService {
     @Autowired
     FileScanService fsService;
     
-//    public boolean deleteBlobFile(String token, String fileUrl) {
-//
-//        return microService.deleteFileObject(token, fileUrl);
-//    }
-
-    
-//    public V2_BlobObject uploadWxFile(String openId, File file){
-//        String token = microService.getAuthenticateByOpenId(null, openId);
-//        if (token == null || token.isEmpty()) {
-//            WebUtil.addErrorMessage("do not have premission");
-//            return null;
-//        }
-//        
-//        Map<String, Object> fileObject = microService.uploadSingleFile(token, file);
-//        if (null != fileObject) {
-//            V2_BlobObject blobObject = new V2_BlobObject();
-//            blobObject.setObjectName((String) fileObject.get("objectName"));
-//            blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
-//            blobObject.setObjectStorageId((String) fileObject.get("objectId"));
-//            blobObject.setObjectType((String) fileObject.get("objectType"));
-//            return blobDao.save(blobObject);
-//        } else {
-//            return null;
-//        }
-//    }
-    
     public V2_BlobObject uploadFile(FileUploadEvent event) {
+        return uploadFile(event.getFile());
+    }
+    
+    public V2_BlobObject uploadFile(UploadedFile file) {
+    
         String path = "";
         try {
-            path = fsService.saveUploadedFile(event.getFile());
+            path = fsService.saveUploadedFile(file);
         } catch (Exception ex) {
             WebUtil.addErrorMessage("Upload file exception" + ex.getMessage());
             Logger.getLogger(AssetFileAttachmentController.class.getName()).log(Level.SEVERE, null, ex);
@@ -110,19 +91,11 @@ public class BlobFileService {
         return deleteBlobFile(token,blobObject);
     }
 
-//    public V2_BlobObject getBlobObjectByStorageId(String storagedId) {
-//        return blobDao.findByObjectStorageId(storagedId);
-//    }
 
     public List<V2_BlobObject> getBlobObjectsByStorageId(String storagedId) {
         return blobDao.findAllByObjectStorageId(storagedId);
     }
 
-//    public Boolean deleteBlobFileByStorageId(String objectId) {
-//        V2_BlobObject object = getBlobObjectByStorageId(objectId);
-//        return deleteBlobFile(object);
-//    }
-    
     
     public Boolean deleteBlobFileById(String id){
         V2_BlobObject blobObject = blobDao.findById(id);
@@ -143,22 +116,13 @@ public class BlobFileService {
     public Boolean deleteBlobFilesByStorageId(String objectId) {
         List<V2_BlobObject> objects = getBlobObjectsByStorageId(objectId);
         for (V2_BlobObject object: objects) {
-            deleteBlobFile(object);
+            if(!deleteBlobFile(object)){
+                return false;
+            }
         }
-
         return true;
     }
 
-//    public Boolean deleteBlobFileByStorageId(String openId, String objectId) {
-//        String token = microService.getAuthenticateByOpenId(null, openId);
-//        if (token == null || token.isEmpty()) {
-//            WebUtil.addErrorMessage("do not have premission");
-//            return false;
-//        }
-//        V2_BlobObject object = getBlobObjectByStorageId(objectId);
-//        return deleteBlobFile(token,object);
-//    }
-    
     
     public Boolean deleteBlobFile(String token,V2_BlobObject blobObject) {
         if (microService.deleteFileObject(token, blobObject.getObjectStorageId())) {
@@ -174,4 +138,7 @@ public class BlobFileService {
         blobDao.save(blobObject);
     }
 
+    public StreamedContent getBlobObjectByStorageId(String storageId){
+        return microService.downloadSingleFile(storageId);
+    }
 }
