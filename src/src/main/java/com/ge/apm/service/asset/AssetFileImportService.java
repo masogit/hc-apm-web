@@ -42,7 +42,6 @@ public class AssetFileImportService {
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
-//    private static final String SHEET_USER = "User List";
     public static final int EXCEL_ASSET_HEADER_ROW = 6;
     public static final int EXCEL_ASSET_DATA_ROW = 7;
 
@@ -58,14 +57,12 @@ public class AssetFileImportService {
     public List<I18nMessage> assetFunctionTypes = FieldValueMessageController.getFieldValueList("assetFunctionType", siteId);
     public List<I18nMessage> assetGroup = FieldValueMessageController.getFieldValueList("assetGroup", siteId);
     public List<I18nMessage> depreciationMethod = FieldValueMessageController.getFieldValueList("depreciationMethodList", siteId);
-    public List<I18nMessage> assetCategoryList = FieldValueMessageController.getFieldValueList("assetCategory", siteId);
     public List<I18nMessage> assetUsageList = FieldValueMessageController.getFieldValueList("assetUsage", siteId);
     public List<I18nMessage> capitalSourceList = FieldValueMessageController.getFieldValueList("capitalSource", siteId);
     public List<I18nMessage> measureGradeList = FieldValueMessageController.getFieldValueList("measureGrade", siteId);
     public List<I18nMessage> riskGradeList = FieldValueMessageController.getFieldValueList("riskGrade", siteId);
     public List<I18nMessage> emergencyEquipmentList = FieldValueMessageController.getFieldValueList("emergencyEquipment", siteId);
     public List<I18nMessage> importEquipmentList = FieldValueMessageController.getFieldValueList("importEquipment", siteId);
-//    private List<I18nMessage> usageStatusList = FieldValueMessageController.getFieldValueList("usageStatus", siteId);
     public List<I18nMessage> accountingCategoryList = FieldValueMessageController.getFieldValueList("accountingCategory", siteId);
     public List<I18nMessage> measuringItemCategoryList = FieldValueMessageController.getFieldValueList("measuringItemCategory", siteId);
     public List<I18nMessage> repairFormList = FieldValueMessageController.getFieldValueList("repairForm", siteId);
@@ -90,14 +87,11 @@ public class AssetFileImportService {
     @Autowired
     ConfigService configService;
 
-    private UserContextService userContextService=WebUtil.getBean(UserContextService.class);
-
     private OrgInfo selectedOrgToImport;
 
     private String assetCodeConfig;
     private static final String ASSET_CODE_MERGE_THREE = "DFQ";
     private static final String ASSET_CODE_MERGE_TWO = "DF";
-//    boolean autoGenerateFinancingNum;
 
     private final String OLD_QRCODE_KEY = "old_qrcode";
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
@@ -142,24 +136,6 @@ public class AssetFileImportService {
         return result;
     }
 
-//    public Map<String, Map<String, Object>> getUserMapFromTemplate(ExcelDocument doc) {
-//        Map<String, Map<String, Object>> result = new LinkedHashMap();
-//        int keyRow = 4;
-//        int dataRow = 5;
-//
-//        for (Map< String, Object> rowMap = doc.getDataRowMap(SHEET_USER, keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(SHEET_USER, keyRow, ++dataRow)) {
-//            String userName = ExcelDocument.getCellStringValue(rowMap.get("人员名字"));
-//            String loginName = ExcelDocument.getCellStringValue(rowMap.get("用户名"));
-//            if (userName == null || userName.isEmpty() || loginName == null || loginName.isEmpty()) {
-//                break;
-//            }
-//
-//            Map<String, Object> map = new LinkedHashMap();
-//            map.put("rowData", rowMap);
-//            result.put(userName, map);
-//        }
-//        return result;
-//    }
     public List<Map<String, Object>> getAssetMapFromTemplate(ExcelDocument doc) throws Exception {
 
         LocalDateTime startTime = LocalDateTime.now();
@@ -298,7 +274,6 @@ public class AssetFileImportService {
                     asset.setSiteUID(selectedOrgToImport.getSiteUID());
 
                     asset.setIsValid(true);
-//                    asset.setStatus(1);
                     asset.setDeviceStatus(0);
                     asset.setIsDeleted(Boolean.FALSE);
 
@@ -328,15 +303,6 @@ public class AssetFileImportService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for getAssetMapFromTemplate: {} seconds", duration.getSeconds());
-
-        return result;
-    }
-
-    public String getAssetKey(AssetInfo assetInfo) {
-        String result = assetInfo.getName();
-        result = result.concat(assetInfo.getDepartNum() == null ? "" : assetInfo.getDepartNum());
-        result = result.concat(assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum());
-        result = result.concat(assetInfo.getQrCode() == null ? "" : assetInfo.getQrCode());
 
         return result;
     }
@@ -587,9 +553,6 @@ public class AssetFileImportService {
                 } else {
                     String oldQrCode = (String)item.get(OLD_QRCODE_KEY);
                     if (!qrCode.equals(oldQrCode)) {
-//                        if (!StringUtils.isEmpty(oldQrCode)) {
-//                            qrCodeService.updateQrCodeStatus(oldQrCode, selectedOrgToImport.getUid(), 1);
-//                        }
 
                         boolean qrCodeUpdated = qrCodeService.updateExistingQrCodeNotUsed(qrCode, selectedOrgToImport);
                         if (!qrCodeUpdated) {
@@ -646,12 +609,6 @@ public class AssetFileImportService {
             hasFailData = item.get("status").equals(ImportStatus.Failure);
         }
 
-//        Integer keyRowUser = 4;
-//        Integer dataRowUser = 5;
-//        doc.clearRowsData(SHEET_USER, 5, 4 + importUserMap.values().size());
-//        for (Map<String, Object> item : importUserMap.values()) {
-//            doc.writeRowData(SHEET_USER, keyRowUser, dataRowUser++, (Map<String, Object>) item.get("rowData"));
-//        }
         Integer keyRowAsset = 6;
         Integer dataRowAsset = 7;
         doc.clearRowsData(SHEET_ASSET, 7, 6 + importAssetMap.size());
@@ -661,9 +618,7 @@ public class AssetFileImportService {
                 hasFailData = true;
             }
         }
-//        doc.clearRowsData(SHEET_ASSET, dataRowAsset, 6+importAssetMap.values().size());
 
-//        doc.clearRowsData(SHEET_USER, 5, 6);
         return hasFailData;
     }
 
