@@ -24,12 +24,28 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12">
-
                 <div class="ui-g-12 card cardTitle">
                     <p:outputLabel class="pageTitle" value="设备计费情况"/>
                 </div>
                 <div class="ui-g-12 card">
+                    <h:form id="searchForm">
+                        <h:panelGrid id="searchPanel" columns="2">
+                            <p:inputText id="searchText" value="#{sharedAssetReqDetailForQueryController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
+                                <p:ajax event="keyup" update=":IouListForm searchButtons" />
+                            </p:inputText>
+                            <h:panelGroup id='searchButtons'>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":IouListForm :searchForm"  rendered="#{empty sharedAssetReqDetailForQueryController.oneSearchStr}"/>
+                                <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":IouListForm :searchForm" actionListener="#{sharedAssetReqDetailForQueryController.setOneSearchStr('')}" rendered="#{not empty sharedAssetReqDetailForQueryController.oneSearchStr}"/>
+                            </h:panelGroup>
+
+                        </h:panelGrid>
+                    </h:form>
             <h:form id="IouListForm">
+
+                <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="#{msg.All}"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetReqDetailForQueryController.searchList(0)}" rendered="true" disabled="#{sharedAssetReqDetailForQueryController.queryIndex == 0}"/>
+                    <p:commandButton value="在借中"  process="@this" update="datalist buttonSet " actionListener="#{sharedAssetReqDetailForQueryController.searchList(1)}"  rendered="true" disabled="#{sharedAssetReqDetailForQueryController.queryIndex == 1}"/>
+                </h:panelGrid>
                 
                 <p:dataTable id="datalist" value="#{sharedAssetReqDetailForQueryController.lazyModel}" var="item" widgetVar="varDataList"
                     selectionMode="single" selection="#{sharedAssetReqDetailForQueryController.selected}"
@@ -107,47 +123,46 @@
                             </f:facet>
                             <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
-                        <p:column headerText="费用" sortBy="#{item.cost}">
-                            <f:facet name="filter">
-                                <p:inputText id="filterCost" widgetVar="varFilterCost" value="#{sharedAssetReqDetailForQueryController.filterCost}"/>
-                            </f:facet>
-                            <h:outputText value="#{item.cost}" rendered="#{item.chargingEndTime ne null}">
-                                <!--<f:convertNumber pattern="0.00"/>-->
+                        <p:column headerText="使用时长">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getUseTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
+                        </p:column>
+                        <p:column headerText="当前费用">
+                            <h:outputText value="#{sharedAssetReqDetailForQueryController.getUseCost(item.chargingBeginTime,item.chargingEndTime,item.chargingType,item.unitPrice)}">
+                                <f:convertNumber pattern="0.00"/>
                             </h:outputText>
-                            <h:outputText value="" rendered="#{item.chargingEndTime eq null}"/>
                         </p:column>
-                        <p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.remark}"/>
-                        </p:column>
+                        <!--<p:column headerText="备注" sortBy="#{item.remark}" filterBy="#{item.remark}" filterMatchMode="LIKE">-->
+                            <!--<h:outputText value="#{item.remark}"/>-->
+                        <!--</p:column>-->
                     <f:facet name="{Toolbar}">
                         <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                             <p:dataExporter type="xls" target="datalist" fileName="Iou_export"/>
                         </p:commandButton>
                     </f:facet>
                 </p:dataTable>
-                <p:overlayPanel id="panelForFilterPrice" widgetVar="panelFilterUnitPrice" for=":IouListForm:datalist:filterUnitPrice" showCloseIcon="true" dismissable="false">
-                    <h:panelGrid columns="3">
-                        <p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceFrom}" decimalPlaces="0" minValue="0">
-                            <p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>
-                        </p:inputNumber>
-                        --
-                        <p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceTo}" decimalPlaces="0" minValue="0">
-                            <p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>
-                        </p:inputNumber>
-                    </h:panelGrid>
-                </p:overlayPanel>
+                <!--<p:overlayPanel id="panelForFilterPrice" widgetVar="panelFilterUnitPrice" for=":IouListForm:datalist:filterUnitPrice" showCloseIcon="true" dismissable="false">-->
+                    <!--<h:panelGrid columns="3">-->
+                        <!--<p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceFrom}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>-->
+                        <!--</p:inputNumber>-->
+                        <!--&#45;&#45;-->
+                        <!--<p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterUnitPriceTo}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterPrice ,panelForFilterCost"/>-->
+                        <!--</p:inputNumber>-->
+                    <!--</h:panelGrid>-->
+                <!--</p:overlayPanel>-->
 
-                <p:overlayPanel id="panelForFilterCost" widgetVar="panelFilterUnitCost" for=":IouListForm:datalist:filterCost" showCloseIcon="true" dismissable="false">
-                    <h:panelGrid columns="3">
-                        <p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterCostFrom}" decimalPlaces="0" minValue="0">
-                            <p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>
-                        </p:inputNumber>
-                        --
-                        <p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterCostTo}" decimalPlaces="0" minValue="0">
-                            <p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>
-                        </p:inputNumber>
-                    </h:panelGrid>
-                </p:overlayPanel>
+                <!--<p:overlayPanel id="panelForFilterCost" widgetVar="panelFilterUnitCost" for=":IouListForm:datalist:filterCost" showCloseIcon="true" dismissable="false">-->
+                    <!--<h:panelGrid columns="3">-->
+                        <!--<p:inputNumber placeholder="最小值" value="#{sharedAssetReqDetailForQueryController.filterCostFrom}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>-->
+                        <!--</p:inputNumber>-->
+                        <!--&#45;&#45;-->
+                        <!--<p:inputNumber placeholder="最大值" value="#{sharedAssetReqDetailForQueryController.filterCostTo}" decimalPlaces="0" minValue="0">-->
+                            <!--<p:ajax update=":IouListForm:datalist ,panelForFilterCost ,panelForFilterPrice"/>-->
+                        <!--</p:inputNumber>-->
+                    <!--</h:panelGrid>-->
+                <!--</p:overlayPanel>-->
             </h:form>
             </div>
                 </div>

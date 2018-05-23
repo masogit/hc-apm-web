@@ -294,6 +294,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         object.setCreateBy(UserContextService.getCurrentUserAccount().getUid());
         
         object.setApplicant(UserContextService.getCurrentUserAccount().getLoginName());
+        object.setApplicantPhone(UserContextService.getCurrentUserAccount().getTelephone());
         
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
         OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
@@ -600,78 +601,27 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     
     public void setCost(SharedAssetReqDetail sard){
         if (sard.getChargingEndTime() != null) {
+            long nd = 1000 * 24 * 60 * 60;
+            long nh = 1000 * 60 * 60;
+            long nm = 1000 * 60;
+            long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
+            Integer countQty = null;
+            // 计算差多少天
+            long day = diff / nd;
+            // 计算差多少小时
+            long hour = diff % nd / nh;
+            // 计算差多少分钟
+            long min = diff % nd % nh / nm;
+
+            double number = day * 24 + hour + min/60.0;
+            number = number < 0 ? 0 : number;
+
             if ("1".equals(sard.getChargingType())) {
-                sard.setCountQty(1);
-                sard.setCost(sard.getUnitPrice());
-            } else if ("2".equals(sard.getChargingType())) {
-                long nd = 1000 * 24 * 60 * 60;
-                long nh = 1000 * 60 * 60;
-                long nm = 1000 * 60;
-                long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
-                Integer countQty = null;
-                // 计算差多少天
-                long day = diff / nd;
-                // 计算差多少小时
-                long hour = diff % nd / nh;
-                // 计算差多少分钟
-                long min = diff % nd % nh / nm;
-                countQty = (int) (day * 24 * 60 / 30 + hour * 2 + min / 30);
-                sard.setCountQty(countQty);
-                sard.setCost(countQty * sard.getUnitPrice() / 2);
-            }else if ("4".equals(sard.getChargingType())){
-                long nd = 1000 * 24 * 60 * 60;
-                long nh = 1000 * 60 * 60;
-                long nm = 1000 * 60;
-                long diff = sard.getChargingEndTime().getTime() - (sard.getChargingBeginTime()).getTime();
-                // 计算差多少天
-                long day = diff / nd;
-                // 计算差多少小时
-                long hour = diff % nd / nh;
-                // 计算差多少分钟
-                long min = diff % nd % nh / nm;
-                double number = day * 24 + hour + min/60.0;
-                number = number < 0 ? 0 : number;
-                sard.setCost(number * sard.getUnitPrice());
-            }else {
-                Calendar cal1 = Calendar.getInstance();
-                cal1.setTime(sard.getChargingBeginTime());
-                Calendar cal2 = Calendar.getInstance();
-                cal2.setTime(sard.getChargingEndTime());
-                int day1 = cal1.get(Calendar.DAY_OF_YEAR);
-                int day2 = cal2.get(Calendar.DAY_OF_YEAR);
-                int year1 = cal1.get(Calendar.YEAR);
-                int year2 = cal2.get(Calendar.YEAR);
-                Date date1 = sard.getChargingBeginTime();
-                Date date2 = sard.getChargingEndTime();
-                long between = date2.getTime() - date1.getTime();
-                if (year1 != year2) {  //同一年
-                    int timeDistance = 0;
-                    for (int i = year1; i < year2; i++) {
-                        if (i % 4 == 0 && i % 100 != 0 || i % 400 == 0)    //闰年
-                        {
-                            timeDistance += 366;
-                        } else    //不是闰年
-                        {
-                            timeDistance += 365;
-                        }
-                    }
-                    if (between >= (24 * 3600000)) {
-                        sard.setCountQty(timeDistance + (day2 - day1));
-                        sard.setCost((timeDistance + (day2 - day1)) * sard.getUnitPrice());
-                    } else {
-                        sard.setCountQty(0);
-                        sard.setCost(null);
-                    }
-                } else {  //不同年
-                    if (between >= (24 * 3600000)) {
-                        sard.setCountQty(day2 - day1);
-                        sard.setCost((day2 - day1) * sard.getUnitPrice());
-                    } else {
-                        sard.setCountQty(0);
-                        sard.setCost(null);
-                    }
-                }
+                number = 1;
+            } else if ("3".equals(sard.getChargingType())) {
+                number = day;
             }
+            sard.setCost(number * sard.getUnitPrice());
         }
     }
     
@@ -786,6 +736,12 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                                     assetDetaiVo.setAssetNumber(infoVo.getDepartNum());
                                     assetDetaiVo.setClinicalDeptUid(selected.getClinicalDeptUid());
                                     assetDetaiVo.setClinicalDeptName(selected.getClinicalDeptName());
+                                    //权限字段
+                                    assetDetaiVo.setHospitalUID(selected.getHospitalUID());
+                                    assetDetaiVo.setInstitutionUID(selected.getInstitutionUID());
+                                    assetDetaiVo.setSiteUID(selected.getSiteUID());
+                                    assetDetaiVo.setTenantUID(selected.getTenantUID());
+
     //                                assetDetaiVo.setState("0");//0：待归还 1：已归还
                                     assetDetaiVo.setBorrowDealUid(UserContextService.getCurrentUserAccount().getUid());//受理人
                                     assetDetaiVo.setFinancingNum(infoVo.getFinancingNum());//资产编号
