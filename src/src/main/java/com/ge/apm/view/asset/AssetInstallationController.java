@@ -76,6 +76,7 @@ public class AssetInstallationController {
     private List<OrgInfo> deptInfoList;
     private UaaService uaaService;
     private WorkflowConfig config;
+    private boolean needInstorageCheck;
 
     @PostConstruct
     protected void init() {
@@ -114,6 +115,8 @@ public class AssetInstallationController {
         attachList = aiService.getPicList(arrivalListItem.getArrivalList().getId());
         attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        needInstorageCheck=userContextService.needInstorageCheck();
     }
 
     public String rejectInstall() {
@@ -613,5 +616,13 @@ public class AssetInstallationController {
     public void setDeptName(String deptName) {
         this.deptName = deptName;
     }
+    
+    public boolean isNeedInstorageCheck() {
+		return needInstorageCheck;
+	}
+
+	public void setNeedInstorageCheck(boolean needInstorageCheck) {
+		this.needInstorageCheck = needInstorageCheck;
+	}
 
 }

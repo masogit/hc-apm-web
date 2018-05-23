@@ -210,14 +210,14 @@
                                 <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="false" requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum">
+                                <label class="label">#{msg.departNum}#{assetInstallationController.needInstorageCheck?'*':''}</label>
+                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck}" requiredMessage="#{msg.departNum}#{msg.ValidationRequire}">
                                     <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)"/>
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">#{msg.financingNum}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
+                                <label class="label">#{msg.financingNum}#{assetInstallationController.needInstorageCheck?'*':''}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum" required="#{assetInstallationController.needInstorageCheck}" requiredMessage="#{msg.financingNum}#{msg.ValidationRequire}">
                                     <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                     <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum @(.financingNum)"/>
                                 </p:inputText>
@@ -225,8 +225,8 @@
                                                  update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                             </h:panelGroup>
                             <h:panelGroup id="qrCode" class="financingNum">
-                                <label class="label">#{msg.qrCode}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}">
+                                <label class="label">#{msg.qrCode}#{assetInstallationController.needInstorageCheck?'*':''}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}" required="#{assetInstallationController.needInstorageCheck}" requiredMessage="#{msg.qrCode}#{msg.ValidationRequire}">
                                     <p:ajax listener="#{assetInstallationController.onDepartNumChange('qrCode')}" update="@(.financingNum)" />
                                 </p:inputText>
                                 <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
