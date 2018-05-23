@@ -16,14 +16,18 @@ import com.ge.apm.domain.PmScheduleData;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.view.asset.components.CustomPanelGrid;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import javax.faces.component.UIComponent;
 import org.apache.commons.lang.StringUtils;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -46,7 +50,14 @@ public class AssetInfoDetailController {
     private List<V2_BlobObject> attachements;
     
     private CustomConfigObject customConfig;
+    
+    private CustomPanelGrid basicFieldsPanelGrid;
+    private CustomPanelGrid detailFieldsPanelGrid;
+    
+    private Map<String, UIComponent> detailFields = new HashMap();
 
+    private List<String> readableFieldsList;
+    
     @PostConstruct
     protected void init() {
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
@@ -60,8 +71,9 @@ public class AssetInfoDetailController {
         String selectedId = (String) UrlEncryptController.getValueFromMap(encodeStr, "selectedid");
         selected = assetDao.findById(Integer.parseInt(selectedId));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
+        readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
     }
-
+    
     public OrgInfo getOrgInfoByUid(String uid) {
         return orgDao.getByUid(uid);
     }
@@ -126,4 +138,30 @@ public class AssetInfoDetailController {
         return customConfig;
     }
 
+    public CustomPanelGrid getBasicFieldsPanelGrid() {
+        if(null==basicFieldsPanelGrid){
+            basicFieldsPanelGrid=new CustomPanelGrid();
+            basicFieldsPanelGrid.setCustomUIComponents(customConfig.getAssetsDetailpageBasicFields().stream()
+                    .filter(item-> readableFieldsList.contains(item)).map(item-> detailFields.get(item)).collect(Collectors.toList()));
+        }
+        return basicFieldsPanelGrid;
+    }
+
+    public CustomPanelGrid getDetailFieldsPanelGrid() {
+        if(null==detailFieldsPanelGrid){
+            detailFieldsPanelGrid=new CustomPanelGrid();
+            detailFieldsPanelGrid.setCustomUIComponents(customConfig.getAssetsDetailpageDetailFields().stream()
+                    .filter(item-> readableFieldsList.contains(item)).map(item-> detailFields.get(item)).collect(Collectors.toList()));
+        }
+        return detailFieldsPanelGrid;
+    }
+
+    public Map<String, UIComponent> getDetailFields() {
+        return detailFields;
+    }
+
+    public void setDetailFields(Map<String, UIComponent> detailFields) {
+        this.detailFields = detailFields;
+    }
+    
 }
