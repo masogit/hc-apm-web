@@ -125,6 +125,36 @@
                                     </p:panel>
                             </p:fieldset>
                         </p:tab>
+                        <p:tab title="仪器数据导入配置">
+                            <div class="ui-g-12 card cardTitle">
+                                <p:inputText id="pageTitle4" class="pageTitle" value="#{tableCreateController.table.title}"  required="true" requiredMessage="#{msg.name}#{msg.ValidationRequire}" >
+                                    <p:ajax update=":CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle1"  listener="#{tableCreateController.onTitleChange}"/>
+                                </p:inputText>
+                            </div>
+                            <h:panelGroup id="instrumentDataImportConfig">
+                            	<label class="label">仪器数据字段</label>
+	                            <p:selectOneMenu value="#{tableCreateController.instrumentDataLabel}">
+		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+		                            <f:selectItems value="#{tableCreateController.instrumentDataLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+	                            </p:selectOneMenu>
+	                            <label class="label">模板标签</label>
+	                            <p:selectOneMenu value="#{tableCreateController.templateLabel}">
+		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+		                            <f:selectItems value="#{tableCreateController.templateLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+	                            </p:selectOneMenu>
+	                            <p:commandButton value="绑定键值对"  update="@this" actionListener="#{tableCreateController.bindInstrumentData()}" />
+                            </h:panelGroup>
+                            <p:fieldset legend="绑定结果" id="instrumentDataBindResult">
+                                    <p:dataTable id="datalist" value="#{tableCreateController.mapInstrumentMppingLabels}" var="item" widgetVar="varDataList" >
+										<p:column headerText="仪器数据字段">
+											<h:outputText value="#{item.key}" />
+										</p:column>
+										<p:column headerText="模板标签">
+											<h:outputText value="#{item.value}" />
+										</p:column>
+									</p:dataTable>
+                            </p:fieldset>
+                        </p:tab>
                     </p:tabView>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 

@@ -28,7 +28,7 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ElectricSafetyDataRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.ElectricSafetyDetail;
+import com.ge.apm.domain.ElectricSafetyData;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
 
@@ -52,41 +52,35 @@ public class ElectricSafetyService {
     @Autowired
     ElectricSafetyDataRepository electricSafetyDataRepository;
     
-    public List<ElectricSafetyDetail> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
+    public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr=readFileByLine(file);
 		return analysis(strArr,file.getFileName());
     }
     
    
-    public void insertUpdateData(List<ElectricSafetyDetail> list){
+    public void insertUpdateData(List<ElectricSafetyData> list){
     	String financingNum="";
-    	for(ElectricSafetyDetail detail: list){
+    	for(ElectricSafetyData detail: list){
     		financingNum=detail.getFinancingNum();
     		if(financingNum!=null){
         		AssetInfo info=assetInfoRepository.findByFinancingNum(financingNum);
         		if(info!=null){
         			String uid=info.getUid();
             		String id=v2_PmOrderRepository.findByAssetUid(uid);
-            		detail.setAssetId(info.getId());
+//            		detail.setAssetId(info.getId());
             		detail.setAssetUid(uid);
             		detail.setV2_PmOrderId(id);
         		}
         		try {
-        			ElectricSafetyDetail dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate());
+        			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate());
         			if(dbData!=null){
-        				copyProperties(detail,dbData);
-        				setDefaultValue(dbData,UPDATE);
-        				electricSafetyDataRepository.save(dbData);
-//        				System.out.println("xxx test set id");
-//        				detail.setId(dbData.getId());
-//        				setDefaultValue(detail,UPDATE);
-//        				electricSafetyDataRepository.save(detail);
+        				detail.setId(dbData.getId());
+        				setDefaultValue(detail,UPDATE);
         			}
         			else{
         				setDefaultValue(detail,INSERT);
-        				electricSafetyDataRepository.save(detail);
         			}
-        			
+        			electricSafetyDataRepository.save(detail);
         			detail.setWarnMessage("import success");
 				} catch (Exception e) {
 					// TODO: handle exception
@@ -101,28 +95,27 @@ public class ElectricSafetyService {
     }
     
     
-    private void setDefaultValue(ElectricSafetyDetail detail,String type){
+    private void setDefaultValue(ElectricSafetyData detail,String type){
     	
     	if(type.equals(INSERT)){
     		detail.setCreatedBy(UserContextService.getCurrentUserAccount().getId());
         	detail.setCreatedDate(new Date());
     	}
-    	else if(type.equals(UPDATE)){
-    		detail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getId());
-    		detail.setLastModifiedDate(new Date());
-    	}
+    	detail.setLastModifiedBy(UserContextService.getCurrentUserAccount().getId());
+		detail.setLastModifiedDate(new Date());
     }
 	
-    private List<ElectricSafetyDetail> analysis(String[] arrStr,String filename){
+    private List<ElectricSafetyData> analysis(String[] arrStr,String filename){
 		getProperties();
-		List<ElectricSafetyDetail> listData=new ArrayList<ElectricSafetyDetail>();
+		List<ElectricSafetyData> listData=new ArrayList<ElectricSafetyData>();
 		for(int i=0;i<arrStr.length;++i){
-			ElectricSafetyDetail data=new ElectricSafetyDetail();
+			ElectricSafetyData data=new ElectricSafetyData();
 			data.setFileName(filename);
 			data.setLineIndex(i+1);
 			parseValues(arrStr[i],data);
-//			System.out.println("xxx "+data.getValues());
-			listData.add(data);
+			if(data.getValues()!=null){
+				listData.add(data);
+			}
 		}
 		return listData;
 	}
@@ -140,7 +133,7 @@ public class ElectricSafetyService {
 		return null;
 	}
 	
-	private Map<String,Object> parseValues(String strLine,ElectricSafetyDetail data){
+	private Map<String,Object> parseValues(String strLine,ElectricSafetyData data){
 		strLine=" "+strLine;
 		Map<String,Object> map=new HashMap<String,Object>();
 		String regex="[^0-9a-zA-Z][0-9]+,";
@@ -195,7 +188,7 @@ public class ElectricSafetyService {
 		return newMap;
 	}
 	
-	private Map<String,Object> convertValues(Map<String,Object> map,ElectricSafetyDetail data){
+	private Map<String,Object> convertValues(Map<String,Object> map,ElectricSafetyData data){
 		String strValue="";
 		for(String key:map.keySet()){
 			strValue=map.get(key).toString();
@@ -239,121 +232,121 @@ public class ElectricSafetyService {
 				data.setProtectGroundImpedance(strValue);
 			}
 //			8，——》保护接地阻抗参考值（<0.2Ω）
-			else if(StringUtils.equals(key, "8")){
-				data.setProtectGroundImpedanceRefVal(strValue);
-			}
+//			else if(StringUtils.equals(key, "8")){
+//				data.setProtectGroundImpedanceRefVal(strValue);
+//			}
 //			23，——》患者漏电流（应用部分加电）（单位：μA）
 			else if(StringUtils.equals(key, "23")){
 				data.setPatientElectricLeakage_app(strValue);
 			}
 //			24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "24")){
-				data.setPatientElectricLeakageRefVal_app(strValue);
-			}
+//			else if(StringUtils.equals(key, "24")){
+//				data.setPatientElectricLeakageRefVal_app(strValue);
+//			}
 //			25，——》对地漏电流（正常状态）（单位：mA）
 			else if(StringUtils.equals(key, "25")){
 				data.setGroundElectricLeakage_normal(strValue);
 			}
 //			26，——》对地漏电流（正常状态）参考值（<0.5mA）
-			else if(StringUtils.equals(key, "26")){
-				data.setGroundElectricLeakageRefVal_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "26")){
+//				data.setGroundElectricLeakageRefVal_normal(strValue);
+//			}
 //			27，——》对地漏电流（单一故障状态）（单位：mA）
-			else if(StringUtils.equals(key, "27")){
-				data.setGroundElectricLeakage_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "27")){
+//				data.setGroundElectricLeakage_singleError(strValue);
+//			}
 //			28，——》对地漏电流（单一故障状态）参考值（<1.0mA）
-			else if(StringUtils.equals(key, "28")){
-				data.setGroundElectricLeakageRefVal_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "28")){
+//				data.setGroundElectricLeakageRefVal_singleError(strValue);
+//			}
 //			29，——》外壳漏电流（正常状态）（单位：μA）
 			else if(StringUtils.equals(key, "29")){
 				data.setShellElectricLeakage_normal(strValue);
 			}
 //			30，——》外壳漏电流（正常状态）参考值（<100μA）
-			else if(StringUtils.equals(key, "30")){
-				data.setShellElectricLeakageRefVal_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "30")){
+//				data.setShellElectricLeakageRefVal_normal(strValue);
+//			}
 //			31，——》外壳漏电流（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "31")){
-				data.setShellElectricLeakage_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "31")){
+//				data.setShellElectricLeakage_singleError(strValue);
+//			}
 //			32，——》外壳漏电流（单一故障状态）参考值（<0.5mA）
-			else if(StringUtils.equals(key, "32")){
-				data.setShellElectricLeakageRefVal_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "32")){
+//				data.setShellElectricLeakageRefVal_singleError(strValue);
+//			}
 //			33，——》患者漏电流AC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "33")){
-				data.setPatientElectricLeakageAC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "33")){
+//				data.setPatientElectricLeakageAC_normal(strValue);
+//			}
 //			34，——》患者漏电流AC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "34")){
-				data.setPatientElectricLeakageRefValAC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "34")){
+//				data.setPatientElectricLeakageRefValAC_normal(strValue);
+//			}
 //			35，——》患者漏电流AC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "35")){
-				data.setShellElectricLeakageAC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "35")){
+//				data.setShellElectricLeakageAC_singleError(strValue);
+//			}
 //			36，——》患者漏电流AC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "36")){
-				data.setShellElectricLeakageRefValAC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "36")){
+//				data.setShellElectricLeakageRefValAC_singleError(strValue);
+//			}
 //			37，——》患者漏电流DC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "37")){
-				data.setPatientElectricLeakageDC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "37")){
+//				data.setPatientElectricLeakageDC_normal(strValue);
+//			}
 //			38，——》患者漏电流DC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "38")){
-				data.setPatientElectricLeakageRefValDC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "38")){
+//				data.setPatientElectricLeakageRefValDC_normal(strValue);
+//			}
 //			39，——》患者漏电流DC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "39")){
-				data.setShellElectricLeakageDC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "39")){
+//				data.setShellElectricLeakageDC_singleError(strValue);
+//			}
 //			40，——》患者漏电流DC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "40")){
-				data.setShellElectricLeakageRefValDC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "40")){
+//				data.setShellElectricLeakageRefValDC_singleError(strValue);
+//			}
 //			41，——》患者辅助电流AC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "41")){
-				data.setPatientAssisElectricAC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "41")){
+//				data.setPatientAssisElectricAC_normal(strValue);
+//			}
 //			42，——》患者辅助电流AC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "42")){
-				data.setPatientAssisElectricRefValAC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "42")){
+//				data.setPatientAssisElectricRefValAC_normal(strValue);
+//			}
 //			43，——》患者辅助电流AC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "43")){
-				data.setPatientAssisElectricAC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "43")){
+//				data.setPatientAssisElectricAC_singleError(strValue);
+//			}
 //			44，——》患者辅助电流AC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "44")){
-				data.setPatientAssisElectricRefValAC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "44")){
+//				data.setPatientAssisElectricRefValAC_singleError(strValue);
+//			}
 //			45，——》患者辅助电流DC（正常状态）（单位：μA）
-			else if(StringUtils.equals(key, "45")){
-				data.setPatientAssisElectricDC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "45")){
+//				data.setPatientAssisElectricDC_normal(strValue);
+//			}
 //			46，——》患者辅助电流DC（正常状态）参考值（<10.0μA）
-			else if(StringUtils.equals(key, "46")){
-				data.setPatientAssisElectricRefValDC_normal(strValue);
-			}
+//			else if(StringUtils.equals(key, "46")){
+//				data.setPatientAssisElectricRefValDC_normal(strValue);
+//			}
 //			47，——》患者辅助电流DC（单一故障状态）（单位：μA）
-			else if(StringUtils.equals(key, "47")){
-				data.setPatientAssisElectricDC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "47")){
+//				data.setPatientAssisElectricDC_singleError(strValue);
+//			}
 //			48，——》患者辅助电流DC（单一故障状态）参考值（<50.0μA）
-			else if(StringUtils.equals(key, "48")){
-				data.setPatientAssisElectricRefValDC_singleError(strValue);
-			}
+//			else if(StringUtils.equals(key, "48")){
+//				data.setPatientAssisElectricRefValDC_singleError(strValue);
+//			}
 //			51，——》市电电压实际值
-			else if(StringUtils.equals(key, "51")){
-				data.setCityVoltage(strValue);
-			}
+//			else if(StringUtils.equals(key, "51")){
+//				data.setCityVoltage(strValue);
+//			}
 //			52，——》市电电压参考值（230V）
-			else if(StringUtils.equals(key, "52")){
-				data.setCityVoltageRefVal(strValue);
-			}
+//			else if(StringUtils.equals(key, "52")){
+//				data.setCityVoltageRefVal(strValue);
+//			}
 			map.put(key, strValue);
 		}
 		return map;
@@ -407,7 +400,7 @@ public class ElectricSafetyService {
 		}
 	}
 	
-	private void setCheckType(String str,ElectricSafetyDetail data){
+	private void setCheckType(String str,ElectricSafetyData data){
 		if(str.length()==40){
 			String a=str.substring(3,4);
 			String b=str.substring(4,5);
@@ -453,60 +446,19 @@ public class ElectricSafetyService {
 				data.setCheckType("II CF");
 			}
 			
-			c=str.substring(33,34);
-			if(StringUtils.equals(c, "0")){
-				data.setGroupType("0组应用");
-			}
-			else if(StringUtils.equals(c, "2")){
-				data.setGroupType("2组应用");
-			}
-			else if(StringUtils.equals(c, "5")){
-				data.setGroupType("5组应用");
-			}
-			else if(StringUtils.equals(c, "10")){
-				data.setGroupType("10组应用");
-			}
-		}
-	}
-	
-	private void copyProperties(Object source,Object target){
-		Field[] sourceFieldsArr=source.getClass().getDeclaredFields();
-		Field[] targetFieldsArr=target.getClass().getDeclaredFields();
-		String sourceName="";
-		Object sourceValue=null;
-		String targetName="";
-		Object targetValue=null;
-		Field sourceTemp=null;
-		Field targetTemp=null;
-		boolean sourceAccessFlag=true;
-		boolean targetAccessFlag=true;
-		for(int i=0;i<sourceFieldsArr.length;++i){
-			sourceTemp=sourceFieldsArr[i];
-			sourceName=sourceTemp.getName();
-			sourceAccessFlag=sourceTemp.isAccessible();
-			sourceTemp.setAccessible(true);
-			try {
-				if(sourceTemp.get(source)!=null){
-					for(int j=0;j<targetFieldsArr.length;++j){
-						targetTemp=targetFieldsArr[j];
-						targetName=targetTemp.getName();
-						if(targetName!=sourceName){
-							continue;
-						}
-						else{
-							targetAccessFlag=targetTemp.isAccessible();
-							targetTemp.setAccessible(true);
-							targetTemp.set(target,sourceTemp.get(source));
-							targetTemp.setAccessible(targetAccessFlag);
-							break;
-						}
-					}
-				}
-				
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
-			sourceTemp.setAccessible(sourceAccessFlag);
+//			c=str.substring(33,34);
+//			if(StringUtils.equals(c, "0")){
+//				data.setGroupType("0组应用");
+//			}
+//			else if(StringUtils.equals(c, "2")){
+//				data.setGroupType("2组应用");
+//			}
+//			else if(StringUtils.equals(c, "5")){
+//				data.setGroupType("5组应用");
+//			}
+//			else if(StringUtils.equals(c, "10")){
+//				data.setGroupType("10组应用");
+//			}
 		}
 	}
 }

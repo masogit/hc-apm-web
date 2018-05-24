@@ -555,6 +555,18 @@ public class UserAccount implements ChineseName, Serializable {
 		byte[] hashPassword = Digests.sha1(getPlainPassword().getBytes(), salt, HASH_INTERATIONS);
 		setPassword(Digests.encodeHex(hashPassword));
 	}
+	
+	public static void main(String[] args) {
+		UserAccount user=new UserAccount();
+		user.setPlainPassword("111");
+		try {
+			user.entryptPassword();
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		System.out.println(user.getPassword());
+	}
 
 	public Date getLockTime() {
 		return lockTime;
