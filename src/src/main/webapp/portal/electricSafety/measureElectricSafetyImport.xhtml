@@ -47,13 +47,12 @@
 							currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
 							pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
 							rowsPerPageTemplate="10,20,50" selection="#{measureElectricSafetyController.selectedItems}" rowKey="#{item.lineIndex}">
-							<p:column selectionMode="multiple"
-								style="width:32px;text-align:center" />
-							 <p:column headerText="资产编号">
-								<h:outputText value="#{item.financingNum}" />
-							</p:column>
+							<p:column selectionMode="multiple" style="width:32px;text-align:center" />
 							<p:column headerText="设备名称">
 								<h:outputText value="#{item.assetInfo.name}" />
+							</p:column>
+							<p:column headerText="资产编号">
+								<h:outputText value="#{item.financingNum}" />
 							</p:column>
 							<p:column headerText="设备型号">
 								<h:outputText value="#{item.assetInfo.functionType}" />
@@ -61,21 +60,37 @@
 							<p:column headerText="使用科室">
 								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 							</p:column>
-							<p:column headerText="设备类别">
-								<h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}" />
+							<p:column headerText="保护接地阻抗">
+								<h:outputText value="#{item.protectGroundImpedance}" />
 							</p:column>
+							<p:column headerText="患者漏电流">
+								<h:outputText value="#{item.patientElectricLeakage_app}" />
+							</p:column>
+							<p:column headerText="对地漏电流">
+								<h:outputText value="#{item.groundElectricLeakage_normal}" />
+							</p:column>
+							<p:column headerText="外壳漏电流">
+								<h:outputText value="#{item.shellElectricLeakage_normal}" />
+							</p:column>
+							<!-- <p:column headerText="设备类别">
+								<h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetInfo.assetGroup)}" />
+							</p:column> -->
 							<p:column headerText="检测仪时间">
-								<h:outputText value="#{item.checkDate}" />
+								<h:outputText value="#{item.checkDate}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+								</h:outputText>
 							</p:column>
 							<p:column headerText="存储器时间">
-								<h:outputText value="#{item.storageDate}" />
+								<h:outputText value="#{item.storageDate}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+								</h:outputText>
 							</p:column>
-							<p:column headerText="检测类型">
+							<!-- <p:column headerText="检测类型">
 								<h:outputText value="#{item.checkType}" />
-							</p:column>
-							<p:column headerText="应用组数">
+							</p:column> -->
+							<!-- <p:column headerText="应用组数">
 								<h:outputText value="#{item.groupType}" />
-							</p:column>
+							</p:column> -->
 							
 							<p:column headerText="警告信息">
 								<h:outputText value="#{item.warnMessage}" />

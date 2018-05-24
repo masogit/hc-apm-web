@@ -1,32 +1,38 @@
 package com.ge.apm.view.report;
 
-import com.ge.apm.domain.pure.TableSchema;
-import javax.annotation.PostConstruct;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.TableDefinitionRepository;
-import com.ge.apm.domain.TableDefinition;
-import com.ge.apm.domain.V2_BlobObject;
-import com.ge.apm.domain.pure.TableGroup;
-import com.ge.apm.domain.pure.TableItem;
-import com.ge.apm.domain.pure.TableOption;
-import com.ge.apm.service.asset.BlobFileService;
-import com.ge.apm.service.report.TableDefinitionService;
-import com.ge.apm.service.report.TieFacesService;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.transaction.annotation.Transactional;
 import org.tiefaces.components.websheet.TieWebSheetBean;
+
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.domain.ElectricSafetyData;
+import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.pure.TableGroup;
+import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.report.TieFacesService;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -58,6 +64,12 @@ public class TableCreateController extends TieWebSheetBean {
     private Map<String, Object> tableFields;
     private HashMap<String, Object> context = new HashMap<String, Object>();
     private V2_BlobObject uploadedFileObject;
+    private Set<String> instrumentDataLabels;
+    private Set<String> templateLabels;
+    private Map<String,String> mapTemplateKeyValues;
+    private Map<String,String> mapInstrumentMppingLabels;
+    private String instrumentDataLabel;
+    private String templateLabel;
 
     @Override
     public void initialLoad() {
@@ -389,6 +401,13 @@ public class TableCreateController extends TieWebSheetBean {
             }
         }
     }
+    
+    public void bindInstrumentData(){
+    	if(mapInstrumentMppingLabels==null){
+    		mapInstrumentMppingLabels=new HashMap<String,String>();
+    		mapInstrumentMppingLabels.put(this.instrumentDataLabel, this.templateLabel);
+    	}
+    }
 
     public void testSubmit() {
     }
@@ -474,4 +493,62 @@ public class TableCreateController extends TieWebSheetBean {
         this.uploadedFile = uploadedFile;
     }
 
+	public Set<String> getInstrumentDataLabels() {
+		instrumentDataLabels=ElectricSafetyData.getLabelAttributeMapping().keySet();
+		return instrumentDataLabels;
+	}
+
+	public void setInstrumentDataLabels(Set<String> instrumentDataLabels) {
+		this.instrumentDataLabels = instrumentDataLabels;
+	}
+	public String getInstrumentDataLabel() {
+		return instrumentDataLabel;
+	}
+
+	public void setInstrumentDataLabel(String instrumentDataLabel) {
+		this.instrumentDataLabel = instrumentDataLabel;
+	}
+
+	public String getTemplateLabel() {
+		return templateLabel;
+	}
+
+	public void setTemplateLabel(String templateLabel) {
+		this.templateLabel = templateLabel;
+	}
+
+	public Map<String, String> getMapInstrumentMppingLabels() {
+		return mapInstrumentMppingLabels;
+	}
+
+	public void setMapInstrumentMppingLabels(Map<String, String> mapInstrumentMppingLabels) {
+		this.mapInstrumentMppingLabels = mapInstrumentMppingLabels;
+	}
+
+	public Set<String> getTemplateLabels() {
+		if(templateLabels==null){
+			mapTemplateKeyValues=new HashMap<String,String>();
+			if(table!=null){
+				try {
+					for(TableGroup group: table.getGroups()){
+						for(TableItem item: group.getItems()){
+							mapTemplateKeyValues.put(item.getLabel(), item.getKey());
+						}
+					}
+					templateLabels=mapTemplateKeyValues.keySet();
+				} catch (Exception e) {
+					// TODO: handle exception
+					WebUtil.addErrorMessage(e, "解析模版失败");
+				}
+			}
+		}
+		return templateLabels;
+	}
+
+	public void setTemplateLabels(Set<String> templateLabels) {
+		this.templateLabels = templateLabels;
+	}
+
+	
+    
 }

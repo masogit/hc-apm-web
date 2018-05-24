@@ -12,7 +12,7 @@ import javax.faces.context.FacesContext;
 
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
-import com.ge.apm.domain.ElectricSafetyDetail;
+import com.ge.apm.domain.ElectricSafetyData;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.ElectricSafetyService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -29,8 +29,8 @@ public class MeasureElectricSafetyController {
     private ElectricSafetyService electricSafetyService;
     private UserAccount currentUser;
     private UploadedFile file;
-    private List<ElectricSafetyDetail> dataList;
-    private List<ElectricSafetyDetail> selectedItems;
+    private List<ElectricSafetyData> dataList;
+    private List<ElectricSafetyData> selectedItems;
 
     @PostConstruct
     protected void init() {
@@ -58,19 +58,19 @@ public class MeasureElectricSafetyController {
         this.file = file;
     }
 
-    public List<ElectricSafetyDetail> getDataList() {
+    public List<ElectricSafetyData> getDataList() {
         return dataList;
     }
 
-    public void setDataList(List<ElectricSafetyDetail> dataList) {
+    public void setDataList(List<ElectricSafetyData> dataList) {
         this.dataList = dataList;
     }
 
-	public List<ElectricSafetyDetail> getSelectedItems() {
+	public List<ElectricSafetyData> getSelectedItems() {
 		return selectedItems;
 	}
 
-	public void setSelectedItems(List<ElectricSafetyDetail> selectedItems) {
+	public void setSelectedItems(List<ElectricSafetyData> selectedItems) {
 		this.selectedItems = selectedItems;
 	}
     
