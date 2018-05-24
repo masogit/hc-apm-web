@@ -44,6 +44,7 @@
                             <p:calendar id="date_edit" rendered="#{workScheduleController.disableScheduleDate}" value="#{workScheduleController.scheduleDate}" disabled="true" timeZone="GMT+8" pattern="yyyy-MM-dd"/>
                         </h:panelGroup>
                         <br/>
+                        <br/>
                         <h:panelGroup>
                             <label class="label">人员*</label>
                             <p:selectOneMenu value="#{workScheduleController.userUID}" style="width:125px" required="true" requiredMessage="人员不能为空">
@@ -56,15 +57,22 @@
                         <br/>
                         <h:panelGroup>
                             <label class="label">班次*</label>
-                            <p:selectOneRadio value="#{workScheduleController.scheduleDateStage}" disabled="#{workScheduleController.disableScheduleDateStage}" required="true" requiredMessage="班次不能为空">
+                            <!--<p:selectOneRadio value="#{workScheduleController.scheduleDateStage}" disabled="#{workScheduleController.disableScheduleDateStage}" required="true" requiredMessage="班次不能为空">
                                 <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
                                 <f:selectItem itemLabel="全天" itemValue="ALL" />
                                 <f:selectItem itemLabel="早班" itemValue="AM" />
                                 <f:selectItem itemLabel="晚班" itemValue="PM" />
-                            </p:selectOneRadio>
+                            </p:selectOneRadio>-->
+                            <p:selectOneMenu value="#{workScheduleController.scheduleDateStage}" style="width:125px" required="true" requiredMessage="班次不能为空">
+                                <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="全天" itemValue="ALL" />
+                                <f:selectItem itemLabel="早班" itemValue="AM" />
+                                <f:selectItem itemLabel="晚班" itemValue="PM" />
+                            </p:selectOneMenu>
                         </h:panelGroup>
                         <br/>
-
+                        <br/>
                         <p:commandButton id="addButton" value="保存" validateClient="true" actionListener="#{workScheduleController.addSchedule}" update="messages" disabled="#{workScheduleController.disableSave}" oncomplete="PF('workSchedule').update();PF('workScheduleDialog').hide();" />
                         <p:commandButton id="deleteButton" value="删除" actionListener="#{workScheduleController.deleteSchedule}" disabled="#{workScheduleController.disableDelete}" oncomplete="PF('workSchedule').update();PF('workScheduleDialog').hide();" >
                             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
