@@ -99,7 +99,7 @@
                <p:menuitem id="um151" value="CT球管预测" rendered="#{userContextService.isAgentTenant()}" outcome="/portal/config/tubeData/List.xhtml"/>
             </p:submenu>
 
-            <p:submenu  id="um60"  label="预防维护" rendered="#{userContextService.hasAnyRole('ClinicalStaff, DeptHead') and !userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')}" icon="fa fa-check-square-o" >
+            <p:submenu  id="um60"  label="预防维护" rendered="#{userContextService.hasAnyRole('ClinicalStaff, DeptHead,HospitalHead') and !userContextService.hasAnyRole('AssetStaff,SuperAdmin,AssetHead')}" icon="fa fa-check-square-o" >
                 <p:menuitem id="um601"  value="保养工作台" outcome="/portal/pm/pmOrderListAll.xhtml"/>
             </p:submenu>
             <p:submenu id="um24" label="#{msg.PreventiveMaintainceMgmt}" icon="fa fa-check-square-o"
