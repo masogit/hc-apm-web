@@ -63,7 +63,7 @@
                                 <f:selectItem itemLabel="早班" itemValue="AM" />
                                 <f:selectItem itemLabel="晚班" itemValue="PM" />
                             </p:selectOneRadio>-->
-                            <p:selectOneMenu value="#{workScheduleController.scheduleDateStage}" style="width:125px" required="true" requiredMessage="班次不能为空">
+                            <p:selectOneMenu value="#{workScheduleController.scheduleDateStage}" style="width:125px" required="true" disabled="#{workScheduleController.disableScheduleDateStage}" requiredMessage="班次不能为空">
                                 <p:ajax listener="#{workScheduleController.onScheduleValidate}" update="workScheduleForm:addButton"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="全天" itemValue="ALL" />
