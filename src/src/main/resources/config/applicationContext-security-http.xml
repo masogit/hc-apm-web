@@ -68,7 +68,7 @@
         <!-- 预防维护 -->
         <intercept-url pattern="/portal/insp/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 巡检管理 -->
 
-        <intercept-url pattern="/portal/pm/**" access="hasAnyRole('DeptHead','ClinicalStaff','SuperAdmin','AssetHead','AssetStaff')"/> <!-- 保养管理 -->
+        <intercept-url pattern="/portal/pm/**" access="hasAnyRole('DeptHead','ClinicalStaff','SuperAdmin','AssetHead','AssetStaff','HospitalHead')"/> <!-- 保养管理 -->
         <intercept-url pattern="/portal/metering/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 计量管理 -->
         <intercept-url pattern="/portal/qc/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 质控管理 -->
         <intercept-url pattern="/portal/adverseEvent/**" access="hasAnyRole('SuperAdmin','AssetHead','AssetStaff')"/> <!-- 不良事件上报 -->

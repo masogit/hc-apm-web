@@ -66,7 +66,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private UaaService uaaService;
 	private OrgInfo selectedOrg;
 	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
-	private String newFormat;
+	//private String newFormat;
 	private List<OrgInfo> dispatherClinical = new ArrayList<OrgInfo>();
 
 	@Override
@@ -425,7 +425,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 			return;
 		}
 
-		if(selected.getId() != null){
+/*		if(selected.getId() != null){
     		if(selected.getFormat() != null && newFormat != null){
     			if(selected.getFormat().length() > newFormat.length()){
 					RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -433,7 +433,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 					return;
 				}
 			}
-		}
+		}*/
 
 		if(selected.getGenerateMethod() != null && selected.getGenerateMethod() == 1){
     		if(StringUtils.isEmpty(selected.getPrefix())){
@@ -461,10 +461,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 		}
 
-
-		if(newFormat != null){
-    		selected.setFormat(newFormat);
-		}
         onBeforeSave(selected);
 
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
@@ -475,7 +471,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
         dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
 		selectedUserOrg = null; //orgInfoRepository.getByUid(user.getOrgInfoUID());
-		newFormat = null;
     }
 
 	@Override
@@ -499,7 +494,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		updateDispater();
 		updateApproverList();
 		updateDispatherClinical();
-		newFormat = selected.getFormat();
 	}
 
 	public void prepareCreate(){
@@ -629,14 +623,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public void setApproveUserList(List<UserAccount> approveUserList) {
 		this.approveUserList = approveUserList;
-	}
-
-	public String getNewFormat() {
-		return newFormat;
-	}
-
-	public void setNewFormat(String newFormat) {
-		this.newFormat = newFormat;
 	}
 
 	public void setDispatherClinical(List<OrgInfo> dispatherClinical) {

@@ -33,6 +33,9 @@ public class MicroServiceInvoker {
     @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
     private String baseURL;
     
+    @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
+    protected String downLoadURL;
+    
     public String getGatewayURL(GatewayURL url) {
         return baseURL + url.toString();
     }

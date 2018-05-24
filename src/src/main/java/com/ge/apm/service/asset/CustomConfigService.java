@@ -18,6 +18,7 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Arrays;
@@ -90,7 +91,7 @@ public class CustomConfigService {
         res.put("comments", WebUtil.getMessage("comments"));
         res.put("assetUsage", WebUtil.getMessage("assetUsage"));
         res.put("capitalSource", WebUtil.getMessage("capitalSource"));
-        res.put("capitalSource2", WebUtil.getMessage("capitalSource"));
+        res.put("capitalSource2", WebUtil.getMessage("capitalSource2"));
         res.put("measureGrade", WebUtil.getMessage("measureGrade"));
         res.put("riskGrade", WebUtil.getMessage("riskGrade"));
         res.put("emergencyEquipment", WebUtil.getMessage("emergencyEquipment"));
@@ -153,8 +154,10 @@ public class CustomConfigService {
         object.setAssetFields(new HashMap());
         List<String> allRoles = getConfigRoles().stream().map(SysRole::getName).collect(Collectors.toList());
         getAllFields().entrySet().stream().forEach(item-> object.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(),allRoles)));
-        object.setAssetsListPageFields(Arrays.asList("name","functionType","serialNum","departNum","assetGroup",
+        List<String> listPageFields = new ArrayList();
+        listPageFields.addAll(Arrays.asList("name","functionType","serialNum","departNum","assetGroup",
                 "clinicalDeptName","manufacture","vendor","status","warrantyDate","financingNum","qrCode"));
+        object.setAssetsListPageFields(listPageFields);
         object.setAssetsDetailpageBasicFields(Arrays.asList("serialNum","name","aliasName","assetGroup","assetOwnerName",
                 "assetOwnerTel","assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3","siteUID",
                 "clinicalDeptName","clinicalOwnerName","clinicalOwnerTel","manufacture","makerShortName","vendor",
@@ -241,6 +244,21 @@ public class CustomConfigService {
         }
         if (customConfigObject.getAssetsDetailpageDetailFields().contains(key)) {
             customConfigObject.getAssetsDetailpageDetailFields().remove(key);
+        }
+        if (customConfigObject.getAssetsEditpageBasicFields().contains(key)) {
+            customConfigObject.getAssetsEditpageBasicFields().remove(key);
+        }
+        if (customConfigObject.getAssetsEditpageCatalogFields().contains(key)) {
+            customConfigObject.getAssetsEditpageCatalogFields().remove(key);
+        }
+        if (customConfigObject.getAssetsEditpageCodesFields().contains(key)) {
+            customConfigObject.getAssetsEditpageCodesFields().remove(key);
+        }
+        if (customConfigObject.getAssetsEditpageFinicialFields().contains(key)) {
+            customConfigObject.getAssetsEditpageFinicialFields().remove(key);
+        }
+        if (customConfigObject.getAssetsEditpageStatusFields().contains(key)) {
+            customConfigObject.getAssetsEditpageStatusFields().remove(key);
         }
     }
     
