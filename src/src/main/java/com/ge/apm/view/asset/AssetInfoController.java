@@ -943,7 +943,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
+        //already in specified order, no need to order by pinyin
+//        res.sort(new PinYinComparatorByName());
         return res;
     }
 
