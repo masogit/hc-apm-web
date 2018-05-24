@@ -212,9 +212,16 @@
                                 </p:selectOneMenu>
                             </h:panelGroup>
 
-                            <h:panelGroup>
+                            <!--<h:panelGroup>
                                 <label class ="label">初始流水号</label>
                                 <p:selectOneMenu value="#{v2_WorkflowConfigController.newFormat}" disabled="false">
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>-->
+                            <h:panelGroup>
+                                <label class ="label">初始流水号</label>
+                                <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.format}" disabled="false">
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
