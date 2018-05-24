@@ -173,7 +173,7 @@ public class MicroServiceUtil extends MicroServiceInvoker {
     }
 
     public String getUrl_downloadFile() {
-        return  getGatewayURL(GatewayURL.DOWNLOAD_FILE);
+        return  downLoadURL.concat(GatewayURL.DOWNLOAD_FILE.toString());
     }
 
 }
