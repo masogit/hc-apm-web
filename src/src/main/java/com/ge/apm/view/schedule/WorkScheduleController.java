@@ -11,6 +11,7 @@ import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -117,6 +118,8 @@ public class WorkScheduleController{
         UserSchedule tempUserSchedule = null;
         DefaultScheduleEvent tempEvent = null;
 
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
         if(event.getId() == null){
             //新增记录
             tempUserSchedule = new UserSchedule();
@@ -128,7 +131,7 @@ public class WorkScheduleController{
             tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
             tempUserSchedule.setUserUID(this.userUID);
             //tempUserSchedule.setScheduleDate(event.getStartDate());
-            tempUserSchedule.setScheduleDate(this.scheduleDate);
+            tempUserSchedule.setScheduleDate(TimeUtil.fromString(sdf.format(this.scheduleDate)).toDate());
             tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
 
             //tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), event.getStartDate(), event.getEndDate(), true);
@@ -142,7 +145,7 @@ public class WorkScheduleController{
 
                 tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
                 tempUserSchedule.setUserUID(this.userUID);
-                tempUserSchedule.setScheduleDate(event.getStartDate());
+                tempUserSchedule.setScheduleDate(TimeUtil.fromString(sdf.format(event.getStartDate())).toDate());
                 tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
 
                 //tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), event.getStartDate(), event.getEndDate(), true);
