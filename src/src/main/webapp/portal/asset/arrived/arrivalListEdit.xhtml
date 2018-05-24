@@ -110,7 +110,7 @@
                                                                         <p:inputText value="#{assetArrivedListEditController.selected.classCode}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
                                                                     </h:panelGroup>-->
                                     <h:panelGroup>
-                                        <label class="label">#{msg.ArrivalProcessType}</label>
+                                        <label class="label">#{msg.ArrivalProcessType}*</label>
                                         <p:selectOneMenu  value="#{assetArrivedListEditController.selected.processType}" required="true" requiredMessage="#{msg.ArrivalProcessType}#{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.selected.status ne '1'}" >
                                         	<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>

@@ -11,6 +11,7 @@ import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.*;
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.TimeUtil;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -127,11 +128,9 @@ public class WorkScheduleController{
             tempUserSchedule.setType("W");
             tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
             tempUserSchedule.setUserUID(this.userUID);
-            //tempUserSchedule.setScheduleDate(event.getStartDate());
             tempUserSchedule.setScheduleDate(this.scheduleDate);
             tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
 
-            //tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), event.getStartDate(), event.getEndDate(), true);
             tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
             tempEvent.setData(tempUserSchedule);
 
@@ -145,7 +144,6 @@ public class WorkScheduleController{
                 tempUserSchedule.setScheduleDate(event.getStartDate());
                 tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
 
-                //tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), event.getStartDate(), event.getEndDate(), true);
                 tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
                 tempEvent.setId(event.getId());
                 tempEvent.setData(tempUserSchedule);

@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-              <p:outputLabel class="pageTitle" value="#{msg.msgsubscribe}"/>
+              <p:outputLabel class="pageTitle" value="设备消息订阅"/>
             </div>
             <div class="ui-g-12 card">
             <h:form id ="TagSubscriberForm" style="margin-top: 20px;">
@@ -41,7 +41,7 @@
 
         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
 
-        <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected}"/>
+        <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSuassetINfobscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected}"/>
 
         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{tagSubscriberController.delete}" update=":TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
