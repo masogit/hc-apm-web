@@ -118,8 +118,6 @@ public class WorkScheduleController{
         UserSchedule tempUserSchedule = null;
         DefaultScheduleEvent tempEvent = null;
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-
         if(event.getId() == null){
             //新增记录
             tempUserSchedule = new UserSchedule();
@@ -130,11 +128,9 @@ public class WorkScheduleController{
             tempUserSchedule.setType("W");
             tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
             tempUserSchedule.setUserUID(this.userUID);
-            //tempUserSchedule.setScheduleDate(event.getStartDate());
-            tempUserSchedule.setScheduleDate(TimeUtil.fromString(sdf.format(this.scheduleDate)).toDate());
+            tempUserSchedule.setScheduleDate(this.scheduleDate);
             tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
 
-            //tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), event.getStartDate(), event.getEndDate(), true);
             tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
             tempEvent.setData(tempUserSchedule);
 
@@ -145,10 +141,9 @@ public class WorkScheduleController{
 
                 tempUserSchedule.setScheduleDateStage(this.scheduleDateStage);
                 tempUserSchedule.setUserUID(this.userUID);
-                tempUserSchedule.setScheduleDate(TimeUtil.fromString(sdf.format(event.getStartDate())).toDate());
+                tempUserSchedule.setScheduleDate(event.getStartDate());
                 tempUserSchedule.setUserAccount(userAccountDao.getByUid(this.userUID));
 
-                //tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), event.getStartDate(), event.getEndDate(), true);
                 tempEvent = new DefaultScheduleEvent(this.getShowTitle(tempUserSchedule.getScheduleDateStage()) + "---" + tempUserSchedule.getUserAccount().getName(), this.scheduleDate, this.scheduleDate, true);
                 tempEvent.setId(event.getId());
                 tempEvent.setData(tempUserSchedule);
