@@ -53,7 +53,7 @@
                                         <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('UsingFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
                                     </f:facet>
                                     <p:commandLink value="修改" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsEditForm" oncomplete="PF('AssetFieldsEditDialog').show()"/>
-                                    <p:commandLink value="删除" actionListener="#{customConfigController.removeAssetField(item.key)}" update="assetFieldsTable"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.removeAssetField(item.key)}" update=":customConfigForm"/>
                                 </p:column>
                             </p:dataTable>
                         </p:tab>
