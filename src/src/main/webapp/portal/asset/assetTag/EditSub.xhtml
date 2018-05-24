@@ -39,7 +39,7 @@
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <p:selectBooleanCheckbox id="sb1" class="scbCls" rendered="#{tagSubscriberController.selected.receiveMsgMode!=3}" value="#{tagSubscriberController.selected.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送#{tagSubscriberController.selected.receiveMsgMode!=3}"/>
+                        <p:selectBooleanCheckbox id="sb1" class="scbCls" rendered="#{tagSubscriberController.selected.receiveMsgMode!=3}" value="#{tagSubscriberController.selected.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送"/>
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.save}" value="#{msg.Save}" update=":AssetTagSubscribEditDlg, :TagSubscriberForm:dataList, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>
