@@ -65,6 +65,8 @@ public class AssetInstallationController {
     private GbCode selectedGb;
     private TreeNode gbTree;
     private String src = "";
+    private UserAccount owner1;
+    private AutoCompleteService autoCompleteService;
 //    private String currentQrCode;
 
     private ConfigService configService;
@@ -72,7 +74,7 @@ public class AssetInstallationController {
     private String exportQrCodeTemplateId;
 
     private String deptName;
-
+    private List<UserAccount> ownerList;
     private List<OrgInfo> deptInfoList;
     private UaaService uaaService;
     private WorkflowConfig config;
@@ -87,6 +89,7 @@ public class AssetInstallationController {
         qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         assetDao = WebUtil.getBean(AssetInfoRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -101,12 +104,16 @@ public class AssetInstallationController {
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
-            onAssetOwnerNameChange();
+            owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+        }
+        else{
+        	owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
         }
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             OrgInfo org = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());
             deptName = org == null ? null : org.getName();
         }
+        getOwnerList();
         changeFunctionGroup();
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
@@ -403,7 +410,8 @@ public class AssetInstallationController {
     }
 
     public void onAssetOwnerNameChange() {
-        UserAccount owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+//        owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+    	arrivalListItem.setAssetOwnerUID(owner1 == null ? null : owner1.getUid());
         List<Object[]> ownerComposition = assetDao.findAssetOwnerComposition(owner1.getId(), arrivalListItem.getArrivalList().getSiteUID());
         if (ownerComposition != null && !ownerComposition.isEmpty()) {
             Object[] composition = ownerComposition.get(0);
@@ -530,6 +538,9 @@ public class AssetInstallationController {
             arrivalListItem.setClinicalDeptUID(dept.getUid());
         }
     }
+    public List<UserAccount> completeOwnerList(String query) {
+        return autoCompleteService.completeOwnerList(query, ownerList);
+    }
 
     public List<QrCodeTemplate> getQrCodeTemplates() {
         QrCodeTemplateService qtService = WebUtil.getBean(QrCodeTemplateService.class
@@ -538,7 +549,10 @@ public class AssetInstallationController {
     }
 
     public List<UserAccount> getOwnerList() {
-        return aiService.getWorkerList();
+        if (ownerList == null) {
+            ownerList = aiService.getWorkerList();
+        }
+        return ownerList;
     }
 
     public UserAccount getUserAccountByUid(String uid) {
@@ -625,4 +639,11 @@ public class AssetInstallationController {
 		this.needInstorageCheck = needInstorageCheck;
 	}
 
+	public UserAccount getOwner1() {
+		return owner1;
+	}
+
+	public void setOwner1(UserAccount owner1) {
+		this.owner1 = owner1;
+	}
 }

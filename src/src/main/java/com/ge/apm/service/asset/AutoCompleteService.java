@@ -10,11 +10,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.Supplier;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.google.common.base.Strings;
 
@@ -23,7 +22,7 @@ import com.google.common.base.Strings;
  * @author 212579464
  */
 @Component
-public class SupplierService {
+public class AutoCompleteService {
 
     
     public List<Supplier> autoCompleteVendor(String query,List<Supplier> supplierList) {
@@ -37,6 +36,16 @@ public class SupplierService {
     public List<Supplier> autoCompleteMaintainer(String query,List<Supplier> supplierList) {
 
         List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("2","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    
+    public List<UserAccount> completeOwnerList(String query,List<UserAccount> ownerList) {
+
+        if (ownerList == null) return Collections.emptyList();
+
+        List<UserAccount> res = ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
