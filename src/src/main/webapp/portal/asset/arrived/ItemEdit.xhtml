@@ -255,11 +255,16 @@
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
-                                <p:selectOneMenu id="assetOwnerName" value="#{assetInstallationController.arrivalListItem.assetOwnerUID}" >
-                                    <p:ajax listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                                <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
+                                    </p:column>
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName2}</label>

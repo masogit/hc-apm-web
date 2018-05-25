@@ -36,7 +36,7 @@ import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
-import com.ge.apm.service.asset.SupplierService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
@@ -92,7 +92,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     private boolean needInstorageCheck;
-    private SupplierService supplierService;
+    private AutoCompleteService autoCompleteService;
 
     @Override
     protected void init() {
@@ -100,7 +100,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         dao = WebUtil.getBean(ArrivalListRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
-        supplierService = WebUtil.getBean(SupplierService.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -448,11 +448,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public List<Supplier> autoCompleteVendor(String query) {
-        return supplierService.autoCompleteVendor(query, suppliersList);
+        return autoCompleteService.autoCompleteVendor(query, suppliersList);
     }
     
     public List<Supplier> autoCompleteMaintainer(String query) {
-        return supplierService.autoCompleteMaintainer(query, suppliersList);
+        return autoCompleteService.autoCompleteMaintainer(query, suppliersList);
     }
 
     public void onSupplierChange() {
