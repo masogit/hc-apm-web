@@ -4,25 +4,63 @@
  * and open the template in the editor.
  */
 package com.ge.apm.service.pm;
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
+
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.BiomedGroupRepository;
+import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.ElectricSafetyDataRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.PmOrderRuleRepository;
+import com.ge.apm.dao.RelRuleAssetRepository;
+import com.ge.apm.dao.ServiceRequestMsgRepository;
+import com.ge.apm.dao.ServiceRequestRepository;
+import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.dao.UserAccountRepository;
+import com.ge.apm.dao.V2_PmOrderRepository;
+import com.ge.apm.dao.WorkOrderCoworkerRepository;
+import com.ge.apm.dao.WorkOrderDetailRepository;
+import com.ge.apm.dao.WorkOrderStepRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.ElectricSafetyData;
+import com.ge.apm.domain.PmOrderRule;
+import com.ge.apm.domain.ServiceRequestMsg;
+import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UnstructuredDataCollection;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.domain.V2_ServiceRequest;
+import com.ge.apm.domain.V2_WorkOrderCoworker;
+import com.ge.apm.domain.V2_WorkOrder_Detail;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.common.UserCommonService;
 /*import com.ge.apm.service.wo.PmOrderActionForm;
 import com.ge.apm.service.wo.WorkOrderForm;*/
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+
 import webapp.framework.web.WebUtil;
-import java.text.SimpleDateFormat;
-import java.util.*;
 /**
  *
  * @author 212579464
  */
 @Component
 public class V2_PmOrderService {
+	private static final Logger log = LoggerFactory.getLogger(V2_PmOrderService.class);
     @Autowired
     private ServiceRequestMsgRepository msgDao;
     @Autowired
@@ -67,6 +105,8 @@ public class V2_PmOrderService {
     private PmOrderRuleRepository pmOrderRuleRepository;
     @Autowired
     private UnstructuredDataCollectionRepository reportDao;
+    @Autowired
+    private ElectricSafetyDataRepository electricSafetyDataRepository;
 
     public PmOrderRule acqPmOrderRule(V2_PmOrder v2PmOrder){
         PmOrderRule pmOrderRule=null;
@@ -111,6 +151,39 @@ public class V2_PmOrderService {
     public List<UnstructuredDataCollection> getReportList(String boUid) {
         return reportDao.findByBoUuidNoPMCheckList(boUid);
     }
+    
+    public void saveReport(UnstructuredDataCollection report){
+    	reportDao.save(report);
+    }
+    
+    public void saveReport(List<UnstructuredDataCollection> listReport){
+    	reportDao.save(listReport);
+    }
+    
+    private void getInstrumentDataForReport(UnstructuredDataCollection report){
+    	if(report!=null){
+    		String pmOrderId=report.getBoUuid();
+    		String schemaId=report.getSchemaId();
+    		if(StringUtils.isNotEmpty(pmOrderId) && StringUtils.isNotEmpty(schemaId)){
+    			ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByPmOrderId(pmOrderId);
+    			TableDefinition tableDefinition=tableDao.findById(schemaId);
+    			if(electricSafetyData!=null && tableDefinition!=null){
+    				String instrumentJsonStr=tableDefinition.getInstrumentKeyValues();
+    				String templateJsonStr=tableDefinition.getSchema();
+    				if(StringUtils.isNotEmpty(instrumentJsonStr) && StringUtils.isNotEmpty(templateJsonStr)){
+    					JSONObject instrumentJson=JSONObject.parseObject(instrumentJsonStr);
+    					TableSchema tableSchema=JSONObject.parseObject(templateJsonStr, TableSchema.class);
+    					
+    					
+    				}
+    			}
+    		}
+    	}
+    }
+    private void getInstrumentDataForReport(List<UnstructuredDataCollection> listReport){
+    	
+    }
+    
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();

@@ -5,6 +5,17 @@
  */
 package com.ge.apm.service.report;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
@@ -16,17 +27,10 @@ import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -44,6 +48,9 @@ public class TableDefinitionService {
     private UnstructuredDataRepository udDao;
     @Autowired
     private BlobFileService blobService;
+    @Autowired
+    private V2_PmOrderService v2PmOrderService;
+    
 
     public Integer getCountByTemplate(String templateId) {
         return udcDao.getCountByTemplate(templateId);
@@ -207,12 +214,12 @@ public class TableDefinitionService {
         });
         report.setData(dataList);
         report.setCreatedDate(new Date());
-        udcDao.save(report);
+        v2PmOrderService.saveReport(report);
     }
 
     public void submitReport(UnstructuredDataCollection report) {
         report.setStatus(UnstructuredDataCollection.Status.Archived.toString());
-        udcDao.save(report);
+        v2PmOrderService.saveReport(report);
     }
 
     public void deleteReport(String reportId) {
@@ -245,6 +252,7 @@ public class TableDefinitionService {
         newTemplate.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
         newTemplate.setStatus(selectedTableDefinition.getStatus());
         newTemplate.setExcelStorageId(selectedTableDefinition.getExcelStorageId());
+        newTemplate.setInstrumentKeyValues(selectedTableDefinition.getInstrumentKeyValues());
         newTemplate.setSchema(tableString);
         templateDao.save(newTemplate);
         selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
