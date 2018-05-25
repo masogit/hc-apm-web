@@ -1,20 +1,34 @@
 package com.ge.apm.view.asset;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.stream.Collectors;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.SelectEvent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
+
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.SupplierRepository;
-import java.util.List;
-import javax.faces.bean.ManagedBean;
-import javax.faces.bean.ViewScoped;
-import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.GbCode;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
@@ -22,27 +36,16 @@ import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
+import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import org.apache.commons.lang.StringUtils;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
+
 import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 @ManagedBean
 @ViewScoped
@@ -61,6 +64,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private TreeNode orgTree;
 
     private Supplier supplier;
+    private Supplier maitanance;
 
     private TreeNode selectedNode;
 
@@ -88,6 +92,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     private boolean needInstorageCheck;
+    private AutoCompleteService autoCompleteService;
 
     @Override
     protected void init() {
@@ -95,6 +100,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         dao = WebUtil.getBean(ArrivalListRepository.class);
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -110,6 +116,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
+        
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 String copyFrom = (String) UrlEncryptController.getValueFromMap(encodeStr, "copyFrom");
@@ -165,7 +172,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void applyChange() {
-        onSupplierChange(null);
+        onSupplierChange();
         this.save();
     }
 
@@ -271,6 +278,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             easyInstallItem.setPurchasePrice(selected.getContractPrice() / selected.getQuantity());
             easyInstallItem.setIsPm(true);
             easyInstallItem.setIsChecked(true);
+        }
+        String maitananceName=easyInstallItem.getMaitanance();
+        if(maitananceName!=null){
+        	this.maitanance=new Supplier();
+        	maitanance.setName(maitananceName);
         }
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
@@ -435,18 +447,24 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.save();
     }
 
-    public List<String> autoCompleteVendor(String query) {
-        List<String> res = suppliersList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query) 
-                || (item.getNamePyCode() == null? false: item.getNamePyCode().contains(query.toLowerCase()))).map(Supplier::getName).collect(Collectors.toList());
-        res.sort(new PinYinComparator());
-        return res;
+    public List<Supplier> autoCompleteVendor(String query) {
+        return autoCompleteService.autoCompleteVendor(query, suppliersList);
+    }
+    
+    public List<Supplier> autoCompleteMaintainer(String query) {
+        return autoCompleteService.autoCompleteMaintainer(query, suppliersList);
     }
 
-    public void onSupplierChange(SelectEvent event) {
-        Supplier selectedSupplier = suppliersList.stream().filter(item -> item.getName().equals(supplierName)).findFirst().orElse(null);
-        if (selectedSupplier != null) {
-            selected.setSupplierId(selectedSupplier.getId());
-            selected.setVendor(selectedSupplier.getName());
+    public void onSupplierChange() {
+    	if (null != supplier) {
+            selected.setSupplierId(supplier.getId());
+            selected.setVendor(supplier.getName());
+        }
+    }
+    
+    public void onMaintainerChange() {
+    	if (null != maitanance) {
+            this.easyInstallItem.setMaitanance(maitanance.getName());
         }
     }
 
@@ -491,7 +509,15 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.supplier = supplier;
     }
 
-    public ArrivalListItem getEasyInstallItem() {
+    public Supplier getMaitanance() {
+		return maitanance;
+	}
+
+	public void setMaitanance(Supplier maitanance) {
+		this.maitanance = maitanance;
+	}
+
+	public ArrivalListItem getEasyInstallItem() {
         return easyInstallItem;
     }
 
