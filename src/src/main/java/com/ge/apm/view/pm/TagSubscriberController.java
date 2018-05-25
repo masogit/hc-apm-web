@@ -56,6 +56,23 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		assetTags =  assetTagRepository.getTagBySite(userAccountRepository.getById(this.selected.getSubscribeUserId()).getSiteUID());
 
 	}
+	public void test(){
+		System.out.println(selected.getReceiveMsgMode());
+	}
+
+	public void saveTagSub(){
+         if(selected!=null){
+			 AssetTagMsgSubscriber dup = dao.getDupAssetTagMsgSubscriber(selected.getTagId(),
+					 selected.getSubscribeUserId(), selected.getReceiveMsgMode());
+			 if(dup!=null){
+			 	WebUtil.addErrorMessage("不能有重复的消息订阅");
+			 }else{
+			 	super.save();
+			 }
+
+		 }
+	}
+
 	@Override
 	protected void init() {
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
