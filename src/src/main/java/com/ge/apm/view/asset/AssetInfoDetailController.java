@@ -15,7 +15,10 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.PmScheduleData;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.CustomConfigObject;
+import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.components.CustomPanelGrid;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -29,6 +32,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.component.UIComponent;
 import org.apache.commons.lang.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -45,6 +50,7 @@ public class AssetInfoDetailController {
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
     private CustomConfigService ccService;
+    private AssetInfoMgrService aimService;
     private Boolean terminate;
     private AssetInfo selected;
     private List<V2_BlobObject> attachements;
@@ -57,6 +63,7 @@ public class AssetInfoDetailController {
     private Map<String, UIComponent> detailFields = new HashMap();
 
     private List<String> readableFieldsList;
+    private TreeNode parentsTree;
     
     @PostConstruct
     protected void init() {
@@ -65,6 +72,7 @@ public class AssetInfoDetailController {
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
+        aimService = WebUtil.getBean(AssetInfoMgrService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
         String terminateStr = (String) UrlEncryptController.getValueFromMap(encodeStr, "terminate");
         terminate = terminateStr == null ? false : Boolean.parseBoolean(terminateStr);
@@ -125,6 +133,32 @@ public class AssetInfoDetailController {
         return JSONObject.toJSONString(customConfig);
     }
     
+    public TreeNode getParentsRelationTree(){
+        if(parentsTree==null){
+            parentsTree = aimService.getParentAssetTree(selected);
+            TreeNodeUtil.expandTreeNode(parentsTree);
+        }
+        return parentsTree;
+    }
+    
+    public boolean showParentsTree(){
+        TreeNode node = getParentsRelationTree();
+        if(node==null || node.getChildCount()==0){
+            return false;
+        }
+        return node.getChildren().stream().anyMatch(item-> item.getChildCount()>0);
+    }
+    
+    public String getDetailPageLink(String uid){
+        AssetInfo viewAsset = assetDao.findByUid(uid);
+        String url = "actionName=View&selectedid="
+                + viewAsset.getId().toString()
+                + "&asset_name=" + viewAsset.getName()
+                + "&terminate=" + this.terminate;
+        url = "AssetDetail.xhtml?faces-redirect=true&str=" + UrlParamUtil.encodeUrlQueryString(url);
+        return url;
+    }
+    
     //getter and setter
     public Boolean getTerminate() {
         return terminate;
@@ -156,6 +190,15 @@ public class AssetInfoDetailController {
         return detailFieldsPanelGrid;
     }
 
+    public void setBasicFieldsPanelGrid(CustomPanelGrid basicFieldsPanelGrid) {
+        this.basicFieldsPanelGrid = basicFieldsPanelGrid;
+    }
+
+    public void setDetailFieldsPanelGrid(CustomPanelGrid detailFieldsPanelGrid) {
+        this.detailFieldsPanelGrid = detailFieldsPanelGrid;
+    }
+
+    
     public Map<String, UIComponent> getDetailFields() {
         return detailFields;
     }
