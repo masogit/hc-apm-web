@@ -433,7 +433,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = getServiceRequestPicList(selected.getSrId(), 2,null);
-        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);
+        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);// gaolei to xiuggai
         attachList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_DOCS);
     }
 
@@ -870,7 +870,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
         if (picList != null) {
-            return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
+            List<V2_BlobObject> collect = picList.stream().filter(item -> boType.equals(item.getBoType())).collect
+                    (Collectors.toList());
+            return collect;
         } else {
             return null;
         }
