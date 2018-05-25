@@ -370,6 +370,14 @@ public class AssetFileImportService {
 
             }
 
+            //check depart num to avoid duplicate when update
+            boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+            if (isDuplicate) {
+                item.put("status", ImportStatus.Failure);
+                AssetRow.addErrMessage(item, "错误: 设备编号重复");
+                return;
+            }
+
             String orgName = newAsset.getClinicalDeptName();
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.Failure);
@@ -663,11 +671,18 @@ public class AssetFileImportService {
     }
 
     private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
+
         List<SearchFilter> assetFilters = new ArrayList<>();
         String orgUid = selectedOrgToImport.getUid();
+
         assetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.EQ, asset.getDepartNum()));
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgUid));
+
+        if (null != asset.getUid()) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, asset.getUid()));
+        }
+
         List<AssetInfo> resultList = assetDao.findBySearchFilter(assetFilters);
         if (resultList.size() > 0) {
             return true;
@@ -759,14 +774,12 @@ public class AssetFileImportService {
                 continue;
             }
 
-            if (newAsset.getUid() == null) {
-                //check depart num to avoid duplicate when update
-                boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
-                if (isDuplicate) {
-                    item.put("status", ImportStatus.CheckFail);
-                    result.add(Boolean.FALSE);
-                    AssetRow.addErrMessage(item, "错误: 设备编号重复");
-                }
+            //check depart num to avoid duplicate when update
+            boolean isDuplicate = isAssetDepartNumDuplicate(newAsset);
+            if (isDuplicate) {
+                item.put("status", ImportStatus.CheckFail);
+                result.add(Boolean.FALSE);
+                AssetRow.addErrMessage(item, "错误: 设备编号重复");
             }
 
             //配置了三码合一和设备编号不为空，则检查，Jira: YHAAO-1594
