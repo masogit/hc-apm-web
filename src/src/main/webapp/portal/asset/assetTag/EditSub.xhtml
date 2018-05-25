@@ -33,7 +33,7 @@
                         <h:panelGroup >
                             <label class="label">工单消息推送选项*</label>
                             <p:selectOneMenu  value="#{tagSubscriberController.selected.receiveMsgMode}" required="true">
-                                <p:ajax update=":AssetTagSubscribEditForm" event="change" listener="#{tagSubscriberController.test()}"></p:ajax>
+                                <p:ajax update=":AssetTagSubscribEditForm" event="change"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
