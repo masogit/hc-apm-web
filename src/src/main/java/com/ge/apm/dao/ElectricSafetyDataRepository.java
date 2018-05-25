@@ -18,4 +18,7 @@ public interface ElectricSafetyDataRepository extends GenericRepositoryUUID<Elec
 	
 	@Query("select 1 from ElectricSafetyData o where o.financingNum =?1 and o.checkDate =?2")
 	public Integer findExistsByFinancingNumAndCheckDate(String financingNum,Date checkDate);
+	
+	@Query("select o from ElectricSafetyData o where o.v2_PmOrderId =?1")
+	public ElectricSafetyData findByPmOrderId(String pmOrderId);
 }

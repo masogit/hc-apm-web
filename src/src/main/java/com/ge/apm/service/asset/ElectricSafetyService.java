@@ -42,6 +42,7 @@ public class ElectricSafetyService {
     private Properties properties;
     private final String UPDATE="UPDATE";
     private final String INSERT="INSERT";
+    private UserAccount user;
     
     @Autowired
     AssetInfoRepository assetInfoRepository;
@@ -52,8 +53,10 @@ public class ElectricSafetyService {
     @Autowired
     ElectricSafetyDataRepository electricSafetyDataRepository;
     
+    
     public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr=readFileByLine(file);
+		this.user=user;
 		return analysis(strArr,file.getFileName());
     }
     
@@ -70,6 +73,10 @@ public class ElectricSafetyService {
 //            		detail.setAssetId(info.getId());
             		detail.setAssetUid(uid);
             		detail.setV2_PmOrderId(id);
+            		detail.setTenantUID(user.getTenantUID());
+            		detail.setHospitalUID(user.getHospitalUID());
+            		detail.setSiteUID(user.getSiteUID());
+            		detail.setInstitutionUID(user.getInstitutionUID());
         		}
         		try {
         			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate());

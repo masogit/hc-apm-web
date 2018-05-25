@@ -10,9 +10,10 @@ import java.util.Set;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.math3.util.Pair;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DualListModel;
 import org.primefaces.model.StreamedContent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,12 +65,15 @@ public class TableCreateController extends TieWebSheetBean {
     private Map<String, Object> tableFields;
     private HashMap<String, Object> context = new HashMap<String, Object>();
     private V2_BlobObject uploadedFileObject;
+    
+    //for instrument data import
     private Set<String> instrumentDataLabels;
     private Set<String> templateLabels;
     private Map<String,String> mapTemplateKeyValues;
-    private Map<String,String> mapInstrumentMppingLabels;
+    private DualListModel listInstrumentMppingLabels;
     private String instrumentDataLabel;
     private String templateLabel;
+    private static final String SPLIT_STR=" <=> ";
 
     @Override
     public void initialLoad() {
@@ -126,6 +130,7 @@ public class TableCreateController extends TieWebSheetBean {
         }
     }
 
+    //main save
     @Transactional
     public void saveTemplate() {
         if (!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length() > 64) {
@@ -134,6 +139,8 @@ public class TableCreateController extends TieWebSheetBean {
         }
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
             selectedTableDefinition.setName(table.getTitle());
+          //save instrument data
+            selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
             templateDao.save(selectedTableDefinition);
             table.setSchemaId(selectedTableDefinition.getId());
             tableString = JSONObject.toJSONString(table);
@@ -141,15 +148,20 @@ public class TableCreateController extends TieWebSheetBean {
             templateDao.save(selectedTableDefinition);
             selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
             templateDao.save(selectedTableDefinition);
+            
             WebUtil.addSuccessMessage("JSON已保存");
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
+            	//save instrument data
+                selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
                 selectedTableDefinition.setSchema(tableString);
                 selectedTableDefinition.setName(table.getTitle());
                 templateDao.save(selectedTableDefinition);
                 WebUtil.addSuccessMessage("JSON已保存");
             } else {
+            	//save instrument data
+                selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
                 selectedTableDefinition = templateService.updateJSONTemplate(selectedTableDefinition, tableString);
                 WebUtil.addErrorMessage("字段变动, JSON已保存为新版本");
             }
@@ -403,10 +415,51 @@ public class TableCreateController extends TieWebSheetBean {
     }
     
     public void bindInstrumentData(){
-    	if(mapInstrumentMppingLabels==null){
-    		mapInstrumentMppingLabels=new HashMap<String,String>();
-    		mapInstrumentMppingLabels.put(this.instrumentDataLabel, this.templateLabel);
+    	if(listInstrumentMppingLabels==null){
+    		listInstrumentMppingLabels=new DualListModel();
     	}
+    	System.out.println("bind");
+    	System.out.println(this.instrumentDataLabel);
+    	System.out.println(this.templateLabel);
+    	if(this.instrumentDataLabel==null || this.templateLabel==null){
+    		return;
+    	}
+    	List listSource=null;
+    	List listTarget=null;
+    	if(listInstrumentMppingLabels.getSource()==null){
+    		listSource=new ArrayList<String>();
+    		listInstrumentMppingLabels.setSource(listSource);
+    	}
+    	if(listInstrumentMppingLabels.getTarget()==null){
+    		listTarget=new ArrayList<String>();
+    		listInstrumentMppingLabels.setTarget(listTarget);
+    	}
+    	listSource=listInstrumentMppingLabels.getSource();
+    	String temp=this.instrumentDataLabel+SPLIT_STR+this.templateLabel;
+    	if(!listSource.contains(temp)){
+    		listSource.add(temp);
+    	}
+    }
+    
+    public String saveSelectedInstrumentData(){
+    	System.out.println("saveSelectedInstrumentData");
+    	String result="";
+    	
+    	if(listInstrumentMppingLabels!=null){
+    		JSONObject obj=new JSONObject();
+    		List<String> targetList=listInstrumentMppingLabels.getTarget();
+    		if(targetList!=null && targetList.size()>0){
+    			String strArr[];
+    			for(int i=0;i<targetList.size();++i){
+    				strArr=targetList.get(i).split(SPLIT_STR);
+    				if(strArr!=null && strArr.length==2){
+    					obj.put(ElectricSafetyData.getLabelAttributeMapping().get(strArr[0]), mapTemplateKeyValues.get(strArr[1]));
+    				}
+    			}
+    		}
+    		result=obj.toString();
+    	}
+    	return result;
     }
 
     public void testSubmit() {
@@ -517,12 +570,12 @@ public class TableCreateController extends TieWebSheetBean {
 		this.templateLabel = templateLabel;
 	}
 
-	public Map<String, String> getMapInstrumentMppingLabels() {
-		return mapInstrumentMppingLabels;
+	public DualListModel getListInstrumentMppingLabels() {
+		return listInstrumentMppingLabels;
 	}
 
-	public void setMapInstrumentMppingLabels(Map<String, String> mapInstrumentMppingLabels) {
-		this.mapInstrumentMppingLabels = mapInstrumentMppingLabels;
+	public void setListInstrumentMppingLabels(DualListModel listInstrumentMppingLabels) {
+		this.listInstrumentMppingLabels = listInstrumentMppingLabels;
 	}
 
 	public Set<String> getTemplateLabels() {
@@ -548,6 +601,7 @@ public class TableCreateController extends TieWebSheetBean {
 	public void setTemplateLabels(Set<String> templateLabels) {
 		this.templateLabels = templateLabels;
 	}
+
 
 	
     

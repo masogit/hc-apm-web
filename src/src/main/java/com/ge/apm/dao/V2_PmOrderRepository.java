@@ -30,7 +30,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Query(value = "select exists(select 1 from v2_pm_order where asset_id= ?1 and is_finished = false and rule_level = ?2) ",nativeQuery = true)
 	public Boolean findOpenPm(int assetId, Integer level);
 	
-	@Query(value = "select * from v2_pm_order where asset_uid= ?1 and is_finished='false' order by created_date desc limit 1",nativeQuery = true)
+	@Query(value = "select id from v2_pm_order where asset_uid= ?1 and is_finished='false' order by created_date desc limit 1",nativeQuery = true)
 	public String findByAssetUid(String asset_uid);
 
 
