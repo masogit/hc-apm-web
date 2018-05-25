@@ -174,17 +174,22 @@
                             <h:panelGroup >
                                 <label class="label">资产创建审核人</label>
                                 <p:selectOneMenu id="approveUserList" value="#{v2_WorkflowConfigController.selected.assetApprover}">
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.approveUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
                                 <label class = "label">维保提醒提前天数</label>
-                                <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="warrantyRemindDays" value="#{v2_WorkflowConfigController.selected.warrantyRemindDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">维保提醒次数</label>
-                                <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />  
+                                </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">到货安装是否需要核对入库</label>
@@ -193,6 +198,7 @@
                             <h:panelGroup rendered="true">
                                 <label class="label">调剂中心</label>
                                 <p:selectOneMenu id="deptForSharedAsset" value="#{v2_WorkflowConfigController.selected.deptForSharedAsset}">
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatherClinical}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                 </p:selectOneMenu>
@@ -200,6 +206,7 @@
                             <h:panelGroup>
                                 <label class="label">三码配置</label>
                                 <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.assetCodeConfig}">
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('assetCodeConfig')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
@@ -222,6 +229,7 @@
                             <h:panelGroup>
                                 <label class ="label">初始流水号</label>
                                 <p:selectOneMenu value="#{v2_WorkflowConfigController.selected.format}" disabled="false">
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('formatNum')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.value}"/>
                                 </p:selectOneMenu>
