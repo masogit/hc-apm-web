@@ -158,7 +158,7 @@
                                 <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量保养"  update="@(.pmrepairCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
+                                <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>
 
 
@@ -174,6 +174,7 @@
 
             </div>
        <!-- </div>-->
+    <!--批量保养完成对话框-->
     <p:dialog class ="pmrepairCompleteDialogBatch" id="pmrepairCompleteDialogBatch" widgetVar="pmrepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量保养">
         <h:form id="pmrepairCompleteDialogFormBatch" class="pmrepairCompleteDialogFormclsBatch" >
             <h:panelGroup  id="display5" style="height:500px">
@@ -194,6 +195,30 @@
             </h:panelGroup>
         </h:form>
     </p:dialog>
+    <!--批量完成2级保养工单对话框-->
+    <p:dialog class ="pmCompleteDialogBatch" id="pmCompleteDialogBatch" widgetVar="pmCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
+        <h:form id="pmCompleteDialogFormBatch" class="pmCompleteDialogFormclsBatch" >
+            <h:panelGroup  id="display6" style="height:500px">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">结束保养时间*</label>
+                        <p:calendar timeZone="GMT+8" id="fillDate6" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.endTime}" required="true" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh"  requiredMessage="结束时间 #{msg.ValidationRequire}"></p:calendar>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">总工时*</label>
+                        <p:inputText value="#{v2PmOrderController.totalManHours}" required="true"  minValue="0" maxValue="999" requiredMessage="总工时(小时)#{msg.ValidationRequire}"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+                <h:panelGroup>
+                    <p:commandButton validateClient="true"  actionListener="#{v2PmOrderController.batchComplete()}" value="完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmCompleteDialogBatch');"/>
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{v2PmOrderController.cancel()}" icon="ui-icon-cancel" onclick="PF('pmCompleteDialogBatch').hide()"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:form>
+    </p:dialog>
+
+
+
         <p:dialog id="createPMDialog" widgetVar="createPMDialog" modal="true"  resizable="true" draggable="true" width="80%" height="450"   header="新增保养" >
             <h:form id="PmRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}保养">

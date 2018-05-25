@@ -347,7 +347,12 @@ public class V2_PmOrderService {
         pmListTmp.stream().forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setPmOrderId(item.getId());
-            formData.setActionType("repair");
+            if(item.getSimplify()!=null && item.getSimplify()==true){
+                formData.setActionType("simplify");
+            }else{
+                formData.setActionType("repair");
+            }
+            formData.setQualityChecking("1");
             formData.setStepId(item.getCurrentStepId());
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
             formData.setManHours(averageHours);
