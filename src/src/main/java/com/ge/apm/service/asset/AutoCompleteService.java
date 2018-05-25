@@ -43,11 +43,12 @@ public class AutoCompleteService {
     
     public List<UserAccount> completeOwnerList(String query,List<UserAccount> ownerList) {
 
-        if (ownerList == null) return Collections.emptyList();
+    	if (ownerList == null) return Collections.emptyList();
 
         List<UserAccount> res = ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
+        //already in specified order, no need to order by pinyin
+//        res.sort(new PinYinComparatorByName());
         return res;
     }
 

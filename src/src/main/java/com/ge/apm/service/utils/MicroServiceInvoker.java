@@ -5,6 +5,7 @@
  */
 package com.ge.apm.service.utils;
 
+import com.ge.apm.service.common.GatewayURL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import java.util.LinkedHashMap;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 
@@ -28,6 +30,15 @@ public class MicroServiceInvoker {
     @Autowired
     protected RestTemplate template;
     
+    @Value("#{systemEnvironment['GATEWAY_URL'] ?: urlProperties.defaultGateway}")
+    private String baseURL;
+    
+    @Value("#{systemEnvironment['DOMAIN_URL'] ?: urlProperties.domainUrl}")
+    protected String downLoadURL;
+    
+    public String getGatewayURL(GatewayURL url) {
+        return baseURL + url.toString();
+    }
     
     protected Boolean isOkay(ResponseEntity res) {
 

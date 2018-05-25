@@ -108,7 +108,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private  String head;
-    
+
     private String reportUid; //selected table base uid
     public String getHead() {
         return head;
@@ -337,6 +337,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             cancel();
         }
     }
+
+   /* UserAccountRepository
+    public void testXX(V2_PmOrder pmOrder){
+        List<PmOrderSteps> pmOrderStep = pmOrderService.getPmOrderStep(pmOrder.getId());
+        System.out.println("ownerof step......."+pmOrderStep.get( pmOrderStep.size()-1).getOwnerName());
+
+
+        userDao.getByUid(pmOrder.getCurrentStepName())
+
+
+    }*/
     public List<PmOrderSteps> aquirePmOrderStep(){
         if(selected!=null)
             return pmOrderService.getPmOrderStep(selected.getId());
@@ -467,7 +478,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         this.selectedMap = new HashMap();
         //如果当前人员只是 临床科室主任或者 只是临床科室人员...
-        if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") &&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))){
+        if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") &&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") ){
             queryIndex= 8;
         }else {
             queryIndex = -1;
@@ -591,6 +602,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -656,6 +668,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
+
+      /* for(int i=0;i<result.getContent().size();i++){
+           testXX(result.getContent().get(i));
+       }
+       //如果是待派工 额外处理 负责人是当前工单在待派工步骤的那个ownerName
+       if(queryIndex == 2){
+
+       }*/
         return result;
     }
     public void onSelectPmOrder(){
@@ -806,8 +826,34 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         picList = new ArrayList<V2_BlobObject>();
     }
     public void repairPmOrderBatch() {
+        System.out.println(selectedMap);
+        //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
+//selectedMap.forEach();
+        /*selectedMap.entrySet().stream().forEach(item->{
+            V2_PmOrder byId = dao.findById(item.getKey());
+            if(byId.getSimplify() == false){
+
+            }
+
+        });*/
+
         pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
     }
+
+  /*  public boolean getV2Simply(Map<String, Boolean>  selectedMap, String uid){
+
+        selectedMap.entrySet().stream().forEach(item->{
+            V2_PmOrder byId = dao.findById(item.getKey());
+            if(byId.getSimplify() == false){
+                mark =false;
+            }
+
+        });
+
+
+
+       return true;
+    }*/
     public void repairPmOrder() {
         if(!requiredCheck()){
             return;
