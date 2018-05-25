@@ -825,35 +825,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
-    public void repairPmOrderBatch() {
-        System.out.println(selectedMap);
-        //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
-//selectedMap.forEach();
-        /*selectedMap.entrySet().stream().forEach(item->{
-            V2_PmOrder byId = dao.findById(item.getKey());
-            if(byId.getSimplify() == false){
-
-            }
-
-        });*/
-
-        pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
+    //已计划-->批量保养完成
+    public void repairPmOrderBatch(){
+		  pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
     }
 
-  /*  public boolean getV2Simply(Map<String, Boolean>  selectedMap, String uid){
-
-        selectedMap.entrySet().stream().forEach(item->{
-            V2_PmOrder byId = dao.findById(item.getKey());
-            if(byId.getSimplify() == false){
-                mark =false;
-            }
-
+    public void batchComplete(){
+        List<String> assetIdList = new ArrayList<String>();
+        //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
+        selectedMap.forEach((k,v)->{
+            if(v==true)
+                assetIdList.add(k);
         });
-
-
-
-       return true;
-    }*/
+        List<V2_PmOrder> pmList = dao.checkSimplify(assetIdList);
+        if(pmList.size()!=assetIdList.size()){//说明选定的工单全都是可以简化即simplify为3
+            //不能选择"抢单"的来做批量"完成"
+            WebUtil.addErrorMessage("不能选择抢单的工单来做批量完成");
+            return;
+        }
+        pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
+    }
+    //已计划-->保养完成
     public void repairPmOrder() {
         if(!requiredCheck()){
             return;
@@ -914,6 +906,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
+    }
+    public void prepareBatchComplete(){
+        this.endTime=null;
+        this.totalManHours=null;
     }
     public void prepareEditCoWorkerDetail(String itemId) {
         if ("new".equals(itemId)) {
