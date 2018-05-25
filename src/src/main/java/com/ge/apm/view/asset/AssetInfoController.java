@@ -96,6 +96,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> ownerOrgList;
 
     private List<V2_BlobObject> attachements;
+    
+    private SupplierService supplierService;
 
     private BlobFileService blobService;
 
@@ -256,7 +258,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
-
+        supplierService=WebUtil.getBean(SupplierService.class);
         importService = WebUtil.getBean(AssetFileImportService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
@@ -1961,19 +1963,11 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
-
-        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("1","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return supplierService.autoCompleteVendor(query, supplierList);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-
-        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("2","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return supplierService.autoCompleteMaintainer(query, supplierList);
     }
 
     public void setOwnerList(List<UserAccount> ownerList) {
