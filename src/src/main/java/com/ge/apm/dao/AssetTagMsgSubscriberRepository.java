@@ -23,6 +23,7 @@ public interface AssetTagMsgSubscriberRepository extends GenericRepository<Asset
     public List<AssetTagMsgSubscriber> getAssetTagMsgSubscriberAll();
 
 
-
+    @Query(value = "select * from Asset_Tag_Msg_Subscriber where tag_id=?1 and subscribe_user_id=?2 and receive_msg_mode=?3",nativeQuery = true)
+    public AssetTagMsgSubscriber getDupAssetTagMsgSubscriber(Integer tagId,Integer userId, Integer mode);
 }
 
