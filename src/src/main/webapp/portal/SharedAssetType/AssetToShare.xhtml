@@ -15,7 +15,7 @@
 
                 <h:form id="searchForm">
                     <h:panelGrid id="searchPanel" columns="2">
-                        <p:inputText id="searchText" value="#{sharedAssetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}" maxlength="100" style="width: 450px">
+                        <p:inputText id="searchText" value="#{sharedAssetInfoController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}" maxlength="100" style="width: 450px">
                             <p:ajax event="keyup" update=":AssetInfoListForm searchButtons" />
                         </p:inputText>
                         <h:panelGroup id='searchButtons'>
@@ -76,10 +76,6 @@
                             <h:outputText value="#{item.departNum}"/>
                         </p:column>
 
-                        <p:column headerText="#{msg.financingNum}" visible="true" exportable="true" sortBy="#{item.financingNum}" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.financingNum}"/>
-                        </p:column>
-
                         <p:column headerText="#{msg.assetGroup}" sortBy="#{item.assetGroup}" filterBy="#{item.assetGroup}" filterMatchMode="EQ">
                             <h:outputText value="#{fieldMsg.fieldValue('assetGroup',item.assetGroup)}"/>
                             <f:facet name="filter">
@@ -90,8 +86,12 @@
                             </f:facet>
                         </p:column>
 
-                        <p:column headerText="#{msg.QRCode}" sortBy="#{item.qrCode}" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
-                            <h:outputText value="#{item.qrCode}"/>
+                        <p:column headerText="#{msg.functionType}" sortBy="#{item.functionType}" filterBy="#{item.functionType}" filterMatchMode="LIKE">
+                            <h:outputText value="#{item.functionType}"/>
+                        </p:column>
+
+                        <p:column headerText="#{msg.purchasePrice}" sortBy="#{item.purchasePrice}" filterBy="#{item.purchasePrice}" filterMatchMode="GTE">
+                            <h:outputText value="#{item.purchasePrice}"/>
                         </p:column>
 
                         <p:column headerText="调剂设备名称" sortBy="#{item.sharedAssetTypeUid}" filterBy="#{item.sharedAssetTypeUid}" filterMatchMode="LIKE">
@@ -109,7 +109,7 @@
                                              <!--onclick="PrimeFaces.monitorDownload(start, stop);" ajax="false">-->
                                 <!--<p:fileDownload value="#{assetInfoController.excelFile}" />-->
                             <!--</p:commandButton>-->
-                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="批量编辑" update=":BatchAssetEditDlg, datalist" oncomplete="PF('BatchAssetEditDialog').show()" disabled="#{!sharedAssetInfoController.editFlag()}" />
+                            <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="批量编辑" update=":BatchAssetEditDlg" oncomplete="PF('BatchAssetEditDialog').show()" disabled="#{!sharedAssetInfoController.editFlag()}" />
 
                         </f:facet>
 
