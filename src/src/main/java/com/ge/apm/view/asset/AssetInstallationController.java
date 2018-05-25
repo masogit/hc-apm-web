@@ -202,6 +202,18 @@ public class AssetInstallationController {
                 isValidate = false;
             }
         }
+        if(needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getDepartNum())){
+        	WebUtil.addErrorMessage("设备编号（院方）不能为空");
+            isValidate = false;
+        }
+        if(needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getFinancingNum())){
+        	WebUtil.addErrorMessage("资产编号不能为空");
+            isValidate = false;
+        }
+        if(needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getQrCode())){
+        	WebUtil.addErrorMessage("二维码不能为空");
+            isValidate = false;
+        }
 
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
             if (!isAvailableQrcode(arrivalListItem.getQrCode())) {
