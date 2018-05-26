@@ -434,13 +434,24 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = getServiceRequestPicList(selected.getSrId(), 2,null);
         picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);// gaolei to xiuggai
+
+
         attachList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_DOCS);
     }
 
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type,String boSubType) { //type 1:picture 2:audio
-        return woService.getPicListBySrUid(srId,boSubType).stream().filter(item -> type == 1 ^ (item.getObjectType()!=null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
+
+		List<V2_BlobObject> pList = woService.getPicListBySrUid(srId,type, boSubType).stream().filter(item -> type == 1 ^
+				(item.getObjectType() != null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
+
+		return pList;
     }
 
+
+/*
+*   if type =1 -->picList
+*
+* */
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
