@@ -104,12 +104,14 @@
 
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}</label>
-                                <p:inputText id="selectedUserOrgName" value="#{assetInfoEditController.selectedOrg==null?'':assetInfoEditController.selectedOrg.name}" readonly="true" />
+                                <p:inputText id="selectedUserOrgName" value="#{assetInfoEditController.selectedObjectMap['selectedOrg']}" readonly="true" />
                                 <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id}"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" selection="#{assetInfoEditController.selectedNode}" var="node" selectionMode="single">
-                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName :AssetInfoEditForm:assetOwnerName :AssetInfoEditForm:assetOwnerName2 :AssetInfoEditForm:parentAssetList :AssetInfoEditForm:buttonGroup :AssetInfoEditForm:qrCode" listener="#{assetInfoEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update=":AssetInfoEditForm:selectedUserOrgName :AssetInfoEditForm:clinicalDeptName  
+                                                    :AssetInfoEditForm:clinicalOwnerName :AssetInfoEditForm:clinicalOwnerTel :AssetInfoEditForm:parentAssetList :AssetInfoEditForm:buttonGroup :AssetInfoEditForm:qrCode"
+                                                    listener="#{assetInfoEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
                                             <p:ajax process="@this" event="expand"/>
                                             <p:ajax process="@this" event="collapse"/>
 
@@ -161,7 +163,7 @@
 
                                 <p:autoComplete id="vendor2" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300"  forceSelection="true"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteSupplier}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange}"/>
+                                    <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
                                     <p:ajax listener="#{assetInfoEditController.onSupplierChange}"/>
                                 </p:autoComplete>
 
@@ -170,7 +172,7 @@
                                 <label class="label">维修供应商</label>
                                 <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300"  forceSelection="true"  requiredMessage="维修供应商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoEditController.onMaintainerChange}"/>
+                                    <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
                                     <p:ajax listener="#{assetInfoEditController.onMaintainerChange}"/>
                                 </p:autoComplete>
                             </h:panelGroup>
@@ -187,7 +189,7 @@
                                 <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
                                 <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
-                                        <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.gbTree}" selection="#{assetInfoEditController.selectedGbNode}" var="node" selectionMode="single">
+                                        <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.gbTree}" var="node" selectionMode="single">
                                             <p:ajax process="@this" event="select" listener="#{assetInfoEditController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
 
                                             <p:ajax process="@this" event="expand"/>

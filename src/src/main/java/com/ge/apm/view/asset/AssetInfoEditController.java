@@ -6,47 +6,27 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.UserCommonService;
-import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.PinYinComparator;
 import com.ge.apm.service.utils.PinYinComparatorByName;
-import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.SupplierController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.web.GbForm;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
 import org.joda.time.DateTime;
-import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
-import org.primefaces.event.data.FilterEvent;
-import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
 import org.primefaces.model.TreeNode;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-import webapp.framework.web.mvc.ServerEventInterface;
 
 import com.ge.apm.service.asset.CustomConfigService;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
-import java.text.MessageFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -79,28 +59,20 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private CustomConfigObject customConfig;
     private List<String> readableFieldsList;
     private List<AssetInfo> parentAssetList;
-
     private List<OrgInfo> clinicalDeptList;
     private List<UserAccount> ownerList;
     private List<I18nMessage> code68List;
-
     private List<Supplier> supplierList = Collections.emptyList();
     private List<UserAccount> clinicalOwnerList;
     private List<V2_BlobObject> attachements;
     private ConfigService configService;
-
     private boolean resultStatus;
     private WorkflowConfig config;
     private String qrCode;
-
     private String gbCodeName;
     private GbCode selectedGb;
-    private TreeNode selectedGbNode;
     private TreeNode gbTree;
-    private OrgInfo selectedOrg;
     private TreeNode orgTree;
-    private TreeNode selectedNode;
-    private String selectedSiteUID;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
 
@@ -132,8 +104,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 prepareCreate();
-                selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-                updateSelectedOrg(selectedOrg);
+                selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
+                changeAssetOrg((OrgInfo)selectedObjectMap.get("selectedOrg"));
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -161,12 +133,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     @Override
     public void onBeforeNewObject(AssetInfo object) {
-        assignUserOrg(object);
         object.setIsValid(true);
         object.setStatus(1);
         object.setDeviceStatus(0);
         object.setIsDeleted(false);
-
     }
 
     private void beforeEdit() {
@@ -183,6 +153,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptId() == null ? null : orgDao.findById(selected.getClinicalDeptId()));
         selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
+        selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
 
     }
     
@@ -204,9 +175,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
-        updateSelectedOrg(orgInfo);
-        updateParentAssetList();
-        clinicalDeptList = assetInfoService.getClinicalDeptList(this.selectedSiteUID);
+        changeAssetOrg(orgInfo);
+        selectedObjectMap.put("selectedOrg",orgInfo);
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -221,14 +191,19 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         return res;
     }
 
-    private void assignUserOrg(AssetInfo assetInfo) {
-        assetInfo.setSiteId(UserContextService.getSiteId());
-        assetInfo.setHospitalId(UserContextService.getCurrentUserAccount().getHospitalId());
+    private void changeAssetOrg(OrgInfo orgInfo) {
+        selected.setSiteId(orgInfo.getSiteId());
+        selected.setHospitalId(orgInfo.getId());
 
-        assetInfo.setTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
-        assetInfo.setHospitalUID(UserContextService.getCurrentUserAccount().getHospitalUID());
-        assetInfo.setInstitutionUID(UserContextService.getCurrentUserAccount().getInstitutionUID());
-        assetInfo.setSiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        selected.setTenantUID(orgInfo.getTenantUID());
+        selected.setHospitalUID(orgInfo.getHospitalUID());
+        selected.setInstitutionUID(orgInfo.getInstitutionUID());
+        selected.setSiteUID(orgInfo.getSiteUID());
+        config = configService.findConfigBySite(selected.getSiteUID());
+        clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+        selectedObjectMap.put("clinicalDept",null);
+        onClinicalDeptChange();
+        parentAssetList.clear();
     }
 
     public void onOwnerChange(String idx) {
@@ -339,7 +314,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                     return "";
                 }
             }
-
         }
         if (null != gbCodeName) {
             GbCode gbCode = gbDao.getGbCode(gbCodeName.split("/")[0]);
@@ -350,7 +324,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
             selected.setNationalStandardCode(selectedGb.getCode());
         }
-
         this.save();
         assetDepreciationService.saveAssetDerpeciation(selected);
         if (resultStatus) {
@@ -452,9 +425,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             temp = new DateTime(object.getTerminateDate());
             object.setTerminateDate(temp.plusHours(12).toDate());
         }
-
         Date now = new Date();
-
         if (object.getId() == null) {
             object.setCreatedBy(UserContextService.getCurrentUserAccount().getLoginName());
             object.setCreatedDate(now);
@@ -491,7 +462,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void renewQrcode() {
         QrCodeLib qrcodeLib = qrCodeService.createOneQrCode(selected.getTenantUID(), selected.getSiteUID(), 1);
         qrCode = qrcodeLib.getQrCode();
-//        selected.setQrCode(qrcodeLib.getQrCode());
         onDepartNumChange("qrCode");
     }
 
@@ -561,10 +531,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    public void updateParentAssetList() {
-        parentAssetList = aimService.getRelationAssets(this.selected);
-    }
-
     public void updateFinancingNumByNationalStandardCode() {
         if (null != selected && null != selectedGb) {
             String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(
@@ -578,7 +544,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
                 this.selected.setFinancingNum(financingNum);
             }
         }
-
     }
 
     public List<String> completeGbName(String prefix) {
@@ -587,7 +552,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             names = gbDao.findGbCodeByPrefix(prefix);
         }
         return names;
-
     }
 
     private void updateSelectedOrgGb(GbCode gbCode) {
@@ -610,34 +574,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         TreeNode node = event.getTreeNode();
         GbCode gbCode = (GbCode) node.getData();
         updateSelectedOrgGb(gbCode);
-    }
-
-    private void updateSelectedOrg(OrgInfo orgInfo) {
-        if (orgInfo == null || orgInfo.getId() == -1) {
-
-            //revert to current user's org if org is not selected by the user
-            assignUserOrg(selected);
-
-            selectedOrg = null;
-            setSelectedSiteUID(null);
-        } else {
-            selectedOrg = orgInfo;
-
-            selected.setTenantUID(selectedOrg.getTenantUID());
-            selected.setInstitutionUID(selectedOrg.getInstitutionUID());
-            selected.setHospitalUID(selectedOrg.getHospitalUID());
-            selected.setSiteUID(selectedOrg.getSiteUID());
-            selected.setHospitalId(selectedOrg.getId());
-
-            setSelectedSiteUID(selectedOrg.getUid());
-            config = configService.findConfigBySite(selected.getSiteUID());
-        }
-
-    }
-
-    public void setSelectedSiteUID(String selectedSiteUID) {
-        this.selectedSiteUID = selectedSiteUID;
-        clinicalDeptList = assetInfoService.getClinicalDeptList(this.selectedSiteUID);
     }
 
     public List<OrgInfo> autoCompleteDept(String query) {
@@ -697,7 +633,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         selectedObjectMap.put("clinicalOwner", null);
         onOwnerChange("clinicalOwner");
-        updateParentAssetList();
+        parentAssetList = aimService.getRelationAssets(this.selected);
         getClinicalOwnerList();
     }
 
@@ -776,13 +712,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.selectedGb = selectedGb;
     }
 
-    public OrgInfo getSelectedOrg() {
-        return selectedOrg;
-    }
-
-    public void setSelectedOrg(OrgInfo selectedOrg) {
-        this.selectedOrg = selectedOrg;
-    }
 
     public TreeNode getOrgTree() {
         return orgTree;
@@ -792,28 +721,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         this.orgTree = orgTree;
     }
 
-    public TreeNode getSelectedNode() {
-        return selectedNode;
-    }
-
-    public void setSelectedNode(TreeNode selectedNode) {
-        this.selectedNode = selectedNode;
-    }
-
     public TreeNode getGbTree() {
         return gbTree;
     }
 
     public void setGbTree(TreeNode gbTree) {
         this.gbTree = gbTree;
-    }
-
-    public TreeNode getSelectedGbNode() {
-        return selectedGbNode;
-    }
-
-    public void setSelectedGbNode(TreeNode selectedGbNode) {
-        this.selectedGbNode = selectedGbNode;
     }
 
     public Map<String, Object> getSelectedObjectMap() {
