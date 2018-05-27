@@ -6,6 +6,7 @@
 package com.ge.apm.domain.pure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,15 +18,16 @@ import java.util.Map;
 public class CustomConfigObject {
     Map<String,CustomConfigAssetField> assetFields;
 
-    List<String> assetsListPageFields;
-    List<String> assetsDetailpageBasicFields;
-    List<String> assetsDetailpageDetailFields;
+    List<String> assetsListPageFields = Collections.EMPTY_LIST;
+    List<String> assetsDetailpageBasicFields = Collections.EMPTY_LIST;
+    List<String> assetsDetailpageDetailFields = Collections.EMPTY_LIST;
     
-    List<String> assetsEditpageBasicFields;
-    List<String> assetsEditpageCodesFields;
-    List<String> assetsEditpageStatusFields;
-    List<String> assetsEditpageCatalogFields;
-    List<String> assetsEditpageFinicialFields;
+    List<String> assetsEditpageBasicFields = Collections.EMPTY_LIST;
+    List<String> assetsEditpageCodesFields = Collections.EMPTY_LIST;
+    List<String> assetsEditpageStatusFields = Collections.EMPTY_LIST;
+    List<String> assetsEditpageCatalogFields = Collections.EMPTY_LIST;
+    List<String> assetsEditpageDateFields = Collections.EMPTY_LIST;
+    List<String> assetsEditpageFinicialFields = Collections.EMPTY_LIST;
     
 
     public Map<String, CustomConfigAssetField> getAssetFields() {
@@ -98,6 +100,14 @@ public class CustomConfigObject {
 
     public void setAssetsEditpageFinicialFields(List<String> assetsEditpageFinicialFields) {
         this.assetsEditpageFinicialFields = assetsEditpageFinicialFields;
+    }
+
+    public List<String> getAssetsEditpageDateFields() {
+        return assetsEditpageDateFields;
+    }
+
+    public void setAssetsEditpageDateFields(List<String> assetsEditpageDateFields) {
+        this.assetsEditpageDateFields = assetsEditpageDateFields;
     }
     
 }
