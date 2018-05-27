@@ -267,16 +267,9 @@ public class CustomConfigService {
         if (customConfigObject.getAssetsEditpageStatusFields().contains(key)) {
             customConfigObject.getAssetsEditpageStatusFields().remove(key);
         }
-    }
-    
-    public  static void main(String [] args){
-        CustomConfigObject object = new CustomConfigObject();
-        String s = JSONObject.toJSONString(object);
-        System.out.println(s);
-        
-        CustomConfigObject d = JSONObject.parseObject(s, CustomConfigObject.class);
-        
-        System.out.println(d);
+        if (customConfigObject.getAssetsEditpageDateFields().contains(key)) {
+            customConfigObject.getAssetsEditpageDateFields().remove(key);
+        }
     }
     
 }
