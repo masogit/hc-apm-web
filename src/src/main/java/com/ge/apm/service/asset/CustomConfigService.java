@@ -176,10 +176,11 @@ public class CustomConfigService {
         object.setAssetsEditpageCodesFields(Arrays.asList("parentAssetId","deviceName","systemId","financingNum","departNum",
                 "barcode","registrationNo","modalityId","qrCode"));
         object.setAssetsEditpageStatusFields(Arrays.asList("functionType","functionGroup","assetCode68","functionGrade","repairForm",
-                "locationCode","locationName","status","deviceStatus","isPm","isChecked","comments","manufactDate","purchaseDate","arriveDate",
-                "installDate","factoryWarrantyDate","warrantyDate","terminateDate","warranty"));
+                "locationCode","locationName","status","deviceStatus","isPm","isChecked","comments"));
         object.setAssetsEditpageCatalogFields(Arrays.asList("assetUsage","capitalSource","capitalSource2","measureGrade","riskGrade",
                 "emergencyEquipment","importEquipment","measuringItemCategory","accountingCategory"));
+        object.setAssetsEditpageDateFields(Arrays.asList("manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
+                "warrantyDate","terminateDate","warranty"));
         object.setAssetsEditpageFinicialFields(Arrays.asList("purchasePrice","salvageValue","lifecycle","depreciationMethod"));
         return object;
     }
@@ -218,6 +219,12 @@ public class CustomConfigService {
     public List<String> getReadAssetFieldsByRoles(CustomConfigObject config,List<String> userRoles){
        return config.getAssetFields().entrySet().stream()
                .filter(item-> item.getValue().getReadRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
+               .map(Entry::getKey).collect(Collectors.toList());
+    }
+    
+    public List<String> getEditAssetFieldsByRoles(CustomConfigObject config,List<String> userRoles){
+       return config.getAssetFields().entrySet().stream()
+               .filter(item-> item.getValue().getEditRoles().stream().anyMatch(itemRole -> userRoles.contains(itemRole)))
                .map(Entry::getKey).collect(Collectors.toList());
     }
 
@@ -260,6 +267,16 @@ public class CustomConfigService {
         if (customConfigObject.getAssetsEditpageStatusFields().contains(key)) {
             customConfigObject.getAssetsEditpageStatusFields().remove(key);
         }
+    }
+    
+    public  static void main(String [] args){
+        CustomConfigObject object = new CustomConfigObject();
+        String s = JSONObject.toJSONString(object);
+        System.out.println(s);
+        
+        CustomConfigObject d = JSONObject.parseObject(s, CustomConfigObject.class);
+        
+        System.out.println(d);
     }
     
 }

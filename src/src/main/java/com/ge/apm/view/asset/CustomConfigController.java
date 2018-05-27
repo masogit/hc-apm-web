@@ -107,12 +107,14 @@ public class CustomConfigController {
             case "EditpageCodesFields":
             case "EditpageStatusFields":
             case "EditpageCatalogFields":
+            case "EditpageDateFields":
             case "EditpageFinicialFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsEditpageBasicFields().contains(item)
                         && !customConfigObject.getAssetsEditpageCodesFields().contains(item)
                         && !customConfigObject.getAssetsEditpageStatusFields().contains(item)
                         && !customConfigObject.getAssetsEditpageCatalogFields().contains(item)
+                        && !customConfigObject.getAssetsEditpageDateFields().contains(item)
                         && !customConfigObject.getAssetsEditpageFinicialFields().contains(item)).collect(Collectors.toList());
                 break;
             case "RemoveEditpageBasicFields":
@@ -126,6 +128,9 @@ public class CustomConfigController {
                 break;
             case "RemoveEditpageCatalogFields":
                 addFieldsList.addAll(customConfigObject.getAssetsEditpageCatalogFields());
+                break;
+            case "RemoveEditpageDateFields":
+                addFieldsList.addAll(customConfigObject.getAssetsEditpageDateFields());
                 break;
             case "RemoveEditpageFinicialFields":
                 addFieldsList.addAll(customConfigObject.getAssetsEditpageFinicialFields());
@@ -157,6 +162,9 @@ public class CustomConfigController {
             case "EditpageCatalogFields":
             case "RemoveEditpageCatalogFields":
                 return "customConfigForm:tabView:EditpageCatalogFields";
+            case "EditpageDateFields":
+            case "RemoveEditpageDateFields":
+                return "customConfigForm:tabView:EditpageDateFields";
             case "EditpageFinicialFields":
             case "RemoveEditpageFinicialFields":
                 return "customConfigForm:tabView:EditpageFinicialFields";
@@ -224,6 +232,14 @@ public class CustomConfigController {
             case "RemoveEditpageCatalogFields":
                 customConfigObject.getAssetsEditpageCatalogFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsEditpageCatalogFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "EditpageDateFields":
+                customConfigObject.getAssetsEditpageDateFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsEditpageDateFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveEditpageDateFields":
+                customConfigObject.getAssetsEditpageDateFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsEditpageDateFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "EditpageFinicialFields":
                 customConfigObject.getAssetsEditpageFinicialFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
@@ -297,8 +313,12 @@ public class CustomConfigController {
 
     public void deleteConfig() {
         ccService.removeConfig(selectSite);
-        customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
+        loadConfigForSite(selectSite.getUid());
         WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
+    }
+    
+    public boolean isSystemFields(String key){
+        return CustomConfigService.getSysTemFields().contains(key);
     }
 
     public void removeListPageField(String key) {

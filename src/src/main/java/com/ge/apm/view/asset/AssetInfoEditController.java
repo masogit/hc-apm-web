@@ -24,6 +24,7 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.view.asset.components.CustomPanelGrid;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -31,6 +32,7 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import javax.faces.component.UIComponent;
 
 @ManagedBean
 @ViewScoped
@@ -57,7 +59,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
-    private List<String> readableFieldsList;
     private List<AssetInfo> parentAssetList;
     private List<OrgInfo> clinicalDeptList;
     private List<UserAccount> ownerList;
@@ -75,8 +76,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode orgTree;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
+    
+    private Map<String, UIComponent> editFields = new HashMap();
+    private List<String> readableFieldsList;
+    private List<String> editableFieldsList;
+    
+    
 
-    @PostConstruct
+    @Override
     protected void init() {
         dao = WebUtil.getBean(AssetInfoRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -121,7 +128,9 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         config = configService.findConfigBySite(selected.getSiteUID());
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = supplierController.getSupplierList();
+        
         initGbTree();
         initOrgTree();
     }
@@ -654,7 +663,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
     }
-
+    
+    public boolean needShow(String itemKey, String fieldKey){
+        return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
+    }
+    
+    public boolean needEdit(String fieldKey){
+        return editableFieldsList.contains(fieldKey);
+    }
+    
 //getter and setter
     public Boolean getTerminate() {
         return terminate;
@@ -662,10 +679,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public CustomConfigObject getCustomConfig() {
         return customConfig;
-    }
-
-    public List<String> getReadableFieldsList() {
-        return readableFieldsList;
     }
 
     public List<I18nMessage> getCode68List() {
