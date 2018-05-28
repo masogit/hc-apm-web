@@ -84,7 +84,7 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListContractPrice}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
-                                        <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
+                                        <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" required="false" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
                                     </h:panelGroup>
 <!--                                    <h:panelGroup>
                                         <label class="label">#{msg.vendor}</label>
