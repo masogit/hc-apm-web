@@ -30,7 +30,15 @@
                         </p:overlayPanel>
                     </h:panelGroup>
                     <h:panelGroup >
-                        <h:outputText id="configInfo" value="#{customConfigController.getCustomConfigInfomation()}"/>
+                        <h:outputText id="configInfo" value="当前院区无配置,保存后创建" rendered="#{empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="创建人:" rendered="#{not empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['CreatedBy']}" rendered="#{not empty customConfigController.customConfig}"/>
+                        <h:outputText value="创建时间:" rendered="#{not empty customConfigController.customConfig}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['CreatedDate']}" rendered="#{not empty customConfigController.customConfig}"/>
+                        <h:outputText value="修改人:" rendered="#{not empty customConfigController.customConfig and not empty customConfigController.configInfo['LastModifiedBy']}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['LastModifiedBy']}" rendered="#{not empty customConfigController.customConfig}"/>
+                        <h:outputText value="修改时间:" rendered="#{not empty customConfigController.customConfig and not empty customConfigController.configInfo['LastModifiedDate']}" style="font-weight:bold; padding: 10px"/>
+                        <h:outputText value="#{customConfigController.configInfo['LastModifiedDate']}" rendered="#{not empty customConfigController.customConfig}"/>
                     </h:panelGroup>
                     <p:tabView  id="tabView">
                         <p:tab title="资产字段设置">
@@ -41,11 +49,11 @@
                                 <p:column headerText="可读取角色">
                                     <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.readRoles)}" />
                                 </p:column>
-                                <p:column headerText="可修改角色">
-                                    <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.editRoles)}" />
-                                </p:column>
                                 <p:column headerText="可导出角色">
                                     <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.exportRoles)}" />
+                                </p:column>
+                                <p:column headerText="可修改角色">
+                                    <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.editRoles)}" />
                                 </p:column>
                                 <p:column>
                                     <f:facet name="header" >
