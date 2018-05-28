@@ -184,7 +184,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'vendor')}" >
         <h:panelGroup>
-            <label class="label">设备#{msg.vendor}#{assetInfoEditController.customConfig.assetFields['vendor'].required? '*':''}</label>
+            <label class="label">#{msg.vendor}#{assetInfoEditController.customConfig.assetFields['vendor'].required? '*':''}</label>
 
             <p:autoComplete id="vendor2" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}" 
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" 
@@ -196,9 +196,9 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'maitanance')}" >
         <h:panelGroup>
-            <label class="label">维修供应商#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</label>
+            <label class="label">维修商#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</label>
             <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('maitanance')}" 
-                            forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修供应商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
+                            forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
                 <p:ajax listener="#{assetInfoEditController.onMaintainerChange}"/>
