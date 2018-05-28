@@ -43,7 +43,7 @@
 
         <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected}"/>
 
-        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{tagSubscriberController.deleteTagSubscriber}" update=":TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
+        <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{tagSubscriberController.delete}" update=":TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
         </p:commandButton>        
     </f:facet>
