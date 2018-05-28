@@ -467,7 +467,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean needAssetApproval(String siteUid) {
-        return acService.needAssetApproval(siteUid);
+        if(config.getNeedInstorageCheck() ){
+            return false;
+        }
+        return acService.needAssetApproval(siteUid) ;
     }
 
     public void renewQrcode() {
