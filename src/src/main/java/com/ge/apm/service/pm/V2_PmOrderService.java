@@ -355,12 +355,13 @@ public class V2_PmOrderService {
             formData.setQualityChecking("1");
             formData.setStepId(item.getCurrentStepId());
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
-            formData.setManHours(averageHours);
+            //小数点后保留两位小数
+            formData.setManHours(Math.round(averageHours*100.0)/100.0);
             formData.setPlanTime(item.getPlanTime().toString());
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
-        String res = srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+        String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
         }else{
