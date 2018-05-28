@@ -236,7 +236,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public String getEditPage(String assetId, String assetName) {
-        String operation = "Create.xhtml?actionName=Edit&selectedid=" + assetId
+        String operation = "AssetCreate.xhtml?actionName=Edit&selectedid=" + assetId
                 + "&asset_name=" + assetName
                 + "&terminate=" + this.terminate;
         return UrlEncryptController.encodeUrlParam(operation);

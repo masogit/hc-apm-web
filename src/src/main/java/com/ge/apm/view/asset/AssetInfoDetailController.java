@@ -112,7 +112,7 @@ public class AssetInfoDetailController {
     }
     
     public String getListPageLink() {
-        return "List?faces-redirect=true" + (terminate ? "&terminate=true" : "");
+        return "AssetList?faces-redirect=true" + (terminate ? "&terminate=true" : "");
     }
     
     public String getParentAssetName() {
