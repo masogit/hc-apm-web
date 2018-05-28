@@ -79,6 +79,48 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     	resetValue();
     }
     
+    public void prepareGEIBData(){
+    	if(this.selected!=null){
+    		this.prepareEdit();
+    		if(this.selected.getType()==1){
+    			this.selected.setGeDeviceType(0);
+    			this.selected.setIbStatus(0);
+    			this.selected.setType(0);
+    		}
+    	}
+    	else{
+    		try {
+				this.prepareCreate();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				logger.error(e.getMessage());
+			} 
+    	}
+    }
+    
+    public void geIBDataSave(){
+    	if(assetInfo!=null){
+    		assetInfo.setIbStatus(this.selected.getIbStatus());
+    		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
+    	}
+    	else{
+    		getAssetInfo();
+    		if(assetInfo==null){
+    			FacesMessage message = new FacesMessage("注意！保存失败,SystemID对应设备未找到");
+                FacesContext.getCurrentInstance().addMessage("other", message);
+                return;
+    		}
+    		else{
+    			assetInfo.setIbStatus(this.selected.getIbStatus());
+        		assetInfo.setGeDeviceType(this.selected.getGeDeviceType());
+    		}
+    	}
+    	assetInfoRepository.save(assetInfo);
+    	this.selected=null;
+    	FacesMessage message = new FacesMessage("保存成功！");
+        FacesContext.getCurrentInstance().addMessage("other", message);
+    }
+    
     @Override
     public void prepareEdit() {
     	// TODO Auto-generated method stub
@@ -210,6 +252,8 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		else{
     			setIndexValue();
     			this.selected.setSystemId("");
+    			this.selected.setGeDeviceType(0);
+    			this.selected.setIbStatus(0);
         		super.save();
     		}
     	}
