@@ -519,9 +519,10 @@
                             <h:outputText value="#{item.contractAmount}"/>
                         </p:column>
                         <p:column headerText="#{msg.AssetContractAttachment}"  >
-                            <p:commandButton value="#{msg.download}"  onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download" rendered="#{item.fileId > 0}" ajax="false">
+                            <p:link href="#{fileDownloadService.getFileUrl(item.objectId)}">下载</p:link>
+<!--                            <p:commandButton value="#{msg.download}"  onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download" rendered="#{item.fileId > 0}" ajax="false">
                                 <p:fileDownload value="#{attachmentFileService.getFile(item.fileId)}" />
-                            </p:commandButton>
+                            </p:commandButton>-->
                         </p:column>
                     </p:dataTable>
                 </p:panel>
