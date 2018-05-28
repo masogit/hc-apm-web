@@ -47,9 +47,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 			 return false;
 	}*/
 	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
-	/*public void takeAssetTags(){
-		assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
-	}*/
+	public void checkSelectedEmpty(){
+		if(selected==null){
+			WebUtil.addErrorMessage("设备消息订阅没有被选中");
+		}
+	}
 // 关注人tentant下的tag
 	public void takeAssetTags(){
 		//获得的是:和标签绑定的用户的院区下的所有标签
@@ -95,6 +97,13 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 		}
 	}
+	public void deleteTagSubscriber(){
+		if (selected !=null && selected.getId()!=null){
+			super.delete();
+		}
+
+	}
+
 
 	@Override
 	protected void init() {
