@@ -130,7 +130,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = supplierController.getSupplierList();
-        
+        clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
         initGbTree();
         initOrgTree();
     }

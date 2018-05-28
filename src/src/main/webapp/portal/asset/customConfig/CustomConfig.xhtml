@@ -36,7 +36,7 @@
                         <p:tab title="资产字段设置">
                             <p:dataTable id="assetFieldsTable" var='item' value="#{customConfigController.assetFieldsList}">
                                 <p:column headerText="显示的字段">
-                                    <h:outputText value="#{customConfigController.allFields[item.key]}"  style="color:#{customConfigController.isSystemFields(item.key)? 'red':'black'}" />
+                                    <h:outputText value="#{customConfigController.allFields[item.key]}#{customConfigController.isSystemFields(item.key)?'*':''}"  style="color:#{customConfigController.isSystemFields(item.key)? 'red':'black'}" />
                                 </p:column>
                                 <p:column headerText="可读取角色">
                                     <h:outputText value="#{customConfigController.getAssetFieldsRoles(item.readRoles)}" />
@@ -142,7 +142,7 @@
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">是否必填</label>
-                                    <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.required}"/>
+                                    <p:selectBooleanCheckbox value="#{customConfigController.currentEditField.required}" disabled="#{customConfigController.isSystemFields(customConfigController.currentEditField.key)}"/>
                                 </h:panelGroup>
                                 <h:panelGroup >
                                     <label class="label">可读取角色</label>

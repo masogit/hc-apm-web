@@ -115,7 +115,7 @@ public class CustomConfigService {
         res.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
         res.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
         res.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
-        res.put("warranty", "是否对质保到期进行提醒");
+        res.put("warranty", "是否对质保到期提醒");
         return res;
     }
     
@@ -154,6 +154,9 @@ public class CustomConfigService {
         object.setAssetFields(new HashMap());
         List<String> allRoles = getConfigRoles().stream().map(SysRole::getName).collect(Collectors.toList());
         getAllFields().entrySet().stream().forEach(item-> object.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(),allRoles)));
+        getSysTemFields().forEach(item->{
+            object.getAssetFields().get(item).setRequired(true);
+        });
         List<String> listPageFields = new ArrayList();
         listPageFields.addAll(Arrays.asList("name","functionType","serialNum","departNum","assetGroup",
                 "clinicalDeptName","manufacture","vendor","status","warrantyDate","financingNum","qrCode"));
