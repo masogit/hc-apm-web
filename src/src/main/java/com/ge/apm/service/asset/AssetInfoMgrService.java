@@ -9,10 +9,16 @@ import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_PmOrder;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.TreeNode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import webapp.framework.dao.SearchFilter;
@@ -56,4 +62,43 @@ public class AssetInfoMgrService {
         asset.setQrCode(null);
         assetDao.save(asset);
     }
+    
+    
+    public List<AssetInfo> getRelationAssets(AssetInfo asset){
+        List<SearchFilter> assetFilters = new ArrayList();
+        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetFilters.add(new SearchFilter("siteId", SearchFilter.Operator.EQ, asset.getSiteId()));
+        if (asset.getClinicalDeptUID() != null) {
+            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, asset.getClinicalDeptUID()));
+        }
+        if (asset.getSiteUID() != null) {
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, asset.getSiteUID()));
+        }
+        if (asset.getUid() != null) {
+            assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NE, asset.getUid()));
+        }
+        return assetDao.findBySearchFilter(assetFilters);
+    }
+     
+    
+    public TreeNode getParentAssetTree(AssetInfo asset){
+        
+        List<AssetInfo> assetList = getRelationAssets(asset);
+        assetList.add(asset);
+        Map<Integer, TreeNode> treeMap = assetList.stream().collect(Collectors.toMap(AssetInfo::getId, item -> new DefaultTreeNode("asset", item, null)));
+        assetList.forEach(item ->{
+            if (treeMap.containsKey(item.getParentAssetId())) {
+                treeMap.get(item.getParentAssetId()).getChildren().add(treeMap.get(item.getId()));
+            } 
+        });
+        
+        TreeNode res = treeMap.get(asset.getId());
+        while(res.getParent()!=null){
+            res = res.getParent();
+        }
+        TreeNode rootNode = new DefaultTreeNode("root", null, null);
+        rootNode.getChildren().add(res);
+        return rootNode;
+    }
+    
 }

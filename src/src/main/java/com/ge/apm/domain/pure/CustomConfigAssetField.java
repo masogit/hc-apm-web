@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain.pure;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -14,9 +15,9 @@ import java.util.List;
 public class CustomConfigAssetField {
     String key;
     Double widthInListPage;
-    List<String> exportRoles;
-    List<String> readRoles;
-    List<String> editRoles;
+    List<String> exportRoles = Collections.EMPTY_LIST;
+    List<String> readRoles = Collections.EMPTY_LIST;
+    List<String> editRoles = Collections.EMPTY_LIST;
     boolean required = false;
 
 
