@@ -32,11 +32,11 @@ import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.StreamedContent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
-import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
@@ -145,8 +145,24 @@ public class AssetArrivedListController extends GenericCRUDUUIDController<Arriva
             dao.delete(selected);
             this.selected = null;
         } else {
-            WebUtil.addErrorMessage("到货清单已经提交,不能删除");
+        	if(selected.isCannotDeleted()==false){
+        		deleteArrivalList();
+        	}
+        	else{
+        		WebUtil.addErrorMessage("到货清单已经提交,不能删除");
+        	}
         }
+    }
+    
+    @Transactional
+    public void deleteArrivalList(){
+    	//delete phone and others
+    	aiService.deleteBlobObject(this.selected.getId());
+    	//delete items and qrCode
+    	aiService.deleteListItem(this.selected.getId(),this.selected.getSiteUID());
+    	//delete list obj
+    	dao.delete(selected);
+		this.selected=null;
     }
 
     public String createAction() {
