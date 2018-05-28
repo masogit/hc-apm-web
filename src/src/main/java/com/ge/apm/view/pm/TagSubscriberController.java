@@ -69,7 +69,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void saveTagSub(){
 		int direct = selected.getReceiveMsgMode();
 		AssetTagMsgSubscriber tagUserMode=null;
-		if( this.getCRUDActionName().equals("新增")){  //是新增
+		//if( this.getCRUDActionName().equals("新增")){  //是新增
 			if(direct ==3){
 				 tagUserMode = dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
 				if(tagUserMode==null){
@@ -86,9 +86,14 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 				}
 			}
 
-		}else{//是修改
+	/*	}else{//是修改
 			if(direct ==3){
-				super.save();
+				tagUserMode = dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode==null){
+					super.save();
+				}else{
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+				}
 			}else{//当前选择的是0 1 2
 				//查看当前有没有 A B C=0,1,2
 				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
@@ -99,7 +104,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 				}
 			}
 
-		}
+		}*/
 	}
 
 	@Override
