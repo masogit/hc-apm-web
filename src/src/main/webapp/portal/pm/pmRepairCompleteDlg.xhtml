@@ -173,7 +173,7 @@
 
                     <!--维修完成 转单 新建工单-->
                     <h:panelGroup class="buttonG">
-                        <p:commandButton class="rpb" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '1'}" actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成1" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
+                        <p:commandButton class="rpb" validateClient="true" disabled="#{v2PmOrderController.qaStatus eq '1'}" actionListener="#{v2PmOrderController.repairPmOrder()}" value="保养完成" update="pmTab:pmOrderListForm:datalist :growl" icon="ui-icon-check" oncomplete="handleRepairComplete(xhr, status, args)"/>
                         <p:commandButton class="rpt" disabled="#{v2PmOrderController.qaStatus eq '0'}" actionListener="#{v2PmOrderController.createServiceRequest(v2PmOrderController.selectedPmOrder,1)}" value="去报修" update="pmTab:ServiceRequestCreateForm pmTab:pmOrderListForm pmTab:pmOrderDetailForm :growl" icon="ui-icon-check" oncomplete="handleToRepair(xhr, status, args)"/>
 
                         <p:commandButton validateClient="false"  actionListener="#{v2PmOrderController.stagingPmOrder()}" value="暂存"  icon="ui-icon-check" oncomplete="handleSubmit(args, 'pmrepairCompleteDialog');"/>
