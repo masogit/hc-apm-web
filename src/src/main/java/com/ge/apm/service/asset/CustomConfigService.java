@@ -109,7 +109,7 @@ public class CustomConfigService {
         res.put("salvageValue", WebUtil.getMessage("salvageValue"));
         res.put("lifecycle", WebUtil.getMessage("lifecycle"));
         res.put("depreciationMethod", WebUtil.getMessage("depreciationMethod"));
-        res.put("usageStatus", WebUtil.getMessage("usageStatus"));
+//        res.put("usageStatus", WebUtil.getMessage("usageStatus"));
         res.put("isPm", WebUtil.getMessage("isAssetPMed"));
         res.put("isChecked", WebUtil.getMessage("isAssetChecked"));
         res.put("lastPmDate", WebUtil.getMessage("lastPmDate"));

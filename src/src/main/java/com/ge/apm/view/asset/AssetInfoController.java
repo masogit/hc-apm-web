@@ -965,8 +965,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<UserAccount> clinicalOwnerList;
 
     public void getClinicalOwnerList() {
-        if (null != selected.getClinicalDeptId()) {
-            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId());
+        if (null != selected.getClinicalDeptUID()) {
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptUID());
         }
     }
 

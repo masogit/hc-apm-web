@@ -53,6 +53,8 @@ public class CustomConfigController {
     private List<String> addFieldsList;
     private String addFieldsType;
 
+    private Map<String, String> configInfo = new HashMap();
+
     @PostConstruct
     protected void init() {
         ccService = WebUtil.getBean(CustomConfigService.class);
@@ -72,6 +74,7 @@ public class CustomConfigController {
         } else {
             customConfigObject = JSONObject.parseObject(customConfig.getConfig(), CustomConfigObject.class);
         }
+        updateConfigInfo();
     }
 
     public void prepareAddAssetField(String type) {
@@ -291,6 +294,15 @@ public class CustomConfigController {
         return res.toString();
     }
 
+    private void updateConfigInfo() {
+        if (null != customConfig) {
+            configInfo.put("CreatedBy", userService.getUserByUid(customConfig.getCreatedBy()).getName());
+            configInfo.put("CreatedDate",customConfig.getCreatedDate()==null?"": DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
+            configInfo.put("LastModifiedBy", userService.getUserByUid(customConfig.getLastModifiedBy()).getName());
+            configInfo.put("LastModifiedDate",customConfig.getLastModifiedDate()==null?"": DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
+        }
+    }
+
     public void onSelectSiteTreeNode(NodeSelectEvent event) {
         if (null != event) {
             if (null != event.getTreeNode() && null != event.getTreeNode().getData()) {
@@ -309,6 +321,7 @@ public class CustomConfigController {
         ccService.saveConfig(selectSite, customConfigObject);
         customConfig = ccService.getCustomConfigBySite(selectSite.getSiteUID());
         WebUtil.addSuccessMessage("已保存");
+        updateConfigInfo();
     }
 
     public void deleteConfig() {
@@ -316,8 +329,8 @@ public class CustomConfigController {
         loadConfigForSite(selectSite.getUid());
         WebUtil.addSuccessMessage(WebUtil.getMessage("Deleted"));
     }
-    
-    public boolean isSystemFields(String key){
+
+    public boolean isSystemFields(String key) {
         return CustomConfigService.getSysTemFields().contains(key);
     }
 
@@ -380,4 +393,12 @@ public class CustomConfigController {
         return addFieldsType;
     }
 
+    public Map<String, String> getConfigInfo() {
+        return configInfo;
+    }
+
+    public CustomConfig getCustomConfig() {
+        return customConfig;
+    }
+    
 }

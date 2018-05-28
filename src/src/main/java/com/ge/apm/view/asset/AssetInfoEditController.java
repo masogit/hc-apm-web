@@ -131,6 +131,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = supplierController.getSupplierList();
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
+        parentAssetList = aimService.getRelationAssets(this.selected);
         initGbTree();
         initOrgTree();
     }
@@ -647,8 +648,8 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public void getClinicalOwnerList() {
-        if (null != selected.getClinicalDeptId()) {
-            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId());
+        if (null != selected.getClinicalDeptUID()) {
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptUID());
         } else {
             clinicalOwnerList = Collections.emptyList();
         }
