@@ -276,15 +276,21 @@
 
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['purchasePrice']}">
                     <label class="label">#{msg.purchasePrice}</label>
-                    <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoDetailController.selected.purchasePrice}" readonly="true"/>
+                    <p:inputText id="purchasePrice" value="#{assetInfoDetailController.selected.purchasePrice}" readonly="true">
+                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                    </p:inputText>
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['salvageValue']}">
                     <label class="label">#{msg.salvageValue}</label>
-                    <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoDetailController.selected.salvageValue}" readonly="true"/>
+                    <p:inputText  id="salvageValue" value="#{assetInfoDetailController.selected.salvageValue}" readonly="true">
+                        <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+                    </p:inputText>
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['lifecycle']}">
                     <label class="label">#{msg.lifecycle}</label>
-                    <p:inputNumber decimalPlaces="1" id="lifecycle" value="#{assetInfoDetailController.selected.lifecycleInYear}" readonly="true"/>
+                    <p:inputText id="lifecycle" value="#{assetInfoDetailController.selected.lifecycleInYear}" readonly="true">
+                        <f:convertNumber maxFractionDigits="1" minFractionDigits="1" />
+                    </p:inputText>
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['depreciationMethod']}">
                     <label class="label">#{msg.depreciationMethod}</label>
