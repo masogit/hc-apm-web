@@ -171,15 +171,14 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
-		System.out.println(this.selected);
 		this.selected.setReceiveMsgMode(null);
-		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(currentUser.getSiteUID(), this.selected.getSubscribeUserId());
+		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 	}
 
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-		assetTags= assetTagRepository.getTagBySite(currentUser.getSiteUID());
+		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 		//assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), this.selected.getSubscribeUserId());
 	}
 
