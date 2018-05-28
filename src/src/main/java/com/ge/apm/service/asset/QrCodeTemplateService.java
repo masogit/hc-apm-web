@@ -8,6 +8,7 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.QrCodeTemplateElementRepository;
 import com.ge.apm.dao.QrCodeTemplateRepository;
+import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.QrCodeTemplate;
 import com.ge.apm.domain.QrCodeTemplateElement;
 import com.ge.apm.domain.UserAccount;
@@ -51,6 +52,18 @@ public class QrCodeTemplateService {
         template.setSiteUID(loginUser.getSiteUID());
         return template;
     }
+    
+    public QrCodeTemplate getDefaultTemplateByQrCodeLib(QrCodeLib qrCodeLib) {
+        QrCodeTemplate template = new QrCodeTemplate();
+        template.setHeight(360);
+        template.setWidth(900);
+        template.setHospitalUID(qrCodeLib.getHospitalUID());
+        template.setInstitutionUID(qrCodeLib.getInstitutionUID());
+        template.setTenantUID(qrCodeLib.getTenantUID());
+        template.setSiteUID(qrCodeLib.getSiteUID());
+        return template;
+    }
+    
 
     private QrCodeTemplateElement createTextElement(String text, String fieldKey, Integer px, Integer py, Integer fs, Integer ft, String fn, String fc) {
         QrCodeTemplateElement element = new QrCodeTemplateElement();
