@@ -23,10 +23,10 @@ public class FileScanService {
 
     private static Long TIME_OUT = 5000l;
 
-    @Value("#{urlProperties.FileScanFolder}")
+    @Value("#{systemEnvironment['FILE_SCAN_FOLDER'] ?: urlProperties.FileScanFolder}")
     private String FILE_SCAN_FOLDER;
 
-    @Value("#{urlProperties.BatchFileFolder}")
+    @Value("#{systemEnvironment['BATCH_FILE_FOLDER'] ?: urlProperties.BatchFileFolder}")
     private String BATCH_FILE_Folder;
 
     //save for file scan
