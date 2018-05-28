@@ -169,7 +169,7 @@ public class CustomConfigService {
                 "barcode","registrationNo","modalityId","qrCode","functionType","functionGroup","assetCode68","functionGrade",
                 "repairForm","locationCode","locationName","status","deviceStatus","isPm","isChecked","comments","assetUsage",
                 "capitalSource","capitalSource2","measureGrade","riskGrade","emergencyEquipment","importEquipment","measuringItemCategory",
-                "usageStatus","accountingCategory","manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
+                "accountingCategory","manufactDate","purchaseDate","arriveDate","installDate","factoryWarrantyDate",
                 "warrantyDate","terminateDate","purchasePrice","salvageValue","lifecycle","depreciationMethod","lastPmDate",
                 "lastQaDate","lastMeteringDate","warranty"));
         
