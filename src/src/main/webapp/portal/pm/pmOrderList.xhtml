@@ -12,16 +12,16 @@
                 <h:form id="pmOrderListForm">
                     <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
 
-                        <p:commandButton value="待办"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(-1)}" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
+                        <p:commandButton value="待办"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=-1" disabled="#{v2PmOrderController.queryIndex==-1}" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"/>
                         <p:commandButton value="创建保养" rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}" actionListener="#{v2PmOrderController.createPMRequest()}" process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm pmTab:PmRequestCreateForm"  oncomplete="PF('createPMDialog').show()" />
-                                                <p:commandButton value="待派工"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(2)}" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead')}"/>
-                                                <p:commandButton value="待接单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(3)}" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
+                                                <p:commandButton value="待派工"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=2" disabled="#{v2PmOrderController.queryIndex==2}" rendered="#{userContextService.isPmDispatcher() or userContextService.hasRole('AssetHead')}"/>
+                                                <p:commandButton value="待接单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=3" disabled="#{v2PmOrderController.queryIndex==3}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
 
-                        <p:commandButton value="待抢单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(31)}" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff')}"  />
+                        <p:commandButton value="待抢单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=31" disabled="#{v2PmOrderController.queryIndex==31}"  rendered="#{ userContextService.hasRole('AssetStaff')}"  />
 
                         <!--<p:commandButton value="待验收"  process="@this" update="datalist buttonSet :pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(5)}" disabled="#{v2PmOrderController.queryIndex==5}" rendered="true"/>-->
-                        <p:commandButton value="已计划"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(0)}" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
-                        <p:commandButton value="待审核"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(8)}" disabled="#{v2PmOrderController.queryIndex==8}" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('ClinicalStaff') or userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetHead') or userContextService.hasRole('Guest')}"/>
+                        <p:commandButton value="已计划"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=0" disabled="#{v2PmOrderController.queryIndex==0}"  rendered="#{userContextService.hasRole('AssetStaff')}"  />
+                        <p:commandButton value="待审核"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" action="pmOrderListAll.xhtml?faces-redirect=true&amp;query=8" disabled="#{v2PmOrderController.queryIndex==8}" rendered="#{userContextService.hasRole('DeptHead') or userContextService.hasRole('ClinicalStaff') or userContextService.hasRole('HospitalHead')  or userContextService.hasRole('AssetHead') or userContextService.hasRole('Guest')}"/>
                        <!-- <p:commandButton value="待关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(6)}" disabled="#{v2PmOrderController.queryIndex==6}"  rendered="#{userContextService.hasRole('AssetStaff')}" />-->
                         <p:commandButton value="已关单"  process="@this" update="datalist buttonSet pmTab:pmOrderDetailForm" actionListener="#{v2PmOrderController.searchList(7)}" disabled="#{v2PmOrderController.queryIndex==7}"  rendered="#{userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}"  />
 
@@ -38,10 +38,9 @@
                         <p:ajax event="rowSelect" listener="#{v2PmOrderController.onSelectPmOrder()}" update="pmTab:pmOrderDetailForm pmTab:pmOrderDetailForm:pmcoworkerList"/>
                         <p:ajax event="filter" listener="#{v2PmOrderController.onFilter}" update="datalist pmTab:pmOrderDetailForm"/>
 
-
                         <p:column width="36" rendered="#{v2PmOrderController.queryIndex==2 or v2PmOrderController.queryIndex==3 or v2PmOrderController.queryIndex==0 or v2PmOrderController.queryIndex==6 or v2PmOrderController.queryIndex == 31}" exportable="false">
                             <p:selectBooleanCheckbox value="#{v2PmOrderController.selectedMap[item.id]}" class="selectCheckBox">
-                                <p:ajax listener="#{v2PmOrderController.onItemSelected}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton)"/>
+                                <p:ajax listener="#{v2PmOrderController.onItemSelected}" update="@(.selectCheckBoxHeader) @(.batch-terminated) @(.takeOrderbutton) @(.dispatchOrderButton) @(.transButton) @(.closeButton) @(.maintainButton) @(.batch-piliangjiedan)"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header">
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" value="#{v2PmOrderController.isSelectedCurrentPage}" class="selectCheckBoxHeader">
@@ -149,16 +148,16 @@
                                 <p:commandButton  icon="ui-icon-assignment-ind" class="btn btn-sm btn-gray batch-terminated" title="批量派工"  update="@(.disClass)" rendered="#{v2PmOrderController.queryIndex==2}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('dispatchDialog').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量接单"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('takeOrderDialog').show()">
+                                <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-piliangjiedan" title="批量接单"  update="@(.t1)" rendered="#{v2PmOrderController.queryIndex==3}" disabled="#{v2PmOrderController.isPiliangJiedan()}" oncomplete="PF('takeOrderDialog').show()">
                                 </p:commandButton>
 
                                 <p:commandButton  icon="ui-icon-assessment" class="btn btn-sm btn-gray batch-terminated" title="批量转单"  update="@(.transferOrderClass)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('transferOrderDialog').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量保养"  update="@(.pmrepairCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
+                                <p:commandButton  icon="ui-icon-assignment" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmrepairCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==0}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmrepairCompleteDialogBatch').show()">
                                 </p:commandButton>
 
-                                <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31}" disabled="#{not v2PmOrderController.isChecked()}" oncomplete="PF('pmCompleteDialogBatch').show()">
+                                <p:commandButton  icon="ui-icon-assignment" actionListener="#{v2PmOrderController.prepareBatchComplete()}" class="btn btn-sm btn-gray batch-terminated" title="批量完成"  update="@(.pmCompleteDialogBatch)" rendered="#{v2PmOrderController.queryIndex==31 or v2PmOrderController.queryIndex==3}" disabled="#{not v2PmOrderController.isPiliangWanChen()}" oncomplete="PF('pmCompleteDialogBatch').show()">
                                 </p:commandButton>
 
 
@@ -175,7 +174,7 @@
             </div>
        <!-- </div>-->
     <!--批量保养完成对话框-->
-    <p:dialog class ="pmrepairCompleteDialogBatch" id="pmrepairCompleteDialogBatch" widgetVar="pmrepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量保养">
+    <p:dialog class ="pmrepairCompleteDialogBatch" id="pmrepairCompleteDialogBatch" widgetVar="pmrepairCompleteDialogBatch" modal="true" height="100" width="500"  resizable="false" draggable="true" appendTo="@this" header="批量完成">
         <h:form id="pmrepairCompleteDialogFormBatch" class="pmrepairCompleteDialogFormclsBatch" >
             <h:panelGroup  id="display5" style="height:500px">
                 <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -390,7 +389,7 @@
             </h:form>
         </p:dialog>
 <!--接单对话框-->
-        <p:dialog class ="t1" id="takeOrderDialog"  widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="#{v2PmOrderController.head}">
+        <p:dialog class ="t1" id="takeOrderDialog"  widgetVar="takeOrderDialog" modal="true" width="400"  resizable="true" draggable="true" appendTo="@(body)" header="接单对话框">
             <!--批量和单个接单使用同一个对话框 只是计划时间显示不同 通过v2PmOrderController.isChecked() 来控制-->
             <h:form id="takeOrderDialogForm" >
                 <h:panelGroup id="display1" rendered="#{not empty v2PmOrderController.selectedPmOrder or v2PmOrderController.isChecked()}">
@@ -401,7 +400,7 @@
 
                     <h:panelGroup rendered="#{v2PmOrderController.isChecked() eq true}">
                         <label class="label">批量计划完成时间*</label>
-                        <p:calendar timeZone="GMT+8" id="fillDate4" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
+                        <p:calendar timeZone="GMT+8" id="fillDate5" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTimeForBatch}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                     </h:panelGroup>
                     <br/>
                     <h:panelGroup>
@@ -423,7 +422,7 @@
                                 <f:selectItems value="#{v2PmOrderController.findRepairPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <!--批量转单-->
+                        <!--展现批量转单对话框的内容-->
                         <h:panelGroup rendered="#{v2PmOrderController.isChecked() eq true}">
                             <label class="label">保养人</label>
                             <p:selectOneMenu  value="#{v2PmOrderController.currentPersonIdBatch}" required="true" requiredMessage="#{msg.currentPersonId} #{msg.ValidationRequire}">
