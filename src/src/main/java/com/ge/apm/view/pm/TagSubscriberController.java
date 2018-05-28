@@ -62,6 +62,10 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		System.out.println(selected.getReceiveMsgMode());
 	}
 
+
+	public void cancel(){
+		selected=null;
+	}
 	public void saveTagSub(){
 		int direct = selected.getReceiveMsgMode();
 		AssetTagMsgSubscriber tagUserMode=null;
@@ -97,13 +101,6 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 		}
 	}
-	public void deleteTagSubscriber(){
-		if (selected !=null && selected.getId()!=null){
-			super.delete();
-		}
-
-	}
-
 
 	@Override
 	protected void init() {
