@@ -274,11 +274,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private void initEasyInstallItem() {
         easyInstallItem = getNewInstallAssetList().stream().findAny().orElse(new ArrivalListItem());
-        if (selected.getContractPrice() != null) {
-            easyInstallItem.setPurchasePrice(selected.getContractPrice() / selected.getQuantity());
-            easyInstallItem.setIsPm(true);
-            easyInstallItem.setIsChecked(true);
-        }
         String maitananceName=easyInstallItem.getMaitanance();
         if(maitananceName!=null){
         	this.maitanance=new Supplier();
