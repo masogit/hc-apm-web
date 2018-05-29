@@ -6,11 +6,14 @@ import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.*;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.utils.FileUtils;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.components.CustomDataTable;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import java.io.File;
+import java.io.FileOutputStream;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -28,9 +31,14 @@ import webapp.framework.web.mvc.JpaCRUDController;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import org.primefaces.model.UploadedFile;
+import java.io.InputStream;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @ManagedBean
 @ViewScoped
@@ -229,7 +237,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onSelectAllOfPage() {
-        boolean isSelectedAll =  !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
+        boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
         for (AssetInfo item : currentPageAssets) {
             selectedMap.put(item.getUid(), !isSelectedAll);
         }
@@ -253,48 +261,35 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             dao.save(ai);
         }
     }
-    
+
+    boolean exported = false;
+
     public void exportExcel() throws IOException {
 
-        
-        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        
-        //非设备科的人导出的时候，导出部分数据
-        boolean allColumns = false;
-        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
-            allColumns = true;
-        }
+        if (!exported) {
+            List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-        Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
+            //非设备科的人导出的时候，导出部分数据
+            boolean allColumns = false;
+            if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
+                allColumns = true;
+            }
+
+            Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
 
 //        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
+            List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+            orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
-        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
+            List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-        List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+            List<AssetInfo> assetList = getExportList();
 
-//        List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
-//        if (!assetUids.isEmpty()) {
-//            assetList = assetList.stream().filter(assetInfo -> {
-//                Boolean exists = this.selectedMap.get(assetInfo.getUid());
-//                if (exists == null) {
-//                    return false;
-//                }
-//                return exists.booleanValue();
-//            }).collect(Collectors.toList());
-//        }
-        
-        List<AssetInfo> assetList = getExportList();
+            ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
 
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
-
-//        DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
-        excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
-//        streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-//        streamedContent.setName("AssetInfo_export.xlsx");
-//
-//        excelFile = streamedContent;
+            excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+            exported = true;
+        }
     }
 
     public void batchProcessToBeTerminated() {
