@@ -342,6 +342,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setDepreciationMethod(easyInstallItem.getDepreciationMethod());
             item.setIsPm(easyInstallItem.getIsPm());
             item.setIsChecked(easyInstallItem.getIsChecked());
+            item.setWarrantyYear(easyInstallItem.getWarrantyYear());
         });
         itemDao.save(saveList);
         WebUtil.addSuccessMessage("已保存");
