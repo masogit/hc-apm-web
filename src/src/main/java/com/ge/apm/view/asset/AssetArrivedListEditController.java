@@ -281,7 +281,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         }
         String maitananceName=easyInstallItem.getMaitanance();
         if(maitananceName!=null){
-        	this.maitanance=new Supplier();
+        	maitanance=new Supplier();
         	maitanance.setName(maitananceName);
         }
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
@@ -460,12 +460,19 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selected.setSupplierId(supplier.getId());
             selected.setVendor(supplier.getName());
         }
+    	else{
+    		selected.setSupplierId(null);
+    		selected.setVendor(null);
+    	}
     }
     
     public void onMaintainerChange() {
     	if (null != maitanance) {
             this.easyInstallItem.setMaitanance(maitanance.getName());
         }
+    	else{
+    		this.easyInstallItem.setMaitanance(null);
+    	}
     }
 
     //geter and setter
