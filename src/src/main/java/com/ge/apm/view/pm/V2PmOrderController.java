@@ -267,7 +267,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 }
                 reportDao.save(unDataCollection);
             }
-            WebUtil.addSuccessMessage("保存检查项操作成功");
+          //  WebUtil.addSuccessMessage("保存检查项操作成功");
         }catch(Exception ex){
             ex.printStackTrace();
         }
