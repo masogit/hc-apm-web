@@ -215,7 +215,7 @@
         <h:panelGroup>
             <label class="label">设备国标码#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required? '*':''}</label>
             <p:autoComplete id="gbname" value="#{assetInfoEditController.gbCodeName}" completeMethod="#{assetInfoEditController.completeGbName}" required="#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required}" 
-                         requiredMessage="#{msg.nationalStandardCode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('nationalStandardCode')}" >
+                         requiredMessage="#{msg.nationalStandardCode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('nationalStandardCode')}" class="financingNumChange">
                 <p:ajax process="@this" update="" listener="#{assetInfoEditController.updateFinancingNumByNationalStandardCode()}"/>
             </p:autoComplete>
             <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
@@ -268,7 +268,7 @@
                 <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
             </p:inputText>
             <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoEditController.generateFinancialNum()}"  disabled="#{assetInfoEditController.selected.financingNum.length() gt 4}"
-                             process="@(.financingNumChange) parentAssetList gbname" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
+                             process="@(.financingNumChange)" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'departNum')}" >
