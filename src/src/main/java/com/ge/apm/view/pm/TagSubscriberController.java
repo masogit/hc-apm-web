@@ -27,7 +27,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	private AssetTagMsgSubscriberRepository dao = null;
 	private AssetTagRepository assetTagRepository;
-	private I18nMessageRepository i18nMessageRepository;
+	private I18nMessageRepository i18Dao;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
 	private List<UserAccount> tenantUserList;
@@ -68,19 +68,26 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 	public void saveTagSub(){
 		int direct = selected.getReceiveMsgMode();
-		AssetTagMsgSubscriber tagUserMode=null;
+		List<AssetTagMsgSubscriber> tagUserMode=null;
+		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
+		List<I18nMessage> fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
+		List<Integer> modeList =new ArrayList<Integer>();
+		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
+
 		if( this.getCRUDActionName().equals("新增")){  //是新增
 			if(direct ==3){
-				 tagUserMode = dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode==null){
+				tagUserMode = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode.isEmpty()){
 					super.save();
+					return;
 				}else{
 					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 				}
 			}else{
-				 tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode==null){
+				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode.isEmpty()){
 					super.save();
+					return;
 				}else{
 					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 				}
@@ -88,19 +95,33 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 		}else{//是修改
 			if(direct ==3){
-				tagUserMode = dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode==null){
+				tagUserMode = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode.isEmpty()){
 					super.save();
 				}else{
 					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 				}
 			}else{//当前选择的是0 1 2
 				//查看当前有没有 A B C=0,1,2
-				super.save();
+				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode.isEmpty()){
+					super.save();
+					return;
+				}
+				if(tagUserModeBasic.size()==2){
+					if( modeList.stream().anyMatch(item->item.equals(direct))){
+						WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					}else{
+						super.save();
+						return;
+					}
+				}else{
+					super.save();
+				}
 			}
 
 		}
-	}
+	}//
 
 	@Override
 	protected void init() {
@@ -109,7 +130,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
 		assetTagRepository =WebUtil.getBean(AssetTagRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+		i18Dao = WebUtil.getBean(I18nMessageRepository.class);
 		FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
 		msgModeList = fieldMsg.getFieldValueList("focusOption");
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
