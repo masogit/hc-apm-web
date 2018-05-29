@@ -863,6 +863,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setClinicalOwnerTel(null);
         }
     }
+    
+    public List<Supplier> autoCompleteSupplier(String query) {
+        return autoCompleteService.autoCompleteVendor(query, supplierList);
+    }
+
+    public List<Supplier> autoCompleteMaintainer(String query) {
+        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
+    }
 
     public void onSupplierChange() {
 
@@ -870,12 +878,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setSupplierId(supplier.getId());
             selected.setVendor(supplier.getName());
         }
+        else{
+        	selected.setSupplierId(null);
+            selected.setVendor(null);
+        }
     }
 
     public void onMaintainerChange() {
         if (null != maintainer) {
             selected.setMaitananceId(maintainer.getId()+"");
             selected.setMaitanance(maintainer.getName());
+        }
+        else{
+        	selected.setMaitananceId(null);
+            selected.setMaitanance(null);
         }
     }
 
@@ -1954,14 +1970,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
-    }
-
-    public List<Supplier> autoCompleteSupplier(String query) {
-        return autoCompleteService.autoCompleteVendor(query, supplierList);
-    }
-
-    public List<Supplier> autoCompleteMaintainer(String query) {
-        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
     }
 
     public void setOwnerList(List<UserAccount> ownerList) {
