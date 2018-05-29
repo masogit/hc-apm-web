@@ -289,11 +289,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
         ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
 
-        DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
-        streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        streamedContent.setName("AssetInfo_export.xlsx");
-
-        excelFile = streamedContent;
+//        DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
+        excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+//        streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+//        streamedContent.setName("AssetInfo_export.xlsx");
+//
+//        excelFile = streamedContent;
     }
 
     public void batchProcessToBeTerminated() {

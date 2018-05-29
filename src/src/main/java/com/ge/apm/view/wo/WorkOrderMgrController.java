@@ -738,6 +738,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
+            itemDetail.setApplyTime(new Date());
 
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();

@@ -140,9 +140,14 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="申请时间">
+                                        <h:outputText value="#{item.applyTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
                                     <p:column headerText="预计到达时间">
                                         <h:outputText value="#{item.estimatedArriveTime}">
-                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
                                     <p:column headerText="到货">
