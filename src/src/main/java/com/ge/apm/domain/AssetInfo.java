@@ -658,9 +658,9 @@ public class AssetInfo implements Serializable {
         if (isDeleted == null) {
             isDeleted = false;
         }
-        if (supplierId == null) {
-            supplierId = -1;
-        }
+//        if (supplierId == null) {
+//            supplierId = -1;
+//        }
     }
 
     public String getUid() {

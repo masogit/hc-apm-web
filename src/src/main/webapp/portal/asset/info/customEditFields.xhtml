@@ -189,7 +189,7 @@
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" 
                             completeMethod="#{assetInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange}"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
             </p:autoComplete>
         </h:panelGroup>
     </c:if>
@@ -200,7 +200,7 @@
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                 <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
-                <p:ajax listener="#{assetInfoEditController.onMaintainerChange}"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
             </p:autoComplete>
         </h:panelGroup>
     </c:if>
@@ -262,13 +262,13 @@
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'financingNum')}" >
         <h:panelGroup>
             <label class="label">#{msg.financingNum}#{assetInfoEditController.customConfig.assetFields['financingNum'].required? '*':''}</label>
-            <p:inputText value="#{assetInfoEditController.selected.financingNum}" class="financingNum" required="#{assetInfoEditController.customConfig.assetFields['financingNum'].required}" 
+            <p:inputText value="#{assetInfoEditController.selected.financingNum}" class="financingNumChange" required="#{assetInfoEditController.customConfig.assetFields['financingNum'].required}" 
                          requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('financingNum')}" >
                 <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                 <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
             </p:inputText>
             <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoEditController.generateFinancialNum()}"  disabled="#{assetInfoEditController.selected.financingNum.length() gt 4}"
-                             process="@(.financingNum) parentAssetList gbname" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
+                             process="@(.financingNumChange) parentAssetList gbname" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'departNum')}" >
