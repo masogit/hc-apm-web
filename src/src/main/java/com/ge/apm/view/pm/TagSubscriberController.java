@@ -67,6 +67,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		selected=null;
 	}
 	public void saveTagSub(){
+		if(selected==null)return;
 		int direct = selected.getReceiveMsgMode();
 		List<AssetTagMsgSubscriber> tagUserMode=null;
 		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
