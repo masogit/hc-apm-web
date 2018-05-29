@@ -253,6 +253,10 @@
                                 <label class="label">#{msg.warrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.InstallDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true"

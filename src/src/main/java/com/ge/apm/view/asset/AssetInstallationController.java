@@ -125,6 +125,10 @@ public class AssetInstallationController {
         arrivalListItem = itemDao.findById(itemId);
         arrivalListItem.setIsPm(arrivalListItem.getIsPm()==null?true:arrivalListItem.getIsPm());
         arrivalListItem.setIsChecked(arrivalListItem.getIsChecked()==null?true:arrivalListItem.getIsChecked());
+        
+        if(null == arrivalListItem.getInstallDate()){
+            arrivalListItem.setInstallDate(new Date());
+        }
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
         initOwner();
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
@@ -285,7 +289,7 @@ public class AssetInstallationController {
         if (arrivalListItem.getWarrantyYear() != null) {
             Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
             Calendar calender = Calendar.getInstance();
-            calender.setTime(new Date());
+            calender.setTime(arrivalListItem.getInstallDate()==null?new Date():arrivalListItem.getInstallDate());
             calender.add(Calendar.MONTH, monthLong);
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
