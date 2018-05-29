@@ -5,26 +5,16 @@
  */
 package com.ge.apm.view.asset;
 
-import com.ge.apm.dao.*;
-import com.ge.apm.domain.*;
-import com.ge.apm.service.asset.*;
-import com.ge.apm.service.common.ConfigService;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.PinYinComparator;
-import com.ge.apm.view.sysutil.UrlEncryptController;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.google.common.base.Strings;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
-import javaslang.Tuple2;
+
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -32,6 +22,37 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+
+import com.ge.apm.dao.ArrivalListItemRepository;
+import com.ge.apm.dao.AssetInfoRepository;
+import com.ge.apm.dao.GbCodeRepository;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.QrCodeLibRepository;
+import com.ge.apm.domain.ArrivalList;
+import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.GbCode;
+import com.ge.apm.domain.I18nMessage;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.QrCodeTemplate;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.domain.WorkflowConfig;
+import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
+import com.ge.apm.service.asset.AssetInstallationService;
+import com.ge.apm.service.asset.AutoCompleteService;
+import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.GbCodeService;
+import com.ge.apm.service.asset.QrCodeService;
+import com.ge.apm.service.asset.QrCodeTemplateService;
+import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.PinYinComparator;
+import com.ge.apm.view.sysutil.UrlEncryptController;
+import com.ge.apm.view.sysutil.UserContextService;
+import com.google.common.base.Strings;
+
+import javaslang.Tuple2;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
@@ -66,6 +87,9 @@ public class AssetInstallationController {
     private TreeNode gbTree;
     private String src = "";
     private UserAccount owner1;
+    private UserAccount owner2;
+    private UserAccount owner3;
+    private UserAccount useOwner;
     private AutoCompleteService autoCompleteService;
 //    private String currentQrCode;
 
@@ -102,13 +126,7 @@ public class AssetInstallationController {
         arrivalListItem.setIsPm(arrivalListItem.getIsPm()==null?true:arrivalListItem.getIsPm());
         arrivalListItem.setIsChecked(arrivalListItem.getIsChecked()==null?true:arrivalListItem.getIsChecked());
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
-        if (Strings.isNullOrEmpty(arrivalListItem.getAssetOwnerUID())) {
-            arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
-            owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
-        }
-        else{
-        	owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
-        }
+        initOwner();
         if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
             OrgInfo org = aiService.getOrgInfoByUid(arrivalListItem.getClinicalDeptUID());
             deptName = org == null ? null : org.getName();
@@ -124,6 +142,38 @@ public class AssetInstallationController {
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         needInstorageCheck=userContextService.needInstorageCheck();
+    }
+    
+    private void initOwner(){
+    	String owner1UID=arrivalListItem.getAssetOwnerUID();
+    	String owenr2UID=arrivalListItem.getAssetOwnerUID2();
+    	String owner3UID=arrivalListItem.getAssetOwnerUID3();
+    	String useOwnerUID=arrivalListItem.getClinicalOwnerUid();
+    	if (Strings.isNullOrEmpty(owner1UID)) {
+            arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
+            owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+        }
+        else{
+        	owner1 = aiService.getUserAccountByUid(owner1UID);
+        }
+        if(StringUtils.isNotEmpty(owenr2UID)){
+        	owner2=aiService.getUserAccountByUid(owenr2UID);
+        }
+        else{
+        	owner2=new UserAccount();
+        }
+        if(StringUtils.isNotEmpty(owner3UID)){
+        	owner3=aiService.getUserAccountByUid(owner3UID);
+        }
+        else{
+        	owner3=new UserAccount();
+        }
+        if(StringUtils.isNotEmpty(useOwnerUID)){
+        	useOwner=aiService.getUserAccountByUid(useOwnerUID);
+        }
+        else{
+        	useOwner=new UserAccount();
+        }
     }
 
     public String rejectInstall() {
@@ -424,21 +474,36 @@ public class AssetInstallationController {
     public void onAssetOwnerNameChange() {
 //        owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
     	arrivalListItem.setAssetOwnerUID(owner1 == null ? null : owner1.getUid());
+    	if(owner1==null){
+    		return;
+    	}
         List<Object[]> ownerComposition = assetDao.findAssetOwnerComposition(owner1.getId(), arrivalListItem.getArrivalList().getSiteUID());
         if (ownerComposition != null && !ownerComposition.isEmpty()) {
             Object[] composition = ownerComposition.get(0);
             Integer assetOwnerId2 = (Integer) composition[2];
             if (assetOwnerId2 != null) {
-                UserAccount owner2 = aiService.getUserAccountById(assetOwnerId2);
+                owner2 = aiService.getUserAccountById(assetOwnerId2);
                 arrivalListItem.setAssetOwnerUID2(owner2 == null ? null : owner2.getUid());
             }
             Integer assetOwnerId3 = (Integer) composition[3];
             if (assetOwnerId3 != null) {
-                UserAccount owner3 = aiService.getUserAccountById(assetOwnerId3);
+                owner3 = aiService.getUserAccountById(assetOwnerId3);
                 arrivalListItem.setAssetOwnerUID3(owner3 == null ? null : owner3.getUid());
             }
         }
     }
+
+	public void onAssetOwnerName2Change() {
+		arrivalListItem.setAssetOwnerUID2(owner2== null ? null : owner2.getUid());
+	}
+
+	public void onAssetOwnerName3Change() {
+		arrivalListItem.setAssetOwnerUID3(owner3== null ? null : owner3.getUid());
+	}
+
+	public void onUseOwnerNameChange() {
+		arrivalListItem.setClinicalOwnerUid(useOwner.getId() == null ? null : useOwner.getUid());
+	}
 
     public void onDepartNumChange(String fieldName) {
         if (config == null) {
@@ -658,4 +723,30 @@ public class AssetInstallationController {
 	public void setOwner1(UserAccount owner1) {
 		this.owner1 = owner1;
 	}
+
+	public UserAccount getOwner2() {
+		return owner2;
+	}
+
+	public void setOwner2(UserAccount owner2) {
+		this.owner2 = owner2;
+	}
+
+	public UserAccount getOwner3() {
+		return owner3;
+	}
+
+	public void setOwner3(UserAccount owner3) {
+		this.owner3 = owner3;
+	}
+
+	public UserAccount getUseOwner() {
+		return useOwner;
+	}
+
+	public void setUseOwner(UserAccount useOwner) {
+		this.useOwner = useOwner;
+	}
+	
+	
 }
