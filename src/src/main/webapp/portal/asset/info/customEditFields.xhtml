@@ -265,18 +265,18 @@
             <p:inputText value="#{assetInfoEditController.selected.financingNum}" class="financingNum" required="#{assetInfoEditController.customConfig.assetFields['financingNum'].required}" 
                          requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('financingNum')}" >
                 <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
-                <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNum) qrCode qrCodeButton departNum" />
+                <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
             </p:inputText>
             <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoEditController.generateFinancialNum()}"  disabled="#{assetInfoEditController.selected.financingNum.length() gt 4}"
-                             process="@(.financingNum) parentAssetList gbname" update="@(.financingNum) qrCode qrCodeButton departNum" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" />
+                             process="@(.financingNum) parentAssetList gbname" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'departNum')}" >
         <h:panelGroup>
             <label class="label">#{msg.departNum}#{assetInfoEditController.customConfig.assetFields['departNum'].required? '*':''}</label>
             <p:inputText id="departNum" value="#{assetInfoEditController.selected.departNum}" required="#{assetInfoEditController.customConfig.assetFields['departNum'].required}" 
-                         requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('departNum')}" >
-                <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('departNum')}" update="@(.financingNum) qrCode qrCodeButton departNum"/>
+                         requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('departNum')}" class="financingNumChange">
+                <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('departNum')}" update="@(.financingNumChange)"/>
             </p:inputText>
         </h:panelGroup>
     </c:if>
@@ -304,11 +304,11 @@
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'qrCode')}" >
         <h:panelGroup>
             <label class="label">#{msg.qrCode}#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</label>
-            <p:inputText id="qrCode" value="#{assetInfoEditController.qrCode}" required="#{assetInfoEditController.customConfig.assetFields['qrCode'].required}" class="SiteUIDChange"
+            <p:inputText id="qrCode" value="#{assetInfoEditController.qrCode}" required="#{assetInfoEditController.customConfig.assetFields['qrCode'].required}" class="SiteUIDChange financingNumChange"
                          requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}" readonly="#{not empty assetInfoEditController.selected.qrCode or !assetInfoEditController.needEdit('qrCode')}">
-                <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('qrCode')}" update="@(.financingNum) qrCode qrCodeButton departNum"/>
+                <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('qrCode')}" update="@(.financingNumChange)"/>
             </p:inputText>
-            <p:commandButton id="qrCodeButton" actionListener="#{assetInfoEditController.renewQrcode()}" update="@(.financingNum) departNum qrCode qrCodeButton" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this" disabled="#{not empty assetInfoEditController.qrCode}"/>
+            <p:commandButton id="qrCodeButton" actionListener="#{assetInfoEditController.renewQrcode()}" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" process="@this" disabled="#{not empty assetInfoEditController.qrCode}"/>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'functionType')}" >
@@ -512,14 +512,14 @@
             <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.manufactDate}" required="#{assetInfoEditController.customConfig.assetFields['manufactDate'].required}" 
                          requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufactDate')}" 
                         maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
-                <p:ajax process="@(this)" update="@(.inputDate) purchaseDate" />
+                <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)" />
             </p:calendar>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'purchaseDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.purchaseDate}#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required? '*':''}</label>
-            <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('purchaseDate')}" 
+            <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('purchaseDate')}" class="manufactDateChange"
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required}" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
         </h:panelGroup>
     </c:if>
