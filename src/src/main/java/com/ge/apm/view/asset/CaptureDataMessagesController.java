@@ -252,7 +252,6 @@ public class CaptureDataMessagesController extends GenericCRUDUUIDController<Cap
     		else{
     			setIndexValue();
     			this.selected.setSystemId("");
-    			this.selected.setGeDeviceType(0);
     			this.selected.setIbStatus(0);
         		super.save();
     		}
