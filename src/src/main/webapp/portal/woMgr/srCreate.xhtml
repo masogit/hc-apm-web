@@ -9,7 +9,7 @@
 
     <ui:composition>
 
-        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修" >
+        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@this"  header="新增报修" >
 
             <h:form id="ServiceRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" rendered="#{not empty workOrderMgrController.newServiceRequest}">
