@@ -313,13 +313,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void saveEasyItem() {
         easyInstallItem.setNationalStandardCode(nationalStandardCode == null ? "" : nationalStandardCode.split("/")[0]);
         List<ArrivalListItem> saveList = getNewInstallAssetList();
-        if (easyInstallItem.getWarrantyYear() != null) {
-            Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
-            Calendar calender = Calendar.getInstance();
-            calender.setTime(new Date());
-            calender.add(Calendar.MONTH, monthLong);
-            easyInstallItem.setFactoryWarrantyDate(calender.getTime());
-        }
+//        if (easyInstallItem.getWarrantyYear() != null) {
+//            Integer monthLong = Double.valueOf(easyInstallItem.getWarrantyYear() * 12).intValue();
+//            Calendar calender = Calendar.getInstance();
+//            calender.setTime(new Date());
+//            calender.add(Calendar.MONTH, monthLong);
+//            easyInstallItem.setFactoryWarrantyDate(calender.getTime());
+//        }
         saveList.forEach(item -> {
             item.setNationalStandardCode(easyInstallItem.getNationalStandardCode());
             item.setFunctionGroup(easyInstallItem.getFunctionGroup());
