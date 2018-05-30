@@ -159,7 +159,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
     //是否全是批量完成
     public boolean isPiliangWanChen() {
-        System.out.println(result);
+        //System.out.println(result);
         boolean mark =false;
         List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
@@ -176,7 +176,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     public boolean isPiliangJiedan() {
-        System.out.println(result);
+       // System.out.println(result);
         boolean mark =true;
         List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
