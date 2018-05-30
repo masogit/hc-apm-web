@@ -64,7 +64,7 @@ public class V2_WorkOrder_Detail implements Serializable {
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     private Date warrantyDate;
 
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm", timezone = "GMT+8")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "apply_time")
     @Temporal(TemporalType.TIMESTAMP)
     private Date applyTime;

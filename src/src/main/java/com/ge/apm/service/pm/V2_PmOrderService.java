@@ -390,7 +390,7 @@ public class V2_PmOrderService {
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         if(endTime !=null)
-            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
+            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         if(planTime !=null)
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTime));
         formData.setManHours(selectedPmOrder.getManHours());

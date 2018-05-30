@@ -66,7 +66,65 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void cancel(){
 		selected=null;
 	}
-	public void saveTagSub(){
+	private void clearMode(List<AssetTagMsgSubscriber> a,List<AssetTagMsgSubscriber> b, List<AssetTagMsgSubscriber> c){
+a=null;
+b=null;
+c=null;
+	}
+	public void saveTagSub1()
+	{
+		if(selected==null)return;
+		int direct = selected.getReceiveMsgMode();
+		List<AssetTagMsgSubscriber> tagUserMode3and1=dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());;
+		List<AssetTagMsgSubscriber> tagUserModeEE=dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
+		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
+		List<I18nMessage> fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
+		List<Integer> modeList =new ArrayList<Integer>();
+		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
+		if(this.getCRUDActionName().equals("修改")){
+			if(!tagUserModeBasic.isEmpty()){
+				WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+				clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+				return;
+			}
+			if(!tagUserModeEE.isEmpty()){
+				if(direct==3){
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+					return;
+				}
+			}
+			if(!tagUserMode3and1.isEmpty()){
+				if( modeList.stream().anyMatch(item->item.equals(direct))){
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+					return;
+				}
+			}
+			super.save();
+		}else{//新增
+			if(tagUserModeBasic.isEmpty()){
+				super.save();
+				clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+				return;
+			}
+			if(tagUserModeEE.isEmpty()){
+				if(direct==3){
+					super.save();
+					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+					return;
+				}
+			}
+			if(tagUserMode3and1.isEmpty()){
+				if( !modeList.stream().anyMatch(item->item.equals(direct))){
+					super.save();
+					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+					return;
+				}
+			}
+			WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+		}
+	}	public void saveTagSub(){
 		if(selected==null)return;
 		int direct = selected.getReceiveMsgMode();
 		List<AssetTagMsgSubscriber> tagUserMode=null;
