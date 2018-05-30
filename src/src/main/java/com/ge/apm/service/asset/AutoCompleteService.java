@@ -63,5 +63,20 @@ public class AutoCompleteService {
 //        res.sort(new PinYinComparatorByName());
         return res;
     }
+    
+    public List<UserAccount> completeClinicalOwnerList(String query,List<UserAccount> clinicalOwnerList) {
+
+        if (clinicalOwnerList == null) return Collections.emptyList();;
+
+        List<UserAccount> res = clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
+        res.sort(new PinYinComparatorByName());
+        UserAccount user=new UserAccount();
+        user.setName("请选择");
+        user.setId(null);
+        res.add(0, user);
+        return res;
+    }
 
 }

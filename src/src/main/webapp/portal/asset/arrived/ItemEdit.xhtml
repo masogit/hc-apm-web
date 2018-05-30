@@ -295,7 +295,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalOwnerName}</label>
                                 <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true"
-                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
                                     <p:ajax event="itemSelect" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
