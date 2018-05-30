@@ -137,6 +137,7 @@ public class AssetInstallationController {
             deptName = org == null ? null : org.getName();
         }
         getOwnerList();
+        onAssetOwnerNameChange();
         getClinicalOwnerList();
         changeFunctionGroup();
         gbCodeService = WebUtil.getBean(GbCodeService.class);
