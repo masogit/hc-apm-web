@@ -300,6 +300,8 @@ public class AssetInstallationController {
         if(configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())){
             //待审核
             arrivalListItem.setUsageStatus(2);
+        }else{
+            arrivalListItem.setUsageStatus(3);
         }
         
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
