@@ -99,6 +99,7 @@ public class AssetInstallationController {
 
     private String deptName;
     private List<UserAccount> ownerList;
+    private List<UserAccount> clinicalOwnerList;
     private List<OrgInfo> deptInfoList;
     private UaaService uaaService;
     private WorkflowConfig config;
@@ -132,6 +133,7 @@ public class AssetInstallationController {
             deptName = org == null ? null : org.getName();
         }
         getOwnerList();
+        getClinicalOwnerList();
         changeFunctionGroup();
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
@@ -388,7 +390,8 @@ public class AssetInstallationController {
     }
 
     public List<UserAccount> getClinicalOwnerList() {
-        return aiService.getClinicalOwnerList(arrivalListItem.getClinicalDeptUID());
+    	clinicalOwnerList=aiService.getClinicalOwnerList(arrivalListItem.getClinicalDeptUID());
+        return clinicalOwnerList;
     }
 
     public List<AssetInfo> getParentAssetList() {
@@ -613,10 +616,15 @@ public class AssetInstallationController {
         OrgInfo dept = deptInfoList.stream().filter(item -> item.getName().equals(deptName)).findFirst().orElse(null);
         if (dept != null) {
             arrivalListItem.setClinicalDeptUID(dept.getUid());
+            getClinicalOwnerList();
         }
     }
     public List<UserAccount> completeOwnerList(String query) {
         return autoCompleteService.completeOwnerList(query, ownerList);
+    }
+    
+    public List<UserAccount> completeClinicalOwnerList(String query) {
+        return autoCompleteService.completeClinicalOwnerList(query, clinicalOwnerList);
     }
 
     public List<QrCodeTemplate> getQrCodeTemplates() {
