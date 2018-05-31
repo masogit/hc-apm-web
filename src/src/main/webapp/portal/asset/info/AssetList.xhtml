@@ -63,7 +63,7 @@
                         <p:ajax event="page" oncomplete="updateSelectAllCheckBox();" />
                         <p:column width="36"  id="checkBoxColumn">
                             <p:selectBooleanCheckbox value="#{assetInfoListController.selectedMap[item.uid]}"  class="selectCheckBox">
-                                <p:ajax listener="#{assetInfoListController.onItemSelected(item.uid)}" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
+                                <p:ajax process="@this" update="@this @(.batch-terminated)" oncomplete="updateSelectAllCheckBox();"/>
                             </p:selectBooleanCheckbox>
                             <f:facet name="header"  >
                                 <p:selectBooleanCheckbox id="selectCheckBoxHeader" class="selectCheckBoxHeader">
