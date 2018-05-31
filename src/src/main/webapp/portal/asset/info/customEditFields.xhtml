@@ -240,6 +240,7 @@
             <label class="label">#{msg.parentAsset}#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</label>
             <p:selectOneMenu id="parentAssetList" value="#{assetInfoEditController.selected.parentAssetId}" required="#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required}" disabled="#{!assetInfoEditController.needEdit('parentAssetId')}" 
                              requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax process="@this" />
                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                 <f:selectItems value="#{assetInfoEditController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
             </p:selectOneMenu>
@@ -268,7 +269,7 @@
                 <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
             </p:inputText>
             <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoEditController.generateFinancialNum()}"  disabled="#{assetInfoEditController.selected.financingNum.length() gt 4}"
-                             process="@(.financingNumChange)" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
+                             process="@(.financingNumChange) " update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(basicItem, 'departNum')}" >
