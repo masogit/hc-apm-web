@@ -90,7 +90,10 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private List<AssetInfo> selectedAssets;
     //custom config
     private CustomConfigObject customConfig;
-    private CustomDataTable customTable;
+//    private CustomDataTable customTable;
+    
+    List<String> customedColumns;
+    
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -120,8 +123,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private void loadCustomConfig() {
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         List<String> readFields = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
-        customTable = new CustomDataTable();
-        customTable.setCustomedColumn(customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList()));
+        customedColumns = customConfig.getAssetsListPageFields().stream().filter(item -> readFields.contains(item)).collect(Collectors.toList());
     }
 
     @Override
@@ -262,11 +264,9 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-    boolean exported = false;
 
     public void exportExcel() throws IOException {
 
-        if (!exported) {
             List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
             //非设备科的人导出的时候，导出部分数据
@@ -288,8 +288,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
 
             excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
-            exported = true;
-        }
     }
 
     public void batchProcessToBeTerminated() {
@@ -485,20 +483,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         return acService.needAssetApproval(siteUid);
     }
 
-    public CustomDataTable getCustomTable() {
-        return customTable;
-    }
-
-    public void setCustomTable(CustomDataTable customTable) {
-        this.customTable = customTable;
-    }
-
     public List<AssetInfo> getSelectedAssets() {
         return selectedAssets;
     }
 
     public void setSelectedAssets(List<AssetInfo> selectedAssets) {
         this.selectedAssets = selectedAssets;
+    }
+
+    public List<String> getCustomedColumns() {
+        return customedColumns;
     }
 
 }
