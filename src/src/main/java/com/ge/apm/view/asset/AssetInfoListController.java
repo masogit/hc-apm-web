@@ -232,12 +232,6 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         requestContext.addCallbackParam("url", url);
     }
 
-    public void onItemSelected(String id) {
-        if (!Strings.isNullOrEmpty(id)) {
-            selectedMap.put(id, selectedMap.get(id) == null ? true : !selectedMap.get(id));
-        }
-    }
-
     public void onSelectAllOfPage() {
         boolean isSelectedAll = !currentPageAssets.stream().anyMatch(item -> !selectedMap.containsKey(item.getUid()) || !selectedMap.get(item.getUid()));
         for (AssetInfo item : currentPageAssets) {
@@ -304,6 +298,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetInfo.setStatus(4);
             dao.save(assetInfo);
         }
+        this.selectedMap.clear();
     }
 
     public boolean isChecked() {
@@ -368,6 +363,11 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             assetInfo.setTerminateDate(new Date());
             dao.save(assetInfo);
         }
+        this.selectedMap.clear();
+    }
+    
+    public boolean isShowColumn(String fieldName){
+        return customedColumns.contains(fieldName);
     }
 
     public String getSiteOrgName(String siteUID) {
