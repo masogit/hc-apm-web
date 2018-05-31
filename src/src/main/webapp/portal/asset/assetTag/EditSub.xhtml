@@ -45,7 +45,7 @@
 
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub3()}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>
 
                     <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{tagSubscriberController.cancel()}" icon="ui-icon-cancel" update="TagSubscriberForm" onclick="PF('AssetTagSubscribEditDialog').hide()"/>
                 </h:panelGroup>
