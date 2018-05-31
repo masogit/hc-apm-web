@@ -192,6 +192,12 @@ public class QrCodeService {
     private BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, QrCodeTemplate template,String siteUid) {
         List<QrCodeTemplateElement> elementList;
         if (template == null) {
+        	if(StringUtils.isEmpty(qrCode)){
+        		qrCode=asset.getQrCode();
+        	}
+        	if(StringUtils.isEmpty(qrCode)){
+        		return null;
+        	}
             QrCodeLib qrCodeLib= this.findByQrCode(qrCode, siteUid);
             template = templateService.getDefaultTemplateByQrCodeLib(qrCodeLib);
             elementList = templateService.getDefaultTemplateElements();
