@@ -66,121 +66,154 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void cancel(){
 		selected=null;
 	}
-	private void clearMode(List<AssetTagMsgSubscriber> a,List<AssetTagMsgSubscriber> b, List<AssetTagMsgSubscriber> c){
-a=null;
-b=null;
-c=null;
-	}
-	public void saveTagSub1()
-	{
-		if(selected==null)return;
-		int direct = selected.getReceiveMsgMode();
-		List<AssetTagMsgSubscriber> tagUserMode3and1=dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());;
-		List<AssetTagMsgSubscriber> tagUserModeEE=dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
-		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
-		List<I18nMessage> fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
-		List<Integer> modeList =new ArrayList<Integer>();
-		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
-		if(this.getCRUDActionName().equals("修改")){
-			if(!tagUserModeBasic.isEmpty()){
-				WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-				return;
-			}
-			if(!tagUserModeEE.isEmpty()){
-				if(direct==3){
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
-			if(!tagUserMode3and1.isEmpty()){
-				if( modeList.stream().anyMatch(item->item.equals(direct))){
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
-			super.save();
-		}else{//新增
-			if(tagUserModeBasic.isEmpty()){
+
+
+	public void saveTagSub3(){
+		List<AssetTagMsgSubscriber> modeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
+		if(this.getCRUDActionName().equals("新增")) {
+			if (modeBasic.isEmpty()) {
 				super.save();
-				clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+				return;
+			} else {
+				if (modeBasic.size() == 1) {
+					AssetTagMsgSubscriber dy = modeBasic.get(0);
+					if (dy.getReceiveMsgMode() != 3) {
+						if (selected.getReceiveMsgMode() == 3) {
+							super.save();
+						} else {
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						}
+
+					} else {
+						if (selected.getReceiveMsgMode() != 3) {
+							super.save();
+						} else {
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						}
+					}
+				}else{//已经有两条不同组合的 不能再创建了
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+				}
+			}
+		}else{//修改
+			if (modeBasic.isEmpty()) {
+				super.save();
 				return;
 			}
-			if(tagUserModeEE.isEmpty()){
-				if(direct==3){
-					super.save();
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
-			if(tagUserMode3and1.isEmpty()){
-				if( !modeList.stream().anyMatch(item->item.equals(direct))){
-					super.save();
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
-			WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-		}
-	}	public void saveTagSub(){
-		if(selected==null)return;
-		int direct = selected.getReceiveMsgMode();
-		List<AssetTagMsgSubscriber> tagUserMode=null;
-		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
-		List<I18nMessage> fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
-		List<Integer> modeList =new ArrayList<Integer>();
-		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
+			if(modeBasic.size() == 1){
+				AssetTagMsgSubscriber dy = modeBasic.get(0);
+				if(currentAtms.getTagId().intValue()!=selected.getTagId().intValue()){
+					if(dy.getReceiveMsgMode().intValue()==3){
+						if(selected.getReceiveMsgMode().intValue()!=3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
 
-		if( this.getCRUDActionName().equals("新增")){  //是新增
-			if(direct ==3){
-				tagUserMode = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-					return;
-				}else{
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				}
-			}else{
-				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-					return;
-				}else{
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				}
-			}
-
-		}else{//是修改
-			if(direct ==3){
-				tagUserMode = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-				}else{
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				}
-			}else{//当前选择的是0 1 2
-				//查看当前有没有 A B C=0,1,2
-				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-					return;
-				}
-				if(tagUserModeBasic.size()==2){
-					if( modeList.stream().anyMatch(item->item.equals(direct))){
-						WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 					}else{
-						super.save();
-						return;
+						if(selected.getReceiveMsgMode().intValue()==3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
 					}
-				}else{
+
+				}
+				if(currentAtms.getSubscribeUserId().intValue()!=selected.getSubscribeUserId().intValue()){
+					if(dy.getReceiveMsgMode().intValue()==3){
+						if(selected.getReceiveMsgMode().intValue()!=3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+
+					}else{
+						if(selected.getReceiveMsgMode().intValue()==3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+					}
+
+				}
+				if(dy.getTagId().intValue()==selected.getTagId().intValue()){//如果不是改动设备标签 而是改动 选项 则随便改
+					  if(currentAtms.getTagId().intValue()!=selected.getTagId().intValue()){
+
+					  }
+					  super.save();
+						return;
+				  }else{
+					  if (dy.getReceiveMsgMode() != 3){
+						  if (selected.getReceiveMsgMode() == 3) {
+							  super.save();
+						  } else {
+							  WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						  }
+					  }else{
+						  if (selected.getReceiveMsgMode() != 3){
+						  	super.save();
+						  	return;
+						  }else{
+							  WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						  }
+					  }
+				  }
+			}else {//如果有两条数据存在
+				if(selected.getSubscriberUser().getId().intValue()!=selected.getSubscribeUserId().intValue()){
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					return;
+				}
+				/*
+				*从表中获取当前要改的数据的 选项
+				*如果改动的是ee报警的那条数据 那 就无法改动 refuse,
+				* 如果改动的是3and1的 ,那么direct 不为3 就可以save 否则 refuse
+				*
+				* */
+				//
+				AssetTagMsgSubscriber atmtmp=null;
+				if(tagUserModeBasic.size()>1){
+					if(currentAtms.getReceiveMsgMode()==3){
+						WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						return;
+					}else{
+						if(selected.getReceiveMsgMode()!=3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+					}
+				}
+				if (selected.getReceiveMsgMode() != 3) {
 					super.save();
+				} else {
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 				}
 			}
-
 		}
-	}//
+	}
+
+	public AssetTagMsgSubscriber getATMS(Integer id1,List<AssetTagMsgSubscriber> alist){
+		for(int i=0; i<alist.size();i++){
+			if(alist.get(i).getId().equals(id1))
+				return alist.get(i);
+		}
+		return null;
+	}
+
+	List<I18nMessage> fousOptionWithOutEE;
+	List<Integer> modeList;
+
+
 
 	@Override
 	protected void init() {
@@ -200,6 +233,10 @@ c=null;
 		for (I18nMessage local1 : msgModeList) {
 			hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
 		}
+
+		fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
+		modeList =new ArrayList<Integer>();
+		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
 
 	}
 	public String getTagName(Integer tagId){
@@ -261,11 +298,21 @@ c=null;
 		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 	}
 
+	List<AssetTagMsgSubscriber> tagUserMode3and1;
+	List<AssetTagMsgSubscriber> tagUserModeEE;
+	List<AssetTagMsgSubscriber> tagUserModeBasic;
+	AssetTagMsgSubscriber currentAtms;
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
+
+		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
+		currentAtms=dao.findById(selected.getId());
 		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 		//assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), this.selected.getSubscribeUserId());
+
+
+
 	}
 
 	@Override
