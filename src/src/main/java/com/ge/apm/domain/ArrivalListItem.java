@@ -152,6 +152,9 @@ public class ArrivalListItem implements Serializable {
     @Size(max = 64)
     @Column(name = "maitanance")
     private String maitanance;//维修商
+    
+    @Column(name = "maitanance_id")
+    private String maitananceId;
 
     @Size(max = 32)
     @Column(name = "maitanance_tel")
@@ -487,8 +490,16 @@ public class ArrivalListItem implements Serializable {
     public void setMaitanance(String maitanance) {
         this.maitanance = maitanance;
     }
+    
+    public String getMaitananceId() {
+		return maitananceId;
+	}
 
-    public String getMaitananceTel() {
+	public void setMaitananceId(String maitananceId) {
+		this.maitananceId = maitananceId;
+	}
+
+	public String getMaitananceTel() {
         return maitananceTel;
     }
 

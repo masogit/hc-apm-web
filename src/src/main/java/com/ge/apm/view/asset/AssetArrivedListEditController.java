@@ -465,9 +465,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void onMaintainerChange() {
     	if (null != maitanance) {
             this.easyInstallItem.setMaitanance(maitanance.getName());
+            this.easyInstallItem.setMaitananceId(maitanance.getId()+"");
         }
     	else{
     		this.easyInstallItem.setMaitanance(null);
+    		this.easyInstallItem.setMaitananceId(null);
     	}
     }
 
