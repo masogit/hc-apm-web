@@ -24,15 +24,12 @@ import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 
 import com.ge.apm.service.asset.CustomConfigService;
-import com.ge.apm.view.asset.components.CustomPanelGrid;
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import javax.faces.component.UIComponent;
 
 @ManagedBean
 @ViewScoped
@@ -76,8 +73,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private TreeNode orgTree;
 
     private Map<String, Object> selectedObjectMap = new HashMap();
-    
-    private Map<String, UIComponent> editFields = new HashMap();
     private List<String> readableFieldsList;
     private List<String> editableFieldsList;
     
@@ -131,7 +126,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         editableFieldsList = ccService.getEditAssetFieldsByRoles(customConfig, UserContextService.getRoles());
         supplierList = supplierController.getSupplierList();
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
-        parentAssetList = aimService.getRelationAssets(this.selected);
         initGbTree();
         initOrgTree();
     }
@@ -165,7 +159,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
         qrCode = selected.getQrCode();
-        parentAssetList = aimService.getRelationAssets(this.selected);
+        parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
 
     }
@@ -649,7 +643,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
         selectedObjectMap.put("clinicalOwner", null);
         onOwnerChange("clinicalOwner");
-        parentAssetList = aimService.getRelationAssets(this.selected);
+        parentAssetList = aimService.getParentsAssetsList(this.selected);
         getClinicalOwnerList();
     }
 
