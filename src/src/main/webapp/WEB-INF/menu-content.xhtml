@@ -32,9 +32,11 @@
             </p:submenu>
 
             <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt') and userContextService.isHospitalUser()}">
-                <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>
+                <!--<p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
+                <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt')}"/>
                 <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
-                <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>
+                <!--<p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
+                <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt')}"/>
                 <p:menuitem id="um904" value="归还受理" outcome="/portal/ReturnAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <p:menuitem id="um190" value="借还维护" outcome="/portal/sharedAssetRequest/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <!--<p:menuitem id="um906" value="在借设备查询" outcome="/portal/BorrowApplyV2/ListForQuery" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,AssetHead')}"/>-->
