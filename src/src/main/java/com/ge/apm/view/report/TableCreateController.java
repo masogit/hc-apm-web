@@ -150,6 +150,7 @@ public class TableCreateController extends TieWebSheetBean {
     //main save
     @Transactional
     public void saveTemplate() {
+    	tableString = JSONObject.toJSONString(table);
         if (!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length() > 64) {
             WebUtil.addErrorMessage("名称最大长度64");
             return;
@@ -378,6 +379,7 @@ public class TableCreateController extends TieWebSheetBean {
         if (null != uploadedFileObject) {
             StreamedContent savedFile = blobService.getBlobObjectByStorageId(uploadedFileObject.getObjectStorageId());
             table.setTitle(uploadedFileObject.getObjectName().indexOf(".") > 0 ? uploadedFileObject.getObjectName().substring(0, uploadedFileObject.getObjectName().indexOf(".")) : uploadedFileObject.getObjectName());
+            
             loadWebSheetByStream(savedFile.getStream());
             
             saveExcelTable();
