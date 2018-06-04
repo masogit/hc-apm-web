@@ -32,7 +32,7 @@
 
                         <h:panelGroup rendered="#{tagSubscriberController.getCRUDActionName().equals('新增')}">
                             <label class="label">选择类型</label>
-                            <p:selectOneMenu id="xuanzeleixing" required="true" value="#{tagSubscriberController.selectType}" requiredMessage="设备标签不能为空">
+                            <p:selectOneMenu required="true" value="#{tagSubscriberController.selectType}" requiredMessage="设备标签不能为空">
                                 <p:ajax update=":AssetTagSubscribEditForm" event="change"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItem itemLabel="维修" itemValue="1"/>
