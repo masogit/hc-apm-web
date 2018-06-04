@@ -178,6 +178,19 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
             }
         }
+        boolean nameFilter=false;
+        Object nameValue="";
+        for(SearchFilter filter: searchFilters){
+        	if(filter.fieldName.equals("name")){
+        		nameFilter=true;
+        		nameValue=filter.value;
+        		filter.conditionPath="1*2*3+";
+        	}
+        }
+        if(nameFilter){
+        	searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
+        }
+        
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
         	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
