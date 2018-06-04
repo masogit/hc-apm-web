@@ -1,32 +1,41 @@
 package com.ge.apm.view.report;
 
-import com.ge.apm.domain.pure.TableSchema;
-import javax.annotation.PostConstruct;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
+import org.primefaces.context.RequestContext;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.DualListModel;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.UploadedFile;
+import org.springframework.transaction.annotation.Transactional;
+import org.tiefaces.components.websheet.TieWebSheetBean;
+
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.domain.ElectricSafetyData;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableOption;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.report.TieFacesService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import org.primefaces.context.RequestContext;
-import org.primefaces.event.FileUploadEvent;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.UploadedFile;
-import org.springframework.transaction.annotation.Transactional;
-import org.tiefaces.components.websheet.TieWebSheetBean;
+
 import webapp.framework.web.WebUtil;
 
 /**
@@ -58,6 +67,15 @@ public class TableCreateController extends TieWebSheetBean {
     private Map<String, Object> tableFields;
     private HashMap<String, Object> context = new HashMap<String, Object>();
     private V2_BlobObject uploadedFileObject;
+    
+    //for instrument data import
+    private Collection<String> instrumentDataLabels;
+    private Collection<String> templateLabels;
+    private Map<String,String> mapTemplateKeyValues;
+    private DualListModel listInstrumentMppingLabels;
+    private String instrumentDataLabel;
+    private String templateLabel;
+    private static final String SPLIT_STR=" <=> ";
 
     @Override
     public void initialLoad() {
@@ -81,7 +99,7 @@ public class TableCreateController extends TieWebSheetBean {
                 table = new TableSchema();
                 tableString = selectedTableDefinition.getSchema();
             }
-
+            
             if (null != selectedTableDefinition.getExcelStorageId()) {
                 try {
                     StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
@@ -89,6 +107,21 @@ public class TableCreateController extends TieWebSheetBean {
                 } catch (Exception e) {
                     WebUtil.addErrorMessage("Excel模版加载失败");
                 }
+            }
+            listInstrumentMppingLabels=new DualListModel<>();
+            if(StringUtils.isNotEmpty(selectedTableDefinition.getInstrumentKeyValues())){
+            	List<String> targetList=new ArrayList<String>();
+            	listInstrumentMppingLabels.setTarget(targetList);
+            	getTemplateLabels();
+            	JSONObject obj=JSONObject.parseObject(selectedTableDefinition.getInstrumentKeyValues());
+            	Map<String,String> map=ElectricSafetyData.getLabelAttributeMapping();
+            	for(Map.Entry<String,String> entity:mapTemplateKeyValues.entrySet()){
+            		for(String key:obj.keySet()){
+            			if(key.equals(entity.getKey())){
+            				targetList.add(entity.getValue()+SPLIT_STR+map.get(obj.get(key)));
+            			}
+            		}
+            	}
             }
         }
 
@@ -114,6 +147,7 @@ public class TableCreateController extends TieWebSheetBean {
         }
     }
 
+    //main save
     @Transactional
     public void saveTemplate() {
         if (!Strings.isNullOrEmpty(table.getTitle()) && table.getTitle().length() > 64) {
@@ -122,6 +156,8 @@ public class TableCreateController extends TieWebSheetBean {
         }
         if (Strings.isNullOrEmpty(selectedTableDefinition.getId())) {
             selectedTableDefinition.setName(table.getTitle());
+          //save instrument data
+            selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
             templateDao.save(selectedTableDefinition);
             table.setSchemaId(selectedTableDefinition.getId());
             tableString = JSONObject.toJSONString(table);
@@ -129,15 +165,20 @@ public class TableCreateController extends TieWebSheetBean {
             templateDao.save(selectedTableDefinition);
             selectedTableDefinition.setBaseId(selectedTableDefinition.getId());
             templateDao.save(selectedTableDefinition);
+            
             WebUtil.addSuccessMessage("JSON已保存");
         } else {
             Integer count = templateService.getCountByTemplate(selectedTableDefinition.getId());
             if (count == 0 || !templateService.hasKeyChange(selectedTableDefinition.getSchema(), tableString)) {
+            	//save instrument data
+                selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
                 selectedTableDefinition.setSchema(tableString);
                 selectedTableDefinition.setName(table.getTitle());
                 templateDao.save(selectedTableDefinition);
                 WebUtil.addSuccessMessage("JSON已保存");
             } else {
+            	//save instrument data
+                selectedTableDefinition.setInstrumentKeyValues(saveSelectedInstrumentData());
                 selectedTableDefinition = templateService.updateJSONTemplate(selectedTableDefinition, tableString);
                 WebUtil.addErrorMessage("字段变动, JSON已保存为新版本");
             }
@@ -389,6 +430,62 @@ public class TableCreateController extends TieWebSheetBean {
             }
         }
     }
+    
+    public void bindInstrumentData(){
+    	if(listInstrumentMppingLabels==null){
+    		listInstrumentMppingLabels=new DualListModel();
+    	}
+    	if(this.instrumentDataLabel==null || this.templateLabel==null){
+    		return;
+    	}
+    	List listSource=null;
+    	List listTarget=null;
+    	if(listInstrumentMppingLabels.getSource()==null){
+    		listSource=new ArrayList<String>();
+    		listInstrumentMppingLabels.setSource(listSource);
+    	}
+    	if(listInstrumentMppingLabels.getTarget()==null){
+    		listTarget=new ArrayList<String>();
+    		listInstrumentMppingLabels.setTarget(listTarget);
+    	}
+    	listSource=listInstrumentMppingLabels.getSource();
+    	String temp=this.templateLabel+SPLIT_STR+this.instrumentDataLabel;
+    	if(!listSource.contains(temp)){
+    		listSource.add(temp);
+    	}
+    }
+    
+    public String saveSelectedInstrumentData(){
+    	String result="";
+    	
+    	if(listInstrumentMppingLabels!=null){
+    		JSONObject obj=new JSONObject();
+    		List<String> targetList=listInstrumentMppingLabels.getTarget();
+    		if(targetList!=null && targetList.size()>0){
+    			String strArr[];
+    			for(int i=0;i<targetList.size();++i){
+    				strArr=targetList.get(i).split(SPLIT_STR);
+    				if(strArr!=null && strArr.length==2){
+    					String keyTemplate="";
+    					String keyInstrument="";
+    					for(Entry<String,String>entity:mapTemplateKeyValues.entrySet()){
+    						if(entity.getValue().equals(strArr[0])){
+    							keyTemplate=entity.getKey();
+    						}
+    					}
+    					for(Entry<String,String>entity:ElectricSafetyData.getLabelAttributeMapping().entrySet()){
+    						if(entity.getValue().equals(strArr[1])){
+    							keyInstrument=entity.getKey();
+    						}
+    					}
+    					obj.put(keyTemplate, keyInstrument);
+    				}
+    			}
+    		}
+    		result=obj.toString();
+    	}
+    	return result;
+    }
 
     public void testSubmit() {
     }
@@ -474,4 +571,59 @@ public class TableCreateController extends TieWebSheetBean {
         this.uploadedFile = uploadedFile;
     }
 
+	public Collection<String> getInstrumentDataLabels() {
+		instrumentDataLabels=ElectricSafetyData.getLabelAttributeMapping().values();
+		return instrumentDataLabels;
+	}
+
+	public void setInstrumentDataLabels(Collection<String> instrumentDataLabels) {
+		this.instrumentDataLabels = instrumentDataLabels;
+	}
+	public String getInstrumentDataLabel() {
+		return instrumentDataLabel;
+	}
+
+	public void setInstrumentDataLabel(String instrumentDataLabel) {
+		this.instrumentDataLabel = instrumentDataLabel;
+	}
+
+	public String getTemplateLabel() {
+		return templateLabel;
+	}
+
+	public void setTemplateLabel(String templateLabel) {
+		this.templateLabel = templateLabel;
+	}
+
+	public DualListModel getListInstrumentMppingLabels() {
+		return listInstrumentMppingLabels;
+	}
+
+	public void setListInstrumentMppingLabels(DualListModel listInstrumentMppingLabels) {
+		this.listInstrumentMppingLabels = listInstrumentMppingLabels;
+	}
+
+	public Collection<String> getTemplateLabels() {
+		if(templateLabels==null){
+			mapTemplateKeyValues=new HashMap<String,String>();
+			if(table!=null){
+				try {
+					for(TableGroup group: table.getGroups()){
+						for(TableItem item: group.getItems()){
+							mapTemplateKeyValues.put( item.getKey(),item.getLabel());
+						}
+					}
+					templateLabels=mapTemplateKeyValues.values();
+				} catch (Exception e) {
+					// TODO: handle exception
+					WebUtil.addErrorMessage(e, "解析模版失败");
+				}
+			}
+		}
+		return templateLabels;
+	}
+
+	public void setTemplateLabels(Collection<String> templateLabels) {
+		this.templateLabels = templateLabels;
+	}
 }

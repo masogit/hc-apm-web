@@ -9,6 +9,7 @@ import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
+import com.ge.apm.service.asset.ElectricSafetyService;
 import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,11 +36,13 @@ public class EditReportController {
 
     private TableDefinitionService tableService;
     
-    
+    private ElectricSafetyService electricSafetyService;
     private UnstructuredDataCollection report;
     @PostConstruct
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
+        electricSafetyService = WebUtil.getBean(ElectricSafetyService.class);
+
         String reportId = WebUtil.getRequestParameter("reportId");
         
         report = tableService.getReportById(reportId);
@@ -54,6 +57,7 @@ public class EditReportController {
                 tableValue.put(item.getKey(),item.getValueSerialized());
             }
         });
+        electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
     }
 
     public void save() {
