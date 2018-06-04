@@ -14,8 +14,7 @@
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{tagSubscriberController.selected != null}">
                         <h:panelGroup >
                             <label class="label" >关注人</label>
-                            <p:selectOneMenu disabled="#{!(userContextService.hasRole('ITAdmin') or userContextService.hasRole('LocalITAdmin'))}" value="#{tagSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
-                            <!--<p:selectOneMenu disabled="#{!userContextService.hasRole('ITAdmin') or !userContextService.hasRole('LocalITAdmin')}" value="#{tagSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">-->
+                            <p:selectOneMenu disabled="#{tagSubscriberController.getCRUDActionName().equals('修改')}" value="#{tagSubscriberController.selected.subscribeUserId}"  required="true" requiredMessage="关注人不能为空">
                                 <p:ajax update=":AssetTagSubscribEditForm:assetTag" event="change" listener="#{tagSubscriberController.takeAssetTags()}"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.tenantUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
@@ -24,28 +23,39 @@
 
                         <h:panelGroup >
                             <label class="label">设备标签*</label>
-                            <p:selectOneMenu id="assetTag" value="#{tagSubscriberController.selected.tagId}" required="true" requiredMessage="设备标签不能为空">
+                            <p:selectOneMenu id="assetTag" disabled="#{tagSubscriberController.getCRUDActionName().equals('修改')}" value="#{tagSubscriberController.selected.tagId}" required="true" requiredMessage="设备标签不能为空">
+                                <p:ajax process="@this"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.assetTags}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        
-                        <h:panelGroup  >
-                            <label class="label">工单消息推送选项*</label>
-                            <p:selectOneMenu  value="#{tagSubscriberController.selected.receiveMsgMode}" required="true" requiredMessage="工单消息推送选项不能为空">
+
+                        <h:panelGroup rendered="#{tagSubscriberController.getCRUDActionName().equals('新增')}">
+                            <label class="label">选择类型</label>
+                            <p:selectOneMenu id="xuanzeleixing" required="true" value="#{tagSubscriberController.selectType}" requiredMessage="设备标签不能为空">
+                                <p:ajax update=":AssetTagSubscribEditForm" event="change"></p:ajax>
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItem itemLabel="维修" itemValue="1"/>
+                                <f:selectItem itemLabel="EE报警" itemValue="2"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup id="id2" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
+                            <label  class="label">工单消息推送选项*</label>
+                            <p:selectOneMenu value="#{tagSubscriberController.selected.receiveMsgMode}" required="true" requiredMessage="工单消息推送选项不能为空">
                                 <p:ajax update=":AssetTagSubscribEditForm:id1" event="change"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
                         </h:panelGroup>
 
-                        <h:panelGroup id ="id1">
-                            <p:selectBooleanCheckbox  rendered="#{tagSubscriberController.selected.receiveMsgMode!=3}" value="#{tagSubscriberController.selected.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送"/>
+                        <h:panelGroup id ="id1" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
+                            <p:selectBooleanCheckbox  value="#{tagSubscriberController.selected.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送"/>
                         </h:panelGroup>
 
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub3()}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>
+                    <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>
 
                     <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{tagSubscriberController.cancel()}" icon="ui-icon-cancel" update="TagSubscriberForm" onclick="PF('AssetTagSubscribEditDialog').hide()"/>
                 </h:panelGroup>
