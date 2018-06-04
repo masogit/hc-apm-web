@@ -72,7 +72,7 @@ public class TableCreateController extends TieWebSheetBean {
     private Collection<String> instrumentDataLabels;
     private Collection<String> templateLabels;
     private Map<String,String> mapTemplateKeyValues;
-    private DualListModel listInstrumentMppingLabels;
+    private DualListModel listInstrumentMppingLabels=new DualListModel<>();;
     private String instrumentDataLabel;
     private String templateLabel;
     private static final String SPLIT_STR=" <=> ";
@@ -108,7 +108,7 @@ public class TableCreateController extends TieWebSheetBean {
                     WebUtil.addErrorMessage("Excel模版加载失败");
                 }
             }
-            listInstrumentMppingLabels=new DualListModel<>();
+            
             if(StringUtils.isNotEmpty(selectedTableDefinition.getInstrumentKeyValues())){
             	List<String> targetList=new ArrayList<String>();
             	listInstrumentMppingLabels.setTarget(targetList);
