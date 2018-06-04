@@ -13,6 +13,7 @@ import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.utils.TimeUtils;
 import com.google.common.base.Strings;
@@ -21,7 +22,6 @@ import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.springframework.transaction.annotation.Transactional;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
@@ -49,6 +49,8 @@ public class AssetCreateController {
 
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
+    
+    private AssetInfoMgrService assetMgrService;
 
     private String[] selectedPictures;
 
@@ -74,7 +76,6 @@ public class AssetCreateController {
     private String gbCodeName;
 
     private TreeNode gbTree;
-    private AssetInfoRepository assetDao;
     private TreeNode selectedGbNode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
@@ -86,9 +87,9 @@ public class AssetCreateController {
         brandDao = WebUtil.getBean(BrandRepository.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         gbDao = WebUtil.getBean(GbCodeRepository.class);
-        assetDao = WebUtil.getBean(AssetInfoRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
+        assetMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
         createRequest = acService.getCreateRequest(qrCode,siteUid);
@@ -347,14 +348,7 @@ public class AssetCreateController {
     }
 
      public List<AssetInfo> getParentAssetList() {
-        List<SearchFilter> assetFilters = new ArrayList<>();
-         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.assetInfo.getTenantUID()));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, assetInfo.getSiteUID()));
-        if (!Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())) {
-            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, assetInfo.getClinicalDeptUID()));
-        }
-        return assetDao.findBySearchFilter(assetFilters);
+        return assetMgrService.getParentsAssetsList(assetInfo);
     }
     //getter and setter
     public QrCodeLib getCreateRequest() {
