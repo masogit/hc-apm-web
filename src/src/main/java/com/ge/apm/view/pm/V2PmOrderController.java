@@ -133,7 +133,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newReport.setBoType("pm-performance-report");
         if(tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getSafetyReport()))
             newReport.setBoType("pm-safety-report");
-        reportDao.save(newReport);
+        pmOrderService.saveReport(newReport);
     }
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
@@ -213,7 +213,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     UnstructuredData untest;
     public void hmCheckSet(String key)throws Exception{
         //临时用hmCheck1  因为hmCheck的value 是String ?
-        System.out.println(key);
         untest = (UnstructuredData) hmCheck.get(key);
     }
     private String qaStatus="0";
@@ -256,7 +255,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     }
                 }
                 unColl.setData(unD);
-                reportDao.save(unColl);
+                pmOrderService.saveReport(unColl);
             }else{ //更新已经有的检查项
                 //清空原来的unstructuredDataList
                 unDataCollection.get(0).setData(new ArrayList<UnstructuredData>());
@@ -265,7 +264,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     untest = entry.getValue();
                     unDataCollection.get(0).getData().add(untest);
                 }
-                reportDao.save(unDataCollection);
+                pmOrderService.saveReport(unDataCollection);
             }
           //  WebUtil.addSuccessMessage("保存检查项操作成功");
         }catch(Exception ex){

@@ -44,6 +44,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public AssetInfo getByUid(String uid);
 
     public AssetInfo findByUid(String uid);
+    
+    @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true")
+    public AssetInfo findByFinancingNum(String financingNum);
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
 
