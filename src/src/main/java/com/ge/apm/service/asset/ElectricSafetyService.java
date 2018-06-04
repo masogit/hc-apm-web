@@ -24,12 +24,16 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ElectricSafetyDataRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.ElectricSafetyData;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.pure.TableGroup;
+import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.view.sysutil.UserContextService;
 
 /**
@@ -405,6 +409,61 @@ public class ElectricSafetyService {
 			// TODO: handle exception
 			LOGGER.info(e.getMessage());
 		}
+	}
+	
+	public void parseTableValue(Map<String, Object> tableValue,String jsonStrInstrumentData,String schemaStr,String boUuid){
+		TableSchema table=null;
+		if(StringUtils.isNotEmpty(schemaStr)){
+			table = JSONObject.parseObject(schemaStr, TableSchema.class);
+		}
+		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& StringUtils.isNotEmpty(boUuid)){
+			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
+			if(obj!=null){
+				ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByPmOrderId(boUuid);
+				if(electricSafetyData!=null){
+					for(String key:obj.keySet()){
+//						if(tableValue.containsKey(key)){
+//							tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+//						}
+						if(table!=null){
+							List<TableGroup> listTableGroup=table.getGroups();
+							if(listTableGroup!=null && listTableGroup.size()>0){
+								for(int i=0;i<listTableGroup.size();++i){
+									List<TableItem> listTableItem=listTableGroup.get(i).getItems();
+									if(listTableItem!=null && listTableItem.size()>0){
+										for(int j=0;j<listTableItem.size();++j){
+											TableItem temp=listTableItem.get(j);
+											if(temp.getKey().equals(key)){
+												tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	private Object getInstrumentValue(String attrName, ElectricSafetyData data) {
+		Object result = null;
+		Field[] fields = ElectricSafetyData.class.getDeclaredFields();
+		for (Field field : fields) {
+			if (field.getName().equals(attrName)) {
+				boolean access = field.isAccessible();
+				field.setAccessible(true);
+				try {
+					result = field.get(data);
+					field.setAccessible(access);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					LOGGER.error(e.getMessage());
+				}
+				break;
+			}
+		}
+		return result;
 	}
 	
 	private void setCheckType(String str,ElectricSafetyData data){

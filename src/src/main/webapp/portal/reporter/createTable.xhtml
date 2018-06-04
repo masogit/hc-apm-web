@@ -129,20 +129,20 @@
                             <div class="ui-g-12 card">
                             </div>
                             <h:panelGrid columns="6" id="instrumentDataImportConfig">
+                          	  <label class="label">模板标签</label>
+	                            <p:selectOneMenu value="#{tableCreateController.templateLabel}" id="idTemplateLabel">
+		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+		                            <f:selectItems value="#{tableCreateController.templateLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+	                            </p:selectOneMenu>
                             	<label class="label">仪器数据字段</label>
 	                            <p:selectOneMenu value="#{tableCreateController.instrumentDataLabel}" id="idInstrumentLabel">
 		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
 		                            <f:selectItems value="#{tableCreateController.instrumentDataLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
 	                            </p:selectOneMenu>
-	                            <label class="label">模板标签</label>
-	                            <p:selectOneMenu value="#{tableCreateController.templateLabel}" id="idTemplateLabel">
-		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-		                            <f:selectItems value="#{tableCreateController.templateLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
-	                            </p:selectOneMenu>
 	                            <p:commandButton value="绑定键值对" update="idInstrumentDataBind" actionListener="#{tableCreateController.bindInstrumentData()}" />
                             </h:panelGrid>
                             <h:panelGrid id="idInstrumentDataBind" columns="2">
-							    <p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" rendered="#{not empty tableCreateController.listInstrumentMppingLabels}" >
+							    <p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" >
 							    	<f:facet name="sourceCaption">预绑定键值对</f:facet>
         							<f:facet name="targetCaption">绑定键值对确认</f:facet>
 							    </p:pickList>

@@ -178,7 +178,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     UnstructuredData untest;
     public void hmCheckSet(String key)throws Exception{
         //临时用hmCheck1  因为hmCheck的value 是String ?
-        System.out.println(key);
         untest = (UnstructuredData) hmCheck.get(key);
     }
     private String qaStatus="0";
