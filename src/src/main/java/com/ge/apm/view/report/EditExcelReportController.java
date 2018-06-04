@@ -9,6 +9,7 @@ import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.asset.ElectricSafetyService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.report.TieFacesService;
 import java.util.HashMap;
@@ -39,10 +40,12 @@ public class EditExcelReportController extends TieWebSheetBean {
     private HashMap<String, Object> context = new HashMap<String, Object>();
 
     private TableDefinition tableDefinition;
+    private ElectricSafetyService electricSafetyService;
 
     @Override
     public void initialLoad() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
+        electricSafetyService = WebUtil.getBean(ElectricSafetyService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         String reportId = WebUtil.getRequestParameter("reportId");
         report = tableService.getReportById(reportId);
@@ -62,6 +65,7 @@ public class EditExcelReportController extends TieWebSheetBean {
                 tableValue.put(item.getKey(), item.getValueSerialized());
             }
         });
+        electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
         StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());

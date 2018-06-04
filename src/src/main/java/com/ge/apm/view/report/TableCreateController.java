@@ -2,15 +2,17 @@ package com.ge.apm.view.report;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
-import org.apache.commons.math3.util.Pair;
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.DualListModel;
@@ -67,8 +69,8 @@ public class TableCreateController extends TieWebSheetBean {
     private V2_BlobObject uploadedFileObject;
     
     //for instrument data import
-    private Set<String> instrumentDataLabels;
-    private Set<String> templateLabels;
+    private Collection<String> instrumentDataLabels;
+    private Collection<String> templateLabels;
     private Map<String,String> mapTemplateKeyValues;
     private DualListModel listInstrumentMppingLabels;
     private String instrumentDataLabel;
@@ -97,7 +99,7 @@ public class TableCreateController extends TieWebSheetBean {
                 table = new TableSchema();
                 tableString = selectedTableDefinition.getSchema();
             }
-
+            
             if (null != selectedTableDefinition.getExcelStorageId()) {
                 try {
                     StreamedContent savedFile = blobService.getBlobObjectByStorageId(selectedTableDefinition.getExcelStorageId());
@@ -105,6 +107,21 @@ public class TableCreateController extends TieWebSheetBean {
                 } catch (Exception e) {
                     WebUtil.addErrorMessage("Excel模版加载失败");
                 }
+            }
+            listInstrumentMppingLabels=new DualListModel<>();
+            if(StringUtils.isNotEmpty(selectedTableDefinition.getInstrumentKeyValues())){
+            	List<String> targetList=new ArrayList<String>();
+            	listInstrumentMppingLabels.setTarget(targetList);
+            	getTemplateLabels();
+            	JSONObject obj=JSONObject.parseObject(selectedTableDefinition.getInstrumentKeyValues());
+            	Map<String,String> map=ElectricSafetyData.getLabelAttributeMapping();
+            	for(Map.Entry<String,String> entity:mapTemplateKeyValues.entrySet()){
+            		for(String key:obj.keySet()){
+            			if(key.equals(entity.getKey())){
+            				targetList.add(entity.getValue()+SPLIT_STR+map.get(obj.get(key)));
+            			}
+            		}
+            	}
             }
         }
 
@@ -418,9 +435,6 @@ public class TableCreateController extends TieWebSheetBean {
     	if(listInstrumentMppingLabels==null){
     		listInstrumentMppingLabels=new DualListModel();
     	}
-    	System.out.println("bind");
-    	System.out.println(this.instrumentDataLabel);
-    	System.out.println(this.templateLabel);
     	if(this.instrumentDataLabel==null || this.templateLabel==null){
     		return;
     	}
@@ -435,14 +449,13 @@ public class TableCreateController extends TieWebSheetBean {
     		listInstrumentMppingLabels.setTarget(listTarget);
     	}
     	listSource=listInstrumentMppingLabels.getSource();
-    	String temp=this.instrumentDataLabel+SPLIT_STR+this.templateLabel;
+    	String temp=this.templateLabel+SPLIT_STR+this.instrumentDataLabel;
     	if(!listSource.contains(temp)){
     		listSource.add(temp);
     	}
     }
     
     public String saveSelectedInstrumentData(){
-    	System.out.println("saveSelectedInstrumentData");
     	String result="";
     	
     	if(listInstrumentMppingLabels!=null){
@@ -453,7 +466,19 @@ public class TableCreateController extends TieWebSheetBean {
     			for(int i=0;i<targetList.size();++i){
     				strArr=targetList.get(i).split(SPLIT_STR);
     				if(strArr!=null && strArr.length==2){
-    					obj.put(ElectricSafetyData.getLabelAttributeMapping().get(strArr[0]), mapTemplateKeyValues.get(strArr[1]));
+    					String keyTemplate="";
+    					String keyInstrument="";
+    					for(Entry<String,String>entity:mapTemplateKeyValues.entrySet()){
+    						if(entity.getValue().equals(strArr[0])){
+    							keyTemplate=entity.getKey();
+    						}
+    					}
+    					for(Entry<String,String>entity:ElectricSafetyData.getLabelAttributeMapping().entrySet()){
+    						if(entity.getValue().equals(strArr[1])){
+    							keyInstrument=entity.getKey();
+    						}
+    					}
+    					obj.put(keyTemplate, keyInstrument);
     				}
     			}
     		}
@@ -546,12 +571,12 @@ public class TableCreateController extends TieWebSheetBean {
         this.uploadedFile = uploadedFile;
     }
 
-	public Set<String> getInstrumentDataLabels() {
-		instrumentDataLabels=ElectricSafetyData.getLabelAttributeMapping().keySet();
+	public Collection<String> getInstrumentDataLabels() {
+		instrumentDataLabels=ElectricSafetyData.getLabelAttributeMapping().values();
 		return instrumentDataLabels;
 	}
 
-	public void setInstrumentDataLabels(Set<String> instrumentDataLabels) {
+	public void setInstrumentDataLabels(Collection<String> instrumentDataLabels) {
 		this.instrumentDataLabels = instrumentDataLabels;
 	}
 	public String getInstrumentDataLabel() {
@@ -578,17 +603,17 @@ public class TableCreateController extends TieWebSheetBean {
 		this.listInstrumentMppingLabels = listInstrumentMppingLabels;
 	}
 
-	public Set<String> getTemplateLabels() {
+	public Collection<String> getTemplateLabels() {
 		if(templateLabels==null){
 			mapTemplateKeyValues=new HashMap<String,String>();
 			if(table!=null){
 				try {
 					for(TableGroup group: table.getGroups()){
 						for(TableItem item: group.getItems()){
-							mapTemplateKeyValues.put(item.getLabel(), item.getKey());
+							mapTemplateKeyValues.put( item.getKey(),item.getLabel());
 						}
 					}
-					templateLabels=mapTemplateKeyValues.keySet();
+					templateLabels=mapTemplateKeyValues.values();
 				} catch (Exception e) {
 					// TODO: handle exception
 					WebUtil.addErrorMessage(e, "解析模版失败");
@@ -598,11 +623,7 @@ public class TableCreateController extends TieWebSheetBean {
 		return templateLabels;
 	}
 
-	public void setTemplateLabels(Set<String> templateLabels) {
+	public void setTemplateLabels(Collection<String> templateLabels) {
 		this.templateLabels = templateLabels;
 	}
-
-
-	
-    
 }

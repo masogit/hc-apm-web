@@ -160,30 +160,6 @@ public class V2_PmOrderService {
     	reportDao.save(listReport);
     }
     
-    private void getInstrumentDataForReport(UnstructuredDataCollection report){
-    	if(report!=null){
-    		String pmOrderId=report.getBoUuid();
-    		String schemaId=report.getSchemaId();
-    		if(StringUtils.isNotEmpty(pmOrderId) && StringUtils.isNotEmpty(schemaId)){
-    			ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByPmOrderId(pmOrderId);
-    			TableDefinition tableDefinition=tableDao.findById(schemaId);
-    			if(electricSafetyData!=null && tableDefinition!=null){
-    				String instrumentJsonStr=tableDefinition.getInstrumentKeyValues();
-    				String templateJsonStr=tableDefinition.getSchema();
-    				if(StringUtils.isNotEmpty(instrumentJsonStr) && StringUtils.isNotEmpty(templateJsonStr)){
-    					JSONObject instrumentJson=JSONObject.parseObject(instrumentJsonStr);
-    					TableSchema tableSchema=JSONObject.parseObject(templateJsonStr, TableSchema.class);
-    					
-    					
-    				}
-    			}
-    		}
-    	}
-    }
-    private void getInstrumentDataForReport(List<UnstructuredDataCollection> listReport){
-    	
-    }
-    
     public void submitWorkOrder(V2_PmOrder selectedPmOrder,List<V2_WorkOrder_Detail> accessoryList,String approvaler ,String desc) {
         String token = UserContextService.getAccessToken();
         PmOrderActionForm formData = new PmOrderActionForm();
