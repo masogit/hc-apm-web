@@ -14,11 +14,10 @@ public interface AssetTagRepository extends GenericRepository<AssetTag> {
     @Query(value = "select * from asset_tag where id=-999 or tenant_uid=?1  and id not in (select tag_id from asset_tag_msg_subscriber where subscribe_user_id=?2)",nativeQuery =true)
     public List<AssetTag> getUnSubscriberTag(String tenantUID, int userId);
     
-    @Query(value = "select * from asset_tag where id=-999 or site_uid=?1  and id not in (select tag_id from asset_tag_msg_subscriber where subscribe_user_id=?2)",nativeQuery =true)
-    public List<AssetTag> getUnSubscriberTagBySiteUID(String siteUID, int userId);
+    //@Query(value = "select * from asset_tag where id=-999 or site_uid=?1",nativeQuery =true)
+    @Query(value = "select tag.* from asset_tag tag, user_account ua where ua.site_uid =tag.site_uid and ua.id=?1 union select * from asset_tag where id =-999",nativeQuery =true)
+    public List<AssetTag> getUnSubscriberTagBySiteUID(int userId);
 
-    @Query(value = "select * from asset_tag where tenant_uid=?1 or id=-999",nativeQuery =true)
-    public List<AssetTag> getTagUnderTanent(String tenantUID);
 
     @Query(value = "select * from asset_tag where site_uid=?1 or id=-999",nativeQuery =true)
     public List<AssetTag> getTagBySite(String siteUID);

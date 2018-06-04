@@ -512,15 +512,10 @@ public class WorkflowConfig implements Serializable {
     }
 
     public Integer getTimeoutDispatch() {
-    	
-    	
         return timeoutDispatch;
     }
 
     public void setTimeoutDispatch(Integer timeoutDispatch) {
-    	
-    	System.out.println("***************"+timeoutDispatch);
-    			
         this.timeoutDispatch = timeoutDispatch;
     }
 

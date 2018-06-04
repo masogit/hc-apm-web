@@ -396,15 +396,21 @@ public class V2_PmOrderService {
         pmListTmp.stream().forEach(item->{
             PmOrderActionForm formData = new PmOrderActionForm();
             formData.setPmOrderId(item.getId());
-            formData.setActionType("repair");
+            if(item.getSimplify()!=null && item.getSimplify()==true){
+                formData.setActionType("simplify");
+            }else{
+                formData.setActionType("repair");
+            }
+            formData.setQualityChecking("1");
             formData.setStepId(item.getCurrentStepId());
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
-            formData.setManHours(averageHours);
+            //小数点后保留两位小数
+            formData.setManHours(Math.round(averageHours*100.0)/100.0);
             formData.setPlanTime(item.getPlanTime().toString());
             item.setCurrentStepName("保养中");
             formDataList.add(formData);
         });
-        String res = srApi.invokePmOrderActionBatch(token,formDataList,"repair");
+        String res= srApi.invokePmOrderActionBatch(token,formDataList,"repair");
         if (res==null || !res.contains("OK")) {
             WebUtil.addErrorMessage(WebUtil.getMessage("OperationFail"),"批量完成");
         }else{
@@ -433,7 +439,7 @@ public class V2_PmOrderService {
         formData.setActionType("tempRepair");
         formData.setStepId(selectedPmOrder.getCurrentStepId());
         if(endTime !=null)
-            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd").format(endTime));
+            formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         if(planTime !=null)
             formData.setPlanTime(new SimpleDateFormat("yyyy-MM-dd").format(planTime));
         formData.setManHours(selectedPmOrder.getManHours());

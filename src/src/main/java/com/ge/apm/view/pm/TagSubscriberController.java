@@ -27,7 +27,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	private AssetTagMsgSubscriberRepository dao = null;
 	private AssetTagRepository assetTagRepository;
-	private I18nMessageRepository i18nMessageRepository;
+	private I18nMessageRepository i18Dao;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
 	private List<UserAccount> tenantUserList;
@@ -47,15 +47,174 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 			 return false;
 	}*/
 	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
-	/*public void takeAssetTags(){
-		assetTags =  assetTagRepository.getUnSubscriberTag(currentUser.getTenantUID(), this.selected.getSubscribeUserId());
-	}*/
+	public void checkSelectedEmpty(){
+		if(selected==null){
+			WebUtil.addErrorMessage("设备消息订阅没有被选中");
+		}
+	}
 // 关注人tentant下的tag
 	public void takeAssetTags(){
 		//获得的是:和标签绑定的用户的院区下的所有标签
 		assetTags =  assetTagRepository.getTagBySite(userAccountRepository.getById(this.selected.getSubscribeUserId()).getSiteUID());
 
 	}
+	public void test(){
+		System.out.println(selected.getReceiveMsgMode());
+	}
+
+
+	public void cancel(){
+		selected=null;
+	}
+
+
+	public void saveTagSub3(){
+		List<AssetTagMsgSubscriber> modeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
+		if(this.getCRUDActionName().equals("新增")) {
+			if (modeBasic.isEmpty()) {
+				super.save();
+				return;
+			} else {
+				if (modeBasic.size() == 1) {
+					AssetTagMsgSubscriber dy = modeBasic.get(0);
+					if (dy.getReceiveMsgMode() != 3) {
+						if (selected.getReceiveMsgMode() == 3) {
+							super.save();
+						} else {
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						}
+
+					} else {
+						if (selected.getReceiveMsgMode() != 3) {
+							super.save();
+						} else {
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						}
+					}
+				}else{//已经有两条不同组合的 不能再创建了
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+				}
+			}
+		}else{//修改
+			if (modeBasic.isEmpty()) {
+				super.save();
+				return;
+			}
+			if(modeBasic.size() == 1){
+				AssetTagMsgSubscriber dy = modeBasic.get(0);
+				if(currentAtms.getTagId().intValue()!=selected.getTagId().intValue()){
+					if(dy.getReceiveMsgMode().intValue()==3){
+						if(selected.getReceiveMsgMode().intValue()!=3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+
+					}else{
+						if(selected.getReceiveMsgMode().intValue()==3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+					}
+
+				}
+				if(currentAtms.getSubscribeUserId().intValue()!=selected.getSubscribeUserId().intValue()){
+					if(dy.getReceiveMsgMode().intValue()==3){
+						if(selected.getReceiveMsgMode().intValue()!=3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+
+					}else{
+						if(selected.getReceiveMsgMode().intValue()==3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+					}
+
+				}
+				if(dy.getTagId().intValue()==selected.getTagId().intValue()){//如果不是改动设备标签 而是改动 选项 则随便改
+					  if(currentAtms.getTagId().intValue()!=selected.getTagId().intValue()){
+
+					  }
+					  super.save();
+						return;
+				  }else{
+					  if (dy.getReceiveMsgMode() != 3){
+						  if (selected.getReceiveMsgMode() == 3) {
+							  super.save();
+						  } else {
+							  WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						  }
+					  }else{
+						  if (selected.getReceiveMsgMode() != 3){
+						  	super.save();
+						  	return;
+						  }else{
+							  WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						  }
+					  }
+				  }
+			}else {//如果有两条数据存在
+				if(selected.getSubscriberUser().getId().intValue()!=selected.getSubscribeUserId().intValue()){
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					return;
+				}
+				/*
+				*从表中获取当前要改的数据的 选项
+				*如果改动的是ee报警的那条数据 那 就无法改动 refuse,
+				* 如果改动的是3and1的 ,那么direct 不为3 就可以save 否则 refuse
+				*
+				* */
+				//
+				AssetTagMsgSubscriber atmtmp=null;
+				if(tagUserModeBasic.size()>1){
+					if(currentAtms.getReceiveMsgMode()==3){
+						WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+						return;
+					}else{
+						if(selected.getReceiveMsgMode()!=3){
+							super.save();
+							return;
+						}else{
+							WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+							return;
+						}
+					}
+				}
+				if (selected.getReceiveMsgMode() != 3) {
+					super.save();
+				} else {
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+				}
+			}
+		}
+	}
+
+	public AssetTagMsgSubscriber getATMS(Integer id1,List<AssetTagMsgSubscriber> alist){
+		for(int i=0; i<alist.size();i++){
+			if(alist.get(i).getId().equals(id1))
+				return alist.get(i);
+		}
+		return null;
+	}
+
+	List<I18nMessage> fousOptionWithOutEE;
+	List<Integer> modeList;
+
+
+
 	@Override
 	protected void init() {
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
@@ -63,7 +222,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
 		assetTagRepository =WebUtil.getBean(AssetTagRepository.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-		i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
+		i18Dao = WebUtil.getBean(I18nMessageRepository.class);
 		FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
 		msgModeList = fieldMsg.getFieldValueList("focusOption");
 		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
@@ -74,6 +233,10 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		for (I18nMessage local1 : msgModeList) {
 			hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
 		}
+
+		fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
+		modeList =new ArrayList<Integer>();
+		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
 
 	}
 	public String getTagName(Integer tagId){
@@ -131,16 +294,25 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
-		System.out.println(this.selected);
 		this.selected.setReceiveMsgMode(null);
-		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(currentUser.getSiteUID(), this.selected.getSubscribeUserId());
+		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 	}
 
+	List<AssetTagMsgSubscriber> tagUserMode3and1;
+	List<AssetTagMsgSubscriber> tagUserModeEE;
+	List<AssetTagMsgSubscriber> tagUserModeBasic;
+	AssetTagMsgSubscriber currentAtms;
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-		assetTags= assetTagRepository.getTagBySite(currentUser.getSiteUID());
+
+		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
+		currentAtms=dao.findById(selected.getId());
+		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 		//assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), this.selected.getSubscribeUserId());
+
+
+
 	}
 
 	@Override
