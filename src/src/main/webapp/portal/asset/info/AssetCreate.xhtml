@@ -24,7 +24,7 @@
                 <h:form id="AssetInfoEditForm">
                     <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="basicItem" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="fieldItem" >
                                 <ui:include src="customEditFields.xhtml"/>
                             </c:forEach>
                         </p:panelGrid>
@@ -32,35 +32,35 @@
 
                     <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="basicItem" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="fieldItem" >
                                 <ui:include src="customEditFields.xhtml"/>
                             </c:forEach>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageStatusFields}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="basicItem" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="fieldItem" >
                                 <ui:include src="customEditFields.xhtml"/>
                             </c:forEach>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
                             <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                                <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="basicItem" >
+                                <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="fieldItem" >
                                     <ui:include src="customEditFields.xhtml"/>
                                 </c:forEach>
                             </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="basicItem" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="fieldItem" >
                                     <ui:include src="customEditFields.xhtml"/>
                                 </c:forEach>
                         </p:panelGrid>
                     </p:fieldset>
                     <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageFinicialFields}">
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="basicItem" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="fieldItem" >
                                     <ui:include src="customEditFields.xhtml"/>
                                 </c:forEach>
                             
