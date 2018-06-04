@@ -4,11 +4,13 @@
 	<ui:define name="content">
 		<h:outputScript name="js/captureDataMessage.js"></h:outputScript>
 		<ui:include src="captureDataMessageEdit.xhtml" />
+		<ui:include src="geIBDataEdit.xhtml" />
 		<div class="ui-g">
 			<div class="ui-g-12 card cardTitle">
 				<p:outputLabel class="pageTitle" value="小屏消息配置" />
 			</div>
 			<div class="ui-g-12 card ">
+				<p:commandButton id="idGEIBDataEditButton" value="GE IB 配置" actionListener="#{captureDataMessagesController.prepareGEIBData}" update=":geIBDataEditDlg" oncomplete="PF('geIBDataEditDialog').show()" />
 				<h:form id="captureDataMessagesListForm">
 					<p:growl id="growl" showDetail="true" />
 					<p:growl id="captureDataMessageGrowl" showDetail="true" autoUpdate="true" for="other"/>

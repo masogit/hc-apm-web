@@ -47,7 +47,7 @@ public class TableDefinition implements Serializable {
     @Column(name = "name")
     private String name;
 
-    //jason 值
+    //json 值
     @Column(name = "schema")
     @Type(type = "text")
     private String schema;

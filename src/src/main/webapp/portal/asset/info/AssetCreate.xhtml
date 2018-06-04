@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:define name="content">
+        <style>
+            div.ui-panelgrid-cell>label+div.ui-selectonemenu {
+                min-width: 75px !important;
+                max-width: 90%;
+            }
+        </style>
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{assetInfoEditController.CRUDActionName} #{assetInfoEditController.terminate? msg.TerminateAssetInfo :msg.AssetInfo}"/>
+            </div>
+
+            <div class="ui-g-12 card">
+
+                <!--<p:separator/>-->
+                <h:form id="AssetInfoEditForm">
+                    <p:fieldset legend="#{msg.BasicInfo}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageBasicFields}" >
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageBasicFields}" var="basicItem" >
+                                <ui:include src="customEditFields.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCodesFields}" >
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCodesFields}" var="basicItem" >
+                                <ui:include src="customEditFields.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageStatusFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageStatusFields}" var="basicItem" >
+                                <ui:include src="customEditFields.xhtml"/>
+                            </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset legend="#{msg.assetCategory}" style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageCatalogFields}">
+                            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageCatalogFields}" var="basicItem" >
+                                    <ui:include src="customEditFields.xhtml"/>
+                                </c:forEach>
+                            </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageDateFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageDateFields}" var="basicItem" >
+                                    <ui:include src="customEditFields.xhtml"/>
+                                </c:forEach>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <p:fieldset  style="margin-bottom:20px" rendered="#{not empty assetInfoEditController.customConfig.assetsEditpageFinicialFields}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <c:forEach items="#{assetInfoEditController.customConfig.assetsEditpageFinicialFields}" var="basicItem" >
+                                    <ui:include src="customEditFields.xhtml"/>
+                                </c:forEach>
+                            
+                        </p:panelGrid>
+                    </p:fieldset>
+
+                    <p:fieldset legend="#{msg.Attachment}" style="margin-bottom:20px">
+                        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup >
+                                <p:dataList id="pictureList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,1)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 1)}</f:facet>
+
+                                    #{fileitem.objectName}
+                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="pictureList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="type1" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <p:dataList id="contractList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,2)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 2)}</f:facet>
+                                        #{fileitem.objectName}
+                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="contractList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="type2" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="contractList" auto="true" invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                            <h:panelGroup >
+                                <p:dataList id="manualList" value="#{assetInfoEditController.getAttachList(assetInfoEditController.selected.uid,3)}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                    <f:facet name="header">#{fieldMsg.fieldValue('attachmentType', 3)}</f:facet>
+                                    #{fileitem.objectName},
+                                    <p:commandButton actionListener="#{assetInfoEditController.removeAttachmentById(fileitem.id)}" update="manualList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandButton>
+                                </p:dataList>
+                                <p:fileUpload id="type3" fileUploadListener="#{assetInfoEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%"
+                                              multiple="true"  sizeLimit="100000000"  update="manualList" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}100M" label="#{msg.Add}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+                    <h:panelGroup id="buttonGroup">
+                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" action="#{assetInfoEditController.applyChange()}" validateClient="true" update=":growl" style="float:left" rendered="#{!(assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3))}"/>
+                        <p:commandButton value="提交审核" icon="ui-icon-check" action="#{assetInfoEditController.submitApproval()}" validateClient="true" update=":growl" style="float:left" rendered="#{assetInfoEditController.needAssetApproval(assetInfoEditController.selected.siteUID) and (assetInfoEditController.CRUDActionName eq msg.Create or assetInfoEditController.selected.usageStatus ne 3)}"/>
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="#{assetInfoEditController.getListPageLink()}" immediate="true"  update=":growl" style="float:left"/>
+                        <p:commandButton id="setIsValid" value="#{assetInfoEditController.terminate? msg.ActiveAsset :msg.InactiveAsset}" action="#{assetInfoEditController.setValidButton}" immediate="true"  update=":growl" style="float:right;"/>
+                    </h:panelGroup>
+                </h:form>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>

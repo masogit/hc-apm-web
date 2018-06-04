@@ -33,5 +33,7 @@ public interface V2_PmOrderRepository extends GenericRepositoryUUID<V2_PmOrder> 
 	@Query(value = "select id from v2_pm_order where asset_uid= ?1 and is_finished='false' order by created_date desc limit 1",nativeQuery = true)
 	public String findByAssetUid(String asset_uid);
 
+@Query(value="select pm.* from v2_pm_order pm where id in ?1 and pm.simplify =true",nativeQuery = true)
+	public  List<V2_PmOrder> checkSimplify(List<String> idList);
 
 }

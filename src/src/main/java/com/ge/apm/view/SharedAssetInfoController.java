@@ -122,8 +122,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
             this.updateSearchFilter(new SearchFilter("name", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
             this.updateSearchFilter(new SearchFilter("departNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("financingNum", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
-            this.updateSearchFilter(new SearchFilter("qrCode", SearchFilter.Operator.LIKE, oneSearchStr, "1*3+"));
 
             this.selectedMap.clear();
         }
@@ -152,8 +150,6 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
         if (oneSearchStr.isEmpty()) {
             this.removeFilterOnField("name");
             this.removeFilterOnField("departNum");
-            this.removeFilterOnField("financingNum");
-            this.removeFilterOnField("qrCode");
         }
     }
 
@@ -193,10 +189,8 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
 
         List<String> assetUids = selectedMap.entrySet().stream().filter(item -> item.getValue()).map(item -> item.getKey()).collect(Collectors.toList());
 
-        UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgIds = dao.getOrgId(user.getSiteUID());
-        if (orgIds.size() > 0){
-            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,orgIds.get(0));
+        if (deptids.size() > 0 && batchSharedAssetTypeUid != null){
+            dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,deptids.get(0));
         }else{
             dao.batchUpdateAssetInfoSwapType(batchSharedAssetTypeUid,assetUids,null);
         }
@@ -213,10 +207,12 @@ public class SharedAssetInfoController extends JpaCRUDController<AssetInfo> {
     @Override
     public void onBeforeUpdateObject(AssetInfo object) {
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgIds = dao.getOrgId(user.getSiteUID());
-        if (orgIds.size() > 0) {
+        if (deptids.size() > 0) {
 //            selected.setClinicalDeptUID(orgIds.get(0));
-            selected.setAssetDeptUID(orgIds.get(0));
+            selected.setAssetDeptUID(deptids.get(0));
+        }
+        if (selected.getSharedAssetTypeUid() == null){
+            selected.setAssetDeptUID(null);
         }
     }
 

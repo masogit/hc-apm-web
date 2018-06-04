@@ -18,6 +18,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import org.hibernate.annotations.GenericGenerator;
@@ -146,6 +147,9 @@ public class ArrivalList implements Serializable{
     @JoinColumn(name = "creator_uid", referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private UserAccount creator;
+    
+    @Transient
+    private boolean cannotDeleted;
     
     public String getId() {
         return id;
@@ -354,8 +358,16 @@ public class ArrivalList implements Serializable{
     public void setCreator(UserAccount creator) {
         this.creator = creator;
     }
-    
-    @Override
+
+	public boolean isCannotDeleted() {
+		return cannotDeleted;
+	}
+
+	public void setCannotDeleted(boolean cannotDeleted) {
+		this.cannotDeleted = cannotDeleted;
+	}
+
+	@Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);

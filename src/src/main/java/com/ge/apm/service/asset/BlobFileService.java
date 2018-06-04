@@ -96,9 +96,15 @@ public class BlobFileService {
         return blobDao.findAllByObjectStorageId(storagedId);
     }
 
-    
+    public List<V2_BlobObject> findBlobObjectsByBoUid(String uid){
+        return blobDao.findByBoUuid(uid);
+    }
+
     public Boolean deleteBlobFileById(String id){
         V2_BlobObject blobObject = blobDao.findById(id);
+        if(blobObject==null){
+            return null;
+        }
         List<V2_BlobObject> blobList = getBlobObjectsByStorageId(blobObject.getObjectStorageId());
         if(blobList!=null && blobList.size()==1){
             return deleteBlobFile(blobObject);

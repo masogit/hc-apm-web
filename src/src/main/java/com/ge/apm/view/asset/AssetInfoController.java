@@ -96,6 +96,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<OrgInfo> ownerOrgList;
 
     private List<V2_BlobObject> attachements;
+    
+    private AutoCompleteService autoCompleteService;
 
     private BlobFileService blobService;
 
@@ -256,7 +258,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         exWoDao = WebUtil.getBean(ExWorkOrderRepository.class);
         configService = WebUtil.getBean(ConfigService.class);
-
+        autoCompleteService=WebUtil.getBean(AutoCompleteService.class);
         importService = WebUtil.getBean(AssetFileImportService.class);
         assetInfoService = WebUtil.getBean(AssetInfoService.class);
         supplierController = WebUtil.getBean(SupplierController.class);
@@ -861,6 +863,14 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setClinicalOwnerTel(null);
         }
     }
+    
+    public List<Supplier> autoCompleteSupplier(String query) {
+        return autoCompleteService.autoCompleteVendor(query, supplierList);
+    }
+
+    public List<Supplier> autoCompleteMaintainer(String query) {
+        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
+    }
 
     public void onSupplierChange() {
 
@@ -868,12 +878,20 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             selected.setSupplierId(supplier.getId());
             selected.setVendor(supplier.getName());
         }
+        else{
+        	selected.setSupplierId(null);
+            selected.setVendor(null);
+        }
     }
 
     public void onMaintainerChange() {
         if (null != maintainer) {
             selected.setMaitananceId(maintainer.getId()+"");
             selected.setMaitanance(maintainer.getName());
+        }
+        else{
+        	selected.setMaitananceId(null);
+            selected.setMaitanance(null);
         }
     }
 
@@ -938,13 +956,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<UserAccount> completeOwnerList(String query) {
-
-        if (ownerList == null) return Collections.emptyList();
-
-        List<UserAccount> res = this.ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return autoCompleteService.completeOwnerList(query, ownerList);
     }
 
     public List<UserAccount> completeClinicalOwnerList(String query) {
@@ -969,8 +981,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
     private List<UserAccount> clinicalOwnerList;
 
     public void getClinicalOwnerList() {
-        if (null != selected.getClinicalDeptId()) {
-            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptId());
+        if (null != selected.getClinicalDeptUID()) {
+            clinicalOwnerList = userDao.findUsersByOrgIdExceptTemporaryAccount(selected.getClinicalDeptUID());
         }
     }
 
@@ -1955,22 +1967,6 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         if (clinicalDeptList == null) return Collections.emptyList();
 
         List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
-    }
-
-    public List<Supplier> autoCompleteSupplier(String query) {
-
-        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("1","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
-    }
-
-    public List<Supplier> autoCompleteMaintainer(String query) {
-
-        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("2","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;

@@ -76,9 +76,6 @@ public class QrCodeService {
     ConfigService configService;
 
     @Autowired
-    private ArrivalListItemRepository itemDao;
-    
-    @Autowired
     private OrgInfoRepository orgDao;
 
     public QrCodeLib createOneQrCode(String tenantUID, String siteUID, Integer status) {
@@ -195,7 +192,14 @@ public class QrCodeService {
     private BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, QrCodeTemplate template,String siteUid) {
         List<QrCodeTemplateElement> elementList;
         if (template == null) {
-            template = templateService.getDefaultTemplate();
+        	if(StringUtils.isEmpty(qrCode)){
+        		qrCode=asset.getQrCode();
+        	}
+        	if(StringUtils.isEmpty(qrCode)){
+        		return null;
+        	}
+            QrCodeLib qrCodeLib= this.findByQrCode(qrCode, siteUid);
+            template = templateService.getDefaultTemplateByQrCodeLib(qrCodeLib);
             elementList = templateService.getDefaultTemplateElements();
         } else {
             elementList = templateService.getElementsByTemplate(template.getId());
@@ -549,7 +553,7 @@ public class QrCodeService {
 
     public boolean updateExistingQrCodeNotUsed(String qrCode, OrgInfo currentOrg) {
 
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
+        QrCodeLib qrCodeLib = findByQrCode(qrCode,currentOrg.getUid());
 
         if (qrCodeLib == null) {
             return false;
@@ -565,7 +569,7 @@ public class QrCodeService {
     }
 
     public void releaseQrCodeInUse(String qrCode, String siteUid) {
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
+        QrCodeLib qrCodeLib = findByQrCode(qrCode,siteUid);
         if (qrCodeLib != null) {
             int status = qrCodeLib.getStatus();
             if (status == 3) {
@@ -574,5 +578,9 @@ public class QrCodeService {
             }
 
         }
+    }
+    
+    public QrCodeLib findByQrCode(String qrCode, String siteUid){
+        return qrCodeLibDao.findByQrCode(qrCode,siteUid);
     }
 }

@@ -1,0 +1,606 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'serialNum')}">
+        <h:panelGroup>
+            <label class="label">#{msg.serialNum}#{assetInfoEditController.customConfig.assetFields['serialNum'].required? '*':''}</label>
+            <p:inputText id="serialNum" value="#{assetInfoEditController.selected.serialNum}" required="#{assetInfoEditController.customConfig.assetFields['serialNum'].required}" 
+                         requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('serialNum')}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'name')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.name}*</label>
+            <p:autoComplete id="name" value="#{assetInfoEditController.selected.name}" readonly="#{!assetInfoEditController.needEdit('name')}" 
+                            completeMethod="#{assetInfoEditController.completeAssetName}" required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'aliasName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.aliasName}#{assetInfoEditController.customConfig.assetFields['aliasName'].required? '*':''}</label>
+            <p:inputText id="aliasName" value="#{assetInfoEditController.selected.aliasName}" required="#{assetInfoEditController.customConfig.assetFields['aliasName'].required}" 
+                         requiredMessage="#{msg.aliasName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('aliasName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetGroup')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetGroup}*</label>
+            <p:selectOneMenu id="assetGroup" value="#{assetInfoEditController.selected.assetGroup}" required="true" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetGroup')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetOwnerName')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName}#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required? '*':''}</label>
+            <p:autoComplete id="assetOwnerName" value="#{assetInfoEditController.selectedObjectMap['assetOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName')}" 
+                            forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName'].required}" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('assetOwner')}" process="@this" update="@(.assetOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetOwnerTel')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel}#{assetInfoEditController.customConfig.assetFields['assetOwnerTel'].required? '*':''}</label>
+            <p:inputText id="assetOwnerTel" value="#{assetInfoEditController.selected.assetOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerTel'].required}" 
+                         requiredMessage="#{msg.assetOwnerTel} #{msg.ValidationRequire}" readonly="true" class="assetOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetOwnerName2')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName2}#{assetInfoEditController.customConfig.assetFields['assetOwnerName2'].required? '*':''}</label>
+            <p:autoComplete id="assetOwnerName2" value="#{assetInfoEditController.selectedObjectMap['assetOwner2']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName2')}" 
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName2'].required}" requiredMessage="#{msg.assetOwnerName2} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('assetOwner2')}" process="@this" update="@(.assetOwnerName2Change)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetOwnerTel2')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel2}#{assetInfoEditController.customConfig.assetFields['assetOwnerTel2'].required? '*':''}</label>
+            <p:inputText id="assetOwnerTel2" value="#{assetInfoEditController.selected.assetOwnerTel2}" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerTel2'].required}" 
+                         requiredMessage="#{msg.assetOwnerTel2} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName2Change"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetOwnerName3')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName3}#{assetInfoEditController.customConfig.assetFields['assetOwnerName3'].required? '*':''}</label>
+            <p:autoComplete id="assetOwnerName3" value="#{assetInfoEditController.selectedObjectMap['assetOwner3']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('assetOwnerName3')}" 
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerName3'].required}" requiredMessage="#{msg.assetOwnerName3} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeOwnerList}">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('assetOwner3')}" process="@this" update="@(.assetOwnerName3Change)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetOwnerTel3')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel3}#{assetInfoEditController.customConfig.assetFields['assetOwnerTel3'].required? '*':''}</label>
+            <p:inputText id="assetOwnerTel3" value="#{assetInfoEditController.selected.assetOwnerTel3}" required="#{assetInfoEditController.customConfig.assetFields['assetOwnerTel3'].required}" 
+                         requiredMessage="#{msg.assetOwnerTel3} #{msg.ValidationRequire}" readonly="true" class="assetOwnerName3Change"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'siteUID')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.hospitalId}*</label>
+            <p:inputText id="selectedUserOrgName" value="#{assetInfoEditController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
+            <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty assetInfoEditController.selected.id}"/>
+            <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.orgTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" update="@(.SiteUIDChange) :AssetInfoEditForm:buttonGroup "
+                                listener="#{assetInfoEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+
+                        <p:treeNode type="org">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'clinicalDeptName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalDeptName}#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required? '*':''}</label>
+            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['clinicalDept']}"  readonly="#{!assetInfoEditController.needEdit('clinicalDeptName')}" 
+                            scrollHeight="300"  forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['clinicalDeptName'].required}" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteDept}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onClinicalDeptChange}" update="@(.clinicalDeptNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onClinicalDeptChange}" update="@(.clinicalDeptNameChange)" />
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'clinicalOwnerName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalOwnerName}#{assetInfoEditController.customConfig.assetFields['clinicalOwnerName'].required? '*':''}</label>
+
+            <p:autoComplete id="clinicalOwnerName" value="#{assetInfoEditController.selectedObjectMap['clinicalOwner']}" converter="userAccountConverter" dropdown="true" readonly="#{!assetInfoEditController.needEdit('clinicalOwnerName')}" 
+                            forceSelection="true" var="t" required="#{assetInfoEditController.customConfig.assetFields['clinicalOwnerName'].required}" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}"
+                            itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoEditController.completeClinicalOwnerList}" class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
+                <p:ajax listener="#{assetInfoEditController.onOwnerChange('clinicalOwner')}" process="@this" update="@(.clinicalOwnerNameChange)" />
+                <p:column>
+                    <h:outputText value="#{t.name}"/>
+                </p:column>
+                <p:column>
+                    <h:outputText value="#{t.telephone}"/>
+                </p:column>
+            </p:autoComplete>
+
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'clinicalOwnerTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.clinicalOwnerTel}#{assetInfoEditController.customConfig.assetFields['clinicalOwnerTel'].required? '*':''}</label>
+            <p:inputText id="clinicalOwnerTel" value="#{assetInfoEditController.selected.clinicalOwnerTel}" required="#{assetInfoEditController.customConfig.assetFields['clinicalOwnerTel'].required}" 
+                         requiredMessage="#{msg.clinicalOwnerTel} #{msg.ValidationRequire}" readonly="true" class="SiteUIDChange clinicalDeptNameChange clinicalOwnerNameChange"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'manufacture')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufacture}#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</label>
+            <p:autoComplete id="manufacture" value="#{assetInfoEditController.selected.manufacture}" required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}" 
+                         requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufacture')}" 
+                            completeMethod="#{assetInfoEditController.completeManufacture}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'makerShortName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.makerShortName}#{assetInfoEditController.customConfig.assetFields['makerShortName'].required? '*':''}</label>
+            <p:inputText id="makerShortName" value="#{assetInfoEditController.selected.makerShortName}" required="#{assetInfoEditController.customConfig.assetFields['makerShortName'].required}"  
+                         requiredMessage="#{msg.makerShortName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('makerShortName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'vendor')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.vendor}#{assetInfoEditController.customConfig.assetFields['vendor'].required? '*':''}</label>
+
+            <p:autoComplete id="vendor2" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}" 
+                            forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" 
+                            completeMethod="#{assetInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'maitanance')}" >
+        <h:panelGroup>
+            <label class="label">维修商#{assetInfoEditController.customConfig.assetFields['maitanance'].required? '*':''}</label>
+            <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('maitanance')}" 
+                            forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
+                            var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
+            </p:autoComplete>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'maitananceTel')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.maitananceTel}#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required? '*':''}</label>
+            <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" required="#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required}" 
+                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('maitananceTel')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'nationalStandardCode')}" >
+        <h:panelGroup>
+            <label class="label">设备国标码#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required? '*':''}</label>
+            <p:autoComplete id="gbname" value="#{assetInfoEditController.gbCodeName}" completeMethod="#{assetInfoEditController.completeGbName}" required="#{assetInfoEditController.customConfig.assetFields['nationalStandardCode'].required}" 
+                         requiredMessage="#{msg.nationalStandardCode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('nationalStandardCode')}" class="financingNumChange">
+                <p:ajax process="@this" update="" listener="#{assetInfoEditController.updateFinancingNumByNationalStandardCode()}"/>
+            </p:autoComplete>
+            <p:commandButton id="btnOrg1" class="btn btn-sm popupIconButton"  process="@this" icon="ui-icon-arrow-drop-down" />
+            <p:overlayPanel id="popupPanel1" widgetVar="varPanelOrg1" for="btnOrg1" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                    <p:tree id="gbTree" class="tree" style="width:98%;border:0;" value="#{assetInfoEditController.gbTree}" var="node" selectionMode="single">
+                        <p:ajax process="@this" event="select" listener="#{assetInfoEditController.onSelectGbTreeNode}" update=":AssetInfoEditForm:gbname" oncomplete="PF('varPanelOrg1').hide();"/>
+
+                        <p:ajax process="@this" event="expand"/>
+                        <p:ajax process="@this" event="collapse"/>
+
+                        <p:treeNode type="gb">
+                            <h:outputText value="#{node}"/>
+                        </p:treeNode>
+                    </p:tree>
+                </p:scrollPanel>
+            </p:overlayPanel>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'parentAssetId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.parentAsset}#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required? '*':''}</label>
+            <p:selectOneMenu id="parentAssetList" value="#{assetInfoEditController.selected.parentAssetId}" required="#{assetInfoEditController.customConfig.assetFields['parentAssetId'].required}" disabled="#{!assetInfoEditController.needEdit('parentAssetId')}" 
+                             requiredMessage="#{msg.parentAsset} #{msg.ValidationRequire}" class="SiteUIDChange clinicalDeptNameChange">
+                <p:ajax process="@this" />
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{assetInfoEditController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'deviceName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.deviceName}#{assetInfoEditController.customConfig.assetFields['deviceName'].required? '*':''}</label>
+            <p:inputText id="deviceName" value="#{assetInfoEditController.selected.deviceName}" required="#{assetInfoEditController.customConfig.assetFields['deviceName'].required}" 
+                         requiredMessage="#{msg.deviceName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('deviceName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'systemId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.systemId}#{assetInfoEditController.customConfig.assetFields['systemId'].required? '*':''}</label>
+            <p:inputText id="systemId" value="#{assetInfoEditController.selected.systemId}" required="#{assetInfoEditController.customConfig.assetFields['systemId'].required}" 
+                         requiredMessage="#{msg.systemId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('systemId')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'financingNum')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.financingNum}#{assetInfoEditController.customConfig.assetFields['financingNum'].required? '*':''}</label>
+            <p:inputText value="#{assetInfoEditController.selected.financingNum}" class="financingNumChange" required="#{assetInfoEditController.customConfig.assetFields['financingNum'].required}" 
+                         requiredMessage="#{msg.financingNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('financingNum')}" >
+                <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
+                <p:ajax listener="#{assetInfoEditController.onDepartNumChange('financingNum')}" update="@(.financingNumChange)" />
+            </p:inputText>
+            <p:commandButton id="generateFinancingNum" actionListener="#{assetInfoEditController.generateFinancialNum()}"  disabled="#{assetInfoEditController.selected.financingNum.length() gt 4}"
+                             process="@(.financingNumChange) " update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'departNum')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.departNum}#{assetInfoEditController.customConfig.assetFields['departNum'].required? '*':''}</label>
+            <p:inputText id="departNum" value="#{assetInfoEditController.selected.departNum}" required="#{assetInfoEditController.customConfig.assetFields['departNum'].required}" 
+                         requiredMessage="#{msg.departNum} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('departNum')}" class="financingNumChange">
+                <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('departNum')}" update="@(.financingNumChange)"/>
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'barcode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.barcode}#{assetInfoEditController.customConfig.assetFields['barcode'].required? '*':''}</label>
+            <p:inputText id="barcode" value="#{assetInfoEditController.selected.barcode}" required="#{assetInfoEditController.customConfig.assetFields['barcode'].required}" 
+                         requiredMessage="#{msg.barcode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('barcode')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'registrationNo')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.registrationNo}#{assetInfoEditController.customConfig.assetFields['registrationNo'].required? '*':''}</label>
+            <p:inputText id="registrationNo" value="#{assetInfoEditController.selected.registrationNo}" required="#{assetInfoEditController.customConfig.assetFields['registrationNo'].required}" 
+                         requiredMessage="#{msg.registrationNo} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('registrationNo')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'modalityId')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.modalityId}#{assetInfoEditController.customConfig.assetFields['modalityId'].required? '*':''}</label>
+            <p:inputText id="modalityId" value="#{assetInfoEditController.selected.modalityId}" required="#{assetInfoEditController.customConfig.assetFields['modalityId'].required}" 
+                         requiredMessage="#{msg.modalityId} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('modalityId')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'qrCode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.qrCode}#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</label>
+            <p:inputText id="qrCode" value="#{assetInfoEditController.qrCode}" required="#{assetInfoEditController.customConfig.assetFields['qrCode'].required}" class="SiteUIDChange financingNumChange"
+                         requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}" readonly="#{not empty assetInfoEditController.selected.qrCode or !assetInfoEditController.needEdit('qrCode')}">
+                <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('qrCode')}" update="@(.financingNumChange)"/>
+            </p:inputText>
+            <p:commandButton id="qrCodeButton" actionListener="#{assetInfoEditController.renewQrcode()}" update="@(.financingNumChange)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNumChange" process="@this" disabled="#{not empty assetInfoEditController.qrCode}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'functionType')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.functionType}#{assetInfoEditController.customConfig.assetFields['functionType'].required? '*':''}</label>
+            <p:inputText id="functionType" value="#{assetInfoEditController.selected.functionType}" required="#{assetInfoEditController.customConfig.assetFields['functionType'].required}" 
+                         requiredMessage="#{msg.functionType} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('functionType')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'functionGroup')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.functionGroup}#{assetInfoEditController.customConfig.assetFields['functionGroup'].required? '*':''}</label>
+            <p:selectOneMenu id="functionGroup" value="#{assetInfoEditController.selected.functionGroup}" style="width: 100%" required="#{assetInfoEditController.customConfig.assetFields['functionGroup'].required}" 
+                         requiredMessage="#{msg.functionGroup} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('functionGroup')}" >
+                <p:ajax  listener="#{assetInfoEditController.onFunctionGroupChange()}" update="@(.functionGroupChange)" />
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetCode68')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.assetCode68}#{assetInfoEditController.customConfig.assetFields['assetCode68'].required? '*':''}</label>
+            <p:selectOneMenu id="assetCode68" value="#{assetInfoEditController.selected.assetCode68}" style="width: 100%" required="#{assetInfoEditController.customConfig.assetFields['assetCode68'].required}" 
+                         requiredMessage="#{msg.assetCode68} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetCode68')}" class="functionGroupChange">
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{assetInfoEditController.code68List}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'functionGrade')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.functionGrade}#{assetInfoEditController.customConfig.assetFields['functionGrade'].required? '*':''}</label>
+            <p:selectOneMenu id="functionGrade" value="#{assetInfoEditController.selected.functionGrade}" required="#{assetInfoEditController.customConfig.assetFields['functionGrade'].required}" 
+                         requiredMessage="#{msg.functionGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('functionGrade')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetFunctionGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'repairForm')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.repairForm}#{assetInfoEditController.customConfig.assetFields['repairForm'].required? '*':''}</label>
+            <p:selectOneMenu id="repairForm" value="#{assetInfoEditController.selected.repairForm}" required="#{assetInfoEditController.customConfig.assetFields['repairForm'].required}" 
+                         requiredMessage="#{msg.repairForm} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('repairForm')}" >
+                <f:selectItems value="#{fieldMsg.getFieldValueList('repairForm')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'locationCode')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.locationCode}#{assetInfoEditController.customConfig.assetFields['locationCode'].required? '*':''}</label>
+            <p:inputText id="locationCode" value="#{assetInfoEditController.selected.locationCode}" required="#{assetInfoEditController.customConfig.assetFields['locationCode'].required}" 
+                         requiredMessage="#{msg.locationCode} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationCode')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'locationName')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.locationName}#{assetInfoEditController.customConfig.assetFields['locationName'].required? '*':''}</label>
+            <p:inputText id="locationName" value="#{assetInfoEditController.selected.locationName}" required="#{assetInfoEditController.customConfig.assetFields['locationName'].required}" 
+                         requiredMessage="#{msg.locationName} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('locationName')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'status')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.status}*</label>
+            <p:selectOneRadio id="status" value="#{assetInfoEditController.selected.status}" required="true" requiredMessage="#{msg.status} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('status')}" >
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'deviceStatus')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.deviceStatus}#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required? '*':''}</label>
+            <p:selectOneRadio id="deviceStatus" value="#{assetInfoEditController.selected.deviceStatus}" required="#{assetInfoEditController.customConfig.assetFields['deviceStatus'].required}" requiredMessage="#{msg.deviceStatus} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('deviceStatus')}" >
+                <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'isPm')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isAssetPMed}#{assetInfoEditController.customConfig.assetFields['isPm'].required? '*':''}</label>
+            <p:selectOneRadio value="#{assetInfoEditController.selected.isPm}" required="#{assetInfoEditController.customConfig.assetFields['isPm'].required}" 
+                         requiredMessage="#{msg.isAssetPMed} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isPm')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'isChecked')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.isAssetChecked}#{assetInfoEditController.customConfig.assetFields['isChecked'].required? '*':''}</label>
+            <p:selectOneRadio value="#{assetInfoEditController.selected.isChecked}" required="#{assetInfoEditController.customConfig.assetFields['isChecked'].required}" 
+                         requiredMessage="#{msg.isChecked} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('isChecked')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'comments')}" >
+        <h:panelGroup >
+            <label class="label">#{msg.comments}#{assetInfoEditController.customConfig.assetFields['comments'].required? '*':''}</label>
+            <p:inputTextarea value="#{assetInfoEditController.selected.comments}" required="#{assetInfoEditController.customConfig.assetFields['comments'].required}" 
+                         requiredMessage="#{msg.comments} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('comments')}"  maxlength="256"/>
+        </h:panelGroup>
+
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'assetUsage')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.assetUsage}#{assetInfoEditController.customConfig.assetFields['assetUsage'].required? '*':''}</label>
+            <p:selectOneMenu id="assetUsage" value="#{assetInfoEditController.selected.assetUsage}" required="#{assetInfoEditController.customConfig.assetFields['assetUsage'].required}" 
+                         requiredMessage="#{msg.assetUsage} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('assetUsage')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetUsage')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'capitalSource')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.capitalSource}#{assetInfoEditController.customConfig.assetFields['capitalSource'].required? '*':''}</label>
+            <p:selectOneMenu id="capitalSource" value="#{assetInfoEditController.selected.capitalSource}" required="#{assetInfoEditController.customConfig.assetFields['capitalSource'].required}" 
+                         requiredMessage="#{msg.capitalSource} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('capitalSource')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'capitalSource2')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.capitalSource2}#{assetInfoEditController.customConfig.assetFields['capitalSource2'].required? '*':''}</label>
+            <p:selectOneMenu id="capitalSource2" value="#{assetInfoEditController.selected.capitalSource2}" required="#{assetInfoEditController.customConfig.assetFields['capitalSource2'].required}" 
+                         requiredMessage="#{msg.capitalSource2} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('capitalSource2')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('capitalSource2')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'measureGrade')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.measureGrade}#{assetInfoEditController.customConfig.assetFields['measureGrade'].required? '*':''}</label>
+            <p:selectOneMenu id="measureGrade" value="#{assetInfoEditController.selected.measureGrade}" required="#{assetInfoEditController.customConfig.assetFields['measureGrade'].required}" 
+                         requiredMessage="#{msg.measureGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('measureGrade')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'riskGrade')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.riskGrade}#{assetInfoEditController.customConfig.assetFields['riskGrade'].required? '*':''}</label>
+            <p:selectOneMenu id="riskGrade" value="#{assetInfoEditController.selected.riskGrade}" required="#{assetInfoEditController.customConfig.assetFields['riskGrade'].required}" 
+                         requiredMessage="#{msg.riskGrade} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('riskGrade')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('riskGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'emergencyEquipment')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.emergencyEquipment}#{assetInfoEditController.customConfig.assetFields['emergencyEquipment'].required? '*':''}</label>
+            <p:selectOneMenu id="emergencyEquipment" value="#{assetInfoEditController.selected.emergencyEquipment}" required="#{assetInfoEditController.customConfig.assetFields['emergencyEquipment'].required}" 
+                         requiredMessage="#{msg.emergencyEquipment} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('emergencyEquipment')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('emergencyEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'importEquipment')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.importEquipment}#{assetInfoEditController.customConfig.assetFields['importEquipment'].required? '*':''}</label>
+            <p:selectOneMenu id="importEquipment" value="#{assetInfoEditController.selected.importEquipment}" required="#{assetInfoEditController.customConfig.assetFields['importEquipment'].required}" 
+                         requiredMessage="#{msg.importEquipment} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('importEquipment')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('importEquipment')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'measuringItemCategory')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.measuringItemCategory}#{assetInfoEditController.customConfig.assetFields['measuringItemCategory'].required? '*':''}</label>
+            <p:selectOneMenu id="measuringItemCategory" value="#{assetInfoEditController.selected.measuringItemCategory}" required="#{assetInfoEditController.customConfig.assetFields['measuringItemCategory'].required}" 
+                         requiredMessage="#{msg.measuringItemCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('measuringItemCategory')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'accountingCategory')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.accountingCategory}#{assetInfoEditController.customConfig.assetFields['accountingCategory'].required? '*':''}</label>
+            <p:selectOneMenu id="accountingCategory" value="#{assetInfoEditController.selected.accountingCategory}" required="#{assetInfoEditController.customConfig.assetFields['accountingCategory'].required}" 
+                         requiredMessage="#{msg.accountingCategory} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('accountingCategory')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('accountingCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'manufactDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.manufactDate}#{assetInfoEditController.customConfig.assetFields['manufactDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.manufactDate}" required="#{assetInfoEditController.customConfig.assetFields['manufactDate'].required}" 
+                         requiredMessage="#{msg.manufactDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufactDate')}" 
+                        maxdate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  >
+                <p:ajax process="@(this)" update="@(.inputDate) @(.manufactDateChange)" />
+            </p:calendar>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'purchaseDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.purchaseDate}#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.purchaseDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('purchaseDate')}" class="manufactDateChange"
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{assetInfoEditController.customConfig.assetFields['purchaseDate'].required}" requiredMessage="#{msg.purchaseDate} #{msg.ValidationRequire}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'arriveDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.arriveDate}#{assetInfoEditController.customConfig.assetFields['arriveDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="arriveDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.arriveDate}" required="#{assetInfoEditController.customConfig.assetFields['arriveDate'].required}" 
+                         requiredMessage="#{msg.arriveDate} #{msg.ValidationRequire}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('arriveDate')}" 
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'installDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.installDate}#{assetInfoEditController.customConfig.assetFields['installDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.installDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}" 
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'factoryWarrantyDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.factoryWarrantyDate}#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="factoryWarrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.factoryWarrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['factoryWarrantyDate'].required}" 
+                         requiredMessage="#{msg.factoryWarrantyDate} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('factoryWarrantyDate')}"  
+                        showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'warrantyDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyDate}#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.warrantyDate}" required="#{assetInfoEditController.customConfig.assetFields['warrantyDate'].required}" 
+                         requiredMessage="#{msg.warrantyDate} #{msg.ValidationRequire}" showOn="button" readonly="#{!assetInfoEditController.needEdit('warrantyDate')}" 
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'terminateDate')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.terminateDate}#{assetInfoEditController.customConfig.assetFields['terminateDate'].required? '*':''}</label>
+            <p:calendar timeZone="GMT+8"  id="terminateDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.terminateDate}" showOn="button" readonly="#{!assetInfoEditController.needEdit('terminateDate')}" 
+                        readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'warranty')}" >
+        <h:panelGroup >
+            <label class="label">是否对质保到期进行提醒#{assetInfoEditController.customConfig.assetFields['warranty'].required? '*':''}</label>
+            <p:selectOneRadio value="#{assetInfoEditController.selected.warranty}" required="#{assetInfoEditController.customConfig.assetFields['warranty'].required}" 
+                         requiredMessage="#{msg.warranty} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('warranty')}" >
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'purchasePrice')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.purchasePrice}#{assetInfoEditController.customConfig.assetFields['purchasePrice'].required? '*':''}</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="purchasePrice" value="#{assetInfoEditController.selected.purchasePrice}" required="#{assetInfoEditController.customConfig.assetFields['purchasePrice'].required}" 
+                         requiredMessage="#{msg.purchasePrice} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('purchasePrice')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'salvageValue')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.salvageValue}#{assetInfoEditController.customConfig.assetFields['salvageValue'].required? '*':''}</label>
+            <p:inputNumber minValue="0" decimalPlaces="2" id="salvageValue" value="#{assetInfoEditController.selected.salvageValue}" required="#{assetInfoEditController.customConfig.assetFields['salvageValue'].required}" 
+                         requiredMessage="#{msg.salvageValue} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('salvageValue')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'lifecycle')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.lifecycle}#{assetInfoEditController.customConfig.assetFields['lifecycle'].required? '*':''}</label>
+            <p:inputNumber minValue="0" decimalPlaces="1" id="lifecycle" value="#{assetInfoEditController.selected.lifecycleInYear}" required="#{assetInfoEditController.customConfig.assetFields['lifecycle'].required}" 
+                         requiredMessage="#{msg.lifecycle} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('lifecycle')}" />
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoEditController.needShow(basicItem, 'depreciationMethod')}" >
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationMethod}#{assetInfoEditController.customConfig.assetFields['depreciationMethod'].required? '*':''}</label>
+            <p:selectOneMenu id="depreciationMethod" value="#{assetInfoEditController.selected.depreciationMethod}" required="#{assetInfoEditController.customConfig.assetFields['depreciationMethod'].required}" 
+                         requiredMessage="#{msg.depreciationMethod} #{msg.ValidationRequire}" disabled="#{!assetInfoEditController.needEdit('depreciationMethod')}" >
+                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                <f:selectItems value="#{fieldMsg.getFieldValueList('depreciationMethodList')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneMenu>
+        </h:panelGroup>
+    </c:if>
+</ui:composition>
