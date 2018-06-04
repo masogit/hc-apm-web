@@ -73,6 +73,7 @@ public class AssetInfoMgrService {
     public List<AssetInfo> getParentsAssetsList(AssetInfo asset, String clinicalDeptUID, String siteUID) {
         List<SearchFilter> assetFilters = new ArrayList();
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+        assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));  //不能待报废
         if (asset == null ? clinicalDeptUID != null : asset.getClinicalDeptUID() != null) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, asset == null ? clinicalDeptUID : asset.getClinicalDeptUID()));
