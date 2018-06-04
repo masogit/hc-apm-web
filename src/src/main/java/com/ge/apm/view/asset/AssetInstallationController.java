@@ -39,6 +39,7 @@ import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
+import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.AutoCompleteService;
 import com.ge.apm.service.asset.BlobFileService;
@@ -67,17 +68,16 @@ public class AssetInstallationController {
     private ArrivalListItem arrivalListItem;
     private ArrivalListItemRepository itemDao;
     private AssetInstallationService aiService;
-    private QrCodeLibRepository qrcodeDao;
     private AssetInfoRepository assetDao;
     private BlobFileService blobService;
     private QrCodeService qrCodeService;
+    private AssetInfoMgrService assetMgrService;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
     private List<V2_BlobObject> attachList;
 
     private List<I18nMessage> code68List;
     private I18nMessageRepository i18nDao;
-//    private Boolean isGeneratePmOrder;
     private GbCodeService gbCodeService;
     private GbCodeRepository gbDao;
     private TreeNode selectedNode;
@@ -110,8 +110,8 @@ public class AssetInstallationController {
         aiService = WebUtil.getBean(AssetInstallationService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         qrCodeService = WebUtil.getBean(QrCodeService.class);
+        assetMgrService = WebUtil.getBean(AssetInfoMgrService.class);
         configService = WebUtil.getBean(ConfigService.class);
-        qrcodeDao = WebUtil.getBean(QrCodeLibRepository.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
@@ -402,17 +402,20 @@ public class AssetInstallationController {
     }
 
     public List<AssetInfo> getParentAssetList() {
-        List<SearchFilter> assetFilters = new ArrayList<>();
-        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
-        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
-        if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
-            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
-        }
-        if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
-            assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
-        }
-        return assetDao.findBySearchFilter(assetFilters);
+        
+        return assetMgrService.getParentsAssetsList(null, arrivalListItem.getClinicalDeptUID(), arrivalListItem.getArrivalList().getSiteUID());
+        
+//        List<SearchFilter> assetFilters = new ArrayList<>();
+//        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
+//        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
+//        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
+//        if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
+//            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
+//        }
+//        if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
+//            assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
+//        }
+//        return assetDao.findBySearchFilter(assetFilters);
     }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
