@@ -200,7 +200,7 @@
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['capitalSource2']}">
                     <label class="label">#{msg.capitalSource2}</label>
-                    <p:inputText id="capitalSource2" value="#{fieldMsg.fieldValue('capitalSource2', assetInfoController.selected.capitalSource2)}" readonly="true"/>
+                    <p:inputText id="capitalSource2" value="#{fieldMsg.fieldValue('capitalSource2', assetInfoDetailController.selected.capitalSource2)}" readonly="true"/>
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['measureGrade']}">
                     <label class="label">#{msg.measureGrade}</label>
@@ -324,14 +324,14 @@
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['isPm']}">
                     <label class="label">#{msg.isAssetPMed}</label>
-                    <p:selectOneRadio value="#{assetInfoController.selected.isPm}" disabled="true">
+                    <p:selectOneRadio value="#{assetInfoDetailController.selected.isPm}" disabled="true">
                         <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                     </p:selectOneRadio>
                 </h:panelGroup>
                 <h:panelGroup binding="#{assetInfoDetailController.detailFields['isChecked']}">
                     <label class="label">#{msg.isAssetChecked}</label>
-                    <p:selectOneRadio value="#{assetInfoController.selected.isChecked}" disabled="true">
+                    <p:selectOneRadio value="#{assetInfoDetailController.selected.isChecked}" disabled="true">
                         <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
                         <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
                     </p:selectOneRadio>
