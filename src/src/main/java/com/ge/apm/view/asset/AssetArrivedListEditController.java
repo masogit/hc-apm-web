@@ -325,6 +325,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             item.setFunctionGroup(easyInstallItem.getFunctionGroup());
             item.setAssetCode68(easyInstallItem.getAssetCode68());
             item.setRegistrationNo(easyInstallItem.getRegistrationNo());
+            item.setMaitananceId(easyInstallItem.getMaitananceId());
             item.setMaitanance(easyInstallItem.getMaitanance());
             item.setPurchaseDate(easyInstallItem.getPurchaseDate());
             item.setWarrantyDate(easyInstallItem.getWarrantyDate());
@@ -465,9 +466,11 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public void onMaintainerChange() {
     	if (null != maitanance) {
             this.easyInstallItem.setMaitanance(maitanance.getName());
+            this.easyInstallItem.setMaitananceId(maitanance.getId()+"");
         }
     	else{
     		this.easyInstallItem.setMaitanance(null);
+    		this.easyInstallItem.setMaitananceId(null);
     	}
     }
 
