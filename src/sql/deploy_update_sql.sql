@@ -146,3 +146,9 @@ ALTER TABLE public.shared_asset_request ALTER COLUMN msg_end_time TYPE timestamp
 alter table capture_data_messages alter start_date type timestamp(4) without time zone
 alter table capture_data_messages alter end_date type timestamp(4) without time zone
 
+
+--v6.1
+
+update supplier set uid = replace('' || uuid_generate_v4(),'-','') where uid is null;
+
+
