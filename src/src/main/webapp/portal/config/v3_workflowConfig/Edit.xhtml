@@ -96,6 +96,21 @@
                                 <label class = "label">不允许临时账号?</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
                             </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">是否电话报修?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTelReport}">
+                                    <p:ajax process="@this" update="V2_WorkflowConfigEditForm:wo" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup id="telStart" rendered="#{!!v2_WorkflowConfigController.selected.isTelReport}">
+                                <label class = "label">电话报修开始时间</label>
+                                <p:calendar value="#{v2_WorkflowConfigController.telRepStart}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup >
+                            <h:panelGroup id="telEnd" rendered="#{!!v2_WorkflowConfigController.selected.isTelReport}">
+                                <label class = "label">电话报修结束时间</label>
+                                <p:calendar value="#{v2_WorkflowConfigController.telRepEnd}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup >
+
                             <h:panelGroup>
                                 <label class="label">工单人工费用(元/小时)</label>
                                 <p:inputNumber id="woManHourPrice" value="#{v2_WorkflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0"/>
