@@ -104,6 +104,8 @@ public class AssetInstallationController {
     private UaaService uaaService;
     private WorkflowConfig config;
     private boolean needInstorageCheck;
+    
+    private String oldQrCode;
 
     @PostConstruct
     protected void init() {
@@ -124,10 +126,11 @@ public class AssetInstallationController {
         src = (String) UrlEncryptController.getValueFromMap(encodeStr, "src");
 //        String itemId = WebUtil.getRequestParameter("itemId");
         arrivalListItem = itemDao.findById(itemId);
-        arrivalListItem.setIsPm(arrivalListItem.getIsPm()==null?true:arrivalListItem.getIsPm());
-        arrivalListItem.setIsChecked(arrivalListItem.getIsChecked()==null?true:arrivalListItem.getIsChecked());
-        
-        if(null == arrivalListItem.getInstallDate()){
+        arrivalListItem.setIsPm(arrivalListItem.getIsPm() == null ? true : arrivalListItem.getIsPm());
+        arrivalListItem.setIsChecked(arrivalListItem.getIsChecked() == null ? true : arrivalListItem.getIsChecked());
+        oldQrCode = arrivalListItem.getQrCode();
+
+        if (null == arrivalListItem.getInstallDate()) {
             arrivalListItem.setInstallDate(new Date());
         }
         config = configService.findConfigBySite(arrivalListItem.getArrivalList().getSiteUID());
@@ -148,38 +151,34 @@ public class AssetInstallationController {
         attachList.addAll(aiService.getPicList(arrivalListItem.getId()));
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        needInstorageCheck=userContextService.needInstorageCheck();
+        needInstorageCheck = userContextService.needInstorageCheck();
     }
-    
-    private void initOwner(){
-    	String owner1UID=arrivalListItem.getAssetOwnerUID();
-    	String owenr2UID=arrivalListItem.getAssetOwnerUID2();
-    	String owner3UID=arrivalListItem.getAssetOwnerUID3();
-    	String useOwnerUID=arrivalListItem.getClinicalOwnerUid();
-    	if (Strings.isNullOrEmpty(owner1UID)) {
+
+    private void initOwner() {
+        String owner1UID = arrivalListItem.getAssetOwnerUID();
+        String owenr2UID = arrivalListItem.getAssetOwnerUID2();
+        String owner3UID = arrivalListItem.getAssetOwnerUID3();
+        String useOwnerUID = arrivalListItem.getClinicalOwnerUid();
+        if (Strings.isNullOrEmpty(owner1UID)) {
             arrivalListItem.setAssetOwnerUID(UserContextService.getCurrentUserAccount().getUid());
             owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
+        } else {
+            owner1 = aiService.getUserAccountByUid(owner1UID);
         }
-        else{
-        	owner1 = aiService.getUserAccountByUid(owner1UID);
+        if (StringUtils.isNotEmpty(owenr2UID)) {
+            owner2 = aiService.getUserAccountByUid(owenr2UID);
+        } else {
+            owner2 = new UserAccount();
         }
-        if(StringUtils.isNotEmpty(owenr2UID)){
-        	owner2=aiService.getUserAccountByUid(owenr2UID);
+        if (StringUtils.isNotEmpty(owner3UID)) {
+            owner3 = aiService.getUserAccountByUid(owner3UID);
+        } else {
+            owner3 = new UserAccount();
         }
-        else{
-        	owner2=new UserAccount();
-        }
-        if(StringUtils.isNotEmpty(owner3UID)){
-        	owner3=aiService.getUserAccountByUid(owner3UID);
-        }
-        else{
-        	owner3=new UserAccount();
-        }
-        if(StringUtils.isNotEmpty(useOwnerUID)){
-        	useOwner=aiService.getUserAccountByUid(useOwnerUID);
-        }
-        else{
-        	useOwner=new UserAccount();
+        if (StringUtils.isNotEmpty(useOwnerUID)) {
+            useOwner = aiService.getUserAccountByUid(useOwnerUID);
+        } else {
+            useOwner = new UserAccount();
         }
     }
 
@@ -204,7 +203,7 @@ public class AssetInstallationController {
     }
 
     private Boolean isAvailableQrcode(String qrcode) {
-        String qrCodeStatus = qrCodeService.isAvailableQrcode(qrcode, arrivalListItem.getArrivalList().getSiteUID());
+        String qrCodeStatus = qrCodeService.checkAvailableBeforeSave(qrcode, arrivalListItem.getArrivalList().getSiteUID());
         if ("Normal".equals(qrCodeStatus)) {
             return true;
         } else {
@@ -259,16 +258,16 @@ public class AssetInstallationController {
                 isValidate = false;
             }
         }
-        if(needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getDepartNum())){
-        	WebUtil.addErrorMessage("设备编号（院方）不能为空");
+        if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getDepartNum())) {
+            WebUtil.addErrorMessage("设备编号（院方）不能为空");
             isValidate = false;
         }
-        if(needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getFinancingNum())){
-        	WebUtil.addErrorMessage("资产编号不能为空");
+        if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getFinancingNum())) {
+            WebUtil.addErrorMessage("资产编号不能为空");
             isValidate = false;
         }
-        if(needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getQrCode())){
-        	WebUtil.addErrorMessage("二维码不能为空");
+        if (needInstorageCheck && StringUtils.isEmpty(arrivalListItem.getQrCode())) {
+            WebUtil.addErrorMessage("二维码不能为空");
             isValidate = false;
         }
 
@@ -292,18 +291,18 @@ public class AssetInstallationController {
         if (arrivalListItem.getWarrantyYear() != null) {
             Integer monthLong = Double.valueOf(arrivalListItem.getWarrantyYear() * 12).intValue();
             Calendar calender = Calendar.getInstance();
-            calender.setTime(arrivalListItem.getInstallDate()==null?new Date():arrivalListItem.getInstallDate());
+            calender.setTime(arrivalListItem.getInstallDate() == null ? new Date() : arrivalListItem.getInstallDate());
             calender.add(Calendar.MONTH, monthLong);
             arrivalListItem.setFactoryWarrantyDate(calender.getTime());
         }
-        
-        if(configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())){
+
+        if (configService.isNeedAssetApprover(arrivalListItem.getArrivalList().getSiteUID())) {
             //待审核
             arrivalListItem.setUsageStatus(2);
-        }else{
+        } else {
             arrivalListItem.setUsageStatus(3);
         }
-        
+
         if (arrivalListItem.getInstallStatus().equals(ArrivalListItem.INSTALL_STATUS_NEW)) {
             aiService.saveOrUpdateItem(arrivalListItem);
             if (aiService.submitInstallItem(arrivalListItem.getId(), true, arrivalListItem.getIsGeneratePmOrder() == null ? false : arrivalListItem.getIsGeneratePmOrder())) {
@@ -397,7 +396,7 @@ public class AssetInstallationController {
     }
 
     public List<UserAccount> getClinicalOwnerList() {
-    	clinicalOwnerList=aiService.getClinicalOwnerList(arrivalListItem.getClinicalDeptUID());
+        clinicalOwnerList = aiService.getClinicalOwnerList(arrivalListItem.getClinicalDeptUID());
         return clinicalOwnerList;
     }
 
@@ -483,10 +482,10 @@ public class AssetInstallationController {
 
     public void onAssetOwnerNameChange() {
 //        owner1 = aiService.getUserAccountByUid(arrivalListItem.getAssetOwnerUID());
-    	arrivalListItem.setAssetOwnerUID(owner1 == null ? null : owner1.getUid());
-    	if(owner1==null){
-    		return;
-    	}
+        arrivalListItem.setAssetOwnerUID(owner1 == null ? null : owner1.getUid());
+        if (owner1 == null) {
+            return;
+        }
         List<Object[]> ownerComposition = assetDao.findAssetOwnerComposition(owner1.getId(), arrivalListItem.getArrivalList().getSiteUID());
         if (ownerComposition != null && !ownerComposition.isEmpty()) {
             Object[] composition = ownerComposition.get(0);
@@ -503,18 +502,37 @@ public class AssetInstallationController {
         }
     }
 
-	public void onAssetOwnerName2Change() {
-		arrivalListItem.setAssetOwnerUID2(owner2== null ? null : owner2.getUid());
-	}
+    public void onAssetOwnerName2Change() {
+        arrivalListItem.setAssetOwnerUID2(owner2 == null ? null : owner2.getUid());
+    }
 
-	public void onAssetOwnerName3Change() {
-		arrivalListItem.setAssetOwnerUID3(owner3== null ? null : owner3.getUid());
-	}
+    public void onAssetOwnerName3Change() {
+        arrivalListItem.setAssetOwnerUID3(owner3 == null ? null : owner3.getUid());
+    }
 
-	public void onUseOwnerNameChange() {
-		arrivalListItem.setClinicalOwnerUid(useOwner.getId() == null ? null : useOwner.getUid());
-	}
+    public void onUseOwnerNameChange() {
+        arrivalListItem.setClinicalOwnerUid(useOwner.getId() == null ? null : useOwner.getUid());
+    }
 
+    public void onQrCodeChange(){
+        if(!Strings.isNullOrEmpty(oldQrCode)){
+            //release old qrCode
+            qrCodeService.updateQrCodeStatus(oldQrCode, arrivalListItem.getArrivalList().getSiteUID(), 1);
+        }
+        if(!Strings.isNullOrEmpty(arrivalListItem.getQrCode())){
+            String availableQrcode =qrCodeService.getAvailableQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
+            if(Strings.isNullOrEmpty(availableQrcode)){
+                WebUtil.addErrorMessage("二维码不正确");
+                arrivalListItem.setQrCode("");
+            }else{
+                oldQrCode=arrivalListItem.getQrCode();
+            }
+        }else{
+            oldQrCode="";
+        }
+        onDepartNumChange("qrCode");
+    }
+    
     public void onDepartNumChange(String fieldName) {
         if (config == null) {
             return;
@@ -525,36 +543,18 @@ public class AssetInstallationController {
                 case "DFQ":
                     switch (fieldName) {
                         case "financingNum":
-                            num = arrivalListItem.getFinancingNum();
-                            if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-                                if (!qrCodeService.deleteQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID())) {
-//                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
-                                    WebUtil.addErrorMessage("二维码不正确");
-                                    arrivalListItem.setQrCode(null);
-                                } else {
-                                    arrivalListItem.setQrCode(num);
-                                }
-                            } else {
-                                arrivalListItem.setQrCode(num);
-                            }
+                            arrivalListItem.setQrCode(arrivalListItem.getFinancingNum());
+                            onQrCodeChange();
+                            num = arrivalListItem.getQrCode();
                             break;
                         case "departNum":
-                            num = arrivalListItem.getDepartNum();
-                            if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-                                if (!qrCodeService.deleteQrcode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID())) {
-//                                    qrCodeService.discardQrCode(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID());
-                                    WebUtil.addErrorMessage("二维码不正确");
-                                    arrivalListItem.setQrCode(null);
-                                } else {
-                                    arrivalListItem.setQrCode(num);
-                                }
-                            } else {
-                                arrivalListItem.setQrCode(num);
-                            }
+                            arrivalListItem.setQrCode(arrivalListItem.getDepartNum());
+                            onQrCodeChange();
+                            num = arrivalListItem.getQrCode();
                             break;
                         case "qrCode":
                             num = arrivalListItem.getQrCode();
-                            arrivalListItem.setQrCode(num);
+//                            arrivalListItem.setQrCode(num);
                             break;
                         default:
                     }
@@ -626,10 +626,11 @@ public class AssetInstallationController {
             getClinicalOwnerList();
         }
     }
+
     public List<UserAccount> completeOwnerList(String query) {
         return autoCompleteService.completeOwnerList(query, ownerList);
     }
-    
+
     public List<UserAccount> completeClinicalOwnerList(String query) {
         return autoCompleteService.completeClinicalOwnerList(query, clinicalOwnerList);
     }
@@ -722,46 +723,45 @@ public class AssetInstallationController {
     public void setDeptName(String deptName) {
         this.deptName = deptName;
     }
-    
+
     public boolean isNeedInstorageCheck() {
-		return needInstorageCheck;
-	}
+        return needInstorageCheck;
+    }
 
-	public void setNeedInstorageCheck(boolean needInstorageCheck) {
-		this.needInstorageCheck = needInstorageCheck;
-	}
+    public void setNeedInstorageCheck(boolean needInstorageCheck) {
+        this.needInstorageCheck = needInstorageCheck;
+    }
 
-	public UserAccount getOwner1() {
-		return owner1;
-	}
+    public UserAccount getOwner1() {
+        return owner1;
+    }
 
-	public void setOwner1(UserAccount owner1) {
-		this.owner1 = owner1;
-	}
+    public void setOwner1(UserAccount owner1) {
+        this.owner1 = owner1;
+    }
 
-	public UserAccount getOwner2() {
-		return owner2;
-	}
+    public UserAccount getOwner2() {
+        return owner2;
+    }
 
-	public void setOwner2(UserAccount owner2) {
-		this.owner2 = owner2;
-	}
+    public void setOwner2(UserAccount owner2) {
+        this.owner2 = owner2;
+    }
 
-	public UserAccount getOwner3() {
-		return owner3;
-	}
+    public UserAccount getOwner3() {
+        return owner3;
+    }
 
-	public void setOwner3(UserAccount owner3) {
-		this.owner3 = owner3;
-	}
+    public void setOwner3(UserAccount owner3) {
+        this.owner3 = owner3;
+    }
 
-	public UserAccount getUseOwner() {
-		return useOwner;
-	}
+    public UserAccount getUseOwner() {
+        return useOwner;
+    }
 
-	public void setUseOwner(UserAccount useOwner) {
-		this.useOwner = useOwner;
-	}
-	
-	
+    public void setUseOwner(UserAccount useOwner) {
+        this.useOwner = useOwner;
+    }
+
 }
