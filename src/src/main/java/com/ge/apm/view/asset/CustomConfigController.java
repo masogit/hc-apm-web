@@ -9,11 +9,11 @@ import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.pure.CustomConfigObject;
-import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
 import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.service.asset.CustomConfigService;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
@@ -61,7 +61,7 @@ public class CustomConfigController {
         userService = WebUtil.getBean(UserCommonService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         selectSite = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        allFields = ccService.getAllFields();
+        allFields = CustomConfigConstant.getAllFields();
         configRoles = ccService.getConfigRoles().stream().collect(Collectors.toMap(SysRole::getName, SysRole::getRoleDesc));
         selectedAddFields = new HashMap();
         loadConfigForSite(selectSite.getUid());
@@ -331,7 +331,7 @@ public class CustomConfigController {
     }
 
     public boolean isSystemFields(String key) {
-        return CustomConfigService.getSysTemFields().contains(key);
+        return CustomConfigConstant.getSysTemFields().contains(key);
     }
 
     public void removeListPageField(String key) {
