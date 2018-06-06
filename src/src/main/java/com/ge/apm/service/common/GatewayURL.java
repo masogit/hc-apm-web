@@ -33,7 +33,9 @@ public enum GatewayURL {
     // User Schedule
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
-    BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch");
+    BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    // Allocation Center URLs
+    SHARED_ASSET_PUSH_MESSAGE("/hcapmassetservice/api/apm/allocation/message/{requestId}");
 
     private final String url;
 
