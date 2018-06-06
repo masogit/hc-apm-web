@@ -29,7 +29,7 @@ public class SharedAssetService extends MicroServiceInvoker {
 
     private org.slf4j.Logger logger = LoggerFactory.getLogger(getClass());
 
-    public void pushWxMsg(String requestId) throws Exception {
+    public void pushWxMsg(String requestId) {
         String url = getGatewayURL(GatewayURL.SHARED_ASSET_PUSH_MESSAGE);
         url = url.replace("{requestId}", requestId);
         String token = UserContextService.getAccessToken();
@@ -37,9 +37,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("pushWxMsg request: " + JSON.toJSONString(requestEntity));
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
-        if (!isOkay(response)) {
-            throw new Exception("Failed to create shared asset request.");
-        }
+        logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
     }
 }
 
