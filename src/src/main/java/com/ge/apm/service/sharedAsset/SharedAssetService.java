@@ -36,7 +36,7 @@ public class SharedAssetService extends MicroServiceInvoker {
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         logger.info("pushWxMsg request: " + JSON.toJSONString(requestEntity));
-        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
     }
 }
