@@ -7,7 +7,16 @@ public class AssetRuleModel {
 	private Integer level;
 	private Integer period;
 	private Date planTime;
-	
+	private Integer pmType;
+
+	public Integer getPmType() {
+		return pmType;
+	}
+
+	public void setPmType(Integer pmType) {
+		this.pmType = pmType;
+	}
+
 	public Date getPlanTime() {
 		return planTime;
 	}

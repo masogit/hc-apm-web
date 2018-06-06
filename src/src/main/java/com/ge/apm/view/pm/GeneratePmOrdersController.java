@@ -62,6 +62,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private V2_PmOrderRepository pmOrderRepository;
 	private String siteUid;
 	private Date planTime;
+	private Integer pmType;
 
 	@Override
 	protected void init() {
@@ -260,18 +261,20 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 //				WebUtil.addErrorMessage("该设备该级别的保养规则周期不能为空！");
 //				return;
 			}
-			boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level);
+			boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level,pmType);
 			if(isExists) {
 				WebUtil.addErrorMessage("保养工单已存在！");
 				return;
 			}
 			AssetRuleModel model = new AssetRuleModel();
+			if(pmType == 1){
+				model.setPeriod(period);
+			}
+			model.setPmType(pmType);
 			model.setUid(ai.getUid());
 			model.setLevel(level);
-			model.setPeriod(period);
 			model.setPlanTime(planTime);
 			models.add(model);
-		
 		}else {
 			for (AssetInfo ai : targetAssets) {
 				if(ai.getClinicalDeptId() == null) {
@@ -289,16 +292,19 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 					LOGGER.error("not find pmOrderRule by assetUid : {},level : {}", ai.getUid(), level);
 					continue;
 				}
-				int period = rule.getPeriod();
-				boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level);
+				boolean isExists = pmOrderRepository.findOpenPm(ai.getId(),level,pmType);
 				if(isExists) {
 					LOGGER.warn("open pm exists !");
 					continue;
 				}
+				int period = rule.getPeriod();
 				AssetRuleModel model = new AssetRuleModel();
+				if(pmType == 1){
+					model.setPeriod(period);
+				}
+				model.setPmType(pmType);
 				model.setUid(ai.getUid());
 				model.setLevel(level);
-				model.setPeriod(period);
 				model.setPlanTime(planTime);
 				models.add(model);
 			}
@@ -402,7 +408,12 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	public void setPlanTime(Date planTime) {
 		this.planTime = planTime;
 	}
-	
-	
 
+	public Integer getPmType() {
+		return pmType;
+	}
+
+	public void setPmType(Integer pmType) {
+		this.pmType = pmType;
+	}
 }
