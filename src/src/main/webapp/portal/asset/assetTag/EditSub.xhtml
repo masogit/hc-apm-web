@@ -39,7 +39,6 @@
                                 <f:selectItem itemLabel="EE报警" itemValue="2"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-
                         <h:panelGroup id="id2" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
                             <label  class="label">工单消息推送选项*</label>
                             <p:selectOneMenu value="#{tagSubscriberController.selected.receiveMsgMode}" required="true" requiredMessage="工单消息推送选项不能为空">
@@ -47,6 +46,19 @@
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
+
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
+                            <p:panelGrid columns="3">
+                                <h:panelGroup> <p:outputLabel  value="紧急: " />
+                                    <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level0}"/></h:panelGroup>
+                                <h:panelGroup> <p:outputLabel value="重要: " />
+                                    <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level1}"/></h:panelGroup>
+                                <h:panelGroup> <p:outputLabel  value="一般: " />
+                                    <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level2}"/></h:panelGroup>
+
+                            </p:panelGrid>
+
                         </h:panelGroup>
 
                         <h:panelGroup id ="id1" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
