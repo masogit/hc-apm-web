@@ -70,6 +70,13 @@
                                 <p:calendar timeZone="GMT+8"  id="manufactDate" pattern="yyyy/MM/dd" value="#{generatePmOrdersController.planTime}" 
                                  showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"  />
                             </h:panelGroup>
+						   <h:panelGroup>
+							   <label class="label">工单类型 *</label>
+							   <p:selectOneMenu value="#{generatePmOrdersController.pmType}" >
+								   <!--<f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />-->
+								   <f:selectItems value="#{fieldMsg.getFieldValueList('pmType')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+							   </p:selectOneMenu>
+						   </h:panelGroup>
 		                  <h:panelGroup >
 				                <!-- <label class="label">是否已配置规则</label>
 		                        <p:selectOneRadio id="ruleStatus"  label="#{msg.status}" value="#{generatePmOrdersController.queryAsset.ruleStatus}" disabled="true">

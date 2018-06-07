@@ -49,6 +49,9 @@ public class AssetInstallationService {
 
     @Autowired
     BlobObjectRepository blobDao;
+    
+    @Autowired
+    protected BlobFileService blobService;
 
     @Autowired
     SupplierRepository supplierDao;
@@ -98,7 +101,9 @@ public class AssetInstallationService {
     public void deleteBlobObject(String arrivalListId){
     	List<V2_BlobObject> listObj=blobDao.findByBoUuid(arrivalListId);
     	if(listObj!=null){
-    		blobDao.delete(listObj);
+    		for(V2_BlobObject obj :listObj){
+    			blobService.deleteBlobFile(obj);
+    		}
     	}
     }
     private void deleteQrCode(String qrCode,String siteUid){
