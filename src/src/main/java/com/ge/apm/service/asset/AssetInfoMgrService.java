@@ -114,12 +114,10 @@ public class AssetInfoMgrService {
     private List<AssetInfo> getChildrenAssetsFromList(List<AssetInfo> allAssets, AssetInfo asset) {
         List<AssetInfo> subAssets = allAssets.stream().filter(item -> Objects.equals(item.getParentAssetId(), asset.getId())).collect(Collectors.toList());
         if (!subAssets.isEmpty()) {
-            List<AssetInfo> d = subAssets.stream().flatMap(item -> getChildrenAssetsFromList(allAssets, item).stream()).collect(Collectors.toList());
-            subAssets.addAll(d);
-            return subAssets;
-        } else {
-            return Collections.EMPTY_LIST;
-        }
+            List<AssetInfo> temp = subAssets.stream().flatMap(item -> getChildrenAssetsFromList(allAssets, item).stream()).collect(Collectors.toList());
+            subAssets.addAll(temp);
+        } 
+        return subAssets;
     }
 
     public TreeNode getParentAssetTree(AssetInfo asset) {
