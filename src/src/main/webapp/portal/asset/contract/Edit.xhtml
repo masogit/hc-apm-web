@@ -27,8 +27,8 @@
                         </h:panelGroup>
 
                         <h:panelGroup>
-                            <label class="label">#{msg.contractType}</label>
-                            <p:selectOneMenu id="contractType" value="#{assetContractController.selected.contractType}" required="false" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}">
+                            <label class="label">#{msg.contractType}*</label>
+                            <p:selectOneMenu id="contractType" value="#{assetContractController.selected.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}">
                                 <p:ajax update="pmCount" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}" />
                                 <f:selectItems value="#{assetContractController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />

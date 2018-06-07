@@ -64,9 +64,9 @@
         p:testOnBorrow="true" p:testOnReturn="true" p:testWhileIdle="true"
         p:validationQuery="select 1" p:timeBetweenEvictionRunsMillis="1000" p:minEvictableIdleTimeMillis="1000">
     <property name="driverClassName" value="org.postgresql.Driver" />
-    <property name="url" value="#{cloudCfg.jdbcUrl}"/>
-    <property name="username" value="#{cloudCfg.jdbcUserName}"/>
-    <property name="password" value="#{cloudCfg.jdbcPassword}"/>
+    <property name="url" value="#{systemEnvironment['PG_URL'] ?: cloudCfg.jdbcUrl}"/>
+    <property name="username" value="#{systemEnvironment['PG_USERNAME'] ?: cloudCfg.jdbcUserName}"/>
+    <property name="password" value="#{systemEnvironment['PG_PASSWORD'] ?: cloudCfg.jdbcPassword}"/>
   </bean>
 
   <!--

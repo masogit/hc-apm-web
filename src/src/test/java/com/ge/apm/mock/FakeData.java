@@ -47,6 +47,8 @@ public class FakeData {
     @Autowired
     I18nMessageRepository i18nDao;
 
+    public static final String DEFAULT_SITE_NAME = "Site A";
+
 //    @Autowired
 //    PlatformTransactionManager transactionManager;
 
@@ -124,10 +126,10 @@ public class FakeData {
             if (orgHospitalA == null) throw new IllegalStateException("Hospital A not found!");
         }
 
-        String siteA = "Site A";
-        OrgInfo orgSiteA = orgInfoDao.findByTenantUIDAndName(tenantInfo.getUid(), siteA);
+//        String siteA = "Site A";
+        OrgInfo orgSiteA = orgInfoDao.findByTenantUIDAndName(tenantInfo.getUid(), DEFAULT_SITE_NAME);
         if (orgSiteA == null) {
-            orgSiteA = buildOrgSite(siteA, orgHospitalA);
+            orgSiteA = buildOrgSite(DEFAULT_SITE_NAME, orgHospitalA);
             orgInfoDao.save(orgSiteA);
             orgSiteA = orgInfoDao.getByUid(orgSiteA.getUid());
 

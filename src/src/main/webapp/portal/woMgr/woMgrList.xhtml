@@ -91,7 +91,7 @@
                         <h:outputText value="#{item.currentPersonName}"/>
                     </p:column>-->
                     <p:column headerText="#{msg.requestReason}" sortBy="#{item.serviceRequest.requestReason}" filterBy="#{item.serviceRequest.requestReason}" filterMatchMode="LIKE">
-                        <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.comment)}"/>
+                        <h:outputText value="#{workOrderMgrController.getRequestReasonInShort(item.serviceRequest.requestReason)}"/>
                     </p:column>
                     <p:column headerText="#{msg.Actions}" rendered="#{workOrderMgrController.queryIndex==1}" exportable="false">
                         <p:commandButton value="#{msg.Cancel}" actionListener="#{workOrderMgrController.prepareAct(item.id)}" update="woTab:cancelDialogForm" oncomplete="PF('cancelDialog').show()"/>

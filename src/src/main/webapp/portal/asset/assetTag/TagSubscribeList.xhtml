@@ -8,22 +8,20 @@
     <ui:define name="content">
         <div class="ui-g clearfix">
             <div class="ui-g-12 card cardTitle">
-              <p:outputLabel class="pageTitle" value="#{msg.msgsubscribe}"/>
+              <p:outputLabel class="pageTitle" value="设备消息订阅"/>
             </div>
             <div class="ui-g-12 card">
             <h:form id ="TagSubscriberForm" style="margin-top: 20px;">
-<p:dataTable  id="dataList" value="#{tagSubscriberController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{tagSubscriberController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+<p:dataTable  class="dt" id="dataList" value="#{tagSubscriberController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single" selection="#{tagSubscriberController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
               rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
               paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
               currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
               rows="20" emptyMessage="#{msg.noRecordFound}"
               rowsPerPageTemplate="20,40,60">
-    <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+    <p:ajax event="rowSelect" listener="#{tagSubscriberController.test}" update="createButton editButton deleteButton "/>
     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
     <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
-
-      <!--  <h:outputText value="  #{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />-->
         <h:outputText value="#{item.subscriberUser.name}" />
     </p:column>
 
@@ -41,7 +39,7 @@
 
         <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
 
-        <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected}"/>
+        <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected or tagSubscriberController.selected.getReceiveMsgMode()==3}"/>
 
         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{tagSubscriberController.delete}" update=":TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>

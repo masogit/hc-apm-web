@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<ui:composition>
+	<p:dialog id="geIBDataEditDlg" widgetVar="geIBDataEditDialog" modal="true" resizable="false" draggable="true" appendTo="@(body)"
+		header="GE IB 编辑">
+		<h:form id="geIBDataEditForm" rendered="#{captureDataMessagesController.selected != null}">
+			<p:messages id="messages" autoUpdate="true" closable="false" showDetail="true" for="systemID"></p:messages>
+			
+			<div class="ui-g">
+				<div class="ui-g-12">
+					<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+						<h:panelGroup>
+							<span id="type0Span"> <label class="label">SystemID*</label>
+								<p:inputText id="systemId" value="#{captureDataMessagesController.selected.systemId}" required="#{captureDataMessagesController.selected.type==0?true:false}" requiredMessage="请输入SystemID">
+								</p:inputText>
+								<p:commandButton id="searchSystemId" value="查找" actionListener="#{captureDataMessagesController.checkSystemId()}" update="idIbStatus,idGeDeviceType" process="@parent"/>
+								<label class="label">是否GE IB</label> 
+								<p:selectOneMenu id="idIbStatus" value="#{captureDataMessagesController.selected.ibStatus}">
+									<f:selectItem itemLabel="否" itemValue="0" />
+									<f:selectItem itemLabel="是" itemValue="1" />
+								</p:selectOneMenu>
+							</span>
+							<label class="label">
+								<h:outputText id="deviceTypeLabel" value="#{captureDataMessagesController.selected.type==0?'设备类型':'设备类型*'}"></h:outputText>
+							</label>
+							<p:selectOneMenu id="idGeDeviceType" value="#{captureDataMessagesController.selected.geDeviceType}" required="#{captureDataMessagesController.selected.type==1?true:false}" requiredMessage="请选择设备类型">
+								<f:selectItem itemLabel="#{msg.selectOneMessage}" />
+								<f:selectItems value="#{fieldMsg.getFieldValueList('geDeviceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+							</p:selectOneMenu>
+						</h:panelGroup>
+						<h:panelGroup>
+							<p:commandButton validateClient="false" value="#{msg.Save}" actionListener="#{captureDataMessagesController.geIBDataSave}"
+								update="@parent, :captureDataMessagesListForm:datalist, :captureDataMessagesListForm:growl" icon="ui-icon-check"
+								oncomplete="handleSubmit(args, 'geIBDataEditDialog');" timeout="3000"/>
+							<p:commandButton process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('geIBDataEditDialog').hide()" />
+						</h:panelGroup>
+					</p:panelGrid>
+				</div>
+			</div>
+		</h:form>
+	</p:dialog>
+</ui:composition>
+
+</html>

@@ -110,11 +110,18 @@ public class V2_WorkOrderService {
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
-    public List<V2_BlobObject> getPicListBySrUid(String srUid,String boSubType) {
+    public List<V2_BlobObject> getPicListBySrUid(String srUid,Integer type, String boSubType) {
         List<SearchFilter> blobSearchFilters = new ArrayList();
         blobSearchFilters.add(new SearchFilter("boUuid", SearchFilter.Operator.EQ, srUid));
-        if(boSubType!=null)
-         blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, boSubType));
+      if(type ==1 && boSubType == V2_BlobObject.BO_SUB_TYPE_DOCS ) {
+              blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, V2_BlobObject.BO_SUB_TYPE_DOCS ));
+      }
+        if(type ==1 && boSubType == V2_BlobObject.BO_SUB_TYPE_IMG ) {
+                blobSearchFilters.add(new SearchFilter("objectType", SearchFilter.Operator.LIKE, "image/%"));
+                blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.EQ, "Image", "1*2+" ));
+                blobSearchFilters.add(new SearchFilter("boSubType", SearchFilter.Operator.IsNull,null,"1*2+" ));
+        }
+
         return blobDao.findBySearchFilter(blobSearchFilters);
     }
 
@@ -408,103 +415,7 @@ public class V2_WorkOrderService {
         }
     }
 
-    public List<UserAccount> getAssetResponser2(int assetId) {
-        List<UserAccount> userList999 = new ArrayList<UserAccount>();
-        AssetInfo assetInfo = assetInfoRepository.getById(assetId);
-        if (assetInfo != null) {
-            userList999 = userAccountRepository.getResponserwithTag999(assetInfo.getSiteUID());
-        }
-        //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
-        List<UserAccount> userListTag = userAccountRepository.getResponserByAssetId(assetId);
-        //获取和资产绑定的owner
-        List<UserAccount> defaultUserList = new ArrayList<UserAccount>();
 
-        // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID-->tenanent
-        if (CollectionUtils.isEmpty(userListTag)) {
-            if (!StringUtils.isEmpty(assetInfo.getSiteUID())) {
-                return userAccountRepository.getBySiteUID(assetInfo.getSiteUID());
-            }
-            if (!StringUtils.isEmpty(assetInfo.getHospitalUID())) {
-                return userAccountRepository.getByHospitalUID(assetInfo.getHospitalUID());
-            }
-            if (!StringUtils.isEmpty(assetInfo.getInstitutionUID())) {
-                return userAccountRepository.getByInstitutionUID(assetInfo.getInstitutionUID());
-            }
-            if (!StringUtils.isEmpty(assetInfo.getTenantUID())) {
-                return userAccountRepository.getByTenantUID(assetInfo.getInstitutionUID());
-            }
-
-            return defaultUserList;
-        } else {
-            return userListTag;
-        }
-    }
-
-    public List<UserAccount> getAssetResponser(int assetId) {
-        List<UserAccount> userList999 = new ArrayList<UserAccount>();
-        AssetInfo assetInfo = assetInfoRepository.getById(assetId);
-        if (assetInfo != null) {
-            userList999 = userAccountRepository.getResponserwithTag999(assetInfo.getSiteUID());
-        }
-        List<UserAccount> userListTag = null;
-
-        //获取关注过该资产标签的用户, 设备标签<->(设备+工程师组[员1，2..])
-        userListTag = userAccountRepository.getResponserByAssetId(assetId);
-        //获取和资产绑定的owner
-        List<UserAccount> assetOwnerList = userAccountRepository.getResponserWithAsset(assetId);
-        List<UserAccount> defaultUserList = new ArrayList<UserAccount>();
-
-        // Get responser with deeper down agaisnt on siteuid ->hospitalUid -> InstitutionUID
-        if (CollectionUtils.isEmpty(userListTag) & CollectionUtils.isEmpty(assetOwnerList)) {
-            OrgInfo orgInfo = orgInfoRepository.getByUid(assetInfo.getClinicalDeptUID());
-            if (orgInfo != null) {
-                if (orgInfo.getAssetOwnerId() != null) {
-                    UserAccount user1 = userAccountRepository.findById(orgInfo.getAssetOwnerId());
-                    defaultUserList.add(user1);
-                }
-                if (orgInfo.getAssetOwnerId2() != null) {
-                    UserAccount user2 = userAccountRepository.findById(orgInfo.getAssetOwnerId2());
-                    defaultUserList.add(user2);
-                }
-            }
-            defaultUserList.addAll(userList999);
-            defaultUserList = removeDuAccounts(defaultUserList);
-            return defaultUserList;
-
-        }
-        if (CollectionUtils.isNotEmpty(userListTag) & CollectionUtils.isNotEmpty(assetOwnerList)) {
-            userListTag.addAll(assetOwnerList);
-            userListTag.addAll(userList999);
-            userListTag = removeDuAccounts(assetOwnerList);
-            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-            return userListTag;
-        } else if (CollectionUtils.isEmpty(assetOwnerList)) {
-            userListTag.addAll(userList999);
-            userListTag = removeDuAccounts(userListTag);
-            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-            return userListTag;
-        } else if (CollectionUtils.isEmpty(userListTag)) {
-            assetOwnerList.addAll(userList999);
-            defaultUserList = userAccountRepository.getDefaultUsers(assetId);
-            userListTag.addAll(defaultUserList);
-            userListTag = removeDuAccounts(assetOwnerList);
-            userListTag = userListTag.stream().filter(id -> id != null).collect(Collectors.toList());
-            return userListTag;
-        }
-
-        return userListTag;
-    }
-
-    private List<UserAccount> removeDuAccounts(List<UserAccount> assetOwnerList) {
-        List<UserAccount> ulist = new ArrayList<UserAccount>();
-        Set<UserAccount> useSet = new HashSet<UserAccount>();
-        for (UserAccount ua : assetOwnerList) {
-            if (useSet.add(ua)) {
-                ulist.add(ua);
-            }
-        }
-        return ulist;
-    }
 
 //Type：0-我的/1-同一group的/2-同院区的/3-其它院区的
     public Page<V2_WorkOrder> getWorkOrderListToPickup(int type, PageRequest pr, UserAccount ua) {
