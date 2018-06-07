@@ -210,13 +210,13 @@
                                 <p:inputText value="#{assetInstallationController.arrivalListItem.serialNum}" id="serialNum" required="false" requiredMessage="#{msg.serialNum} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.departNum}</label>
-                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum">
-                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)"/>
+                                <label class="label">#{msg.departNum}#{assetInstallationController.needInstorageCheck?'*':''}</label>
+                                <p:inputText id="departNum2" value="#{assetInstallationController.arrivalListItem.departNum}" class="financingNum" >
+                                    <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('departNum')}" update="@(.financingNum)" />
                                 </p:inputText>
                             </h:panelGroup>
                             <h:panelGroup >
-                                <label class="label">#{msg.financingNum}</label>
+                                <label class="label">#{msg.financingNum}#{assetInstallationController.needInstorageCheck?'*':''}</label>
                                 <p:inputText  value="#{assetInstallationController.arrivalListItem.financingNum}" class="financingNum">
                                     <p:ajax event="keyup" process="@this" update="generateFinancingNum"/>
                                     <p:ajax process="@this" listener="#{assetInstallationController.onDepartNumChange('financingNum')}" update="departNum2 qrCode generateFinancingNum @(.financingNum)"/>
@@ -225,9 +225,9 @@
                                                  update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton financingNum" process="@(.financingNum)"/>
                             </h:panelGroup>
                             <h:panelGroup id="qrCode" class="financingNum">
-                                <label class="label">#{msg.qrCode}</label>
-                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}" readonly="#{not empty assetInstallationController.arrivalListItem.qrCode}">
-                                    <p:ajax listener="#{assetInstallationController.onDepartNumChange('qrCode')}" update="@(.financingNum)" />
+                                <label class="label">#{msg.qrCode}#{assetInstallationController.needInstorageCheck?'*':''}</label>
+                                <p:inputText  value="#{assetInstallationController.arrivalListItem.qrCode}">
+                                    <p:ajax listener="#{assetInstallationController.onQrCodeChange()}" update="@(.financingNum)" />
                                 </p:inputText>
                                 <p:commandButton actionListener="#{assetInstallationController.renewQrcode()}" disabled="#{not empty assetInstallationController.arrivalListItem.qrCode}" update="@(.financingNum)" icon="ui-icon-repeat" title="#{msg.Renew}" class="popupIconButton" process="@this"/>
                                 <p:commandButton process="@this" icon="ui-icon-search" title="#{msg.View}" update=":qrCodeLibShowDlg" oncomplete="PF('qrCodeLibShowDialog').show()" disabled="#{empty assetInstallationController.arrivalListItem.qrCode}" class="popupIconButton"/>
@@ -253,34 +253,61 @@
                                 <label class="label">#{msg.warrantyDate}</label>
                                 <p:calendar timeZone="GMT+8"  id="warrantyDate" pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.warrantyDate}" mindate="#{appContextService.curentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                             </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.InstallDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{assetInstallationController.arrivalListItem.installDate}" mindate="#{assetInstallationController.arrivalListItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                            </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName}</label>
-                                <p:selectOneMenu id="assetOwnerName" value="#{assetInstallationController.arrivalListItem.assetOwnerUID}" >
-                                    <p:ajax listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                                <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
+                                    </p:column>
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName2}</label>
-                                <p:selectOneMenu id="assetOwnerName2" value="#{assetInstallationController.arrivalListItem.assetOwnerUID2}"  >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                                <p:autoComplete id="assetOwnerName2" value="#{assetInstallationController.owner2}" converter="userAccountConverter" dropdown="true" forceSelection="true"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerName2Change}" process="@this"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
+                                    </p:column>
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.assetOwnerName3}</label>
-                                <p:selectOneMenu id="assetOwnerName3" value="#{assetInstallationController.arrivalListItem.assetOwnerUID3}"  >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                                <p:autoComplete id="assetOwnerName3" value="#{assetInstallationController.owner3}" converter="userAccountConverter" dropdown="true" forceSelection="true"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
+                                   	<p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerName3Change}" process="@this"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
+                                    </p:column>
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalOwnerName}</label>
-                                <p:selectOneMenu id="clinicalOwnerName" value="#{assetInstallationController.arrivalListItem.clinicalOwnerUid}" >
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.getClinicalOwnerList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                </p:selectOneMenu>
+                                <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true"
+                                var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
+                                    <p:column>
+                                        <h:outputText value="#{t.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <h:outputText value="#{t.telephone}"/>
+                                    </p:column>
+                                </p:autoComplete>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.locationCode}</label>

@@ -433,14 +433,25 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         needConfirmTime = false;
         selectedWorkOrderList = dao.findBySrId(selected.getServiceRequest().getId());
         audioList = getServiceRequestPicList(selected.getSrId(), 2,null);
-        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);
+        picList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_IMG);// gaolei to xiuggai
+
+
         attachList = getServiceRequestPicList(selected.getSrId(), 1,V2_BlobObject.BO_SUB_TYPE_DOCS);
     }
 
     public List<V2_BlobObject> getServiceRequestPicList(String srId, Integer type,String boSubType) { //type 1:picture 2:audio
-        return woService.getPicListBySrUid(srId,boSubType).stream().filter(item -> type == 1 ^ (item.getObjectType()!=null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
+
+		List<V2_BlobObject> pList = woService.getPicListBySrUid(srId,type, boSubType).stream().filter(item -> type == 1 ^
+				(item.getObjectType() != null && item.getObjectType().contains("audio"))).collect(Collectors.toList());
+
+		return pList;
     }
 
+
+/*
+*   if type =1 -->picList
+*
+* */
     public List<V2_WorkOrder_Step> getWOrkOrderStep(String woId) {
         return woService.getWorkOrderSteps(woId);
     }
@@ -727,6 +738,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
             itemDetail.setWoId(selectedWorkOrder.getId());
+            itemDetail.setApplyTime(new Date());
 
         } else {
             itemDetail = accessoryList.stream().filter(item -> item.getId().equals(itemId)).findAny().get();
@@ -870,7 +882,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
 
     public List<V2_BlobObject> getPicListByBoType(String boType) {
         if (picList != null) {
-            return picList.stream().filter(item -> boType.equals(item.getBoType())).collect(Collectors.toList());
+            List<V2_BlobObject> collect = picList.stream().filter(item -> boType.equals(item.getBoType())).collect
+                    (Collectors.toList());
+            return collect;
         } else {
             return null;
         }

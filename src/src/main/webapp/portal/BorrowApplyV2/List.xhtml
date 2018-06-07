@@ -47,8 +47,14 @@
                             listener="#{sharedAssetRequestV2Controller.onSelectB}" 
                             oncomplete="openSwapTypeViewWindow(xhr, status, args)" />
                     <p:ajax event="filter" listener="#{sharedAssetRequestV2Controller.onFilter}" update="createButton "/>
-                    
-                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}"  filterMatchMode="LIKE">
+
+                    <p:column headerText="科室名称" sortBy="#{item.clinicalDeptName}" filterBy="#{item.clinicalDeptName}" filterMatchMode="LIKE">
+                        <f:facet name="filter">
+                            <p:selectOneMenu onchange="PF('varDataList').filter()" autoWidth="false" style="max-width: 150px;" height="200">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{assetInfoService.getAllAccessibleOrgDeptListNestedByOrgLevel()}" />
+                            </p:selectOneMenu>
+                        </f:facet>
                         <h:outputText value="#{item.clinicalDeptName}"/>
                     </p:column>
                     <p:column headerText="申请人" sortBy="#{item.applicantName}" filterBy="#{item.applicantName}" filterMatchMode="LIKE">

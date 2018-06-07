@@ -7,6 +7,7 @@ package com.ge.apm.view;
 
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.springframework.data.domain.Page;
@@ -19,9 +20,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -42,17 +42,31 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     SharedAssetRequestRepository sharedDao = null;
     OrgInfoRepository orgInfoDao = null;
     WorkflowConfigRepository wfCfigDao = null;
+    private UaaService uuaService;
 
     private Date filterBeginTime;
     private Date filterEndTime;
+    private String oneSearchStr;
 
-    private String filterUnitPrice;
-    private Double filterUnitPriceFrom;
-    private Double filterUnitPriceTo;
+    public String getOneSearchStr() {
+        return oneSearchStr;
+    }
 
-    private String filterCost;
-    private Double filterCostFrom;
-    private Double filterCostTo;
+    public void setOneSearchStr(String oneSearchStr) {
+        this.oneSearchStr = oneSearchStr;
+        if (oneSearchStr.isEmpty()) {
+            this.removeFilterOnField("assetName");
+            this.removeFilterOnField("assetNumber");
+        }
+    }
+    private long queryIndex = 0;
+    public long getQueryIndex() {
+        return queryIndex;
+    }
+
+    public void setQueryIndex(long queryIndex) {
+        this.queryIndex = queryIndex;
+    }
 
     public Date getFilterBeginTime() {
         return filterBeginTime;
@@ -72,6 +86,7 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
 
     @Override
     protected void init() {
+        uuaService = WebUtil.getBean(UaaService.class);
         dao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         asiDao = WebUtil.getBean(AssetInfoRepository.class);
         apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
@@ -96,20 +111,36 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
     protected SharedAssetReqDetailRepository getDAO() {
         return dao;
     }
+
+    //根据登录人信息配置权限
+    private void setUserSearchFilters() {
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<SearchFilter>();
+        }
+        UserAccount user = UserContextService.getCurrentUserAccount();
+        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+        searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+
+    }
     
     @Override
     protected Page<SharedAssetReqDetail> loadData(PageRequest pageRequest) {
-        List<String> sharedList = new ArrayList<String>();
-        
+
+        setUserSearchFilters();
+
         String orgUid = UserContextService.getCurrentUserAccount().getOrgInfoUID();
-        OrgInfo userOrg = orgInfoDao.getByUid(orgUid);
         List<WorkflowConfig> wfCfigList = wfCfigDao.findByDeptForSharedAsset(orgUid);
-        if (wfCfigList == null || wfCfigList.size() == 0) {
-            sharedList = sharedDao.findSharedIdByOrgUidforQuery(orgUid);
-        } else {
-            sharedList = sharedDao.findSharedIdforQuery(userOrg.getSiteUID());
+        if (wfCfigList != null && wfCfigList.size() > 0) {
+            searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.NE,orgUid));
         }
 
+        if (queryIndex == 0){
+            this.removeFilterOnField("chargingEndTime");
+        }
         if (filterBeginTime != null){
             searchFilters.add(new SearchFilter("chargingBeginTime", SearchFilter.Operator.GTE,filterBeginTime));
         }
@@ -117,34 +148,80 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             searchFilters.add(new SearchFilter("chargingEndTime", SearchFilter.Operator.LTE,filterEndTime));
         }
 
-        this.removeFilterOnField("unitPrice");
-
-        if (this.getFilterUnitPrice() != null && this.getFilterUnitPrice() != ""){
-            String[] split = this.getFilterUnitPrice().split("~");
-            searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.GTE,split[0]));
-            if (split.length == 2) {
-                if (!split[1].equals(""))
-                    searchFilters.add(new SearchFilter("unitPrice", SearchFilter.Operator.LTE, split[1]));
-            }
+        if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
+            this.updateSearchFilter(new SearchFilter("assetName", SearchFilter.Operator.LIKE, oneSearchStr, "1*2+"));
+            this.updateSearchFilter(new SearchFilter("assetNumber", SearchFilter.Operator.LIKE, oneSearchStr, "1*2+"));
+        }
+        if (queryIndex == 1){
+            this.updateSearchFilter(new SearchFilter("chargingEndTime", SearchFilter.Operator.IsNull,null));
         }
 
-        this.removeFilterOnField("cost");
-
-        if (this.getFilterCost() != null && this.getFilterCost() != ""){
-            String[] split = this.getFilterCost().split("~");
-            searchFilters.add(new SearchFilter("cost", SearchFilter.Operator.GTE,split[0]));
-            if (split.length == 2) {
-                if (!split[1].equals(""))
-                    searchFilters.add(new SearchFilter("cost", SearchFilter.Operator.LTE, split[1]));
-            }
-        }
-      
-        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
+//        searchFilters.add(new SearchFilter("borrowId", SearchFilter.Operator.IN,sharedList));
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
+    }
+
+    public void searchList(Long queryIndex){
+        this.queryIndex = queryIndex;
+        this.searchFilters.clear();
+    }
+
+    public String getUseTime(Date chargingBeginTime,Date chargingEndTime,String chargingType){
+
+        return (String) getUseTimeOrCost(chargingBeginTime,chargingEndTime,chargingType,null);
+    }
+
+    public Double getUseCost(Date chargingBeginTime,Date chargingEndTime,String chargingType,Double unitPrice){
+
+        return (Double) getUseTimeOrCost(chargingBeginTime,chargingEndTime,chargingType,unitPrice == null ? 0.0 : unitPrice);
+    }
+
+    public Object getUseTimeOrCost(Date chargingBeginTime,Date chargingEndTime,String chargingType,Double unitPrice){
+        if (chargingEndTime == null){
+            Calendar cal = Calendar.getInstance();
+            Date date = new Date();
+            cal.setTime(date);
+            if ("2".equals(chargingType)){
+                cal.set(Calendar.SECOND,0);
+                int minutes = cal.get(Calendar.MINUTE);
+                if (minutes>=0 && minutes <30){
+                    cal.set(Calendar.MINUTE,0);
+                }else {
+                    cal.set(Calendar.MINUTE,30);
+                }
+            }
+            chargingEndTime = cal.getTime();
+        }
+        long nd = 1000 * 24 * 60 * 60;
+        long nh = 1000 * 60 * 60;
+        long nm = 1000 * 60;
+        long diff = chargingEndTime.getTime() - chargingBeginTime.getTime();
+        // 计算差多少天
+        long day = diff / nd;
+        // 计算差多少小时
+        long hour = diff % nd / nh;
+        // 计算差多少分钟
+        long min = diff % nd % nh / nm;
+        double number = day * 24 + hour + min/60.0;
+        number = number < 0 ? 0 : number;
+
+        String useTime = "";
+        useTime = day+"天"+hour+"时"+min+"分";
+        if ("1".equals(chargingType)){
+            useTime = "1次";
+            number = 1;
+        }else if ("3".equals(chargingType)){
+            useTime = day+"天";
+            number = day;
+        }
+        if (unitPrice == null){
+            return useTime;
+        }
+        return number * unitPrice;
+
     }
     
     public String getclinicalDeptName(String Uid){
@@ -160,34 +237,6 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         }
     }
 
-    public String getFilterUnitPrice() {
-        double from = filterUnitPriceFrom != null ? filterUnitPriceFrom : 0;
-        String s = (filterUnitPriceTo != null && filterUnitPriceTo != 0) ? filterUnitPriceTo + "" : "";
-        if (filterUnitPriceFrom == null && filterUnitPriceTo == null)
-            return null;
-        return from + "~" + s;
-    }
-
-    public void setFilterUnitPrice(String filterUnitPrice) {
-        this.filterUnitPrice = filterUnitPrice;
-    }
-
-    public Double getFilterUnitPriceFrom() {
-        return filterUnitPriceFrom;
-    }
-
-    public void setFilterUnitPriceFrom(Double filterUnitPriceFrom) {
-        this.filterUnitPriceFrom = filterUnitPriceFrom;
-    }
-
-    public Double getFilterUnitPriceTo() {
-        return filterUnitPriceTo;
-    }
-
-    public void setFilterUnitPriceTo(Double filterUnitPriceTo) {
-        this.filterUnitPriceTo = filterUnitPriceTo;
-    }
-
     public SharedAssetReqDetailRepository getDao() {
         return dao;
     }
@@ -196,31 +245,4 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         this.dao = dao;
     }
 
-    public String getFilterCost() {
-        double from = filterCostFrom != null ? filterCostFrom : 0;
-        String s = (filterCostTo != null && filterCostTo != 0) ? filterCostTo + "" : "";
-        if (filterCostFrom == null && filterCostTo == null)
-            return null;
-        return from + "~" + s;
-    }
-
-    public void setFilterCost(String filterCost) {
-        this.filterCost = filterCost;
-    }
-
-    public Double getFilterCostFrom() {
-        return filterCostFrom;
-    }
-
-    public void setFilterCostFrom(Double filterCostFrom) {
-        this.filterCostFrom = filterCostFrom;
-    }
-
-    public Double getFilterCostTo() {
-        return filterCostTo;
-    }
-
-    public void setFilterCostTo(Double filterCostTo) {
-        this.filterCostTo = filterCostTo;
-    }
 }

@@ -7,6 +7,7 @@ package com.ge.apm.view.sysutil;
 
 import com.ge.apm.dao.ImportFilesRepository;
 import com.ge.apm.domain.ImportFiles;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.utils.FileScanService;
 import com.google.common.base.Strings;
@@ -107,7 +108,8 @@ public class BatchFileController extends GenericCRUDUUIDController<ImportFiles> 
     }
 
     public String getUserName(String userUid) {
-        return userService.getUserByUid(userUid).getName();
+        UserAccount user = userService.getUserByUid(userUid);
+        return null==user?"":user.getName();
     }
 
     public void saveFiles() throws Exception {

@@ -32,14 +32,15 @@
                             <label class='label'>科室名称</label>
                             <!--<h:outputText value="#{sharedAssetRequestV2Controller.selected.clinicalDeptName}" />-->
                             <p:selectOneMenu id="clinicalDeptUid" value="#{sharedAssetRequestV2Controller.selected.clinicalDeptUid}" required="true" requiredMessage="科室 #{msg.ValidationRequire}" >
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{assetInfoService.getClinicalDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-<!--                                <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>-->
+                                <!--<f:selectItem itemLabel="#{msg.selectOneMessage}"/>-->
+                                <!--<f:selectItems value="#{assetInfoService.getClinicalDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>-->
+                                <f:selectItems value="#{assetInfoService.getOrgDeptList(sharedAssetRequestV2Controller.selected.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>虚拟网电话</label>
-                            <p:inputText id="applicantPhone" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />
+                            <h:outputText value="#{sharedAssetRequestController.selected.applicantPhone}"/>
+                            <!--<p:inputText id="applicantPhone" value="#{sharedAssetRequestV2Controller.selected.applicantPhone}" />-->
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class='label'>申请日期</label>

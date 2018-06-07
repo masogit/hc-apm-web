@@ -20,6 +20,8 @@ import com.ge.apm.domain.QrCodeLib;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import com.ge.apm.domain.V2_BlobObject;
@@ -47,6 +49,9 @@ public class AssetInstallationService {
 
     @Autowired
     BlobObjectRepository blobDao;
+    
+    @Autowired
+    protected BlobFileService blobService;
 
     @Autowired
     SupplierRepository supplierDao;
@@ -80,6 +85,29 @@ public class AssetInstallationService {
 
     public List<ArrivalListItem> getListItem(String arrivalListId) {
         return itemDao.findByArrivalListId(arrivalListId);
+    }
+    
+    public void deleteListItem(String arrivalListId,String siteUid){
+    	List<ArrivalListItem> listItem=getListItem(arrivalListId);
+    	if(listItem!=null){
+    		for(ArrivalListItem item: listItem){
+    			if(StringUtils.isNotEmpty(item.getQrCode())){
+    				deleteQrCode(item.getQrCode(), siteUid);
+    			}
+    		}
+    		itemDao.delete(listItem);
+    	}
+    }
+    public void deleteBlobObject(String arrivalListId){
+    	List<V2_BlobObject> listObj=blobDao.findByBoUuid(arrivalListId);
+    	if(listObj!=null){
+    		for(V2_BlobObject obj :listObj){
+    			blobService.deleteBlobFile(obj);
+    		}
+    	}
+    }
+    private void deleteQrCode(String qrCode,String siteUid){
+    	qrCodeService.deleteQrcode(qrCode, siteUid);
     }
 
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {

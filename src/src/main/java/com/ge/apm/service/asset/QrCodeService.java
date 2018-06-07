@@ -76,9 +76,6 @@ public class QrCodeService {
     ConfigService configService;
 
     @Autowired
-    private ArrivalListItemRepository itemDao;
-    
-    @Autowired
     private OrgInfoRepository orgDao;
 
     public QrCodeLib createOneQrCode(String tenantUID, String siteUID, Integer status) {
@@ -95,7 +92,7 @@ public class QrCodeService {
         }
         String dtStr = new DateTime().toString("yyMMdd");
         String qrCode = dtStr + Long.valueOf((long) ((Math.random() * 9 + 1) * 1000000000L));
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getSiteUID());
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, currentOrg.getSiteUID());
         if (null == qrCodeLib) {
             qrCodeLib = new QrCodeLib();
 //            qrCodeLib.setSiteId(currentOrg.getSiteId());
@@ -122,7 +119,7 @@ public class QrCodeService {
             throw new IllegalArgumentException("current org should not be empty");
         }
 
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getSiteUID());
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, currentOrg.getSiteUID());
         if (qrCodeLib != null) {
             throw new IllegalArgumentException("current qrcode already exists");
         }
@@ -154,54 +151,61 @@ public class QrCodeService {
         return result;
     }
 
-    public void discardQrCode(String qrCode,String siteUid) {
-        updateQrCodeStatus(qrCode,siteUid,4);
+    public void discardQrCode(String qrCode, String siteUid) {
+        updateQrCodeStatus(qrCode, siteUid, 4);
     }
 
-    public void updateQrCodeStatus(String qrCode, String siteUid,Integer status) {
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
+    public void updateQrCodeStatus(String qrCode, String siteUid, Integer status) {
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
         if (qrCodeLib != null) {
             qrCodeLib.setStatus(status);
             qrCodeLibDao.save(qrCodeLib);
         }
     }
 
-    public BufferedImage getQrCodeImage(String qrCode,String siteUid ) {
+    public BufferedImage getQrCodeImage(String qrCode, String siteUid) {
         return getQrCodeImage(qrCode, null, siteUid);
     }
-    
+
     public BufferedImage getQrCodeImage(QrCodeLib qrCodeLib) {
         return getQrCodeImage(qrCodeLib.getQrCode(), null, qrCodeLib.getSiteUID());
     }
 
-    public BufferedImage getQrCodeImage(String qrCode, AssetInfo asset,String siteUid ) {
+    public BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, String siteUid) {
         QrCodeTemplate template = null;
         if (asset != null) {
             template = getTemplateBySiteUid(asset.getSiteUID());
         } else if (!Strings.isNullOrEmpty(qrCode)) {
             template = getTemplateBySiteUid(siteUid);
         }
-        return getQrCodeImage(qrCode, asset, template,siteUid);
+        return getQrCodeImage(qrCode, asset, template, siteUid);
     }
 
-    public BufferedImage getQrCodeImageWithTemplate(String qrCode, AssetInfo asset, String templateId,String siteUid) {
-        if(Strings.isNullOrEmpty(templateId)){
-            return getQrCodeImage(qrCode,asset,asset.getSiteUID());
+    public BufferedImage getQrCodeImageWithTemplate(String qrCode, AssetInfo asset, String templateId, String siteUid) {
+        if (Strings.isNullOrEmpty(templateId)) {
+            return getQrCodeImage(qrCode, asset, asset.getSiteUID());
         }
         QrCodeTemplate template = templateDao.findById(templateId);
-        return getQrCodeImage(qrCode, asset, template,siteUid);
+        return getQrCodeImage(qrCode, asset, template, siteUid);
     }
 
-    private BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, QrCodeTemplate template,String siteUid) {
+    private BufferedImage getQrCodeImage(String qrCode, AssetInfo asset, QrCodeTemplate template, String siteUid) {
         List<QrCodeTemplateElement> elementList;
         if (template == null) {
-            template = templateService.getDefaultTemplate();
+//            if (StringUtils.isEmpty(qrCode)) {
+//                qrCode = asset.getQrCode();
+//            }
+//            if (StringUtils.isEmpty(qrCode)) {
+//                return null;
+//            }
+            QrCodeLib qrCodeLib = this.findByQrCode(Strings.isNullOrEmpty(qrCode)?asset.getQrCode():qrCode, siteUid);
+            template = templateService.getDefaultTemplateByQrCodeLib(qrCodeLib);
             elementList = templateService.getDefaultTemplateElements();
         } else {
             elementList = templateService.getElementsByTemplate(template.getId());
         }
         if (!Strings.isNullOrEmpty(qrCode)) {
-            elementList = getElementsValue(template, elementList, qrCode,siteUid);
+            elementList = getElementsValue(template, elementList, qrCode, siteUid);
         } else {
             elementList = getElementsValue(template, elementList, asset);
         }
@@ -222,7 +226,6 @@ public class QrCodeService {
 //                        .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getInstitutionUID()))
 //                                .orElse(Optional.ofNullable(templateDao.findSiteTemplate(qrcodeLib.getTenantUID())).orElse(null))));
 //    }
-    
     public QrCodeTemplate getTemplateBySiteUid(String siteUid) {
         OrgInfo siteOrg = orgDao.findByUid(siteUid);
         return siteOrg == null ? null : Optional.ofNullable(templateDao.findSiteTemplate(siteOrg.getSiteUID()))
@@ -230,22 +233,21 @@ public class QrCodeService {
                         .orElse(Optional.ofNullable(templateDao.findSiteTemplate(siteOrg.getInstitutionUID()))
                                 .orElse(Optional.ofNullable(templateDao.findSiteTemplate(siteOrg.getTenantUID())).orElse(null))));
     }
-    
 
     public String getQrCodeImageBase64(String qrCode, String siteUid) {
-        return qrCodeDrawService.getImageBase64(getQrCodeImage(qrCode,siteUid));
+        return qrCodeDrawService.getImageBase64(getQrCodeImage(qrCode, siteUid));
     }
 
     public String getQrCodeImageBase64(AssetInfo asset) {
-        return qrCodeDrawService.getImageBase64(getQrCodeImage(null, asset,asset.getSiteUID()));
-    }
-    
-    public String getQrCodeImageBase64WithTemplate(AssetInfo asset,String templateId,String siteUid) {
-        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(null, asset,templateId,siteUid));
+        return qrCodeDrawService.getImageBase64(getQrCodeImage(null, asset, asset.getSiteUID()));
     }
 
-    public String getQrCodeImageBase64WithTemplate(String qrCode, String templateId,String siteUid) {
-        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(qrCode, null, templateId,siteUid));
+    public String getQrCodeImageBase64WithTemplate(AssetInfo asset, String templateId, String siteUid) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(null, asset, templateId, siteUid));
+    }
+
+    public String getQrCodeImageBase64WithTemplate(String qrCode, String templateId, String siteUid) {
+        return qrCodeDrawService.getImageBase64(getQrCodeImageWithTemplate(qrCode, null, templateId, siteUid));
     }
 
     private static Map<String, String> FieldsMap;
@@ -271,8 +273,8 @@ public class QrCodeService {
         return FieldsMap;
     }
 
-    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode,String SiteUid) {
-        AssetInfo asset = assetDao.getByQrCodeAndSiteUid(qrCode,SiteUid);
+    public List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements, String qrCode, String SiteUid) {
+        AssetInfo asset = assetDao.getByQrCodeAndSiteUid(qrCode, SiteUid);
         if (asset == null) {
             //Demo asset for preview
             asset = new AssetInfo();
@@ -405,7 +407,7 @@ public class QrCodeService {
 
     List<QrCodeTemplateElement> getElementsValue(QrCodeTemplate template, List<QrCodeTemplateElement> elements) {
 
-        return getElementsValue(template, elements, "0123456789123456","");
+        return getElementsValue(template, elements, "0123456789123456", "");
     }
 
     public String getPreViewBase64(QrCodeTemplate template, List<QrCodeTemplateElement> elementList) {
@@ -427,6 +429,61 @@ public class QrCodeService {
     }
 
     /**
+     * 设置时检查, 不合法返回空值, 三码合一时创建新码
+     *
+     * @param qrcode
+     * @param siteUid
+     * @return
+     */
+    public String getAvailableQrcode(String qrcode, String siteUid) {
+        if (Strings.isNullOrEmpty(qrcode)) {
+            return "";
+        }
+        if (qrcode.length() > 16) {
+            return "";
+        }
+
+        WorkflowConfig config = configService.findConfigBySite(siteUid);
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
+        if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
+            if (qrCodeLib == null) {
+                createSpecialQrCode(qrcode, siteUid);
+                return qrcode;
+            }
+            if (qrCodeLib.getStatus() == 1) {
+                return qrcode;
+            }
+
+        } else {
+            if (qrCodeLib == null) {
+                return "";
+            }
+            if (qrCodeLib.getStatus() == 1) {
+                return qrcode;
+            }
+        }
+
+        return "";
+    }
+
+    public String checkAvailableBeforeSave(String qrcode, String siteUid) {
+        if (Strings.isNullOrEmpty(qrcode)) {
+            return "Normal";
+        }
+        if (qrcode.length() > 16) {
+            return "TooLong";
+        }
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
+        if (qrCodeLib == null) {
+            return "InvalidQRCode";
+        }
+        if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
+                return "AlreadyUsingQrCode";
+        }
+        return "Normal";
+    }
+
+    /**
      * Return "Normal" is available;
      *
      * @param qrcode
@@ -437,7 +494,7 @@ public class QrCodeService {
         if (Strings.isNullOrEmpty(qrcode)) {
             return "Normal";
         }
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode,siteUid);
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
         if (config != null && "DFQ".equals(config.getAssetCodeConfig())) {
             if (qrCodeLib == null) {
                 createSpecialQrCode(qrcode, siteUid);
@@ -474,7 +531,7 @@ public class QrCodeService {
 
     public void createQrCodeIfNotExists(String qrCode, OrgInfo currentOrg, int status) {
 
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, currentOrg.getUid());
 
         if (qrCodeLib == null) {
             createSpecifiedQrCode(qrCode, currentOrg, status);
@@ -483,7 +540,7 @@ public class QrCodeService {
     }
 
     public boolean createSpecialQrCode(String qrcode, String siteUid) {
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode,siteUid);
+        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrcode, siteUid);
         if (null != qrCodeLib) {
             return false;
         }
@@ -502,17 +559,17 @@ public class QrCodeService {
         return true;
     }
 
-    public void forceRemoveQrcode(String qrCode, String siteUid){
+    public void forceRemoveQrcode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
-        if(null == qrCodeLib){
-            return ;
+        if (null == qrCodeLib) {
+            return;
         }
         qrCodeLibDao.delete(qrCodeLib);
     }
-    
+
     public boolean deleteQrcode(String qrCode, String siteUid) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
-        if(null == qrCodeLib){
+        if (null == qrCodeLib) {
             return true;
         }
         if (qrCodeLib.getStatus() != 1 && qrCodeLib.getStatus() != 2) {
@@ -535,7 +592,7 @@ public class QrCodeService {
 
     public boolean isQrcodeAvailableInStatus(String qrCode, String siteUid, int status) {
         QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode, siteUid);
-        if(null == qrCodeLib){
+        if (null == qrCodeLib) {
             return false;
         }
 
@@ -549,7 +606,7 @@ public class QrCodeService {
 
     public boolean updateExistingQrCodeNotUsed(String qrCode, OrgInfo currentOrg) {
 
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,currentOrg.getUid());
+        QrCodeLib qrCodeLib = findByQrCode(qrCode, currentOrg.getUid());
 
         if (qrCodeLib == null) {
             return false;
@@ -565,7 +622,7 @@ public class QrCodeService {
     }
 
     public void releaseQrCodeInUse(String qrCode, String siteUid) {
-        QrCodeLib qrCodeLib = qrCodeLibDao.findByQrCode(qrCode,siteUid);
+        QrCodeLib qrCodeLib = findByQrCode(qrCode, siteUid);
         if (qrCodeLib != null) {
             int status = qrCodeLib.getStatus();
             if (status == 3) {
@@ -574,5 +631,9 @@ public class QrCodeService {
             }
 
         }
+    }
+
+    public QrCodeLib findByQrCode(String qrCode, String siteUid) {
+        return qrCodeLibDao.findByQrCode(qrCode, siteUid);
     }
 }

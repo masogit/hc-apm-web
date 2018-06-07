@@ -464,7 +464,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'V3_WorkFlowConfig', '院区工作流配置', 'config for hospital', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'V2_WorkOrderWorkflowConfig', '紧急工单工作流配置', 'workorder workflow config', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'brand', '品牌', 'Brand', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'nationalStandardCode', '2010国家编码', 'National Standard Code', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'nationalStandardCode', '设备国标码', 'National Standard Code', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'srNum', '报修单号', 'Service Request Number', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetCategory', '设备类型', 'Asset Category', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetUsage', '用途分类', 'Asset Usage', NULL, '-1');
@@ -1505,9 +1505,9 @@ INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw
 INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '3', '天', null, null, -1, null, null, null, null, null, null, null, null, null);
 INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw, site_id, created_by, created_date, last_modified_by, last_modified_date, hospital_id, tenant_uid, institution_uid, hospital_uid, site_uid) VALUES ('chargingType', '4', '自然时间', null, null, -1, null, null, null, null, null, null, null, null, null);
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '1', '设备供应商', 'vendor', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '2', '设备维修商', 'maintainer', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '设备供应/维修商', 'vendor and maintainer', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '1', '供应商', 'vendor', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '2', '维修商', 'maintainer', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '供应/维修商', 'vendor and maintainer', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isAssetPMed', '是否PM', 'need PM?', NULL, '-1');

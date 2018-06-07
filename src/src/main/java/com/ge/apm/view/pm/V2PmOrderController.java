@@ -108,7 +108,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private  String head;
-    
+
     private String reportUid; //selected table base uid
     public String getHead() {
         return head;
@@ -157,6 +157,41 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return tdListTotal.stream().anyMatch(item->item.getId().equalsIgnoreCase(reportUid));//reportUId: tableDefinition-id
     }
 
+    //是否全是批量完成
+    public boolean isPiliangWanChen() {
+        //System.out.println(result);
+        boolean mark =false;
+        List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k,v)->{
+            result.getContent().stream().forEach(item->{
+               if(item.getId()==k && v==true)
+                x3.add(item);
+            });
+        });
+        //x3存放的是所选中pm工单
+        if(x3.size()>0)
+            mark= x3.stream().allMatch(item->item.getSimplify().equals(true));
+        return mark;
+    }
+
+    public boolean isPiliangJiedan() {
+       // System.out.println(result);
+        boolean mark =true;
+        List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
+        //选中的保养工单中是否都是批量接单货或批量完成
+        selectedMap.forEach((k,v)->{
+            result.getContent().stream().forEach(item->{
+                if(item.getId()==k && v==true)
+                    x3.add(item);
+            });
+        });
+        //x3存放的是所选中pm工单
+        if(x3.size()>0)
+            mark= x3.stream().anyMatch(item->item.getSimplify().equals(true));
+        return mark;//==false?true:false;
+    }
+
     public boolean isChecked() {
         Map<String, Boolean> map = this.selectedMap;
         for (Map.Entry<String, Boolean> entry : map.entrySet()) {
@@ -195,6 +230,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         return true;
     }
 
+
+
     @Transactional
     public void saveCheckItemData(){
         UnstructuredDataCollection unColl = new UnstructuredDataCollection();
@@ -206,7 +243,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 unColl.setBoUuid(selectedPmOrder.getId());
                 unColl.setBoType("pm-checklist-report");
                 PmOrderRule pmOrderRule= pmOrderService.acqPmOrderRule(selectedPmOrder);
-                unColl.setSchemaId(pmOrderRule.getPerformanceReport());
+                if(pmOrderRule!=null){
+                    unColl.setSchemaId(pmOrderRule.getPerformanceReport());
+                }
                 //将检查项的数据保存到UnstructuredDataCollection中.
                 while(it.hasNext()){
                     Map.Entry<String, UnstructuredData> entry = it.next();
@@ -227,7 +266,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 }
                 pmOrderService.saveReport(unDataCollection);
             }
-            WebUtil.addSuccessMessage("保存检查项操作成功");
+          //  WebUtil.addSuccessMessage("保存检查项操作成功");
         }catch(Exception ex){
             ex.printStackTrace();
         }
@@ -465,11 +504,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
         this.selectedMap = new HashMap();
-        //如果当前人员只是 临床科室主任或者 只是临床科室人员...
-        if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead") && userContextService.hasAnyRole("ClinicalStaff") &&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))){
-            queryIndex= 8;
-        }else {
-            queryIndex = -1;
+        /*backup  if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") &&( userContextService.hasAnyRole("HospitalHead")|| userContextService.hasAnyRole("ClinicalStaff")|| userContextService.hasAnyRole("DeptHead")) )*/
+
+      /* if( (userContextService.hasAnyRole("DeptHead")||userContextService.hasAnyRole("HospitalHead")||userContextService.hasAnyRole("ClinicalStaff")) &&(!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")|| userContextService.hasAnyRole("ITAdmin")) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")))*/
+
+//如果是院长等管理层登陆进来queryIndex默认是8即当前就显示待审核
+           if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") &&( userContextService.hasAnyRole("HospitalHead")|| userContextService.hasAnyRole("ClinicalStaff")|| userContextService.hasAnyRole("DeptHead")) ){
+            String query = WebUtil.getRequestParameter("query");
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = 8;
+            } else {
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
+        }else{
+            String query = WebUtil.getRequestParameter("query");
+            if (Strings.isNullOrEmpty(query)) {
+                queryIndex = -1;
+            } else {
+                queryIndex = Integer.valueOf(query);
+                searchList(queryIndex);
+            }
         }
         this.filterBySite = false;
         this.filterByHospital = false;
@@ -538,6 +593,17 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             Date planTime =selectedPmOrder.getPlanTime();
             pmOrderService.acceptWorkOrder(selectedPmOrder,planTime);
         }else{ //批量操作
+            //先判定 批量的里面会不会包含 待接单Tab中 二级简化中的"完成"保养单
+            List<String> assetIdList = new ArrayList<String>();
+            selectedMap.forEach((k,v)->{
+                if(v==true)
+                    assetIdList.add(k);
+            });
+            List<V2_PmOrder> pmList = dao.checkSimplify(assetIdList);
+            if(pmList.size()>0){
+                WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
+                return;
+            }
             pmOrderService.acceptWorkOrderBatch(currentPagePmOrders,selectedMap,planTimeForBatch);
         }
         cancel();
@@ -562,6 +628,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     /*DISPATER(2,"待派工", "Assign"),ACCEPT(3,"待接单", "Accept"),
 			CONFIRM(5,"待验收", "Ack"),CLOSE(6,"待关单", "Close"),EVALUATE(7,"待评价", "Rate"),APPROVAL(8, "待审核", "Approval"), MAINTAIN(0, "保养中", "Repair");*/
+    Page<V2_PmOrder> result;
     @Override
     protected Page<V2_PmOrder> loadData(PageRequest pageRequest) {
         this.setSearchFilter();
@@ -590,6 +657,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("assetInfo.institutionUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
             searchFilters.add(new SearchFilter("assetInfo.tenantUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
             searchFilters.add(new SearchFilter("assetInfo.clinicalDeptUID", SearchFilter.Operator.IN, sitelist, "1*3+"));
+
         } else if (queryIndex == 3) {//待接单
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, "Accept"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));
@@ -652,7 +720,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.EQ, true));
         }
         this.selected = null;
-        Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+   //     Page<V2_PmOrder> result1 =dao.findBySearchFilter(this.searchFilters,null);
+        result =dao.findBySearchFilter(this.searchFilters, pageRequest);
         currentPagePmOrders = result.getContent();
         this.isSelectedCurrentPage = !currentPagePmOrders.stream().anyMatch(item -> !selectedMap.containsKey(item.getId()) || !selectedMap.get(item.getId()));
         return result;
@@ -804,9 +873,27 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         needConfirmTime = false;
         picList = new ArrayList<V2_BlobObject>();
     }
-    public void repairPmOrderBatch() {
+    //已计划-->批量保养完成
+    public void repairPmOrderBatch(){
+		  pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
+    }
+
+    public void batchComplete(){
+       /* List<String> assetIdList = new ArrayList<String>();
+        //批量的必须是能"完成"的而非"抢单"的操作 如果有抢单的工单在里面 需要提醒用户
+        selectedMap.forEach((k,v)->{
+            if(v==true)
+                assetIdList.add(k);
+        });
+        List<V2_PmOrder> pmList = dao.checkSimplify(assetIdList);
+        if(pmList.size()!=assetIdList.size()){//说明选定的工单全都是可以简化即simplify为3
+            //不能选择"抢单"的来做批量"完成"
+            WebUtil.addErrorMessage("您的批量中不能包含待接单或待抢单的保养工单");
+            return;
+        }*/
         pmOrderService.repairWorkOrderBatch(endTime,totalManHours,currentPagePmOrders,selectedMap);
     }
+    //已计划-->保养完成
     public void repairPmOrder() {
         if(!requiredCheck()){
             return;
@@ -852,7 +939,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         needConfirmTime = false;
     }
-    public void prepareEditAccDetail(String itemId) {
+    public void prepareEditAccDetail(String itemId){
         if ("new".equals(itemId)) {
             itemDetail = new V2_WorkOrder_Detail();
             itemDetail.setId(UUID.randomUUID().toString().replace("-", ""));
@@ -867,6 +954,10 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         } else if (index == 2) {
             coWorkerList.removeAll(coWorkerList.stream().filter(item -> item.getId().equals(itemId)).collect(Collectors.toList()));
         }
+    }
+    public void prepareBatchComplete(){
+        this.endTime=null;
+        this.totalManHours=null;
     }
     public void prepareEditCoWorkerDetail(String itemId) {
         if ("new".equals(itemId)) {
@@ -958,7 +1049,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public List<V2_WorkOrder_Detail> getAccessoryList() {
         if (accessoryList == null) {
-            // accessoryList = new ArrayList<V2_WorkOrder_Detail>();
             return null;
         }
         V2_WorkOrder_Detail emptyDetail = new V2_WorkOrder_Detail();
@@ -973,7 +1063,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
     public List<V2_WorkOrderCoworker> getCoWorkerList() {
         if (coWorkerList == null) {
-            // coWorkerList  = new ArrayList<V2_WorkOrderCoworker>();
             return null;
         }
         V2_WorkOrderCoworker emptyDetail = new V2_WorkOrderCoworker();

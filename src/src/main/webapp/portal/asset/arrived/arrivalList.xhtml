@@ -69,7 +69,7 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{assetArrivedListController.createAction}" update="datalist"  />
                             <p:commandButton id="viewButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{assetArrivedListController.editAction}" update="datalist " disabled="#{empty assetArrivedListController.selected}"/>
                             <p:commandButton id="saveAsButton" icon="ui-icon-save" class="btn btn-sm btn-gray" title="另存为" action="#{assetArrivedListController.saveAsAction}" update="datalist" disabled="#{empty assetArrivedListController.selected}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetArrivedListController.delete}" update=":AssetArrivalListForm:datalist, :growl"  disabled="#{empty assetArrivedListController.selected or assetArrivedListController.selected.status ne 1}">
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{assetArrivedListController.delete}" update=":AssetArrivalListForm:datalist, :growl"  disabled="#{empty assetArrivedListController.selected or assetArrivedListController.selected.cannotDeleted}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
