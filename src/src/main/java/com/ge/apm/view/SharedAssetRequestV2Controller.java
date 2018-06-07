@@ -2,6 +2,7 @@
 package com.ge.apm.view;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.service.sharedAsset.SharedAssetService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
@@ -41,6 +42,7 @@ import static com.fasterxml.jackson.databind.util.ISO8601Utils.format;
 public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<SharedAssetRequest>{
     private Double total;
     private UaaService uuaService;
+    private SharedAssetService sharedAssetService;
     private Integer queryIndex=-1;
     UserOrgInfoRepository userOrgDao = null;
     OrgInfoRepository orgInfoDao = null;
@@ -129,6 +131,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     @Override
     protected void init() {
         uuaService = WebUtil.getBean(UaaService.class);
+        sharedAssetService = WebUtil.getBean(SharedAssetService.class);
         dao = WebUtil.getBean(SharedAssetRequestRepository.class);
         asdDao = WebUtil.getBean(SharedAssetReqDetailRepository.class);
         apdDao = WebUtil.getBean(SharedAssetReqTypeRepository.class);
@@ -265,7 +268,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         OrgInfo userOrg = orgInfoDao.getByUid(object.getClinicalDeptUid());
         object.setClinicalDeptName(userOrg.getName());
         object.setApplyAssetInfo(null);
-        
+
     }
     
     @Override
@@ -318,7 +321,13 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         
         
     }
-    
+
+    @Override
+    public void save() {
+        super.save();
+        sharedAssetService.pushWxMsg(selected.getId());
+    }
+
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
         if (searchFilters == null) {
@@ -369,7 +378,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         requestContext.addCallbackParam("url", url);
     }
     
-    public void onSelectE() throws IOException, ParseException {
+    public void onSelectE() throws Exception {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -396,7 +405,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         requestContext.addCallbackParam("pageName", pageName);
     }
     
-    public void onSelectC() throws IOException, ParseException {
+    public void onSelectC() throws Exception {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -952,7 +961,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         this.selected = null;
     }
     
-    public void submmit0() {
+    public void submmit0() throws Exception {
         if (selected.getSartList().size() == 0) {
                 String url = "norespond" ;
                 RequestContext requestContext = RequestContext.getCurrentInstance();
@@ -977,6 +986,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
             dao.save(selected);
             apdDao.save(selected.getSartList());
+
+            //调用微服务
+            sharedAssetService.pushWxMsg(selected.getId());
             String url = "List.xhtml?faces-redirect=true";
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", url);
@@ -985,7 +997,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
     }
     
-   public void submmitR0() {
+   public void submmitR0() throws Exception {
        this.save();
        String uid = selected.getId();
        int sta = selected.getState();
@@ -994,6 +1006,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        if(sta == 7){
            state = 8;
            dao.updateState(uid, state);
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        
        }else{
            WebUtil.addErrorMessage("当前状态不是可提交状态！");
@@ -1002,7 +1016,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
     }
     
-    public void refers() {
+    public void refers() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 4;//4为取消借用
@@ -1025,19 +1039,24 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }
              asdDao.delete(ListAll);//删除借用设备信息
+
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可取消借用！");
            return;
        }
        
     }
-    public void submmitR() {
+    public void submmitR() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 12;//12归还待确认—确认—>6借用完成
        
        if(sta == 9){//借用待确认状态
            dao.updateState(uid, state);
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可确认归还！");
            return;
@@ -1045,7 +1064,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
     }
     
-    public void Accept() {
+    public void Accept() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -1066,6 +1085,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         if(sta ==1|| sta == 5){//借用待受理状态/借用搁置状态
             dao.updateState(uid, state);
             apdDao.save(sartList);
+
+            //调用微服务
+            sharedAssetService.pushWxMsg(selected.getId());
             String url = "List.xhtml?faces-redirect=true";
             requestContext.addCallbackParam("url", url);
             return;
@@ -1076,7 +1098,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
     }
     
-    public void AcceptR() {
+    public void AcceptR() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -1084,6 +1106,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         RequestContext requestContext = RequestContext.getCurrentInstance();
        if(sta  == 7 || sta == 11){//归还待受理状态
            dao.updateState(uid, state);
+
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
            String url = "List.xhtml?faces-redirect=true";
            requestContext.addCallbackParam("url", url);
            return;
@@ -1094,7 +1119,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
     }
     
-    public void Shelve() {
+    public void Shelve() throws Exception {
        String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -1102,6 +1127,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         RequestContext requestContext = RequestContext.getCurrentInstance();
        if(sta == 1){//借用待受理状态
            dao.updateState(uid, state);
+
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
            String url = "List.xhtml?faces-redirect=true";
            requestContext.addCallbackParam("url", url);
            return;
@@ -1112,7 +1140,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
     }
 
-    public void ShelveR() {
+    public void ShelveR() throws Exception {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -1120,6 +1148,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         RequestContext requestContext = RequestContext.getCurrentInstance();
         if(sta == 7){//待受理状态
             dao.updateState(uid, state);
+
+            //调用微服务
+            sharedAssetService.pushWxMsg(selected.getId());
             String url = "List.xhtml?faces-redirect=true";
             requestContext.addCallbackParam("url", url);
             return;
@@ -1130,7 +1161,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         }
     }
     
-    public void deliver() {
+    public void deliver() throws Exception {
 
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
@@ -1187,6 +1218,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 apdDao.save(selected.getSartList());
 
                 asdDao.save(selected.getSardList());
+
+               //调用微服务
+               sharedAssetService.pushWxMsg(selected.getId());
                 String url = "List.xhtml?faces-redirect=true";
                 requestContext.addCallbackParam("url", url);
                 return;
@@ -1199,7 +1233,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
     }
     
-    public void deliverR() {
+    public void deliverR() throws Exception {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -1257,6 +1291,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                apdDao.save(selected.getSartList());
 
                 asdDao.save(selected.getSardList());
+
+               //调用微服务
+               sharedAssetService.pushWxMsg(selected.getId());
                 String url = "List.xhtml?faces-redirect=true";
                 requestContext.addCallbackParam("url", url);
                 return;
@@ -1368,7 +1405,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
      * 以下是老版本的一些方法暂做保留
      */
     
-    public void refersR() {
+    public void refersR() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
               int state = 10;//11为取消归还
@@ -1391,8 +1428,9 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
                 }
             }
             asdDao.delete(ListAll);
-            
-                    
+
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
 
        }else {
            WebUtil.addErrorMessage("当前状态不可取消归还！");
@@ -1411,13 +1449,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     }
     
-    public void submmit() {
+    public void submmit() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 6;//3借用待确认—确认—>6借用完成
        
        if(sta == 3){//借用待确认状态
            dao.updateState(uid, state);
+
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可确认借用！");
            return;
@@ -1425,13 +1466,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
     }
     
-    public void submmit1() {
+    public void submmit1() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 2;//
      
        if(sta == 1){//借用待确认状态
            dao.updateState(uid, state);
+
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可受理！");
            return;
@@ -1439,7 +1483,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     }
         
-    public void submmit2() {
+    public void submmit2() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 0;
@@ -1450,6 +1494,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
        if(sta == 7){
            dao.updateState(uid, state);
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可确认归还！");
            return;
@@ -1457,13 +1503,15 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        
     }
         
-    public void submmit5() {
+    public void submmit5() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 6;//
      
        if(sta == 5){//借用待确认状态
            dao.updateState(uid, state);
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可受理！");
            return;
@@ -1473,7 +1521,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     
-    public void refers2() {
+    public void refers2() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 0;
@@ -1485,6 +1533,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
        }
            if(sta == 6||sta == 7){
            dao.updateState(uid, state);
+               //调用微服务
+               sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可取消归还！");
            return;
@@ -1492,12 +1542,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     }
     
     
-    public void upLoad() {
+    public void upLoad() throws Exception {
        String uid = selected.getId();
        int sta = selected.getState();
        int state = 6;
        if(sta == 4||sta == 5){
            dao.updateState(uid, state);
+           //调用微服务
+           sharedAssetService.pushWxMsg(selected.getId());
        }else {
            WebUtil.addErrorMessage("当前状态不可申请归还！");
            return;

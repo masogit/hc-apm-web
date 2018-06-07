@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
+
+<h:form id="measureElectricSafetyListForm">
+	<p:dataTable id="datalist" value="#{measureElectricSafetyController.lazyModel}" var="item" widgetVar="varDataList" selectionMode="single"
+		selection="#{measureElectricSafetyController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+		rowKey="#{item.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
+		paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
+
+		<p:ajax event="rowSelect" update="deleteButton" />
+		<p:ajax event="filter" listener="#{measureElectricSafetyController.onFilter}" />
+
+		<p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.name}" />
+		</p:column>
+		<p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.financingNum}" />
+		</p:column>
+		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.functionType}" />
+		</p:column>
+		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		</p:column>
+		<p:column headerText="保护接地阻抗" filterBy="#{item.protectGroundImpedance}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.protectGroundImpedance}" />
+		</p:column>
+		<p:column headerText="患者漏电流" filterBy="#{item.patientElectricLeakage_app}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.patientElectricLeakage_app}" />
+		</p:column>
+		<p:column headerText="对地漏电流" filterBy="#{item.groundElectricLeakage_normal}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.groundElectricLeakage_normal}" />
+		</p:column>
+		<p:column headerText="外壳漏电流" filterBy="#{item.shellElectricLeakage_normal}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.shellElectricLeakage_normal}" />
+		</p:column>
+		<p:column headerText="检测仪时间" sortBy="#{item.checkDate}">
+			<h:outputText value="#{item.checkDate}" >
+				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="存储器时间" sortBy="#{item.storageDate}">
+			<h:outputText value="#{item.storageDate}" >
+				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
+			</h:outputText>
+		</p:column>
+
+		<f:facet name="{Toolbar}">
+			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
+				actionListener="#{measureElectricSafetyController.delete}" update=":measureElectricSafetyTab:measureElectricSafetyListForm:datalist"
+				disabled="#{empty measureElectricSafetyController.selected.id}">
+				<p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert" />
+			</p:commandButton>
+		</f:facet>
+	</p:dataTable>
+</h:form>
+<!-- <ui:include src="measureElectricSafetyEdit.xhtml" /> -->
+
+</html>

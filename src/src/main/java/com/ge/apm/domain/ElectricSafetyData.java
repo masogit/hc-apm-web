@@ -47,7 +47,7 @@ public class ElectricSafetyData implements Serializable {
 	private String siteUID;
 
 	// 警告信息
-	@Column(name = "warn_message")
+	@Transient
 	private String warnMessage;
 
 	// 存储器日期
@@ -75,8 +75,8 @@ public class ElectricSafetyData implements Serializable {
 	private String assetUid;
 	
 	//对应asset_info 的id
-//	@Column(name = "asset_id")
-//	private Integer assetId;
+	@Column(name = "asset_id")
+	private Integer assetId;
 	
 	//对应v2_pm_order 的id
 	@Column(name = "v2_pm_order_id")
@@ -371,13 +371,13 @@ public class ElectricSafetyData implements Serializable {
 		this.shellElectricLeakage_normal = shellElectricLeakage_normal;
 	}
 	
-//	public Integer getAssetId() {
-//		return assetId;
-//	}
-//
-//	public void setAssetId(Integer assetId) {
-//		this.assetId = assetId;
-//	}
+	public Integer getAssetId() {
+		return assetId;
+	}
+
+	public void setAssetId(Integer assetId) {
+		this.assetId = assetId;
+	}
 //	public String getGroupType() {
 //		return groupType;
 //	}
