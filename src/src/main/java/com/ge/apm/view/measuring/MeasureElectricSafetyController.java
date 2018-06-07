@@ -53,7 +53,6 @@ public class MeasureElectricSafetyController extends GenericCRUDUUIDController<E
     
     @Override
     protected Page<ElectricSafetyData> loadData(PageRequest pageRequest) {
-    	System.out.println("loadData");
         List<SearchFilter> searchFilters = this.searchFilters;
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
@@ -68,10 +67,7 @@ public class MeasureElectricSafetyController extends GenericCRUDUUIDController<E
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
             }
         }
-        System.out.println(searchFilters.toString());
         Page<ElectricSafetyData> result=dao.findBySearchFilter(searchFilters, pageRequest);
-        System.out.println(result.toString());
-        System.out.println(result.getSize());
         return result;
     }
     

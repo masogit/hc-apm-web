@@ -4,6 +4,9 @@ import com.ge.apm.domain.pure.TableSchema;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
@@ -44,7 +47,7 @@ public class EditReportController {
         electricSafetyService = WebUtil.getBean(ElectricSafetyService.class);
 
         String reportId = WebUtil.getRequestParameter("reportId");
-        
+        String action = WebUtil.getRequestParameter("action");
         report = tableService.getReportById(reportId);
         TableDefinition tableDefinition = tableService.getTemplateById(report.getSchemaId());
         table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
@@ -57,7 +60,9 @@ public class EditReportController {
                 tableValue.put(item.getKey(),item.getValueSerialized());
             }
         });
-        electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+        if(StringUtils.isNotEmpty(action) && action.equals("edit")){
+        	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+        }
     }
 
     public void save() {

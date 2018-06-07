@@ -78,7 +78,8 @@ public class ElectricSafetyService {
         		if(info!=null){
         			String uid=info.getUid();
             		String id=v2_PmOrderRepository.findByAssetUid(uid);
-//            		detail.setAssetId(info.getId());
+            		detail.setAssetId(info.getId());
+//            		detail.setAssetInfo(info);
             		detail.setAssetUid(uid);
             		detail.setV2_PmOrderId(id);
         		}

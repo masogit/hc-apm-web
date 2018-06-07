@@ -90,9 +90,9 @@ public class CommonReportController {
         if(table==null)
                 return "";
         if (null != table.getExcelStorageId()) {
-            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/EditExcelReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }else{
-            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/EditReport.xhtml?faces-redirect=true&action=edit&reportId=" + report.getId();
         }
     }
 
@@ -101,9 +101,9 @@ public class CommonReportController {
         if(table==null)
             return "";
          if (null != table.getExcelStorageId()) {
-            return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/ViewExcelReport.xhtml?faces-redirect=true&action=view&reportId=" + report.getId();
         }else{
-            return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&reportId=" + report.getId();
+            return "/portal/reporter/ViewReport.xhtml?faces-redirect=true&action=view&reportId=" + report.getId();
         }
     }
 
