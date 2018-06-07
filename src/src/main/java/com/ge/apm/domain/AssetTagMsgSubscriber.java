@@ -51,6 +51,20 @@ public class AssetTagMsgSubscriber  implements Serializable {
     @Column(name = "tag_id")
     private Integer tagId;
 
+
+    @Basic(optional = true)
+    @Column(name = "level_0")
+    private Boolean level0;
+
+    @Basic(optional = true)
+    @Column(name = "level_1")
+    private Boolean level1;
+
+    @Basic(optional = true)
+    @Column(name = "level_2")
+    private Boolean level2;
+
+
     public UserAccount getSubscriberUser() {
         return subscriberUser;
     }
@@ -126,6 +140,30 @@ public class AssetTagMsgSubscriber  implements Serializable {
             return false;
         }
         return true;
+    }
+
+    public Boolean getLevel0() {
+        return level0;
+    }
+
+    public void setLevel0(Boolean level0) {
+        this.level0 = level0;
+    }
+
+    public Boolean getLevel1() {
+        return level1;
+    }
+
+    public void setLevel1(Boolean level1) {
+        this.level1 = level1;
+    }
+
+    public Boolean getLevel2() {
+        return level2;
+    }
+
+    public void setLevel2(Boolean level2) {
+        this.level2 = level2;
     }
 
     @Override

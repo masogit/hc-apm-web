@@ -21,8 +21,9 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> {
 
-	private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
+	private List<String> cities;
 	private AssetTagMsgSubscriberRepository dao = null;
 	private AssetTagRepository assetTagRepository;
 	private I18nMessageRepository i18Dao;
@@ -68,7 +69,16 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
-				super.save();
+				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected
+						.getSubscribeUserId());
+				if(tagUserMode012.isEmpty()) {
+					super.save();
+					return;
+				}
+				else{
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					return;
+				}
 			} else {//EE报警
 				selected.setReceiveMsgMode(3);
 				dao.save(selected);
@@ -79,6 +89,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 	@Override
 	protected void init() {
+		cities = new ArrayList<String>();
+		cities.add("Miami");
+		cities.add("London");
+		cities.add("Paris");
+		cities.add("Istanbul");
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
 		this.filterBySite =false;
 		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
@@ -214,5 +229,49 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	public void setSelectType(int selectType) {
 		this.selectType = selectType;
+	}
+	private String[] selectedCities2;
+
+	public String[] getSelectedCities2() {
+		return selectedCities2;
+	}
+
+	public void setSelectedCities2(String[] selectedCities2) {
+		this.selectedCities2 = selectedCities2;
+	}
+
+	public List<String> getCities() {
+		return cities;
+	}
+
+	public void setCities(List<String> cities) {
+		this.cities = cities;
+	}
+	private boolean level0;
+	private boolean level1;
+	private boolean level2;
+
+	public boolean isLevel0() {
+		return level0;
+	}
+
+	public void setLevel0(boolean level0) {
+		this.level0 = level0;
+	}
+
+	public boolean isLevel1() {
+		return level1;
+	}
+
+	public void setLevel1(boolean level1) {
+		this.level1 = level1;
+	}
+
+	public boolean isLevel2() {
+		return level2;
+	}
+
+	public void setLevel2(boolean level2) {
+		this.level2 = level2;
 	}
 }
