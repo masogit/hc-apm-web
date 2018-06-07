@@ -88,7 +88,12 @@ public class MeasureElectricSafetyController extends GenericCRUDUUIDController<E
     }
     
     public void importSelectedItem(){
-    	electricSafetyService.insertUpdateData(selectedItems);
+    	if(selectedItems!=null&&selectedItems.size()>0){
+    		electricSafetyService.insertUpdateData(selectedItems);
+    	}
+    	else{
+    		electricSafetyService.insertUpdateData(dataList);
+    	}
     }
 
     public UploadedFile getFile() {
