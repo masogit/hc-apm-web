@@ -43,7 +43,7 @@ import com.ge.apm.view.sysutil.UserContextService;
 public class ElectricSafetyService {
     private static final Logger LOGGER = LoggerFactory.getLogger(ElectricSafetyService.class);
     
-    private Properties properties;
+//    private Properties properties;
     private final String UPDATE="UPDATE";
     private final String INSERT="INSERT";
     private UserAccount user;
@@ -68,6 +68,10 @@ public class ElectricSafetyService {
     public void insertUpdateData(List<ElectricSafetyData> list){
     	String financingNum="";
     	for(ElectricSafetyData detail: list){
+    		detail.setTenantUID(user.getTenantUID());
+    		detail.setHospitalUID(user.getHospitalUID());
+    		detail.setSiteUID(user.getSiteUID());
+    		detail.setInstitutionUID(user.getInstitutionUID());
     		financingNum=detail.getFinancingNum();
     		if(financingNum!=null){
         		AssetInfo info=assetInfoRepository.findByFinancingNum(financingNum);
@@ -77,10 +81,6 @@ public class ElectricSafetyService {
 //            		detail.setAssetId(info.getId());
             		detail.setAssetUid(uid);
             		detail.setV2_PmOrderId(id);
-            		detail.setTenantUID(user.getTenantUID());
-            		detail.setHospitalUID(user.getHospitalUID());
-            		detail.setSiteUID(user.getSiteUID());
-            		detail.setInstitutionUID(user.getInstitutionUID());
         		}
         		try {
         			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate());
@@ -117,7 +117,7 @@ public class ElectricSafetyService {
     }
 	
     private List<ElectricSafetyData> analysis(String[] arrStr,String filename){
-		getProperties();
+//		getProperties();
 		List<ElectricSafetyData> listData=new ArrayList<ElectricSafetyData>();
 		for(int i=0;i<arrStr.length;++i){
 			ElectricSafetyData data=new ElectricSafetyData();
@@ -174,7 +174,8 @@ public class ElectricSafetyService {
 		if(StringUtils.isNotEmpty(preKey)){
 			convertValues(map,data);
 			setCheckType(map.get("2").toString(), data);
-			data.setValues(convertKeys(map));
+//			data.setValues(convertKeys(map));
+			data.setValues(map);
 		}
 		return map;
 	}
@@ -184,20 +185,20 @@ public class ElectricSafetyService {
 		return key;
 	}
 	
-	private Map<String,Object> convertKeys(Map<String,Object> map){
-		Map<String,Object> newMap=new HashMap<String,Object>();
-		String newKey="";
-		for(String key:map.keySet()){
-			if(properties.get(key)==null){
-				newKey=key;
-			}
-			else{
-				newKey=(String)properties.get(key);
-			}
-			newMap.put(newKey, map.get(key));
-		}
-		return newMap;
-	}
+//	private Map<String,Object> convertKeys(Map<String,Object> map){
+//		Map<String,Object> newMap=new HashMap<String,Object>();
+//		String newKey="";
+//		for(String key:map.keySet()){
+//			if(properties.get(key)==null){
+//				newKey=key;
+//			}
+//			else{
+//				newKey=(String)properties.get(key);
+//			}
+//			newMap.put(newKey, map.get(key));
+//		}
+//		return newMap;
+//	}
 	
 	private Map<String,Object> convertValues(Map<String,Object> map,ElectricSafetyData data){
 		String strValue="";
@@ -396,20 +397,20 @@ public class ElectricSafetyService {
 		return false;
 	}
 	
-	private void getProperties(){
-		if(properties!=null)
-			return;
-		properties=new Properties();
-		try {
-			String filePath=URLDecoder.decode(ElectricSafetyService.class.getResource("/").getPath(),"UTF-8")+"electricSafetyMapping.properties";
-			InputStream input=new FileInputStream(new File(filePath));
-			properties.load(input);
-			input.close();
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.info(e.getMessage());
-		}
-	}
+//	private void getProperties(){
+//		if(properties!=null)
+//			return;
+//		properties=new Properties();
+//		try {
+//			String filePath=URLDecoder.decode(ElectricSafetyService.class.getResource("/").getPath(),"UTF-8")+"electricSafetyMapping.properties";
+//			InputStream input=new FileInputStream(new File(filePath));
+//			properties.load(input);
+//			input.close();
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			LOGGER.info(e.getMessage());
+//		}
+//	}
 	
 	public void parseTableValue(Map<String, Object> tableValue,String jsonStrInstrumentData,String schemaStr,String boUuid){
 		TableSchema table=null;
