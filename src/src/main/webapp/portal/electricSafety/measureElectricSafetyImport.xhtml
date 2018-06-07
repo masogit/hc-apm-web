@@ -96,7 +96,7 @@
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                     <p:dataExporter type="xls" target="datalistId" fileName="MeasuringFailed_export"/>
                                 </p:commandButton>
-                                <p:commandButton actionListener="#{measureElectricSafetyController.importSelectedItem}" value="#{msg.Import}" update="datalistId :growl" icon="ui-icon-check" />
+                                <p:commandButton actionListener="#{measureElectricSafetyController.importSelectedItem}" value="#{msg.Import}" update="datalistId :growl,:measureElectricSafetyTab:measureElectricSafetyListForm" icon="ui-icon-check" />
                             </f:facet>
 						</p:dataTable>
 					</p:fieldset>
