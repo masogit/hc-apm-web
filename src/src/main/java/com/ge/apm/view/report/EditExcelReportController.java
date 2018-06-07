@@ -17,6 +17,8 @@ import java.util.List;
 import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.model.StreamedContent;
 import org.tiefaces.components.websheet.TieWebSheetBean;
 import webapp.framework.web.WebUtil;
@@ -48,6 +50,7 @@ public class EditExcelReportController extends TieWebSheetBean {
         electricSafetyService = WebUtil.getBean(ElectricSafetyService.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         String reportId = WebUtil.getRequestParameter("reportId");
+        String action = WebUtil.getRequestParameter("action");
         report = tableService.getReportById(reportId);
         tableDefinition = tableService.getTemplateById(report.getSchemaId());
         tableValue = new HashMap<String, Object>();
@@ -65,7 +68,9 @@ public class EditExcelReportController extends TieWebSheetBean {
                 tableValue.put(item.getKey(), item.getValueSerialized());
             }
         });
-        electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+        if(StringUtils.isNotEmpty(action) && action.equals("edit")){
+        	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+        }
         StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
