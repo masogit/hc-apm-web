@@ -37,12 +37,12 @@
 		<p:column headerText="外壳漏电流" filterBy="#{item.shellElectricLeakage_normal}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.shellElectricLeakage_normal}" />
 		</p:column>
-		<p:column headerText="检测仪时间" filterBy="#{item.checkDate}" filterMatchMode="LIKE">
+		<p:column headerText="检测仪时间" sortBy="#{item.checkDate}">
 			<h:outputText value="#{item.checkDate}" >
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 			</h:outputText>
 		</p:column>
-		<p:column headerText="存储器时间" filterBy="#{item.storageDate}" filterMatchMode="LIKE">
+		<p:column headerText="存储器时间" sortBy="#{item.storageDate}">
 			<h:outputText value="#{item.storageDate}" >
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 			</h:outputText>
