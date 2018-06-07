@@ -47,7 +47,7 @@ public class ElectricSafetyData implements Serializable {
 	private String siteUID;
 
 	// 警告信息
-	@Column(name = "warn_message")
+	@Transient
 	private String warnMessage;
 
 	// 存储器日期
