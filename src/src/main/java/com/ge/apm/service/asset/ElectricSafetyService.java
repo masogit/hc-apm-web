@@ -74,7 +74,7 @@ public class ElectricSafetyService {
     		detail.setInstitutionUID(user.getInstitutionUID());
     		financingNum=detail.getFinancingNum();
     		if(financingNum!=null){
-        		AssetInfo info=assetInfoRepository.findByFinancingNum(financingNum);
+        		AssetInfo info=assetInfoRepository.findByFinancingNum(financingNum,user.getSiteUID());
         		if(info!=null){
         			String uid=info.getUid();
             		String id=v2_PmOrderRepository.findByAssetUid(uid);
@@ -84,7 +84,7 @@ public class ElectricSafetyService {
             		detail.setV2_PmOrderId(id);
         		}
         		try {
-        			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate());
+        			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate(),detail.getSiteUID());
         			if(dbData!=null){
         				detail.setId(dbData.getId());
         				setDefaultValue(detail,UPDATE);
@@ -93,15 +93,15 @@ public class ElectricSafetyService {
         				setDefaultValue(detail,INSERT);
         			}
         			electricSafetyDataRepository.save(detail);
-        			detail.setWarnMessage("import success");
+        			detail.setWarnMessage("导入成功");
 				} catch (Exception e) {
 					// TODO: handle exception
 					LOGGER.info("insert electric safety data failed. Reason is "+e.getMessage());
-					detail.setWarnMessage("import failed");
+					detail.setWarnMessage("导入失败");
 				}
     		}
     		else{
-    			detail.setWarnMessage("import failed");
+    			detail.setWarnMessage("导入失败");
     		}
     	}
     }
@@ -237,7 +237,7 @@ public class ElectricSafetyService {
 			else if(StringUtils.equals(key, "60")){
 				strValue=strValue.replaceAll(" ", "");
 				data.setFinancingNum(strValue);
-				data.setAssetInfo(assetInfoRepository.findByFinancingNum(strValue));
+				data.setAssetInfo(assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID()));
 			}
 			
 //			7，——》保护接地阻抗（单位：Ω）
