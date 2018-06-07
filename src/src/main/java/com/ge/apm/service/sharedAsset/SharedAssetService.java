@@ -39,6 +39,17 @@ public class SharedAssetService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
     }
+
+    public void remoteConfirmRent(String requestId) {
+        String url = getGatewayURL(GatewayURL.REMOTE_CONFIRM_RENT);
+        url = url.replace("{requestId}", requestId);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        logger.info("Remote confirm rent request: " + JSON.toJSONString(requestEntity));
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
+        logger.info("Remote confirm rent " + (isOkay(response) ? "successfully." : "failed."));
+    }
 }
 
 
