@@ -37,7 +37,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
 	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
 	private Integer receiveMsgMode;
-	private int selectType;
+	private int selectType=1;
 	/*public boolean subscriberShow(){
 		//xiugai   if(xiu gai and fei admin) return true
 		if(!userContextService.hasRole("ITAdmin")&  WebUtil.getMessage(crudActionName)=="修改")
@@ -45,6 +45,18 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		else
 			 return false;
 	}*/
+	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
+	public Boolean subscribe(){
+		if(this.getCRUDActionName().equals("修改")){
+			return true; //不可修改
+		}else if(userContextService.hasRole("ITAdmin")){
+				return false;
+			}else
+				{
+					return true;
+				}
+		}
+
 	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
 	public void checkSelectedEmpty(){
 		if(selected==null){
@@ -69,8 +81,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
-				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected
-						.getSubscribeUserId());
+				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
 				if(tagUserMode012.isEmpty()) {
 					super.save();
 					return;
@@ -80,8 +91,15 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 					return;
 				}
 			} else {//EE报警
-				selected.setReceiveMsgMode(3);
-				dao.save(selected);
+				List<AssetTagMsgSubscriber> tagUserMode3 = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode3.isEmpty()) {
+					selected.setReceiveMsgMode(3);
+					dao.save(selected);
+					return;
+				}else{
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					return;
+				}
 			}
 		}else{
 			super.save();
@@ -173,7 +191,9 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-
+		Integer se=selected.getSelectType();
+		if(se!=null)
+         selectType=se.intValue();
 		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
 		currentAtms=dao.findById(selected.getId());
 		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());

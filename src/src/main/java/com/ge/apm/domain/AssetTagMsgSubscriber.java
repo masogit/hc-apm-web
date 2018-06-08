@@ -64,6 +64,10 @@ public class AssetTagMsgSubscriber  implements Serializable {
     @Column(name = "level_2")
     private Boolean level2;
 
+    @Basic(optional = true)
+    @Column(name = "select_type")
+    private Integer selectType;
+
 
     public UserAccount getSubscriberUser() {
         return subscriberUser;
@@ -169,5 +173,13 @@ public class AssetTagMsgSubscriber  implements Serializable {
     @Override
     public String toString() {
         return "AssetTagMsgSubscriber[ id=" + id + " ]";
+    }
+
+    public Integer getSelectType() {
+        return selectType;
+    }
+
+    public void setSelectType(Integer selectType) {
+        this.selectType = selectType;
     }
 }

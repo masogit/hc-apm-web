@@ -36,7 +36,7 @@ public interface AssetTagMsgSubscriberRepository extends GenericRepository<Asset
 
 
     @Query(value = "select * from Asset_Tag_Msg_Subscriber where tag_id=?1 and subscribe_user_id=?2 and receive_msg_mode = ?3",nativeQuery = true)
-    public List<AssetTagMsgSubscriber> getTagUserMode3XX(Integer tagId,Integer userId,Integer direct);
+    public List<AssetTagMsgSubscriber> getTagUserMode3EE(Integer tagId,Integer userId,Integer direct);
 
 
 }
