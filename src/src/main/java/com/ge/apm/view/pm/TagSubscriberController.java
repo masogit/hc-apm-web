@@ -57,6 +57,15 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 				}
 		}
 
+	public Boolean priorityShow(){
+		//selected.getReceiveMsgMode() = 2  //不推送消息
+		if(selected.getReceiveMsgMode()!=null && selected.getReceiveMsgMode()==2)
+			return false;
+		if(selectType==1 || (this.getCRUDActionName().equals("修改") && selected.getReceiveMsgMode()!=3))
+             return true;
+		return false;
+	}
+
 	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
 	public void checkSelectedEmpty(){
 		if(selected==null){
@@ -78,7 +87,6 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 
 	public void saveTagSub4(){
-
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
 				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());

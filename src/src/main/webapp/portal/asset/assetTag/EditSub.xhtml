@@ -42,13 +42,13 @@
                         <h:panelGroup id="id2" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
                             <label  class="label">工单消息推送选项*</label>
                             <p:selectOneMenu value="#{tagSubscriberController.selected.receiveMsgMode}" required="true" requiredMessage="工单消息推送选项不能为空">
-                                <p:ajax update=":AssetTagSubscribEditForm:id1" event="change"></p:ajax>
+                                <p:ajax update=":AssetTagSubscribEditForm" event="change"></p:ajax>
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
-
+                            #{tagSubscriberController.jinjiduShow()}
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
+                        <h:panelGroup id="id3" rendered="#{tagSubscriberController.priorityShow()}">
                             <p:panelGrid columns="3">
                                 <h:panelGroup> <p:outputLabel  value="紧急: " />
                                     <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level0}"/></h:panelGroup>
