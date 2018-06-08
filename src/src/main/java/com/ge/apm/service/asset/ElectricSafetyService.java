@@ -317,7 +317,7 @@ public class ElectricSafetyService {
 				else{
 					date=convertStringDate("dd.MM.yy", strValue);
 				}
-				data.setStorageDate(date);
+				data.setCheckDate(date);
 			}
 			//55,存储器日期（格式：日-月-年）30.10.18 56,存储器时间（格式：H:M）13:20
 			else if(StringUtils.equals(key, "55")){
@@ -328,7 +328,7 @@ public class ElectricSafetyService {
 				else{
 					date=convertStringDate("dd.MM.yy", strValue);
 				}
-				data.setCheckDate(date);
+				data.setStorageDate(date);
 			}
 			//60,设备编号
 			else if(StringUtils.equals(key, "60")){
