@@ -1,11 +1,7 @@
 package com.ge.apm.service.asset;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Field;
-import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -13,7 +9,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -23,17 +18,29 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ElectricSafetyDataRepository;
+import com.ge.apm.dao.PmOrderRuleRepository;
+import com.ge.apm.dao.TableDefinitionRepository;
+import com.ge.apm.dao.UnstructuredDataCollectionRepository;
+import com.ge.apm.dao.UnstructuredDataRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.ElectricSafetyData;
+import com.ge.apm.domain.PmOrderRule;
+import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UnstructuredData;
+import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.report.TableDefinitionService;
+import com.ge.apm.service.report.TableResultReportService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 /**
@@ -52,10 +59,25 @@ public class ElectricSafetyService {
     AssetInfoRepository assetInfoRepository;
     
     @Autowired
+    TableDefinitionService tableDefinitionService;
+    
+    @Autowired
     V2_PmOrderRepository v2_PmOrderRepository;
     
     @Autowired
+    PmOrderRuleRepository pmOrderRuleRepository;
+    
+    @Autowired
+    TableDefinitionRepository tableDefinitionRepository;
+    
+    @Autowired
     ElectricSafetyDataRepository electricSafetyDataRepository;
+    
+    @Autowired
+    UnstructuredDataCollectionRepository unstructuredDataCollectionRepository;
+    
+    @Autowired
+    UnstructuredDataRepository unstructuredDataRepository;
     
     
     public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
@@ -64,7 +86,63 @@ public class ElectricSafetyService {
 		return analysis(strArr,file.getFileName());
     }
     
-   
+    private boolean updateExistReport(UnstructuredDataCollection tempReport,ElectricSafetyData detail){
+    	String schemaId=tempReport.getSchemaId();
+		if(StringUtils.isNotEmpty(schemaId)){
+			TableDefinition tableDefinition = tableDefinitionService.getTemplateById(schemaId);
+			TableSchema table=JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+			Map<String,Object>tableValue = new HashMap<String, Object>();
+			List<UnstructuredData> dataList=tempReport.getData();
+			dataList.forEach(item -> {
+	            try{
+	                tableValue.put(item.getKey(),item.getValue());
+	            }catch(ClassNotFoundException e){
+	                tableValue.put(item.getKey(),item.getValueSerialized());
+	            }
+	        });
+			parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), detail);
+			tableValue.putAll(tableDefinitionService.getRuleResultData(tableValue,table));
+			tableDefinitionService.saveTableDate(tempReport,tableValue);
+		}
+		else{
+			return false;
+		}
+		return true;
+    }
+    
+    private boolean newReport(String assetUid,String pmOrderId,ElectricSafetyData detail){
+    	if(StringUtils.isNotEmpty(assetUid)){
+    		PmOrderRule pmOrderRule=pmOrderRuleRepository.findPmOrderRuleLevel3(assetUid);
+    		if(pmOrderRule!=null){
+    			List<TableDefinition> tableDefinitions = tableDefinitionRepository.findSafetyReportTable(pmOrderRule.getUid());
+    			if(tableDefinitions!=null && tableDefinitions.size()==1){
+    				TableDefinition tableDefinition=tableDefinitions.get(0);
+    				TableSchema table=JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+    				Map<String,Object>tableValue = new HashMap<String, Object>();
+    				UnstructuredDataCollection report=new UnstructuredDataCollection();
+    				report.setBoUuid(pmOrderId);
+    				report.setSchemaId(tableDefinition.getId());
+    				report.setBoType("pm-safety-report");
+    				unstructuredDataCollectionRepository.save(report);
+    				parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), detail);
+    				tableValue.putAll(tableDefinitionService.getRuleResultData(tableValue, table));
+    				tableDefinitionService.saveTableDate(report,tableValue);
+    			}
+    			else{
+    				detail.setWarnMessage("报告模板未找到");
+    			}
+    		}
+    		else{
+    			detail.setWarnMessage("保养规则未找到");
+    		}
+    	}
+    	else{
+    		return false;
+    	}
+    	return true;
+    }
+    
+    @Transactional
     public void insertUpdateData(List<ElectricSafetyData> list){
     	String financingNum="";
     	for(ElectricSafetyData detail: list){
@@ -77,11 +155,27 @@ public class ElectricSafetyService {
         		AssetInfo info=assetInfoRepository.findByFinancingNum(financingNum,user.getSiteUID());
         		if(info!=null){
         			String uid=info.getUid();
-            		String id=v2_PmOrderRepository.findByAssetUid(uid);
+        			V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(uid);
             		detail.setAssetId(info.getId());
 //            		detail.setAssetInfo(info);
             		detail.setAssetUid(uid);
-            		detail.setV2_PmOrderId(id);
+            		detail.setV2_PmOrderId(order.getId());
+            		List<UnstructuredDataCollection> listUnstructuredDataCollection=unstructuredDataCollectionRepository.findCKByBoUuid(order.getId(),"pm-safety-report");
+    				if(listUnstructuredDataCollection!=null && listUnstructuredDataCollection.size()>0){
+    					//find report
+    					if(updateExistReport(listUnstructuredDataCollection.get(0), detail)==false){
+    						detail.setWarnMessage("报告未生成");
+    					}
+    				}
+    				else{
+    					//no report
+    					if(newReport(uid, order.getId(), detail)==false){
+							detail.setWarnMessage("报告未生成");
+						}
+    				}
+        		}
+        		else{
+        			detail.setWarnMessage("设备未找到");
         		}
         		try {
         			ElectricSafetyData dbData=electricSafetyDataRepository.findByFinancingNumAndCheckDate(detail.getFinancingNum(),detail.getCheckDate(),detail.getSiteUID());
@@ -93,7 +187,9 @@ public class ElectricSafetyService {
         				setDefaultValue(detail,INSERT);
         			}
         			electricSafetyDataRepository.save(detail);
-        			detail.setWarnMessage("导入成功");
+        			if(StringUtils.isEmpty(detail.getWarnMessage())){
+        				detail.setWarnMessage("报告已生成");
+        			}
 				} catch (Exception e) {
 					// TODO: handle exception
 					LOGGER.info("insert electric safety data failed. Reason is "+e.getMessage());
@@ -237,7 +333,12 @@ public class ElectricSafetyService {
 			else if(StringUtils.equals(key, "60")){
 				strValue=strValue.replaceAll(" ", "");
 				data.setFinancingNum(strValue);
-				data.setAssetInfo(assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID()));
+				AssetInfo assetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
+				data.setAssetInfo(assetInfo);
+				if(assetInfo!=null && StringUtils.isNotEmpty(assetInfo.getUid())){
+					V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(assetInfo.getUid());
+					data.setV2PmOrder(order);
+				}
 			}
 			
 //			7，——》保护接地阻抗（单位：Ω）
@@ -413,6 +514,80 @@ public class ElectricSafetyService {
 //		}
 //	}
 	
+	private void parseTableValue(List<UnstructuredData> listData,String jsonStrInstrumentData,String schemaStr,ElectricSafetyData electricSafetyData){
+		TableSchema table=null;
+		if(StringUtils.isNotEmpty(schemaStr)){
+			table = JSONObject.parseObject(schemaStr, TableSchema.class);
+		}
+		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& electricSafetyData!=null){
+			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
+			if(obj!=null){
+				if(electricSafetyData!=null){
+					for(String key:obj.keySet()){
+//						if(tableValue.containsKey(key)){
+//							tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+//						}
+						if(table!=null){
+							List<TableGroup> listTableGroup=table.getGroups();
+							if(listTableGroup!=null && listTableGroup.size()>0){
+								for(int i=0;i<listTableGroup.size();++i){
+									List<TableItem> listTableItem=listTableGroup.get(i).getItems();
+									if(listTableItem!=null && listTableItem.size()>0){
+										for(int j=0;j<listTableItem.size();++j){
+											TableItem temp=listTableItem.get(j);
+											if(temp.getKey().equals(key)){
+												for(int z=0;z<listData.size();++z){
+													UnstructuredData tempData=listData.get(z);
+													if(tempData.getKey().equals(key)){
+														tempData.setValue(getInstrumentValue(obj.getString(key), electricSafetyData));
+													}
+												}
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	
+	public void parseTableValue(Map<String, Object> tableValue,String jsonStrInstrumentData,String schemaStr,ElectricSafetyData electricSafetyData){
+		TableSchema table=null;
+		if(StringUtils.isNotEmpty(schemaStr)){
+			table = JSONObject.parseObject(schemaStr, TableSchema.class);
+		}
+		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& electricSafetyData!=null){
+			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
+			if(obj!=null){
+				if(electricSafetyData!=null){
+					for(String key:obj.keySet()){
+//						if(tableValue.containsKey(key)){
+//							tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+//						}
+						if(table!=null){
+							List<TableGroup> listTableGroup=table.getGroups();
+							if(listTableGroup!=null && listTableGroup.size()>0){
+								for(int i=0;i<listTableGroup.size();++i){
+									List<TableItem> listTableItem=listTableGroup.get(i).getItems();
+									if(listTableItem!=null && listTableItem.size()>0){
+										for(int j=0;j<listTableItem.size();++j){
+											TableItem temp=listTableItem.get(j);
+											if(temp.getKey().equals(key)){
+												tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+											}
+										}
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 	public void parseTableValue(Map<String, Object> tableValue,String jsonStrInstrumentData,String schemaStr,String boUuid){
 		TableSchema table=null;
 		if(StringUtils.isNotEmpty(schemaStr)){

@@ -47,7 +47,7 @@ public class ElectricSafetyData implements Serializable {
 	private String siteUID;
 
 	// 警告信息
-	@Transient
+	@Column(name = "warn_message")
 	private String warnMessage;
 
 	// 存储器日期
@@ -188,6 +188,10 @@ public class ElectricSafetyData implements Serializable {
 	@JoinColumn(name = "asset_id", referencedColumnName = "id",updatable=false,insertable=false)
     @ManyToOne(fetch = FetchType.EAGER,optional=true)
     private AssetInfo assetInfo;
+	
+	@JoinColumn(name = "v2_pm_order_id", referencedColumnName = "id",updatable=false,insertable=false)
+    @ManyToOne(fetch = FetchType.EAGER,optional=true)
+    private V2_PmOrder v2PmOrder;
 
 	// 文件名
 	@Transient
@@ -324,7 +328,13 @@ public class ElectricSafetyData implements Serializable {
 		this.assetUid = assetUid;
 	}
 
-	
+	public V2_PmOrder getV2PmOrder() {
+		return v2PmOrder;
+	}
+
+	public void setV2PmOrder(V2_PmOrder v2PmOrder) {
+		this.v2PmOrder = v2PmOrder;
+	}
 
 	public String getV2_PmOrderId() {
 		return v2_PmOrderId;
@@ -333,8 +343,6 @@ public class ElectricSafetyData implements Serializable {
 	public void setV2_PmOrderId(String v2_PmOrderId) {
 		this.v2_PmOrderId = v2_PmOrderId;
 	}
-	
-	
 
 	public String getProtectGroundImpedance() {
 		return protectGroundImpedance;
