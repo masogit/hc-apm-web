@@ -19,10 +19,10 @@
 		<p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.financingNum}" />
 		</p:column>
-		<p:column headerText="工单编号">
+		<p:column headerText="工单编号" filterBy="#{item.v2PmOrder.pmNum}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.v2PmOrder.pmNum}" />
 		</p:column>
-		<p:column headerText="计划完成时间">
+		<p:column headerText="计划完成时间" sortBy="#{item.v2PmOrder.planTime}">
 			<h:outputText value="#{item.v2PmOrder.planTime}" >
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 			</h:outputText>
