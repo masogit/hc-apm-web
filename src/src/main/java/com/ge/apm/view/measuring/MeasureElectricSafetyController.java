@@ -81,7 +81,7 @@ public class MeasureElectricSafetyController extends GenericCRUDUUIDController<E
     }
 
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
-        FacesMessage message = new FacesMessage("导入完成", event.getFile().getFileName() + " 处理完成！");
+        FacesMessage message = new FacesMessage("解析完成", event.getFile().getFileName() + " 处理完成！");
         this.file = event.getFile();
         dataList=electricSafetyService.handlerPsFile(file, currentUser);
         FacesContext.getCurrentInstance().addMessage(null, message);

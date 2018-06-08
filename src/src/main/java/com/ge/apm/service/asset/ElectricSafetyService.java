@@ -105,6 +105,7 @@ public class ElectricSafetyService {
 			tableDefinitionService.saveTableDate(tempReport,tableValue);
 		}
 		else{
+			detail.setWarnMessage("报告模板未找到");
 			return false;
 		}
 		return true;
@@ -186,10 +187,10 @@ public class ElectricSafetyService {
         			else{
         				setDefaultValue(detail,INSERT);
         			}
-        			electricSafetyDataRepository.save(detail);
         			if(StringUtils.isEmpty(detail.getWarnMessage())){
         				detail.setWarnMessage("报告已生成");
         			}
+        			electricSafetyDataRepository.save(detail);
 				} catch (Exception e) {
 					// TODO: handle exception
 					LOGGER.info("insert electric safety data failed. Reason is "+e.getMessage());
