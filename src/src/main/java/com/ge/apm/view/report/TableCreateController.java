@@ -616,7 +616,7 @@ public class TableCreateController extends TieWebSheetBean {
 				try {
 					for(TableGroup group: table.getGroups()){
 						for(TableItem item: group.getItems()){
-							mapTemplateKeyValues.put( item.getKey(),item.getLabel());
+							mapTemplateKeyValues.put( item.getKey(),item.getLabel()+"("+item.getKey()+")");
 						}
 					}
 					templateLabels=mapTemplateKeyValues.values();
