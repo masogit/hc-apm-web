@@ -12,12 +12,14 @@
                 <p:outputLabel class="pageTitle" value="计量结果"/>
             </div>
 
-            <div class="ui-g-12 card ">
-                <p:tabView id="measuringTab">
-                    <p:ajax event="tabChange"/>
-                    <p:tab title="计量结果查询" id="showList">
-                        <ui:include src="showList.xhtml"/>
+            <div class="ui-g-12">
+                <p:tabView id="measuringTab" class="ui-g-12" dynamic="true" cache="false">
+                    <p:tab title="计量信息" id="measuringAssetList">
+                        <ui:include src="measuringAssetList.xhtml"/>
                     </p:tab>
+                    <!--<p:tab title="计量结果查询" id="showList">
+                        <ui:include src="showList.xhtml"/>
+                    </p:tab>-->
                     <p:tab title="计量结果导入" id="resultImport">
                         <ui:include src="resultImport.xhtml"/>
                     </p:tab>
