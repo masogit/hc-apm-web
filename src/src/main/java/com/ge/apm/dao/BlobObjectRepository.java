@@ -25,4 +25,6 @@ public interface BlobObjectRepository extends GenericRepositoryUUID<V2_BlobObjec
     
     @Query(value="select o.* from v2_blob_object o limit 10", nativeQuery = true)
 	public List<V2_BlobObject> findSomeTestRecords();
+
+    public List<V2_BlobObject> findByBoUuidAndBoSubType(String boUuid, String boSubType);
 }
