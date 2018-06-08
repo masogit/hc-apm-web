@@ -51,6 +51,14 @@
 							<p:column headerText="资产编号">
 								<h:outputText value="#{item.financingNum}" />
 							</p:column>
+							<p:column headerText="工单编号">
+								<h:outputText value="#{item.v2PmOrder.pmNum}" />
+							</p:column>
+							<p:column headerText="计划完成时间">
+								<h:outputText value="#{item.v2PmOrder.planTime}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+								</h:outputText>
+							</p:column>
 							<p:column headerText="设备型号">
 								<h:outputText value="#{item.assetInfo.functionType}" />
 							</p:column>
