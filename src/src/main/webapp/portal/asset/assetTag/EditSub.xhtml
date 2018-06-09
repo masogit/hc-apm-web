@@ -39,35 +39,34 @@
                                 <f:selectItem itemLabel="EE报警" itemValue="2"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        <h:panelGroup id="id2" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
+                        <h:panelGroup rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.receiveMsgModeInteger!=3)}">
                             <label  class="label">工单消息推送选项*</label>
-                            <p:selectOneMenu value="#{tagSubscriberController.selected.receiveMsgMode}" required="true" requiredMessage="工单消息推送选项不能为空">
-                                <p:ajax update=":AssetTagSubscribEditForm" event="change"></p:ajax>
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                            <p:selectOneMenu id="select1" value="#{tagSubscriberController.receiveMsgModeInteger}" required="true" requiredMessage="工单消息推送选项不能为空">
+                                <p:ajax  process="@this" listener="#{tagSubscriberController.gondantuisongxuanxiang}" update=":AssetTagSubscribEditForm"></p:ajax>
                                 <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
-                            #{tagSubscriberController.jinjiduShow()}
                         </h:panelGroup>
-                        <h:panelGroup id="id3" rendered="#{tagSubscriberController.priorityShow()}">
-                            <p:panelGrid columns="3">
-                                <h:panelGroup> <p:outputLabel  value="紧急: " />
-                                    <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level0}"/></h:panelGroup>
+                        <h:panelGroup id="id3" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.receiveMsgMode!=3)}">
+                            <p:panelGrid rendered="#{tagSubscriberController.prioritySetFalse()}" columns="3">
+                                <h:panelGroup > <p:outputLabel  value="紧急: " />
+                                    <p:selectBooleanCheckbox  rendered="#{tagSubscriberController.prioritySetFalse()}" value="#{tagSubscriberController.level0}"/></h:panelGroup>
                                 <h:panelGroup> <p:outputLabel value="重要: " />
-                                    <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level1}"/></h:panelGroup>
+                                    <p:selectBooleanCheckbox rendered="#{tagSubscriberController.prioritySetFalse()}" value="#{tagSubscriberController.level1}"/></h:panelGroup>
                                 <h:panelGroup> <p:outputLabel  value="一般: " />
-                                    <p:selectBooleanCheckbox value="#{tagSubscriberController.selected.level2}"/></h:panelGroup>
-
+                                    <p:selectBooleanCheckbox rendered="#{tagSubscriberController.prioritySetFalse()}" value="#{tagSubscriberController.level2}"/></h:panelGroup>
                             </p:panelGrid>
-
                         </h:panelGroup>
 
-                        <h:panelGroup id ="id1" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.selected.receiveMsgMode!=3)}">
-                            <p:selectBooleanCheckbox  value="#{tagSubscriberController.selected.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送"/>
+                        <h:panelGroup id ="id1" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.receiveMsgMode!=3)}">
+                            <p:selectBooleanCheckbox  value="#{tagSubscriberController.isReceiveTimeoutMsg}"  itemLabel="工单超时消息推送">
+                                <p:ajax update=":AssetTagSubscribEditForm" event="change" listener="#{tagSubscriberController.gongdantuisongxuanxiang}"></p:ajax>
+                            </p:selectBooleanCheckbox>
                         </h:panelGroup>
 
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>
+                   <!-- <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>-->
 
                     <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{tagSubscriberController.cancel()}" icon="ui-icon-cancel" update="TagSubscriberForm" onclick="PF('AssetTagSubscribEditDialog').hide()"/>
                 </h:panelGroup>

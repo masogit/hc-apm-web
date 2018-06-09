@@ -69,6 +69,11 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="到达时间">
+                                        <h:outputText value="#{item.arrivedTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
                                     <p:column headerText="到货">
                                         <h:outputText value="#{item.arrived?'已到货':''}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                         <p:commandLink process="@this"  actionListener="#{v2PmOrderController.accessoryArrival(item.id)}" class="arrivalItem" rendered="#{item.id ne '000' and !item.arrived}" update="accessList">未到货</p:commandLink>
