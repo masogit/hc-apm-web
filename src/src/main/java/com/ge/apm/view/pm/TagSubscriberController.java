@@ -37,7 +37,9 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
 	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
 	private Integer receiveMsgMode;
+	private Integer receiveMsgModeInteger =new Integer(0);
 	private int selectType=1;
+	private Boolean isReceiveTimeoutMsg;
 	/*public boolean subscriberShow(){
 		//xiugai   if(xiu gai and fei admin) return true
 		if(!userContextService.hasRole("ITAdmin")&  WebUtil.getMessage(crudActionName)=="修改")
@@ -56,7 +58,35 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 					return true;
 				}
 		}
+		public void gongdantuisongxuanxiang(){
+		if(isReceiveTimeoutMsg==false && receiveMsgModeInteger==2){
+			level0=false;
+			level1=false;
+			level2=false;
+		}
+			System.out.println(level0);
+			System.out.println(level1);
+			System.out.println(level2);
+		}
+     public Boolean prioritySetFalse(){
+		/*如果 不推送工单消息 并且 工单超时推送不选 ,返回true,让紧急 重要 一般 变成灰色*/
+		/*if(receiveMsgModeInteger==null){
+			return null;
+		}*/
+         if(isReceiveTimeoutMsg==false && receiveMsgModeInteger==2){
+         	return false;
+		 }else
+		 	return true;
 
+	 }
+	 public void gondantuisongxuanxiang(){
+     	if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){//如果选中"所有.."或"仅.."那么默认 优先级和工单超时都选上
+		  level0=true;
+		  level1=true;
+		  level2=true;
+		  isReceiveTimeoutMsg=true;
+		}
+	 }
 	public Boolean priorityShow(){
 		//selected.getReceiveMsgMode() = 2  //不推送消息
 		if(selected.getReceiveMsgMode()!=null && selected.getReceiveMsgMode()==2)
@@ -72,6 +102,12 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 			WebUtil.addErrorMessage("设备消息订阅没有被选中");
 		}
 	}
+	public void setLevelsFalse(){
+		level0=false;
+		level1=false;
+		level2=false;
+	}
+
 // 关注人tentant下的tag
 	public void takeAssetTags(){
 		//获得的是:和标签绑定的用户的院区下的所有标签
@@ -87,6 +123,20 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 
 	public void saveTagSub4(){
+		/*如果 消息推送选项是 "所有.."和"仅.., ",那么紧急度必须选一个*/
+		  if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){
+		  	if(level0==false && level1==false && level2==false){
+		  		WebUtil.addErrorMessage("务必选择紧急程度");
+		  		return;
+			}
+		  }
+		/*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*/
+		if(receiveMsgModeInteger==2 && isReceiveTimeoutMsg==false){
+			if(level0==true || level1==true || level2==true){
+				WebUtil.addErrorMessage("不推送工单和超时消息，不需要选择紧急度");
+				return;
+			}
+		}
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
 				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
@@ -188,6 +238,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
 		selectType=0;
+		level0=true;
+		level1=true;
+		level2=true;
+		isReceiveTimeoutMsg=true;
+
 		this.selected.setReceiveMsgMode(null);
 		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 	}
@@ -200,8 +255,14 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void prepareEdit() {
 		super.prepareEdit();
 		Integer se=selected.getSelectType();
+		level0=selected.getLevel0();
+		level1=selected.getLevel1();
+		level2=selected.getLevel2();
+		receiveMsgMode= selected.getReceiveMsgMode();
+		isReceiveTimeoutMsg=selected.getIsReceiveTimeoutMsg();
 		if(se!=null)
          selectType=se.intValue();
+
 		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
 		currentAtms=dao.findById(selected.getId());
 		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
@@ -301,5 +362,23 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	public void setLevel2(boolean level2) {
 		this.level2 = level2;
+	}
+
+	public Boolean getIsReceiveTimeoutMsg() {
+		return isReceiveTimeoutMsg;
+	}
+
+	public void setIsReceiveTimeoutMsg(Boolean receiveTimeoutMsg) {
+		isReceiveTimeoutMsg = receiveTimeoutMsg;
+	}
+
+
+
+	public Integer getReceiveMsgModeInteger() {
+		return receiveMsgModeInteger;
+	}
+
+	public void setReceiveMsgModeInteger(Integer receiveMsgModeInteger) {
+		this.receiveMsgModeInteger = receiveMsgModeInteger;
 	}
 }

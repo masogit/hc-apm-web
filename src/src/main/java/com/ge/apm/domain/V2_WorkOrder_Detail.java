@@ -74,6 +74,12 @@ public class V2_WorkOrder_Detail implements Serializable {
     @Temporal(TemporalType.TIMESTAMP)
     private Date estimatedArriveTime;
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
+    @Column(name = "arrived_time")
+    @Temporal(TemporalType.TIMESTAMP)
+    private Date arrivedTime;
+
+
     @Column(name = "arrived")
     private Boolean arrived;
 
@@ -222,6 +228,14 @@ public class V2_WorkOrder_Detail implements Serializable {
 
     public void setApplyTime(Date applyTime) {
         this.applyTime = applyTime;
+    }
+
+    public Date getArrivedTime() {
+        return arrivedTime;
+    }
+
+    public void setArrivedTime(Date arrivedTime) {
+        this.arrivedTime = arrivedTime;
     }
 
     @Override

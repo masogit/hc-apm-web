@@ -372,6 +372,14 @@ public class V2_PmOrderService {
             formData.setEndTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(endTime));
         formData.setManHours(selectedPmOrder.getManHours());
         selectedPmOrder.setCurrentStepName("保养中");
+
+        accDetails.stream().forEach(item->{
+            if(item.getArrivedTime()==null){
+                item.setArrivedTime((new Date()));
+            }
+
+        });
+
         formData.setDetails(accDetails);
         formData.setCoworkers(coDetails);
         formData.setQualityChecking(selectedPmOrder.getQualityChecking());
