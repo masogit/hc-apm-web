@@ -7,11 +7,12 @@ package com.ge.apm.dao;
 
 import com.ge.apm.domain.ContractInfoItem;
 import webapp.framework.dao.GenericRepositoryUUID;
+import java.util.List;
 /**
  *
  * @author 212579464
  */
 public interface ContractInfoItemRepository extends GenericRepositoryUUID<ContractInfoItem>{
 
-    
+   List<ContractInfoItem>  findByContractId(String id);
 }

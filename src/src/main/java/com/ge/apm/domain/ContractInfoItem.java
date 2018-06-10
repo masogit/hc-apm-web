@@ -29,6 +29,10 @@ import org.hibernate.annotations.GenericGenerator;
 @Table(name = "contract_info_item")
 public class ContractInfoItem implements Serializable {
 
+    public enum ContractInfoItemType {
+        ExistAsset, Purchase
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
@@ -37,21 +41,24 @@ public class ContractInfoItem implements Serializable {
 
     @Column(name = "contract_id", columnDefinition = "CHAR(32)")
     private String contractId;
-    
+
     @JoinColumn(name = "contract_id", referencedColumnName = "id", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private ContractInfo contractInfo;
 
+    @Column(name = "item_type")
+    private String itemType;
+
     @Column(name = "asset_uid", columnDefinition = "CHAR(32)")
     private String assetUid;
 
-    //制造商
-    @Column(name = "supplier_uid", columnDefinition = "CHAR(32)")
-    private String supplierUid;
+    @JoinColumn(name = "asset_uid", referencedColumnName = "uid", insertable = false, updatable = false, nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private AssetInfo assetInfo;
 
-    //型号
-    @Column(name = "pattern")
-    private String pattern;
+    //到货单条目
+    @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
+    private String arrivalItemId;
 
     //交货期
     @Basic(optional = true)
@@ -81,27 +88,34 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "in_time_arrived")
     private Boolean inTimeArrived;
 
-    //验收时间
-    @Basic(optional = true)
-    @Column(name = "ack_date")
-    @Temporal(TemporalType.DATE)
-    private Date ackDate;
+    //购入方式
+    @Column(name = "tender_type")
+    private String tenderType;
 
-    //出保日期
-    @Basic(optional = true)
-    @Column(name = "warranty_end_date")
-    @Temporal(TemporalType.DATE)
-    private Date warrantyEndDate;
+    //合同内设备名称
+    @Column(name = "contract_asset_name")
+    private String contractAssetName;
 
-    //质保期(保修时长)
-    @Column(name = "warranty_year")
-    private Double warrantyYear;
-    
-    //设备SN
-    @Column(name = "serial_num")
-    private String serialNum;
-    
-  
+    //合同标价（万元）
+    @Column(name = "contract_asset_price")
+    private Double contractAssetPrice;
+
+    //合同内设备数量
+    @Column(name = "contract_asset_quantity")
+    private Integer contractAssetQuantity;
+
+    //制造商
+    @Column(name = "manufacturer")
+    private String manufacturer;
+
+    //规格型号
+    @Column(name = "pattern")
+    private String pattern;
+
+    //交货期(天)
+    @Column(name = "delivery_days")
+    private Integer deliveryDays;
+
     //备注
     @Column(name = "comments")
     @Size(min = 0, max = 256)
@@ -137,14 +151,6 @@ public class ContractInfoItem implements Serializable {
 
     public void setAssetUid(String assetUid) {
         this.assetUid = assetUid;
-    }
-
-    public String getSupplierUid() {
-        return supplierUid;
-    }
-
-    public void setSupplierUid(String supplierUid) {
-        this.supplierUid = supplierUid;
     }
 
     public String getPattern() {
@@ -195,38 +201,6 @@ public class ContractInfoItem implements Serializable {
         this.inTimeArrived = inTimeArrived;
     }
 
-    public Date getAckDate() {
-        return ackDate;
-    }
-
-    public void setAckDate(Date ackDate) {
-        this.ackDate = ackDate;
-    }
-
-    public Date getWarrantyEndDate() {
-        return warrantyEndDate;
-    }
-
-    public void setWarrantyEndDate(Date warrantyEndDate) {
-        this.warrantyEndDate = warrantyEndDate;
-    }
-
-    public Double getWarrantyYear() {
-        return warrantyYear;
-    }
-
-    public void setWarrantyYear(Double warrantyYear) {
-        this.warrantyYear = warrantyYear;
-    }
-
-    public String getSerialNum() {
-        return serialNum;
-    }
-
-    public void setSerialNum(String serialNum) {
-        this.serialNum = serialNum;
-    }
-
     public String getComments() {
         return comments;
     }
@@ -235,13 +209,84 @@ public class ContractInfoItem implements Serializable {
         this.comments = comments;
     }
 
+    public AssetInfo getAssetInfo() {
+        return assetInfo;
+    }
+
+    public void setAssetInfo(AssetInfo assetInfo) {
+        this.assetInfo = assetInfo;
+    }
+
+    public String getArrivalItemId() {
+        return arrivalItemId;
+    }
+
+    public void setArrivalItemId(String arrivalItemId) {
+        this.arrivalItemId = arrivalItemId;
+    }
+
+    public String getTenderType() {
+        return tenderType;
+    }
+
+    public void setTenderType(String tenderType) {
+        this.tenderType = tenderType;
+    }
+
+    public String getContractAssetName() {
+        return contractAssetName;
+    }
+
+    public void setContractAssetName(String contractAssetName) {
+        this.contractAssetName = contractAssetName;
+    }
+
+    public Double getContractAssetPrice() {
+        return contractAssetPrice;
+    }
+
+    public void setContractAssetPrice(Double contractAssetPrice) {
+        this.contractAssetPrice = contractAssetPrice;
+    }
+
+    public Integer getContractAssetQuantity() {
+        return contractAssetQuantity;
+    }
+
+    public void setContractAssetQuantity(Integer contractAssetQuantity) {
+        this.contractAssetQuantity = contractAssetQuantity;
+    }
+
+    public String getManufacturer() {
+        return manufacturer;
+    }
+
+    public void setManufacturer(String manufacturer) {
+        this.manufacturer = manufacturer;
+    }
+
+    public Integer getDeliveryDays() {
+        return deliveryDays;
+    }
+
+    public void setDeliveryDays(Integer deliveryDays) {
+        this.deliveryDays = deliveryDays;
+    }
+
+    public String getItemType() {
+        return itemType;
+    }
+
+    public void setItemType(String itemType) {
+        this.itemType = itemType;
+    }
+    
     @Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
         return hash;
     }
-    
 
     @Override
     public boolean equals(Object object) {

@@ -1,88 +1,318 @@
-<?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui">
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
 
-    <ui:composition>
+    <ui:define name="content">
+        <div class="ui-g clearfix">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{contractInfoEditController.CRUDActionName}#{msg.ContractInfo}"/>
+            </div>
+            <div class="ui-g-12 card">
+                <h:form id="AssetContractEditForm">
+                    <p:fieldset legend="基本信息">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">#{msg.hospitalId}</label>
+                                <p:inputText id="selectedUserOrgName" value="#{contractInfoEditController.selectedObjectMap['selectedOrg']}" readonly="true" class="SiteUIDChange"/>
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{not empty contractInfoEditController.selected.id}"/>
+                                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
+                                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{contractInfoEditController.orgTree}" var="node" selectionMode="single">
+                                            <p:ajax process="@this" event="select" update="@(.SiteUIDChange)"
+                                                    listener="#{contractInfoEditController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
+                                            <p:ajax process="@this" event="expand"/>
+                                            <p:ajax process="@this" event="collapse"/>
 
-        <h:form id="AssetContractEditForm">
-            <p:fieldset  id="editSet" legend="#{assetContractController.CRUDActionName}" style="margin-bottom:20px" rendered="#{assetContractController.selected != null}">
-                <h:panelGroup id="display">
-                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                            <p:treeNode type="org">
+                                                <h:outputText value="#{node}"/>
+                                            </p:treeNode>
+                                        </p:tree>
+                                    </p:scrollPanel>
+                                </p:overlayPanel>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.AssetContractName}*</label>
+                                <p:inputText value="#{contractInfoEditController.selected.name}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractNum}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.contractNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractType}</label>
+                                <p:selectOneMenu id="contractType" value="#{contractInfoEditController.selected.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                                    <f:selectItems value="#{contractInfoEditController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.vendor}</label>
+                                <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['supplier']}"  scrollHeight="300"  forceSelection="true" 
+                                                completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
+                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.AssetContractAmount}</label>
+                                <p:inputNumber decimalPlaces="0" id="contractAmount" value="#{contractInfoEditController.selected.amount}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.startTime}*</label>
+                                <p:calendar timeZone="GMT+8"  id="startTime" pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.startDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.endTime}*</label>
+                                <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.endDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"/>
+                            </h:panelGroup>
+                        </p:panelGrid>
+                        <h:panelGroup >
+                            <p:dataList id="AttachList" value="#{contractInfoEditController.attachements}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}" style="text-align:left">
+                                <f:facet name="header">
+                                    <div class="ui-g" style="text-align:left">
+                                        <h:outputText value="附件类型" class="ui-g-2"/>
+                                        <h:outputText value="文件名称" class="ui-g-3"/>
+                                        <h:outputText value="上传时间" class="ui-g-3" />
+                                        <h:outputText value="上传人" class="ui-g-2" />
+                                        <p:commandLink value="#{msg.Add}#{msg.attachment}" immediate="true"  oncomplete="PF('uploadDialog').show()" class="ui-g-2"/>
+                                    </div>
+                                </f:facet>
 
-                        <!--                        <h:panelGroup>
-                                                    <label class="label">#{msg.fileType}*</label>
-                                                    <p:selectOneMenu id="fileType" value="#{assetContractController.selected.fileType}" required="true" requiredMessage="#{msg.fileType} #{msg.ValidationRequire}">
-                                                        <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                                                        <f:selectItems value="#{fieldMsg.getFieldValueList('attachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
-                                                    </p:selectOneMenu>
-                                                </h:panelGroup>-->
+                                <div class="ui-g">
+                                    <h:outputText value="#{fieldMsg.fieldValue('contractAttachmentType', fileitem.boSubType)}" class="ui-g-2"/>
+                                    <p:link href="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" class="ui-g-3" >#{fileitem.objectName}</p:link>
+                                    <h:outputText value="#{fileitem.createdDate}" class="ui-g-3">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm" />
+                                    </h:outputText>
+                                    <h:outputText value="#{contractInfoEditController.getUserNameByUid(fileitem.createdBy)}" class="ui-g-2" />
+                                    <p:commandLink value="#{msg.Delete}" class="ui-g-2" update="AttachList " actionListener="#{contractInfoEditController.removeAttachmentById(fileitem.id)}" process="@this">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                    </p:commandLink>
+                                </div>
+                            </p:dataList>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.AssetContractName}*</label>
-                            <p:inputText   id="contractName"  value="#{assetContractController.selected.name}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}"/>
                         </h:panelGroup>
 
+                    </p:fieldset>
+                    <p:fieldset legend="详细信息一" rendered="#{not empty contractInfoEditController.selected.id}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                            <h:panelGroup>
+                                <label class="label">#{msg.reportNum}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.reportNum}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.applyDept}</label>
+                                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true"
+                                                completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
+                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.applyProjectName}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.applyProjectName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.quantity}</label>
+                                <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selected.quantity}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.estimatedPrice}</label>
+                                <p:inputNumber decimalPlaces="0"  value="#{contractInfoEditController.selected.estimatedPrice}">
+                                    <p:ajax listener="#{contractInfoEditController.onEstimatedPriceChange}" process="@this" update="priceType" />
+                                </p:inputNumber>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.priceType}</label>
+                                <p:selectOneMenu id="priceType" value="#{contractInfoEditController.selected.priceType}" disabled="true">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('contractPriceType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.argumentEndDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.argumentEndDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.parameterEndDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.parameterEndDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.parameterPerson}</label>
+                                <p:inputText value="#{contractInfoEditController.selected.parameterPerson}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.tenderOpenDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.tenderOpenDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.bidWinner}</label>
+                                <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['bidWinner']}"  scrollHeight="300"  forceSelection="true" 
+                                                completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('bidWinner')}" update="@(.bidWinner)" />
+                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('bidWinner')}" update="@(.bidWinner)"/>
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.bidWinnerPerson}</label>
+                                <p:inputText class="bidWinner" value="#{contractInfoEditController.selected.bidWinnerPerson}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.bidWinnerTelphone}</label>
+                                <p:inputText class="bidWinner" value="#{contractInfoEditController.selected.bidWinnerTelphone}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.tenderNoticeDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.tenderNoticeDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                        </p:panelGrid>
+                    </p:fieldset>
+<!--                    <p:fieldset legend="详细信息二" rendered="#{not empty contractInfoEditController.selected.id}">
+                        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                           
+
+
+                        </p:panelGrid>
+                    </p:fieldset>-->
+                    <p:fieldset legend="合同相关设备">
+                        <p:dataTable id="itemList"  value="#{contractInfoEditController.contractItemsList}" var="item"
+                                     rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
+                                     paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                                     rowsPerPageTemplate="5,10,15"  >
+                            <p:ajax event="rowSelect" />
+                            <p:column headerText="#{msg.AssetName}" >
+                                <h:outputText value="#{item.itemType eq 'ExistAsset'? item.assetInfo.name : item.contractAssetName}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.serialNum}">
+                                <h:outputText value="#{item.assetInfo.serialNum}"/>
+                            </p:column>
+                            <p:column headerText="#{msg.clinicalDeptName}" >
+                                <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+                            </p:column>
+                            <p:column width="90" >
+                                <f:facet name="header" >
+                                    <h:outputText value="操作" />
+                                </f:facet>
+                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" />
+                                <p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
+                                <p:commandLink actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" />
+                            </p:column>
+
+                            <f:facet name="{Toolbar}">
+                                <p:commandLink  value="添加已有设备" style="color:#3e87e8;padding: 10px" actionListener="#{selectAssetController.prepareDialogCallback(contractInfoEditController, ':AssetContractEditForm:itemList')}" process="@this" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()"/>
+                                <p:commandLink value="添加订购设备" style="color:#3e87e8;padding: 10px" actionListener="#{contractInfoEditController.prepareAddPurchaseAsset()}" process="@this" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()"/>
+
+
+                            </f:facet>
+
+                        </p:dataTable>
+                    </p:fieldset>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true"  actionListener="#{contractInfoEditController.saveContract}" value="#{msg.Save}" update=":growl" icon="ui-icon-check"/>
+                        <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" action="ContractList?faces-redirect=true" immediate="true" />
+                    </h:panelGroup>
+                </h:form>
+            </div>
+
+        </div>
+        <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
+        <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="添加/修改采购设备">
+            <h:form id="addPurchaseForm" >
+                <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
+                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                         <h:panelGroup>
+                                <label class="label">#{msg.tenderType}</label>
+                                <p:selectOneMenu value="#{contractInfoEditController.selectedContractItem.tenderType}">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                    <f:selectItems value="#{fieldMsg.getFieldValueList('tenderType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractAssetName}</label>
+                                <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.contractAssetName}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractAssetPrice}</label>
+                                <p:inputNumber decimalPlaces="0"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.contractAssetQuantity}</label>
+                                <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.contractAssetQuantity}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.manufacture}</label>
+                                <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['manufacture']}"  scrollHeight="300"  forceSelection="true" 
+                                                completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('manufacture')}" />
+                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('manufacture')}"/>
+                                </p:autoComplete>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.pattern}</label>
+                                <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.pattern}"/>
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.deliveryDays}</label>
+                                <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.deliveryDays}"/>
+                            </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{contractInfoEditController.savePurchaseItem()}" value="#{msg.Confirm}" 
+                                         update=":AssetContractEditForm:itemList :addPurchaseForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'addPurchaseDlg');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{contractInfoEditController.cancelPurchaseItem()}" icon="ui-icon-cancel" onclick="PF('addPurchaseDlg').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+        
+        <p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传模版文件">
+            <h:form id="uploadDialogForm" >
+                <h:panelGroup id="display" >
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                         <h:panelGroup>
-                            <label class="label">#{msg.contractType}*</label>
-                            <p:selectOneMenu id="contractType" value="#{assetContractController.selected.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}">
-                                <p:ajax update="pmCount" />
-                                <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                                <f:selectItems value="#{assetContractController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                            <p:selectOneMenu id="functionGroup" value="#{contractInfoEditController.attachmentType}" autoWidth="false" style="width: 100%">
+                                <p:ajax process="@this" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{fieldMsg.getFieldValueList('contractAttachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </h:panelGroup>
-                        
                         <h:panelGroup>
-                            <label class="label">#{msg.assetName}*</label>
-                            <p:inputText id="assetName" readonly="true" value="#{assetContractController.selectedAsset.name}" placeholder="#{msg.noAssetSelected}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
-                            <p:commandButton class="popupIconButton" actionListener="#{selectAssetController.prepareDialogCallback(assetContractController, ':AssetContractEditForm:assetName')}" process="@this" icon="ui-icon-arrow-drop-down" update=":selectAssetDlg" oncomplete="PF('varSelectAssetDlg').show()"/>
+                            <label class="label">#{msg.choseFileToUpload}</label>
+                            <p:dataList id="AttachUploadList" value="#{contractInfoEditController.uploadedFileObjects}" var="fileitem" type="definition" emptyMessage="#{msg.noRecordFound}">
+                                <f:facet name="header">#{msg.attachment}</f:facet>
+                                    #{fileitem.objectName}
+                                <p:commandButton actionListener="#{contractInfoEditController.removeUploadedFileObjects(fileitem.id)}" update="AttachUploadList" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this">
+                                    <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
+                                </p:commandButton>
+                            </p:dataList>
+                            <p:fileUpload  fileUploadListener="#{contractInfoEditController.uploadDataFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                                           multiple="true" sizeLimit="10000000" update=":uploadDialogForm:AttachUploadList saveButton" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" />
                         </h:panelGroup>
 
-                        <h:panelGroup>
-                            <label class="label">#{msg.startTime}*</label>
-                            <p:calendar timeZone="GMT+8"  id="startTime" pattern="yyyy/MM/dd" value="#{assetContractController.selected.startDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.startTime} #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.endTime}*</label>
-                            <p:calendar timeZone="GMT+8"  id="endTime" pattern="yyyy/MM/dd" value="#{assetContractController.selected.endDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="true" requiredMessage="#{msg.endTime} #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
 
-                        <h:panelGroup id="pmCount">
-                        <h:panelGroup rendered="#{assetContractController.selected.contractType == 5}">
-                            <label class="label">保养次数*</label>
-                            <p:inputNumber decimalPlaces="0" value="#{assetContractController.pmCount}" required="true" requiredMessage="保养次数 #{msg.ValidationRequire}"/>
-                        </h:panelGroup>
-                            <h:panelGroup>
-                                <label class="label">#{msg.AssetContractAmount}*</label>
-                                <p:inputNumber decimalPlaces="0" id="contractAmount" value="#{assetContractController.selected.contractAmount}" required="true" requiredMessage="#{msg.AssetContractAmount} #{msg.ValidationRequire}"/>
-                            </h:panelGroup>
-                        </h:panelGroup>
                     </p:panelGrid>
-                    <p:panel  id="upload" styleClass="ui-panelgrid-blank" style=" border: 0">
-                        <h:panelGroup  style="max-width:50px;" rendered="#{assetContractController.isCreatAction() and assetContractController.selected.objectId==null}">
-                            <label class="label">合同附件*</label>
-                            <p:fileUpload required="true" fileUploadListener="#{assetContractController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:40%" process="@this" multiple="false" sizeLimit="10000000" update=":AssetContractEditForm:upload" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  label="#{msg.Add}" />
-                            <p:growl id="messages" showDetail="true" />
-                        </h:panelGroup>
-                        <h:panelGroup id="namepanel" rendered="#{assetContractController.selected.objectId!=null}">
-                            <label class="label">#{msg.AssetContractAttachment}*</label>
-                            <p:inputText id="name" value="#{assetContractController.fileName}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}" readonly="true"/>
-                            <p:commandButton actionListener="#{assetContractController.removeAttachmentById(assetContractController.blobObject)}" id="iconOnly" update=":AssetContractEditForm:upload" icon="ui-icon-clear" title="#{msg.Delete}" class="popupIconButton" process="@this" rendered="#{assetContractController.isCreatAction()}">
-                                <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
-                            </p:commandButton>
-                        </h:panelGroup>
-                    </p:panel>
                     <h:panelGroup>
-                        <p:commandButton validateClient="true"  actionListener="#{assetContractController.save}" value="#{msg.Save}" update=":AssetContractEditForm :AssetContractListForm:datalist, :growl" icon="ui-icon-check"/>
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-arrow-back" actionListener="#{assetContractController.cancel}" update="display,:AssetContractEditForm :growl"/>
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{contractInfoEditController.finishUpload()}" disabled="#{empty contractInfoEditController.uploadedFileObjects}" value="#{msg.Confirm}" 
+                                         update=":AssetContractEditForm:AttachList :uploadDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{contractInfoEditController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadDialog').hide()"/>
                     </h:panelGroup>
-
                 </h:panelGroup>
-            </p:fieldset>
-        </h:form>
-
-    </ui:composition>
-</html>
+            </h:form>
+        </p:dialog>
+        <script>
+            //<![CDATA[
+            var newWin;
+            function prepareAssetViewWindow() {
+                newWin = window.open('about:blank', '_blank');
+                newWin.document.body.innerHTML = '加载中...';
+            }
+            function openAssetViewWindow(xhr, status, args) {
+                newWin.location.href = args.url;
+            }
+            //]]>
+        </script>
+    </ui:define>
+</ui:composition>
