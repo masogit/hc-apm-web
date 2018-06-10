@@ -199,6 +199,16 @@ public class Supplier implements Serializable, ChineseName {
         this.supplierType = supplierType;
     }
 
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+    
+    
+
     @Override
     public int hashCode() {
         int hash = 0;

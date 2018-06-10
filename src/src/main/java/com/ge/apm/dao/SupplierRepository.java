@@ -11,4 +11,6 @@ public interface SupplierRepository extends GenericRepository<Supplier> {
     public List<Supplier> getByTenantUID(String tenantUid);
 
     public Supplier getBySiteIdAndName(int siteId, String name);
+    
+    public Supplier findByUid(String uid);
 }

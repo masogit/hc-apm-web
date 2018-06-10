@@ -39,7 +39,7 @@
                                                 <c:if test="#{fieldItem.component eq 'Select'}" >
                                                     <p:selectOneMenu value="#{tableCreateController.tableValue[fieldItem.key]}">
                                                         <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                        <f:selectItems value="#{fieldItem.options}" var="option" itemLabel="#{option.key}" itemValue="#{option.value}"/>
+                                                        <f:selectItems value="#{fieldItem.options}" var="option" itemLabel="#{option.value}" itemValue="#{option.key}"/>
                                                     </p:selectOneMenu>
                                                 </c:if>
                                                 <c:if test="#{fieldItem.component eq 'Switch'}" >
@@ -471,7 +471,7 @@
                     <h:panelGroup>
                         <p:commandButton immediate="false" validateClient="true" actionListener="#{tableCreateController.finishUpload()}" disabled="#{empty tableCreateController.uploadedFile}" value="#{msg.Confirm}" 
                                          update=":CreateTemplateForm:tabView:importExcel :uploadDialogForm :growl :CreateTemplateForm:tabView:pageTitle1 :CreateTemplateForm:tabView:pageTitle2 :CreateTemplateForm:tabView:pageTitle3 :CreateTemplateForm:tabView:preview" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
-                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{tableCreateController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('rateDialog').hide()"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{tableCreateController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadDialog').hide()"/>
                     </h:panelGroup>
                 </h:panelGroup>
             </h:form>

@@ -36,7 +36,11 @@ public class ContractInfo implements Serializable {
     }
 
     public enum PurchaseType {
-        Tender, Negotiated, Continue
+        Tenders, Negotiated, Continue
+    }
+    
+    public enum AttachmentType {
+        Contract, Tenders, Other
     }
 
     @Id
@@ -101,7 +105,7 @@ public class ContractInfo implements Serializable {
     @Column(name = "quantity")
     private Integer quantity;
 
-    //预估单价
+    //预估单价(万元)
     @Column(name = "estimated_price")
     private Double estimatedPrice;
 
@@ -109,7 +113,7 @@ public class ContractInfo implements Serializable {
     @Column(name = "price_type")
     private String priceType;
 
-    //论证会结果时间
+    //论证会结果/时间
     @Basic(optional = true)
     @Column(name = "argument_end_date")
     @Temporal(TemporalType.DATE)
@@ -143,38 +147,35 @@ public class ContractInfo implements Serializable {
     @Column(name = "bid_winner_telphone")
     private String bidWinnerTelphone;
 
-    //开标时间
+    //中标通知书时间
     @Basic(optional = true)
     @Column(name = "tender_notice_date")
     @Temporal(TemporalType.DATE)
     private Date tenderNoticeDate;
 
-    //购入方式
-    @Column(name = "tender_type")
-    private String tenderType;
     
-    //发票号
-    @Size(max = 64)
-    @Column(name = "invoice_num")
-    private String invoiceNum;
-    
-    //报送首付日期
-    @Basic(optional = true)
-    @Column(name = "down_payment_date")
-    @Temporal(TemporalType.DATE)
-    private Date downPaymentDate;
-    
-    //供应商申请尾款日期
-    @Basic(optional = true)
-    @Column(name = "apply_payment_date")
-    @Temporal(TemporalType.DATE)
-    private Date applyPaymentDate;
-    
-    //报送尾款日期
-    @Basic(optional = true)
-    @Column(name = "tail_payment_date")
-    @Temporal(TemporalType.DATE)
-    private Date tailPaymentDate;
+//    //发票号
+//    @Size(max = 64)
+//    @Column(name = "invoice_num")
+//    private String invoiceNum;
+//    
+//    //报送首付日期
+//    @Basic(optional = true)
+//    @Column(name = "down_payment_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date downPaymentDate;
+//    
+//    //供应商申请尾款日期
+//    @Basic(optional = true)
+//    @Column(name = "apply_payment_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date applyPaymentDate;
+//    
+//    //报送尾款日期
+//    @Basic(optional = true)
+//    @Column(name = "tail_payment_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date tailPaymentDate;
     
     
     //备注
@@ -195,6 +196,18 @@ public class ContractInfo implements Serializable {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+    
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
 
     public String getId() {
         return id;
@@ -380,14 +393,6 @@ public class ContractInfo implements Serializable {
         this.tenderNoticeDate = tenderNoticeDate;
     }
 
-    public String getTenderType() {
-        return tenderType;
-    }
-
-    public void setTenderType(String tenderType) {
-        this.tenderType = tenderType;
-    }
-
     public String getTenantUID() {
         return tenantUID;
     }
@@ -420,37 +425,37 @@ public class ContractInfo implements Serializable {
         this.siteUID = siteUID;
     }
 
-    public String getInvoiceNum() {
-        return invoiceNum;
-    }
-
-    public void setInvoiceNum(String invoiceNum) {
-        this.invoiceNum = invoiceNum;
-    }
-
-    public Date getDownPaymentDate() {
-        return downPaymentDate;
-    }
-
-    public void setDownPaymentDate(Date downPaymentDate) {
-        this.downPaymentDate = downPaymentDate;
-    }
-
-    public Date getApplyPaymentDate() {
-        return applyPaymentDate;
-    }
-
-    public void setApplyPaymentDate(Date applyPaymentDate) {
-        this.applyPaymentDate = applyPaymentDate;
-    }
-
-    public Date getTailPaymentDate() {
-        return tailPaymentDate;
-    }
-
-    public void setTailPaymentDate(Date tailPaymentDate) {
-        this.tailPaymentDate = tailPaymentDate;
-    }
+//    public String getInvoiceNum() {
+//        return invoiceNum;
+//    }
+//
+//    public void setInvoiceNum(String invoiceNum) {
+//        this.invoiceNum = invoiceNum;
+//    }
+//
+//    public Date getDownPaymentDate() {
+//        return downPaymentDate;
+//    }
+//
+//    public void setDownPaymentDate(Date downPaymentDate) {
+//        this.downPaymentDate = downPaymentDate;
+//    }
+//
+//    public Date getApplyPaymentDate() {
+//        return applyPaymentDate;
+//    }
+//
+//    public void setApplyPaymentDate(Date applyPaymentDate) {
+//        this.applyPaymentDate = applyPaymentDate;
+//    }
+//
+//    public Date getTailPaymentDate() {
+//        return tailPaymentDate;
+//    }
+//
+//    public void setTailPaymentDate(Date tailPaymentDate) {
+//        this.tailPaymentDate = tailPaymentDate;
+//    }
 
     public String getComments() {
         return comments;
@@ -459,7 +464,38 @@ public class ContractInfo implements Serializable {
     public void setComments(String comments) {
         this.comments = comments;
     }
-    
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
+    }
 
     @Override
     public int hashCode() {
