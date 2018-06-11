@@ -40,8 +40,8 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Message send " + (isOkay(response) ? "successfully." : "failed."));
     }
 
-    public void remoteConfirmRent(String requestId) {
-        String url = getGatewayURL(GatewayURL.REMOTE_CONFIRM_RENT);
+    public void remoteAcceptRent(String requestId) {
+        String url = getGatewayURL(GatewayURL.REMOTE_ACCEPT_RENT);
         url = url.replace("{requestId}", requestId);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);

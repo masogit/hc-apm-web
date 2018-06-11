@@ -16,14 +16,22 @@
 		<p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.financingNum}" />
-		</p:column>
 		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.functionType}" />
 		</p:column>
 		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		</p:column>
+		<p:column headerText="工单编号" filterBy="#{item.v2PmOrder.pmNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.v2PmOrder.pmNum}" />
+		</p:column>
+		<p:column headerText="计划完成时间" sortBy="#{item.v2PmOrder.planTime}">
+			<h:outputText value="#{item.v2PmOrder.planTime}" >
+				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+			</h:outputText>
+		</p:column>
+		<p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.financingNum}" />
 		</p:column>
 		<p:column headerText="保护接地阻抗" filterBy="#{item.protectGroundImpedance}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.protectGroundImpedance}" />
@@ -47,7 +55,9 @@
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 			</h:outputText>
 		</p:column>
-
+		<p:column headerText="警告信息">
+			<h:outputText value="#{item.warnMessage}" />
+		</p:column>
 		<f:facet name="{Toolbar}">
 			<p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}"
 				actionListener="#{measureElectricSafetyController.delete}" update=":measureElectricSafetyTab:measureElectricSafetyListForm:datalist"

@@ -3,12 +3,12 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:ui="http://xmlns.jcp.org/jsf/facelets" xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core" xmlns:p="http://primefaces.org/ui">
 		<div class="ui-g">
-			<div class="ui-g-12 card cardTitle">
+			<!-- <div class="ui-g-12 card cardTitle">
 				<p:outputLabel class="pageTitle" value="电气安全数据导入" />
-			</div>
+			</div> -->
 			<div class="ui-g-12 card">
 				<h:form enctype="multipart/form-data">
-					<p:fieldset legend="批量导入计量数据" id="uploaderContainer">
+					<p:fieldset legend="批量导入电气安全数据" id="uploaderContainer">
 						<p:panelGrid columns="1" layout="grid"
 							styleClass="ui-panelgrid-blank form-group">
 							<p:fileUpload
@@ -48,14 +48,22 @@
 							<p:column headerText="设备名称">
 								<h:outputText value="#{item.assetInfo.name}" />
 							</p:column>
-							<p:column headerText="资产编号">
-								<h:outputText value="#{item.financingNum}" />
-							</p:column>
 							<p:column headerText="设备型号">
 								<h:outputText value="#{item.assetInfo.functionType}" />
 							</p:column>
 							<p:column headerText="使用科室">
 								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+							</p:column>
+							<p:column headerText="工单编号">
+								<h:outputText value="#{item.v2PmOrder.pmNum}" />
+							</p:column>
+							<p:column headerText="计划完成时间">
+								<h:outputText value="#{item.v2PmOrder.planTime}" >
+									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+								</h:outputText>
+							</p:column>
+							<p:column headerText="资产编号">
+								<h:outputText value="#{item.financingNum}" />
 							</p:column>
 							<p:column headerText="保护接地阻抗">
 								<h:outputText value="#{item.protectGroundImpedance}" />

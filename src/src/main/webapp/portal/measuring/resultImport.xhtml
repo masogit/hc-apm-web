@@ -15,7 +15,7 @@
                                       dragDropSupport="false" multiple="false" auto="true"
                                       invalidFileMessage="只支持xls或xlsx格式的文件"
                                       invalidSizeMessage="文件大小不得超过5M"
-                                      update=":measuringTab:dataListForm, :measuringTab:measuringResultListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                      update=":measuringTab:dataListForm, :measuringTab:measuringResultForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
                                       label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
                         <p:growl id="messages" showDetail="true"/>
                     </p:panelGrid>
@@ -90,6 +90,9 @@
                         </p:column>
                         <p:column headerText="送检单位">
                             <h:outputText value="#{item.department}" />
+                        </p:column>
+                        <p:column headerText="存档记录">
+                            <h:outputText value="#{item.fileNo}" />
                         </p:column>
                         <!--<p:column headerText="备注">
                             <h:outputText value="#{item.comments}" />

@@ -111,6 +111,10 @@ public class MeasuringCertificateDetail implements Serializable {
     @Column(name = "is_expired")
     private Boolean isExpired;
 
+    //存档记录
+    @Column(name = "file_no")
+    private String fileNo;
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     @Size(max = 32)
     private String tenantUID;
@@ -344,6 +348,14 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setAssetSN(String assetSN) {
         this.assetSN = assetSN;
+    }
+
+    public String getFileNo() {
+        return fileNo;
+    }
+
+    public void setFileNo(String fileNo) {
+        this.fileNo = fileNo;
     }
 
     @Override
