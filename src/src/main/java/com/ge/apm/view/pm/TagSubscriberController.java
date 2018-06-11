@@ -4,6 +4,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -121,22 +122,43 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void cancel(){
 		selected=null;
 	}
+	public boolean requiredCheck(){
 
+		if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){
+			if(level0==false && level1==false && level2==false){
+				WebUtil.addErrorMessage("务必选择紧急程度");
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		/*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*/
+		if(receiveMsgModeInteger==2 && isReceiveTimeoutMsg==false){
+			if(level0==true || level1==true || level2==true){
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		return true;
+	}
 	public void saveTagSub4(){
-		/*如果 消息推送选项是 "所有.."和"仅.., ",那么紧急度必须选一个*/
+		if (!requiredCheck()) {
+			return;
+		}
+
+		/*如果 消息推送选项是 "所有.."和"仅.., ",那么紧急度必须选一个*//*
 		  if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){
 		  	if(level0==false && level1==false && level2==false){
 		  		WebUtil.addErrorMessage("务必选择紧急程度");
 		  		return;
 			}
 		  }
-		/*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*/
+		*//*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*//*
 		if(receiveMsgModeInteger==2 && isReceiveTimeoutMsg==false){
 			if(level0==true || level1==true || level2==true){
 				WebUtil.addErrorMessage("不推送工单和超时消息，不需要选择紧急度");
 				return;
 			}
-		}
+		}*/
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
 				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
