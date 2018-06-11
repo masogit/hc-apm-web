@@ -32,4 +32,7 @@ public interface TableDefinitionRepository extends GenericRepositoryUUID<TableDe
 	@Query(value = "select td.* from table_definition td where td.status='Released' and td.base_id in (\n" +
 			"\tselect performance_report from pm_order_rule where uid=?1 union select safety_report from pm_order_rule where uid=?1)",nativeQuery = true)
 	public List<TableDefinition> findTableName(String pmOrderRuleId);
+	
+	@Query(value = "select td.* from table_definition td where td.status='Released' and td.base_id in (select safety_report from pm_order_rule where uid=?1)",nativeQuery = true)
+	public List<TableDefinition> findSafetyReportTable(String pmOrderRuleId);
 }

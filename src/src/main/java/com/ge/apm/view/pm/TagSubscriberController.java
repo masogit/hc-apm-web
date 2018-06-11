@@ -21,8 +21,9 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> {
 
-	private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
+	private List<String> cities;
 	private AssetTagMsgSubscriberRepository dao = null;
 	private AssetTagRepository assetTagRepository;
 	private I18nMessageRepository i18Dao;
@@ -36,7 +37,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
 	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
 	private Integer receiveMsgMode;
-	private int selectType;
+	private int selectType=1;
 	/*public boolean subscriberShow(){
 		//xiugai   if(xiu gai and fei admin) return true
 		if(!userContextService.hasRole("ITAdmin")&  WebUtil.getMessage(crudActionName)=="修改")
@@ -44,6 +45,18 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		else
 			 return false;
 	}*/
+	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
+	public Boolean subscribe(){
+		if(this.getCRUDActionName().equals("修改")){
+			return true; //不可修改
+		}else if(userContextService.hasRole("ITAdmin")){
+				return false;
+			}else
+				{
+					return true;
+				}
+		}
+
 	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
 	public void checkSelectedEmpty(){
 		if(selected==null){
@@ -68,10 +81,25 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 		if(this.getCRUDActionName().equals("新增")) {
 			if (selectType == 1) {//维修
-				super.save();
+				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode012.isEmpty()) {
+					super.save();
+					return;
+				}
+				else{
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					return;
+				}
 			} else {//EE报警
-				selected.setReceiveMsgMode(3);
-				dao.save(selected);
+				List<AssetTagMsgSubscriber> tagUserMode3 = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode3.isEmpty()) {
+					selected.setReceiveMsgMode(3);
+					dao.save(selected);
+					return;
+				}else{
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
+					return;
+				}
 			}
 		}else{
 			super.save();
@@ -79,6 +107,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 	@Override
 	protected void init() {
+		cities = new ArrayList<String>();
+		cities.add("Miami");
+		cities.add("London");
+		cities.add("Paris");
+		cities.add("Istanbul");
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
 		this.filterBySite =false;
 		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
@@ -158,7 +191,9 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
-
+		Integer se=selected.getSelectType();
+		if(se!=null)
+         selectType=se.intValue();
 		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
 		currentAtms=dao.findById(selected.getId());
 		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
@@ -214,5 +249,49 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	public void setSelectType(int selectType) {
 		this.selectType = selectType;
+	}
+	private String[] selectedCities2;
+
+	public String[] getSelectedCities2() {
+		return selectedCities2;
+	}
+
+	public void setSelectedCities2(String[] selectedCities2) {
+		this.selectedCities2 = selectedCities2;
+	}
+
+	public List<String> getCities() {
+		return cities;
+	}
+
+	public void setCities(List<String> cities) {
+		this.cities = cities;
+	}
+	private boolean level0;
+	private boolean level1;
+	private boolean level2;
+
+	public boolean isLevel0() {
+		return level0;
+	}
+
+	public void setLevel0(boolean level0) {
+		this.level0 = level0;
+	}
+
+	public boolean isLevel1() {
+		return level1;
+	}
+
+	public void setLevel1(boolean level1) {
+		this.level1 = level1;
+	}
+
+	public boolean isLevel2() {
+		return level2;
+	}
+
+	public void setLevel2(boolean level2) {
+		this.level2 = level2;
 	}
 }

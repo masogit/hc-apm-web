@@ -610,20 +610,18 @@ public class TableCreateController extends TieWebSheetBean {
 	}
 
 	public Collection<String> getTemplateLabels() {
-		if(templateLabels==null){
-			mapTemplateKeyValues=new HashMap<String,String>();
-			if(table!=null){
-				try {
-					for(TableGroup group: table.getGroups()){
-						for(TableItem item: group.getItems()){
-							mapTemplateKeyValues.put( item.getKey(),item.getLabel());
-						}
+		mapTemplateKeyValues=new HashMap<String,String>();
+		if(table!=null){
+			try {
+				for(TableGroup group: table.getGroups()){
+					for(TableItem item: group.getItems()){
+						mapTemplateKeyValues.put( item.getKey(),item.getLabel()+"("+item.getKey()+")");
 					}
-					templateLabels=mapTemplateKeyValues.values();
-				} catch (Exception e) {
-					// TODO: handle exception
-					WebUtil.addErrorMessage(e, "解析模版失败");
 				}
+				templateLabels=mapTemplateKeyValues.values();
+			} catch (Exception e) {
+				// TODO: handle exception
+				WebUtil.addErrorMessage(e, "解析模版失败");
 			}
 		}
 		return templateLabels;

@@ -10,7 +10,6 @@ import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
-import org.primefaces.ultima.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
@@ -24,10 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -325,7 +321,11 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     @Override
     public void save() {
         super.save();
-        sharedAssetService.pushWxMsg(selected.getId());
+        try {
+            sharedAssetService.pushWxMsg(selected.getId());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //根据登录人信息配置权限
@@ -378,7 +378,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         requestContext.addCallbackParam("url", url);
     }
     
-    public void onSelectE() throws Exception {
+    public void onSelectE() {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -405,7 +405,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         requestContext.addCallbackParam("pageName", pageName);
     }
     
-    public void onSelectC() throws Exception {
+    public void onSelectC() {
         String uid = selected.getId();
         SharedAssetRequest realSAR = dao.findById(uid);
         int sta = realSAR.getState();
@@ -1088,6 +1088,7 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
             //调用微服务
             sharedAssetService.pushWxMsg(selected.getId());
+            sharedAssetService.remoteAcceptRent(selected.getId());
             String url = "List.xhtml?faces-redirect=true";
             requestContext.addCallbackParam("url", url);
             return;
