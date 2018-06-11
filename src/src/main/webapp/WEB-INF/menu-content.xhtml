@@ -19,7 +19,7 @@
                 <p:menuitem id="um06" value="#{msg.AssetValueAnalysis}" rendered="false" outcome="/empty"/>
                 <!--asset browser-->
                 <p:menuitem id="um1001" value="#{msg.AssetBrowser}" url="/portal/analysis/reports.xhtml#/AssetBrowser" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
-                <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/List" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/ContractList" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
 
                 <!--<p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/List.xhtml?terminate=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>-->
