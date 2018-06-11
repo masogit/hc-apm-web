@@ -48,8 +48,11 @@
 							<p:column headerText="设备名称">
 								<h:outputText value="#{item.assetInfo.name}" />
 							</p:column>
-							<p:column headerText="资产编号">
-								<h:outputText value="#{item.financingNum}" />
+							<p:column headerText="设备型号">
+								<h:outputText value="#{item.assetInfo.functionType}" />
+							</p:column>
+							<p:column headerText="使用科室">
+								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 							</p:column>
 							<p:column headerText="工单编号">
 								<h:outputText value="#{item.v2PmOrder.pmNum}" />
@@ -59,11 +62,8 @@
 									<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 								</h:outputText>
 							</p:column>
-							<p:column headerText="设备型号">
-								<h:outputText value="#{item.assetInfo.functionType}" />
-							</p:column>
-							<p:column headerText="使用科室">
-								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+							<p:column headerText="资产编号">
+								<h:outputText value="#{item.financingNum}" />
 							</p:column>
 							<p:column headerText="保护接地阻抗">
 								<h:outputText value="#{item.protectGroundImpedance}" />

@@ -16,8 +16,11 @@
 		<p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.financingNum}" />
+		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.functionType}" />
+		</p:column>
+		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
 		<p:column headerText="工单编号" filterBy="#{item.v2PmOrder.pmNum}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.v2PmOrder.pmNum}" />
@@ -27,11 +30,8 @@
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
 			</h:outputText>
 		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.functionType}" />
-		</p:column>
-		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
+		<p:column headerText="资产编号" filterBy="#{item.financingNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.financingNum}" />
 		</p:column>
 		<p:column headerText="保护接地阻抗" filterBy="#{item.protectGroundImpedance}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.protectGroundImpedance}" />
