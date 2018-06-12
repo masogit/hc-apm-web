@@ -101,17 +101,6 @@ public class ContractInfo implements Serializable {
     @Column(name = "apply_project_name")
     private String applyProjectName;
 
-    //数量
-    @Column(name = "quantity")
-    private Integer quantity;
-
-    //预估单价(万元)
-    @Column(name = "estimated_price")
-    private Double estimatedPrice;
-
-    //价值类别
-    @Column(name = "price_type")
-    private String priceType;
 
     //论证会结果/时间
     @Basic(optional = true)
@@ -153,29 +142,9 @@ public class ContractInfo implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date tenderNoticeDate;
 
-    
-//    //发票号
-//    @Size(max = 64)
-//    @Column(name = "invoice_num")
-//    private String invoiceNum;
-//    
-//    //报送首付日期
-//    @Basic(optional = true)
-//    @Column(name = "down_payment_date")
-//    @Temporal(TemporalType.DATE)
-//    private Date downPaymentDate;
-//    
-//    //供应商申请尾款日期
-//    @Basic(optional = true)
-//    @Column(name = "apply_payment_date")
-//    @Temporal(TemporalType.DATE)
-//    private Date applyPaymentDate;
-//    
-//    //报送尾款日期
-//    @Basic(optional = true)
-//    @Column(name = "tail_payment_date")
-//    @Temporal(TemporalType.DATE)
-//    private Date tailPaymentDate;
+    //购入方式
+    @Column(name = "tender_type")
+    private String tenderType;
     
     
     //备注
@@ -208,6 +177,14 @@ public class ContractInfo implements Serializable {
 
     @Column(name = "last_modified_date", nullable = true)
     private Date lastModifiedDate;
+
+    public String getTenderType() {
+        return tenderType;
+    }
+
+    public void setTenderType(String tenderType) {
+        this.tenderType = tenderType;
+    }
 
     public String getId() {
         return id;
@@ -305,30 +282,6 @@ public class ContractInfo implements Serializable {
         this.applyProjectName = applyProjectName;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public Double getEstimatedPrice() {
-        return estimatedPrice;
-    }
-
-    public void setEstimatedPrice(Double estimatedPrice) {
-        this.estimatedPrice = estimatedPrice;
-    }
-
-    public String getPriceType() {
-        return priceType;
-    }
-
-    public void setPriceType(String priceType) {
-        this.priceType = priceType;
-    }
-
     public Date getArgumentEndDate() {
         return argumentEndDate;
     }
@@ -424,38 +377,6 @@ public class ContractInfo implements Serializable {
     public void setSiteUID(String siteUID) {
         this.siteUID = siteUID;
     }
-
-//    public String getInvoiceNum() {
-//        return invoiceNum;
-//    }
-//
-//    public void setInvoiceNum(String invoiceNum) {
-//        this.invoiceNum = invoiceNum;
-//    }
-//
-//    public Date getDownPaymentDate() {
-//        return downPaymentDate;
-//    }
-//
-//    public void setDownPaymentDate(Date downPaymentDate) {
-//        this.downPaymentDate = downPaymentDate;
-//    }
-//
-//    public Date getApplyPaymentDate() {
-//        return applyPaymentDate;
-//    }
-//
-//    public void setApplyPaymentDate(Date applyPaymentDate) {
-//        this.applyPaymentDate = applyPaymentDate;
-//    }
-//
-//    public Date getTailPaymentDate() {
-//        return tailPaymentDate;
-//    }
-//
-//    public void setTailPaymentDate(Date tailPaymentDate) {
-//        this.tailPaymentDate = tailPaymentDate;
-//    }
 
     public String getComments() {
         return comments;
