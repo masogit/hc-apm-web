@@ -85,6 +85,10 @@
                                     <p:commandLink process="@this" actionListener="#{tableCreateController.prepareAddGroup}" value="添加Group"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" />
                                     <br/>
                                     <p:commandLink immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
+                                    <br />
+                                    <p:commandLink value="下载模版" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false">
+                                        <p:fileDownload value="#{tableCreateController.exportedFile}"/>
+                                    </p:commandLink>
                                 </h:panelGroup>
                             </p:panelGrid>
 
@@ -118,7 +122,7 @@
                                 <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
                             </h:panelGroup>
                             <p:fieldset legend="预览" id="preview">
-                                    <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
+                                    <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}" showLineNumber="false" />
                                     <p:panel rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId }">
                                         <p:commandButton value="测试"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
                                         <h:outputText value="#{tableCreateController.tableFields}" />
