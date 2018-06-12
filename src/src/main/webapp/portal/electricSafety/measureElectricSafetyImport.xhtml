@@ -17,7 +17,7 @@
 								auto="true" invalidFileMessage="只支持ps格式的文件"
 								invalidSizeMessage="文件大小不得超过5M" update=":measureElectricSafetyTab:dataListForm"
 								sizeLimit="5242880" allowTypes="/(\.|\/)(ps|PS)$/"
-								label="从ps文件导入" cancelLabel="取消" uploadLabel="确认上传" />
+								label="添加" cancelLabel="取消" uploadLabel="确认上传" />
 							<p:growl id="messages" showDetail="true" />
 						</p:panelGrid>
 						<h:panelGroup>
@@ -34,7 +34,7 @@
 
 			<div class="ui-g-12 card">
 				<h:form id="dataListForm">
-					<p:fieldset legend="预览即将导入的电气安全数据">
+					<p:fieldset legend="电气安全数据导入预览">
 						<p:dataTable id="datalistId"
 							rendered="#{not empty measureElectricSafetyController.dataList}"
 							value="#{measureElectricSafetyController.dataList}" var="item"

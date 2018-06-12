@@ -94,6 +94,8 @@ public class MeasureElectricSafetyController extends GenericCRUDUUIDController<E
     	else{
     		electricSafetyService.insertUpdateData(dataList);
     	}
+    	FacesMessage message = new FacesMessage("导入完成");
+    	FacesContext.getCurrentInstance().addMessage(null, message);
     }
 
     public UploadedFile getFile() {
