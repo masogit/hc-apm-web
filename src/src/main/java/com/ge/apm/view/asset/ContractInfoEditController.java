@@ -297,7 +297,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void viewContractItemPage(ContractInfoItem item) {
-        if (ContractInfoItem.ContractInfoItemType.ExistAsset.toString().equals(item.getItemType())) {
+        if (null!=item.getAssetInfo()) {
             AssetInfo asset = item.getAssetInfo();
             String url = "actionName=View&selectedid="
                     + asset.getId().toString()
@@ -306,9 +306,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             url = "../info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", url);
-        } else if (!Strings.isNullOrEmpty(item.getArrivalItemId())) {
-
-        }
+        } 
     }
 
     public void savePurchaseItem() {
