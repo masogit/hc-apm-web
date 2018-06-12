@@ -158,6 +158,9 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 				if(tagUserMode012.isEmpty()) {
 					selected.setReceiveMsgMode(receiveMsgMode);
 					selected.setIsReceiveTimeoutMsg(isReceiveTimeoutMsg);
+					selected.setLevel0(level0);
+					selected.setLevel1(level1);
+					selected.setLevel2(level2);
 					super.save();
 					return;
 				}
