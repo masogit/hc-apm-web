@@ -116,7 +116,22 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		selected=null;
 	}
 	public boolean requiredCheck(){
+      //不推送工单消息  情况下 必须选工单超时消息
+		if(receiveMsgMode==0 && isReceiveTimeoutMsg==false){
+			WebUtil.addErrorMessage("务必选择工单超时消息推送");
+			RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+			return false;
+		}
 
+		//选了工单超时消息 必须选择紧急程度
+		if(isReceiveTimeoutMsg==true && receiveMsgMode==2){
+			if(level0==false && level1==false && level2==false) {
+				WebUtil.addErrorMessage("务必选择工单超时消息推送");
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		///
 		if(receiveMsgMode==0 || receiveMsgMode==1){
 			if(level0==false && level1==false && level2==false){
 				WebUtil.addErrorMessage("务必选择紧急程度");
