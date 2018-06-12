@@ -29,108 +29,114 @@ import org.hibernate.annotations.GenericGenerator;
  */
 @Entity
 @Table(name = "arrival_list")
-public class ArrivalList implements Serializable{
-    
-    public enum ProcessType { Normal, Easy } 
-    
+public class ArrivalList implements Serializable {
+
+    public enum ProcessType {
+        Normal, Easy
+    }
+
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
     @Column(columnDefinition = "CHAR(32)")
     private String id;
-    
+
     //到货单名称
     @Basic(optional = true)
     @Column(name = "name")
     private String name;
-    
+
     //到货单类型  [1:医院购买,2:赠送,3:投放,4;试用,5:借用]
     @Column(name = "order_type")
     private Integer orderType;
-    
+
     //设备名称
     @Basic(optional = false)
     @NotNull
     @Size(min = 1, max = 64)
     @Column(name = "asset_name")
     private String assetName;
-    
+
     @Column(name = "asset_group")
     private Integer assetGroup;//设备分类
-    
+
     //规格型号
     @Column(name = "function_type")
     private String functionType;
-    
+
     //数量
     @Column(name = "quantity")
     private Integer quantity;
-    
+
     //生产厂家
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;
-    
+
     //品牌
     @Size(max = 64)
     @Column(name = "brand")
     private String brand;
-    
+
     //产地
     @Size(max = 64)
     @Column(name = "origin")
     private String origin;
-    
+
     //发票号
     @Size(max = 64)
     @Column(name = "invoice_num")
     private String invoiceNum;
-    
+
     //合同价格
     @Column(name = "contract_price")
     private Double contractPrice;
-    
+
+    //关联合同订购项
+    @Column(name = "contract_item_id", columnDefinition = "CHAR(32)")
+    private String contractItemId;
+
     //合同号
     @Size(max = 64)
     @Column(name = "contract_num")
     private String contractNum;
-    
+
     //供应商
     @Size(max = 64)
     @Column(name = "vendor")
     private String vendor;
-    
+
     //供应商Id
     @Column(name = "supplier_id")
-    private Integer supplierId; 
+    private Integer supplierId;
     //经办人
     @Size(max = 64)
     @Column(name = "agent")
     private String agent;
-    
+
     //设备分类编码
     @Size(max = 64)
     @Column(name = "class_code")
     private String classCode;
-    
+
     //填表人
     @Column(name = "creator_uid", columnDefinition = "CHAR(32)")
     private String creatorUID;
-    
+
     //到货日期
     @Column(name = "arrival_date")
     @Temporal(TemporalType.DATE)
     private Date arrivalDate;
-    
+
     @Column(name = "process_type")
     private String processType;
-    
+
     // 1:new 2:partial finished 3.finished
     @Basic(optional = false)
     @NotNull
     @Column(name = "status")
     private int status;
-    
+
     @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
@@ -143,14 +149,13 @@ public class ArrivalList implements Serializable{
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
-    
     @JoinColumn(name = "creator_uid", referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(fetch = FetchType.EAGER)
     private UserAccount creator;
-    
+
     @Transient
     private boolean cannotDeleted;
-    
+
     public String getId() {
         return id;
     }
@@ -359,15 +364,23 @@ public class ArrivalList implements Serializable{
         this.creator = creator;
     }
 
-	public boolean isCannotDeleted() {
-		return cannotDeleted;
-	}
+    public String getContractItemId() {
+        return contractItemId;
+    }
 
-	public void setCannotDeleted(boolean cannotDeleted) {
-		this.cannotDeleted = cannotDeleted;
-	}
+    public void setContractItemId(String contractItemId) {
+        this.contractItemId = contractItemId;
+    }
 
-	@Override
+    public boolean isCannotDeleted() {
+        return cannotDeleted;
+    }
+
+    public void setCannotDeleted(boolean cannotDeleted) {
+        this.cannotDeleted = cannotDeleted;
+    }
+
+    @Override
     public int hashCode() {
         Integer hash = 0;
         hash += (id != null ? id.hashCode() : 0);
