@@ -49,11 +49,20 @@
                         <h:panelGroup id="id3" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.receiveMsgMode!=3)}">
                             <p:panelGrid rendered="#{tagSubscriberController.prioritySetFalse()}" columns="3">
                                 <h:panelGroup >
-                                    <p:selectBooleanCheckbox  rendered="#{tagSubscriberController.prioritySetFalse()}" value="#{tagSubscriberController.level0}" itemLabel="紧急"/></h:panelGroup>
+                                    <p:selectBooleanCheckbox   value="#{tagSubscriberController.level0}" itemLabel="紧急">
+                                     <p:ajax event="change"  listener="#{tagSubscriberController.level0Set()}"></p:ajax>
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
                                 <h:panelGroup>
-                                    <p:selectBooleanCheckbox rendered="#{tagSubscriberController.prioritySetFalse()}" value="#{tagSubscriberController.level1}" itemLabel="重要"/></h:panelGroup>
+                                    <p:selectBooleanCheckbox  value="#{tagSubscriberController.level1}" itemLabel="重要">
+                                   <!-- <p:ajax event="change" listener="#{tagSubscriberController.level1Set()}"></p:ajax>-->
+                                </p:selectBooleanCheckbox>
+                                </h:panelGroup>
                                 <h:panelGroup>
-                                    <p:selectBooleanCheckbox rendered="#{tagSubscriberController.prioritySetFalse()}" value="#{tagSubscriberController.level2}" itemLabel="一般"/></h:panelGroup>
+                                    <p:selectBooleanCheckbox   value="#{tagSubscriberController.level2}" itemLabel="一般">
+                                   <!-- <p:ajax event="change" listener="#{tagSubscriberController.level2Set()}"></p:ajax>-->
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
                             </p:panelGrid>
                         </h:panelGroup>
 
