@@ -189,29 +189,34 @@ public class TableDefinitionService {
     public void saveTableDate(UnstructuredDataCollection report, Map<String, Object> tableValue) {
         final String reportId = report.getId();
         List<UnstructuredData> dataList = udDao.findByCollectionId(reportId);
-        Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item -> item));
-        tableValue.entrySet().forEach(item -> {
-            UnstructuredData dataItem = dataMap.get(item.getKey());
-            Object value = item.getValue();
-            if (item.getKey().contains("_res")) {
-                switch ((String) item.getValue()) {
-                    case "合格":
-                    case "正常":
-                        value = "Normal";
-                    default:
-                }
-            }
-            if (null == dataItem) {
-                dataItem = new UnstructuredData();
-                dataItem.setCollectionId(reportId);
-                dataItem.setKey(item.getKey());
-                dataItem.setValue(value);
-
-                dataList.add(dataItem);
-            } else {
-                dataItem.setValue(value);
-            }
-        });
+        if(dataList!=null){
+        	Map<String, UnstructuredData> dataMap = dataList.stream().collect(Collectors.toMap(UnstructuredData::getKey, item -> item));
+        	if(tableValue!=null){
+        		tableValue.entrySet().forEach(item -> {
+        			if(item!=null && item.getKey()!=null){
+        				UnstructuredData dataItem = dataMap.get(item.getKey());
+                        Object value = item.getValue();
+                        if (item.getKey().contains("_res") && item.getValue()!=null) {
+                            switch ((String) item.getValue()) {
+                                case "合格":
+                                case "正常":
+                                    value = "Normal";
+                                default:
+                            }
+                        }
+                        if (null == dataItem) {
+                            dataItem = new UnstructuredData();
+                            dataItem.setCollectionId(reportId);
+                            dataItem.setKey(item.getKey());
+                            dataItem.setValue(value);
+                            dataList.add(dataItem);
+                        } else {
+                            dataItem.setValue(value);
+                        }
+        			}
+                });
+        	}
+        }
         report.setData(dataList);
         report.setCreatedDate(new Date());
         v2PmOrderService.saveReport(report);
