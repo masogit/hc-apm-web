@@ -90,7 +90,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         }
 
         if(!this.hasFilterOnField("isDeleted")){
-            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.TRUE, "1*"));
+            searchFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, Boolean.FALSE, "1*"));
         }
 
         if(!this.hasFilterOnField("measureGrade")){
