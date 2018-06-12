@@ -5,6 +5,7 @@ import com.ge.apm.dao.BlobObjectRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
@@ -47,6 +48,8 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
     private BlobFileService blobService;
     private BlobObjectRepository blobDao;
 
+    private UaaService uaaService;
+
     private List<V2_BlobObject> attachements;
 
     private OrgInfo fileterOrg;
@@ -58,6 +61,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         measuringCertificateDetailDao = WebUtil.getBean(MeasuringCertificateDetailRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
+        uaaService = WebUtil.getBean(UaaService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
 
@@ -75,29 +79,19 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             searchFilters = new ArrayList<SearchFilter>();
         }
 
-        if(!this.hasFilterOnField("tenantUID")){
-            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID(), "1*"));
-        }
-        //searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IN, Arrays.asList(1,2,3,null)));
-        if (currentUser.getOrgLevel() != 0) {
-            if (currentUser.getOrgLevel() == 1) {
-                if(!this.hasFilterOnField("institutionUID")){
-                    searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID(), "1*"));
-                }
-            } else if (currentUser.getOrgLevel() == 2) {
-                if(!this.hasFilterOnField("hospitalUID")){
-                    searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID(), "1*"));
-                }
-            } else {
-                if(!this.hasFilterOnField("siteUID")){
-                    searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID(), "1*"));
-                }
-            }
+        if (!this.hasFilterOnField("siteUID")) {
+            UserAccount user = UserContextService.getCurrentUserAccount();
+            List<String> orgUidList = uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
+            searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
 
         if(!this.hasFilterOnField("measureGrade")){
-            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*2+"));
-            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*2+"));
+            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+            searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
         }else{
             boolean hasNullMeasureGrade = false;
             Integer measureGradeValue = null;
@@ -115,20 +109,23 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             //判断计量等级过滤条件是否为空
             if(hasNullMeasureGrade){
                 this.removeFilterOnField("measureGrade");
-                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*2+"));
-                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*2+"));
+                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.NE, 4, "1*3+"));
+                searchFilters.add(new SearchFilter("measureGrade", SearchFilter.Operator.IsNull, null, "1*3+"));
             }else {
                 this.updateSearchFilter(new SearchFilter("measureGrade", SearchFilter.Operator.EQ, measureGradeValue, "1*"));
             }
         }
 
         if(null != fileterOrg){
-            if(!this.hasFilterOnField("clinicalDeptUID")){
+            /*if(!this.hasFilterOnField("clinicalDeptUID")){
                 searchFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
-            }else{
+            }else{*/
                 this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, fileterOrg.getUid(), "1*"));
+            //}
+        }else{
+            if(this.hasFilterOnField("clinicalDeptUID")){
+                searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
             }
-
         }
 
         return dao.findBySearchFilter(searchFilters, pageRequest);
