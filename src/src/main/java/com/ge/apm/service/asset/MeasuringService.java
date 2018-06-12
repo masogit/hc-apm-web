@@ -80,6 +80,7 @@ public class MeasuringService {
             tempAssetInfo.setMeteringNO(measuringCertificateDetail.getCertificateNo());
             if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
                 tempAssetInfo.setUsageStatus(2);//停用
+                tempAssetInfo.setStatus(5);
             }
 
             assetInfoDao.save(tempAssetInfo);
