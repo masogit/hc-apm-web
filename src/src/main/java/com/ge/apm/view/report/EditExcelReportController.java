@@ -43,7 +43,7 @@ public class EditExcelReportController extends TieWebSheetBean {
 
     private TableDefinition tableDefinition;
     private ElectricSafetyService electricSafetyService;
-
+    private boolean hasElectricSafetyData=false;
     @Override
     public void initialLoad() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
@@ -53,6 +53,9 @@ public class EditExcelReportController extends TieWebSheetBean {
         String action = WebUtil.getRequestParameter("action");
         report = tableService.getReportById(reportId);
         tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        if(StringUtils.isNotEmpty(tableDefinition.getInstrumentKeyValues())){
+        	hasElectricSafetyData=true;
+        }
         tableValue = new HashMap<String, Object>();
         List<UnstructuredData> dataList = report.getData();
         dataList.forEach(item -> {
@@ -68,9 +71,6 @@ public class EditExcelReportController extends TieWebSheetBean {
                 tableValue.put(item.getKey(), item.getValueSerialized());
             }
         });
-        if(StringUtils.isNotEmpty(action) && action.equals("edit")){
-        	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
-        }
         StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
         try {
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
@@ -90,6 +90,10 @@ public class EditExcelReportController extends TieWebSheetBean {
         tableService.saveTableDate(report, tableValue);
         tableService.submitReport(report);
         WebUtil.addSuccessMessage("已提交");
+    }
+    
+    public void importElectricSafetyData(){
+    	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
     }
 
     public Map<String, Object> getTableValue() {
@@ -111,5 +115,11 @@ public class EditExcelReportController extends TieWebSheetBean {
     public UnstructuredDataCollection getReport() {
         return report;
     }
+    public boolean isHasElectricSafetyData() {
+		return hasElectricSafetyData;
+	}
 
+	public void setHasElectricSafetyData(boolean hasElectricSafetyData) {
+		this.hasElectricSafetyData = hasElectricSafetyData;
+	}
 }

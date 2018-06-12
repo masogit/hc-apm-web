@@ -157,23 +157,28 @@ public class ElectricSafetyService {
         		if(info!=null){
         			String uid=info.getUid();
         			V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(uid);
-            		detail.setAssetId(info.getId());
-//            		detail.setAssetInfo(info);
-            		detail.setAssetUid(uid);
-            		detail.setV2_PmOrderId(order.getId());
-            		List<UnstructuredDataCollection> listUnstructuredDataCollection=unstructuredDataCollectionRepository.findCKByBoUuid(order.getId(),"pm-safety-report");
-    				if(listUnstructuredDataCollection!=null && listUnstructuredDataCollection.size()>0){
-    					//find report
-    					if(updateExistReport(listUnstructuredDataCollection.get(0), detail)==false){
-    						detail.setWarnMessage("报告未生成");
-    					}
-    				}
-    				else{
-    					//no report
-    					if(newReport(uid, order.getId(), detail)==false){
-							detail.setWarnMessage("报告未生成");
-						}
-    				}
+        			if(order!=null){
+        				detail.setAssetId(info.getId());
+//                		detail.setAssetInfo(info);
+                		detail.setAssetUid(uid);
+                		detail.setV2_PmOrderId(order.getId());
+                		List<UnstructuredDataCollection> listUnstructuredDataCollection=unstructuredDataCollectionRepository.findCKByBoUuid(order.getId(),"pm-safety-report");
+        				if(listUnstructuredDataCollection!=null && listUnstructuredDataCollection.size()>0){
+        					//find report
+        					if(updateExistReport(listUnstructuredDataCollection.get(0), detail)==false){
+        						detail.setWarnMessage("报告未生成");
+        					}
+        				}
+        				else{
+        					//no report
+        					if(newReport(uid, order.getId(), detail)==false){
+    							detail.setWarnMessage("报告未生成");
+    						}
+        				}
+        			}
+        			else{
+        				detail.setWarnMessage("工单未找到");
+        			}
         		}
         		else{
         			detail.setWarnMessage("设备未找到");
@@ -190,7 +195,9 @@ public class ElectricSafetyService {
         			if(StringUtils.isEmpty(detail.getWarnMessage())){
         				detail.setWarnMessage("报告已生成");
         			}
-        			electricSafetyDataRepository.save(detail);
+        			if(detail.getAssetId()!=null){
+        				electricSafetyDataRepository.save(detail);
+        			}
 				} catch (Exception e) {
 					// TODO: handle exception
 					LOGGER.info("insert electric safety data failed. Reason is "+e.getMessage());
@@ -332,13 +339,25 @@ public class ElectricSafetyService {
 			}
 			//60,设备编号
 			else if(StringUtils.equals(key, "60")){
-				strValue=strValue.replaceAll(" ", "");
-				data.setFinancingNum(strValue);
-				AssetInfo assetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
-				data.setAssetInfo(assetInfo);
-				if(assetInfo!=null && StringUtils.isNotEmpty(assetInfo.getUid())){
-					V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(assetInfo.getUid());
-					data.setV2PmOrder(order);
+//				strValue=strValue.replaceAll(" ", "");
+				if(StringUtils.isNotEmpty(strValue)){
+					String strArr[]=strValue.split(" ");
+					strValue=strArr[0];
+					data.setFinancingNum(strValue);
+					AssetInfo assetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
+					data.setAssetInfo(assetInfo);
+					if(assetInfo!=null && StringUtils.isNotEmpty(assetInfo.getUid())){
+						V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(assetInfo.getUid());
+						if(order!=null){
+							data.setV2PmOrder(order);
+						}
+						else{
+							data.setWarnMessage("工单未找到");
+						}
+					}
+					else{
+						data.setWarnMessage("设备未找到");
+					}
 				}
 			}
 			
@@ -597,7 +616,7 @@ public class ElectricSafetyService {
 		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& StringUtils.isNotEmpty(boUuid)){
 			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
 			if(obj!=null){
-				ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByPmOrderId(boUuid);
+				ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByPmOrderIdAssetUid(boUuid);
 				if(electricSafetyData!=null){
 					for(String key:obj.keySet()){
 //						if(tableValue.containsKey(key)){

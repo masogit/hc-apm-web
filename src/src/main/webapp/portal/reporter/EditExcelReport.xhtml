@@ -17,6 +17,7 @@
                 <h:form id="EditReportForm">
                     <tie:websheet id="sheet1" webSheetBean="#{editExcelReportController}"  maxRowsPerPage="30"/>
                     <p:commandButton actionListener="#{editExcelReportController.saveData}" value="#{msg.save}" update=":EditReportForm"  disabled="#{editExcelReportController.report.status eq 'Archived'}" />
+                    <p:commandButton actionListener="#{editExcelReportController.importElectricSafetyData}" value="测试仪数据导入" update=":EditReportForm"  disabled="#{editExcelReportController.hasElectricSafetyData==false}" />
                     <!--<p:commandButton actionListener="#{editExcelReportController.submit}" value="#{msg.submit}" update=":EditReportForm" disabled="#{editExcelReportController.report.status eq 'Archived'}"/>-->
                 </h:form>
             </div>

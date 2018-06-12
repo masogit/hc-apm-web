@@ -41,6 +41,8 @@ public class EditReportController {
     
     private ElectricSafetyService electricSafetyService;
     private UnstructuredDataCollection report;
+    private TableDefinition tableDefinition;
+    private boolean hasElectricSafetyData=false;
     @PostConstruct
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
@@ -49,7 +51,10 @@ public class EditReportController {
         String reportId = WebUtil.getRequestParameter("reportId");
         String action = WebUtil.getRequestParameter("action");
         report = tableService.getReportById(reportId);
-        TableDefinition tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        if(StringUtils.isNotEmpty(tableDefinition.getInstrumentKeyValues())){
+        	hasElectricSafetyData=true;
+        }
         table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
         tableValue = new HashMap<String, Object>();
         List<UnstructuredData> dataList = report.getData();
@@ -60,9 +65,6 @@ public class EditReportController {
                 tableValue.put(item.getKey(),item.getValueSerialized());
             }
         });
-        if(StringUtils.isNotEmpty(action) && action.equals("edit")){
-        	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
-        }
     }
 
     public void save() {
@@ -77,6 +79,10 @@ public class EditReportController {
         tableService.saveTableDate(report,tableValue);
         tableService.submitReport(report);
          WebUtil.addSuccessMessage("已提交");
+    }
+    
+    public void importElectricSafetyData(){
+    	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
     }
 
     public Map<String, Object> getTableValue() {
@@ -99,4 +105,13 @@ public class EditReportController {
         return report;
     }
 
+	public boolean isHasElectricSafetyData() {
+		return hasElectricSafetyData;
+	}
+
+	public void setHasElectricSafetyData(boolean hasElectricSafetyData) {
+		this.hasElectricSafetyData = hasElectricSafetyData;
+	}
+
+    
 }

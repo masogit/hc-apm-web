@@ -16,8 +16,8 @@
 		<p:column headerText="设备名称" filterBy="#{item.assetInfo.name}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.name}" />
 		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
-			<h:outputText value="#{item.assetInfo.functionType}" />
+		<p:column headerText="制造商序列号" filterBy="#{item.assetInfo.serialNum}" filterMatchMode="LIKE">
+			<h:outputText value="#{item.assetInfo.serialNum}" />
 		</p:column>
 		<p:column headerText="使用科室" filterBy="#{item.assetInfo.clinicalDeptName}" filterMatchMode="LIKE">
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
@@ -55,7 +55,7 @@
 				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm:ss" />
 			</h:outputText>
 		</p:column>
-		<p:column headerText="导入结果">
+		<p:column headerText="警告信息">
 			<h:outputText value="#{item.warnMessage}" />
 		</p:column>
 		<f:facet name="{Toolbar}">
