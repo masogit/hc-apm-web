@@ -188,6 +188,7 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         	}
         }
         if(nameFilter){
+        	nameValue=((String)nameValue).toLowerCase();
         	searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
         }
         
