@@ -77,6 +77,7 @@
 
 
                     <p:commandButton actionListener="#{editReportController.save}" value="#{msg.save}" update=":EditReportForm"  disabled="#{editReportController.report.status eq 'Archived'}"/>
+                    <p:commandButton actionListener="#{editReportController.importElectricSafetyData}" value="测试仪数据导入" update=":EditReportForm"  disabled="#{editReportController.hasElectricSafetyData==false}"/>
                     <!--<p:commandButton actionListener="#{editReportController.submit}" value="#{msg.submit}" update=":EditReportForm" disabled="#{editReportController.report.status eq 'Archived'}"/>-->
                 </h:form>
             </div>

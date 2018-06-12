@@ -48,8 +48,8 @@
 							<p:column headerText="设备名称">
 								<h:outputText value="#{item.assetInfo.name}" />
 							</p:column>
-							<p:column headerText="设备型号">
-								<h:outputText value="#{item.assetInfo.functionType}" />
+							<p:column headerText="制造商序列号">
+								<h:outputText value="#{item.assetInfo.serialNum}" />
 							</p:column>
 							<p:column headerText="使用科室">
 								<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
@@ -97,7 +97,7 @@
 								<h:outputText value="#{item.groupType}" />
 							</p:column> -->
 							
-							<p:column headerText="导入结果">
+							<p:column headerText="警告信息">
 								<h:outputText value="#{item.warnMessage}" />
 							</p:column>
 							<f:facet name="{Toolbar}">
