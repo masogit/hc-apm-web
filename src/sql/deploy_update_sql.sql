@@ -160,5 +160,6 @@ when contract_type='11' then 'ZZB' when contract_type='12' then 'ZYB' when contr
 end  from asset_contract); 
 
 insert into contract_info_item (id,item_type,contract_id,asset_uid) (select replace('' || uuid_generate_v4(),'-',''),'ExistAsset',ac.uid,ai.uid  from asset_contract ac, asset_info ai where ac.asset_id=ai.id)
+update asset_tag_msg_subscriber set level_0=true, level_1=true, level_2=true
 
 
