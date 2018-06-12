@@ -103,8 +103,8 @@
                             </h:outputText>
                         </p:column>
 
-                        <p:column headerText="实际完成时间"  sortBy="#{item.endTime}">
-                            <h:outputText value="#{item.planTime}">
+                        <p:column headerText="实际完成时间" rendered="#{v2PmOrderController.queryIndex==7}" sortBy="#{item.endTime}">
+                            <h:outputText value="#{item.endTime}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
