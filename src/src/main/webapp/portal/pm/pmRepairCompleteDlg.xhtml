@@ -10,7 +10,7 @@
 
     <ui:composition>
 
-        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="550" width="1000"  resizable="false" draggable="true" appendTo="@this" header="保养完成">
+        <p:dialog class ="pmrepairCompleteDialog" id="pmrepairCompleteDialog" widgetVar="pmrepairCompleteDialog" modal="true" height="550" width="1000"  resizable="true" draggable="true" appendTo="@this" header="保养完成">
             <h:form id="pmrepairCompleteDialogForm" class="pmrepairCompleteDialogFormcls" >
                 <h:panelGroup  id="display5" style="height:500px" rendered="#{not empty v2PmOrderController.selectedPmOrder}">
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
@@ -69,7 +69,7 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
-                                    <p:column headerText="到达时间">
+                                    <p:column headerText="到货确认时间">
                                         <h:outputText value="#{item.arrivedTime}">
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
@@ -86,7 +86,8 @@
                                     <p:column headerText="#{msg.Actions}">
                                         <p:commandButton process="@this" icon="ui-icon-add" actionListener="#{v2PmOrderController.prepareEditAccDetail('new')}"  oncomplete="PF('pmmoreAccDialogDlg').show()" update="@(.pmmoreAccDialogDlgCls)" rendered="#{item.id eq '000'}" />
 
-                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and (item.approved? false:true)}"/>
+                                        <!--<p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000' and (item.approved? false:true)}"/>-->
+                                        <p:commandButton process="@this" icon="ui-icon-pencil" style="zoom:0.8;" title="#{msg.Edit}" actionListener="#{v2PmOrderController.prepareEditAccDetail(item.id)}" update="@(.pmmoreAccDialogFormCls)" oncomplete="PF('pmmoreAccDialogDlg').show()"  rendered="#{item.id ne '000'}"/>
                                          <p:commandButton process="@this" icon="ui-icon-close" style="zoom:0.8;" title="#{msg.Delete}" update="accessList @(.cmd1)" actionListener="#{v2PmOrderController.removeWoDetail(item.id,1)}"   rendered="#{item.id ne '000' and (item.approved?false:true)}">
                                              <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
                                          </p:commandButton>
