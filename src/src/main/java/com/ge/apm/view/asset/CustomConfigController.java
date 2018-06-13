@@ -93,6 +93,14 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
                 break;
+            case "MobileBasicFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
+                break;
+            case "MobileDetailFields":
+                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+                        .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)).collect(Collectors.toList());
+                break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsListPageFields().contains(item)).collect(Collectors.toList());
@@ -138,6 +146,12 @@ public class CustomConfigController {
             case "RemoveEditpageFinicialFields":
                 addFieldsList.addAll(customConfigObject.getAssetsEditpageFinicialFields());
                 break;
+            case "RemoveMobileBasicFields":
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageBasicFields());
+                break;
+            case "RemoveMobileDetailFields":
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageDetailFields());
+                break;
         }
     }
 
@@ -146,6 +160,12 @@ public class CustomConfigController {
             case "BasicFields":
             case "RemoveBasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
+            case "MobileBasicFields":
+            case "RemoveMobileBasicFields":
+                return ":customConfigForm:tabView:MobileBasicFieldsList";
+            case "MobileDetailFields":
+            case "RemoveMobileDetailFields":
+                return ":customConfigForm:tabView:MobileDetailFieldsList";
             case "DetailFields":
             case "RemoveDetailFields":
                 return ":customConfigForm:tabView:DetailFieldsList";
@@ -186,6 +206,14 @@ public class CustomConfigController {
                 customConfigObject.getAssetsDetailpageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsDetailpageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
+            case "MobileBasicFields":
+                customConfigObject.getAssetsMobilepageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsMobilepageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "MobileDetailFields":
+                customConfigObject.getAssetsMobilepageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsMobilepageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
             case "ListPageFields":
                 customConfigObject.getAssetsListPageFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsListPageFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
@@ -196,13 +224,20 @@ public class CustomConfigController {
                         .collect(Collectors.toMap(itemField -> itemField.getKey(), itemField -> new CustomConfigAssetField(itemField.getKey(), new ArrayList<String>(configRoles.keySet())))));
                 break;
             case "RemoveBasicFields":
-                List<String> removeList = selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
-                        && customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList());
-                customConfigObject.getAssetsDetailpageBasicFields().removeAll(removeList);
+                customConfigObject.getAssetsDetailpageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsDetailpageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "RemoveDetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsDetailpageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveMobileBasicFields":
+                customConfigObject.getAssetsMobilepageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsMobilepageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveMobileDetailFields":
+                customConfigObject.getAssetsMobilepageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsMobilepageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "EditpageBasicFields":
                 customConfigObject.getAssetsEditpageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()

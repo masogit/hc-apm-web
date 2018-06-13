@@ -77,20 +77,20 @@ public class CustomConfigService {
     private CustomConfigObject getDefalutCustomConfigObject() {
         if (null == defaultConfig) {
             defaultConfig = new CustomConfigObject();
-            defaultConfig.setAssetFields(new HashMap());
-            CustomConfigConstant.getAllFields().entrySet().stream().forEach(item -> defaultConfig.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
-            CustomConfigConstant.getSysTemFields().forEach(item -> {
-                defaultConfig.getAssetFields().get(item).setRequired(true);
-            });
-            defaultConfig.setAssetsListPageFields(CustomConfigConstant.getAssetsListPageFields());
-            defaultConfig.setAssetsDetailpageBasicFields(CustomConfigConstant.getAssetsDetailpageBasicFields());
-            defaultConfig.setAssetsDetailpageDetailFields(CustomConfigConstant.getAssetsDetailpageDetailFields());
-            defaultConfig.setAssetsEditpageBasicFields(CustomConfigConstant.getAssetsEditpageBasicFields());
-            defaultConfig.setAssetsEditpageCatalogFields(CustomConfigConstant.getAssetsEditpageCatalogFields());
-            defaultConfig.setAssetsEditpageCodesFields(CustomConfigConstant.getAssetsEditpageCodesFields());
-            defaultConfig.setAssetsEditpageDateFields(CustomConfigConstant.getAssetsEditpageDateFields());
-            defaultConfig.setAssetsEditpageFinicialFields(CustomConfigConstant.getAssetsEditpageFinicialFields());
-            defaultConfig.setAssetsEditpageStatusFields(CustomConfigConstant.getAssetsEditpageStatusFields());
+//            defaultConfig.setAssetFields(new HashMap());
+//            CustomConfigConstant.getAllFields().entrySet().stream().forEach(item -> defaultConfig.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
+//            CustomConfigConstant.getSysTemFields().forEach(item -> {
+//                defaultConfig.getAssetFields().get(item).setRequired(true);
+//            });
+//            defaultConfig.setAssetsListPageFields(CustomConfigConstant.getAssetsListPageFields());
+//            defaultConfig.setAssetsDetailpageBasicFields(CustomConfigConstant.getAssetsDetailpageBasicFields());
+//            defaultConfig.setAssetsDetailpageDetailFields(CustomConfigConstant.getAssetsDetailpageDetailFields());
+//            defaultConfig.setAssetsEditpageBasicFields(CustomConfigConstant.getAssetsEditpageBasicFields());
+//            defaultConfig.setAssetsEditpageCatalogFields(CustomConfigConstant.getAssetsEditpageCatalogFields());
+//            defaultConfig.setAssetsEditpageCodesFields(CustomConfigConstant.getAssetsEditpageCodesFields());
+//            defaultConfig.setAssetsEditpageDateFields(CustomConfigConstant.getAssetsEditpageDateFields());
+//            defaultConfig.setAssetsEditpageFinicialFields(CustomConfigConstant.getAssetsEditpageFinicialFields());
+//            defaultConfig.setAssetsEditpageStatusFields(CustomConfigConstant.getAssetsEditpageStatusFields());
         }
         return defaultConfig;
     }

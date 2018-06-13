@@ -149,4 +149,17 @@ public class CustomConfigConstant {
         return Arrays.asList("manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "warranty");
     }
+
+    public static List<String> getAssetsMobilepageBasicFields() {
+        return Arrays.asList("departNum", "name", "assetGroup", "status", "siteUID","clinicalDeptName", "clinicalOwnerName", "qrCode","comments");
+    }
+
+    public static List<String> getAssetsMobilepageDetailFields() {
+        return Arrays.asList("aliasName", "systemId", "manufacture", "vendor", "maitanance","maitananceTel", "assetOwnerName", "assetOwnerTel",
+                "assetOwnerName2","assetOwnerTel2","assetOwnerName3","assetOwnerTel3","serialNum","nationalStandardCode","repairForm","assetUsage",
+                "functionGrade","functionGroup","assetCode68","capitalSource","riskGrade","measureGrade","emergencyEquipment","importEquipment",
+                "isPm","isChecked","accountingCategory","measuringItemCategory","financingNum","barcode","registrationNo","modalityId","locationCode",
+                "locationName","functionType","manufactDate","purchaseDate","warrantyDate","arriveDate","installDate","factoryWarrantyDate","terminateDate",
+                "lastPmDate","lastQaDate","lastMeteringDate","salvageValue","purchasePrice","lifecycle","depreciationMethod");
+    }
 }
