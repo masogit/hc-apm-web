@@ -6,6 +6,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import org.springframework.data.domain.Page;
@@ -22,12 +23,14 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 @ViewScoped
 public class ContractInfoController extends GenericCRUDUUIDController<ContractInfo> {
 
-    UaaService uaaService;
-    ContractInfoRepository dao = null;
+    private UaaService uaaService;
+    private ContractInfoService contractService;
+    private ContractInfoRepository dao = null;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
+        contractService = WebUtil.getBean(ContractInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
     }
 
@@ -51,6 +54,15 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         }
 
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+    
+    
+    public void deleteContract(){
+        if(contractService.deleteContract(selected)){
+            WebUtil.addSuccessMessage("已删除");
+        }else{
+            WebUtil.addErrorMessage("不能删除");
+        }
     }
     
     public String createAction() {

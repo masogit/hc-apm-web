@@ -5,15 +5,19 @@
  */
 package com.ge.apm.service.asset;
 
+import com.ge.apm.dao.ArrivalListRepository;
 import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.ContractInfoRepository;
+import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
 import com.ge.apm.domain.ContractInfo;
 import com.ge.apm.domain.ContractInfoItem;
+import com.ge.apm.domain.V2_BlobObject;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  *
@@ -26,6 +30,10 @@ public class ContractInfoService {
     private ContractInfoItemRepository contractItemDao;
     @Autowired
     private ContractInfoRepository contractDao;
+    @Autowired
+    private ArrivalListRepository arrivalDao;
+    @Autowired
+    private BlobFileService blobService;
 
     public List<ContractInfoItem> getContractItems(String id) {
         return contractItemDao.findByContractId(id);
@@ -54,6 +62,25 @@ public class ContractInfoService {
 
     public ContractInfoItem getContractItem(String contractItemId) {
         return contractItemDao.findById(contractItemId);
+    }
+
+    @Transactional
+    public boolean deleteContract(ContractInfo contract) {
+        if(null==contract){
+            return false;
+        }
+        List<ContractInfoItem>  contractItems = getContractItems(contract.getId());
+        List<ArrivalList> arrivalList =  arrivalDao.findByContractItemIdIn(contractItems.stream().map(ContractInfoItem::getId).collect(Collectors.toList()));
+        if(arrivalList!=null && !arrivalList.isEmpty()){
+            return false;
+        }
+        List<V2_BlobObject> blobList =  blobService.findBlobObjectsByBoUid(contract.getId());
+        blobList.stream().forEach(item -> blobService.deleteBlobFile(item));
+        
+        contractItemDao.delete(contractItems);
+        contractDao.delete(contract);
+        
+        return true;
     }
 
 }

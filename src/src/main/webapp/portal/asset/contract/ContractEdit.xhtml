@@ -158,6 +158,39 @@
                                 <label class="label">#{msg.tenderNoticeDate}</label>
                                 <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.tenderNoticeDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                             </h:panelGroup>
+                            
+                            <h:panelGroup>
+                                <label class="label">#{msg.receiveFileDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.receiveFileDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.copyFileDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.copyFileDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.firstCheckDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.firstCheckDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.changeCommentDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.changeCommentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.lawerDignDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.lawerDignDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.returnSupplierDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.returnSupplierDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.fileContractDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.fileContractDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
+                            <h:panelGroup>
+                                <label class="label">#{msg.signContractDate}</label>
+                                <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selected.signContractDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup>
                         </p:panelGrid>
                         
                         <p:dataTable id="purchaseList"  value="#{contractInfoEditController.purchaseItemsList}" var="item"
