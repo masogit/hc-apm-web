@@ -112,7 +112,7 @@
                         </p:column> 
                     </p:pickList>
                     <br/> <br/>
-                    <p:panelGrid id ="PmOrderRule" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <p:panelGrid id ="PmOrderRule" columns="6" layout="grid" styleClass="ui-panelgrid-blank form-group">
                       <!-- <h:panelGroup >
                        		<label class="label">#{msg.ruleLevel}*</label>
                                <p:selectOneMenu id="level" value="#{generatePmOrdersController.level}"  required="true"   requiredMessage="#{msg.ruleLevel} #{msg.ValidationRequire}">
@@ -128,7 +128,7 @@
                                    <f:selectItems value="#{generatePmOrdersController.getPmOrderRuleList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                       </h:panelGroup> -->
-						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true"  update=":growl" />
+						<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
 						<p:commandButton validateClient="true" action="#{generatePmOrdersController.generatePmOrders()}" value="批量生成工单" icon="ui-icon-check" update=":growl" />
                     </p:panelGrid>
 <!--                 </p:tab>

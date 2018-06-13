@@ -325,7 +325,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		LOGGER.info("list is {}",request);
 		pmOrderRequestApiService.createPmOrdersByBatch(token, request);
 		//WebUtil.addSuccessMessage("保养工单生成成功！");
-		WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后再工作台中查看！");
+		WebUtil.addSuccessMessage("提交完成，工单生成中，请稍后在工作台中查看！");
 		//targetAssets.clear();
 	}
 
