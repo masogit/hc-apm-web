@@ -1556,4 +1556,4 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenderType', 'Negotiated', '院内议标 ', '50万元以上 ', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenderType', 'Continue', '续标 ', '50万元以上 ', NULL, '-1');
 
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmWebType', '1', '周期', 'Cycle', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmTypeWeb', '1', '周期性', 'Cycle', NULL, '-1');

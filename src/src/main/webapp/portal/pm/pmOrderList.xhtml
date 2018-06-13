@@ -240,7 +240,7 @@
                             <p:outputLabel id="dptName"  value="#{v2PmOrderController.dptName}" />
                         </h:panelGroup>
                         <h:panelGroup>
-                            <label class="label">计划完成时间</label>
+                            <label class="label">计划完成时间*</label>
                             <p:calendar timeZone="GMT+8" id="fillDate" pattern="yyyy/MM/dd"  value="#{v2PmOrderController.planTime}" showOn="button" showButtonPanel="true" navigator="true" readonlyInput="false" locale= "zh" required="true" requiredMessage="计划完成时间 #{msg.ValidationRequire}"></p:calendar>
                         </h:panelGroup>
 
@@ -262,11 +262,24 @@
                     </p:panelGrid>
                 </p:fieldset>
                 <h:panelGroup >
-                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
+                   <!-- <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>-->
+                    <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{v2PmOrderController.savePM()}" validateClient="true" update="pmTab:pmOrderListForm pmTab:PmRequestCreateForm :growl" style="float:left" oncomplete="handleToAddMaintain(xhr, status, args);"/>
                     <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{v2PmOrderController.cancel()}" immediate="true"  style="float:left" oncomplete="handleSubmit(args, 'createPMDialog');"/>
                 </h:panelGroup>
             </h:form>
             <ui:include src="/portal/asset/selectAssetDialogPM.xhtml"/>
+
+            <script>
+                function handleToAddMaintain(xhr, status, args) {
+                    if(args.invalidParam){
+                        $('#pmTab\\:PmRequestCreateForm\\:assetName').addClass("ui-state-error");
+                    }
+                    else{
+                        handleSubmit(args, 'createPMDialog');
+                    }
+                }
+
+            </script>
         </p:dialog>
 
         <!--关单对话框-->
