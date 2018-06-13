@@ -649,6 +649,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         cancel();
         if (!Strings.isNullOrEmpty(requestAssetUid)) {
             selectedAsset = assetDao.findByUid(requestAssetUid);
+            onSelectedAsset(selectedAsset);
             currentStatus = selectedAsset.getStatus();
             if (currentStatus == 1) {
                 currentStatus = 3;
@@ -680,12 +681,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         }
     }
 
-    @Override
-    public void onServerEvent(String eventName, Object eventObject) {
-        AssetInfo asset = (AssetInfo) eventObject;
-        if (asset == null) {
-            return;
-        }
+    private void onSelectedAsset(AssetInfo asset){
         if (Strings.isNullOrEmpty(asset.getLocationName())) {
             final String orgInfoUID = userContextService.getLoginUser().getOrgInfoUID();
             String lName = orgDao.getByUid(orgInfoUID).getName();
@@ -694,6 +690,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         } else {
             locationName = asset.getLocationName();
         }
+    }
+    
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+        AssetInfo asset = (AssetInfo) eventObject;
+        if (asset == null) {
+            return;
+        }
+        onSelectedAsset(asset);
         this.selectedAsset = asset;
         currentStatus = asset.getStatus();
         if (currentStatus == 1) {
