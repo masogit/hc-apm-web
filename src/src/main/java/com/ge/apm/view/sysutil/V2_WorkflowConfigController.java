@@ -427,11 +427,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     		 return;
     	}
 
-    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+    	/*if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
 			return;
-		}
+		}*/
 
 /*		if(selected.getId() != null){
     		if(selected.getFormat() != null && newFormat != null){
