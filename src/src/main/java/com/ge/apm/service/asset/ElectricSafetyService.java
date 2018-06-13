@@ -369,7 +369,7 @@ public class ElectricSafetyService {
 			
 //			7，——》保护接地阻抗（单位：Ω）
 			else if(StringUtils.equals(key, "7")){
-				data.setProtectGroundImpedance(strValue);
+				data.setProtectGroundImpedance(strValue.replaceAll("\\+", ""));
 			}
 //			8，——》保护接地阻抗参考值（<0.2Ω）
 //			else if(StringUtils.equals(key, "8")){
@@ -377,7 +377,7 @@ public class ElectricSafetyService {
 //			}
 //			23，——》患者漏电流（应用部分加电）（单位：μA）
 			else if(StringUtils.equals(key, "23")){
-				data.setPatientElectricLeakage_app(strValue);
+				data.setPatientElectricLeakage_app(strValue.replaceAll("\\+", ""));
 			}
 //			24，——》患者漏电流（应用部分加电）参考值（<50.0μA）
 //			else if(StringUtils.equals(key, "24")){
@@ -385,7 +385,7 @@ public class ElectricSafetyService {
 //			}
 //			25，——》对地漏电流（正常状态）（单位：mA）
 			else if(StringUtils.equals(key, "25")){
-				data.setGroundElectricLeakage_normal(strValue);
+				data.setGroundElectricLeakage_normal(strValue.replaceAll("\\+", ""));
 			}
 //			26，——》对地漏电流（正常状态）参考值（<0.5mA）
 //			else if(StringUtils.equals(key, "26")){
@@ -401,7 +401,7 @@ public class ElectricSafetyService {
 //			}
 //			29，——》外壳漏电流（正常状态）（单位：μA）
 			else if(StringUtils.equals(key, "29")){
-				data.setShellElectricLeakage_normal(strValue);
+				data.setShellElectricLeakage_normal(strValue.replaceAll("\\+", ""));
 			}
 //			30，——》外壳漏电流（正常状态）参考值（<100μA）
 //			else if(StringUtils.equals(key, "30")){
