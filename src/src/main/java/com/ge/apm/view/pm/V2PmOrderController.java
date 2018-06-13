@@ -371,7 +371,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             formData.setPmType(pmType);
-            pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
+            Map<String, Object> res =  pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
+            if(res!=null && res.get("bizStatusCode")!=null) {
+                if (res.get("bizStatusCode").equals("INVALID_PARAM")) {
+                    WebUtil.addErrorMessage(res.get("message").toString());
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("invalidParam", true);
+                }
+            }
             cancel();
         }
     }
