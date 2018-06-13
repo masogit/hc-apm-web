@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -74,13 +75,15 @@ public class MeasuringService {
         }
 
         if(tempAssetInfo != null){
-            tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
-            tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
-            tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
-            tempAssetInfo.setMeteringNO(measuringCertificateDetail.getCertificateNo());
-            if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
-                tempAssetInfo.setUsageStatus(2);//停用
-                tempAssetInfo.setStatus(5);
+            if(tempAssetInfo.getLastMeteringDate() != null && tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+                tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
+                tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
+                tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
+                tempAssetInfo.setMeteringNO(measuringCertificateDetail.getCertificateNo());
+                if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
+                    tempAssetInfo.setUsageStatus(2);//停用
+                    tempAssetInfo.setStatus(5);
+                }
             }
 
             assetInfoDao.save(tempAssetInfo);
@@ -155,11 +158,11 @@ public class MeasuringService {
                 detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
 
                 if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
-                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
                 }
 
                 if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
-                    detail.setCertificateNo(CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
+                    detail.setCertificateNo(CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
                 }
 
                 if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
@@ -175,16 +178,16 @@ public class MeasuringService {
                 detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
                 detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
-                    detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()).intValue()): row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
+                    detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
-                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()).intValue()): row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
                 }
                 detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
                 detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
                 //detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 if(row.getCell(header.get("FILE_NO_CELL")) != null) {
-                    detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
+                    detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
                 }
                 detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
                 Integer status = 3;
