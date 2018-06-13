@@ -9,6 +9,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.event.TabChangeEvent;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
@@ -197,6 +198,14 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             }
         }
         fileterOrg = null;
+    }
+
+    public void onTabChange(TabChangeEvent event){
+        String tabId = event.getTab().getId();
+
+        if("measuringAssetList".equals(tabId)){
+            this.searchFilters = new ArrayList<>();
+        }
     }
 
     public List<MeasuringCertificateDetail> getMeasuringCertificateList() {

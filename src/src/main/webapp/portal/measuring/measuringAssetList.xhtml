@@ -119,7 +119,7 @@
             <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":measuringTab:measuringAssetListForm:datalist_measuringAsset:clinicalDept" dismissable="true" style="text-align: left;">
                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(UserContextService.getCurrentUserAccount().getSiteUID())}"  var="node" selectionMode="single" dynamic="false">
-                        <p:ajax process="@this" event="select"  listener="#{measureAssetListController.onClinicalDeptFilter}" update="measuringTab:measuringAssetListForm:datalist_measuringAsset measuringTab:idVarPanelDeptOrg" oncomplete="PF('varPanelDeptOrg').hide();"/>
+                        <p:ajax process="@this" event="select"  listener="#{measureAssetListController.onClinicalDeptFilter}" update="measuringTab:measuringAssetListForm:datalist_measuringAsset:clinicalDept measuringTab:idVarPanelDeptOrg" oncomplete="PF('varDataList_measuringAsset').filter();PF('varPanelDeptOrg').hide();"/>
                         <p:ajax process="@this" event="expand"/>
                         <p:ajax process="@this" event="collapse"/>
                         <p:treeNode type="org">
