@@ -153,12 +153,12 @@ public class ElectricSafetyService {
     		detail.setInstitutionUID(user.getInstitutionUID());
     		financingNum=detail.getFinancingNum();
     		if(financingNum!=null){
-        		AssetInfo info=assetInfoRepository.findByFinancingNum(financingNum,user.getSiteUID());
-        		if(info!=null){
-        			String uid=info.getUid();
+        		List<AssetInfo> listInfo=assetInfoRepository.findByFinancingNum(financingNum,user.getSiteUID());
+        		if(listInfo!=null && listInfo.size()==1){
+        			String uid=listInfo.get(0).getUid();
         			V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(uid);
         			if(order!=null){
-        				detail.setAssetId(info.getId());
+        				detail.setAssetId(listInfo.get(0).getId());
 //                		detail.setAssetInfo(info);
                 		detail.setAssetUid(uid);
                 		detail.setV2_PmOrderId(order.getId());
@@ -179,6 +179,9 @@ public class ElectricSafetyService {
         			else{
         				detail.setWarnMessage("工单未找到");
         			}
+        		}
+        		else if(listInfo!=null && listInfo.size()>1){
+        			detail.setWarnMessage("找到多台设备");
         		}
         		else{
         			detail.setWarnMessage("设备未找到");
@@ -344,16 +347,19 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue.toUpperCase());
-					AssetInfo assetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
-					data.setAssetInfo(assetInfo);
-					if(assetInfo!=null && StringUtils.isNotEmpty(assetInfo.getUid())){
-						V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(assetInfo.getUid());
+					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
+					if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
+						data.setAssetInfo(listAssetInfo.get(0));
+						V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
 						if(order!=null){
 							data.setV2PmOrder(order);
 						}
 						else{
 							data.setWarnMessage("工单未找到");
 						}
+					}
+					else if(listAssetInfo!=null && listAssetInfo.size()>1){
+						data.setWarnMessage("找到多台设备");
 					}
 					else{
 						data.setWarnMessage("设备未找到");
