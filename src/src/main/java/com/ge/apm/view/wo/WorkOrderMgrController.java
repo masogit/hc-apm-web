@@ -422,7 +422,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         picList = null;
         attachList=null;
         selectedAsset = null;
-        requestAssetUid = null;
+//        requestAssetUid = null;
         locationName = null;
     }
 
