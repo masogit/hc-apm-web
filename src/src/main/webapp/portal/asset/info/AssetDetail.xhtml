@@ -197,7 +197,7 @@
                 <p:panel  header="#{msg.deviceContract}">
                     <f:facet name="actions">
                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}" ><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
+                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
 <!--                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam(assetInfoDetailController.getContractListLink())}" ><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam(assetInfoDetailController.getContractAddLink())}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                     </f:facet>
@@ -218,10 +218,11 @@
                             </h:outputText>
                         </p:column>
                         <p:column headerText="#{msg.AssetContractAmount}" sortBy="#{item.contractAmount}" >
-                            <h:outputText value="#{item.contractAmount}"/>
+                            <h:outputText value="#{item.contractInfo.amount}"/>
                         </p:column>
                         <p:column   >
-                            <p:link href="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;actionName=Edit&amp;selectedid='.concat(item.id))}">查看</p:link>
+                            <p:commandLink action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.contractInfo.id))}" value="查看" />
+                            <!--<p:link href="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Edit&amp;selectedid='.concat(item.contractInfo.id))}">查看</p:link>-->
                             <!--<p:link href="#{fileDownloadService.getFileUrl(item.objectId)}">查看</p:link>-->
 <!--                            <p:commandButton value="#{msg.download}"  onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-file-download" rendered="#{item.fileId > 0}" ajax="false">
                                 <p:fileDownload value="#{attachmentFileService.getFile(item.fileId)}" />
