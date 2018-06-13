@@ -343,7 +343,7 @@ public class ElectricSafetyService {
 				if(StringUtils.isNotEmpty(strValue)){
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
-					data.setFinancingNum(strValue);
+					data.setFinancingNum(strValue.toUpperCase());
 					AssetInfo assetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
 					data.setAssetInfo(assetInfo);
 					if(assetInfo!=null && StringUtils.isNotEmpty(assetInfo.getUid())){
