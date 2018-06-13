@@ -22,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import webapp.framework.web.WebUtil;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -97,10 +98,13 @@ public class PmOrderRequestApiService extends MicroServiceInvoker {
         HttpEntity<PmOrderActionForm> requestEntity = new HttpEntity<>(formData, createHttpHeaders(token));
         String gatewayURL = getGatewayURL(GatewayURL.PM_REQUEST_CREATE);
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
+        LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
         if (isOkay(response)) {
-            LinkedHashMap<String, Object> responseMap = (LinkedHashMap<String, Object>) response.getBody();
             return (LinkedHashMap<String, Object>) responseMap.get("data");
         } else {
+           if(responseMap.get("bizStatusCode").equals("INVALID_PARAM")){
+               return responseMap;
+           }
             return null;
         }
     }
