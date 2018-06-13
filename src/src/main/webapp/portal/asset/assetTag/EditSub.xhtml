@@ -45,11 +45,11 @@
                                <!-- <p:ajax  process="@this" listener="#{tagSubscriberController.gondantuisongxuanxiang}"></p:ajax>-->
                                 <f:selectItems value="#{tagSubscriberController.msgModeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
                             </p:selectOneMenu>
-                        </h:panelGroup>
+                        </h:panelGroup><!--selectType=1 选择类型:维修-->
                         <h:panelGroup id="id3" rendered="#{tagSubscriberController.selectType==1 or (tagSubscriberController.getCRUDActionName().equals('修改') and tagSubscriberController.receiveMsgMode!=3)}">
-                            <p:panelGrid rendered="#{tagSubscriberController.prioritySetFalse()}" columns="3">
+                            <p:panelGrid  columns="3"><!--rendered="#{tagSubscriberController.prioritySetFalse()}"-->
                                 <h:panelGroup >
-                                    <p:selectBooleanCheckbox   value="#{tagSubscriberController.level0}" itemLabel="紧急">
+                                    <p:selectBooleanCheckbox class="ck1"  value="#{tagSubscriberController.level0}" itemLabel="紧急">
                                      <p:ajax event="change"  listener="#{tagSubscriberController.level0Set()}"></p:ajax>
                                     </p:selectBooleanCheckbox>
                                 </h:panelGroup>
@@ -73,7 +73,7 @@
 
                     </p:panelGrid>
                     <br/>
-                    <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update=":TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
+                    <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update=":AssetTagSubscribEditForm :TagSubscriberForm:dataList   :growl" icon="ui-icon-check" oncomplete="handleToSave(xhr, status, args)"/>
                    <!-- <p:commandButton validateClient="true" actionListener="#{tagSubscriberController.saveTagSub4()}" value="#{msg.Save}" update="@(.dt) :AssetTagSubscribEditDlg :TagSubscriberForm:dataList :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'AssetTagSubscribEditDialog');"/>-->
 
                     <p:commandButton immediate="true" value="#{msg.Cancel}"  actionListener="#{tagSubscriberController.cancel()}" icon="ui-icon-cancel" update="TagSubscriberForm" onclick="PF('AssetTagSubscribEditDialog').hide()"/>

@@ -352,11 +352,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 
 	public Integer getReceiveMsgMode() {
-		if(this.selected!=null)
+		/*if(this.selected!=null && this.selected.getId()!=null)
 		{
 			return  this.selected.getReceiveMsgMode();
 		}else
-
+*/
 			return receiveMsgMode;
 	}
 
