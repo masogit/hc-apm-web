@@ -206,6 +206,18 @@
                                     <p:ajax process="@this" />  
                                 </p:inputNumber>
                             </h:panelGroup >
+                            <h:panelGroup>
+                                <label class = "label">计量提醒提前天数</label>
+                                <p:inputNumber id="measuringRemindDays" value="#{v2_WorkflowConfigController.selected.measuringRemindDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class = "label">计量提醒次数</label>
+                                <p:inputNumber id="measuringReminderTimes" value="#{v2_WorkflowConfigController.selected.measuringReminderTimes}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">到货安装是否需要核对入库</label>
                                 <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.needInstorageCheck}"/>
