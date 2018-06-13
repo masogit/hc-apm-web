@@ -123,7 +123,7 @@
                                     <h:outputText value="#{item.unitPrice}"/>
                                </p:column>
                              <p:column headerText="计价方式" sortBy="#{item.chargingType}">
-                                 <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
+                                 <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                              </p:column>
                                <p:column headerText="费用" sortBy="#{item.cost}" >
                                    <h:outputText value="#{item.cost}">
