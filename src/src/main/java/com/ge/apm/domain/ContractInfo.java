@@ -114,7 +114,7 @@ public class ContractInfo implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date parameterEndDate;
 
-    //技术撰写人
+    //参数撰写人
     @Column(name = "parameter_person")
     private String parameterPerson;
 
@@ -146,6 +146,46 @@ public class ContractInfo implements Serializable {
     @Column(name = "tender_type")
     private String tenderType;
     
+    //接招标文件材料
+    @Basic(optional = true)
+    @Column(name = "receive_file_date")
+    @Temporal(TemporalType.DATE)
+    private Date receiveFileDate;
+    //拷样本、发《供货通知书》
+    @Basic(optional = true)
+    @Column(name = "copy_file_date")
+    @Temporal(TemporalType.DATE)
+    private Date copyFileDate;
+    //接电子版合同#初审返修
+    @Basic(optional = true)
+    @Column(name = "first_check_date")
+    @Temporal(TemporalType.DATE)
+    private Date firstCheckDate;
+    //送审#接审计修改意见
+    @Basic(optional = true)
+    @Column(name = "change_comment_date")
+    @Temporal(TemporalType.DATE)
+    private Date changeCommentDate;
+    //律 师#律师意见及签字
+    @Basic(optional = true)
+    @Column(name = "lawer_sign_date")
+    @Temporal(TemporalType.DATE)
+    private Date lawerDignDate;
+    //返回供货商修改意见
+    @Basic(optional = true)
+    @Column(name = "return_supplier_date")
+    @Temporal(TemporalType.DATE)
+    private Date returnSupplierDate;
+    //收合同定稿【4份】
+    @Basic(optional = true)
+    @Column(name = "file_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date fileContractDate;
+    //签字并盖合同专用章
+    @Basic(optional = true)
+    @Column(name = "sign_contract_date")
+    @Temporal(TemporalType.DATE)
+    private Date signContractDate;
     
     //备注
     @Column(name = "comments")
@@ -417,6 +457,72 @@ public class ContractInfo implements Serializable {
     public void setLastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
     }
+
+    public Date getReceiveFileDate() {
+        return receiveFileDate;
+    }
+
+    public void setReceiveFileDate(Date receiveFileDate) {
+        this.receiveFileDate = receiveFileDate;
+    }
+
+    public Date getCopyFileDate() {
+        return copyFileDate;
+    }
+
+    public void setCopyFileDate(Date copyFileDate) {
+        this.copyFileDate = copyFileDate;
+    }
+
+    public Date getFirstCheckDate() {
+        return firstCheckDate;
+    }
+
+    public void setFirstCheckDate(Date firstCheckDate) {
+        this.firstCheckDate = firstCheckDate;
+    }
+
+    public Date getChangeCommentDate() {
+        return changeCommentDate;
+    }
+
+    public void setChangeCommentDate(Date changeCommentDate) {
+        this.changeCommentDate = changeCommentDate;
+    }
+
+    public Date getLawerDignDate() {
+        return lawerDignDate;
+    }
+
+    public void setLawerDignDate(Date lawerDignDate) {
+        this.lawerDignDate = lawerDignDate;
+    }
+
+    public Date getReturnSupplierDate() {
+        return returnSupplierDate;
+    }
+
+    public void setReturnSupplierDate(Date returnSupplierDate) {
+        this.returnSupplierDate = returnSupplierDate;
+    }
+
+    public Date getFileContractDate() {
+        return fileContractDate;
+    }
+
+    public void setFileContractDate(Date fileContractDate) {
+        this.fileContractDate = fileContractDate;
+    }
+
+    public Date getSignContractDate() {
+        return signContractDate;
+    }
+
+    public void setSignContractDate(Date signContractDate) {
+        this.signContractDate = signContractDate;
+    }
+    
+    
 
     @Override
     public int hashCode() {

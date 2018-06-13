@@ -67,7 +67,7 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="#{contractInfoController.createAction}" />
                             <!--<p:commandButton id="viewButton" icon="ui-icon-remove-red-eye" class="btn btn-sm btn-gray" title="#{msg.View}" actionListener="#{contractInfoController.prepareView}" update=":AssetContractViewDlg" oncomplete="PF('AssetContractViewDialog').show()" disabled="#{empty contractInfoController.selected}"/>-->
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{contractInfoController.editAction}" disabled="#{empty contractInfoController.selected}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{contractInfoController.delete}" update=":AssetContractListForm:datalist, :growl"  disabled="#{empty contractInfoController.selected}">
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{contractInfoController.deleteContract}" update=":AssetContractListForm:datalist, :growl"  disabled="#{empty contractInfoController.selected}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             
