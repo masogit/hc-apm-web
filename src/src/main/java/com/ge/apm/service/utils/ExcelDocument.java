@@ -147,7 +147,7 @@ public class ExcelDocument {
                         Date date = cell.getDateCellValue();
                         dataMap.put(rowKey[cellIndex], TimeUtils.getStrDate(date, "yyyy-MM-dd HH:mm:ss"));
                     } else {
-                        dataMap.put(rowKey[cellIndex], new DecimalFormat("##############.#####").format(cell.getNumericCellValue()));
+                        dataMap.put(rowKey[cellIndex], new DecimalFormat("###################.#####").format(cell.getNumericCellValue()));
                     }
                     break;
                 case BOOLEAN:
