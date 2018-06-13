@@ -131,6 +131,20 @@
                                 </p:fieldset>
                             </p:panelGrid>
                         </p:tab>
+                        <p:tab title="微信端资产页面">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <p:fieldset legend="基本信息字段组">
+                                    <p:orderList id="MobileBasicFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                                <p:fieldset legend="详细信息字段组">
+                                    <p:orderList id="MobileDetailFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileDetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
+                                </p:fieldset>
+                            </p:panelGrid>
+                        </p:tab>
                     </p:tabView>
 
                     <h:panelGroup >
