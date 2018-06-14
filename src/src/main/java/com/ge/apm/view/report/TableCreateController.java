@@ -45,6 +45,8 @@ import java.util.logging.Logger;
 @ManagedBean
 @ViewScoped
 public class TableCreateController extends TieWebSheetBean {
+    private static final String FILE_SUFFIX = ".xlsx";
+    private static final String DEFAULT_EXCEL_TEMPLATE_FILE = "ReportTemplate";
 
     private TableDefinitionRepository templateDao;
     private TableDefinitionService templateService;
@@ -441,16 +443,28 @@ public class TableCreateController extends TieWebSheetBean {
         }
     }
 
+
+    private String genExcelTemplateTableName(TableSchema table) {
+        String title;
+        if (table == null || table.getTitle() == null) {
+            title = DEFAULT_EXCEL_TEMPLATE_FILE;
+        } else {
+            title = table.getTitle();
+        }
+        return title + FILE_SUFFIX;
+    }
+
     /**
      * Generate Excel Template File in XLSX format.
      */
     public void generateExcelTemplateFile() {
+        String fname = genExcelTemplateTableName(table);
         try (Workbook wb = new XSSFWorkbook()) {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             ReportTemplateDocument report = new ReportTemplateDocument(wb, table, "Template");
             report.write(out);
             InputStream doc = new ByteArrayInputStream(out.toByteArray());
-            exportedFile = new DefaultStreamedContent(doc, "application/vnd.ms-excel", "ReportTemplate.xlsx");
+            exportedFile = new DefaultStreamedContent(doc, "application/vnd.ms-excel", fname);
         } catch (IOException ex) {
             Logger.getLogger(TableCreateController.class.getName()).log(Level.WARNING, "Error happens while generate Excel template", ex);
             WebUtil.addErrorMessage("Excel模版生成失败");
