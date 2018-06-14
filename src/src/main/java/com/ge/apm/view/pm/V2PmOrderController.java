@@ -117,6 +117,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.head = head;
     }
 
+    public void arrivalTimeSet(){
+        if(itemDetail==null)return;
+        if(itemDetail.getArrived()==true)
+            itemDetail.setArrivedTime(new Date());
+        else{
+            itemDetail.setArrivedTime(null);
+        }
+    }
 
     public void handleToggle(ToggleEvent event) {
         //折叠保养清单后向前台传递的消息
@@ -158,24 +166,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     //是否全是批量完成
-    public boolean isPiliangWanChen() {
+    public boolean isBatchComplete() {
         //System.out.println(result);
         boolean mark =false;
-        List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k,v)->{
             result.getContent().stream().forEach(item->{
                if(item.getId()==k && v==true)
-                x3.add(item);
+                   pmList.add(item);
             });
         });
         //x3存放的是所选中pm工单
-        if(x3.size()>0)
-            mark= x3.stream().allMatch(item->item.getSimplify().equals(true));
+        if(pmList.size()>0)
+            mark= pmList.stream().allMatch(item->item.getSimplify().equals(true));
         return mark;
     }
 
-    public boolean isPiliangJiedan() {
+    public boolean isBatchTakePm() {
        // System.out.println(result);
         boolean mark =true;
         List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();

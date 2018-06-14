@@ -381,7 +381,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("serviceRequest.fromDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         }
     }
-
+    public void arrivalTimeSet(){
+        if(itemDetail==null)return;
+        if(itemDetail.getArrived()==true)
+            itemDetail.setArrivedTime(new Date());
+        else{
+            itemDetail.setArrivedTime(null);
+        }
+    }
     private List<Integer> getNoTagGroupAssets() {
         if (tagNoGroupAssets == null) {
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
