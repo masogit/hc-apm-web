@@ -104,6 +104,8 @@ public class AssetInstallationController {
     private UaaService uaaService;
     private WorkflowConfig config;
     private boolean needInstorageCheck;
+    private List<AssetInfo> parentAssetList;
+    private AssetInfo parentAssetInfo;
     
     private String oldQrCode;
 
@@ -152,6 +154,10 @@ public class AssetInstallationController {
         initGbTree();
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         needInstorageCheck = userContextService.needInstorageCheck();
+        if(arrivalListItem.getParentAssetId()!=null){
+        	parentAssetInfo=assetDao.findById(arrivalListItem.getParentAssetId());
+        }
+        getParentAssetList();
     }
 
     private void initOwner() {
@@ -401,20 +407,8 @@ public class AssetInstallationController {
     }
 
     public List<AssetInfo> getParentAssetList() {
-        
-        return assetMgrService.getParentsAssetsList(null, arrivalListItem.getClinicalDeptUID(), arrivalListItem.getArrivalList().getSiteUID());
-        
-//        List<SearchFilter> assetFilters = new ArrayList<>();
-//        assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
-//        assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, this.arrivalListItem.getArrivalList().getTenantUID()));
-//        assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, arrivalListItem.getArrivalList().getSiteUID()));
-//        if (!Strings.isNullOrEmpty(arrivalListItem.getClinicalDeptUID())) {
-//            assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, arrivalListItem.getClinicalDeptUID()));
-//        }
-//        if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
-//            assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
-//        }
-//        return assetDao.findBySearchFilter(assetFilters);
+    	parentAssetList=assetMgrService.getParentsAssetsList(null, arrivalListItem.getClinicalDeptUID(), arrivalListItem.getArrivalList().getSiteUID());
+        return parentAssetList;
     }
 
     public void onSelectGbTreeNode(NodeSelectEvent event) {
@@ -629,6 +623,15 @@ public class AssetInstallationController {
             getClinicalOwnerList();
         }
     }
+    
+    public void onParentAssetInfoChange(){
+    	if(this.parentAssetInfo!=null){
+    		this.arrivalListItem.setParentAssetId(this.parentAssetInfo.getId());
+    	}
+    	else{
+    		this.arrivalListItem.setParentAssetId(null);
+    	}
+    }
 
     public List<UserAccount> completeOwnerList(String query) {
         return autoCompleteService.completeOwnerList(query, ownerList);
@@ -636,6 +639,10 @@ public class AssetInstallationController {
 
     public List<UserAccount> completeClinicalOwnerList(String query) {
         return autoCompleteService.completeClinicalOwnerList(query, clinicalOwnerList);
+    }
+    
+    public List<AssetInfo> completeParentAssetInfoList(String query){
+    	return autoCompleteService.completeAssetInfoList(query, parentAssetList);
     }
 
     public List<QrCodeTemplate> getQrCodeTemplates() {
@@ -767,4 +774,11 @@ public class AssetInstallationController {
         this.useOwner = useOwner;
     }
 
+	public AssetInfo getParentAssetInfo() {
+		return parentAssetInfo;
+	}
+
+	public void setParentAssetInfo(AssetInfo parentAssetInfo) {
+		this.parentAssetInfo = parentAssetInfo;
+	}
 }
