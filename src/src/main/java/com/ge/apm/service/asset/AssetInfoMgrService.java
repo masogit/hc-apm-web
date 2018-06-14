@@ -161,5 +161,8 @@ public class AssetInfoMgrService {
         }
     }
     
+    public AssetInfo getAssetInfoByUid(String assetUid){
+        return assetDao.findByUid(assetUid);
+    }
 
 }

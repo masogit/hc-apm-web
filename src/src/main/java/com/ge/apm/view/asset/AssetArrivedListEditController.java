@@ -512,6 +512,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
         this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
         this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+        this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
+        this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
+        this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
+        this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
     }
 
     //geter and setter

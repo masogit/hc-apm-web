@@ -84,7 +84,7 @@ public class AssetContract implements Serializable {
     private String siteUID;
     
     
-    @JoinColumn(insertable=false,updatable=false, name = "asset_id", referencedColumnName = "id")
+    @JoinColumn(insertable=false,updatable=false, name = "asset_id", referencedColumnName = "id",nullable = true)
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
     private AssetInfo assetInfo;

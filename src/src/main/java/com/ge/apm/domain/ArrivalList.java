@@ -149,7 +149,7 @@ public class ArrivalList implements Serializable {
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
-    @JoinColumn(name = "creator_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @JoinColumn(name = "creator_uid", referencedColumnName = "uid", insertable = false, updatable = false,nullable = true)
     @ManyToOne(fetch = FetchType.EAGER)
     private UserAccount creator;
 

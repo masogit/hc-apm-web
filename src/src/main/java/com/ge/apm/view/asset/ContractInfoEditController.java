@@ -69,8 +69,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private List<String> contractType;
     private List<OrgInfo> clinicalDeptList;
+    private List<String> removedAttachments=new ArrayList();
 
     private List<ContractInfoItem> allItemList;
+    private List<ContractInfoItem> removedItemList=new ArrayList();
     private ContractInfoItem selectedContractItem;
 
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
@@ -213,7 +215,8 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void removeAttachmentById(String blobId) {
-        blobService.deleteBlobFileById(blobId);
+        removedAttachments.add(blobId);
+//        blobService.deleteBlobFileById(blobId);
         attachements = attachements.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
     }
 
@@ -243,7 +246,12 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             item.setContractId(selected.getId());
         });
         contractItemDao.save(allItemList);
+        contractItemDao.delete(removedItemList);
         blobService.saveBlobObject(attachements);
+        
+        removedAttachments.stream().forEach(item -> {
+            blobService.deleteBlobFileById(item);
+        });
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
     }
 
@@ -283,14 +291,20 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 //        ContractInfoItem removeItem = this.contractItemDao.findById(itemId);
         allItemList.remove(item);
         if (!Strings.isNullOrEmpty(item.getId())) {
-            contractItemDao.delete(item);
+//            contractItemDao.delete(item);
+            removedItemList.add(item);
         }
+    }
+    
+    public boolean canRemovePucheseItem(ContractInfoItem contractItem){
+        return Strings.isNullOrEmpty(contractItem.getId())?true : !allItemList.stream().anyMatch(item->Objects.equals(contractItem.getId(), item.getPurchaseItemId()));
     }
 
     public String getUserNameByUid(String orgUid) {
         UserAccount user = userDao.getByUid(orgUid);
         return user == null ? null : user.getName();
     }
+
     public String getSupplierName(String supplierUid) {
         Supplier supplier = supplierDao.findByUid(supplierUid);
         return supplier == null ? null : supplier.getName();
@@ -306,11 +320,11 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             url = "../info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", url);
-        } 
+        }
     }
 
     public void savePurchaseItem() {
-        
+
     }
 
     public void cancelPurchaseItem() {
