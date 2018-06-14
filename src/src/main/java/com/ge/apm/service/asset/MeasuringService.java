@@ -58,17 +58,39 @@ public class MeasuringService {
     @Autowired
     private AssetInfoRepository assetInfoDao;
 
-    public boolean operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
+    public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
         AssetInfo tempAssetInfo = null;
+        String errorInfo = "";
+        List<AssetInfo> tempAssetInfoList = null;
 
-        List<AssetInfo> tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getTenantUID());
-
-        if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getTenantUID());
+        if(null != measuringCertificateDetail.getAssetSN()){
+            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[设备序列号SN不能匹配到资产设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
         }
 
-        if(tempAssetInfoList != null && !tempAssetInfoList.isEmpty()){
+        if(null != measuringCertificateDetail.getFinanceNo() && !flag){
+            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[资产编号不能匹配到设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }
+
+        if(flag){
             if(tempAssetInfoList.size() == 1){
                 tempAssetInfo = tempAssetInfoList.get(0);
             }
@@ -101,35 +123,40 @@ public class MeasuringService {
             }
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
             measuringCertificateDetailDao.save(measuringCertificateDetail);
-
-            flag = true;
         }
 
-        return flag;
+        if(!flag){
+            measuringCertificateDetail.setErrorInfo(errorInfo);
+            return measuringCertificateDetail;
+        }else{
+            return null;
+        }
     }
 
-    private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String tenantUID){
+    private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(financingNum)){
-            tempAssetInfoList = assetInfoDao.findByFinancingNumAndTenantUID(financingNum, tenantUID);
+            tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID(financingNum, siteUID);
         }
 
         return tempAssetInfoList;
     }
 
-    private List<AssetInfo> getAssetInfoBySerialNum(String serialNum, String tenantUID){
+    private List<AssetInfo> getAssetInfoBySerialNum(String serialNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(serialNum)){
-            tempAssetInfoList = assetInfoDao.findBySerialNumAndTenantUID(serialNum, tenantUID);
+            tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID(serialNum, siteUID);
         }
 
         return tempAssetInfoList;
     }
 
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setLenient(false);
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
         //for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -142,6 +169,8 @@ public class MeasuringService {
                 return null;
             }
             for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
+                String errorInfo = "";
+
                 HSSFRow row = sheet.getRow(j);
 
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
@@ -166,10 +195,22 @@ public class MeasuringService {
                 }
 
                 if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
-                    detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                    try {
+                        detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                    }catch (Exception ex){
+                        errorInfo += "[检定日期格式不对]";
+                    }
+
+                    detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null) {
-                    detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                    try {
+                        detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                    }catch (Exception ex){
+                        errorInfo += "[有效期至格式不对]";
+                    }
+
+                    detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
                 }
                 //detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
                 detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
@@ -214,12 +255,19 @@ public class MeasuringService {
                 detail.setExcelIdex(j + 1);
 
                 //检定日期不能为空，设备序列号和资产编号不能全为空
-                if (row == null || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null || (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null)) {
+                if (row == null || !errorInfo.equals("") || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null || (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null)) {
+                    if(row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null){
+                        errorInfo += "[(设备序列号SN)和(资产编号)不能同时为空]";
+                    }
+                    if(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null){
+                        errorInfo += "[检定日期不能为空]";
+                    }
+                    detail.setErrorInfo(errorInfo);
                     tempMCDList.add(detail);
                     continue;
                 }
 
-                if(!operateMeasuringAndAssetInfo(detail)){
+                if(operateMeasuringAndAssetInfo(detail) != null){
                     tempMCDList.add(detail);
                 }
             }
