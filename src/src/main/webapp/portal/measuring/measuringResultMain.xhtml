@@ -13,8 +13,9 @@
             </div>
 
             <div class="ui-g-12">
-                <p:tabView id="measuringTab" class="ui-g-12" dynamic="true" cache="false">
-                    <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" update=":measuringTab:measuringAssetListForm :measuringTab:dataListForm"/>
+                <p:tabView id="measuringTab" class="ui-g-12">
+                    <!--<p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" update=":measuringTab:measuringAssetListForm :measuringTab:dataListForm"/>-->
+                    <p:ajax event="tabChange"/>
                     <p:tab title="计量信息" id="measuringAssetList">
                         <ui:include src="measuringAssetList.xhtml"/>
                     </p:tab>
