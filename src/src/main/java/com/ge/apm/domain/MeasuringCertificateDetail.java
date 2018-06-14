@@ -134,6 +134,15 @@ public class MeasuringCertificateDetail implements Serializable {
     @Transient
     private String statusDisplay;
 
+    @Transient
+    private String errorInfo;
+
+    @Transient
+    private String checkDateDisplay;
+
+    @Transient
+    private String validDateToDisplay;
+
     public String getId() {
         return id;
     }
@@ -356,6 +365,30 @@ public class MeasuringCertificateDetail implements Serializable {
 
     public void setFileNo(String fileNo) {
         this.fileNo = fileNo;
+    }
+
+    public String getErrorInfo() {
+        return errorInfo;
+    }
+
+    public void setErrorInfo(String errorInfo) {
+        this.errorInfo = errorInfo;
+    }
+
+    public String getCheckDateDisplay() {
+        return checkDateDisplay;
+    }
+
+    public void setCheckDateDisplay(String checkDateDisplay) {
+        this.checkDateDisplay = checkDateDisplay;
+    }
+
+    public String getValidDateToDisplay() {
+        return validDateToDisplay;
+    }
+
+    public void setValidDateToDisplay(String validDateToDisplay) {
+        this.validDateToDisplay = validDateToDisplay;
     }
 
     @Override
