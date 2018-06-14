@@ -25,7 +25,6 @@ public class AssetInfoConverter implements Converter{
     public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
         if(value != null && value.trim().length() > 0) {
             try {
-            	System.out.println("xxx "+value);
                 AssetInfoService service = (AssetInfoService) WebUtil.getBean(AssetInfoService.class);
                 return service.getAssetInfo(Integer.parseInt(value));
             } catch(NumberFormatException e) {
