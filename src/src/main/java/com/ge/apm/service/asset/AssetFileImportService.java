@@ -260,8 +260,8 @@ public class AssetFileImportService {
                     //only new asset need to set this
                     asset.setUsageStatus(3); //已建档
 
-                    boolean isNeedApprover = configService.isNeedAssetApprover(selectedOrgToImport.getSiteUID());
-                    if(isNeedApprover){
+                    boolean isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
+                    if(isNeedAudit){
                         asset.setUsageStatus(2); //待审核
                     }
 

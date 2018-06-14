@@ -24,6 +24,8 @@ public interface WorkflowConfigRepository extends GenericRepository<WorkflowConf
     public WorkflowConfig getBySiteUID(@Param("uid")String site_uid);
     
 	public List<WorkflowConfig> findBySiteUID(String institutionUID);
+
+    public WorkflowConfig findFirstBySiteUID(String siteUid);
 	
 	 @Query(value="delete from WorkflowConfig wc where wc.siteUID = ?1")
 	 @Modifying
