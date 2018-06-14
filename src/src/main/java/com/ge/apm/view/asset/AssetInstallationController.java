@@ -628,6 +628,9 @@ public class AssetInstallationController {
     	if(this.parentAssetInfo!=null){
     		this.arrivalListItem.setParentAssetId(this.parentAssetInfo.getId());
     	}
+    	else{
+    		this.arrivalListItem.setParentAssetId(null);
+    	}
     }
 
     public List<UserAccount> completeOwnerList(String query) {
