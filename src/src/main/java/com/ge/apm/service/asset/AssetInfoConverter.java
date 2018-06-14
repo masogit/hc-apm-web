@@ -28,7 +28,8 @@ public class AssetInfoConverter implements Converter{
                 AssetInfoService service = (AssetInfoService) WebUtil.getBean(AssetInfoService.class);
                 return service.getAssetInfo(Integer.parseInt(value));
             } catch(NumberFormatException e) {
-                throw new ConverterException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Conversion Error", "Not a valid theme."));
+//                throw new ConverterException(new FacesMessage(FacesMessage.SEVERITY_ERROR, "Conversion Error", "Not a valid theme."));
+            	return null;
             }
         }
         else {
