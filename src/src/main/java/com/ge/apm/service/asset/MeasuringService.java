@@ -85,7 +85,7 @@ public class MeasuringService {
                 if(tempAssetInfoList.size() == 1){
                     flag = true;
                 }else{
-                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                    errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
                 }
             }
         }
