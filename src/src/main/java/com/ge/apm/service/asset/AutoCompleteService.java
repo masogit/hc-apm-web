@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Component;
 
+import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.PinYinComparatorByName;
@@ -77,6 +78,19 @@ public class AutoCompleteService {
         user.setId(null);
         res.add(0, user);
         return res;
+    }
+    
+    public List<AssetInfo> completeAssetInfoList(String query,List<AssetInfo> assetInfoList){
+    	if(assetInfoList==null){
+    		return Collections.emptyList();
+    	}
+    	List<AssetInfo> res=assetInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query) || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+    	res.sort(new PinYinComparatorByName());
+    	AssetInfo info=new AssetInfo();
+    	info.setName("请选择");
+    	info.setId(null);
+    	res.add(0,info);
+    	return res;
     }
 
 }
