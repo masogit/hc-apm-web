@@ -17,4 +17,6 @@ public interface ContractInfoItemRepository extends GenericRepositoryUUID<Contra
    List<ContractInfoItem>  findByContractId(String id);
    
    List<ContractInfoItem>  findByAssetUid(String id);
+   
+   ContractInfoItem getByArrivalItemId(String id);
 }
