@@ -23,7 +23,7 @@
 						<h:panelGroup>
 							<p>说明</p>
 							<p>
-								1. <a href="APM_MEASURING_Template.ps" title="download">#{msg.downloadTemplateFile}</a>
+								1. <a href="APM_Electric_Safety_Template.ps" title="download">#{msg.downloadTemplateFile}</a>
 							</p>
 							<p>2. 文件中填入要导入的电气安全数据</p>
 							<p>3. 上传文件进行导入</p>
@@ -102,7 +102,7 @@
 							</p:column>
 							<f:facet name="{Toolbar}">
                                 <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
-                                    <p:dataExporter type="xls" target="datalistId" fileName="MeasuringFailed_export"/>
+                                    <p:dataExporter type="xls" target="datalistId" fileName="Electric_Safety_Export"/>
                                 </p:commandButton>
                                 <p:commandButton actionListener="#{measureElectricSafetyController.importSelectedItem}" value="#{msg.Import}" update="datalistId :growl,:measureElectricSafetyTab:measureElectricSafetyListForm" icon="ui-icon-check" />
                             </f:facet>
