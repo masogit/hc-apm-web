@@ -41,6 +41,7 @@ import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.report.TableResultReportService;
+import com.ge.apm.view.pm.V2PmOrderController;
 import com.ge.apm.view.sysutil.UserContextService;
 
 /**
@@ -550,9 +551,6 @@ public class ElectricSafetyService {
 			if(obj!=null){
 				if(electricSafetyData!=null){
 					for(String key:obj.keySet()){
-//						if(tableValue.containsKey(key)){
-//							tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
-//						}
 						if(table!=null){
 							List<TableGroup> listTableGroup=table.getGroups();
 							if(listTableGroup!=null && listTableGroup.size()>0){
@@ -590,9 +588,6 @@ public class ElectricSafetyService {
 			if(obj!=null){
 				if(electricSafetyData!=null){
 					for(String key:obj.keySet()){
-//						if(tableValue.containsKey(key)){
-//							tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
-//						}
 						if(table!=null){
 							List<TableGroup> listTableGroup=table.getGroups();
 							if(listTableGroup!=null && listTableGroup.size()>0){
@@ -622,22 +617,22 @@ public class ElectricSafetyService {
 		if(StringUtils.isNotEmpty(jsonStrInstrumentData)&& StringUtils.isNotEmpty(boUuid)){
 			JSONObject obj=JSONObject.parseObject(jsonStrInstrumentData);
 			if(obj!=null){
-				ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByPmOrderIdAssetUid(boUuid);
-				if(electricSafetyData!=null){
-					for(String key:obj.keySet()){
-//						if(tableValue.containsKey(key)){
-//							tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
-//						}
-						if(table!=null){
-							List<TableGroup> listTableGroup=table.getGroups();
-							if(listTableGroup!=null && listTableGroup.size()>0){
-								for(int i=0;i<listTableGroup.size();++i){
-									List<TableItem> listTableItem=listTableGroup.get(i).getItems();
-									if(listTableItem!=null && listTableItem.size()>0){
-										for(int j=0;j<listTableItem.size();++j){
-											TableItem temp=listTableItem.get(j);
-											if(temp.getKey().equals(key)){
-												tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+				V2_PmOrder pmorder=v2_PmOrderRepository.findById(boUuid);
+				if(pmorder!=null && StringUtils.isNotEmpty(pmorder.getAssetUid())){
+					ElectricSafetyData electricSafetyData=electricSafetyDataRepository.findByAssetUid(pmorder.getAssetUid());
+					if(electricSafetyData!=null){
+						for(String key:obj.keySet()){
+							if(table!=null){
+								List<TableGroup> listTableGroup=table.getGroups();
+								if(listTableGroup!=null && listTableGroup.size()>0){
+									for(int i=0;i<listTableGroup.size();++i){
+										List<TableItem> listTableItem=listTableGroup.get(i).getItems();
+										if(listTableItem!=null && listTableItem.size()>0){
+											for(int j=0;j<listTableItem.size();++j){
+												TableItem temp=listTableItem.get(j);
+												if(temp.getKey().equals(key)){
+													tableValue.put(key, getInstrumentValue(obj.getString(key), electricSafetyData));
+												}
 											}
 										}
 									}
