@@ -119,7 +119,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             selectedObjectMap.put("supplier", selected.getSupplierUid() == null ? null : supplierDao.findByUid(selected.getSupplierUid()));
             selectedObjectMap.put("bidWinner", selected.getBidWinner() == null ? null : supplierDao.findByUid(selected.getBidWinner()));
             selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
-            selectedObjectMap.put("applyDept", selected.getApplyDept() == null ? null : orgDao.findByUid(selected.getApplyDept()));
 
         }
 
@@ -161,7 +160,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
                 break;
             case "applyDept":
                 OrgInfo clinicalDept = (OrgInfo) selectedObjectMap.get(idx);
-                selected.setApplyDept(clinicalDept == null ? null : clinicalDept.getUid());
+                selectedContractItem.setApplyDept(clinicalDept == null ? null : clinicalDept.getUid());
                 break;
         }
     }
@@ -358,7 +357,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void savePurchaseItem() {
-        allItemList.add(selectedContractItem);
+        if (!allItemList.contains(selectedContractItem)) {
+            allItemList.add(selectedContractItem);
+        }
     }
 
     public void cancelPurchaseItem() {
@@ -369,12 +370,14 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         selectedContractItem = new ContractInfoItem();
         selectedContractItem.setId(UUID.randomUUID().toString().replace("-", ""));
         selectedContractItem.setItemType(ContractInfoItem.ContractInfoItemType.Purchase.toString());
-        selectedObjectMap.put("manufacture",null);
+        selectedObjectMap.put("manufacture", null);
+        selectedObjectMap.put("applyDept", null);
     }
 
     public void prepareEditPurchaseAsset(ContractInfoItem item) {
         selectedContractItem = item;
         selectedObjectMap.put("manufacture", selectedContractItem.getManufacturer() == null ? null : supplierDao.findByUid(selectedContractItem.getManufacturer()));
+        selectedObjectMap.put("applyDept", selectedContractItem.getApplyDept() == null ? null : orgDao.findByUid(selectedContractItem.getApplyDept()));
     }
 
     public List<ContractInfoItem> getPurchaseItemsList() {

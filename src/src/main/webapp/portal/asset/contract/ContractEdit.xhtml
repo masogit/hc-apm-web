@@ -104,14 +104,6 @@
                                 <p:inputText value="#{contractInfoEditController.selected.reportNum}" required="true" requiredMessage="#{msg.reportNum} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
-                                <label class="label">#{msg.applyDept}</label>
-                                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true"
-                                                completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
-                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
-                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
-                                </p:autoComplete>
-                            </h:panelGroup>
-                            <h:panelGroup>
                                 <label class="label">#{msg.applyProjectName}</label>
                                 <p:inputText value="#{contractInfoEditController.selected.applyProjectName}"/>
                             </h:panelGroup>
@@ -340,6 +332,14 @@
                             <label class="label">#{msg.contractAssetName}</label>
                             <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.contractAssetName}"/>
                         </h:panelGroup>
+                        <h:panelGroup>
+                                <label class="label">#{msg.applyDept}</label>
+                                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true" appendTo="@this"
+                                                completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
+                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
+                                </p:autoComplete>
+                            </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.estimatedPrice}</label>
                             <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.estimatedPrice}">
