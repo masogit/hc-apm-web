@@ -101,7 +101,7 @@
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                             <h:panelGroup>
                                 <label class="label">#{msg.reportNum}*</label>
-                                <p:inputText value="#{contractInfoEditController.selected.reportNum}" required="true" requiredMessage="#{msg.AssetContractName} #{msg.ValidationRequire}"/>
+                                <p:inputText value="#{contractInfoEditController.selected.reportNum}" required="true" requiredMessage="#{msg.reportNum} #{msg.ValidationRequire}"/>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.applyDept}</label>
@@ -215,7 +215,7 @@
                                     <h:outputText value="操作" />
                                 </f:facet>
                                 <p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" update=":addPurchaseForm" oncomplete="PF('addPurchaseDlg').show()" value="#{msg.Edit}" style="padding:10px" />
-                                <p:commandLink actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}" disabled="#{!contractInfoEditController.canRemovePucheseItem(item)}"  update="purchaseList" />
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}" disabled="#{!contractInfoEditController.canRemovePucheseItem(item)}"  update="purchaseList" />
                             </p:column>
 
                             <f:facet name="{Toolbar}">
@@ -254,7 +254,7 @@
                                 <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}设备"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
                                 <p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" oncomplete="PF('viewContractItemDlg').show()" value="#{msg.View}"  update=":viewContractItemForm" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
                                 <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}详细"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
-                                <p:commandLink actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
+                                <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
                             </p:column>
 
                             <f:facet name="{Toolbar}">
@@ -364,25 +364,25 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.noticeDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.noticeDate}" readonly="true">
+                            <p:inputText value="#{contractInfoEditController.selectedContractItem.noticeDate}">
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.downPaymentDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" readonly="true">
+                            <p:inputText value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.applyPaymentDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" readonly="true">
+                            <p:inputText value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.tailPaymentDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" readonly="true">
+                            <p:inputText value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" >
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
                             </p:inputText>
                         </h:panelGroup>
