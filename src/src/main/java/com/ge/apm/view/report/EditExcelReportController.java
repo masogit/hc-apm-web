@@ -98,6 +98,9 @@ public class EditExcelReportController extends TieWebSheetBean {
     
     public void importElectricSafetyData(){
     	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+    	if(tableValue.size()==0){
+    		WebUtil.addSuccessMessage("未找到对应数据");
+    	}
     	reloadData();
     }
 
