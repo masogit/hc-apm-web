@@ -40,7 +40,7 @@ public class MeasuringService {
     private final String HEADER_ASSET_SN = "设备序列号SN";
     private final String HEADER_ASSET_NO = "资产编号";
     private final String HEADER_APPLIANCE_NO = "器具编号";
-    private final String HEADER_PAYED = "付款否";
+    //private final String HEADER_PAYED = "付款否";
     private final String HEADER_VERIFICATION_CONCLUSION = "检定结论";
     private final String HEADER_VERIFICATION_DATE = "检定日期";
     private final String HEADER_EXPIRE_DATE = "有效期至";
@@ -50,7 +50,7 @@ public class MeasuringService {
     private final String HEADER_CATEGORY = "种别";
     private final String HEADER_CLINICAL_DEPT = "送检单位";
     private final String HEADER_REMARK = "备注";
-    private final String HEADER_OVERDUE = "过期否";
+    //private final String HEADER_OVERDUE = "过期否";
     private final String HEADER_FILE_NO = "存档记录";
 
     @Autowired
@@ -97,7 +97,7 @@ public class MeasuringService {
         }
 
         if(tempAssetInfo != null){
-            if(tempAssetInfo.getLastMeteringDate() != null && tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+            if(tempAssetInfo.getLastMeteringDate() == null || tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
                 tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
                 tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
                 tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
@@ -216,7 +216,7 @@ public class MeasuringService {
                 detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
                 detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")) == null ? null : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
                 detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
-                detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
+                //detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
                 detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
                 if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
                     detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
@@ -253,6 +253,14 @@ public class MeasuringService {
                 }
                 detail.setStatus(status);
                 detail.setExcelIdex(j + 1);
+
+                if(detail.getCheckDate() != null && detail.getCheckDate().after(sdf.parse("99999/12/31"))){
+                    errorInfo += "[检定日期不能超过99999/12/31]";
+                }
+
+                if(detail.getValidDateTo() != null && detail.getValidDateTo().after(sdf.parse("99999/12/31"))){
+                    errorInfo += "[有效期至不能超过99999/12/31]";
+                }
 
                 //检定日期不能为空，设备序列号和资产编号不能全为空
                 if (row == null || !errorInfo.equals("") || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null || (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null)) {
@@ -293,7 +301,7 @@ public class MeasuringService {
             boolean hasAssetSN = false;
             boolean hasAssetNo = false;
             boolean hasApplianceNo = false;
-            boolean hasPayed = false;
+            //boolean hasPayed = false;
             boolean hasVerificationConclusion = false;
             boolean hasVerificationDate = false;
             boolean hasExpireDate = false;
@@ -303,7 +311,7 @@ public class MeasuringService {
             boolean hasCategory = false;
             boolean hasClinicalDept = false;
             boolean hasRemark = false;
-            boolean hasOverdue = false;
+            //boolean hasOverdue = false;
             boolean hasFileNo = false;
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
@@ -319,7 +327,7 @@ public class MeasuringService {
                     hasAssetSN = HEADER_ASSET_SN.equals(cell.getStringCellValue()) ? true : hasAssetSN;
                     hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue()) ? true : hasAssetNo;
                     hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue()) ? true : hasApplianceNo;
-                    hasPayed = HEADER_PAYED.equals(cell.getStringCellValue()) ? true : hasPayed;
+                    //hasPayed = HEADER_PAYED.equals(cell.getStringCellValue()) ? true : hasPayed;
                     hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue()) ? true : hasVerificationConclusion;
                     hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue()) ? true : hasVerificationDate;
                     hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue()) ? true : hasExpireDate;
@@ -329,7 +337,7 @@ public class MeasuringService {
                     hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue()) ? true : hasCategory;
                     hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue()) ? true : hasClinicalDept;
                     hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
-                    hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
+                    //hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
                     hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
                     switch (cell.getStringCellValue()) {
                         case HEADER_CERTIFICATION_NO:
@@ -360,10 +368,10 @@ public class MeasuringService {
                             hasApplianceNo = true;
                             header.put("APPLIANCE_NO_CELL", j);
                             break;
-                        case HEADER_PAYED:
+                        /*case HEADER_PAYED:
                             hasPayed = true;
                             header.put("PAYED_CELL", j);
-                            break;
+                            break;*/
                         case HEADER_VERIFICATION_CONCLUSION:
                             hasVerificationConclusion = true;
                             header.put("VERIFICATION_CONCLUSION_CELL", j);
@@ -400,10 +408,10 @@ public class MeasuringService {
                             hasRemark = true;
                             header.put("REMARK_CELL", j);
                             break;
-                        case HEADER_OVERDUE:
+                        /*case HEADER_OVERDUE:
                             hasOverdue = true;
                             header.put("OVERDUE_CELL", j);
-                            break;
+                            break;*/
                         case HEADER_FILE_NO:
                             hasFileNo = true;
                             header.put("FILE_NO_CELL", j);
@@ -417,8 +425,8 @@ public class MeasuringService {
                 }
             }
             if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
-                    && hasApplianceNo && hasPayed && hasVerificationConclusion && hasVerificationDate && hasExpireDate
-                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasOverdue && hasFileNo) {
+                    && hasApplianceNo && hasVerificationConclusion && hasVerificationDate && hasExpireDate
+                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo) {
                 header.put("HEADER_ROW", i);
                 break;
             }
