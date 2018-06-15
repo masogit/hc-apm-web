@@ -7,6 +7,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.event.TabChangeEvent;
@@ -204,7 +205,9 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
         String tabId = event.getTab().getId();
 
         if("measuringAssetList".equals(tabId)){
-            this.searchFilters = new ArrayList<>();
+            //this.searchFilters = new ArrayList<>();
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("url", "measuringResultMain.xhtml");
         }
     }
 
