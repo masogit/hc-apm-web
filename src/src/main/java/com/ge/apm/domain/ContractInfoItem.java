@@ -69,11 +69,11 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "purchase_item_id", columnDefinition = "CHAR(32)")
     private String PurchaseItemId;
 
-    //交货期
-    @Basic(optional = true)
-    @Column(name = "delivered_date")
-    @Temporal(TemporalType.DATE)
-    private Date deliveredDate;
+//    //交货期
+//    @Basic(optional = true)
+//    @Column(name = "delivered_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date deliveredDate;
 
     //通知供货时间
     @Basic(optional = true)
@@ -87,15 +87,15 @@ public class ContractInfoItem implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date plannedArriveDate;
 
-    //实际到货时间
-    @Basic(optional = true)
-    @Column(name = "arrive_date")
-    @Temporal(TemporalType.DATE)
-    private Date arriveDate;
+//    //实际到货时间
+//    @Basic(optional = true)
+//    @Column(name = "arrive_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date arriveDate;
 
-    //是否在规定时间内到货
-    @Column(name = "in_time_arrived")
-    private Boolean inTimeArrived;
+//    //是否在规定时间内到货
+//    @Column(name = "in_time_arrived")
+//    private Boolean inTimeArrived;
 
     //合同内设备名称
     @Column(name = "contract_asset_name")
@@ -197,14 +197,6 @@ public class ContractInfoItem implements Serializable {
         this.pattern = pattern;
     }
 
-    public Date getDeliveredDate() {
-        return deliveredDate;
-    }
-
-    public void setDeliveredDate(Date deliveredDate) {
-        this.deliveredDate = deliveredDate;
-    }
-
     public Date getNoticeDate() {
         return noticeDate;
     }
@@ -219,22 +211,6 @@ public class ContractInfoItem implements Serializable {
 
     public void setPlannedArriveDate(Date plannedArriveDate) {
         this.plannedArriveDate = plannedArriveDate;
-    }
-
-    public Date getArriveDate() {
-        return arriveDate;
-    }
-
-    public void setArriveDate(Date arriveDate) {
-        this.arriveDate = arriveDate;
-    }
-
-    public Boolean getInTimeArrived() {
-        return inTimeArrived;
-    }
-
-    public void setInTimeArrived(Boolean inTimeArrived) {
-        this.inTimeArrived = inTimeArrived;
     }
 
     public String getComments() {

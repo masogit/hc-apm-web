@@ -31,6 +31,7 @@ import javax.faces.bean.ViewScoped;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
@@ -323,6 +324,21 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
     }
 
+    public void onPlannedArrivalDateChange(){
+        if(null != selectedContractItem.getDeliveryDays() && null!= selectedContractItem.getNoticeDate()){
+            selectedContractItem.setPlannedArriveDate(new Date(selectedContractItem.getNoticeDate().getTime() + 86400000*selectedContractItem.getDeliveryDays()));
+        }else{
+            selectedContractItem.setPlannedArriveDate(null);
+        }
+    }
+    
+    public String isOnTimeArrival(ContractInfoItem item){
+        if(item.getPlannedArriveDate()==null || item.getArrivalListItem() == null || item.getArrivalListItem().getArrivalList().getArrivalDate()==null){
+            return "";
+        }
+        return item.getArrivalListItem().getArrivalList().getArrivalDate().before(item.getPlannedArriveDate())? WebUtil.getMessage("True2Yes") : WebUtil.getMessage("False2No");
+    }
+    
     public void savePurchaseItem() {
 
     }
