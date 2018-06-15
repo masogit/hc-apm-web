@@ -1,5 +1,6 @@
 package com.ge.apm.view.asset;
 
+import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.ContractInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
@@ -42,7 +43,6 @@ import java.util.stream.Collectors;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -52,6 +52,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 public class ContractInfoEditController extends GenericCRUDUUIDController<ContractInfo> implements ServerEventInterface {
 
     private ContractInfoRepository dao = null;
+    private AssetInfoRepository assetDao = null;
     private ContractInfoItemRepository contractItemDao = null;
     private SupplierRepository supplierDao = null;
     private OrgInfoRepository orgDao = null;
@@ -70,10 +71,10 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private List<String> contractType;
     private List<OrgInfo> clinicalDeptList;
-    private List<String> removedAttachments=new ArrayList();
+    private List<String> removedAttachments = new ArrayList();
 
     private List<ContractInfoItem> allItemList;
-    private List<ContractInfoItem> removedItemList=new ArrayList();
+    private List<ContractInfoItem> removedItemList = new ArrayList();
     private ContractInfoItem selectedContractItem;
 
     private List<V2_BlobObject> uploadedFileObjects = new ArrayList();
@@ -84,6 +85,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         dao = WebUtil.getBean(ContractInfoRepository.class);
         contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
         supplierDao = WebUtil.getBean(SupplierRepository.class);
+        assetDao = WebUtil.getBean(AssetInfoRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
@@ -249,11 +251,26 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         contractItemDao.save(allItemList);
         contractItemDao.delete(removedItemList);
         blobService.saveBlobObject(attachements);
-        
+
         removedAttachments.stream().forEach(item -> {
             blobService.deleteBlobFileById(item);
         });
+        if (!ContractInfo.ContractType.Equipment.toString().equals(selected.getContractType())) {
+            //质保合同
+            allItemList.stream().filter(item -> null != item.getAssetInfo()).forEach(item -> udpateAssetInfoWarranty(item.getAssetInfo()));
+        }
+
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
+    }
+
+    private void udpateAssetInfoWarranty(AssetInfo asset) {
+        if (null == asset.getWarrantyDate()) {
+            asset.setWarrantyDate(selected.getEndDate());
+            assetDao.save(asset);
+        } else if (selected.getEndDate().after(asset.getWarrantyDate())) {
+            asset.setWarrantyDate(selected.getEndDate());
+            assetDao.save(asset);
+        }
     }
 
     public void onEstimatedPriceChange() {
@@ -296,9 +313,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             removedItemList.add(item);
         }
     }
-    
-    public boolean canRemovePucheseItem(ContractInfoItem contractItem){
-        return Strings.isNullOrEmpty(contractItem.getId())?true : !allItemList.stream().anyMatch(item->Objects.equals(contractItem.getId(), item.getPurchaseItemId()));
+
+    public boolean canRemovePucheseItem(ContractInfoItem contractItem) {
+        return Strings.isNullOrEmpty(contractItem.getId()) ? true : !allItemList.stream().anyMatch(item -> Objects.equals(contractItem.getId(), item.getPurchaseItemId()));
     }
 
     public String getUserNameByUid(String orgUid) {
@@ -312,7 +329,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void viewContractItemPage(ContractInfoItem item) {
-        if (null!=item.getAssetInfo()) {
+        if (null != item.getAssetInfo()) {
             AssetInfo asset = item.getAssetInfo();
             String url = "actionName=View&selectedid="
                     + asset.getId().toString()
@@ -324,21 +341,21 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
     }
 
-    public void onPlannedArrivalDateChange(){
-        if(null != selectedContractItem.getDeliveryDays() && null!= selectedContractItem.getNoticeDate()){
-            selectedContractItem.setPlannedArriveDate(new Date(selectedContractItem.getNoticeDate().getTime() + 86400000*selectedContractItem.getDeliveryDays()));
-        }else{
+    public void onPlannedArrivalDateChange() {
+        if (null != selectedContractItem.getDeliveryDays() && null != selectedContractItem.getNoticeDate()) {
+            selectedContractItem.setPlannedArriveDate(new Date(selectedContractItem.getNoticeDate().getTime() + 86400000 * selectedContractItem.getDeliveryDays()));
+        } else {
             selectedContractItem.setPlannedArriveDate(null);
         }
     }
-    
-    public String isOnTimeArrival(ContractInfoItem item){
-        if(item.getPlannedArriveDate()==null || item.getArrivalListItem() == null || item.getArrivalListItem().getArrivalList().getArrivalDate()==null){
+
+    public String isOnTimeArrival(ContractInfoItem item) {
+        if (item.getPlannedArriveDate() == null || item.getArrivalListItem() == null || item.getArrivalListItem().getArrivalList().getArrivalDate() == null) {
             return "";
         }
-        return item.getArrivalListItem().getArrivalList().getArrivalDate().before(item.getPlannedArriveDate())? WebUtil.getMessage("True2Yes") : WebUtil.getMessage("False2No");
+        return item.getArrivalListItem().getArrivalList().getArrivalDate().before(item.getPlannedArriveDate()) ? WebUtil.getMessage("True2Yes") : WebUtil.getMessage("False2No");
     }
-    
+
     public void savePurchaseItem() {
 
     }
