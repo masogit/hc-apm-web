@@ -30,10 +30,9 @@ import webapp.framework.web.WebUtil;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.logging.Level;
@@ -449,7 +448,11 @@ public class TableCreateController extends TieWebSheetBean {
         if (table == null || table.getTitle() == null) {
             title = DEFAULT_EXCEL_TEMPLATE_FILE;
         } else {
-            title = table.getTitle();
+            try {
+                title = URLEncoder.encode(table.getTitle(), StandardCharsets.UTF_8.toString());
+            } catch (UnsupportedEncodingException e) {
+                title = DEFAULT_EXCEL_TEMPLATE_FILE;
+            }
         }
         return title + FILE_SUFFIX;
     }
