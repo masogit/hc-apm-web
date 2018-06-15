@@ -71,8 +71,12 @@ public class EditExcelReportController extends TieWebSheetBean {
                 tableValue.put(item.getKey(), item.getValueSerialized());
             }
         });
-        StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
-        try {
+        reloadData();
+    }
+    
+    private void reloadData(){
+    	try {
+    		StreamedContent excelFile = blobService.getBlobObjectByStorageId(tableDefinition.getExcelStorageId());
             this.setTieCommandAliasList(TieFacesService.commonAliasList());
             context.put("X", tableValue);
             loadWebSheet(excelFile.getStream(), context);
@@ -94,6 +98,7 @@ public class EditExcelReportController extends TieWebSheetBean {
     
     public void importElectricSafetyData(){
     	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+    	reloadData();
     }
 
     public Map<String, Object> getTableValue() {
