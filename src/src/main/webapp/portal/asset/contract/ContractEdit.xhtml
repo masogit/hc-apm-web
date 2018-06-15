@@ -462,6 +462,28 @@
             function openAssetViewWindow(xhr, status, args) {
                 newWin.location.href = args.url;
             }
+            function handleValidFields(xhr, status, args) {
+                var valid = true;
+                if (args.confirmedUpDate) {
+                    $('#woTab\\:repairCompleteDialogForm\\:confirmedUpDate_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.caseType) {
+                    $('#woTab\\:repairCompleteDialogForm\\:caseType').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.repairResult) {
+                    $('#woTab\\:repairCompleteDialogForm\\:repairResult').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (args.manHours) {
+                    $('#woTab\\:repairCompleteDialogForm\\:manHours_input').addClass("ui-state-error");
+                    valid = false;
+                }
+                if (valid) {
+                    handleSubmit(args, 'repairCompleteDialog');
+                }
+            }
             //]]>
         </script>
     </ui:define>

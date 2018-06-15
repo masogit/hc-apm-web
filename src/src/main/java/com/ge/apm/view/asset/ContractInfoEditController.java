@@ -37,6 +37,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -357,7 +358,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     }
 
     public void savePurchaseItem() {
-
+        allItemList.add(selectedContractItem);
     }
 
     public void cancelPurchaseItem() {
@@ -366,7 +367,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     public void prepareAddPurchaseAsset() {
         selectedContractItem = new ContractInfoItem();
-        allItemList.add(selectedContractItem);
+        selectedContractItem.setId(UUID.randomUUID().toString().replace("-", ""));
         selectedContractItem.setItemType(ContractInfoItem.ContractInfoItemType.Purchase.toString());
     }
 
