@@ -31,10 +31,6 @@ public class AutoCompleteService {
         List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("1","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
-        Supplier obj=new Supplier();
-        obj.setName("请选择");
-        obj.setId(null);
-        res.add(0,obj);
         return res;
     }
 
@@ -43,10 +39,6 @@ public class AutoCompleteService {
         List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("2","3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
-        Supplier obj=new Supplier();
-        obj.setName("请选择");
-        obj.setId(null);
-        res.add(0,obj);
         return res;
     }
     
@@ -56,10 +48,6 @@ public class AutoCompleteService {
 
         List<UserAccount> res = ownerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        UserAccount user=new UserAccount();
-        user.setName("请选择");
-        user.setId(null);
-        res.add(0, user);
         //already in specified order, no need to order by pinyin
 //        res.sort(new PinYinComparatorByName());
         return res;
@@ -71,12 +59,7 @@ public class AutoCompleteService {
 
         List<UserAccount> res = clinicalOwnerList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-
         res.sort(new PinYinComparatorByName());
-        UserAccount user=new UserAccount();
-        user.setName("请选择");
-        user.setId(null);
-        res.add(0, user);
         return res;
     }
     
@@ -84,12 +67,8 @@ public class AutoCompleteService {
     	if(assetInfoList==null){
     		return Collections.emptyList();
     	}
-    	List<AssetInfo> res=assetInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query) || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+    	List<AssetInfo> res=assetInfoList.stream().filter(item->Strings.isNullOrEmpty(query) || item.getName().contains(query) || (item.getNamePyCode()==null?false:item.getNamePyCode().contains(query.toLowerCase())) || (item.getDepartNum()!=null?item.getDepartNum().contains(query):true)).collect(Collectors.toList());
     	res.sort(new PinYinComparatorByName());
-    	AssetInfo info=new AssetInfo();
-    	info.setName("请选择");
-    	info.setId(null);
-    	res.add(0,info);
     	return res;
     }
 
