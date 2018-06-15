@@ -92,6 +92,7 @@
                         </p:column> 
                     </p:pickList>
                     <br/> <br/>
+                    <p:commandButton id ="hidden1" value="hello1" style="display:none"/>
                     <p:panelGrid id ="PmOrderRule" columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
                     		<h:panelGroup >
                               <label class="label">#{msg.ruleLevel}*</label>
@@ -111,16 +112,18 @@
                                    <f:selectItems value="#{relRuleAssetController.getPmOrderRuleList()}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
                                </p:selectOneMenu>
                         </h:panelGroup>
-                        
-                        	<h:panelGroup >
-			                   <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" 
-			            		icon="ui-icon-check" update=":growl" />
-			            		<!-- action = "RelRuleAsset" -->
-			             </h:panelGroup>
-                        <center>
 
-			           </center>
                     </p:panelGrid>
+                    <br/> <br/>
+                    <h:panelGroup>
+                        <p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" />
+                        <p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />
+                    </h:panelGroup>
+                    <!--<p:panelGrid id ="buttonGrid" columns="12" layout="grid" styleClass="ui-panelgrid-blank form-group">-->
+                        <!---->
+                        <!--<p:commandButton validateClient="true" actionListener="#{relRuleAssetController.saveRel()}" value="#{msg.Save}" icon="ui-icon-check" update=":growl" />-->
+                        <!--<p:commandButton id="returnButton" value="#{msg.Return}" icon="ui-icon-arrow-back" action="/portal/pm/relRuleAsset/List.xhtml" immediate="true" />-->
+                    <!--</p:panelGrid>-->
 <!--                 </p:tab>
             </p:tabView> -->
                <br/>
