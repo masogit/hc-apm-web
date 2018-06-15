@@ -243,6 +243,22 @@
                             <p:column headerText="#{msg.clinicalDeptName}" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" >
                                 <h:outputText value="#{item.assetInfo.clinicalDeptName}" />
                             </p:column>
+                            <p:column headerText="#{msg.arrivalDate}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
+                                <h:outputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.arrivalDate}">
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.inTimeArrived}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
+                                <h:outputText  value="#{contractInfoEditController.isOnTimeArrival(item)}" />
+                            </p:column>
+                            <p:column headerText="#{msg.AssetArrivalListClinicalAckDate}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
+                                <h:outputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.clinicalAckDate}" >
+                                    <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="#{msg.arrivalListInvoiceNum}" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
+                                <h:outputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.invoiceNum}" />
+                            </p:column>
                             <p:column headerText="安装状态" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" >
                                 <h:outputText value="#{fieldMsg.fieldValue('arrivalListItemStatus',item.arrivalListItem.installStatus)}" />
                             </p:column>
@@ -251,9 +267,9 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}设备"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
-                                <p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" oncomplete="PF('viewContractItemDlg').show()" value="#{msg.View}"  update=":viewContractItemForm" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}详细"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
+                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
+                                <!--<p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" oncomplete="PF('viewContractItemDlg').show()" value="#{msg.View}"  update=":viewContractItemForm" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>-->
+                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
                             </p:column>
 
@@ -273,49 +289,49 @@
 
         </div>
         <ui:include src="/portal/asset/selectAssetDialog.xhtml"/>
-        <p:dialog id="viewContractItemDlg" widgetVar="viewContractItemDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="查看设备">
-            <h:form id="viewContractItemForm" >
-                <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
-                    <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
-                        <h:panelGroup>
-                            <label class="label">#{msg.contractAssetName}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.contractAssetName}" readonly="true"/>
+        <!--        <p:dialog id="viewContractItemDlg" widgetVar="viewContractItemDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="查看设备">
+                    <h:form id="viewContractItemForm" >
+                        <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
+                            <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                                <h:panelGroup>
+                                    <label class="label">#{msg.contractAssetName}</label>
+                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.contractAssetName}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.serialNum}</label>
+                                    <p:inputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.serialNum}" readonly="true"/>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.arrivalDate}</label>
+                                    <p:inputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.arrivalDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
+                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.clinicalAckDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">保修时长(年)</label>
+                                    <p:inputNumber value="#{contractInfoEditController.selectedContractItem.arrivalListItem.warrantyYear}" readonly="true" />
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.factoryWarrantyDate}</label>
+                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.warrantyDate}" readonly="true">
+                                        <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+                                    </p:inputText>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <label class="label">#{msg.arrivalListInvoiceNum}</label>
+                                    <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.invoiceNum}" readonly="true" />
+                                </h:panelGroup>
+        
+                            </p:panelGrid>
                         </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.serialNum}</label>
-                            <p:inputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.serialNum}" readonly="true"/>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.arrivalDate}</label>
-                            <p:inputText  value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.arrivalDate}" readonly="true">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.AssetArrivalListClinicalAckDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.clinicalAckDate}" readonly="true">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">保修时长(年)</label>
-                            <p:inputNumber value="#{contractInfoEditController.selectedContractItem.arrivalListItem.warrantyYear}" readonly="true" />
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.factoryWarrantyDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.warrantyDate}" readonly="true">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
-                        </h:panelGroup>
-                        <h:panelGroup>
-                            <label class="label">#{msg.arrivalListInvoiceNum}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.arrivalListItem.arrivalList.invoiceNum}" readonly="true" />
-                        </h:panelGroup>
-
-                    </p:panelGrid>
-                </h:panelGroup>
-            </h:form>
-        </p:dialog>
+                    </h:form>
+                </p:dialog>-->
         <p:dialog id="addPurchaseDlg" widgetVar="addPurchaseDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="添加/修改采购设备">
             <h:form id="addPurchaseForm" >
                 <h:panelGroup id="display" rendered="#{not empty contractInfoEditController.selectedContractItem}">
@@ -360,31 +376,37 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.deliveryDays}</label>
-                            <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.deliveryDays}"/>
+                            <p:inputNumber  maxValue="999"  decimalPlaces="0" value="#{contractInfoEditController.selectedContractItem.deliveryDays}">
+                                <p:ajax process='@this' listener="#{contractInfoEditController.onPlannedArrivalDateChange()}" update="@(.plannedArriveDate)" />
+                            </p:inputNumber>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.noticeDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.noticeDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.noticeDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" >
+                                <p:ajax process='@this' listener="#{contractInfoEditController.onPlannedArrivalDateChange()}" update="@(.plannedArriveDate)" />
+                            </p:calendar>
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.plannedArriveDate}</label>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" class="plannedArriveDate" value="#{contractInfoEditController.selectedContractItem.plannedArriveDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.downPaymentDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                       
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.applyPaymentDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                       
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.tailPaymentDate}</label>
-                            <p:inputText value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" >
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
-                            </p:inputText>
+                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                        </h:panelGroup>
+                        <h:panelGroup>
+                            <label class="label">#{msg.comments}</label>
+                            <p:inputText  value="#{contractInfoEditController.selectedContractItem.comments}"/>
                         </h:panelGroup>
                     </p:panelGrid>
                     <h:panelGroup>
