@@ -342,7 +342,7 @@
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.estimatedPrice}</label>
-                            <p:inputNumber decimalPlaces="0"  value="#{contractInfoEditController.selectedContractItem.estimatedPrice}">
+                            <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.estimatedPrice}">
                                 <p:ajax listener="#{contractInfoEditController.onEstimatedPriceChange}" process="@this" update="priceType" />
                             </p:inputNumber>
                         </h:panelGroup>
@@ -356,7 +356,7 @@
 
                         <h:panelGroup>
                             <label class="label">#{msg.contractAssetPrice}</label>
-                            <p:inputNumber decimalPlaces="0"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
+                            <p:inputNumber  decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.contractAssetPrice}" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.contractAssetQuantity}*</label>
