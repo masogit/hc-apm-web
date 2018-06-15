@@ -38,6 +38,11 @@ public class UserContextService implements Serializable {
     public static void setLoginUser(UserAccount user) {
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
         userContextService.userAccount = user;
+        userContextService.isDispatcher = null;
+        userContextService.isPmDispatcher = null;
+        userContextService.isAssetApprover = null;
+        userContextService.needAssetApproval = null;
+        userContextService.needInstorageCheck = null;
     }
 
     public void processAfterLogin() {

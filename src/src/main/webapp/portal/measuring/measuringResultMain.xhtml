@@ -14,8 +14,8 @@
 
             <div class="ui-g-12">
                 <p:tabView id="measuringTab" class="ui-g-12">
-                    <!--<p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" update=":measuringTab:measuringAssetListForm :measuringTab:dataListForm"/>-->
-                    <p:ajax event="tabChange"/>
+                    <p:ajax event="tabChange" listener="#{measureAssetListController.onTabChange}" oncomplete="openAssetViewWindow(xhr, status, args)"/>
+                    <!--<p:ajax event="tabChange"/>-->
                     <p:tab title="计量信息" id="measuringAssetList">
                         <ui:include src="measuringAssetList.xhtml"/>
                     </p:tab>
@@ -28,5 +28,13 @@
                 </p:tabView>
             </div>
         </div>
+        <script>
+            function openAssetViewWindow(xhr, status, args) {
+                if(args.url != null){
+                    window.location.href = args.url;
+                }
+
+            }
+        </script>
     </ui:define>
 </ui:composition>
