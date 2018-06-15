@@ -369,6 +369,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         selectedContractItem = new ContractInfoItem();
         selectedContractItem.setId(UUID.randomUUID().toString().replace("-", ""));
         selectedContractItem.setItemType(ContractInfoItem.ContractInfoItemType.Purchase.toString());
+        selectedObjectMap.put("manufacture",null);
     }
 
     public void prepareEditPurchaseAsset(ContractInfoItem item) {
