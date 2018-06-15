@@ -394,11 +394,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 //            selected.setMsgEndTime(this.getTime("归还"));
             selected.setState(sta);
             this.save();
-            try {
-                sharedAssetService.pushWxMsg(selected.getId());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
 
         }else if(sta == 7 || sta == 11){
             pageName = "Edit";
@@ -429,11 +424,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
             selected.setMsgBeginTime(new Date());
             selected.setState(sta);
             this.save();
-            try {
-                sharedAssetService.pushWxMsg(selected.getId());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
 
         }else if(sta == 1||sta == 5){
             pageName = "Edit";
