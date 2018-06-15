@@ -24,4 +24,7 @@ public interface ElectricSafetyDataRepository extends GenericRepositoryUUID<Elec
 	
 	@Query(value="select o.* from electric_safety_data o where o.asset_uid in (select b.asset_uid from electric_safety_data b where b.v2_pm_order_id = ?1) order by o.last_modified_date desc limit 1",nativeQuery=true)
 	public ElectricSafetyData findByPmOrderIdAssetUid(String pmOrderId);
+	
+	@Query(value="select o.* from electric_safety_data o where o.asset_uid =?1 order by o.last_modified_date desc limit 1",nativeQuery=true)
+	public ElectricSafetyData findByAssetUid(String assetUid);
 }
