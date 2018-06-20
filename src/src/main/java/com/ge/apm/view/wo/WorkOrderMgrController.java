@@ -672,6 +672,12 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     }
 
     public void saveServiceRequest() {
+        if(null == selectedAsset){
+            WebUtil.addErrorMessage("没有选择设备,不能报修");
+            RequestContext requestContext = RequestContext.getCurrentInstance();
+            requestContext.addCallbackParam("validationFailed", true);
+            return;
+        }
         if (selectedAsset.getStatus() == 4) {
             WebUtil.addErrorMessage("所选设备待报废,不能报修");
             RequestContext requestContext = RequestContext.getCurrentInstance();
