@@ -69,6 +69,10 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "purchase_item_id", columnDefinition = "CHAR(32)")
     private String PurchaseItemId;
 
+    
+    //申请科室
+    @Column(name = "apply_dept")
+    private String applyDept;
 //    //交货期
 //    @Basic(optional = true)
 //    @Column(name = "delivered_date")
@@ -347,6 +351,14 @@ public class ContractInfoItem implements Serializable {
 
     public void setTailPaymentDate(Date tailPaymentDate) {
         this.tailPaymentDate = tailPaymentDate;
+    }
+
+    public String getApplyDept() {
+        return applyDept;
+    }
+
+    public void setApplyDept(String applyDept) {
+        this.applyDept = applyDept;
     }
 
     @Override
