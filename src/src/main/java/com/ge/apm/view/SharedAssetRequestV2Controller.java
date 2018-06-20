@@ -318,20 +318,6 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
         
     }
 
-    @Override
-    public void save() {
-        super.save();
-        try {
-            try {
-                sharedAssetService.pushWxMsg(selected.getId());
-            }catch (Exception e){
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     //根据登录人信息配置权限
     private void setUserSearchFilters() {
         if (searchFilters == null) {
