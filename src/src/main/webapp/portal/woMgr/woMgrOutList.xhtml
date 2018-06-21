@@ -50,7 +50,7 @@
 
 
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
                 var isActive = "#{userContextService.isActive()}";
                 if(isActive == '1'){
