@@ -11,25 +11,29 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.*;
 
+import static com.ge.apm.service.utils.ReportTemplateDocument.Function.*;
+import static com.ge.apm.service.utils.ReportTemplateDocument.Operator.*;
+import static com.ge.apm.service.utils.ReportTemplateDocument.Widget.FUNC;
+
 /**
  * ReportTemplateDocument represent Excel Template that generated from JSON object.
+ *
+ * @author 212697838
  */
 public class ReportTemplateDocument {
     private static final String SEMICOLON = ";";
-    private static final String DEFAULT_AUTHOR = "GEAPM";
-    private static final int ALPHABET_SIZE = 'Z' - 'A' + 1;
+    private static final String COMMA = ",";
+    private static final String OPEN_PARENTHESIS = "(";
+    private static final String CLOSE_PARENTHESES = ")";
 
-    private static final String CELL_VALUE_FORMAT = "${X.%s}";
-    private static final String CELL_RESULT_FORMAT = "$save{X.%s}";
-    private static final String DROPDOWN_WIDGET_FORMAT = "$widget.dropdown{itemLabels=\"%s\" itemValues=\"%s\" }";
-    private static final String CALENDAR_WIDGET_FORMAT = "$widget.calendar{showOn=\"button\" pattern=\"yyyy/MM/dd\" readonlyInput=\"true\"}";
-    private static final String FLOAT_WIDGET_FORMAT = "$widget.inputnumber{decimalPlaces=\"2\"}";
-    private static final String SWITCH_VALUES = "是;否";
+    private static final String DEFAULT_AUTHOR = "GEAPM";
 
     private TableSchema content;
     private Workbook workbook;
     private CreationHelper factory;
     private Sheet sheet;
+    private Drawing<?> drawing;
+    private ClientAnchor anchor;
 
     // unlocked style
     private CellStyle unlockedStyle;
@@ -41,6 +45,8 @@ public class ReportTemplateDocument {
         this.workbook = workbook;
         this.factory = workbook.getCreationHelper();
         this.sheet = workbook.createSheet(sheetName);
+        this.drawing = sheet.createDrawingPatriarch();
+        this.anchor = factory.createClientAnchor();
 
         this.unlockedStyle = workbook.createCellStyle();
         unlockedStyle.setLocked(false);
@@ -56,10 +62,38 @@ public class ReportTemplateDocument {
         for (TableGroup group : content.getGroups()) {
             row = writeGroup(row, group);
         }
+
+        applyForm(row);
         // moved post process here to avoid early-obtained backref.
         postProcess();
 
         workbook.write(out);
+    }
+
+    /**
+     * Suppress Column header.
+     *
+     * @param length actual length of Excel form.
+     */
+    private void applyForm(int length) {
+        //
+        // See: POI bug 59393
+        // https://svn.apache.org/viewvc/poi/trunk/src/testcases/org/apache/poi/ss/usermodel/BaseTestBugzillaIssues.java?view=markup&pathrev=1742868
+        //
+        // fails with IllegalArgumentException("Multiple cell comments in one cell are not allowed, cell: A1")
+        // because createCellComment tries to create a cell at A1
+        // (from CellAddress(anchor.getRow1(), anchor.getCell1())),
+        // but cell A1 already has a comment (comment1).
+        // Need to atomically create a comment and attach it to a cell.
+        // Current workaround: change anchor between each usage
+        // anchor.setCol1(1);
+        Cell head = getCell(1, 0);
+        String formCmd = Widget.FORM_BODY.apply(String.valueOf(length));
+        writeCellComment(head, formCmd);
+    }
+
+    private CellPos getCellPos(String key) {
+        return cellMap.get(key);
     }
 
     private void postProcess() {
@@ -68,51 +102,16 @@ public class ReportTemplateDocument {
                 if (!needPostProcess(item)) continue;
                 CellPos pos = cellMap.get(item.getKey());
                 Cell cell = getCell(pos.getRow(), pos.getCol());
-                String resOutput = null;
-                switch (item.getExp().get("rule")) {
-                    case "RangeRule":
-                        resOutput = showRangeRuleResult(cell, item);
-                        writeCellData(cell, resOutput);
-                        break;
-                    case "ScopeRule":
-                        resOutput = showScopeRuleResult(cell, item);
-                        writeCellData(cell, resOutput);
-                        break;
-                    case "DeltaRule":
-                        resOutput = showDeltaRuleResult(cell, item);
-                        writeCellData(cell, resOutput);
-                        break;
-                    case "VerifyRule":
-                        resOutput = showVerifyRuleResult(cell, item);
-                        writeCellData(cell, resOutput);
-                        break;
-                    default:
-                        break;
-                }
-
-                if (!StringUtils.isEmpty(resOutput)) {
-                    writeCellComment(cell, resultWrapper(item.getResKey()));
+                Rule rule = Rule.fromString(item.getExp().get("rule"));
+                if (rule != null) {
+                    Optional<String> resOutput = rule.apply(this, cell, item);
+                    writeCellData(cell, resOutput.orElse(null));
+                    if (resOutput.isPresent()) {
+                        writeCellComment(cell, Widget.SAVE_COMMENT.apply(item.getResKey())); // resultWrapper(item.getResKey()));
+                    }
                 }
             }
         }
-    }
-
-    /**
-     * Convert a Column to Excel Column Title.
-     *
-     * @param n column in int
-     * @return Column Title in String
-     */
-    private String convertToTitle(int n) {
-        StringBuilder buf = new StringBuilder();
-
-        while (n > 0) {
-            char c = (char) ('A' + (n - 1) % ALPHABET_SIZE);
-            buf.append(c);
-            n = (n - 1) / ALPHABET_SIZE;
-        }
-
-        return buf.reverse().toString();
     }
 
     @SuppressWarnings("UnusedAssignment")
@@ -141,205 +140,16 @@ public class ReportTemplateDocument {
         writeCellData(cell, item.getLabel());
         // 2. write input field
         cell = getCell(row, col++);
-        writeCellData(cell, keyWrapper(item.getKey()));
+        writeCellData(cell, Widget.CELL_VALUE.apply(item.getKey()));  // keyWrapper(item.getKey()));
         // add comment for input field
-        switch (item.getComponent()) {
-            case Select:
-                renderSelectCell(cell, item.getOptions());
-                break;
-            case Switch:
-                renderSwitchCell(cell);
-                break;
-            case Text:
-            case TextArea:
-                break;
-            case Number:
-                renderNumberCell(cell);
-                break;
-            case Date:
-                renderDateCell(cell);
-                break;
-            default:
-                break;
+        Widget widget = Widget.fromComponentType(item.getComponent());
+        if (widget != null) {
+            String comment = widget.apply(genOptions(item.getOptions()));
+            writeCellComment(cell, comment);
         }
         cell.setCellStyle(unlockedStyle);
         // link input field
         cellMap.put(item.getKey(), new CellPos(row, col));
-    }
-
-    private String showScopeRuleResult(Cell cell, TableItem item) {
-        boolean hasMin = item.getExp().keySet().contains("min");
-        boolean hasMax = item.getExp().keySet().contains("max");
-        if (!item.getExp().keySet().contains("norm")) return null;
-        if (!hasMax && !hasMin) return null;
-
-        Double norm = toDouble(item.getExp().get("norm"));
-        String loc = toCellLocation(cell.getColumnIndex(), cell.getRowIndex() + 1);
-        List<String> conditions = new ArrayList<>();
-        Double min = null;
-        if (hasMin) {
-            // ABS(loc - norm) <GT_OP> min
-            min = Optional.ofNullable(toDouble(item.getExp().get("min"))).orElse(0.0);
-            String exp = Operator.MINUS.apply(loc, String.valueOf(norm));
-            Operator minCompareOp = Operator.fromString(item.getExp().get("minCompare"));
-            if (minCompareOp == null) minCompareOp = Operator.GREATER_THAN;
-            conditions.add(minCompareOp.apply(abs(exp), String.valueOf(min)));
-        }
-        Double max = null;
-        if (hasMax) {
-            // ABS(loc - norm) <LT_OP> max
-            max = Optional.ofNullable(toDouble(item.getExp().get("max"))).orElse(0.0);
-            String exp = Operator.MINUS.apply(loc, String.valueOf(norm));
-            Operator maxCompareOp = Operator.fromString(item.getExp().get("maxCompare"));
-            if (maxCompareOp == null) maxCompareOp = Operator.LESS_THAN;
-            conditions.add(maxCompareOp.apply(abs(exp), String.valueOf(max)));
-        }
-        String condition = conditions.size() > 1 ? and(conditions) : noop(conditions);
-        String statement = ifStatement(condition, "\"合格\"", "\"不合格\"");
-
-        String checker = genChecker(loc);
-
-        return funcWrapper(ifStatement(checker, "\"\"", statement));
-    }
-
-    private String showDeltaRuleResult(Cell cell, TableItem item) {
-        String yKey = item.getExp().get("Y_Key");
-        String zKey = item.getExp().get("Z_Key");
-        String deltaMaxKey = item.getExp().get("deltaMax");
-        if (yKey == null || zKey == null || deltaMaxKey == null) return null;
-
-        CellPos yPos = cellMap.get(yKey);
-        CellPos zPos = cellMap.get(zKey);
-
-        String yLoc = toCellLocation(yPos.getCol(), yPos.getRow() + 1);
-        String zLoc = toCellLocation(zPos.getCol(), zPos.getRow() + 1);
-
-        List<String> conditions = new ArrayList<>();
-        // ABS((y-z)/z) < max
-        String exp = Operator.MINUS.apply(yLoc, zLoc);
-        Double max = Double.parseDouble(deltaMaxKey) / 100;
-        exp = Operator.DIVIDE.apply(exp, zLoc);
-        conditions.add(Operator.LESS_THAN.apply(abs(exp), String.valueOf(max)));
-        String condition = noop(conditions);
-        String statement = ifStatement(condition, "\"合格\"", "\"不合格\"");
-
-        String checker = genChecker(yLoc, zLoc);
-
-        return funcWrapper(ifStatement(checker, "\"\"", statement));
-    }
-
-    private String showVerifyRuleResult(Cell cell, TableItem item) {
-        Double x = toDouble(item.getExp().get("norm"));
-        String yKey = item.getExp().get("Y_Key");
-        String zKey = item.getExp().get("Z_Key");
-        if (yKey == null || zKey == null || x == null) return null;
-
-        CellPos yPos = cellMap.get(yKey);
-        CellPos zPos = cellMap.get(zKey);
-
-        String yLoc = toCellLocation(yPos.getCol(), yPos.getRow() + 1);
-        String zLoc = toCellLocation(zPos.getCol(), zPos.getRow() + 1);
-
-        Double deltaMax = Optional.ofNullable(toDouble(item.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100;
-        Double muMax = Optional.ofNullable(toDouble(item.getExp().get("MuMaxPercent"))).orElse(0.0) / 100;
-
-        List<String> conditions = new ArrayList<>();
-        // delta: ABS((y-x)/x) < deltaMax
-        String exp = Operator.MINUS.apply(yLoc, String.valueOf(x));
-        exp = Operator.DIVIDE.apply(exp, String.valueOf(x));
-        String delta = Operator.GREATER_THAN.apply(abs(exp), String.valueOf(deltaMax));
-        conditions.add(delta);
-        // mu: ABS((y-z)/z) < muMax
-        exp = Operator.MINUS.apply(yLoc, zLoc);
-        exp = Operator.DIVIDE.apply(exp, zLoc);
-        String mu = Operator.GREATER_THAN.apply(abs(exp), String.valueOf(muMax));
-        conditions.add(mu);
-        String condition = or(conditions);
-        String statement = ifStatement(condition, "\"不合格\"", "\"合格\"");
-
-        String checker = genChecker(yLoc, zLoc);
-
-        return funcWrapper(ifStatement(checker, "\"\"", statement));
-    }
-
-    private String toCellLocation(int col, int row) {
-        return String.format("%s%d", convertToTitle(col), row);
-    }
-
-    private String genChecker(String... pos) {
-        List<String> expressions = new ArrayList<>();
-        for (String p : pos) {
-            expressions.add(String.format("ISBLANK(%s), %s=0", p, p));
-        }
-        return or(expressions);
-    }
-
-    //////
-    // Function related method
-    //////
-    private String and(List<String> expressions) {
-        return compose("AND", expressions);
-    }
-
-    private String or(List<String> expressions) {
-        return compose("OR", expressions);
-    }
-
-    private String noop(List<String> expressions) {
-        return compose("", expressions);
-    }
-
-    private String abs(String exp) {
-        return String.format("ABS(%s)", exp);
-    }
-
-    private String compose(String operator, List<String> expressions) {
-        StringBuilder buf = new StringBuilder(operator);
-        buf.append("(");
-        for (String exp : expressions) {
-            buf.append(exp).append(",");
-        }
-        buf.deleteCharAt(buf.length() - 1);
-        buf.append(")");
-        return buf.toString();
-    }
-
-    private String ifStatement(String condition, String... statments) {
-        List<String> expressions = new ArrayList<>();
-        expressions.add(condition);
-        Collections.addAll(expressions, statments);
-        return compose("IF", expressions);
-    }
-
-    private String showRangeRuleResult(Cell cell, TableItem item) {
-        boolean hasMin = item.getExp().keySet().contains("min");
-        boolean hasMax = item.getExp().keySet().contains("max");
-        if (!hasMax && !hasMin) return null;
-
-        String loc = toCellLocation(cell.getColumnIndex(), cell.getRowIndex() + 1);
-        List<String> conditions = new ArrayList<>();
-        Double min = null;
-        if (hasMin) {
-            // loc <GT_OP> min
-            min = Optional.ofNullable(toDouble(item.getExp().get("min"))).orElse(0.0);
-            Operator minCompareOp = Operator.fromString(item.getExp().get("minCompare"));
-            if (minCompareOp == null) minCompareOp = Operator.GREATER_THAN;
-            conditions.add(minCompareOp.apply(loc, String.valueOf(min)));
-        }
-        Double max = null;
-        if (hasMax) {
-            // loc <LT_OP> max
-            max = Optional.ofNullable(toDouble(item.getExp().get("max"))).orElse(0.0);
-            Operator maxCompareOp = Operator.fromString(item.getExp().get("maxCompare"));
-            if (maxCompareOp == null) maxCompareOp = Operator.LESS_THAN;
-            conditions.add(maxCompareOp.apply(loc, String.valueOf(max)));
-        }
-        String condition = conditions.size() > 1 ? and(conditions) : noop(conditions);
-        String statement = ifStatement(condition, "\"合格\"", "\"不合格\"");
-
-        String checker = genChecker(loc);
-
-        return funcWrapper(ifStatement(checker, "\"\"", statement));
     }
 
     /**
@@ -358,7 +168,7 @@ public class ReportTemplateDocument {
         return false;
     }
 
-    private Double toDouble(Object input) {
+    private static Double toDouble(Object input) {
         try {
             return input == null ? null : Double.parseDouble(input.toString().replaceAll("\"", ""));
         } catch (NumberFormatException e) {
@@ -366,9 +176,8 @@ public class ReportTemplateDocument {
         }
     }
 
-    private void renderSelectCell(Cell cell, List<TableOption> options) {
-        if (options == null || options.size() == 0) return;
-
+    private String[] genOptions(List<TableOption> options) {
+        if (options == null) return null;
         StringBuilder labels = new StringBuilder();
         StringBuilder values = new StringBuilder();
 
@@ -379,34 +188,7 @@ public class ReportTemplateDocument {
             }
         }
 
-        String comment = String.format(DROPDOWN_WIDGET_FORMAT, StringUtils.removeEnd(labels.toString(), SEMICOLON),
-                StringUtils.removeEnd(values.toString(), SEMICOLON));
-        writeCellComment(cell, comment);
-    }
-
-    private void renderSwitchCell(Cell cell) {
-        String comment = String.format(DROPDOWN_WIDGET_FORMAT, SWITCH_VALUES, SWITCH_VALUES);
-        writeCellComment(cell, comment);
-    }
-
-    private void renderNumberCell(Cell cell) {
-        writeCellComment(cell, FLOAT_WIDGET_FORMAT);
-    }
-
-    private void renderDateCell(Cell cell) {
-        writeCellComment(cell, CALENDAR_WIDGET_FORMAT);
-    }
-
-    private String keyWrapper(String key) {
-        return String.format(CELL_VALUE_FORMAT, key);
-    }
-
-    private String funcWrapper(String func) {
-        return String.format("$[%s]", func);
-    }
-
-    private String resultWrapper(String key) {
-        return String.format(CELL_RESULT_FORMAT, key);
+        return new String[]{StringUtils.removeEnd(labels.toString(), SEMICOLON), StringUtils.removeEnd(values.toString(), SEMICOLON)};
     }
 
     private Cell getCell(int row, int col) {
@@ -445,9 +227,6 @@ public class ReportTemplateDocument {
     }
 
     private void writeCellComment(Cell cell, String rawContent) {
-        Drawing<?> drawing = sheet.createDrawingPatriarch();
-
-        ClientAnchor anchor = factory.createClientAnchor();
         Comment comment = drawing.createCellComment(anchor);
         RichTextString contentStr = factory.createRichTextString(rawContent);
         comment.setString(contentStr);
@@ -459,6 +238,8 @@ public class ReportTemplateDocument {
      * Inner class for Cell Position.
      */
     static class CellPos {
+        private static final int ALPHABET_SIZE = 'Z' - 'A' + 1;
+
         private final int col;
         private final int row;
 
@@ -473,6 +254,361 @@ public class ReportTemplateDocument {
 
         public int getRow() {
             return row;
+        }
+
+        static String checkExpression(String... pos) {
+            String[] exps = new String[pos.length];
+            for (int i = 0; i < pos.length; i++) {
+                String cell = pos[i];
+                exps[i] = Operator.COMMA.apply(ISBLANK.apply(cell), ASSIGN.apply(cell, "0"));
+            }
+            return OR.apply(StringUtils.join(exps, ","));
+        }
+
+        static String location(int col, int row) {
+            return String.format("%s%d", title(col), row);
+        }
+
+        /**
+         * Convert a Column to Excel Column Title.
+         *
+         * @param n column in int
+         * @return Column Title in String
+         */
+        static String title(int n) {
+            StringBuilder buf = new StringBuilder();
+
+            while (n > 0) {
+                char c = (char) ('A' + (n - 1) % ALPHABET_SIZE);
+                buf.append(c);
+                n = (n - 1) / ALPHABET_SIZE;
+            }
+
+            return buf.reverse().toString();
+        }
+    }
+
+    enum Widget {
+        FUNC("Func", "$[%s]") {
+            String apply(String... value) {
+                return String.format(pattern(), value[0]);
+            }
+        },
+        CELL_VALUE("CellValue", "${X.%s}") {
+            String apply(String... value) {
+                return String.format(pattern(), value[0]);
+            }
+        },
+        SAVE_COMMENT("SaveComment", "$save{X.%s}") {
+            String apply(String... value) {
+                return String.format(pattern(), value[0]);
+            }
+        },
+        DROP_DOWN("DropDownBox", "$widget.dropdown{itemLabels=\"%s\" itemValues=\"%s\" }") {
+            String apply(String... value) {
+                return String.format(pattern(), value[0], value[1]);
+            }
+        },
+        SWITCH_BOX("Switch", "$widget.dropdown{itemLabels=\"%s\" itemValues=\"%s\" }") {
+            String apply(String... value) {
+                String v = "是;否";
+                return String.format(pattern(), v, v);
+            }
+        },
+        CALENDAR_BOX("Calendar", "$widget.calendar{showOn=\"button\" pattern=\"yyyy/MM/dd\" readonlyInput=\"true\"}") {
+            String apply(String... value) {
+                return pattern();
+            }
+        },
+        NUMBER_BOX("Number", "$widget.inputnumber{decimalPlaces=\"2\"}") {
+            String apply(String... value) {
+                return pattern();
+            }
+        },
+        FORM_BODY("Form", "tie:form(name=\"Template\" length=\"%s\" headerLength=\"2\" footerLength=\"0\")") {
+            String apply(String... value) {
+                return String.format(pattern(), value[0]);
+            }
+        };
+        private final String name;
+        private final String pattern;
+
+        Widget(String name, String pattern) {
+            this.name = name;
+            this.pattern = pattern;
+        }
+
+        abstract String apply(String... value);
+
+        public String pattern() {
+            return pattern;
+        }
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        private static final Map<TableItem.ComponentType, Widget> componentToEnum = new HashMap<>();
+
+        static {
+            componentToEnum.put(TableItem.ComponentType.Select, DROP_DOWN);
+            componentToEnum.put(TableItem.ComponentType.Switch, SWITCH_BOX);
+            componentToEnum.put(TableItem.ComponentType.Number, NUMBER_BOX);
+            componentToEnum.put(TableItem.ComponentType.Date, CALENDAR_BOX);
+        }
+
+        /**
+         * Return Widget for ComponentType, or null if string is invalid.
+         *
+         * @param componentType component type
+         * @return Widget
+         */
+        public static Widget fromComponentType(TableItem.ComponentType componentType) {
+            return componentToEnum.get(componentType);
+        }
+
+    }
+
+    /**
+     * Function represents the counterpart in Excel.
+     */
+    enum Function {
+        AND("AND") {
+            String apply(String... expressions) {
+                if (expressions == null || expressions.length == 0)
+                    throw new IllegalArgumentException("Bad parameter in 'AND' function");
+                return compose(toString(), expressions);
+            }
+        },
+        OR("OR") {
+            String apply(String... expressions) {
+                if (expressions == null || expressions.length == 0)
+                    throw new IllegalArgumentException("Bad parameter in 'OR' function");
+                return compose(toString(), expressions);
+            }
+        },
+        NOOP("") {
+            String apply(String... expressions) {
+                if (expressions == null || expressions.length == 0) return toString();
+                return compose(toString(), expressions);
+            }
+        },
+        ABS("ABS") {
+            String apply(String... expressions) {
+                if (expressions == null || expressions.length != 1)
+                    throw new IllegalArgumentException("Bad parameter in 'ABS' function");
+                return String.format("%s(%s)", toString(), expressions[0]);
+            }
+        },
+        IF("IF") {
+            String apply(String... expressions) {
+                if (expressions == null || expressions.length < 2 || expressions.length > 3)
+                    throw new IllegalArgumentException("Bad parameter in 'IF' function");
+                return compose(toString(), expressions);
+            }
+        },
+        ISBLANK("ISBLANK") {
+            String apply(String... expressions) {
+                if (expressions == null || expressions.length != 1)
+                    throw new IllegalArgumentException("Bad parameter in 'ISBLANK' function");
+                return String.format("%s(%s)", toString(), expressions[0]);
+            }
+        };
+        private final String operator;
+
+        Function(String operator) {
+            this.operator = operator;
+        }
+
+        abstract String apply(String... expressions);
+
+        @Override
+        public String toString() {
+            return operator;
+        }
+
+        String compose(String operator, String... expressions) {
+            StringBuilder exp = new StringBuilder(operator);
+            exp.append(OPEN_PARENTHESIS)
+                    .append(StringUtils.join(expressions, COMMA))
+                    .append(CLOSE_PARENTHESES);
+            return exp.toString();
+        }
+    }
+
+    /**
+     * Rule is the parser of {@code exp} node in JSON object.
+     */
+    enum Rule {
+        RANGE("RangeRule") {
+            Optional<String> apply(ReportTemplateDocument doc, Cell cell, TableItem item) {
+                boolean hasMin = item.getExp().keySet().contains("min");
+                boolean hasMax = item.getExp().keySet().contains("max");
+                if (!hasMax && !hasMin) return Optional.empty();
+
+                String loc = CellPos.location(cell.getColumnIndex(), cell.getRowIndex() + 1);
+                List<String> conditions = new ArrayList<>();
+                Double min = null;
+                if (hasMin) {
+                    // loc <GT_OP> min
+                    min = Optional.ofNullable(toDouble(item.getExp().get("min"))).orElse(0.0);
+                    Operator minCompareOp = Operator.fromString(item.getExp().get("minCompare"));
+                    if (minCompareOp == null) minCompareOp = GREATER_THAN;
+                    conditions.add(minCompareOp.apply(loc, String.valueOf(min)));
+                }
+                Double max = null;
+                if (hasMax) {
+                    // loc <LT_OP> max
+                    max = Optional.ofNullable(toDouble(item.getExp().get("max"))).orElse(0.0);
+                    Operator maxCompareOp = Operator.fromString(item.getExp().get("maxCompare"));
+                    if (maxCompareOp == null) maxCompareOp = LESS_THAN;
+                    conditions.add(maxCompareOp.apply(loc, String.valueOf(max)));
+                }
+                String condition = conditions.size() > 1 ? AND.apply(conditions.toArray(new String[0])) : NOOP.apply(conditions.toArray(new String[0]));
+                String statement = IF.apply(condition, "\"合格\"", "\"不合格\"");
+
+                String checker = CellPos.checkExpression(loc);
+
+                return Optional.of(FUNC.apply(IF.apply(checker, "\"\"", statement)));
+            }
+        },
+        SCOPE("ScopeRule") {
+            Optional<String> apply(ReportTemplateDocument doc, Cell cell, TableItem item) {
+                boolean hasMin = item.getExp().keySet().contains("min");
+                boolean hasMax = item.getExp().keySet().contains("max");
+                if (!item.getExp().keySet().contains("norm")) return Optional.empty();
+                if (!hasMax && !hasMin) return Optional.empty();
+
+                Double norm = toDouble(item.getExp().get("norm"));
+                String loc = CellPos.location(cell.getColumnIndex(), cell.getRowIndex() + 1);
+                List<String> conditions = new ArrayList<>();
+                Double min = null;
+                if (hasMin) {
+                    // ABS(loc - norm) <GT_OP> min
+                    min = Optional.ofNullable(toDouble(item.getExp().get("min"))).orElse(0.0);
+                    String exp = MINUS.apply(loc, String.valueOf(norm));
+                    Operator minCompareOp = Operator.fromString(item.getExp().get("minCompare"));
+                    if (minCompareOp == null) minCompareOp = GREATER_THAN;
+                    conditions.add(minCompareOp.apply(ABS.apply(exp), String.valueOf(min)));
+                }
+                Double max = null;
+                if (hasMax) {
+                    // ABS(loc - norm) <LT_OP> max
+                    max = Optional.ofNullable(toDouble(item.getExp().get("max"))).orElse(0.0);
+                    String exp = MINUS.apply(loc, String.valueOf(norm));
+                    Operator maxCompareOp = Operator.fromString(item.getExp().get("maxCompare"));
+                    if (maxCompareOp == null) maxCompareOp = LESS_THAN;
+                    conditions.add(maxCompareOp.apply(ABS.apply(exp), String.valueOf(max)));
+                }
+                String condition = conditions.size() > 1 ? AND.apply(conditions.toArray(new String[0])) : NOOP.apply(conditions.toArray(new String[0]));
+                String statement = IF.apply(condition, "\"合格\"", "\"不合格\"");
+
+                String checker = CellPos.checkExpression(loc);
+
+                return Optional.of(FUNC.apply(IF.apply(checker, "\"\"", statement)));
+            }
+        },
+        DELTA("DeltaRule") {
+            Optional<String> apply(ReportTemplateDocument doc, Cell cell, TableItem item) {
+                String yKey = item.getExp().get("Y_Key");
+                String zKey = item.getExp().get("Z_Key");
+                String deltaMaxKey = item.getExp().get("deltaMax");
+                if (yKey == null || zKey == null || deltaMaxKey == null) return Optional.empty();
+
+                CellPos yPos = doc.getCellPos(yKey);
+                CellPos zPos = doc.getCellPos(zKey);
+
+                String yLoc = CellPos.location(yPos.getCol(), yPos.getRow() + 1);
+                String zLoc = CellPos.location(zPos.getCol(), zPos.getRow() + 1);
+
+                List<String> conditions = new ArrayList<>();
+                // ABS((y-z)/z) < max
+                String exp = NOOP.apply(MINUS.apply(yLoc, zLoc));
+                Double max = Double.parseDouble(deltaMaxKey) / 100;
+                exp = DIVIDE.apply(exp, zLoc);
+                conditions.add(LESS_THAN.apply(ABS.apply(exp), String.valueOf(max)));
+                String condition = NOOP.apply(conditions.toArray(new String[0]));
+                String statement = IF.apply(condition, "\"合格\"", "\"不合格\"");
+
+                String checker = CellPos.checkExpression(yLoc, zLoc);
+
+                return Optional.of(FUNC.apply(IF.apply(checker, "\"\"", statement)));
+            }
+        },
+        VERIFY("VerifyRule") {
+            Optional<String> apply(ReportTemplateDocument doc, Cell cell, TableItem item) {
+                Double x = toDouble(item.getExp().get("norm"));
+                String yKey = item.getExp().get("Y_Key");
+                String zKey = item.getExp().get("Z_Key");
+                if (yKey == null || zKey == null || x == null) return Optional.empty();
+
+                CellPos yPos = doc.getCellPos(yKey);
+                CellPos zPos = doc.getCellPos(zKey);
+
+                String yLoc = CellPos.location(yPos.getCol(), yPos.getRow() + 1);
+                String zLoc = CellPos.location(zPos.getCol(), zPos.getRow() + 1);
+
+                Double deltaMax = Optional.ofNullable(toDouble(item.getExp().get("deltaMaxPercent"))).orElse(0.0) / 100;
+                Double muMax = Optional.ofNullable(toDouble(item.getExp().get("MuMaxPercent"))).orElse(0.0) / 100;
+
+                List<String> conditions = new ArrayList<>();
+                // delta: ABS((y-x)/x) < deltaMax
+                String exp = NOOP.apply(MINUS.apply(yLoc, String.valueOf(x)));
+                exp = DIVIDE.apply(exp, String.valueOf(x));
+                String delta = GREATER_THAN.apply(ABS.apply(exp), String.valueOf(deltaMax));
+                conditions.add(delta);
+                // mu: ABS((y-z)/z) < muMax
+                exp = NOOP.apply(MINUS.apply(yLoc, zLoc));
+                exp = DIVIDE.apply(exp, zLoc);
+                String mu = GREATER_THAN.apply(ABS.apply(exp), String.valueOf(muMax));
+                conditions.add(mu);
+                String condition = OR.apply(conditions.toArray(new String[0]));
+                String statement = IF.apply(condition, "\"不合格\"", "\"合格\"");
+
+                String checker = CellPos.checkExpression(yLoc, zLoc);
+
+                return Optional.of(FUNC.apply(IF.apply(checker, "\"\"", statement)));
+            }
+        };
+        private final String name;
+
+        Rule(String name) {
+            this.name = name;
+        }
+
+        /**
+         * Apply Different Strategy to make function on Excel Document.
+         *
+         * @param doc  Excel
+         * @param cell cell
+         * @param item JSON object
+         * @return formatted function string in TieFaces
+         */
+        abstract Optional<String> apply(ReportTemplateDocument doc, Cell cell, TableItem item);
+
+        @Override
+        public String toString() {
+            return name;
+        }
+
+        // Implementing a fromString method on an Enum type.
+        private static final Map<String, Rule> stringToEnum = new HashMap<>();
+
+        static { // Initialize map from constant name to enum constant
+            for (Rule rule : values()) {
+                stringToEnum.put(rule.toString(), rule);
+            }
+        }
+
+        /**
+         * Return Rule for string, or null if string is invalid.
+         *
+         * @param name rule name
+         * @return Rule
+         */
+        public static Rule fromString(String name) {
+            return stringToEnum.get(name);
         }
     }
 
@@ -493,6 +629,16 @@ public class ReportTemplateDocument {
         DIVIDE("/") {
             String apply(String lhs, String rhs) {
                 return String.format("%s %s %s", lhs, "/", rhs);
+            }
+        },
+        ASSIGN("=") {
+            String apply(String lhs, String rhs) {
+                return String.format("%s%s%s", lhs, "=", rhs);
+            }
+        },
+        COMMA(",") {
+            String apply(String lhs, String rhs) {
+                return String.format("%s%s%s", lhs, ",", rhs);
             }
         },
         GREATER_THAN("GT") {
