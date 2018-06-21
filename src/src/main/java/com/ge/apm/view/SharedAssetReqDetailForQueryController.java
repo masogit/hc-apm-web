@@ -220,6 +220,9 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
         if (unitPrice == null){
             return useTime;
         }
+        if ("维修借用".equals(chargingType)){
+            return 0.0;
+        }
         return number * unitPrice;
 
     }

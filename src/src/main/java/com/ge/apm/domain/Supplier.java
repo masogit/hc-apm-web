@@ -6,14 +6,14 @@ import com.ge.apm.service.utils.ChineseName;
 import com.ge.apm.service.utils.PinyinUtil;
 
 import java.io.Serializable;
+import java.util.UUID;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -31,6 +31,10 @@ public class Supplier implements Serializable, ChineseName {
     @Basic(optional = false)
     @Column(name = "id")
     private Integer id;
+    
+    @Column(columnDefinition = "CHAR(32)")
+    private String uid;
+    
     @Basic(optional = false)
     @NotNull
     @Column(name = "site_id")
@@ -70,6 +74,14 @@ public class Supplier implements Serializable, ChineseName {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
+    
+    
+    @PrePersist
+    public void initializeUid() {
+        if (uid == null) {
+            uid = UUID.randomUUID().toString().replace("-", "");
+        }
+    }
 
     public String getTenantUID() {
         return tenantUID;
@@ -186,6 +198,16 @@ public class Supplier implements Serializable, ChineseName {
     public void setSupplierType(String supplierType) {
         this.supplierType = supplierType;
     }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+    
+    
 
     @Override
     public int hashCode() {

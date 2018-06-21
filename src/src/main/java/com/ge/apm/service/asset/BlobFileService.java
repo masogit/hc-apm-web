@@ -12,6 +12,7 @@ import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.view.asset.AssetFileAttachmentController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.io.File;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -69,6 +70,8 @@ public class BlobFileService {
             blobObject.setObjectSize(Long.parseLong(String.valueOf(fileObject.get("objectSize"))));
             blobObject.setObjectStorageId((String) fileObject.get("objectId"));
             blobObject.setObjectType((String) fileObject.get("objectType"));
+            blobObject.setCreatedDate(new Date());
+            blobObject.setCreatedBy(UserContextService.getCurrentUserAccount().getUid());
             return blobDao.save(blobObject);
         } else {
             return null;
@@ -142,6 +145,10 @@ public class BlobFileService {
     
     public void saveBlobObject(V2_BlobObject blobObject){
         blobDao.save(blobObject);
+    }
+    
+    public void saveBlobObject(List<V2_BlobObject> blobObjects){
+        blobDao.save(blobObjects);
     }
 
     public StreamedContent getBlobObjectByStorageId(String storageId){

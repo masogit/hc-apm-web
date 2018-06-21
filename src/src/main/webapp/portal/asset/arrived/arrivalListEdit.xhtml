@@ -17,6 +17,8 @@
                         <h:panelGroup id="display">
                             <p:fieldset legend="到货单信息" id="arrivalListHeader">
 
+                                <p:commandLink value="选择订购合同"  process="@this" 
+                                               update=":ChoseContractForm" oncomplete="PF('ChoseContractDlg').show()" disabled="#{not empty assetArrivedListEditController.selected.id}" />
                                 <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" >
 
                                     <h:panelGroup>
@@ -38,13 +40,10 @@
                                             </p:scrollPanel>
                                         </p:overlayPanel>
                                     </h:panelGroup>
-                                    <!--                                <h:panelGroup>
-                                                                        <label class="label">#{msg.arrivalListName}</label>
-                                                                        <p:inputText value="#{assetArrivedListEditController.selected.name}" required="false" requiredMessage="#{msg.arrivalListName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
-                                                                    </h:panelGroup>-->
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetName}*</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"  />
+                                        <p:inputText value="#{assetArrivedListEditController.selected.assetName}" required="true" requiredMessage="#{msg.arrivalListAssetName} #{msg.ValidationRequire}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}"  
+                                                     />
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.assetGroup}*</label>
@@ -86,18 +85,10 @@
                                         <label class="label">#{msg.arrivalListContractPrice}#{assetArrivedListEditController.needInstorageCheck?'*':''}</label>
                                         <p:inputNumber  maxValue="99999999"  decimalPlaces="2" value="#{assetArrivedListEditController.selected.contractPrice}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" required="#{assetArrivedListEditController.needInstorageCheck}" requiredMessage="#{msg.arrivalListContractPrice}#{msg.ValidationRequire}"/>
                                     </h:panelGroup>
-<!--                                    <h:panelGroup>
-                                        <label class="label">#{msg.vendor}</label>
-                                        <p:selectOneMenu id="vendor" value="#{assetArrivedListEditController.supplier}" converter="supplierConverter" disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" autoWidth="false">
-                                            <p:ajax  listener="#{assetArrivedListEditController.onSupplierChange()}" process="@parent"/>
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItems value="#{supplierController.supplierList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>-->
                                     <h:panelGroup>
                                         <label class="label">#{msg.vendor}</label>
                                         <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.supplier}"  scrollHeight="300"  forceSelection="true" 
-                                        disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                        disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteVendor}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                             <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onSupplierChange}" />
                                             <p:ajax listener="#{assetArrivedListEditController.onSupplierChange}" />
                                         </p:autoComplete>
@@ -106,14 +97,10 @@
                                         <label class="label">#{msg.arrivalListAgent}</label>
                                         <p:inputText value="#{assetArrivedListEditController.selected.agent}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
                                     </h:panelGroup>
-                                    <!--                                <h:panelGroup>
-                                                                        <label class="label">#{msg.arrivalListClassCode}</label>
-                                                                        <p:inputText value="#{assetArrivedListEditController.selected.classCode}" readonly="#{assetArrivedListEditController.selected.status ne '1'}" />
-                                                                    </h:panelGroup>-->
                                     <h:panelGroup>
                                         <label class="label">#{msg.ArrivalProcessType}*</label>
                                         <p:selectOneMenu  value="#{assetArrivedListEditController.selected.processType}" required="true" requiredMessage="#{msg.ArrivalProcessType}#{msg.ValidationRequire}" disabled="#{assetArrivedListEditController.selected.status ne '1'}" >
-                                        	<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                             <f:selectItems value="#{fieldMsg.getFieldValueList('arrivalListProcessType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                         </p:selectOneMenu>
                                     </h:panelGroup>
@@ -167,13 +154,13 @@
                                     </h:panelGroup>
 
                                     <h:panelGroup>
-		                                <label class="label">#{msg.maitanance}</label>
-		                                <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.maitanance}" scrollHeight="300"  forceSelection="true" completeMethod="#{assetArrivedListEditController.autoCompleteMaintainer}"
-		                                                var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-		                                    <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onMaintainerChange}"/>
-		                                    <p:ajax listener="#{assetArrivedListEditController.onMaintainerChange}"/>
-		                                </p:autoComplete>
-		                            </h:panelGroup>
+                                        <label class="label">#{msg.maitanance}</label>
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.maitanance}" scrollHeight="300"  forceSelection="true" completeMethod="#{assetArrivedListEditController.autoCompleteMaintainer}"
+                                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onMaintainerChange}"/>
+                                            <p:ajax listener="#{assetArrivedListEditController.onMaintainerChange}"/>
+                                        </p:autoComplete>
+                                    </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.purchaseDate}</label>
                                         <p:calendar timeZone="GMT+8"  id="purchaseDate" pattern="yyyy/MM/dd" value="#{assetArrivedListEditController.easyInstallItem.purchaseDate}" maxdate="#{assetArrivedListEditController.easyInstallItem.arrivalList.arrivalDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
@@ -306,21 +293,6 @@
                                         </h:panelGroup>
                                     </p:panelGrid>
                                 </p:fieldset>
-                                <!--                                <p:fieldset legend="设备图片">
-                                                        <p:dataGrid id="pictureList0" var="fileitem" value="#{assetArrivedListEditController.getPicList()}" columns="5" layout="grid" emptyMessage="#{msg.noRecordFound}">
-                                                            <f:facet name="header">#{msg.addPic}</f:facet>
-                                                            <p:panel  style="text-align:center">
-                                                                <h:panelGrid columns="1" style="width:100%" >
-                                                                    <p:graphicImage url="#{fileDownloadService.getFileUrl(fileitem.objectStorageId)}" height="80"  width="100"/> 
-                                                                    <p:commandButton actionListener="#{assetArrivedListEditController.removeAttachmentById(fileitem.id)}" update="pictureList0" icon="ui-icon-clear"  title="#{msg.Delete}" class="popupIconButton" process="@this">
-                                                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteFileConformationMsg}" icon="ui-icon-warning"/>
-                                                                    </p:commandButton>   
-                                                                </h:panelGrid>
-                                                            </p:panel>
-                                                        </p:dataGrid>
-                                                        <p:fileUpload id="asset" fileUploadListener="#{assetArrivedListEditController.handleFileUpload}" mode="advanced" dragDropSupport="false" style="width:100%" 
-                                                                      multiple="true"  sizeLimit="10000000"  update="pictureList0" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
-                                                    </p:fieldset>-->
                                 <h:panelGroup>
                                     <p:commandButton value="#{msg.Save}" actionListener="#{assetArrivedListEditController.saveEasyItem()}"  update=":growl"/>
                                 </h:panelGroup>
@@ -376,5 +348,35 @@
                 <!--<ui:include src="easyInstallDlg.xhtml"/>-->
             </div>
         </div>
+
+        <p:dialog id="ChoseContractDlg" widgetVar="ChoseContractDlg" modal="true" width="800"  resizable="true" draggable="true" appendTo="@this" header="选择合同订购项">
+            <h:form id="ChoseContractForm" >
+                <h:panelGroup id="display">
+                    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label class="label">设备合同</label>
+                            <p:selectOneMenu value="#{assetArrivedListEditController.selectedContractId}">
+                                <p:ajax listener="#{assetArrivedListEditController.onContractChange()}" update="contractItem" />
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{assetArrivedListEditController.contractList}" var="item" itemLabel="#{item.name}/#{item.contractNum}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+
+                        <h:panelGroup>
+                            <label class="label">订购项*</label>
+                            <p:selectOneMenu id="contractItem" value="#{assetArrivedListEditController.selectedContractItemId}" required="true" requiredMessage="订购项 #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                <f:selectItems value="#{assetArrivedListEditController.contractItemList}" var="item" itemLabel="#{item.contractAssetName}/#{item.contractAssetQuantity}" itemValue="#{item.id}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p:commandButton id="saveButton" immediate="false" validateClient="true" actionListener="#{assetArrivedListEditController.finishChoseContractItem()}" value="#{msg.Confirm}" 
+                                         update=":AssetArrivalEditForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'ChoseContractDlg');"/>
+                        <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('ChoseContractDlg').hide()"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
     </ui:define>
 </ui:composition>

@@ -44,6 +44,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     public AssetInfo getByUid(String uid);
 
     public AssetInfo findByUid(String uid);
+    
+    @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and o.siteUID=?2")
+    public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
 
@@ -73,6 +76,12 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
 
     @Query("select a from AssetInfo a where a.isDeleted = false and a.serialNum = ?1 and a.tenantUID=?2 order by a.id desc ")
     public List<AssetInfo> findBySerialNumAndTenantUID(String serialNum, String tenantUID);
+
+    @Query("select a from AssetInfo a where a.isDeleted = false and a.financingNum = ?1 and a.siteUID=?2 and (a.measureGrade <> 4 or a.measureGrade is null) order by a.id desc ")
+    public List<AssetInfo> getByFinancingNumAndSiteUID(String financingNum, String siteUID);
+
+    @Query("select a from AssetInfo a where a.isDeleted = false and a.serialNum = ?1 and a.siteUID=?2 and (a.measureGrade <> 4 or a.measureGrade is null) order by a.id desc ")
+    public List<AssetInfo> getBySerialNumAndSiteUID(String serialNum, String siteUID);
 
     @Query(value = "select distinct a.name from asset_info a where a.tenant_uid=?1 and (a.name like concat('%',?2,'%') or a.name_py_code like concat('%',?2,'%'))order by a.name fetch first 20 rows only", nativeQuery = true)
     public List<String> findDistinctAssetNamesByPrefix(String tenantUID, String prefix);

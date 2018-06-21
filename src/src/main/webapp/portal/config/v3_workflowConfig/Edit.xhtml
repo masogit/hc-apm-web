@@ -39,6 +39,7 @@
                                 <label class="label">维修#{msg.dispatchUserName}</label>
                                 <p:selectOneMenu id="dispatchUserId" value="#{v2_WorkflowConfigController.selected.dispatchUserId}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName} #{msg.ValidationRequire}" >
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
@@ -47,75 +48,123 @@
                                 <label class="label">维修#{msg.dispatchUserName}2</label>
                                 <p:selectOneMenu id="dispatchUserId2" value="#{v2_WorkflowConfigController.selected.dispatchUserId2}"
                                                  required="false" requiredMessage="#{msg.dispatchUserName}2 #{msg.ValidationRequire}" >
+                                    <p:ajax process="@this" />
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{v2_WorkflowConfigController.dispatchUserList}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutDispatch}</label>
-                                <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
+                                <p:inputNumber id="timeoutDispatch" value="#{v2_WorkflowConfigController.selected.timeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">#{msg.timeoutAccept}</label>
-                                <p:inputNumber id="timeoutAccept" value="#{v2_WorkflowConfigController.selected.timeoutAccept}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="timeoutAccept" value="#{v2_WorkflowConfigController.selected.timeoutAccept}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.timeoutClose}</label>
-                                <p:inputNumber id="timeoutClose" value="#{v2_WorkflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="timeoutClose" value="#{v2_WorkflowConfigController.selected.timeoutClose}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.maxMessageCount}</label>
-                                <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="maxMessageCount" value="#{v2_WorkflowConfigController.selected.maxMessageCount}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup rendered="true">
                                 <label class = "label">系统自动验收(天)</label>
-                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="autoAckDays" value="#{v2_WorkflowConfigController.selected.autoAckDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否自动派工?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isAutoEnabled}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否允许抢单?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTakeOrderEnabled}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">
                                 <label class = "label">是否人工派工?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isManualEnabled}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
                                 <label class = "label">工单完工不需要验收?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoAck}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
                             <h:panelGroup >
                                 <label class = "label">工单完工自动关单?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.autoClose}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
 
                             <h:panelGroup rendered="true">
                                 <label class = "label">不允许临时账号?</label>
-                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}"/>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTempUserReport}">
+                                    <p:ajax process="@this" />
+                                </p:selectBooleanCheckbox>
                             </h:panelGroup >
+                            <h:panelGroup rendered="true">
+                                <label class = "label">是否电话报修?</label>
+                                <p:selectBooleanCheckbox value="#{v2_WorkflowConfigController.selected.isTelReport}">
+                                    <p:ajax process="@this" update="V2_WorkflowConfigEditForm:wo" />
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup >
+                            <h:panelGroup id="telStart" rendered="#{!!v2_WorkflowConfigController.selected.isTelReport}">
+                                <label class = "label">电话报修开始时间</label>
+                                <p:calendar value="#{v2_WorkflowConfigController.telRepStart}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup >
+                            <h:panelGroup id="telEnd" rendered="#{!!v2_WorkflowConfigController.selected.isTelReport}">
+                                <label class = "label">电话报修结束时间</label>
+                                <p:calendar value="#{v2_WorkflowConfigController.telRepEnd}" required="true" pattern="HH:mm:ss" timeOnly="true" showOn="button" showButtonPanel="true" navigator="true" mask="true" />
+                            </h:panelGroup >
+
                             <h:panelGroup>
                                 <label class="label">工单人工费用(元/小时)</label>
-                                <p:inputNumber id="woManHourPrice" value="#{v2_WorkflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="woManHourPrice" value="#{v2_WorkflowConfigController.selected.woManhourPrice}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <!-- 紧急工单配置-->
                             <h:panelGroup>
                                 <label class="label">紧急工单#{msg.timeoutDispatch}</label>
-                                <p:inputNumber id="emergencyTimeoutDispatch" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000"/>
+                                <p:inputNumber id="emergencyTimeoutDispatch" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutDispatch}" minValue="0" decimalPlaces="0" maxlength="1000">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup >
                                 <label class="label">紧急工单#{msg.timeoutAccept}</label>
-                                <p:inputNumber id="emergencyTimeoutAccept" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="emergencyTimeoutAccept" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutAccept}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">紧急工单#{msg.timeoutClose}</label>
-                                <p:inputNumber id="emergencyTimeoutClose" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="emergencyTimeoutClose" value="#{v2_WorkflowConfigController.selected.emergencyTimeoutClose}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">紧急工单#{msg.maxMessageCount}</label>
-                                <p:inputNumber id="emergencyMaxMessageCount" value="#{v2_WorkflowConfigController.selected.emergencyMaxMessageCount}" minValue="0" decimalPlaces="0"/>
+                                <p:inputNumber id="emergencyMaxMessageCount" value="#{v2_WorkflowConfigController.selected.emergencyMaxMessageCount}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
                             </h:panelGroup>
                         </p:panelGrid>
                     </p:fieldset>
@@ -189,6 +238,18 @@
                                 <label class = "label">维保提醒次数</label>
                                 <p:inputNumber id="warrantyRemindTimes" value="#{v2_WorkflowConfigController.selected.warrantyRemindTimes}" minValue="0" decimalPlaces="0">
                                     <p:ajax process="@this" />  
+                                </p:inputNumber>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class = "label">计量提醒提前天数</label>
+                                <p:inputNumber id="measuringRemindDays" value="#{v2_WorkflowConfigController.selected.measuringRemindDays}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
+                                </p:inputNumber>
+                            </h:panelGroup >
+                            <h:panelGroup>
+                                <label class = "label">计量提醒次数</label>
+                                <p:inputNumber id="measuringReminderTimes" value="#{v2_WorkflowConfigController.selected.measuringReminderTimes}" minValue="0" decimalPlaces="0">
+                                    <p:ajax process="@this" />
                                 </p:inputNumber>
                             </h:panelGroup >
                             <h:panelGroup rendered="true">

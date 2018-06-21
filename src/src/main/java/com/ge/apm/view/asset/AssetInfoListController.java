@@ -279,7 +279,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
             List<AssetInfo> assetList = getExportList();
 
-            ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
+            ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, exportFields);
 
             excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }

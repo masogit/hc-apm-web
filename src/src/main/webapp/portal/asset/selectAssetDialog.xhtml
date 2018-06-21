@@ -7,9 +7,9 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="selectAssetDlg" widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" appendTo="@this" width="80%" showHeader="false">
+        <p:dialog id="selectAssetDlg"  widgetVar="varSelectAssetDlg" modal="true" resizable="true" draggable="true" header="#{msg.selectAsset}" appendTo="@(body)" width="80%" showHeader="false">
             <h:form id="selectAssetForm" rendered="#{selectAssetController.showDialog}">
-                <p:tabView style="height:460px; overflow: auto;">
+                <p:tabView style="height:460px; overflow: scroll;">
                     <p:tab title="#{msg.searchAssetByDept}">
                         <p:scrollPanel style="width:98%;height:400px;border: 0" mode="native">
                             <p:tree id="assetTree" class="tree" style="border:0;" value="#{selectAssetController.orgAssetTree}" var="node" dynamic="true" cache="true" selectionMode="single" selection="#{selectAssetController.selectedNode}" highlight="true">

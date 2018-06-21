@@ -2,28 +2,44 @@
  */
 package com.ge.apm.domain;
 
-import com.alibaba.druid.util.StringUtils;
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import com.ge.apm.service.utils.PinyinUtil;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+
 import org.springframework.data.annotation.CreatedBy;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Optional;
-import java.util.UUID;
+import com.alibaba.druid.util.StringUtils;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.PinyinUtil;
 
 /**
  * @author 212547631
  */
 @Entity
 @Table(name = "asset_info")
-public class AssetInfo implements Serializable {
+public class AssetInfo implements ChineseName,Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -1466,5 +1482,9 @@ public class AssetInfo implements Serializable {
     public String toString() {
         return name;
     }
+    
+    public String getPinYin() {
+		return getNamePyCode();
+	}
 
 }

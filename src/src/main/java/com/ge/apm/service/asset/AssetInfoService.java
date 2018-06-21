@@ -8,8 +8,10 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.AssetContractRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.domain.AssetContract;
 import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
@@ -39,6 +41,7 @@ public class AssetInfoService {
 
     AssetInfoRepository assetInfoDao = WebUtil.getBean(AssetInfoRepository.class);
     AssetContractRepository contractDao = WebUtil.getBean(AssetContractRepository.class);
+    ContractInfoItemRepository contractItemDao = WebUtil.getBean(ContractInfoItemRepository.class);
     OrgInfoRepository orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
     UaaService uaaService = WebUtil.getBean(UaaService.class);
@@ -71,8 +74,9 @@ public class AssetInfoService {
         return assetList;
     }
 
-    public List<AssetContract> getContractList(Integer assetId) {
-        return contractDao.findByAssetId(assetId);
+    public List<ContractInfoItem> getContractList(String assetUid) {
+//        return contractDao.findByAssetId(assetId);
+            return contractItemDao.findByAssetUid(assetUid);
     }
 
     public List<OrgInfo> getHospitalList() {

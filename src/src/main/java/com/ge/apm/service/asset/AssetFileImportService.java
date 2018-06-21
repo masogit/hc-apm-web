@@ -9,6 +9,7 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
+import com.ge.apm.service.common.CustomConfigConstant;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -28,6 +29,7 @@ import java.io.InputStream;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -260,8 +262,8 @@ public class AssetFileImportService {
                     //only new asset need to set this
                     asset.setUsageStatus(3); //已建档
 
-                    boolean isNeedApprover = configService.isNeedAssetApprover(selectedOrgToImport.getSiteUID());
-                    if(isNeedApprover){
+                    boolean isNeedAudit = configService.isAssetNeedAudit(selectedOrgToImport.getSiteUID());
+                    if(isNeedAudit){
                         asset.setUsageStatus(2); //待审核
                     }
 
@@ -828,7 +830,7 @@ public class AssetFileImportService {
      * @return
      * @throws IOException
      */
-    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, boolean allColumns) throws IOException {
+    public ExcelDocument exportAsset(List<AssetInfo> assetList, List<OrgInfo> sites, List<OrgInfo> clinicalDeptList, List<String> exportFields) throws IOException {
 
         InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
         ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
@@ -836,13 +838,21 @@ public class AssetFileImportService {
         doc.writeCellData(AssetFileImportService.SHEET_ASSET, 2, 3, AssetFileImportService.EXCEL_ASSET_TEMPLATE_VERSION);
         //remove fake data row
         doc.clearRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_DATA_ROW);
-
+        
         String[] columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
+        List<String> fields = Arrays.asList(columnKeys).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) || 
+                exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
+        doc.clearRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
+        for(int i=0;i<fields.size();i++){
+            doc.writeCellData(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, i+1, fields.get(i));
+        }
+        
+        columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
 
         int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this);
-            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(allColumns);
+            Map<String, Object> rowMap = formatter.buildExcelColumnKeyValueMap(true);
 
             doc.writeRowData(AssetFileImportService.SHEET_ASSET, columnKeys, startRow, rowMap);
 

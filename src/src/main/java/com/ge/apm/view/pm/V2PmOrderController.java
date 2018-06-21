@@ -117,6 +117,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         this.head = head;
     }
 
+    public void arrivalTimeSet(){
+        if(itemDetail==null)return;
+        if(itemDetail.getArrived()==true)
+            itemDetail.setArrivedTime(new Date());
+        else{
+            itemDetail.setArrivedTime(null);
+        }
+    }
 
     public void handleToggle(ToggleEvent event) {
         //折叠保养清单后向前台传递的消息
@@ -133,7 +141,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             newReport.setBoType("pm-performance-report");
         if(tbd.getBaseId().equalsIgnoreCase(pmOrderRule.getSafetyReport()))
             newReport.setBoType("pm-safety-report");
-        reportDao.save(newReport);
+        pmOrderService.saveReport(newReport);
     }
     public List<ServiceRequestMsg> getServiceRequestMessageList(String pmOrderId) {
         return selected == null ? null : pmOrderService.getServiceRequestMessageList(pmOrderId);
@@ -158,24 +166,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     //是否全是批量完成
-    public boolean isPiliangWanChen() {
+    public boolean isBatchComplete() {
         //System.out.println(result);
         boolean mark =false;
-        List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
+        List<V2_PmOrder> pmList = new ArrayList<V2_PmOrder>();
         //选中的保养工单中是否都是批量接单货或批量完成
         selectedMap.forEach((k,v)->{
             result.getContent().stream().forEach(item->{
                if(item.getId()==k && v==true)
-                x3.add(item);
+                   pmList.add(item);
             });
         });
         //x3存放的是所选中pm工单
-        if(x3.size()>0)
-            mark= x3.stream().allMatch(item->item.getSimplify().equals(true));
+        if(pmList.size()>0)
+            mark= pmList.stream().allMatch(item->item.getSimplify().equals(true));
         return mark;
     }
 
-    public boolean isPiliangJiedan() {
+    public boolean isBatchTakePm() {
        // System.out.println(result);
         boolean mark =true;
         List<V2_PmOrder> x3 = new ArrayList<V2_PmOrder>();
@@ -213,7 +221,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     UnstructuredData untest;
     public void hmCheckSet(String key)throws Exception{
         //临时用hmCheck1  因为hmCheck的value 是String ?
-        System.out.println(key);
         untest = (UnstructuredData) hmCheck.get(key);
     }
     private String qaStatus="0";
@@ -256,7 +263,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     }
                 }
                 unColl.setData(unD);
-                reportDao.save(unColl);
+                pmOrderService.saveReport(unColl);
             }else{ //更新已经有的检查项
                 //清空原来的unstructuredDataList
                 unDataCollection.get(0).setData(new ArrayList<UnstructuredData>());
@@ -265,7 +272,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                     untest = entry.getValue();
                     unDataCollection.get(0).getData().add(untest);
                 }
-                reportDao.save(unDataCollection);
+                pmOrderService.saveReport(unDataCollection);
             }
           //  WebUtil.addSuccessMessage("保存检查项操作成功");
         }catch(Exception ex){
@@ -372,7 +379,14 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             formData.setRuleLevel(ruleLevel);
             formData.setAttachments(picList);
             formData.setPmType(pmType);
-            pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
+            Map<String, Object> res =  pmOrderService.createPMrequestApi(selectedAsset.getUid(),formData);
+            if(res!=null && res.get("bizStatusCode")!=null) {
+                if (res.get("bizStatusCode").equals("INVALID_PARAM")) {
+                    WebUtil.addErrorMessage(res.get("message").toString());
+                    RequestContext requestContext = RequestContext.getCurrentInstance();
+                    requestContext.addCallbackParam("invalidParam", true);
+                }
+            }
             cancel();
         }
     }

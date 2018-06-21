@@ -33,5 +33,11 @@ public interface AssetTagMsgSubscriberRepository extends GenericRepository<Asset
     ////有没有tagId 和subscriber 并且 mode is 0 ,1 ,2的
     @Query(value = "select * from Asset_Tag_Msg_Subscriber where tag_id=?1 and subscribe_user_id=?2 and (receive_msg_mode = 0 or receive_msg_mode = 1 or receive_msg_mode = 2)",nativeQuery = true)
     public List<AssetTagMsgSubscriber> getTagUserMode012(Integer tagId,Integer userId);
+
+
+    @Query(value = "select * from Asset_Tag_Msg_Subscriber where tag_id=?1 and subscribe_user_id=?2 and receive_msg_mode = ?3",nativeQuery = true)
+    public List<AssetTagMsgSubscriber> getTagUserMode3EE(Integer tagId,Integer userId,Integer direct);
+
+
 }
 

@@ -15,7 +15,7 @@
                                       dragDropSupport="false" multiple="false" auto="true"
                                       invalidFileMessage="只支持xls或xlsx格式的文件"
                                       invalidSizeMessage="文件大小不得超过5M"
-                                      update=":measuringTab:dataListForm, :measuringTab:measuringResultListForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
+                                      update=":measuringTab:dataListForm, :measuringTab:measuringResultForm" sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/"
                                       label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传"/>
                         <p:growl id="messages" showDetail="true"/>
                     </p:panelGrid>
@@ -31,7 +31,7 @@
 
         <div class="ui-g-12 card">
             <h:form id="dataListForm">
-                <p:fieldset  legend="导入失败数据(设备序列号SN和资产编号不能全为空并且需要匹配到设备台账,检定日期不能为空)">
+                <p:fieldset  legend="导入失败数据">
                     <p:dataTable id="datalist" rendered="#{not empty measureFromExcelController.noFoundList}" value="#{measureFromExcelController.noFoundList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
                                  currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
@@ -67,13 +67,13 @@
                             <h:outputText value="#{item.statusDisplay}" />
                         </p:column>
                         <p:column headerText="检定日期">
-                            <h:outputText value="#{item.checkDate}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <h:outputText value="#{item.checkDateDisplay}">
+                                <!--<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
                             </h:outputText>
                         </p:column>
                         <p:column headerText="有效期至">
-                            <h:outputText value="#{item.validDateTo}">
-                                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
+                            <h:outputText value="#{item.validDateToDisplay}">
+                                <!--<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />-->
                             </h:outputText>
                         </p:column>
                         <p:column headerText="检测单位">
@@ -90,6 +90,12 @@
                         </p:column>
                         <p:column headerText="送检单位">
                             <h:outputText value="#{item.department}" />
+                        </p:column>
+                        <p:column headerText="存档记录">
+                            <h:outputText value="#{item.fileNo}" />
+                        </p:column>
+                        <p:column headerText="导入失败信息">
+                            <h:outputText value="#{item.errorInfo}" />
                         </p:column>
                         <!--<p:column headerText="备注">
                             <h:outputText value="#{item.comments}" />

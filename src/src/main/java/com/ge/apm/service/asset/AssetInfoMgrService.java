@@ -7,11 +7,14 @@ package com.ge.apm.service.asset;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.ServiceRequestRepository;
+import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.V2_PmOrderRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.service.common.ConfigService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,6 +45,11 @@ public class AssetInfoMgrService {
     private V2_PmOrderRepository pmDao;
     @Autowired
     private QrCodeService qrCodeService;
+    @Autowired
+    private SupplierRepository supplierDao;
+    @Autowired
+    private ConfigService configService;
+    
 
     public void deleteAsset(AssetInfo asset) {
         List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
@@ -143,6 +151,18 @@ public class AssetInfoMgrService {
             rootNode.getChildren().add(res);
         }
         return rootNode;
+    }
+    
+    public List<Supplier> getSuplierListBySiteUid(String tenantUid, String siteUid){
+        if(configService.isInsulateTenant(tenantUid)){
+            return supplierDao.getBySiteUID(siteUid);
+        }else{
+            return supplierDao.getByTenantUID(tenantUid);
+        }
+    }
+    
+    public AssetInfo getAssetInfoByUid(String assetUid){
+        return assetDao.findByUid(assetUid);
     }
 
 }

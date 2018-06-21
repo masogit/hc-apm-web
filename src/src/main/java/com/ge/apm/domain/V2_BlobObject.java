@@ -5,6 +5,7 @@ import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.Date;
 import org.hibernate.annotations.JoinColumnOrFormula;
 import org.hibernate.annotations.JoinColumnsOrFormulas;
 import org.hibernate.annotations.JoinFormula;
@@ -31,6 +32,7 @@ public class V2_BlobObject implements Serializable {
     public static final String BO_TYPE_TableDefinition = "TableDefinition";
     public static final String BO_SUB_TYPE_DOCS = "Docs";
     public static final String BO_SUB_TYPE_IMG = "Image";
+    public static final String BO_SUB_TYPE_AssetInfo_Measuring = "Measuring";
 
 
 
@@ -67,6 +69,18 @@ public class V2_BlobObject implements Serializable {
     @Column(name = "object_source")
     private V2_BlobObject_Source objectSource = V2_BlobObject_Source.STORED_IN_DB;
 
+    @Column(name = "created_by", nullable = true, length = 50)
+    private String createdBy;
+
+    @Column(name = "created_date", nullable = true)
+    private Date createdDate;
+
+    @Column(name = "last_modified_by", nullable = true, length = 50)
+    private String lastModifiedBy;
+
+    @Column(name = "last_modified_date", nullable = true)
+    private Date lastModifiedDate;
+    
     @JoinColumn(insertable=false,updatable=false, name = "bo_uuid", referencedColumnName = "uid",nullable = true)
     @ManyToOne(optional = true, fetch = FetchType.EAGER)
     @JsonBackReference
@@ -158,6 +172,38 @@ public class V2_BlobObject implements Serializable {
 
     public void setAssetInfo(AssetInfo assetInfo) {
         this.assetInfo = assetInfo;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public String getLastModifiedBy() {
+        return lastModifiedBy;
+    }
+
+    public void setLastModifiedBy(String lastModifiedBy) {
+        this.lastModifiedBy = lastModifiedBy;
+    }
+
+    public Date getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(Date lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     @Override

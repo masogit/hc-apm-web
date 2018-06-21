@@ -262,10 +262,15 @@
                                             <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
                                         </h:outputText>
                                     </p:column>
+                                    <p:column headerText="到货确认时间">
+                                        <h:outputText value="#{detailItem.arrivedTime}">
+                                            <f:convertDateTime pattern="yyyy-MM-dd HH:mm"/>
+                                        </h:outputText>
+                                    </p:column>
                                     <p:column headerText="到货">
                                         <h:outputText value="#{detailItem.arrived?'已到货':'未到货'}" />
                                     </p:column>
-
+T
                                 </p:dataTable>
                             </h:panelGroup>
 
