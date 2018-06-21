@@ -260,6 +260,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
             allItemList.stream().filter(item -> null != item.getAssetInfo()).forEach(item -> udpateAssetInfoWarranty(item.getAssetInfo()));
         }
 
+        allItemList = contractService.getContractItems(selected.getId());
         WebUtil.addSuccessMessage(WebUtil.getMessage("DataSavedOK"));
     }
 

@@ -52,7 +52,7 @@
                                 <label class="label">#{msg.vendor}</label>
                                 <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['supplier']}"  scrollHeight="300"  forceSelection="true" 
                                                 completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
+                                    <p:ajax event="itemSelect" process="@this" listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
                                     <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
                                 </p:autoComplete>
                             </h:panelGroup>
