@@ -43,9 +43,9 @@
                                   filterMatchMode="EQ">
                             <h:outputText value="#{workOrderExportTemplateController.getSiteNameByUId(item.siteUID)}"/>
                         </p:column>
-                        <p:column headerText="模板文件" sortBy="#{item.file}" filterBy="#{item.siteUID}"
+                        <p:column headerText="模板文件" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
-                            <h:outputText value="#{workOrderExportTemplateController.getSiteNameByUId(item.siteUID)}"/>
+                            <h:outputText value="#{item.fileName}"/>
                         </p:column>
 
                         <f:facet name="{Toolbar}">

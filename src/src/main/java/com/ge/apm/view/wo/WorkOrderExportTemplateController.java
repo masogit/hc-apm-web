@@ -1,10 +1,8 @@
 package com.ge.apm.view.wo;
 
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TenantInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
-import com.ge.apm.dao.WorkflowConfigRepository;
+import com.ge.apm.dao.WorkOrderExportTemplateRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
@@ -12,8 +10,6 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
-import com.ge.apm.view.sysutil.UserInfo;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -26,33 +22,27 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
-import webapp.framework.web.mvc.JpaCRUDController;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * @author 212688574
+ */
 @ManagedBean
 @ViewScoped
-public class WorkOrderExportTemplateController extends JpaCRUDController<WorkflowConfig> {
-
+public class WorkOrderExportTemplateController extends GenericCRUDUUIDController<WorkOrderExportTemplate> {
 
     protected static final Logger logger = Logger.getLogger(WorkOrderExportTemplate.class);
 
     private static final long serialVersionUID = 1L;
-    private WorkflowConfigRepository dao = null;
-    private UserAccountRepository userDao;
+    private WorkOrderExportTemplateRepository dao = null;
     private UserAccount user;
-    private UserAccount owner;
-    private List<UserAccount> dispatchUserList = new ArrayList<UserAccount>();
-    private List<UserInfo> userList;
-    private List<V2_DeviceType> deviceTypeList;
-    private List<OrgInfo> institutionList;
-    private List<OrgInfo> hospitalList;
-    private List<OrgInfo> siteList;
     private OrgInfoRepository orgInfoRepository;
     private TenantInfoRepository tenantInfoRepository;
     private Boolean isInsulate;
@@ -74,8 +64,7 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
     @Override
     protected void init() {
         user = UserContextService.getCurrentUserAccount();
-        dao = WebUtil.getBean(WorkflowConfigRepository.class);
-        userDao = WebUtil.getBean(UserAccountRepository.class);
+        dao = WebUtil.getBean(WorkOrderExportTemplateRepository.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
@@ -86,7 +75,6 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
         setTenantUid(user.getTenantUID());
         blobService = WebUtil.getBean(BlobFileService.class);
     }
-
 
     public void uploadDataFile(FileUploadEvent event) {
         ExcelDocument doc = null;
@@ -163,16 +151,8 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
         return userCommonService.getIncludeOrgInfo(isInsulate, loginUserOrgType, uid, parentUID, orgType);
     }
 
-    public List<UserInfo> getUserList() {
-        return userList;
-    }
-
-    public void setUserList(List<UserInfo> userList) {
-        this.userList = userList;
-    }
-
     @Override
-    protected WorkflowConfigRepository getDAO() {
+    protected WorkOrderExportTemplateRepository getDAO() {
         return dao;
     }
 
@@ -222,29 +202,13 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
     }
 
     @Override
-    protected Page<WorkflowConfig> loadData(PageRequest pageRequest) {
+    protected Page<WorkOrderExportTemplate> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate, loginUserOrgType);
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
-    public void onOwnerChange() {
-        if (null != owner) {
-            selected.setDispatchUserId(owner.getId());
-            selected.setDispatchUserName(owner.getName());
-        }
-    }
-
-    public String getTypeName(Integer deviceType) {
-        for (V2_DeviceType dt : deviceTypeList) {
-            if (dt.getId().equals(deviceType)) {
-                return dt.getName();
-            }
-        }
-        return null;
-    }
-
     @Override
-    public List<WorkflowConfig> getItemList() {
+    public List<WorkOrderExportTemplate> getItemList() {
         return dao.find();
     }
 
@@ -256,70 +220,22 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
         this.user = user;
     }
 
-    public List<UserAccount> getDispatchUserList() {
-        return dispatchUserList;
-    }
-
-    public void setDispatchUserList(List<UserAccount> dispatchUserList) {
-        this.dispatchUserList = dispatchUserList;
-    }
-
     @Transactional
     @Override
-    public void onBeforeSave(WorkflowConfig config) {
+    public void onBeforeSave(WorkOrderExportTemplate config) {
         selected.setTenantUID(selectedUserOrg.getTenantUID());
-        selected.setSiteId(user.getSiteId());
-        selected.setHospitalId(user.getHospitalId());
         selected.setInstitutionUID(selectedUserOrg.getInstitutionUID());
         selected.setHospitalUID(selectedUserOrg.getHospitalUID());
         selected.setSiteUID(selectedUserOrg.getSiteUID());
-        int orgType = selectedUserOrg.getOrgType();
-        if (orgType == 0) {
-            selected.setAssetSeriaNumLevel(4);//租户级别
-        } else if (orgType == 1) {
-            selected.setAssetSeriaNumLevel(3);//集团级别
-        } else if (orgType == 2) {
-            selected.setAssetSeriaNumLevel(2);//医院级别
-        } else if (orgType == 3) {
-            selected.setAssetSeriaNumLevel(1);//科室级别
-        }
+        selected.setCreateTime(new Date());
+        selected.setCreatorId(user.getUid());
+        selected.setCreatorName(user.getName());
+        selected.setFileName(file.getFileName());
 
-        UserAccountRepository uaDao = WebUtil.getBean(UserAccountRepository.class);
-        if (selected.getDispatchUserId() != null) {
-            UserAccount dispatcher1 = uaDao.getById(config.getDispatchUserId());
-            if (dispatcher1 != null) {
-                selected.setDispatchUserName(dispatcher1.getName());
-            }
-        } else {
-            selected.setDispatchUserName(null);
-        }
-        if (selected.getDispatchUserId2() != null) {
-            UserAccount dispatcher2 = uaDao.getById(config.getDispatchUserId2());
-            if (dispatcher2 != null) {
-                selected.setDispatchUserName2(dispatcher2.getName());
-            }
-        } else {
-            selected.setDispatchUserName2(null);
-        }
-
-        //pm
-        if (selected.getPmDispatchUserId() != null) {
-            UserAccount pmDispatcher1 = uaDao.getById(config.getPmDispatchUserId());
-            if (pmDispatcher1 != null) {
-                selected.setPmDispatchUserName(pmDispatcher1.getName());
-            }
-        } else {
-            selected.setPmDispatchUserName(null);
-        }
-        if (selected.getPmDispatchUserId2() != null) {
-            UserAccount pmDispatcher2 = uaDao.getById(config.getPmDispatchUserId2());
-            if (pmDispatcher2 != null) {
-                selected.setPmDispatchUserName2(pmDispatcher2.getName());
-            }
-        } else {
-            selected.setPmDispatchUserName2(null);
-        }
-
+        uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_WORKORDER_EXPORT_TEMPLATE);
+        uploadedFileObject.setBoSubType("Excel");
+        uploadedFileObject.setBoUuid(selected.getId());
+        blobService.saveBlobObject(uploadedFileObject);
     }
 
     @Transactional
@@ -329,56 +245,9 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
             WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
             return;
         }
-        Boolean isManual = selected.getIsManualEnabled();
-        Boolean isTakeOrder = selected.getIsTakeOrderEnabled();
-        Boolean isPmManual = selected.getIsPmManualEnabled();
-        Boolean isPmTakeOrder = selected.getIsPmTakeOrderEnabled();
-
-        if (isManual != null && isManual) {
-            if (selected.getDispatchUserId() == null && selected.getDispatchUserId2() == null) {
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage(WebUtil.getMessage("WoNeedDispather"));
-                return;
-            }
-        }
-        if (isPmManual != null && isPmManual) {
-            if (selected.getPmDispatchUserId() == null && selected.getPmDispatchUserId2() == null) {
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage(WebUtil.getMessage("PmNeedDispather"));
-                return;
-            }
-        }
-
-
-        if (isManual != null && isTakeOrder != null && !isManual && !isTakeOrder) {
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage(WebUtil.getMessage("WoManualAndGrapMsg"));
-            return;
-        }
-
-        if (selected.getGenerateMethod() != null && selected.getGenerateMethod() == 1) {
-            if (StringUtils.isEmpty(selected.getPrefix())) {
-                RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
-                return;
-            } else {
-                List<WorkflowConfig> prefixList = dao.findAllPrefixByTenantUID(user.getTenantUID());
-                if (CollectionUtils.isNotEmpty(prefixList)) {
-                    for (WorkflowConfig temp : prefixList) {
-                        if ((!temp.equals(selected)) && temp.getPrefix().equals(selected.getPrefix())) {
-                            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-                            WebUtil.addErrorMessage(WebUtil.getMessage("prefixExistsAlready"));
-                            return;
-                        }
-                    }
-                }
-            }
-
-        }
 
         onBeforeSave(selected);
 
-        dao.deleteBySiteUID(selected.getSiteUID());
         super.save();
         selectedUserOrg = null;
     }
@@ -387,7 +256,6 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
     public void delete() {
         super.delete();
         selectedUserOrg = null;
-        dispatchUserList.clear();
     }
 
     @Override
@@ -397,59 +265,15 @@ public class WorkOrderExportTemplateController extends JpaCRUDController<Workflo
     }
 
     @Override
-    public void prepareCreate() {
+    public void prepareCreate() throws IllegalAccessException, InstantiationException {
         selectedUserOrg = null;
-        try {
-            super.prepareCreate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        super.prepareCreate();
     }
 
     public void onSelect() {
         if (selected != null && selected.getId() != null) {
             selected = dao.findById(selected.getId());
         }
-    }
-
-    public UserAccount getOwner() {
-        return owner;
-    }
-
-    public void setOwner(UserAccount owner) {
-        this.owner = owner;
-    }
-
-    public List<V2_DeviceType> getDeviceTypeList() {
-        return deviceTypeList;
-    }
-
-    public void setDeviceTypeList(List<V2_DeviceType> deviceTypeList) {
-        this.deviceTypeList = deviceTypeList;
-    }
-
-    public List<OrgInfo> getInstitutionList() {
-        return institutionList;
-    }
-
-    public void setInstitutionList(List<OrgInfo> institutionList) {
-        this.institutionList = institutionList;
-    }
-
-    public List<OrgInfo> getHospitalList() {
-        return hospitalList;
-    }
-
-    public void setHospitalList(List<OrgInfo> hospitalList) {
-        this.hospitalList = hospitalList;
-    }
-
-    public List<OrgInfo> getSiteList() {
-        return siteList;
-    }
-
-    public void setSiteList(List<OrgInfo> siteList) {
-        this.siteList = siteList;
     }
 
     public OrgInfo getSelectedUserOrg() {
