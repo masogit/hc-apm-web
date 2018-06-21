@@ -20,19 +20,19 @@ public class WorkOrderExportTemplate implements Serializable {
     @Id
     @GeneratedValue(generator = "uuid")
     @GenericGenerator(name = "uuid", strategy = "uuid")
-    @Column(name="id")
+    @Column(name = "id")
     private String id;
 
-    @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
+    @Column(name = "tenant_uid", columnDefinition = "CHAR(32)")
     private String tenantUID;
 
-    @Column(name="institution_uid",columnDefinition = "CHAR(32)")
+    @Column(name = "institution_uid", columnDefinition = "CHAR(32)")
     private String institutionUID;
 
-    @Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+    @Column(name = "hospital_uid", columnDefinition = "CHAR(32)")
     private String hospitalUID;
 
-    @Column(name="site_uid",columnDefinition = "CHAR(32)")
+    @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
 
     @Column(name = "file_name", columnDefinition = "CHAR(64)")
@@ -143,8 +143,16 @@ public class WorkOrderExportTemplate implements Serializable {
         this.createTime = createTime;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 0;
+        hash += (id != null ? id.hashCode() : 0);
+        return hash;
+    }
+
     /**
      * Warning: this method won't work in the case the id fields are not set
+     *
      * @param object compare target
      * @return true if the object has the same id
      */
