@@ -1865,6 +1865,7 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
         this.excelFile = excelFile;
     }
 
+    @Deprecated
     public void exportExcel() throws IOException {
 
         //非设备科的人导出的时候，导出部分数据
@@ -1894,7 +1895,8 @@ public class AssetInfoController extends JpaCRUDController<AssetInfo> {
             }).collect(Collectors.toList());
         }
 
-        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, allColumns);
+        //不可用
+        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, Collections.EMPTY_LIST);
 
         DefaultStreamedContent streamedContent = new DefaultStreamedContent(doc.getStream());
         streamedContent.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");

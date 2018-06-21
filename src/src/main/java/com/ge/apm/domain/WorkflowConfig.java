@@ -1,13 +1,8 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import java.util.Date;
+import javax.persistence.*;
 
 /**
  *
@@ -150,6 +145,14 @@ public class WorkflowConfig implements Serializable {
     @Column(name = "need_instorage_check")
     private Boolean needInstorageCheck;//到货安装是否需要核对入库 null=false
 
+    @Column(name = "is_tel_report")
+    private Boolean isTelReport; // 电话报修
+
+    @Column(name = "tel_report_start")
+    private String telReportStart;
+    @Column(name = "tel_report_end")
+    private String telReportEnd;
+
     /***
      * 资产编码配置
      */
@@ -188,6 +191,15 @@ public class WorkflowConfig implements Serializable {
 
     @Column(name="emergency_max_message_count")
     private Integer emergencyMaxMessageCount;//推送消息的次数上限
+
+    /***
+     * 计量提醒配置
+     */
+    @Column(name="measuring_remind_days")
+    private Integer measuringRemindDays;//计量提前通知时间，单位：天
+
+    @Column(name = "measuring_reminder_times")
+    private Integer measuringReminderTimes;//提醒次数
 
     public Integer getEmergencyTimeoutDispatch() {
         return emergencyTimeoutDispatch;
@@ -613,6 +625,46 @@ public class WorkflowConfig implements Serializable {
 
     public void setPmManhourPrice(Double pmManhourPrice) {
         this.pmManhourPrice = pmManhourPrice;
+    }
+
+    public Boolean getIsTelReport() {
+        return isTelReport;
+    }
+
+    public void setIsTelReport(Boolean telReport) {
+        isTelReport = telReport;
+    }
+
+    public String getTelReportStart() {
+        return telReportStart;
+    }
+
+    public void setTelReportStart(String telReportStart) {
+        this.telReportStart = telReportStart;
+    }
+
+    public String getTelReportEnd() {
+        return telReportEnd;
+    }
+
+    public void setTelReportEnd(String telReportEnd) {
+        this.telReportEnd = telReportEnd;
+    }
+
+    public Integer getMeasuringRemindDays() {
+        return measuringRemindDays;
+    }
+
+    public void setMeasuringRemindDays(Integer measuringRemindDays) {
+        this.measuringRemindDays = measuringRemindDays;
+    }
+
+    public Integer getMeasuringReminderTimes() {
+        return measuringReminderTimes;
+    }
+
+    public void setMeasuringReminderTimes(Integer measuringReminderTimes) {
+        this.measuringReminderTimes = measuringReminderTimes;
     }
 
     @Override

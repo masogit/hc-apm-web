@@ -1,0 +1,184 @@
+{
+  "groups": [
+    {
+      "items": [
+        {
+          "component": "Text",
+          "exp": {},
+          "key": "1",
+          "label": "电压",
+          "ref": ""
+        }
+      ],
+      "title": "文本输入"
+    },
+    {
+      "items": [
+        {
+          "component": "Number",
+          "exp": {
+            "maxCompare": "LT",
+            "minCompare": "GE",
+            "max": "300",
+            "rule": "RangeRule",
+            "resIdentify": "resIdentify_1"
+          },
+          "key": "Ixyy1",
+          "label": "保护接地电阻(单台设备包含电源线）",
+          "ref": "",
+          "resKey": "Ixyy1_res"
+        },
+        {
+          "component": "Number",
+          "exp": {
+            "maxCompare": "LT",
+            "min": "80",
+            "minCompare": "GT",
+            "max": "100",
+            "rule": "RangeRule",
+            "resIdentify": "resIdentify_2"
+          },
+          "key": "Ixyy4",
+          "label": "设备漏电流",
+          "ref": "",
+          "resKey": "Ixyy4_res"
+        }
+      ],
+      "title": "数字输入-上下限"
+    },
+    {
+      "items": [
+        {
+          "component": "Number",
+          "exp": {
+            "maxCompare": "LE",
+            "min": "-0.5",
+            "minCompare": "GE",
+            "max": "1",
+            "rule": "ScopeRule",
+            "resIdentify": "resIdentify_1",
+            "norm": "100"
+          },
+          "key": "7",
+          "label": "设定值低压",
+          "ref": "",
+          "resKey": "7_res"
+        }
+      ],
+      "title": "数字输入-范围上下限"
+    },
+    {
+      "items": [
+        {
+          "component": "Switch",
+          "exp": {},
+          "key": "2",
+          "label": "温度超限报警",
+          "ref": ""
+        }
+      ],
+      "title": "布尔输入"
+    },
+    {
+      "items": [
+        {
+          "component": "Select",
+          "exp": {},
+          "key": "3",
+          "label": "计量级别",
+          "options": [
+            {
+              "key": "3-1",
+              "value": "A级"
+            },
+            {
+              "key": "3-2",
+              "value": "B级"
+            },
+            {
+              "key": "3-3",
+              "value": "C级"
+            }
+          ],
+          "ref": ""
+        }
+      ],
+      "title": "下拉选择"
+    },
+    {
+      "items": [
+        {
+          "component": "TextArea",
+          "exp": {},
+          "key": "4",
+          "label": "测试",
+          "ref": ""
+        }
+      ],
+      "title": "多行文本"
+    },
+    {
+      "items": [
+        {
+          "component": "Date",
+          "exp": {},
+          "key": "5",
+          "label": "保养日期",
+          "ref": ""
+        }
+      ],
+      "title": "日期输出"
+    },
+    {
+      "items": [
+        {
+          "component": "Number",
+          "exp": {},
+          "key": "Ixyy7",
+          "label": "输入（y)",
+          "ref": ""
+        },
+        {
+          "component": "Number",
+          "exp": {},
+          "key": "Ixyy8",
+          "label": "输入（z)",
+          "ref": ""
+        },
+        {
+          "component": "Label",
+          "exp": {
+            "rule": "VerifyRule",
+            "Z_Key": "Ixyy8",
+            "Y_Key": "Ixyy7",
+            "resIdentify": "resIdentify_3",
+            "MuMaxPercent": "5",
+            "norm": "100",
+            "deltaMaxPercent": "5"
+          },
+          "key": "output1",
+          "label": "结果输出",
+          "ref": "",
+          "resKey": "output1_res"
+        },
+        {
+          "component": "Label",
+          "exp": {
+            "rule": "DeltaRule",
+            "Z_Key": "Ixyy8",
+            "deltaMax": "10",
+            "Y_Key": "Ixyy7",
+            "resIdentify": "resIdentify_1"
+          },
+          "key": "deltab",
+          "label": "deltaa",
+          "ref": "deltadesc",
+          "resKey": "deltax"
+        }
+      ],
+      "title": "结果输出"
+    }
+  ],
+  "schemaId": "ff80808163deafe10163dec0656e0004",
+  "title": "测试"
+}

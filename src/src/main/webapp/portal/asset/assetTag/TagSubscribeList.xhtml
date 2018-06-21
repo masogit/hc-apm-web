@@ -18,12 +18,10 @@
               currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5"
               rows="20" emptyMessage="#{msg.noRecordFound}"
               rowsPerPageTemplate="20,40,60">
-    <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+    <p:ajax event="rowSelect" listener="#{tagSubscriberController.test}" update="createButton editButton deleteButton "/>
     <p:ajax event="filter" listener="#{tagSubscriberController.onFilter}" />
 
     <p:column headerText="关注者" filterMatchMode="LIKE" filterBy="#{item.subscriberUser.name}" sortBy="#{item.subscriberUser.name}">
-
-      <!--  <h:outputText value="  #{tagSubscriberController.getSubscriberName(item.subscribeUserId)}" />-->
         <h:outputText value="#{item.subscriberUser.name}" />
     </p:column>
 
@@ -39,9 +37,9 @@
     <f:facet name="{Toolbar}">
       <!--  <p:commandButton id="createButton" actionListener="#{tagSubscriberController.prepareCreate}" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" />-->
 
-        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
+        <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" actionListener="#{tagSubscriberController.prepareCreate}" update=":AssetTagSubscribEditDlg :AssetTagSubscribEditForm" oncomplete="PF('AssetTagSubscribEditDialog').show()"/>
 
-        <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected}"/>
+        <p:commandButton id="editButton" actionListener="#{tagSubscriberController.prepareEdit}" icon="ui-icon-pencil" title="#{msg.Edit}"  update=":AssetTagSubscribEditDlg" oncomplete="PF('AssetTagSubscribEditDialog').show()" disabled="#{empty tagSubscriberController.selected or tagSubscriberController.selected.getReceiveMsgMode()==3}"/>
 
         <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" title="#{msg.Delete}" actionListener="#{tagSubscriberController.delete}" update=":TagSubscriberForm:dataList" disabled="#{empty tagSubscriberController.selected}">
             <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>

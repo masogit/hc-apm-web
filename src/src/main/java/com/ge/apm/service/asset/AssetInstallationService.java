@@ -8,11 +8,13 @@ package com.ge.apm.service.asset;
 import com.ge.apm.dao.ArrivalListItemRepository;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.ContractInfoItemRepository;
 import com.ge.apm.dao.GbCodeRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.GbCode;
 import com.ge.apm.domain.OrgInfo;
@@ -51,6 +53,9 @@ public class AssetInstallationService {
     BlobObjectRepository blobDao;
 
     @Autowired
+    protected BlobFileService blobService;
+
+    @Autowired
     SupplierRepository supplierDao;
 
     @Autowired
@@ -73,6 +78,8 @@ public class AssetInstallationService {
     private AssetDepreciationService assetDepreciationService;
     @Autowired
     private V2_PmOrderService pmService;
+    @Autowired
+    private ContractInfoItemRepository contractItemDao;
 
     public Boolean submitArrivalList(String srrivalListId) {
         String token = UserContextService.getAccessToken();
@@ -83,26 +90,30 @@ public class AssetInstallationService {
     public List<ArrivalListItem> getListItem(String arrivalListId) {
         return itemDao.findByArrivalListId(arrivalListId);
     }
-    
-    public void deleteListItem(String arrivalListId,String siteUid){
-    	List<ArrivalListItem> listItem=getListItem(arrivalListId);
-    	if(listItem!=null){
-    		for(ArrivalListItem item: listItem){
-    			if(StringUtils.isNotEmpty(item.getQrCode())){
-    				deleteQrCode(item.getQrCode(), siteUid);
-    			}
-    		}
-    		itemDao.delete(listItem);
-    	}
+
+    public void deleteListItem(String arrivalListId, String siteUid) {
+        List<ArrivalListItem> listItem = getListItem(arrivalListId);
+        if (listItem != null) {
+            for (ArrivalListItem item : listItem) {
+                if (StringUtils.isNotEmpty(item.getQrCode())) {
+                    deleteQrCode(item.getQrCode(), siteUid);
+                }
+            }
+            itemDao.delete(listItem);
+        }
     }
-    public void deleteBlobObject(String arrivalListId){
-    	List<V2_BlobObject> listObj=blobDao.findByBoUuid(arrivalListId);
-    	if(listObj!=null){
-    		blobDao.delete(listObj);
-    	}
+
+    public void deleteBlobObject(String arrivalListId) {
+        List<V2_BlobObject> listObj = blobDao.findByBoUuid(arrivalListId);
+        if (listObj != null) {
+            for (V2_BlobObject obj : listObj) {
+                blobService.deleteBlobFile(obj);
+            }
+        }
     }
-    private void deleteQrCode(String qrCode,String siteUid){
-    	qrCodeService.deleteQrcode(qrCode, siteUid);
+
+    private void deleteQrCode(String qrCode, String siteUid) {
+        qrCodeService.deleteQrcode(qrCode, siteUid);
     }
 
     public Boolean submitInstallItem(String itemId, Boolean isFinish, Boolean isGeneratePmOrder) {
@@ -115,7 +126,7 @@ public class AssetInstallationService {
                 ArrivalListItem temp = itemDao.findById(itemId);
                 AssetInfo newAsset = assetDao.getByUid(temp.getAssetUID());
                 if (!Strings.isNullOrEmpty(newAsset.getQrCode())) {
-                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(),newAsset.getSiteUID(), 3);
+                    qrCodeService.updateQrCodeStatus(newAsset.getQrCode(), newAsset.getSiteUID(), 3);
                 }
                 assetDepreciationService.saveAssetDerpeciation(newAsset);
                 if (isGeneratePmOrder) {
@@ -148,6 +159,12 @@ public class AssetInstallationService {
                     temp.setInstallStatus(ArrivalListItem.INSTALL_STATUS_INSTORAGE);
                     itemDao.save(temp);
                 }
+
+                ContractInfoItem contractItem = contractItemDao.getByArrivalItemId(temp.getId());
+                if (null != contractItem) {
+                    contractItem.setAssetUid(temp.getAssetUID());
+                    contractItemDao.save(contractItem);
+                }
             }
             return true;
         } else {
@@ -159,7 +176,7 @@ public class AssetInstallationService {
         arrivalListItem.setLastModifiedDate(new Date());
         itemDao.save(arrivalListItem);
         if (!Strings.isNullOrEmpty(arrivalListItem.getQrCode())) {
-            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(),arrivalListItem.getArrivalList().getSiteUID(), 2);
+            qrCodeService.updateQrCodeStatus(arrivalListItem.getQrCode(), arrivalListItem.getArrivalList().getSiteUID(), 2);
         }
 
     }

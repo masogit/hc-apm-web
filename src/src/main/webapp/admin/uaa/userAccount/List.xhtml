@@ -48,8 +48,8 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="10,20,30,90">
 
-                        <p:ajax event="rowSelect" update="createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
-                        <p:ajax event="filter" listener="#{userAccountController.onFilter}" update="createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
+                        <p:ajax event="rowSelect" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
+                        <p:ajax event="filter" listener="#{userAccountController.onFilter}" update="loginAsButton createButton editButton viewButton deleteButton roleButton resetPassButton lockButton unlockButton"/>
 
                         <!-- <p:column headerText="#{msg.orgId}" sortBy="#{item.orgInfoId}">
                             <h:outputText value="#{userAccountController.getOrgFullNameByUid(item.orgInfoUID)}"/>
@@ -82,6 +82,7 @@
                             <h:outputText value="#{item.userRoleNames}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
+                            <p:commandButton id="loginAsButton" icon="ui-icon-transfer-within-a-station" title="#{msg.LoginAs}" actionListener="#{userAccountController.loginAs}" ajax="false" rendered="#{userContextService.isSuperAdmin}" disabled="#{empty userAccountController.selected}"/>
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{userAccountController.prepareCreate}" process="@this" update=":UserAccountEditDlg" oncomplete="PF('UserAccountEditDialog').show()"/>
                             <p:commandButton id="viewButton" rendered="false" icon="ui-icon-remove-red-eye" title="#{msg.View}" actionListener="#{userAccountController.prepareView}" update=":UserAccountViewDlg" oncomplete="PF('UserAccountViewDialog').show()" disabled="#{empty userAccountController.selected}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" title="#{msg.Edit}" actionListener="#{userAccountController.prepareEdit}" update=":UserAccountEditDlg" process="@this" oncomplete="PF('UserAccountEditDialog').show()" disabled="#{empty userAccountController.selected}"/>

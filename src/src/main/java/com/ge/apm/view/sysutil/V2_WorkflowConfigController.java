@@ -1,9 +1,7 @@
 package com.ge.apm.view.sysutil;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.faces.bean.ManagedBean;
@@ -15,6 +13,7 @@ import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.joda.time.DateTime;
 import org.omg.CORBA.ORB;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.NodeSelectEvent;
@@ -68,6 +67,8 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
 	//private String newFormat;
 	private List<OrgInfo> dispatherClinical = new ArrayList<OrgInfo>();
+	private Date telRepStart;
+	private Date telRepEnd;
 
 	@Override
 	protected void init() {
@@ -383,6 +384,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			selected.setPmDispatchUserName2(null);
 		}
+
+		if (this.telRepStart != null) {
+			selected.setTelReportStart(new DateTime(telRepStart).toString("HH:mm:ss"));
+		}
+		if (this.telRepEnd != null) {
+			selected.setTelReportEnd(new DateTime(telRepEnd).toString("HH:mm:ss"));
+		}
 	}
 	
 	@Transactional
@@ -419,11 +427,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
     		 return;
     	}
 
-    	if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
+    	/*if(isPmManual != null && isPmTakeOrder != null && !isPmManual && !isPmTakeOrder){
 			RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
 			WebUtil.addErrorMessage(WebUtil.getMessage("PmManualAndGrapMsg"));
 			return;
-		}
+		}*/
 
 /*		if(selected.getId() != null){
     		if(selected.getFormat() != null && newFormat != null){
@@ -501,13 +509,19 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		approveUserList.clear();
 		dispatchUserList.clear();
 		try {
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			super.prepareCreate();
+			telRepStart = sdf.parse(DateTime.now().toString("yyyy-MM-dd") + " 20:00:00");
+			telRepEnd = sdf.parse(DateTime.now().toString("yyyy-MM-dd") + " 08:00:00");
 		} catch (InstantiationException e) {
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
 			e.printStackTrace();
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		selectedUserOrg = null;
+
 /*		updateDispater();
 		updateApproverList();*/
 	}
@@ -515,6 +529,17 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	public void onSelect(){
 		if(selected != null && selected.getId() != null){
 			selected = dao.findById(selected.getId());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+			try {
+				if (selected != null) {
+					this.telRepStart = selected.getTelReportStart() != null ? (sdf.parse(DateTime.now().toString("yyyy-MM-dd") + " " + selected.getTelReportStart()))
+							: (sdf.parse(DateTime.now().toString("yyyy-MM-dd") + " 20:00:00"));
+					this.telRepEnd = selected.getTelReportEnd() != null ? (sdf.parse(DateTime.now().toString("yyyy-MM-dd") + " " + selected.getTelReportEnd()))
+							: (sdf.parse(DateTime.now().toString("yyyy-MM-dd") + " 08:00:00"));
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 	}
 	
@@ -631,5 +656,21 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public List<OrgInfo> getDispatherClinical() {
 		return dispatherClinical;
+	}
+
+	public Date getTelRepStart() {
+		return telRepStart;
+	}
+
+	public void setTelRepStart(Date telRepStart) {
+		this.telRepStart = telRepStart;
+	}
+
+	public Date getTelRepEnd() {
+		return telRepEnd;
+	}
+
+	public void setTelRepEnd(Date telRepEnd) {
+		this.telRepEnd = telRepEnd;
 	}
 }

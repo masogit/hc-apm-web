@@ -6,11 +6,15 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ArrivalList;
+import java.util.Collection;
 import webapp.framework.dao.GenericRepositoryUUID;
+import java.util.List;
 /**
  *
  * @author 212579464
  */
 public interface ArrivalListRepository extends GenericRepositoryUUID<ArrivalList>{
     
+    
+    List<ArrivalList> findByContractItemIdIn(Collection<String> itemId);
 }

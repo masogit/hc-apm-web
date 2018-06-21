@@ -18,7 +18,7 @@ import java.util.Optional;
  */
 public class TableResultReportService {
 
-    static final Double MINIMUM = .00001;
+    public static final Double MINIMUM = .00001;
 
     /**
      *

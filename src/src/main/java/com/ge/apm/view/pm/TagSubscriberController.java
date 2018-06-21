@@ -4,16 +4,15 @@ import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.context.RequestContext;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
-
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,35 +22,93 @@ import java.util.stream.Collectors;
 @ViewScoped
 public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscriber> {
 
-	private static final long serialVersionUID = 1L;
 
+	private static final long serialVersionUID = 1L;
+	private List<String> cities;
 	private AssetTagMsgSubscriberRepository dao = null;
 	private AssetTagRepository assetTagRepository;
 	private I18nMessageRepository i18Dao;
 	private UserAccount currentUser;
 	private UserAccountRepository userAccountRepository;
 	private List<UserAccount> tenantUserList;
-
+	List<Integer> modeList;
 	private List<I18nMessage>   msgModeList;
 	private List<AssetTag> assetTags;
 	UserContextService userContextService;
 	List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
 	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
-	private Integer receiveMsgMode;
+	private Integer receiveMsgMode =new Integer(0);
+	private int selectType=1;
+	private Boolean isReceiveTimeoutMsg;
 
-	/*public boolean subscriberShow(){
-		//xiugai   if(xiu gai and fei admin) return true
-		if(!userContextService.hasRole("ITAdmin")&  WebUtil.getMessage(crudActionName)=="修改")
-			return true;
-		else
-			 return false;
-	}*/
+	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
+	public Boolean subscribe(){
+		if(this.getCRUDActionName().equals("修改")){
+			return true; //不可修改
+		}else if(userContextService.hasRole("ITAdmin")){
+				return false;
+			}else
+				{
+					return true;
+				}
+		}
+		public void gongdantuisongxuanxiang(){
+		if(isReceiveTimeoutMsg==false && receiveMsgMode==2){
+			level0=false;
+			level1=false;
+			level2=false;
+		}
+			System.out.println(level0);
+			System.out.println(level1);
+			System.out.println(level2);
+		}
+     public Boolean prioritySetFalse(){
+		/*如果 不推送工单消息 并且 工单超时推送不选 ,返回true,让紧急 重要 一般 变成灰色*/
+		/*if(receiveMsgMode==null){
+			return null;
+		}*/
+         if(isReceiveTimeoutMsg==false && receiveMsgMode==2){
+         	return false;
+		 }else
+		 	return true;
+
+	 }
+	 /*public void gondantuisongxuanxiang(){
+     	if(receiveMsgMode==0 || receiveMsgMode==1){//如果选中"所有.."或"仅.."那么默认 优先级和工单超时都选上
+		  level0=true;
+		  level1=true;
+		  level2=true;
+		  isReceiveTimeoutMsg=true;
+		}
+	 }*/
+	public Boolean priorityShow(){
+		//selected.getReceiveMsgMode() = 2  //不推送消息
+		if(selected.getReceiveMsgMode()!=null && selected.getReceiveMsgMode()==2)
+			return false;
+		if(selectType==1 || (this.getCRUDActionName().equals("修改") && selected.getReceiveMsgMode()!=3))
+             return true;
+		return false;
+	}
+
 	//选择关注人后，被其关注过的不会出现在设备标签的下拉框中
 	public void checkSelectedEmpty(){
 		if(selected==null){
 			WebUtil.addErrorMessage("设备消息订阅没有被选中");
 		}
 	}
+	public void setLevelsFalse(){
+		level0=false;
+		level1=false;
+		level2=false;
+	}
+	public void level0Set(){
+		System.out.println(level0);
+	}
+/*	public void level1Set(){level1=this.selected.getLevel1();}
+	public void level2Set(){level2=this.selected.getLevel2();}*/
+
+
+
 // 关注人tentant下的tag
 	public void takeAssetTags(){
 		//获得的是:和标签绑定的用户的院区下的所有标签
@@ -59,131 +116,107 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	}
 	public void test(){
-		System.out.println(selected.getReceiveMsgMode());
+		//System.out.println(selected.getReceiveMsgMode());
 	}
-
 
 	public void cancel(){
 		selected=null;
 	}
-	private void clearMode(List<AssetTagMsgSubscriber> a,List<AssetTagMsgSubscriber> b, List<AssetTagMsgSubscriber> c){
-a=null;
-b=null;
-c=null;
+	public boolean requiredCheck(){
+      //不推送工单消息  情况下 必须选工单超时消息
+		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
+			WebUtil.addErrorMessage("务必选择工单超时消息推送");
+			RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+			return false;
+		}
+
+		//选了工单超时消息 必须选择紧急程度
+		if(isReceiveTimeoutMsg==true && receiveMsgMode==2){
+			if(level0==false && level1==false && level2==false) {
+				WebUtil.addErrorMessage("务必选择工单紧急程度");
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		///
+		if(receiveMsgMode==0 || receiveMsgMode==1){
+			if(level0==false && level1==false && level2==false){
+				WebUtil.addErrorMessage("务必选择紧急程度");
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		/*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*/
+		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
+			if(level0==true || level1==true || level2==true){
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		return true;
 	}
-	public void saveTagSub1()
-	{
-		if(selected==null)return;
-		int direct = selected.getReceiveMsgMode();
-		List<AssetTagMsgSubscriber> tagUserMode3and1=dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());;
-		List<AssetTagMsgSubscriber> tagUserModeEE=dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
-		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
-		List<I18nMessage> fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
-		List<Integer> modeList =new ArrayList<Integer>();
-		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
-		if(this.getCRUDActionName().equals("修改")){
-			if(!tagUserModeBasic.isEmpty()){
-				WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+	public void saveTagSub4(){
+		if (!requiredCheck()) {
+			return;
+		}
+
+		/*如果 消息推送选项是 "所有.."和"仅.., ",那么紧急度必须选一个*//*
+		  if(receiveMsgMode==0 || receiveMsgMode==1){
+		  	if(level0==false && level1==false && level2==false){
+		  		WebUtil.addErrorMessage("务必选择紧急程度");
+		  		return;
+			}
+		  }
+		*//*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*//*
+		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
+			if(level0==true || level1==true || level2==true){
+				WebUtil.addErrorMessage("不推送工单和超时消息，不需要选择紧急度");
 				return;
 			}
-			if(!tagUserModeEE.isEmpty()){
-				if(direct==3){
+		}*/
+		if(this.getCRUDActionName().equals("新增")) {
+			if (selectType == 1) {//维修
+				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode012.isEmpty()) {
+					selected.setReceiveMsgMode(receiveMsgMode);
+					selected.setIsReceiveTimeoutMsg(isReceiveTimeoutMsg);
+					selected.setLevel0(level0);
+					selected.setLevel1(level1);
+					selected.setLevel2(level2);
+					super.save();
+					return;
+				}
+				else{
 					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
+					return;
+				}
+			} else {//EE报警
+				List<AssetTagMsgSubscriber> tagUserMode3 = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
+				if(tagUserMode3.isEmpty()) {
+					selected.setReceiveMsgMode(3);
+					dao.save(selected);
+					return;
+				}else{
+					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 					return;
 				}
 			}
-			if(!tagUserMode3and1.isEmpty()){
-				if( modeList.stream().anyMatch(item->item.equals(direct))){
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
+		}else{
+			selected.setReceiveMsgMode(receiveMsgMode);
+			selected.setIsReceiveTimeoutMsg(isReceiveTimeoutMsg);
+			selected.setLevel0(level0);
+			selected.setLevel1(level1);
+			selected.setLevel2(level2);
 			super.save();
-		}else{//新增
-			if(tagUserModeBasic.isEmpty()){
-				super.save();
-				clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-				return;
-			}
-			if(tagUserModeEE.isEmpty()){
-				if(direct==3){
-					super.save();
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
-			if(tagUserMode3and1.isEmpty()){
-				if( !modeList.stream().anyMatch(item->item.equals(direct))){
-					super.save();
-					clearMode(tagUserMode3and1,tagUserModeEE,tagUserModeBasic);
-					return;
-				}
-			}
-			WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
 		}
-	}	public void saveTagSub(){
-		if(selected==null)return;
-		int direct = selected.getReceiveMsgMode();
-		List<AssetTagMsgSubscriber> tagUserMode=null;
-		List<AssetTagMsgSubscriber> tagUserModeBasic=dao.getTagUserMode(selected.getTagId(), selected.getSubscribeUserId());
-		List<I18nMessage> fousOptionWithOutEE = i18Dao.getFousOptionWithOutEE();
-		List<Integer> modeList =new ArrayList<Integer>();
-		fousOptionWithOutEE.forEach(item->{modeList.add(Integer.valueOf(item.getMsgKey()));});
-
-		if( this.getCRUDActionName().equals("新增")){  //是新增
-			if(direct ==3){
-				tagUserMode = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-					return;
-				}else{
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				}
-			}else{
-				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-					return;
-				}else{
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				}
-			}
-
-		}else{//是修改
-			if(direct ==3){
-				tagUserMode = dao.getTagUserMode3(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-				}else{
-					WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-				}
-			}else{//当前选择的是0 1 2
-				//查看当前有没有 A B C=0,1,2
-				tagUserMode = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
-				if(tagUserMode.isEmpty()){
-					super.save();
-					return;
-				}
-				if(tagUserModeBasic.size()==2){
-					if( modeList.stream().anyMatch(item->item.equals(direct))){
-						WebUtil.addErrorMessage("不能重复相同的设备消息订阅");
-					}else{
-						super.save();
-						return;
-					}
-				}else{
-					super.save();
-				}
-			}
-
-		}
-	}//
-
+	}
 	@Override
 	protected void init() {
+		cities = new ArrayList<String>();
+		cities.add("Miami");
+		cities.add("London");
+		cities.add("Paris");
+		cities.add("Istanbul");
 		userContextService  = (UserContextService) WebUtil.getBean(UserContextService.class);
 		this.filterBySite =false;
 		dao= WebUtil.getBean(AssetTagMsgSubscriberRepository.class);
@@ -192,15 +225,15 @@ c=null;
 		i18Dao = WebUtil.getBean(I18nMessageRepository.class);
 		FieldValueMessageController fieldMsg = WebUtil.getBean(FieldValueMessageController.class, "fieldMsg");
 		msgModeList = fieldMsg.getFieldValueList("focusOption");
-		userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
-		//获取当前租户下的所有用户 --获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
-		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
-
-		tenantUserList = tenantUserList.stream().distinct().collect(Collectors.toList());
 		for (I18nMessage local1 : msgModeList) {
 			hmMsgMode.put(Integer.parseInt(local1.getMsgKey()), local1.getValue());
 		}
-
+		msgModeList=msgModeList.stream().filter(item->!item.getMsgKey().equals("3")).collect((Collectors.toList()));
+			userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
+		//获取当前租户下的所有用户 --获取关注人--当前租户下除了Guest ClincialStaff Activation..角色以外的其它人 都可以成为关注人
+		tenantUserList =userAccountRepository.getByTenantUID(currentUser.getTenantUID());
+		tenantUserList = tenantUserList.stream().distinct().collect(Collectors.toList());
+		modeList =new ArrayList<Integer>();
 	}
 	public String getTagName(Integer tagId){
             try{
@@ -210,12 +243,6 @@ c=null;
                 return "";
             }
 	}
-	public String getSubscriberName(Integer userId){
-		return userAccountRepository.findById(userId).getName();
-	}
-
-
-
 
 	public String getMsgMode(int msgmode){
 		return hmMsgMode.get(msgmode);
@@ -233,7 +260,7 @@ c=null;
 
 	@Override
 	protected Page<AssetTagMsgSubscriber> loadData(PageRequest pageRequest) {
-		selected = null;
+	//	selected = null;
 		if(this.searchFilters ==null){
 			searchFilters =  new ArrayList<>();
 		}else{
@@ -257,15 +284,48 @@ c=null;
 	@Override
 	public void prepareCreate() throws InstantiationException, IllegalAccessException {
 		super.prepareCreate();
+		selectType=0;
+		level0=true;
+		level1=true;
+		level2=true;
+		isReceiveTimeoutMsg=true;
+
 		this.selected.setReceiveMsgMode(null);
 		assetTags =  assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
 	}
 
+	List<AssetTagMsgSubscriber> tagUserMode3and1;
+	List<AssetTagMsgSubscriber> tagUserModeEE;
+	List<AssetTagMsgSubscriber> tagUserModeBasic;
+	AssetTagMsgSubscriber currentAtms;
 	@Override
 	public void prepareEdit() {
 		super.prepareEdit();
+		Integer se=selected.getSelectType();
+		if(selected.getLevel0()!=null){
+			level0=selected.getLevel0();
+		}else{
+			level0=false;
+		}
+		if(selected.getLevel1()!=null){
+			level1=selected.getLevel1();
+		}else{
+			level1=false;
+		}
+		if(selected.getLevel2()!=null){
+			level2=selected.getLevel2();
+		}else{
+			level2=false;
+		}
+
+		receiveMsgMode= selected.getReceiveMsgMode();
+		isReceiveTimeoutMsg=selected.getIsReceiveTimeoutMsg();
+		if(se!=null)
+         selectType=se.intValue();
+
+		tagUserModeBasic=dao.getTagUserMode(selected.getTagId(),selected.getSubscribeUserId());
+		currentAtms=dao.findById(selected.getId());
 		assetTags= assetTagRepository.getUnSubscriberTagBySiteUID(selected.getSubscribeUserId());
-		//assetTags =  assetTagRepository.getUnSbuscriberTag(currentUser.getHospitalId(), this.selected.getSubscribeUserId());
 	}
 
 	@Override
@@ -273,14 +333,6 @@ c=null;
 		super.onBeforeNewObject(object);
 		object.setSubscribeUserId(currentUser.getId());
 		object.setIsReceiveChatMsg(true);
-	}
-
-	public HashMap<Integer, String> getHmMsgMode() {
-		return hmMsgMode;
-	}
-
-	public void setHmMsgMode(HashMap<Integer, String> hmMsgMode) {
-		this.hmMsgMode = hmMsgMode;
 	}
 
 	public List<I18nMessage> getMsgModeList() {
@@ -300,11 +352,11 @@ c=null;
 	}
 
 	public Integer getReceiveMsgMode() {
-		if(this.selected!=null)
+		/*if(this.selected!=null && this.selected.getId()!=null)
 		{
 			return  this.selected.getReceiveMsgMode();
 		}else
-
+*/
 			return receiveMsgMode;
 	}
 
@@ -319,4 +371,65 @@ c=null;
 	public void setReceiveMsgMode(Integer receiveMsgMode) {
 		this.receiveMsgMode = receiveMsgMode;
 	}
+
+	public int getSelectType() {
+		return selectType;
+	}
+
+	public void setSelectType(int selectType) {
+		this.selectType = selectType;
+	}
+	private String[] selectedCities2;
+
+	public String[] getSelectedCities2() {
+		return selectedCities2;
+	}
+
+	public void setSelectedCities2(String[] selectedCities2) {
+		this.selectedCities2 = selectedCities2;
+	}
+
+	public List<String> getCities() {
+		return cities;
+	}
+
+	public void setCities(List<String> cities) {
+		this.cities = cities;
+	}
+	private boolean level0;
+	private boolean level1;
+	private boolean level2;
+
+	public boolean isLevel0() {
+		return level0;
+	}
+
+	public void setLevel0(boolean level0) {
+		this.level0 = level0;
+	}
+
+	public boolean isLevel1() {
+		return level1;
+	}
+
+	public void setLevel1(boolean level1) {
+		this.level1 = level1;
+	}
+
+	public boolean isLevel2() {
+		return level2;
+	}
+
+	public void setLevel2(boolean level2) {
+		this.level2 = level2;
+	}
+
+	public Boolean getIsReceiveTimeoutMsg() {
+		return isReceiveTimeoutMsg;
+	}
+
+	public void setIsReceiveTimeoutMsg(Boolean receiveTimeoutMsg) {
+		isReceiveTimeoutMsg = receiveTimeoutMsg;
+	}
+
 }

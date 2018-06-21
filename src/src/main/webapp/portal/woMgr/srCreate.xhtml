@@ -9,7 +9,7 @@
 
     <ui:composition>
 
-        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@this"  header="新增报修" >
+        <p:dialog id="createSRDialog" widgetVar="createSRDialog" modal="true"  resizable="false" draggable="true" width="80%" height="450" appendTo="@(body)"  header="新增报修" >
 
             <h:form id="ServiceRequestCreateForm">
                 <p:fieldset legend="#{msg.Create}#{msg.WorkOrder}" rendered="#{not empty workOrderMgrController.newServiceRequest}">
@@ -82,7 +82,7 @@
                                   multiple="false"  sizeLimit="10000000"  update="pictureList" auto="true" invalidFileMessage="#{msg.InvalidPictureFileType}" invalidSizeMessage="#{msg.invalidSizeMessage}10M" label="#{msg.Add}"/>
 
                     <h:panelGroup >
-                        <p:commandButton value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" disabled="#{!workOrderMgrController.canCreateSr()}" validateClient="true" update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
+                        <p:commandButton validateClient="true" value="#{msg.Save}" icon="ui-icon-check" actionListener="#{workOrderMgrController.saveServiceRequest()}" disabled="#{!workOrderMgrController.canCreateSr()}"  update="woTab:woMgrListForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
 
                         <p:commandButton value="#{msg.Return}" icon="ui-icon-arrow-back" actionListener="#{workOrderMgrController.cancel()}" immediate="true"  update="woTab:ServiceRequestCreateForm :growl" style="float:left" oncomplete="handleSubmit(args, 'createSRDialog');"/>
                     </h:panelGroup>

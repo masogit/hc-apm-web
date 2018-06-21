@@ -3,6 +3,8 @@ package com.ge.apm.view;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.domain.Supplier;
@@ -52,6 +54,20 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     protected Page<Supplier> loadData(PageRequest pageRequest) {
         this.setSiteFilter();
         this.selected = null;
+        boolean nameFilter=false;
+        Object nameValue="";
+        for(SearchFilter filter: searchFilters){
+            if(filter.fieldName.equals("name")){
+                nameFilter=true;
+                nameValue=filter.value;
+                filter.conditionPath="1*2*3+";
+            }
+        }
+        if(nameFilter){
+            nameValue=((String)nameValue).toLowerCase();
+            searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
+        }
+
         if (this.searchFilters == null) {
             return dao.findAll(pageRequest);
         } else {

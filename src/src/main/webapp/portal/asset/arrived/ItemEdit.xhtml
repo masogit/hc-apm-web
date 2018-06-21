@@ -173,14 +173,6 @@
                                 <label class="label">#{msg.arrivalListItemNum}</label>
                                 <h:outputText value="#{assetInstallationController.arrivalListItem.itemNum}" />
                             </h:panelGroup>
-                            <!--                            <h:panelGroup>
-                                                            <label class="label">#{msg.clinicalDeptName}*</label>
-                                                            <p:selectOneMenu id="clinicalDeptName" widgetVar="clinicalDeptName" value="#{assetInstallationController.arrivalListItem.clinicalDeptUID}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}">
-                                                                <p:ajax  update="clinicalOwnerName parentAssetList" />
-                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                                                <f:selectItems value="#{orgTreeController.getClinicalDeptListBySite(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.uid}"/>
-                                                            </p:selectOneMenu>
-                                                        </h:panelGroup>-->
 
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
@@ -191,11 +183,10 @@
                             </h:panelGroup>
                             <h:panelGroup>
                                 <label class="label">#{msg.parentAsset}</label>
-                                <p:selectOneMenu id="parentAssetList" value="#{assetInstallationController.arrivalListItem.parentAssetId}" >
-                                    <p:ajax process="@this" />
-                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                    <f:selectItems value="#{assetInstallationController.parentAssetList}" var="item" itemLabel="#{item.departNum}/#{item.name}" itemValue="#{item.id}"/>
-                                </p:selectOneMenu>
+                                <p:autoComplete id="parentAssetList" dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" 
+                                completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.departNum}#{t==null?'':'/'}#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
+                                <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
+                                </p:autoComplete>
                             </h:panelGroup>
                             <p:spacer />
 
@@ -261,7 +252,7 @@
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:autoComplete id="assetOwnerName" value="#{assetInstallationController.owner1}" converter="userAccountConverter" dropdown="true" forceSelection="true"
                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
+                                    <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerNameChange}" update="assetOwnerName2 assetOwnerName3" process="@this"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -274,7 +265,7 @@
                                 <label class="label">#{msg.assetOwnerName2}</label>
                                 <p:autoComplete id="assetOwnerName2" value="#{assetInstallationController.owner2}" converter="userAccountConverter" dropdown="true" forceSelection="true"
                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerName2Change}" process="@this"/>
+                                    <p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerName2Change}" process="@this"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -287,7 +278,7 @@
                                 <label class="label">#{msg.assetOwnerName3}</label>
                                 <p:autoComplete id="assetOwnerName3" value="#{assetInstallationController.owner3}" converter="userAccountConverter" dropdown="true" forceSelection="true"
                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeOwnerList}">
-                                   	<p:ajax event="itemSelect" listener="#{assetInstallationController.onAssetOwnerName3Change}" process="@this"/>
+                                   	<p:ajax event="blur" listener="#{assetInstallationController.onAssetOwnerName3Change}" process="@this"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -300,7 +291,7 @@
                                 <label class="label">#{msg.clinicalOwnerName}</label>
                                 <p:autoComplete id="clinicalOwnerName" value="#{assetInstallationController.useOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true"
                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInstallationController.completeClinicalOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
+                                    <p:ajax event="blur" listener="#{assetInstallationController.onUseOwnerNameChange}" process="@this"/>
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -491,8 +482,8 @@
                                                                         <f:selectItems value="#{commonReportController.getReportTypeList(assetInstallationController.arrivalListItem.arrivalList.siteUID)}" var="item" itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
                                                                     </p:selectOneMenu>
                                                                     <p:commandLink value="添加报告" validateClient="false" process="addReport" actionListener="#{commonReportController.addReporter(assetInstallationController.arrivalListItem.id)}" update="reportList" disabled="#{empty commonReportController.reportUid}"/>
-                                                                </h:panelGroup>
-                                                                <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
+                                                                </h:panelGroup>-->
+<!--                                                                <p:dataList id="reportList" value="#{commonReportController.getReportList(assetInstallationController.arrivalListItem.id)}" var="reportItem" emptyMessage="#{msg.noRecordFound}">
                     #{commonReportController.getTemplateName(reportItem.schemaId)}
 
                     <h:outputText id="installDate" value="#{reportItem.createdDate}" >
@@ -501,8 +492,8 @@
                     <p:link value="编辑" target="_blank" href="#{commonReportController.getEditLinkUrl(reportItem)}" disabled="#{reportItem.status eq 'Archived'}"/>
                     <p:link value="查看" target="_blank" href="#{commonReportController.getViewLinkUrl(reportItem)}" />
                     <p:commandLink value="删除" validateClient="false" process="@this" actionListener="#{commonReportController.deleteReporter(reportItem.id)}" update="reportList" disabled="#{reportItem.status eq 'Archived'}"/>
-                </p:dataList>
-            </p:fieldset>-->
+                </p:dataList>-->
+            <!--</p:fieldset>-->
                     <h:panelGroup>
                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                             <!--                            <h:panelGroup>

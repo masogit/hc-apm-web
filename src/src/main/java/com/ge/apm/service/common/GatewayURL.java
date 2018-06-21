@@ -6,6 +6,7 @@ public enum GatewayURL {
     // Security
     GET_AUTHENTICATE_BY_OPEN_ID("/api/apm/security/userAccounts/authenticateWeChat"),
     GET_AUTHENTICATE_BY_USER_PASSWORD("/api/apm/security/userAccounts/authenticateBasic"),
+    GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED("/api/apm/security/userAccounts/authenticateInternal"),
     // Objects
     UPLOAD_SINGLE_FILE_BY_URL("/hcapmobjecthubservice/api/apm/objectHub/objects/urlFile"),
     UPLOAD_SINGLE_FILE("/zuul/hcapmobjecthubservice/api/apm/objectHub/objects/single"),
@@ -33,7 +34,10 @@ public enum GatewayURL {
     // User Schedule
     USER_VACATION_CREATE("/hcapmassetservice/api/apm/userschedule/userVacation"),
     // Batch Operation
-    BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch");
+    BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
+    // Allocation Center URLs
+    SHARED_ASSET_PUSH_MESSAGE("/hcapmworkflowservice/api/apm/allocation/remote/message/{requestId}"),
+    REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}");
 
     private final String url;
 

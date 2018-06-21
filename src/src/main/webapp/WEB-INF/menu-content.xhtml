@@ -19,7 +19,7 @@
                 <p:menuitem id="um06" value="#{msg.AssetValueAnalysis}" rendered="false" outcome="/empty"/>
                 <!--asset browser-->
                 <p:menuitem id="um1001" value="#{msg.AssetBrowser}" url="/portal/analysis/reports.xhtml#/AssetBrowser" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
-                <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/List" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
+                <p:menuitem id="um07" value="#{msg.AssetContractMgmt}" outcome="/portal/asset/contract/ContractList" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
                 <p:menuitem id="um08" value="#{msg.SupplierMgmt}" outcome="/portal/supplier/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>
 
                 <!--<p:menuitem id="um081" value="#{msg.TerminatedAsset}" outcome="/portal/asset/info/List.xhtml?terminate=true" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,AssetHead,AssetStaff')}"/>-->
@@ -32,9 +32,11 @@
             </p:submenu>
 
             <p:submenu id="um073" label="设备调剂" icon="fa fa-folder-open-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff,SharedAssetMgmt') and userContextService.isHospitalUser()}">
-                <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
+                <!--<p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
+                <p:menuitem id="um901" value="借用申请" outcome="/portal/BorrowApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt')}"/>
                 <p:menuitem id="um903" value="借用受理" outcome="/portal/BorrowAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
-                <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,ClinicalStaff')}"/>
+                <!--<p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead,AssetStaff,DeptHead,ClinicalStaff')}"/>-->
+                <p:menuitem id="um902" value="归还申请" outcome="/portal/ReturnApplyV2/List.xhtml" rendered="#{userContextService.hasNotAnyRole('SharedAssetMgmt')}"/>
                 <p:menuitem id="um904" value="归还受理" outcome="/portal/ReturnAcceptanceV2/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <p:menuitem id="um190" value="借还维护" outcome="/portal/sharedAssetRequest/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,SharedAssetMgmt')}"/>
                 <!--<p:menuitem id="um906" value="在借设备查询" outcome="/portal/BorrowApplyV2/ListForQuery" rendered="#{userContextService.hasAnyRole('SuperAdmin,DeptHead,AssetHead')}"/>-->
@@ -117,8 +119,9 @@
                 <p:menuitem id="um303" value="#{msg.PmOrderRule}" outcome="/portal/pm/pmOrderRule/List.xhtml"/>
                 <!-- <p:menuitem id="um304" value="#{msg.RelRuleAsset}" outcome="/portal/pm/pmOrderRule/RelRuleAsset.xhtml"/> -->
                 <p:menuitem id="um306" value="#{msg.assetRuleManager}" outcome="/portal/pm/relRuleAsset/List.xhtml"/>
+                <p:menuitem id="um307" value="电气安全数据导入" outcome="/portal/electricSafety/measureElectricSafetyMain.xhtml"/>
                 <p:menuitem id="um305" value="计量类别设置" outcome="/portal/measuring/measuringTypeConfigList.xhtml"/>
-                <p:menuitem id="um401" value="计量结果导入" outcome="/portal/measuring/measuringResultMain.xhtml"/>
+                <p:menuitem id="um401" value="计量信息" outcome="/portal/measuring/measuringResultMain.xhtml"/>
                 <p:menuitem value="报告模版管理" outcome="/portal/reporter/schemaList.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
 				<!-- <p:menuitem id="um402" value="SAPConfig" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml"/>
 				<p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>

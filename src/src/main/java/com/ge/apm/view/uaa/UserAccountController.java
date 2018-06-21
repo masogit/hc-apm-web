@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.security.NoSuchAlgorithmException;
@@ -178,6 +179,20 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
                 searchFilters.add(new SearchFilter("orgInfoUID", SearchFilter.Operator.EQ, selectedOrg.getUid(), "1*2+"));
             }
         }
+        boolean nameFilter=false;
+        Object nameValue="";
+        for(SearchFilter filter: searchFilters){
+        	if(filter.fieldName.equals("name")){
+        		nameFilter=true;
+        		nameValue=filter.value;
+        		filter.conditionPath="1*2*3+";
+        	}
+        }
+        if(nameFilter){
+        	nameValue=((String)nameValue).toLowerCase();
+        	searchFilters.add(new SearchFilter("namePyCode",SearchFilter.Operator.LIKE,nameValue,"1*2*3+"));
+        }
+        
         Page<UserAccount> pageUserAccount=dao.findBySearchFilter(this.searchFilters, pageRequest);
         for(UserAccount user: pageUserAccount){
         	user.setOrgInfo(orgInfoDao.getByUid(user.getOrgInfoUID()));
@@ -728,4 +743,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.agree = agree;
     }
 
+    public void loginAs() {
+        if(this.selected==null) return;
+        
+        UserContextService.setLoginUser(this.selected);
+        
+        //call microServices to get Access Token...
+        try{
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+            MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
+
+            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword());
+            request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+        }catch(Exception e){
+            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
 }

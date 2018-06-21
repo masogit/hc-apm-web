@@ -4,11 +4,15 @@ import com.ge.apm.domain.pure.TableSchema;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.dao.UnstructuredDataCollectionRepository;
 import com.ge.apm.domain.TableDefinition;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.UnstructuredData;
+import com.ge.apm.service.asset.ElectricSafetyService;
 import com.ge.apm.service.report.TableDefinitionService;
 import java.util.Date;
 import java.util.HashMap;
@@ -35,15 +39,22 @@ public class EditReportController {
 
     private TableDefinitionService tableService;
     
-    
+    private ElectricSafetyService electricSafetyService;
     private UnstructuredDataCollection report;
+    private TableDefinition tableDefinition;
+    private boolean hasElectricSafetyData=false;
     @PostConstruct
     protected void init() {
         tableService = WebUtil.getBean(TableDefinitionService.class);
+        electricSafetyService = WebUtil.getBean(ElectricSafetyService.class);
+
         String reportId = WebUtil.getRequestParameter("reportId");
-        
+        String action = WebUtil.getRequestParameter("action");
         report = tableService.getReportById(reportId);
-        TableDefinition tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        tableDefinition = tableService.getTemplateById(report.getSchemaId());
+        if(StringUtils.isNotEmpty(tableDefinition.getInstrumentKeyValues())){
+        	hasElectricSafetyData=true;
+        }
         table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
         tableValue = new HashMap<String, Object>();
         List<UnstructuredData> dataList = report.getData();
@@ -69,6 +80,10 @@ public class EditReportController {
         tableService.submitReport(report);
          WebUtil.addSuccessMessage("已提交");
     }
+    
+    public void importElectricSafetyData(){
+    	electricSafetyService.parseTableValue(tableValue, tableDefinition.getInstrumentKeyValues(),tableDefinition.getSchema(), report.getBoUuid());
+    }
 
     public Map<String, Object> getTableValue() {
         return tableValue;
@@ -90,4 +105,13 @@ public class EditReportController {
         return report;
     }
 
+	public boolean isHasElectricSafetyData() {
+		return hasElectricSafetyData;
+	}
+
+	public void setHasElectricSafetyData(boolean hasElectricSafetyData) {
+		this.hasElectricSafetyData = hasElectricSafetyData;
+	}
+
+    
 }

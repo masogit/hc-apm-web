@@ -42,6 +42,11 @@
                             <label class="label">预计到达时间</label>
                             <p:calendar timeZone="GMT+8" label="预计到达时间" pattern="yyyy/MM/dd HH:mm:ss" value="#{v2PmOrderController.itemDetail.estimatedArriveTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
                         </h:panelGroup>
+                       <!-- <h:panelGroup>
+                            <label class="label">到货确认时间</label>
+                            <p:calendar timeZone="GMT+8" label="到达时间" pattern="yyyy/MM/dd HH:mm:ss" value="#{v2PmOrderController.itemDetail.arrivedTime}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true"/>
+                        </h:panelGroup>-->
+
                         <h:panelGroup>
                             <label class="label">质保期</label>
                             <p:calendar timeZone="GMT+8" label="取物时间" pattern="yyyy/MM/dd" value="#{v2PmOrderController.itemDetail.warrantyDate}" showOn="button"
@@ -57,7 +62,9 @@
                         </h:panelGroup>
 
                         <p:column headerText="到货">
-                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货"/>
+                            <p:selectBooleanButton   value="#{v2PmOrderController.itemDetail.arrived}" onLabel="已到货" offLabel="未到货">
+                                <p:ajax listener="#{v2PmOrderController.arrivalTimeSet}" event="change"></p:ajax>
+                            </p:selectBooleanButton>
                         </p:column>
 
                     </p:panelGrid>

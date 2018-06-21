@@ -46,7 +46,7 @@
                                 <label class="label">#{msg.assetOwnerName}</label>
                                 <p:autoComplete id="assetOwnerName" value="#{assetInfoController.owner}" converter="userAccountConverter" dropdown="true" forceSelection="true" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
                                                 var="t" itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
+                                    <p:ajax event="blur" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel" />
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -65,7 +65,7 @@
                                 <label class="label">#{msg.assetOwnerName2}</label>
                                 <p:autoComplete id="assetOwnerName2" value="#{assetInfoController.owner2}" converter="userAccountConverter" dropdown="true" forceSelection="true" var="t" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
                                                 itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel2" />
+                                    <p:ajax event="blur" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel2" />
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -84,7 +84,7 @@
                                 <label class="label">#{msg.assetOwnerName3}</label>
                                 <p:autoComplete id="assetOwnerName3" value="#{assetInfoController.owner3}" converter="userAccountConverter" dropdown="true" forceSelection="true" var="t" required="false" requiredMessage="#{msg.assetOwnerName} #{msg.ValidationRequire}"
                                                 itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel3" />
+                                    <p:ajax event="blur" listener="#{assetInfoController.onOwnerChange}" process="@this" update="assetOwnerTel3" />
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
@@ -150,7 +150,7 @@
 
                                 <p:autoComplete id="clinicalOwnerName" value="#{assetInfoController.clinicalOwner}" converter="userAccountConverter" dropdown="true" forceSelection="true" var="t" required="false" requiredMessage="#{msg.clinicalOwnerId} #{msg.ValidationRequire}"
                                                 itemLabel="#{t.name}" itemValue="#{t}" completeMethod="#{assetInfoController.completeClinicalOwnerList}">
-                                    <p:ajax event="itemSelect" listener="#{assetInfoController.onClinicalOwnerChange}" process="@this" update="clinicalOwnerTel" />
+                                    <p:ajax event="blur" listener="#{assetInfoController.onClinicalOwnerChange}" process="@this" update="clinicalOwnerTel" />
                                     <p:column>
                                         <h:outputText value="#{t.name}"/>
                                     </p:column>
