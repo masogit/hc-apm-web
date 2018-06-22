@@ -123,7 +123,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
 
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
-        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID(), selected.getSiteUID());
+        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
         contractType = Arrays.stream(ContractInfo.ContractType.values()).map((Enum<ContractInfo.ContractType> item) -> item.toString()).collect(Collectors.toList());
         initOrgTree();
     }
