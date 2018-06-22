@@ -45,7 +45,10 @@
                                 <label class="label">#{msg.contractType}</label>
                                 <p:selectOneMenu id="contractType" value="#{contractInfoEditController.selected.contractType}" required="true" requiredMessage="#{msg.contractType} #{msg.ValidationRequire}" disabled="#{not empty contractInfoEditController.selected.id}">
                                     <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-                                    <f:selectItems value="#{contractInfoEditController.getContractTypeList()}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}" />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
                                 </p:selectOneMenu>
                             </h:panelGroup>
                             <h:panelGroup>
@@ -188,7 +191,7 @@
                         <p:dataTable id="purchaseList"  value="#{contractInfoEditController.purchaseItemsList}" var="item"
                                      rowKey="#{item.id}" paginator="true" currentPageReportTemplate="#{msg.recordCount}: {totalRecords}"
                                      paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="5,10,15"  >
+                                     rowsPerPageTemplate="5,10,15"  rows="10" emptyMessage="#{msg.noRecordFound}">
                             <p:ajax event="rowSelect" />
                             <p:column headerText="#{msg.contractAssetName}">
                                 <h:outputText value="#{item.contractAssetName}"/>
@@ -333,13 +336,13 @@
                             <p:inputText class="bidWinner" value="#{contractInfoEditController.selectedContractItem.contractAssetName}"/>
                         </h:panelGroup>
                         <h:panelGroup>
-                                <label class="label">#{msg.applyDept}</label>
-                                <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true" appendTo="@this"
-                                                completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
-                                    <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
-                                    <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
-                                </p:autoComplete>
-                            </h:panelGroup>
+                            <label class="label">#{msg.applyDept}</label>
+                            <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{contractInfoEditController.selectedObjectMap['applyDept']}" scrollHeight="300"  forceSelection="true" appendTo="@this"
+                                            completeMethod="#{contractInfoEditController.autoCompleteDept}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter" class="SiteUIDChange">
+                                <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}"/>
+                                <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('applyDept')}" />
+                            </p:autoComplete>
+                        </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.estimatedPrice}</label>
                             <p:inputNumber decimalPlaces="4"  value="#{contractInfoEditController.selectedContractItem.estimatedPrice}">
@@ -393,16 +396,16 @@
                         <h:panelGroup>
                             <label class="label">#{msg.downPaymentDate}</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.downPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                       
+
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.applyPaymentDate}</label>
                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.applyPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
-                       
+
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.tailPaymentDate}</label>
-                             <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
+                            <p:calendar timeZone="GMT+8"  pattern="yyyy/MM/dd" value="#{contractInfoEditController.selectedContractItem.tailPaymentDate}" showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" />
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.comments}</label>
@@ -426,7 +429,9 @@
                             <p:selectOneMenu id="functionGroup" value="#{contractInfoEditController.attachmentType}" autoWidth="false" style="width: 100%">
                                 <p:ajax process="@this" />
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('contractAttachmentType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractAttachmentType', 'Contract')}" itemValue="Contract"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractAttachmentType', 'Tenders')}" itemValue="Tenders"  />
+                                <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractAttachmentType', 'Other')}" itemValue="Other"  />
                             </p:selectOneMenu>
                         </h:panelGroup>
                         <h:panelGroup>

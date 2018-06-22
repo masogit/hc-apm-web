@@ -36,10 +36,9 @@
                             <f:facet name="filter">
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Full')}" itemValue="Full"  />
-                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Artificial')}" itemValue="Artificial"  />
-                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Equipment')}" itemValue="Equipment"  />
-                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Other"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Contract')}" itemValue="Full"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Tenders')}" itemValue="Artificial"  />
+                                    <f:selectItem itemLabel="#{fieldMsg.fieldValue('contractInfoType', 'Other')}" itemValue="Equipment"  />
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
