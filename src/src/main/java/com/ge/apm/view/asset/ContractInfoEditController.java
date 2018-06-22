@@ -70,7 +70,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private TreeNode orgTree;
 
-    private List<String> contractType;
     private List<OrgInfo> clinicalDeptList;
     private List<String> removedAttachments = new ArrayList();
 
@@ -124,7 +123,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
         supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
-        contractType = Arrays.stream(ContractInfo.ContractType.values()).map((Enum<ContractInfo.ContractType> item) -> item.toString()).collect(Collectors.toList());
         initOrgTree();
     }
 
@@ -226,11 +224,6 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public void removeUploadedFileObjects(String blobId) {
         blobService.deleteBlobFileById(blobId);
         uploadedFileObjects = uploadedFileObjects.stream().filter(item -> !item.getId().equals(blobId)).collect(Collectors.toList());
-    }
-
-    public List<I18nMessage> getContractTypeList() {
-        return FieldValueMessageController.doGetFieldValueList("contractInfoType", -1).stream()
-                .filter(item -> contractType.contains(item.getMsgKey())).collect(Collectors.toList());
     }
 
     public void cancelUpload() {
