@@ -153,12 +153,8 @@ public class AssetInfoMgrService {
         return rootNode;
     }
     
-    public List<Supplier> getSuplierListBySiteUid(String tenantUid, String siteUid){
-        if(configService.isInsulateTenant(tenantUid)){
-            return supplierDao.getBySiteUID(siteUid);
-        }else{
-            return supplierDao.getByTenantUID(tenantUid);
-        }
+    public List<Supplier> getSuplierListBySiteUid(String tenantUid){
+        return supplierDao.getByTenantUID(tenantUid);
     }
     
     public AssetInfo getAssetInfoByUid(String assetUid){

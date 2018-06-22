@@ -71,6 +71,10 @@ public class EditExcelReportController extends TieWebSheetBean {
                 tableValue.put(item.getKey(), item.getValueSerialized());
             }
         });
+        
+        if("view".equalsIgnoreCase(action)){
+       tableValue = tableService.changSelectFommDataByJSON(tableDefinition,tableValue);
+        }
         reloadData();
     }
     
