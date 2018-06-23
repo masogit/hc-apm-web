@@ -61,8 +61,8 @@
                 <br/>
                 <p:commandButton validateClient="false"
                                  actionListener="#{workOrderExportTemplateController.applyChange()}" value="#{msg.Save}"
-                                 update="display,:WoExportTemplateEditDlg, :WoExportTemplateListForm:datalist"
-                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'WoExportTemplateDialog');"/>
+                                 update="display,:WoExportTemplateEditDlg, :WoExportTemplateListForm:datalist, :growl"
+                                 icon="ui-icon-check" oncomplete="handleSubmit(args, 'WoExportTemplateEditDialog');"/>
                 &nbsp;&nbsp;
                 <p:commandButton immediate="true" value="#{msg.Cancel}" icon="ui-icon-cancel"
                                  onclick="PF('WoExportTemplateEditDialog').hide()"/>
