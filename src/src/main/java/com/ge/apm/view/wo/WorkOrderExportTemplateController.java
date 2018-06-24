@@ -231,9 +231,10 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         selected.setCreatorId(user.getUid());
         selected.setCreatorName(user.getName());
         selected.setFileName(file.getFileName());
+        selected.setStorageId(uploadedFileObject.getObjectStorageId());
 
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_WORKORDER_EXPORT_TEMPLATE);
-        uploadedFileObject.setBoSubType("Excel");
+        uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_EXCEL);
         uploadedFileObject.setBoUuid(selected.getId());
         blobService.saveBlobObject(uploadedFileObject);
     }

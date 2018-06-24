@@ -38,8 +38,8 @@ public class WorkOrderExportTemplate implements Serializable {
     @Column(name = "file_name", columnDefinition = "CHAR(64)")
     private String fileName;
 
-    @Column(name = "file_content")
-    private byte[] fileContent;
+    @Column(name = "storage_id")
+    private String storageId;
 
     @Basic(optional = false)
     @NotNull
@@ -111,12 +111,12 @@ public class WorkOrderExportTemplate implements Serializable {
         this.fileName = fileName;
     }
 
-    public byte[] getFileContent() {
-        return fileContent;
+    public String getStorageId() {
+        return storageId;
     }
 
-    public void setFileContent(byte[] fileContent) {
-        this.fileContent = fileContent;
+    public void setStorageId(String storageId) {
+        this.storageId = storageId;
     }
 
     public String getCreatorId() {
