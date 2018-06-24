@@ -45,7 +45,9 @@
                         </p:column>
                         <p:column headerText="模板文件" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
-                            <h:outputText value="#{item.fileName}"/>
+                            <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
+                                <h:outputText value="#{item.fileName}"/>
+                            </p:link>
                         </p:column>
 
                         <f:facet name="{Toolbar}">
