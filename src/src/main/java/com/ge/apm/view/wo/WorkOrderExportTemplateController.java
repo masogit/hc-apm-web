@@ -125,7 +125,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         //判断登陆用户是否是LocalITAdmin(本地后台运营管理)
         if (UserContextService.isOnlyLocalITAdmin()) {
             selectedTenant = tempTenantInfo;
-            orgTree = uaaService.getOrgTreeBySite(user.getSiteUID());
+            orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
         } else {
             selectedTenant = tenantInfoRepository.findByuid(tenantUid);
             OrgInfo rootOrg = new OrgInfo();
@@ -133,7 +133,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
             rootOrg.setName(WebUtil.getMessage("AllHospitals"));
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenant(tenantUid).getChildren());
+            rootNode.getChildren().addAll(uaaService.getOrgTreeBySiteWithoutClinical(tenantUid).getChildren());
         }
 
         TreeNode selectedUserOrg1 = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
