@@ -7,9 +7,9 @@ import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
@@ -26,7 +26,6 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -77,28 +76,13 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     }
 
     public void uploadDataFile(FileUploadEvent event) {
-        ExcelDocument doc = null;
-
-        try {
-            this.file = event.getFile();
-            ExcelDocument.ExcelType type = ExcelDocument.parseTypeByFileName(file.getFileName());
-            if (type == null) {
-                throw new IllegalStateException("Invalid file type: " + file.getFileName());
-            }
-            doc = new ExcelDocument(file.getInputstream(), type);
-            uploadedFileObject = blobService.uploadFile(file);
-            logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
-        } catch (IOException ex) {
-            logger.error(ex);
-            WebUtil.addErrorMessage("File can not be read!");
-        } catch (Exception e) {
-            logger.error(e);
-            WebUtil.addErrorMessage(WebUtil.getMessage("ParsingImportFileError") + "--" + e.getMessage());
-        } finally {
-            if (doc != null) {
-                doc.release();
-            }
+        this.file = event.getFile();
+        String fileName = file.getFileName();
+        if (!StringUtils.endsWithIgnoreCase(fileName, ".docx")) {
+            throw new IllegalStateException("Invalid file type: " + file.getFileName());
         }
+        uploadedFileObject = blobService.uploadFile(file);
+        logger.info("File is uploaded as " + uploadedFileObject.getObjectStorageId());
     }
 
     public String getOrgFullName(OrgInfo org) {
@@ -234,7 +218,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         selected.setStorageId(uploadedFileObject.getObjectStorageId());
 
         uploadedFileObject.setBoType(V2_BlobObject.BO_TYPE_WORKORDER_EXPORT_TEMPLATE);
-        uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_EXCEL);
+        uploadedFileObject.setBoSubType(V2_BlobObject.BO_SUB_TYPE_DOCS);
         uploadedFileObject.setBoUuid(selected.getId());
         blobService.saveBlobObject(uploadedFileObject);
     }
@@ -242,9 +226,10 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     @Transactional
     public void applyChange() {
         if (selectedUserOrg == null) {
-            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-            WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
-            return;
+            selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
+//            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+//            WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
+//            return;
         }
         if (file == null || uploadedFileObject == null) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
@@ -253,12 +238,16 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         }
         super.save();
         selectedUserOrg = null;
+        file = null;
+        uploadedFileObject = null;
     }
 
     @Override
     public void delete() {
         super.delete();
         selectedUserOrg = null;
+        file = null;
+        uploadedFileObject = null;
     }
 
     @Override
@@ -270,6 +259,8 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     @Override
     public void prepareCreate() throws IllegalAccessException, InstantiationException {
         selectedUserOrg = null;
+        file = null;
+        uploadedFileObject = null;
         super.prepareCreate();
     }
 
