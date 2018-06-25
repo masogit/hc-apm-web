@@ -12,7 +12,6 @@ import com.ge.apm.dao.SysRoleRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
@@ -21,7 +20,6 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -165,6 +163,15 @@ public class CustomConfigService {
         }
         if (customConfigObject.getAssetsEditpageDateFields().contains(key)) {
             customConfigObject.getAssetsEditpageDateFields().remove(key);
+        }
+        if (customConfigObject.getAssetsMobilepageBasicFields().contains(key)) {
+            customConfigObject.getAssetsMobilepageBasicFields().remove(key);
+        }
+        if (customConfigObject.getAssetsMobilepageDetailFields().contains(key)) {
+            customConfigObject.getAssetsMobilepageDetailFields().remove(key);
+        }
+        if (customConfigObject.getAssetsMobilepageHeaderFields().contains(key)) {
+            customConfigObject.getAssetsMobilepageHeaderFields().remove(key);
         }
     }
 

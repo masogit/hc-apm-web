@@ -31,6 +31,7 @@ public class CustomConfigObject {
     List<String> assetsEditpageDateFields;
     List<String> assetsEditpageFinicialFields;
 
+    List<String> assetsMobilepageHeaderFields;
     List<String> assetsMobilepageBasicFields;
     List<String> assetsMobilepageDetailFields;
 
@@ -168,6 +169,17 @@ public class CustomConfigObject {
 
     public void setAssetsMobilepageDetailFields(List<String> assetsMobilepageDetailFields) {
         this.assetsMobilepageDetailFields = assetsMobilepageDetailFields;
+    }
+    
+    public List<String> getAssetsMobilepageHeaderFields() {
+        if (assetsMobilepageHeaderFields == null) {
+            assetsMobilepageHeaderFields = CustomConfigConstant.getAssetsMobilepageHeaderFields();
+        }
+        return assetsMobilepageHeaderFields;
+    }
+
+    public void setAssetsMobilepageHeaderFields(List<String> assetsMobilepageHeaderFields) {
+        this.assetsMobilepageHeaderFields = assetsMobilepageHeaderFields;
     }
 
 }
