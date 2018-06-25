@@ -133,7 +133,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
             rootOrg.setName(WebUtil.getMessage("AllHospitals"));
             orgTree = new DefaultTreeNode("root", null, null);
             TreeNode rootNode = new DefaultTreeNode("org", rootOrg, orgTree);
-            rootNode.getChildren().addAll(uaaService.getOrgTreeBySiteWithoutClinical(tenantUid).getChildren());
+            rootNode.getChildren().addAll(uaaService.getOrgFullTreeByTenantWithoutClinical(tenantUid).getChildren());
         }
 
         TreeNode selectedUserOrg1 = TreeNodeUtil.findNodeFromTree(orgTree, selectedOrg);
