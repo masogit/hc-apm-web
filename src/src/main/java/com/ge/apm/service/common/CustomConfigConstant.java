@@ -236,4 +236,8 @@ public class CustomConfigConstant {
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
                 "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod");
     }
+    
+    public static List<String> getAssetsMobilepageHeaderFields() {
+        return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
+    }
 }

@@ -10,7 +10,7 @@
 
     <ui:define name="content">
         <script>
-             window.onload = function () {
+             afterPageLoad = function () {
                  $("#growl").removeAttr("autoUpdate");
                  $("#growl").attr('life','0');
              };
