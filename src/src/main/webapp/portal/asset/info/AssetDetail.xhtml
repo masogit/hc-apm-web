@@ -187,7 +187,8 @@
                             <h:outputText value="#{assetItem.departNum}" />
                         </p:column>
                         <p:column >
-                            <p:commandLink value="#{msg.View}" action="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}"/>
+                            <!--<p:commandLink value="#{msg.View}" action="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}"/>-->
+                            <p:link  outcome="#{assetInfoDetailController.getDetailPageLink(assetItem.uid)}" disabled="#{assetItem.uid eq assetInfoDetailController.selected.uid}" >#{msg.View}</p:link>
                         </p:column>
 
                     </p:treeTable>
@@ -197,9 +198,7 @@
                 <p:panel  header="#{msg.deviceContract}">
                     <f:facet name="actions">
                         <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractList?faces-redirect=true&amp;assetUid='.concat(assetInfoDetailController.selected.uid))}" ><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>
-<!--                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam(assetInfoDetailController.getContractListLink())}" ><h:outputText styleClass="ui-icon ui-icon-fullscreen" /></h:commandLink>
-                        <h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam(assetInfoDetailController.getContractAddLink())}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
+                        <!--<h:commandLink styleClass="ui-panel-titlebar-icon ui-corner-all ui-state-default" action="#{urlEncryptController.encodeUrlParam('/portal/asset/contract/ContractEdit?faces-redirect=true&amp;action=Create&amp;assetId='.concat(assetInfoDetailController.selected.uid))}"><h:outputText styleClass="ui-icon ui-icon-add" /></h:commandLink>-->
                     </f:facet>
                     <p:dataTable var="item" value="#{assetInfoService.getContractList(assetInfoDetailController.selected.uid)}" emptyMessage="#{msg.noRecordFound}">
                         <p:column headerText="#{msg.name}" >
