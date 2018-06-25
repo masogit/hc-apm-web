@@ -56,16 +56,13 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
-
 	private OrgInfo selectedUserOrg;
 	private TenantInfo selectedTenant;
 	private TreeNode orgTree;
 	private TreeNode selectedNode;
-	private String tenantUid;
 	private UaaService uaaService;
 	private OrgInfo selectedOrg;
 	private List<UserAccount> approveUserList = new ArrayList<UserAccount>();
-	//private String newFormat;
 	private List<OrgInfo> dispatherClinical = new ArrayList<OrgInfo>();
 	private Date telRepStart;
 	private Date telRepEnd;
@@ -81,12 +78,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		uaaService = WebUtil.getBean(UaaService.class);
 		isInsulate = UserContextService.isOnlyLocalITAdmin();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
-		/*user.getUserRoleList().stream().anyMatch( userRole -> (userRole.getRoleId() == 11));
-		isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
-		isInsulate = (isInsulate == null || isInsulate == false) ? false : true;
-		institutionList = orgInfoRepository.findByTenantUIDAndOrgType(user.getTenantUID(),1);*/
-		/*updateDispater();
-		updateApproverlList();*/
 		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
 		setTenantUid(user.getTenantUID());
 
@@ -122,15 +113,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		if(isInsulate){
 			Integer orgType = selectedUserOrg.getOrgType();
 			dispatherClinical = orgInfoRepository.findBySiteUIDAndOrgType(selectedUserOrg.getSiteUID(),4);
-			/*if(orgType == 0){
-				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getTenantUID(),4);
-			}else if(orgType == 1) {
-				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getInstitutionUID(),4);
-			}else if(orgType == 2){
-				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getHospitalUID(),4);
-			}else if(orgType == 3){
-				dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selected.getSiteUID(),4);
-			}*/
 		}else{
 			dispatherClinical = orgInfoRepository.findByParentUIDAndOrgType(selectedUserOrg.getSiteUID(),4);
 		}
@@ -216,7 +198,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		}else{
 			approveUserList = userDao.getAssetHeadAndStaffByTenantUID(user.getTenantUID());
 			approveUserList = approveUserList.stream().distinct().collect(Collectors.toList());
-			//return userCommonService.getAssetCreateApproverlList(UserContextService.getCurrentUserAccount().getTenantUID());
 		}
 	}
 	
@@ -620,10 +601,6 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 
 	public void setSelectedNode(TreeNode selectedNode) {
 		this.selectedNode = selectedNode;
-	}
-
-	public String getTenantUid() {
-		return tenantUid;
 	}
 
 	public TenantInfo getSelectedTenant() {

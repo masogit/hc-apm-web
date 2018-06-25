@@ -53,6 +53,15 @@ public class PmOrderRule implements Serializable{
     
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
+
+	@Column(name="institution_uid",columnDefinition = "CHAR(32)")
+	private String institutionUID;
+
+	@Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+	private String hospitalUID;
+
+	@Column(name="site_uid",columnDefinition = "CHAR(32)")
+	private String siteUID;
     
     @Column(name = "status")
     private Integer status;//0、待审核 1、已审核
@@ -202,6 +211,30 @@ public class PmOrderRule implements Serializable{
 	public void setCheckListUID(String checkListUID) {
 		this.checkListUID = checkListUID;
 	}
+
+	public String getInstitutionUID() {
+		return institutionUID;
+	}
+
+	public void setInstitutionUID(String institutionUID) {
+		this.institutionUID = institutionUID;
+	}
+
+	public String getHospitalUID() {
+		return hospitalUID;
+	}
+
+	public void setHospitalUID(String hospitalUID) {
+		this.hospitalUID = hospitalUID;
+	}
+
+	public String getSiteUID() {
+		return siteUID;
+	}
+
+	public void setSiteUID(String siteUID) {
+		this.siteUID = siteUID;
+	}
 	
     @Override
     public int hashCode() {
@@ -221,4 +254,6 @@ public class PmOrderRule implements Serializable{
         }
         return true;
     }
+
+
 }
