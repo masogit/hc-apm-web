@@ -360,7 +360,7 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-          List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
+					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
 					if(listAssetInfo==null || listAssetInfo.size()==0){
 						data.setFinancingNum(data.getFinancingNum().toUpperCase());
 						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
