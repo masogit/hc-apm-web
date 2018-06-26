@@ -7,11 +7,12 @@ import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
@@ -41,6 +42,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private String queryCondition;
 	private List<String> assetUids;
 	private OrgInfoRepository orgInfoRepository;
+	private Boolean isInsulate;
+	private Integer loginUserOrgType;
+	private UserCommonService userCommonService;
 	
 	@Override
 	protected void init() {
@@ -51,8 +55,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
+		userCommonService = WebUtil.getBean(UserCommonService.class);
 		assetMap = new HashMap<String, AssetInfo>();
 		ruleMap = new HashMap<String, PmOrderRule>();
+		isInsulate = UserContextService.isOnlyLocalITAdmin();
+		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
 
 	@Override
@@ -62,42 +69,32 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	@Override
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
-		if(searchFilters != null) {
-			searchFilters.clear();
-		}
 		assetMap.clear();
 		ruleMap.clear();
-		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
+		if(searchFilters != null) {
+			searchFilters.clear();
+		}else{
+			searchFilters = new ArrayList<>();
 		}
-		List<String> uids = getAssetInfoByFilter();
-		if(uids == null) {//查询条件为null
-			if (!this.hasFilterOnField("tenantUID")) {
-				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-				searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoUids()));
-			}
-		}else if(uids.size() == 0) {//查询结果为空
-			 //searchFilters.removeAll(searchFilters.stream().filter(item -> "assetUID".equals(item.fieldName)).collect(Collectors.toList()));
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, uids));
-		}else {
-			if (!this.hasFilterOnField("tenantUID")) {
-				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-			}
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, uids));
+		List<SearchFilter> userFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		searchFilters.addAll(userFilters);
+		if(StringUtils.isNotEmpty(queryCondition)){
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoByFilter()));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		Page<RelRuleAsset> result = dao.findBySearchFilter(searchFilters, pageRequest);
 		initMap(result);
 		return result;
-		// return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
+
+
 
 	public void initMap(Page<RelRuleAsset> result) {
 		if (result.hasContent()) {
 			List<RelRuleAsset> rels = result.getContent();
-			List<String> assetUids = new ArrayList<String>();
-			List<String> ruleUids = new ArrayList<String>();
+			List<String> assetUids = new ArrayList<>();
+			List<String> ruleUids = new ArrayList<>();
 			for (RelRuleAsset relRuleAsset : rels) {
 				if(relRuleAsset.getAssetUID() != null) {
 					assetUids.add(relRuleAsset.getAssetUID());
@@ -223,7 +220,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 	
 	public List<String> getAssetInfoByFilter() {
-		if(!StringUtils.isEmpty(queryCondition)) {
+		if(StringUtils.isNotEmpty(queryCondition)) {
 			List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
 			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));

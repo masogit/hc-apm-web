@@ -10,6 +10,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.dao.*;
+import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.TransferEvent;
@@ -50,6 +51,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	private OrgInfoRepository orgInfoRepository;
 	private String siteUid;
 	private BrandRepository brandRepository;
+	private Boolean isInsulate;
+	private Integer loginUserOrgType;
+	private UserCommonService userCommonService;
 
 	@Override
 	protected void init() {
@@ -61,15 +65,19 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		brandRepository = WebUtil.getBean(BrandRepository.class);
-		targetAssets = new ArrayList<AssetInfo>();
+		targetAssets = new ArrayList<>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
 		siteUid = user.getSiteUID();
-		getAssetsListByTenantUid();
+		initAssets();
+
+		userCommonService = WebUtil.getBean(UserCommonService.class);
+		isInsulate = UserContextService.isOnlyLocalITAdmin();
+		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
 
-	public void getAssetsListByTenantUid() {
-		sourceAssets = new ArrayList<>();// assetInfoRepository.findBySearchFilter(getFilter(user.getSiteUID()));//findByTenantUID(user.getTenantUID());
+	public void initAssets() {
+		sourceAssets = new ArrayList<>();
 		targetAssets.forEach((item) -> {
 			if (sourceAssets.contains(item)) {
 				sourceAssets.remove(item);
@@ -87,7 +95,7 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	}
 
 	public List<AssetInfo> getAssetList() {
-		List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();// getFilter(user.getSiteUID());
+		List<SearchFilter> assetFilters = new ArrayList<SearchFilter>();
 		List<String> uids = null;
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
 			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
@@ -106,12 +114,10 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		}
 		if (StringUtils.isNotEmpty(queryAsset.getBrand())) {
 			assetFilters.add(new SearchFilter("makerShortName", SearchFilter.Operator.LIKE, queryAsset.getBrand()));
-			/*List<Integer> brandIds = brandRepository.findIdsNameLike(queryAsset.getBrand());
-			assetFilters.add(new SearchFilter("brandId", SearchFilter.Operator.IN, brandIds));*/
 		}
 		if (!assetFilters.isEmpty()) {
 			if (queryAsset.getRuleStatus() != null) {
-				uids = new ArrayList<String>();
+				uids = new ArrayList<>();
 				if (queryAsset.getRuleStatus() == 1) {// 已配置
 					uids = relRuleAssetRepository.findAssetUidsByTenantUID(user.getTenantUID());
 					if (CollectionUtils.isNotEmpty(uids)) {
@@ -122,25 +128,15 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 					assetFilters.add(new SearchFilter("uid", SearchFilter.Operator.NotIN, uids));
 				}
 			}
-			List<SearchFilter> userFilter = getFilter(user.getSiteUID());
+			List<SearchFilter> userFilter = getAssetFilter();
 			assetFilters.addAll(userFilter);
 			return assetInfoRepository.findBySearchFilter(assetFilters);
 		}
 		return new ArrayList<>();
 	}
 
-	public List<SearchFilter> getFilter(String siteUID) {
-		List<SearchFilter> filter = new ArrayList<SearchFilter>();
-		OrgInfo orgInfo = orgInfoRepository.getByUid(siteUID);
-		if (orgInfo.getOrgType() == 3) {// 院区
-			filter.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else if (orgInfo.getOrgType() == 2) {// 医院
-			filter.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else if (orgInfo.getOrgType() == 1) {// 集团
-			filter.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		} else {// 租户
-			filter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, orgInfo.getUid()));
-		}
+	public List<SearchFilter> getAssetFilter() {
+		List<SearchFilter> filter = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
 		filter.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
 		filter.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
 		filter.add(new SearchFilter("isPm", SearchFilter.Operator.EQ, true));
@@ -163,14 +159,12 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 	}
 
 	public void onAssetsTransfer(TransferEvent event) {
-		System.out.println("操作前size大小：" + event.getItems());
 		for (Object item : event.getItems()) {
 			if (event.isAdd()) {
 				targetAssets.add((AssetInfo) item);
 			} else {
 				targetAssets.remove((AssetInfo) item);
 			}
-			System.out.println("目标size is " + targetAssets.size());
 		}
 	}
 
@@ -179,9 +173,8 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 		if (targetAssets.isEmpty()) {
 			WebUtil.addErrorMessage(WebUtil.getMessage("ChooseAssets"));
 		} else {
-			List<RelRuleAsset> rels = new ArrayList<RelRuleAsset>(targetAssets.size());
+			List<RelRuleAsset> rels = new ArrayList<>(targetAssets.size());
 			targetAssets = targetAssets.stream().distinct().collect(Collectors.toList());
-			// List<String> deleteIds = new ArrayList<String>();
 			for (AssetInfo ai : targetAssets) {
 				RelRuleAsset rel = relRuleAssetRepository.findByAssetUID(ai.getUid());
 				if (rel == null) {
@@ -202,29 +195,17 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 				}
 				relRuleAssetRepository.save(rels);
 			}
-			// relRuleAssetRepository.deleteByAssetUIDIn(deleteIds);
-
 			WebUtil.addSuccessMessage("配置成功!");
-			//targetAssets.clear();
 		}
 
 	}
 
-	/*
-	 * public void generatePmOrders() { List<AssetRuleModel> models = new
-	 * ArrayList<AssetRuleModel>(); for (AssetInfo ai : targetAssets) {
-	 * AssetRuleModel model = new AssetRuleModel(); model.setUid(ai.getUid());
-	 * models.add(model); } //TODO invoke userCommonService
-	 * WebUtil.addSuccessMessage("配置成功！"); targetAssets.clear(); }
-	 */
-
 	public List<PmOrderRule> getPmOrderRuleList() {
-		List<SearchFilter> assetFilters = new ArrayList<>();// getFilter(user.getSiteUID());
+		List<SearchFilter> assetFilters = new ArrayList<>();
 		assetFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, queryAsset.getTenantUID()));
 		assetFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
 		if (StringUtils.isNotEmpty(queryAsset.getFunctionType())) {
-			assetFilters
-					.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
+			assetFilters.add(new SearchFilter("functionType", SearchFilter.Operator.LIKE, queryAsset.getFunctionType()));
 		}
 		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
