@@ -304,7 +304,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'qrCode')}" >
         <h:panelGroup>
-            <label class="label">#{msg.qrCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</span></label>
+            <label class="label">#{msg.QRCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</span></label>
             <p:inputText id="qrCode" value="#{assetInfoEditController.qrCode}" required="#{assetInfoEditController.customConfig.assetFields['qrCode'].required}" class="SiteUIDChange financingNumChange"
                          requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}" readonly="#{not empty assetInfoEditController.selected.qrCode or !assetInfoEditController.needEdit('qrCode')}">
                 <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('qrCode')}" update="@(.financingNumChange)"/>

@@ -621,6 +621,7 @@ public class AssetInstallationController {
         if (dept != null) {
             arrivalListItem.setClinicalDeptUID(dept.getUid());
             getClinicalOwnerList();
+            parentAssetList = getParentAssetList();
         }
     }
     
