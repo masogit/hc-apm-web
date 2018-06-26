@@ -74,8 +74,15 @@ public class Supplier implements Serializable, ChineseName {
 
     @Column(name = "site_uid", columnDefinition = "CHAR(32)")
     private String siteUID;
-    
-    
+
+    @Column(name = "supplier_t")
+    private Boolean supplierT;
+
+    @Column(name = "maintainer_t")
+    private Boolean maintainerT;
+
+    @Column(name = "manufacturer_t")
+    private Boolean manufacturerT;
     @PrePersist
     public void initializeUid() {
         if (uid == null) {
@@ -206,8 +213,30 @@ public class Supplier implements Serializable, ChineseName {
     public void setUid(String uid) {
         this.uid = uid;
     }
-    
-    
+
+    public Boolean getSupplierT() {
+        return supplierT;
+    }
+
+    public void setSupplierT(Boolean supplierT) {
+        this.supplierT = supplierT;
+    }
+
+    public Boolean getMaintainerT() {
+        return maintainerT;
+    }
+
+    public void setMaintainerT(Boolean maintainerT) {
+        this.maintainerT = maintainerT;
+    }
+
+    public Boolean getManufacturerT() {
+        return manufacturerT;
+    }
+
+    public void setManufacturerT(Boolean manufacturerT) {
+        this.manufacturerT = manufacturerT;
+    }
 
     @Override
     public int hashCode() {

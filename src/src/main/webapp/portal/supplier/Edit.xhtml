@@ -36,12 +36,32 @@
                             <label class="label">#{msg.tel}</label>
                             <p:inputText id="tel" value="#{supplierController.selected.tel}" />
                         </h:panelGroup>
-                        <h:panelGroup>
+                       <!-- <h:panelGroup>
                             <label class="label">供应商类型*</label>
                             <p:selectOneMenu id="supplierType" value="#{supplierController.selected.supplierType}">
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
+                        </h:panelGroup>-->
+
+                        <h:panelGroup>
+                            <label class="label">供应商类型*</label>
+                                <h:panelGroup >
+                                    <p:selectBooleanCheckbox  value="#{supplierController.selected.supplierT}" itemLabel="供应商">
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:selectBooleanCheckbox  value="#{supplierController.selected.maintainerT}" itemLabel="维修商">
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
+                                <h:panelGroup>
+                                    <p:selectBooleanCheckbox   value="#{supplierController.selected.manufacturerT}" itemLabel="制造商">
+                                    </p:selectBooleanCheckbox>
+                                </h:panelGroup>
                         </h:panelGroup>
+
+
+
+
                     </p:panelGrid>
                     <br/>
                     <p:commandButton validateClient="true" actionListener="#{supplierController.save}" value="#{msg.Save}" update=":SupplierListForm:datalist, :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'SupplierEditDialog');"/>
