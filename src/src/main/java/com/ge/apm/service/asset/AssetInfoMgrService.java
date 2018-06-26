@@ -50,7 +50,6 @@ public class AssetInfoMgrService {
     private SupplierRepository supplierDao;
     @Autowired
     private ConfigService configService;
-    
 
     public void deleteAsset(AssetInfo asset) {
         List<V2_ServiceRequest> srlist = srDao.findByAssetId(asset.getId());
@@ -84,17 +83,18 @@ public class AssetInfoMgrService {
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));  //不能待报废
-        
-        //配置项根据主设备生成编号
-        WorkflowConfig config = configService.findConfigBySite(siteUID);
-        if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
-            assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
-        }
+
         if (asset == null ? clinicalDeptUID != null : asset.getClinicalDeptUID() != null) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, asset == null ? clinicalDeptUID : asset.getClinicalDeptUID()));
         }
         if (asset == null ? siteUID != null : asset.getSiteUID() != null) {
-            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, asset == null ? siteUID : asset.getSiteUID()));
+            String usingSiteUid = asset == null ? siteUID : asset.getSiteUID();
+            assetFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, usingSiteUid));
+            //配置项根据主设备生成编号
+            WorkflowConfig config = configService.findConfigBySite(usingSiteUid);
+            if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
+                assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
+            }
         } else {
             return Collections.EMPTY_LIST;
         }
@@ -131,7 +131,7 @@ public class AssetInfoMgrService {
         if (!subAssets.isEmpty()) {
             List<AssetInfo> temp = subAssets.stream().flatMap(item -> getChildrenAssetsFromList(allAssets, item).stream()).collect(Collectors.toList());
             subAssets.addAll(temp);
-        } 
+        }
         return subAssets;
     }
 
@@ -159,12 +159,12 @@ public class AssetInfoMgrService {
         }
         return rootNode;
     }
-    
-    public List<Supplier> getSuplierListBySiteUid(String tenantUid){
+
+    public List<Supplier> getSuplierListBySiteUid(String tenantUid) {
         return supplierDao.getByTenantUID(tenantUid);
     }
-    
-    public AssetInfo getAssetInfoByUid(String assetUid){
+
+    public AssetInfo getAssetInfoByUid(String assetUid) {
         return assetDao.findByUid(assetUid);
     }
 
