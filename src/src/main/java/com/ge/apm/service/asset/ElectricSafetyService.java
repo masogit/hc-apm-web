@@ -348,7 +348,7 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue.toUpperCase());
-					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNum(strValue,user.getSiteUID());
+					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNum(data.getFinancingNum(),user.getSiteUID());
 					if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
 						data.setAssetInfo(listAssetInfo.get(0));
 						V2_PmOrder order=v2_PmOrderRepository.findByAssetUid(listAssetInfo.get(0).getUid());
