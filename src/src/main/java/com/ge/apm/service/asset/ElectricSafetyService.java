@@ -166,7 +166,7 @@ public class ElectricSafetyService {
     		detail.setInstitutionUID(user.getInstitutionUID());
     		financingNum=detail.getFinancingNum();
     		if(financingNum!=null){
-        		List<AssetInfo> listInfo=assetInfoRepository.findByFinancingNumAccessScope(financingNum,user.getSiteUID(),userOrgListStr);
+            List<AssetInfo> listInfo=assetInfoRepository.findByFinancingNumAccessScope(financingNum,user.getSiteUID(),user.getUid());
         		if(listInfo!=null && listInfo.size()==1){
         			String uid=listInfo.get(0).getUid();
         			detail.setAssetId(listInfo.get(0).getId());
@@ -360,10 +360,14 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-          List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
+          List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+					if(listAssetInfo==null || listAssetInfo.size()==0){
+						data.setFinancingNum(data.getFinancingNum().toLowerCase());
+						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
+					}
 					if(listAssetInfo==null || listAssetInfo.size()==0){
 						data.setFinancingNum(data.getFinancingNum().toUpperCase());
-						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
+						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),user.getUid());
 					}
 					if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
 						data.setAssetInfo(listAssetInfo.get(0));
