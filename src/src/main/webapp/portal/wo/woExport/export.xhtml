@@ -157,12 +157,12 @@
             <p:commandButton ajax="false" value="详情全部导出"
                              actionListener="#{workOrderReportExportController.exportAllWoDocx()}"
                              icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                <p:fileDownload value="#{workOrderReportExportController.exportPdf}"/>
+                <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
             </p:commandButton>
             <p:commandButton ajax="false" value="详情选择导出"
                              actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}"
                              icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                <p:fileDownload value="#{workOrderReportExportController.exportPdf}"/>
+                <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
             </p:commandButton>
         </f:facet>
     </p:dataTable>

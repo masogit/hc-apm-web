@@ -1,10 +1,19 @@
 package com.ge.apm.view.wo;
 
-import java.io.*;
-import java.nio.file.Paths;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.service.wo.WorkOrderExportService;
+import com.ge.apm.service.wo.WorkOrderPublishRenderService;
+import com.ge.apm.view.sysutil.UserContextService;
+import org.primefaces.event.NodeSelectEvent;
+import org.primefaces.model.DefaultStreamedContent;
+import org.primefaces.model.DefaultTreeNode;
+import org.primefaces.model.StreamedContent;
+import org.primefaces.model.TreeNode;
+import webapp.framework.web.WebUtil;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -12,37 +21,16 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
-import javax.xml.transform.Result;
-import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.sax.SAXResult;
-import javax.xml.transform.stream.StreamSource;
-
-import org.apache.commons.collections.map.HashedMap;
-import org.apache.fop.apps.FOUserAgent;
-import org.apache.fop.apps.Fop;
-import org.apache.fop.apps.FopFactory;
-import org.apache.fop.apps.MimeConstants;
-import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultStreamedContent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.StreamedContent;
-import org.primefaces.model.TreeNode;
-
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.service.uaa.UaaService;
-import com.ge.apm.service.utils.ExcelDocument;
-import com.ge.apm.service.wo.WorkOrderExportService;
-import com.ge.apm.view.sysutil.UserContextService;
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.io.xml.DomDriver;
-import com.thoughtworks.xstream.mapper.DefaultMapper;
-
-import webapp.framework.web.WebUtil;
-import com.deepoove.poi.XWPFTemplate;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Created by 212605082 on 2017/7/26.
@@ -56,11 +44,17 @@ public class WorkOrderReportExportController implements Serializable {
      */
     private static final long serialVersionUID = -2591740986699150398L;
 
+    protected static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderReportExportController.class);
+
     private WorkOrderExportService workOrderExportService;
+
+    private WorkOrderPublishRenderService workOrderPublishRenderService;
 
     private StreamedContent exportFile;
 
     private StreamedContent exportPdf;
+
+    private StreamedContent exportDocx;
 
     private UserAccount currentUser;
 
@@ -97,6 +91,7 @@ public class WorkOrderReportExportController implements Serializable {
     protected void init() {
 
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
+        workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
@@ -147,41 +142,31 @@ public class WorkOrderReportExportController implements Serializable {
     }
 
     private void export2Pdf(List<Map<String, Object>> data) {
-        try {
-            String woXml = getWoXml(data);
-
-            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
-                    getResource("../../portal/pdf/wo2fo.xsl").getPath());
-
-            File conf = new File(WorkOrderReportExportController.class.getClassLoader().
-                    getResource("../../portal/pdf/fop.xml").getPath());
-
-            FopFactory fopFactory = FopFactory.newInstance(conf);
-            FOUserAgent foUserAgent = fopFactory.newFOUserAgent();
-
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            TransformerFactory factory = TransformerFactory.newInstance();
-            try {
-                Transformer transformer = factory.newTransformer(new StreamSource(xsl));
-                Source src = new StreamSource(new StringReader(woXml));
-                Fop fop = fopFactory.newFop(MimeConstants.MIME_PDF, foUserAgent, out);
-                Result res = new SAXResult(fop.getDefaultHandler());
-                transformer.transform(src, res);
-            } finally {
-                exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(out.toByteArray())), MimeConstants.MIME_PDF, "WorkOrderDetails.pdf");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.renderPdf(data);
+        exportPdf = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
     }
 
-    private String getWoXml(List<Map<String, Object>> data) {
-        XStream xStream = new XStream(new DomDriver());
-        xStream.registerConverter(new Map2XmlConverter(new DefaultMapper(XStream.class.getClassLoader())));
-        xStream.alias("List", List.class);
-        xStream.alias("map", HashedMap.class);
+    public void exportAllWoDocx() {
+        export2Docx(workOrderList);
+    }
 
-        return xStream.toXML(data);
+    public void exportSelectedWoDocx() {
+        export2Docx(selectedItems);
+    }
+
+    private void export2Docx(List<Map<String, Object>> data) {
+        exportDocx = null;
+        if (data.isEmpty()) {
+            WebUtil.addErrorMessage("未选中的需要导出的记录");
+            return;
+        }
+        try {
+            WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data);
+            exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
+        } catch (IOException e) {
+            logger.error("Fail to export work orders", e);
+            WebUtil.addErrorMessage("导出失败");
+        }
     }
 
     public void previewData(ActionEvent actionEvent) {
@@ -265,80 +250,6 @@ public class WorkOrderReportExportController implements Serializable {
         rootNode.getChildren().add(treeNode);
         rootNode.setExpanded(true);
 
-    }
-
-    public void exportAllWoDocx() {
-        export2Docx(workOrderList);
-    }
-
-    public void exportSelectedWoDocx() {
-        export2Docx(selectedItems);
-    }
-
-    private void export2Docx(List<Map<String, Object>> selectedItems) {
-        File file = Paths.get("D:\\tmp\\test.docx").toFile();
-
-        XWPFTemplate template = null;
-        try (FileOutputStream out = new FileOutputStream(file);
-             InputStream inputStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/template.docx")) {
-            template = XWPFTemplate.compile(inputStream);
-            Map<String, Object> datas = new HashMap<>();
-            Map<String, Object> map = selectedItems.get(0);
-            datas.put("device_name", map.get("设备名称"));
-            datas.put("device_type", map.get("设备类型"));
-            datas.put("device_serial", map.get("设备序列号"));
-            datas.put("device_qr", map.get("二维码"));
-            datas.put("device_department", map.get("科室"));
-            datas.put("device_oem", map.get("制造商"));
-            datas.put("device_number", map.get("设备编号"));
-            datas.put("device_location", map.get("当前位置"));
-
-            datas.put("issue_number", map.get("报修单号"));
-            datas.put("issue_reporter", map.get("报修人"));
-            datas.put("issue_reporter_phone", map.get("联系电话"));
-            datas.put("issue_report_time", map.get("报修时间"));
-            datas.put("issue_report_status", map.get("报修状态"));
-            datas.put("issue_device_stop_time", map.get("停机时间"));
-            datas.put("issue_desc", map.get("故障描述"));
-
-            datas.put("fix_status", map.get("工单状态"));
-            datas.put("fix_hours", map.get("维修工时"));
-            datas.put("fix_fee", map.get("维修总费用"));
-            datas.put("fix_sign_time", map.get("签到时间"));
-            datas.put("fix_type", map.get("工单类型"));
-            datas.put("fix_error_type", map.get("故障类型"));
-            //todo
-            datas.put("fix_owner", map.get("当前责任人"));
-            datas.put("fix_reason", map.get("原因描述"));
-            datas.put("fix_solution", map.get("解决方案"));
-            datas.put("fix_validation", map.get("交付前检测"));
-
-            datas.put("fix_co1", map.get("协作者1"));
-            datas.put("fix_co2", map.get("协作者2"));
-            datas.put("fix_cohour1", map.get("工时1"));
-            datas.put("fix_cohour2", map.get("工时2"));
-
-            datas.put("fix_man_hour", map.get("工时"));
-
-            datas.put("part_table", map.get("备件信息"));
-            datas.put("proceed_table", map.get("维修流程"));
-
-            template.registerPolicy("part_table", new PartTableRenderPolicy());
-            template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
-
-            template.render(datas);
-            template.write(out);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            try {
-                if (template != null) {
-                    template.close();
-                }
-            } catch (Exception ignore) {
-
-            }
-        }
     }
 
     public void filterSiteByHospital() {
@@ -505,5 +416,13 @@ public class WorkOrderReportExportController implements Serializable {
 
     public void setExportPdf(StreamedContent exportPdf) {
         this.exportPdf = exportPdf;
+    }
+
+    public StreamedContent getExportDocx() {
+        return exportDocx;
+    }
+
+    public void setExportDocx(StreamedContent exportDocx) {
+        this.exportDocx = exportDocx;
     }
 }
