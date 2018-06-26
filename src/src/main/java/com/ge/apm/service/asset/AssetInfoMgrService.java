@@ -14,6 +14,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.Supplier;
 import com.ge.apm.domain.V2_ServiceRequest;
 import com.ge.apm.domain.V2_PmOrder;
+import com.ge.apm.domain.WorkflowConfig;
 import com.ge.apm.service.common.ConfigService;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
@@ -83,6 +84,12 @@ public class AssetInfoMgrService {
         assetFilters.add(new SearchFilter("isDeleted", SearchFilter.Operator.EQ, false));
         assetFilters.add(new SearchFilter("isValid", SearchFilter.Operator.EQ, true));
         assetFilters.add(new SearchFilter("status", SearchFilter.Operator.NE, 4));  //不能待报废
+        
+        //配置项根据主设备生成编号
+        WorkflowConfig config = configService.findConfigBySite(siteUID);
+        if (config != null && config.getGenerateMethod() != null && config.getGenerateMethod() == 2) {
+            assetFilters.add(new SearchFilter("parentAssetId", SearchFilter.Operator.IsNull, ""));
+        }
         if (asset == null ? clinicalDeptUID != null : asset.getClinicalDeptUID() != null) {
             assetFilters.add(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.EQ, asset == null ? clinicalDeptUID : asset.getClinicalDeptUID()));
         }
