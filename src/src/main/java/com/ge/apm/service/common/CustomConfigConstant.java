@@ -167,7 +167,7 @@ public class CustomConfigConstant {
             allFields.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
             allFields.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
             allFields.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
-            allFields.put("warranty", "是否对质保到期提醒");
+            allFields.put("warranty", WebUtil.getMessage("isWarrantyNotice"));
         }
         return allFields;
     }
