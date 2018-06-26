@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringUtils;
 import org.primefaces.model.UploadedFile;
@@ -40,8 +41,7 @@ import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.report.TableDefinitionService;
-import com.ge.apm.service.report.TableResultReportService;
-import com.ge.apm.view.pm.V2PmOrderController;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 
 /**
@@ -55,6 +55,7 @@ public class ElectricSafetyService {
     private final String UPDATE="UPDATE";
     private final String INSERT="INSERT";
     private UserAccount user;
+    private String userOrgListStr;
     
     @Autowired
     AssetInfoRepository assetInfoRepository;
@@ -80,10 +81,21 @@ public class ElectricSafetyService {
     @Autowired
     UnstructuredDataRepository unstructuredDataRepository;
     
+    @Autowired
+    private UaaService uaaService;
+    
     
     public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr=readFileByLine(file);
 		this.user=user;
+		List<String> userOrgList=uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+		if(userOrgList!=null){
+			userOrgListStr="(";
+			for(int i=0;i<userOrgList.size();++i){
+				userOrgListStr+="'"+userOrgList.get(i)+"',";
+			}
+			userOrgListStr+=")";
+		}
 		return analysis(strArr,file.getFileName());
     }
     
@@ -154,7 +166,7 @@ public class ElectricSafetyService {
     		detail.setInstitutionUID(user.getInstitutionUID());
     		financingNum=detail.getFinancingNum();
     		if(financingNum!=null){
-        		List<AssetInfo> listInfo=assetInfoRepository.findByFinancingNum(financingNum,user.getSiteUID());
+        		List<AssetInfo> listInfo=assetInfoRepository.findByFinancingNumAccessScope(financingNum,user.getSiteUID(),userOrgListStr);
         		if(listInfo!=null && listInfo.size()==1){
         			String uid=listInfo.get(0).getUid();
         			detail.setAssetId(listInfo.get(0).getId());
@@ -348,10 +360,10 @@ public class ElectricSafetyService {
 					String strArr[]=strValue.split(" ");
 					strValue=strArr[0];
 					data.setFinancingNum(strValue);
-					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNum(data.getFinancingNum(),user.getSiteUID());
-					if(listAssetInfo==null){
+					List<AssetInfo> listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
+					if(listAssetInfo==null || listAssetInfo.size()==0){
 						data.setFinancingNum(data.getFinancingNum().toUpperCase());
-						listAssetInfo=assetInfoRepository.findByFinancingNum(data.getFinancingNum(),user.getSiteUID());
+						listAssetInfo=assetInfoRepository.findByFinancingNumAccessScope(data.getFinancingNum(),user.getSiteUID(),userOrgListStr);
 					}
 					if(listAssetInfo!=null && listAssetInfo.size()==1 && StringUtils.isNotEmpty(listAssetInfo.get(0).getUid())){
 						data.setAssetInfo(listAssetInfo.get(0));
