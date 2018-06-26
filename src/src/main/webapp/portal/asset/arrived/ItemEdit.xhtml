@@ -177,13 +177,13 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.clinicalDeptName}*</label>
                                 <p:autoComplete dropdown="true" value="#{assetInstallationController.deptName}"  scrollHeight="300"  forceSelection="true"  completeMethod="#{assetInstallationController.autoCompleteDept}">
-                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="clinicalOwnerName parentAssetList" />
-                                    <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="clinicalOwnerName parentAssetList" />
+                                    <p:ajax event="itemSelect" listener="#{assetInstallationController.onClinicalDeptChange}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
+                                    <p:ajax listener="#{assetInstallationController.onClinicalDeptChange(null)}" update="clinicalOwnerName @(.parentAssetList) parentAssetList" />
                                 </p:autoComplete>
                             </h:panelGroup>
-                            <h:panelGroup>
+                            <h:panelGroup id="parentAssetList">
                                 <label class="label">#{msg.parentAsset}</label>
-                                <p:autoComplete id="parentAssetList" dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" 
+                                <p:autoComplete dropdown="true" value="#{assetInstallationController.parentAssetInfo}"  scrollHeight="300"  forceSelection="true" 
                                 completeMethod="#{assetInstallationController.completeParentAssetInfoList}" var="t" itemLabel="#{t.departNum}#{t==null?'':'/'}#{t.name}" itemValue="#{t}" converter="assetInfoConverter">
                                 <p:ajax event="blur" listener="#{assetInstallationController.onParentAssetInfoChange}" process="@this"/>
                                 </p:autoComplete>
