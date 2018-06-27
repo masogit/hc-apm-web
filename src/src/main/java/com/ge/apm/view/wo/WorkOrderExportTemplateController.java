@@ -8,15 +8,14 @@ import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
+import com.ge.apm.service.wo.WorkOrderExportTemplateService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
-import org.primefaces.model.UploadedFile;
+import org.primefaces.model.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +25,8 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,6 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     private Boolean isInsulate;
     private Integer loginUserOrgType;
     private UserCommonService userCommonService;
-
     private OrgInfo selectedUserOrg;
     private TenantInfo selectedTenant;
     private TreeNode orgTree;
@@ -59,6 +59,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     private UploadedFile file;
     private V2_BlobObject uploadedFileObject;
     private BlobFileService blobService;
+    private WorkOrderExportTemplateService workOrderExportTemplateService;
 
     @Override
     protected void init() {
@@ -73,6 +74,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
         setTenantUid(user.getTenantUID());
         blobService = WebUtil.getBean(BlobFileService.class);
+        workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
     }
 
     public void uploadDataFile(FileUploadEvent event) {
@@ -102,6 +104,16 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         TreeNode node = event.getTreeNode();
         selectedUserOrg = (OrgInfo) node.getData();
         selected.setSiteUID(selectedUserOrg.getSiteUID());
+    }
+
+    public StreamedContent getActiveTemplate() {
+        try {
+            byte[] activeTemplateBytes = workOrderExportTemplateService.getActiveTemplateBytes(user.getSiteUID());
+            return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
+        } catch (IOException e) {
+            WebUtil.addErrorMessage("Fail to download work order template");
+        }
+        return null;
     }
 
     public void setTenantUid(String tenantUid) {
@@ -227,9 +239,6 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     public void applyChange() {
         if (selectedUserOrg == null) {
             selectedUserOrg = orgInfoRepository.getByUid(user.getSiteUID());
-//            RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
-//            WebUtil.addErrorMessage(WebUtil.getMessage("selectedOrg"));
-//            return;
         }
         if (file == null || uploadedFileObject == null) {
             RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);

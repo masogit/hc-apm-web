@@ -94,10 +94,10 @@ public class WorkOrderPublishRenderService {
         try {
             String woXml = getWoXml(data);
 
-            File xsl = new File(WorkOrderPublishRenderService.class.getClassLoader().
+            File xsl = new File(getClass().getClassLoader().
                     getResource("../../portal/pdf/wo2fo.xsl").getPath());
 
-            File conf = new File(WorkOrderPublishRenderService.class.getClassLoader().
+            File conf = new File(getClass().getClassLoader().
                     getResource("../../portal/pdf/fop.xml").getPath());
 
             FopFactory fopFactory = FopFactory.newInstance(conf);

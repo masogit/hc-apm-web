@@ -16,9 +16,9 @@
                 <p:fieldset id="basic" legend="报表模板配置">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
-                                <h:outputText value="下载当前生效模板"/>
-                            </p:link>
+                            <p:commandButton process="@this"  onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s" value="下载当前生效模板">
+                                <p:fileDownload value="#{workOrderExportTemplateController.getActiveTemplate()}"/>
+                            </p:commandButton>
                         </h:panelGroup>
                         <h:panelGroup>
                             <label class="label">#{msg.choseFileToUpload}</label>

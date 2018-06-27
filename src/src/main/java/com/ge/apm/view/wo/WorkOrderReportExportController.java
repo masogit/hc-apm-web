@@ -1,18 +1,14 @@
 package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.WorkOrderExportTemplateRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.WorkOrderExportTemplate;
-import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.service.wo.WorkOrderExportService;
+import com.ge.apm.service.wo.WorkOrderExportTemplateService;
 import com.ge.apm.service.wo.WorkOrderPublishRenderService;
 import com.ge.apm.view.sysutil.UserContextService;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.primefaces.event.NodeSelectEvent;
 import org.primefaces.model.DefaultStreamedContent;
 import org.primefaces.model.DefaultTreeNode;
@@ -50,7 +46,7 @@ public class WorkOrderReportExportController implements Serializable {
 
     private WorkOrderExportService workOrderExportService;
     private WorkOrderPublishRenderService workOrderPublishRenderService;
-    private BlobFileService blobService;
+    private WorkOrderExportTemplateService workOrderExportTemplateService;
 
     private StreamedContent exportFile;
 
@@ -61,8 +57,6 @@ public class WorkOrderReportExportController implements Serializable {
     private UserAccount currentUser;
 
     private OrgInfoRepository orgDao;
-
-    private WorkOrderExportTemplateRepository templateRepository;
 
     private List<OrgInfo> institutionList;
     private List<OrgInfo> hospitalList;
@@ -96,9 +90,8 @@ public class WorkOrderReportExportController implements Serializable {
 
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
         workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
-        blobService = WebUtil.getBean(BlobFileService.class);
+        workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
-        templateRepository = WebUtil.getBean(WorkOrderExportTemplateRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
 
         currentUser = UserContextService.getCurrentUserAccount();
@@ -167,7 +160,8 @@ public class WorkOrderReportExportController implements Serializable {
             return;
         }
         try {
-            WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, getTemplateBytes());
+            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(currentSiteUID);
+            WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
             exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
         } catch (IOException e) {
             logger.error("Fail to export work orders", e);
@@ -175,17 +169,6 @@ public class WorkOrderReportExportController implements Serializable {
         }
     }
 
-    private byte[] getTemplateBytes() throws IOException {
-        byte[] templateBytes = null;
-        WorkOrderExportTemplate template = templateRepository.findTopBySiteUID(currentSiteUID);
-        if (template != null && StringUtils.isNotEmpty(template.getStorageId())) {
-            templateBytes = IOUtils.toByteArray(blobService.getBlobObjectByStorageId(template.getStorageId()).getStream());
-        }
-        if (templateBytes == null) {
-            templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/template.docx"));
-        }
-        return templateBytes;
-    }
 
     public void previewData(ActionEvent actionEvent) {
 
@@ -255,8 +238,6 @@ public class WorkOrderReportExportController implements Serializable {
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
-
-        //orgTree = uaaService.getOrgTreeBySite(loginUser.getSiteUID());
 
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
 
