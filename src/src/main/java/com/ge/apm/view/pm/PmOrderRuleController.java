@@ -168,6 +168,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
         if (this.selected != null && this.selected.getAssetGroup() != null) {
             tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
+        }else{
+            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNotNull, null));
         }
         return templateDao.findBySearchFilter(tempFilter);
     }
