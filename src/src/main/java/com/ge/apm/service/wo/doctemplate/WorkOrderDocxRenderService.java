@@ -1,10 +1,9 @@
 package com.ge.apm.service.wo.doctemplate;
 
 import com.deepoove.poi.XWPFTemplate;
-import com.ge.apm.view.wo.WorkOrderReportExportController;
 import org.springframework.stereotype.Component;
 
-import javax.faces.context.FacesContext;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,17 +12,19 @@ import java.util.Map;
 
 @Component
 public class WorkOrderDocxRenderService {
+
     static final org.apache.log4j.Logger logger = org.apache.log4j.Logger.getLogger(WorkOrderDocxRenderService.class);
 
-    public byte[] renderDocx(Map<String, Object> map) throws IOException {
+    public byte[] renderDocx(Map<String, Object> map, byte[] templateBytes) throws IOException {
         Map<String, Object> datas = mapMyMap(map);
         byte[] bytes;
         XWPFTemplate template = null;
         try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             InputStream inputStream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/template.docx")) {
+             InputStream inputStream = new ByteArrayInputStream(templateBytes)) {
             template = XWPFTemplate.compile(inputStream);
             template.registerPolicy("part_table", new PartTableRenderPolicy());
             template.registerPolicy("proceed_table", new ProceedTableRenderPolicy());
+            template.registerPolicy("audit_table", new AuditTableRenderPolicy());
             template.render(datas);
             template.write(out);
             bytes = out.toByteArray();
@@ -79,6 +80,8 @@ public class WorkOrderDocxRenderService {
 
         datas.put("part_table", map.get("备件信息"));
         datas.put("proceed_table", map.get("维修流程"));
+        datas.put("audit_table", map.get("serviceRequestMessages"));
+
         return datas;
     }
 }

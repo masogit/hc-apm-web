@@ -2,7 +2,6 @@ package com.ge.apm.service.wo;
 
 import com.ge.apm.service.wo.doctemplate.WorkOrderDocxRenderService;
 import com.ge.apm.view.wo.Map2XmlConverter;
-import com.ge.apm.view.wo.WorkOrderReportExportController;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 import com.thoughtworks.xstream.mapper.DefaultMapper;
@@ -41,29 +40,30 @@ public class WorkOrderPublishRenderService {
     @Autowired
     WorkOrderDocxRenderService workOrderDocxRenderService;
 
-    public RenderResult render(List<Map<String, Object>> data) throws IOException {
+    public RenderResult render(List<Map<String, Object>> data, byte[] templateBytes) throws IOException {
         logger.info("Export work orders: " + data.size());
-        return data.size() > 1 ? renderZip(data) : renderDocx(data);
+        return data.size() > 1 ? renderZip(data, templateBytes) : renderDocx(data, templateBytes);
     }
 
-    private RenderResult renderDocx(List<Map<String, Object>> data) throws IOException {
+    private RenderResult renderDocx(List<Map<String, Object>> data, byte[] templateBytes) throws IOException {
         RenderResult renderResult = null;
         for (Map<String, Object> map : data) {
-            byte[] bytes = workOrderDocxRenderService.renderDocx(map);
+            byte[] bytes = workOrderDocxRenderService.renderDocx(map, templateBytes);
             renderResult = new RenderResult(bytes, "application/msword", "WorkOrderDetails.docx");
         }
         return renderResult;
     }
 
-    private RenderResult renderZip(List<Map<String, Object>> data) throws IOException {
+    private RenderResult renderZip(List<Map<String, Object>> data, byte[] templateBytes) throws IOException {
         RenderResult renderResult;
         try (ByteArrayOutputStream bout = new ByteArrayOutputStream();
              ZipOutputStream zout = new ZipOutputStream(bout)) {
+            int index = 1;
             for (Map<String, Object> map : data) {
-                String fileName = getFileName(map);
+                String fileName = getFileName(map, index++);
                 zout.putNextEntry(new ZipEntry(fileName));
                 logger.info("Adding zip entry for: " + fileName);
-                byte[] bytes = workOrderDocxRenderService.renderDocx(map);
+                byte[] bytes = workOrderDocxRenderService.renderDocx(map, templateBytes);
                 IOUtils.write(bytes, zout);
                 zout.closeEntry();
             }
@@ -73,8 +73,8 @@ public class WorkOrderPublishRenderService {
         }
     }
 
-    private String getFileName(Map<String, Object> map) {
-        return "WO-" + map.get("设备名称") + "-" + map.get("报修单号") + ".docx";
+    private String getFileName(Map<String, Object> map, int index) {
+        return "WO" + index + "-" + map.get("设备名称") + "-" + map.get("报修单号") + ".docx";
     }
 
     public class RenderResult {
@@ -94,10 +94,10 @@ public class WorkOrderPublishRenderService {
         try {
             String woXml = getWoXml(data);
 
-            File xsl = new File(WorkOrderReportExportController.class.getClassLoader().
+            File xsl = new File(WorkOrderPublishRenderService.class.getClassLoader().
                     getResource("../../portal/pdf/wo2fo.xsl").getPath());
 
-            File conf = new File(WorkOrderReportExportController.class.getClassLoader().
+            File conf = new File(WorkOrderPublishRenderService.class.getClassLoader().
                     getResource("../../portal/pdf/fop.xml").getPath());
 
             FopFactory fopFactory = FopFactory.newInstance(conf);
