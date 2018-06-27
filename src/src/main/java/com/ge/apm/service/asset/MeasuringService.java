@@ -117,12 +117,12 @@ public class MeasuringService {
                         assetInfoFlag = true;
                     }
                 }else{
-                    if(tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+                    if(tempAssetInfo.getLastMeteringDate() == null || tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
                         assetInfoFlag = true;
                     }
                 }
             }else{
-                if(tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+                if(tempAssetInfo.getLastMeteringDate() == null || tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
                     assetInfoFlag = true;
                 }
             }
