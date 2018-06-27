@@ -97,7 +97,37 @@ public class MeasuringService {
         }
 
         if(tempAssetInfo != null){
-            if(tempAssetInfo.getLastMeteringDate() == null || tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+            List<MeasuringCertificateDetail> mcdList = null;
+            boolean assetInfoFlag = false;
+
+            if(measuringCertificateDetail.getCertificateNo() != null){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
+            }
+
+            if(mcdList.isEmpty()){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
+            }
+
+            if(mcdList != null && !mcdList.isEmpty()){
+                MeasuringCertificateDetail tempMcd = mcdList.get(0);
+                measuringCertificateDetail.setId(tempMcd.getId());
+
+                if(tempAssetInfo.getMeteringNO() != null){
+                    if(tempAssetInfo.getMeteringNO().equals(tempMcd.getCertificateNo())){
+                        assetInfoFlag = true;
+                    }
+                }else{
+                    if(tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+                        assetInfoFlag = true;
+                    }
+                }
+            }else{
+                if(tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
+                    assetInfoFlag = true;
+                }
+            }
+
+            if(assetInfoFlag){
                 tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
                 tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
                 tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
@@ -106,23 +136,12 @@ public class MeasuringService {
                     tempAssetInfo.setUsageStatus(2);//停用
                     tempAssetInfo.setStatus(5);
                 }
+                assetInfoDao.save(tempAssetInfo);
             }
 
-            assetInfoDao.save(tempAssetInfo);
-
-            //向MeasuringCertificateDetail表中插入导入记录
-            /*MeasuringCertificateDetail tempMeasuringCertificateDetail = measuringCertificateDetailDao.findByAssetSNAndCheckDateAndTenantUID(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            if(tempMeasuringCertificateDetail == null){
-                tempMeasuringCertificateDetail = measuringCertificateDetailDao.findByFinanceNoAndCheckDateAndTenantUID(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            }*/
-
-            MeasuringCertificateDetail tempMeasuringCertificateDetail = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-
-            if (tempMeasuringCertificateDetail != null) {
-                measuringCertificateDetail.setId(tempMeasuringCertificateDetail.getId());
-            }
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
             measuringCertificateDetailDao.save(measuringCertificateDetail);
+
         }
 
         if(!flag){
@@ -191,7 +210,11 @@ public class MeasuringService {
                 }
 
                 if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
-                    detail.setCertificateNo(CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
+                    String tempCertificateNo = CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue();
+                    if(tempCertificateNo == null || tempCertificateNo.trim().equals("")){
+                        tempCertificateNo = null;
+                    }
+                    detail.setCertificateNo(tempCertificateNo);
                 }
 
                 if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
