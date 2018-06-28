@@ -470,7 +470,7 @@ public class ExcelDocument {
         }
         if (data instanceof Double) {
             cell.setCellType(CellType.NUMERIC);
-            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
 
             cell.setCellValue((Double) data);
         }
