@@ -80,6 +80,7 @@
                 <p:menuitem id="um201" value="排班管理" outcome="/portal/schedule/workSchedule.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,AssetHead')}"/>
                             <!--rendered="#{userContextService.hasAnyRole('DeptHead,SuperAdmin,AssetHead')}"/>-->
                 <p:menuitem id="um202" value="请假管理" outcome="/portal/schedule/userVacationList.xhtml" rendered="false"/>
+                <p:menuitem id="um220" value="报表模板管理" outcome="/portal/wo/woExportTemplate/List.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,ITAdmin,LocalITAdmin')}"/>
             </p:submenu>
             <p:submenu id="um15" label="#{msg.DeviceMonitor}" icon="fa fa-bell-o"
                        rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('DeptHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}">
@@ -126,6 +127,9 @@
 				<!-- <p:menuitem id="um402" value="SAPConfig" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceConfigMain.xhtml"/>
 				<p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
 				<p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
+            </p:submenu>
+            <p:submenu id="um70" label="护士站维护" icon="fa fa-file-excel-o">
+                       <p:menuitem id="um701" value="设备保养" outcome="/portal/nurseSite/maintainMain.xhtml"/>
             </p:submenu>
             <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book"
                        rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}">
