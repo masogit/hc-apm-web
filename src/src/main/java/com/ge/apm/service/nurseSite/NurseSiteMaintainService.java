@@ -45,11 +45,11 @@ public class NurseSiteMaintainService{
 	}
 	
 	
-	public List<NurseSiteMaintain> getMaintainData(String siteUid,Date startDate,Date endDate){
+	public List<NurseSiteMaintain> getMaintainData(Date startDate,Date endDate,String siteUid,String userUid){
 		Calendar ca=Calendar.getInstance();
 		ca.setTime(endDate);
 		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		return nurseSiteMaintainRepository.findBySiteUidAndDate(siteUid,startDate,ca.getTime());
+		return nurseSiteMaintainRepository.findBySiteUidAndDate(startDate,ca.getTime(),siteUid,userUid);
 	}
 	
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters){
@@ -64,8 +64,8 @@ public class NurseSiteMaintainService{
 		return assetInfoRepository.getByUid(uid);
 	}
 	
-	public boolean canAddMaintainData(){
-		return true;
+	public boolean canAddMaintainData(Date scheduleDate,String siteUid,String userUid){
+		return nurseSiteMaintainRepository.findBySiteUidAndScheduleDate(scheduleDate, siteUid, userUid)==null?true:false;
 	}
 	
 	public void save(NurseSiteMaintain obj){
