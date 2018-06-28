@@ -160,7 +160,7 @@ public class WorkOrderReportExportController implements Serializable {
             return;
         }
         try {
-            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(currentSiteUID);
+            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
             exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
         } catch (IOException e) {

@@ -12,22 +12,8 @@ import java.util.List;
 public interface WorkOrderExportTemplateRepository extends GenericRepositoryUUID<WorkOrderExportTemplate> {
 
     @Query(value = "select w from WorkOrderExportTemplate w where w.siteUID in ?1")
-    public List<WorkOrderExportTemplate> getBySiteUIDList(List<String> uidList);
-
-    @Query(value = "select * from work_order_export_template w where w.site_UID=:uid order by w.id desc limit 1", nativeQuery = true)
-    public WorkOrderExportTemplate getBySiteUID(@Param("uid") String site_uid);
+    public List<WorkOrderExportTemplate> findBySiteUIDList(List<String> uidList);
 
     public List<WorkOrderExportTemplate> findBySiteUID(String siteUid);
-
-    public WorkOrderExportTemplate findFirstBySiteUID(String siteUid);
-
-    public WorkOrderExportTemplate findTopBySiteUID(String siteUid);
-
-    @Query(value = "delete from WorkOrderExportTemplate wc where wc.siteUID = ?1")
-    @Modifying
-    @Transactional
-    public void deleteBySiteUID(String siteUID);
-
-    List<WorkOrderExportTemplate> findByTenantUID(String tenantUID);
 
 }
