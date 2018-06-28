@@ -11,6 +11,7 @@ public class SimplePair {
 	private String key;
 	private String strValue;
 	private Boolean blnValue;
+	private Integer intValue;
 	private List<SimplePair> listSimplePairValue;
 	private List<String> listStrValue;
 	private List<Boolean> listBlnValue;
@@ -29,6 +30,11 @@ public class SimplePair {
 	public SimplePair(String strValue){
 		this.key=COMMONKEY;
 		this.strValue=strValue;
+	}
+	
+	public SimplePair(String key,Integer intValue){
+		this.key=key;
+		this.intValue=intValue;
 	}
 	
 	public SimplePair(String key,String strValue){
@@ -96,6 +102,14 @@ public class SimplePair {
 
 	public void setListBlnValue(List<Boolean> listBlnValue) {
 		this.listBlnValue = listBlnValue;
+	}
+
+	public Integer getIntValue() {
+		return intValue;
+	}
+
+	public void setIntValue(Integer intValue) {
+		this.intValue = intValue;
 	}
 
 	@Override

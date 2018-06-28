@@ -27,7 +27,6 @@ import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
@@ -69,9 +68,9 @@ public class MaintainController {
 	private List<String> listMonthDay;
 	
 	//dropdownlist
-	private List<MutablePair<String,Integer>> checkListHours;
-	private List<MutablePair<String,Integer>> checkListWeekDays;
-	private List<MutablePair<String,Integer>> checkListMonthDays;
+	private List<SimplePair> checkListHours;
+	private List<SimplePair> checkListWeekDays;
+	private List<SimplePair> checkListMonthDays;
 	private List<AssetInfo> checkListAssets;
 
 	
@@ -599,58 +598,58 @@ public class MaintainController {
 		this.endBatchDate = endBatchDate;
 	}
 
-	public List<MutablePair<String,Integer>> getCheckListHours() {
+	public List<SimplePair> getCheckListHours() {
 		if(checkListHours==null){
-			checkListHours=new ArrayList<MutablePair<String,Integer>>();
+			checkListHours=new ArrayList<SimplePair>();
 			for(int i=1;i<=24;++i){
-				MutablePair<String,Integer> p=new MutablePair<String,Integer>(i+"时",i);
+				SimplePair p=new SimplePair(i+"时",i);
 				checkListHours.add(p);
 			}
 		}
 		return checkListHours;
 	}
 
-	public void setCheckListHours(List<MutablePair<String,Integer>> checkListHours) {
+	public void setCheckListHours(List<SimplePair> checkListHours) {
 		this.checkListHours = checkListHours;
 	}
 
-	public List<MutablePair<String,Integer>> getCheckListWeekDays() {
+	public List<SimplePair> getCheckListWeekDays() {
 		if(checkListWeekDays==null){
-			checkListWeekDays=new ArrayList<MutablePair<String,Integer>>();
-			MutablePair<String,Integer> p=new MutablePair<String,Integer>("星期日",1);
+			checkListWeekDays=new ArrayList<SimplePair>();
+			SimplePair p=new SimplePair("星期日",1);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期一",2);
+			p=new SimplePair("星期一",2);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期二",3);
+			p=new SimplePair("星期二",3);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期三",4);
+			p=new SimplePair("星期三",4);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期四",5);
+			p=new SimplePair("星期四",5);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期五",6);
+			p=new SimplePair("星期五",6);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期六",7);
+			p=new SimplePair("星期六",7);
 			checkListWeekDays.add(p);
 		}
 		return checkListWeekDays;
 	}
 
-	public void setCheckListWeekDays(List<MutablePair<String,Integer>> checkListWeekDays) {
+	public void setCheckListWeekDays(List<SimplePair> checkListWeekDays) {
 		this.checkListWeekDays = checkListWeekDays;
 	}
 
-	public List<MutablePair<String,Integer>> getCheckListMonthDays() {
+	public List<SimplePair> getCheckListMonthDays() {
 		if(checkListMonthDays==null){
-			checkListMonthDays=new ArrayList<MutablePair<String,Integer>>();
+			checkListMonthDays=new ArrayList<SimplePair>();
 			for(int i=1;i<=31;++i){
-				MutablePair<String,Integer> p=new MutablePair<String,Integer>(i+"日", i);
+				SimplePair p=new SimplePair(i+"日", i);
 				checkListMonthDays.add(p);
 			}
 		}
 		return checkListMonthDays;
 	}
 
-	public void setCheckListMonthDays(List<MutablePair<String,Integer>> checkListMonthDays) {
+	public void setCheckListMonthDays(List<SimplePair> checkListMonthDays) {
 		this.checkListMonthDays = checkListMonthDays;
 	}
 

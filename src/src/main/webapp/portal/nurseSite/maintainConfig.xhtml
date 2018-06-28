@@ -35,16 +35,16 @@
 					<span id="type1Span" style="#{maintainController.nurseSiteMaintainConfig.type==1?'display:block;':'display:none;'}">
 						<label class="label">生成报告频率</label>
 						<p:selectManyMenu value="#{maintainController.listCheckDate}" var="t" required="false" filter="true" filterMatchMode="contains" showCheckbox="true">
-							<f:selectItems value="#{maintainController.checkListHours}" var="item" itemLabel="#{item.key}" itemValue="#{item.value}" />
+							<f:selectItems value="#{maintainController.checkListHours}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
-								<h:outputText value="#{t}" />
+								<h:outputText value="#{t}时" />
 							</p:column>
 						</p:selectManyMenu>
 					</span>
 					<span id="type2Span" style="#{maintainController.nurseSiteMaintainConfig.type==2?'display:block;':'display:none;'}">
 						<label class="label">生成报告频率</label>
 						<p:selectManyMenu value="#{maintainController.listWeekDay}" var="t" required="false" filter="true" filterMatchMode="contains" showCheckbox="true">
-							<f:selectItems value="#{maintainController.checkListWeekDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.value}" />
+							<f:selectItems value="#{maintainController.checkListWeekDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
 								<h:outputText value="#{t==2?'星期一':t==3?'星期二':t==4?'星期三':t==5?'星期四':t==6?'星期五':t==7?'星期六':t==1?'星期日':''}" />
 							</p:column>
@@ -53,9 +53,9 @@
 					<span id="type3Span" style="#{maintainController.nurseSiteMaintainConfig.type==3?'display:block;':'display:none;'}">
 						<label class="label">生成报告频率</label>
 						<p:selectManyMenu value="#{maintainController.listMonthDay}" var="t" required="false" filter="true" filterMatchMode="contains" showCheckbox="true">
-							<f:selectItems value="#{maintainController.checkListMonthDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.value}" />
+							<f:selectItems value="#{maintainController.checkListMonthDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
-								<h:outputText value="#{t}" />
+								<h:outputText value="#{t}日" />
 							</p:column>
 						</p:selectManyMenu>
 					</span>
