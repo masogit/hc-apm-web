@@ -1,0 +1,37 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml">
+
+    <ui:define name="content">
+
+        <style>
+            /**
+            div.ui-tabs-panel.ui-widget-content {
+                min-height: 700px;
+            }
+            */
+
+        </style>
+
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="#{msg.OrgAdmin}"/>
+            </div>
+
+            <div class="ui-g-12 card ">
+                <p:tabView id="tabview" >
+                    <p:ajax event="tabChange"/>
+                    <p:tab title="组织机构编辑">
+                        <ui:include src="List.xhtml"/>
+                    </p:tab>
+                    <p:tab title="组织机构导入">
+                        <ui:include src="Import.xhtml"/>
+                    </p:tab>
+                </p:tabView>
+            </div>
+        </div>
+    </ui:define>
+</ui:composition>
