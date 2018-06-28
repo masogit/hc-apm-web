@@ -108,7 +108,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
 
     public StreamedContent getActiveTemplate() {
         try {
-            byte[] activeTemplateBytes = workOrderExportTemplateService.getActiveTemplateBytes(user.getSiteUID());
+            byte[] activeTemplateBytes = workOrderExportTemplateService.getActiveTemplateBytes(user.getSiteUID(), user.getHospitalUID(), user.getInstitutionUID(), user.getTenantUID());
             return new DefaultStreamedContent((new ByteArrayInputStream(activeTemplateBytes)), "application/msword", "template.docx");
         } catch (IOException e) {
             WebUtil.addErrorMessage("Fail to download work order template");
@@ -116,7 +116,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         return null;
     }
 
-    public boolean existsSiteTemplate(){
+    public boolean existsSiteTemplate() {
         return workOrderExportTemplateService.existsSiteTemplate(user.getSiteUID());
     }
 
@@ -204,6 +204,7 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
     @Override
     protected Page<WorkOrderExportTemplate> loadData(PageRequest pageRequest) {
         List<SearchFilter> searchFilters = userCommonService.getLoginUserFilters(isInsulate, loginUserOrgType);
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
