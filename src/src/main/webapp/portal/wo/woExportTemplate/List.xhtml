@@ -54,7 +54,8 @@
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray"
                                              actionListener="#{workOrderExportTemplateController.prepareCreate}"
                                              update=":WoExportTemplateEditDlg"
-                                             oncomplete="PF('WoExportTemplateEditDialog').show()"/>
+                                             oncomplete="PF('WoExportTemplateEditDialog').show()"
+                                             disabled="#{workOrderExportTemplateController.existsSiteTemplate()}"/>
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"
                                              actionListener="#{workOrderExportTemplateController.prepareEdit()}"
                                              update=":WoExportTemplateEditDlg"

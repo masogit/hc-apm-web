@@ -16,8 +16,10 @@
                 <p:fieldset id="basic" legend="报表模板配置">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:commandButton process="@this"  onclick="PrimeFaces.monitorDownload(start, stop);" icon="ui-icon-arrowthick-1-s" value="下载当前生效模板">
-                                <p:fileDownload value="#{workOrderExportTemplateController.getActiveTemplate()}"/>
+                            <p:commandButton update=":growl" icon="ui-icon-file-download" value="下载当前生效模板"
+                                             onclick="PrimeFaces.monitorDownload(start, stop);">
+                                <p:fileDownload
+                                        value="#{workOrderExportTemplateController.getActiveTemplate()}"/>
                             </p:commandButton>
                         </h:panelGroup>
                         <h:panelGroup>
