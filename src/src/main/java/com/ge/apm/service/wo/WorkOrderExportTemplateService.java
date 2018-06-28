@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by 212688574
@@ -34,5 +35,10 @@ public class WorkOrderExportTemplateService {
             templateBytes = IOUtils.toByteArray(FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/wo/woExportTemplate/template.docx"));
         }
         return templateBytes;
+    }
+
+    public boolean existsSiteTemplate(String siteUid) {
+        List list = templateRepository.findBySiteUID(siteUid);
+        return list != null && !list.isEmpty();
     }
 }
