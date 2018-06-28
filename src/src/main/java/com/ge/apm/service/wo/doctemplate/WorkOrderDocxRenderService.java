@@ -62,6 +62,8 @@ public class WorkOrderDocxRenderService {
         datas.put("fix_status", map.get("工单状态"));
         datas.put("fix_hours", map.get("维修工时"));
         datas.put("fix_fee", map.get("维修总费用"));
+        datas.put("fix_other_fee", map.get("其他费用"));
+        datas.put("fix_ext_fee", map.get("外修费用"));
         datas.put("fix_sign_time", map.get("签到时间"));
         datas.put("fix_type", map.get("工单类型"));
         datas.put("fix_error_type", map.get("故障类型"));
