@@ -98,49 +98,47 @@ public class MeasuringService {
 
         if(tempAssetInfo != null){
             List<MeasuringCertificateDetail> mcdList = null;
-            boolean assetInfoFlag = false;
+            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
 
             if(measuringCertificateDetail.getCertificateNo() != null){
                 mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
             }
 
-            if(mcdList.isEmpty()){
+            if(mcdList == null || mcdList.isEmpty()){
                 mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
             }
 
-            if(mcdList != null && !mcdList.isEmpty()){
+            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+            if(mcdList != null && !mcdList.isEmpty()) {
                 MeasuringCertificateDetail tempMcd = mcdList.get(0);
                 measuringCertificateDetail.setId(tempMcd.getId());
-
-                if(tempAssetInfo.getMeteringNO() != null){
-                    if(tempAssetInfo.getMeteringNO().equals(tempMcd.getCertificateNo())){
-                        assetInfoFlag = true;
-                    }
-                }else{
-                    if(tempAssetInfo.getLastMeteringDate() == null || tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
-                        assetInfoFlag = true;
-                    }
-                }
-            }else{
-                if(tempAssetInfo.getLastMeteringDate() == null || tempAssetInfo.getLastMeteringDate().before(measuringCertificateDetail.getCheckDate())){
-                    assetInfoFlag = true;
-                }
-            }
-
-            if(assetInfoFlag){
-                tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
-                tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
-                tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
-                tempAssetInfo.setMeteringNO(measuringCertificateDetail.getCertificateNo());
-                if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
-                    tempAssetInfo.setUsageStatus(2);//停用
-                    tempAssetInfo.setStatus(5);
-                }
-                assetInfoDao.save(tempAssetInfo);
             }
 
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
             measuringCertificateDetailDao.save(measuringCertificateDetail);
+
+            //目标设备的所有计量记录
+            List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), measuringCertificateDetail.getTenantUID());
+            if(allMcdList != null && !allMcdList.isEmpty()){
+                //目标设备的所有计量记录中计量日期最大的记录
+                MeasuringCertificateDetail maxMcd = allMcdList.get(0);
+
+                if(measuringCertificateDetail.getCheckDate().before(maxMcd.getCheckDate())){
+
+                    needUpdateAssetMcd = maxMcd;
+
+                }
+            }
+
+            //更新设备台账
+            tempAssetInfo.setNextMeteringDate(needUpdateAssetMcd.getValidDateTo());
+            tempAssetInfo.setLastMeteringDate(needUpdateAssetMcd.getCheckDate());
+            tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
+                tempAssetInfo.setUsageStatus(2);//停用
+                tempAssetInfo.setStatus(5);
+            }
+            assetInfoDao.save(tempAssetInfo);
 
         }
 
