@@ -11,9 +11,12 @@ public class SimplePair {
 	private String key;
 	private String strValue;
 	private Boolean blnValue;
+	private Integer intValue;
 	private List<SimplePair> listSimplePairValue;
 	private List<String> listStrValue;
 	private List<Boolean> listBlnValue;
+	//0：未检查,1:通过，2有问题
+	private Integer status;
 	
 	private final String COMMONKEY="result";
 	
@@ -29,6 +32,11 @@ public class SimplePair {
 	public SimplePair(String strValue){
 		this.key=COMMONKEY;
 		this.strValue=strValue;
+	}
+	
+	public SimplePair(String key,Integer intValue){
+		this.key=key;
+		this.intValue=intValue;
 	}
 	
 	public SimplePair(String key,String strValue){
@@ -98,9 +106,26 @@ public class SimplePair {
 		this.listBlnValue = listBlnValue;
 	}
 
+	public Integer getIntValue() {
+		return intValue;
+	}
+
+	public void setIntValue(Integer intValue) {
+		this.intValue = intValue;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		// TODO Auto-generated method stub
+		status=0;
 		List<SimplePair> listCheckItems=this.getListSimplePairValue();
 		if(listCheckItems.size()>0){
 			String str="{\""+COMMONKEY+"\":[";
@@ -111,7 +136,18 @@ public class SimplePair {
 					str+="{\""+p.getKey()+"\":[";
 					for(int j=0;j<listInner.size();++j){
 						SimplePair temp=listInner.get(j);
-						str+="{\""+temp.getKey()+"\":"+""+temp.getBlnValue()+"},";
+						Boolean bln=temp.getBlnValue();
+						if(bln!=null){
+							if(status==2){
+							}
+							else{
+								status=1;
+								if(bln==false){
+									status=2;
+								}
+							}
+						}
+						str+="{\""+temp.getKey()+"\":"+""+bln+"},";
 					}
 					str=str.substring(0,str.length()-1);
 					str+="]},";
@@ -125,6 +161,7 @@ public class SimplePair {
 	}
 	
 	public void parseStr(List<SimplePair> listP,String content,Object defaultValue){
+		status=0;
 		if(StringUtils.isNotEmpty(content)){
 			JSONObject obj=JSONObject.parseObject(content);
 			JSONArray array=(JSONArray) obj.get(COMMONKEY);
@@ -142,7 +179,18 @@ public class SimplePair {
 								String lastKey=objLast.keySet().iterator().next();
 								if(pLast.getKey().equals(lastKey)){
 									if(objLast.get(lastKey)!=null){
-										pLast.setBlnValue((Boolean)objLast.get(lastKey));
+										Boolean bln=(Boolean)objLast.get(lastKey);
+										if(bln!=null){
+											if(status==2){
+											}
+											else{
+												status=1;
+												if(bln==false){
+													status=2;
+												}
+											}
+										}
+										pLast.setBlnValue(bln);
 									}
 									else{
 										pLast.setBlnValue((Boolean)defaultValue);

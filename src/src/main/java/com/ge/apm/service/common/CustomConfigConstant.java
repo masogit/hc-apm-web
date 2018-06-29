@@ -92,7 +92,7 @@ public class CustomConfigConstant {
             exportFields.put("折旧算法", "depreciationMethod");
             exportFields.put("是否PM", "isPm");
             exportFields.put("是否盘点", "isChecked");
-            exportFields.put("上次维护日期", "lastPmDate");
+            exportFields.put("上次保养日期", "lastPmDate");
             exportFields.put("上次质检日期", "lastQaDate");
             exportFields.put("上次计量日期", "lastMeteringDate");
             exportFields.put("是否对质保到期提醒", "warranty");
@@ -188,7 +188,7 @@ public class CustomConfigConstant {
         return Arrays.asList("parentAssetId", "deviceName", "systemId", "financingNum", "departNum",
                 "barcode", "registrationNo", "modalityId", "qrCode", "functionType", "functionGroup", "assetCode68", "functionGrade",
                 "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "assetUsage",
-                "capitalSource", "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
+                "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
                 "lastQaDate", "lastMeteringDate", "warranty");
@@ -211,7 +211,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsEditpageCatalogFields() {
-        return Arrays.asList("assetUsage", "capitalSource", "capitalSource2", "measureGrade", "riskGrade",
+        return Arrays.asList("assetUsage", "capitalSource", "measureGrade", "riskGrade",
                 "emergencyEquipment", "importEquipment", "measuringItemCategory", "accountingCategory");
     }
 

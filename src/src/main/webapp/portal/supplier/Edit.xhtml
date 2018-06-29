@@ -45,10 +45,7 @@
 
                         <h:panelGroup>
                             <label class="label">供应商类型*</label>
-                                <h:panelGroup >
-                                    <p:selectBooleanCheckbox  value="#{supplierController.selected.supplierT}" itemLabel="供应商">
-                                    </p:selectBooleanCheckbox>
-                                </h:panelGroup>
+
                                 <h:panelGroup>
                                     <p:selectBooleanCheckbox  value="#{supplierController.selected.maintainerT}" itemLabel="维修商">
                                     </p:selectBooleanCheckbox>
@@ -57,6 +54,10 @@
                                     <p:selectBooleanCheckbox   value="#{supplierController.selected.manufacturerT}" itemLabel="制造商">
                                     </p:selectBooleanCheckbox>
                                 </h:panelGroup>
+                            <h:panelGroup >
+                                <p:selectBooleanCheckbox  value="#{supplierController.selected.supplierT}" itemLabel="设备供应商">
+                                </p:selectBooleanCheckbox>
+                            </h:panelGroup>
                         </h:panelGroup>
 
 
