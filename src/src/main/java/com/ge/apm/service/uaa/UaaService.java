@@ -741,14 +741,27 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     
     //用户对指定医院访问的科室列表
     public List<OrgInfo> getOrgDeptList(String siteUid,String userUid) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("getOrgDeptList siteUID: " + siteUid + ", userUid: " + userUid);
+        }
+        List<OrgInfo> deptList;
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
         if (orgUidSet.contains(siteUid)) {
-            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
+            deptList = accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
         } else {
-            return getClinicalDeptListBySiteUID(siteUid);
+            deptList = getClinicalDeptListBySiteUID(siteUid);
         }
+        if(logger.isDebugEnabled()) {
+            logger.debug("deptList: " + deptList.stream().map(item -> item.getUid()).collect(Collectors.joining(",")));
+        }
+        List<String> regulatorUids = this.getRegulatorUidsBySiteUid(siteUid);
+        if(regulatorUids != null && regulatorUids.size() > 0) {
+            deptList = deptList.stream()
+                                .filter(item -> !regulatorUids.contains(item.getUid()))
+                                .collect(Collectors.toList());
+        }
+        return deptList;
     }
     
     public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
@@ -958,6 +971,20 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         }
 
         return null;
+    }
+    
+    // 根据院区UID(siteUID)获取工作流中配置的调剂中心UID列表
+    public List<String> getRegulatorUidsBySiteUid(String siteUID) {
+        List<WorkflowConfig> workflows = wfcfigDao.findBySiteUID(siteUID);
+        List<String> regulatorUids = workflows.stream()
+                                                .map(workflow -> workflow.getDeptForSharedAsset())
+                                                .distinct()
+                                                .collect(Collectors.toList());
+        if(logger.isDebugEnabled()) {
+            logger.debug("getRegulatorUidsBySiteUid siteUID: " + siteUID + ", regulatorUids: " + regulatorUids.stream().collect(Collectors.joining(",")));
+        }
+        return regulatorUids;
+                
     }
 
 }

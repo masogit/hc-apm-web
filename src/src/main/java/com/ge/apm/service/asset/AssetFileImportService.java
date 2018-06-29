@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
-    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.2";
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.3";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -232,7 +232,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDateValue("质保日期", "setFactoryWarrantyDate");
                 assetRow.setFieldDateValue("维保截止日期", "setWarrantyDate");
                 assetRow.setFieldDateValue("报废日期", "setTerminateDate");
-                assetRow.setFieldDateValue("上次维护日期", "setLastPmDate");
+                assetRow.setFieldDateValue("上次保养日期", "setLastPmDate");
                 assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
                 assetRow.setFieldDateValue("上次质检日期", "setLastQaDate");
 
@@ -673,6 +673,10 @@ public class AssetFileImportService {
     }
 
     private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
+
+        if (StringUtils.isEmpty(asset.getDepartNum())) {
+            return false;
+        }
 
         List<SearchFilter> assetFilters = new ArrayList<>();
         String orgUid = selectedOrgToImport.getUid();

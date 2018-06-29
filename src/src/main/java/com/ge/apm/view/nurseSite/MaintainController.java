@@ -27,7 +27,6 @@ import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.alibaba.fastjson.JSONObject;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
@@ -69,15 +68,17 @@ public class MaintainController {
 	private List<String> listMonthDay;
 	
 	//dropdownlist
-	private List<MutablePair<String,Integer>> checkListHours;
-	private List<MutablePair<String,Integer>> checkListWeekDays;
-	private List<MutablePair<String,Integer>> checkListMonthDays;
+	private List<SimplePair> checkListHours;
+	private List<SimplePair> checkListWeekDays;
+	private List<SimplePair> checkListMonthDays;
 	private List<AssetInfo> checkListAssets;
 
 	
 	//validate
 	private boolean isDeleteDisable;
     private boolean isSaveDisable;
+    
+    private boolean isDeptHead;
 
 	@PostConstruct
 	protected void init() {
@@ -89,6 +90,12 @@ public class MaintainController {
 		this.loadMaintainData(orgUidList);
 		this.loadMaintainConfig();
 		checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
+		if(UserContextService.getRoles().contains("DeptHead")){
+			isDeptHead=true;
+		}
+		else{
+			isDeptHead=false;
+		}
 	}
 
 	private void loadMaintainData(List<String> userOrgList) {
@@ -101,9 +108,8 @@ public class MaintainController {
 				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters);
-
 				for (NurseSiteMaintain data : listData) {
-					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(), data.getScheduleDate(), data.getScheduleDate(), true);
+					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data), data.getScheduleDate(), data.getScheduleDate(), true);
 					tempEvent.setData(data);
 					addEvent(tempEvent);
 				}
@@ -111,60 +117,65 @@ public class MaintainController {
 		};
 	}
 	
-	private void parseContentJson(String contentJSON){
+	private SimplePair parseContentJson(String contentJSON){
 		try {
 			SimplePair p=new SimplePair();
 			p.parseStr(listCheckItems,contentJSON, false);
+			return p;
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
 		}
+		return null;
 	}
 
-	private String getContentJson() {
+	private SimplePair getContentJson() {
 		SimplePair p=new SimplePair(listCheckItems);
-		return p.toString();
+		return p;
 	}
 
 	public void saveMaintainData(ActionEvent actionEvent) {
+		updateMaintainData(nurseSiteMaintain, false);
 		if (event.getId() == null) {
 			// 新增记录
-			updateMaintainData(nurseSiteMaintain,false);
+			if (nurseSiteMaintainService.canAddMaintainData(nurseSiteMaintain.getScheduleDate(), currentUser.getSiteUID(), currentUser.getUid())) {
+				lazyEventModel.addEvent(event);
+				nurseSiteMaintainService.save(nurseSiteMaintain);
+			} else {
+				WebUtil.addErrorMessage("不能新增报告，新增最小间隔1小时");
+				return;
+			}
 		} else {
 			// 更新记录
 			if (event.getData() != null) {
-				updateMaintainData(nurseSiteMaintain,false);
-			}
-		}
-		if (nurseSiteMaintain != null) {
-			if (nurseSiteMaintainService.canAddMaintainData()) {
-				if (nurseSiteMaintain.getId() == null) {
-					lazyEventModel.addEvent(event);
-				} else {
-					lazyEventModel.updateEvent(event);
-				}
+				lazyEventModel.updateEvent(event);
 				nurseSiteMaintainService.save(nurseSiteMaintain);
-			} else {
-				WebUtil.addErrorMessage("不能新增");
-				return;
 			}
-
-		} else {
-			lazyEventModel.updateEvent(new DefaultScheduleEvent(event.getTitle(), event.getStartDate(), event.getEndDate(), true));
 		}
-		event = new DefaultScheduleEvent();
+		addMessage("报告已保存");
 	}
 
 	public void deleteMaintainData() {
 		if (event.getId() != null) {
 			if (lazyEventModel.deleteEvent(event)) {
 				nurseSiteMaintainService.delete((NurseSiteMaintain) event.getData());
+				addMessage("报告已删除");
 			}
 		}
 	}
 
-	private String getShowTitle() {
-		return new Date().toString();
+	private String getShowTitle(NurseSiteMaintain tempNurseSiteMaintain) {
+		String strStatus="未检查";
+		if(tempNurseSiteMaintain.getStatus()==null){
+		}
+		else if(tempNurseSiteMaintain.getStatus()==1){
+			strStatus="已通过";
+		}
+		else if(tempNurseSiteMaintain.getStatus()==2){
+			strStatus="有问题";
+		}
+		String str=sdf.format(tempNurseSiteMaintain.getScheduleDate())+"-"+strStatus;
+		return str;
 	}
 
 	public void onEventSelect(SelectEvent selectEvent) {
@@ -175,7 +186,11 @@ public class MaintainController {
 
 	public void onDateSelect(SelectEvent selectEvent) {
 		Date date=(Date) selectEvent.getObject();
-		nurseSiteMaintain=createMaintainData(date);
+		Calendar ca=Calendar.getInstance();
+		int currentHour=ca.get(Calendar.HOUR_OF_DAY);
+		ca.setTime(date);
+		ca.set(Calendar.HOUR_OF_DAY,currentHour);
+		nurseSiteMaintain=createMaintainData(ca.getTime());
 		parseContentJson(nurseSiteMaintain.getContentJSON());
 		DefaultScheduleEvent tempEvent = new DefaultScheduleEvent("", date, date, true);
 		tempEvent.setData(nurseSiteMaintain);
@@ -183,6 +198,7 @@ public class MaintainController {
 	}
 
 	public void onMaintainDataValidate() {
+		
 	}
 
 	public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -223,6 +239,7 @@ public class MaintainController {
 				for(int j=startDay;j<=endDay;++j){
 					for(int i=0;i<arr.length;++i){
 						try {
+							currentCalendar=Calendar.getInstance();
 							currentCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(arr[i]));
 							currentCalendar.set(Calendar.DAY_OF_MONTH,j);
 							Date date=currentCalendar.getTime();
@@ -241,6 +258,7 @@ public class MaintainController {
 				for(int j=startWeek;j<=endWeek;++j){
 					for(int i=0;i<arr.length;++i){
 						try {
+							currentCalendar=Calendar.getInstance();
 							currentCalendar.set(Calendar.DAY_OF_WEEK,Integer.parseInt(arr[i]));
 							currentCalendar.set(Calendar.WEEK_OF_MONTH,j);
 							Date date=currentCalendar.getTime();
@@ -259,6 +277,7 @@ public class MaintainController {
 				for(int j=startMonth;j<=endMonth;++j){
 					for(int i=0;i<arr.length;++i){
 						try {
+							currentCalendar=Calendar.getInstance();
 							int monthDays=DateUtil.getMonthDays(currentYear, j);
 							if(Integer.parseInt(arr[i])<=monthDays){
 								currentCalendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(arr[i]));
@@ -292,18 +311,19 @@ public class MaintainController {
 		}
 		Integer type=nurseSiteMaintainConfig.getType();
 		String typeValue=nurseSiteMaintainConfig.getTypeValue();
-		List<NurseSiteMaintain> listMaintainData=nurseSiteMaintainService.getMaintainData(currentUser.getSiteUID(), startBatchDate, endBatchDate);
+		List<NurseSiteMaintain> listMaintainData=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
 		if(listMaintainData!=null && listMaintainData.size()>0){
 			for(int i=0;i<listMaintainData.size();++i){
 				updateMaintainData(listMaintainData.get(i),true);
 			}
 		}
 		nurseSiteMaintainService.save(listMaintainData);
+		addMessage("报告已批量填写");
 	}
 	
 	private void findExistMaintainData(){
 		existMaintainDate=new ArrayList<Date>();
-		List<NurseSiteMaintain> listNurseSiteMaintain=nurseSiteMaintainService.getMaintainData(currentUser.getSiteUID(), startBatchDate, endBatchDate);
+		List<NurseSiteMaintain> listNurseSiteMaintain=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
 		if(listNurseSiteMaintain!=null && listNurseSiteMaintain.size()>0){
 			for(int i=0;i<listNurseSiteMaintain.size();++i){
 				existMaintainDate.add(listNurseSiteMaintain.get(i).getScheduleDate());
@@ -318,37 +338,40 @@ public class MaintainController {
 		tempNurseSiteMaintain.setInstitutionUID(currentUser.getInstitutionUID());
 		tempNurseSiteMaintain.setHospitalUID(currentUser.getHospitalUID());
 		tempNurseSiteMaintain.setSiteUID(currentUser.getSiteUID());
-		tempNurseSiteMaintain.setCheckDate(null);
+		tempNurseSiteMaintain.setCheckDate(currentDate);
 		tempNurseSiteMaintain.setConfigId(nurseSiteMaintainConfig.getId());
 		tempNurseSiteMaintain.setContentJSON(null);
 		tempNurseSiteMaintain.setCreateBy(currentUser);
 		tempNurseSiteMaintain.setCreateByUid(currentUser.getUid());
 		tempNurseSiteMaintain.setCreateDate(currentDate);
-		tempNurseSiteMaintain.setModifyBy(null);
-		tempNurseSiteMaintain.setModifyByUid(null);
-		tempNurseSiteMaintain.setModifyDate(null);
+		tempNurseSiteMaintain.setModifyBy(currentUser);
+		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
+		tempNurseSiteMaintain.setModifyDate(currentDate);
 		tempNurseSiteMaintain.setScheduleDate(date);
 		return tempNurseSiteMaintain;
 	}
 	
 	private void updateMaintainData(NurseSiteMaintain obj,boolean batchUpdate){
+		SimplePair p=getContentJson();
 		if(batchUpdate){
 			if(obj.getContentJSON()==null){
-				obj.setContentJSON(getContentJson());
+				obj.setContentJSON(p.toString());
 				Date currentDate=new Date();
 				obj.setCheckDate(currentDate);
 				obj.setModifyBy(currentUser);
 				obj.setModifyByUid(currentUser.getUid());
 				obj.setModifyDate(currentDate);
+				obj.setStatus(p.getStatus());
 			}
 		}
 		else{
-			obj.setContentJSON(getContentJson());
+			obj.setContentJSON(p.toString());
 			Date currentDate=new Date();
 			obj.setCheckDate(currentDate);
 			obj.setModifyBy(currentUser);
 			obj.setModifyByUid(currentUser.getUid());
 			obj.setModifyDate(currentDate);
+			obj.setStatus(p.getStatus());
 		}
 	}
 	
@@ -360,11 +383,16 @@ public class MaintainController {
 			LOGGER.error(e.getMessage());
 		}
 		if(!DateUtil.listContainsDate(existMaintainDate, date)){
-			NurseSiteMaintain tempNurseSiteMaintain=createMaintainData(date);
-			DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(), date, date, true);
-	        tempEvent.setData(tempNurseSiteMaintain);
-	        this.lazyEventModel.addEvent(tempEvent);
-	        listMaintainData.add(tempNurseSiteMaintain);
+			Calendar ca=Calendar.getInstance();
+			ca.setTime(endBatchDate);
+			ca.set(Calendar.DATE,ca.get(Calendar.DATE)+1);
+			if(date.getTime()>=startBatchDate.getTime()&&date.getTime()<ca.getTime().getTime()){
+				NurseSiteMaintain tempNurseSiteMaintain=createMaintainData(date);
+				DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(tempNurseSiteMaintain), date, date, true);
+		        tempEvent.setData(tempNurseSiteMaintain);
+		        this.lazyEventModel.addEvent(tempEvent);
+		        listMaintainData.add(tempNurseSiteMaintain);
+			}
 		}
 	}
 
@@ -598,58 +626,58 @@ public class MaintainController {
 		this.endBatchDate = endBatchDate;
 	}
 
-	public List<MutablePair<String,Integer>> getCheckListHours() {
+	public List<SimplePair> getCheckListHours() {
 		if(checkListHours==null){
-			checkListHours=new ArrayList<MutablePair<String,Integer>>();
+			checkListHours=new ArrayList<SimplePair>();
 			for(int i=1;i<=24;++i){
-				MutablePair<String,Integer> p=new MutablePair<String,Integer>(i+"时",i);
+				SimplePair p=new SimplePair(i+"时",i);
 				checkListHours.add(p);
 			}
 		}
 		return checkListHours;
 	}
 
-	public void setCheckListHours(List<MutablePair<String,Integer>> checkListHours) {
+	public void setCheckListHours(List<SimplePair> checkListHours) {
 		this.checkListHours = checkListHours;
 	}
 
-	public List<MutablePair<String,Integer>> getCheckListWeekDays() {
+	public List<SimplePair> getCheckListWeekDays() {
 		if(checkListWeekDays==null){
-			checkListWeekDays=new ArrayList<MutablePair<String,Integer>>();
-			MutablePair<String,Integer> p=new MutablePair<String,Integer>("星期日",1);
+			checkListWeekDays=new ArrayList<SimplePair>();
+			SimplePair p=new SimplePair("星期日",1);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期一",2);
+			p=new SimplePair("星期一",2);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期二",3);
+			p=new SimplePair("星期二",3);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期三",4);
+			p=new SimplePair("星期三",4);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期四",5);
+			p=new SimplePair("星期四",5);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期五",6);
+			p=new SimplePair("星期五",6);
 			checkListWeekDays.add(p);
-			p=new MutablePair<String,Integer>("星期六",7);
+			p=new SimplePair("星期六",7);
 			checkListWeekDays.add(p);
 		}
 		return checkListWeekDays;
 	}
 
-	public void setCheckListWeekDays(List<MutablePair<String,Integer>> checkListWeekDays) {
+	public void setCheckListWeekDays(List<SimplePair> checkListWeekDays) {
 		this.checkListWeekDays = checkListWeekDays;
 	}
 
-	public List<MutablePair<String,Integer>> getCheckListMonthDays() {
+	public List<SimplePair> getCheckListMonthDays() {
 		if(checkListMonthDays==null){
-			checkListMonthDays=new ArrayList<MutablePair<String,Integer>>();
+			checkListMonthDays=new ArrayList<SimplePair>();
 			for(int i=1;i<=31;++i){
-				MutablePair<String,Integer> p=new MutablePair<String,Integer>(i+"日", i);
+				SimplePair p=new SimplePair(i+"日", i);
 				checkListMonthDays.add(p);
 			}
 		}
 		return checkListMonthDays;
 	}
 
-	public void setCheckListMonthDays(List<MutablePair<String,Integer>> checkListMonthDays) {
+	public void setCheckListMonthDays(List<SimplePair> checkListMonthDays) {
 		this.checkListMonthDays = checkListMonthDays;
 	}
 
@@ -692,8 +720,14 @@ public class MaintainController {
 	public void setCheckListAssets(List<AssetInfo> checkListAssets) {
 		this.checkListAssets = checkListAssets;
 	}
-	
-	
+
+	public boolean isDeptHead() {
+		return isDeptHead;
+	}
+
+	public void setDeptHead(boolean isDeptHead) {
+		this.isDeptHead = isDeptHead;
+	}
 	
 	
 }

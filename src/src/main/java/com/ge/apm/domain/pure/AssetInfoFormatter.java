@@ -661,7 +661,7 @@ public class AssetInfoFormatter {
         map.put("质保日期", this.getFactoryWarrantyDate());
         map.put("维保截止日期", this.getWarrantyDate());
         map.put("报废日期", this.getTerminateDate());
-        map.put("上次维护日期", this.getLastPmDate());
+        map.put("上次保养日期", this.getLastPmDate());
         map.put("上次计量日期", this.getLastMeteringDate());
         map.put("上次质检日期", this.getLastQaDate());
 

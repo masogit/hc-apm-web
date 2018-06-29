@@ -5,6 +5,7 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import webapp.framework.dao.SearchFilter;
+import webapp.framework.util.StringUtil;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.domain.Supplier;
@@ -73,6 +74,28 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         } else {
             return dao.findBySearchFilter(this.searchFilters, pageRequest);
         }
+    }
+
+    public String getGongyingshangLeixing(Supplier supplier){
+     if(supplier==null || supplier.getMaintainerT()==null|| supplier.getManufacturerT()==null||supplier.getSupplierT()==null){
+         return "";
+     }
+        String name =new String();
+        if(supplier.getMaintainerT()){
+           name= name.concat("维修商 ");
+        }
+        if(supplier.getManufacturerT()){
+            name= name.concat("制造商 ");
+        }
+        if(supplier.getSupplierT()){
+            name= name.concat("供应商");
+        }
+
+       name= name.replace(" ","/");
+        if(name.charAt(name.length()-1)=='/'){
+            name= name.substring(0,name.length()-1);
+        }
+        return name;
     }
     
 }
