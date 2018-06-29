@@ -674,6 +674,10 @@ public class AssetFileImportService {
 
     private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
 
+        if (StringUtils.isEmpty(asset.getDepartNum())) {
+            return false;
+        }
+
         List<SearchFilter> assetFilters = new ArrayList<>();
         String orgUid = selectedOrgToImport.getUid();
 
