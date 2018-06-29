@@ -153,8 +153,7 @@
                                     </p:column>
 
                                     <p:column headerText="到货">
-                                        <h:outputText value="#{item.arrived?'已到货':''}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
-                                        <p:commandLink process="@this"  actionListener="#{workOrderMgrController.accessoryArrival(item.id)}" class="arrivalItem" rendered="#{item.id ne '000' and !item.arrived}" update="@(.accessList)">未到货</p:commandLink>
+                                        <h:outputText value="#{item.arrived?'已到货':'未到货'}" rendered="#{item.id ne '000'}" class="arrivalItem"/>
                                     </p:column>
 
                                     <p:column headerText="#{msg.Actions}">
