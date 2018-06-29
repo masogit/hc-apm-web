@@ -536,7 +536,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'installDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.installDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['installDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.installDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}" 
+            <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.installDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}"
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
         </h:panelGroup>
     </c:if>
