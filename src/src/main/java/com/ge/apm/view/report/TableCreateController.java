@@ -1,9 +1,12 @@
 package com.ge.apm.view.report;
 
 import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.TableDefinitionRepository;
 import com.ge.apm.domain.ElectricSafetyData;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TableDefinition;
+import com.ge.apm.domain.UserAccount;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
@@ -12,6 +15,7 @@ import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.report.TieFacesService;
+import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.ReportTemplateDocument;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
@@ -44,9 +48,12 @@ import java.util.logging.Logger;
 @ManagedBean
 @ViewScoped
 public class TableCreateController extends TieWebSheetBean {
+
     private static final String FILE_SUFFIX = ".xlsx";
     private static final String DEFAULT_EXCEL_TEMPLATE_FILE = "ReportTemplate";
 
+    private UaaService uaaService;
+    private OrgInfoRepository orgDao;
     private TableDefinitionRepository templateDao;
     private TableDefinitionService templateService;
     private TableSchema table;
@@ -62,6 +69,9 @@ public class TableCreateController extends TieWebSheetBean {
 
     private Boolean isStringEditable = false;
 
+    private Boolean isReadOnly = false;
+    private OrgInfo selectedOrg;
+    private List<OrgInfo> selectedOrgList;
     //for Excel
     private UploadedFile uploadedFile;
     private BlobFileService blobService;
@@ -74,7 +84,6 @@ public class TableCreateController extends TieWebSheetBean {
     private Collection<String> templateLabels;
     private Map<String, String> mapTemplateKeyValues;
     private DualListModel listInstrumentMppingLabels = new DualListModel<>();
-    ;
     private String instrumentDataLabel;
     private String templateLabel;
     private static final String SPLIT_STR = " <=> ";
@@ -87,6 +96,8 @@ public class TableCreateController extends TieWebSheetBean {
         tableValue = new HashMap<String, Object>();
         templateDao = WebUtil.getBean(TableDefinitionRepository.class);
         templateService = WebUtil.getBean(TableDefinitionService.class);
+        uaaService = WebUtil.getBean(UaaService.class);
+        orgDao = WebUtil.getBean(OrgInfoRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         tableFields = new HashMap<>();
 
@@ -128,6 +139,13 @@ public class TableCreateController extends TieWebSheetBean {
                     }
                 }
             }
+        }
+
+        selectedOrg = orgDao.findByUid(selectedTableDefinition.getSiteUID());
+        selectedOrgList =  uaaService.getUserAccessibleSiteList(UserContextService.getCurrentUserAccount().getUid());
+        if(!selectedOrgList.contains(selectedOrg)){
+            selectedOrgList.add(selectedOrg);
+            isReadOnly = true;
         }
 
     }
@@ -442,7 +460,6 @@ public class TableCreateController extends TieWebSheetBean {
         }
     }
 
-
     private String genExcelTemplateTableName(TableSchema table) {
         String title;
         if (table == null || table.getTitle() == null) {
@@ -542,6 +559,19 @@ public class TableCreateController extends TieWebSheetBean {
     public void testSubmit() {
     }
 
+
+    public void onSiteChange() {
+        selectedTableDefinition.setTenantUID(selectedOrg.getTenantUID());
+        selectedTableDefinition.setInstitutionUID(selectedOrg.getInstitutionUID());
+        selectedTableDefinition.setHospitalUID(selectedOrg.getHospitalUID());
+        selectedTableDefinition.setSiteUID(selectedOrg.getSiteUID());
+    }
+    
+    public boolean getIsReadOnly(){
+        return isReadOnly;
+    }
+    
+
     //getter and setter
     public TableSchema getTable() {
         return table;
@@ -623,57 +653,72 @@ public class TableCreateController extends TieWebSheetBean {
         this.uploadedFile = uploadedFile;
     }
 
-	public Collection<String> getInstrumentDataLabels() {
-		instrumentDataLabels=ElectricSafetyData.getLabelAttributeMapping().values();
-		return instrumentDataLabels;
-	}
+    public Collection<String> getInstrumentDataLabels() {
+        instrumentDataLabels = ElectricSafetyData.getLabelAttributeMapping().values();
+        return instrumentDataLabels;
+    }
 
-	public void setInstrumentDataLabels(Collection<String> instrumentDataLabels) {
-		this.instrumentDataLabels = instrumentDataLabels;
-	}
-	public String getInstrumentDataLabel() {
-		return instrumentDataLabel;
-	}
+    public void setInstrumentDataLabels(Collection<String> instrumentDataLabels) {
+        this.instrumentDataLabels = instrumentDataLabels;
+    }
 
-	public void setInstrumentDataLabel(String instrumentDataLabel) {
-		this.instrumentDataLabel = instrumentDataLabel;
-	}
+    public String getInstrumentDataLabel() {
+        return instrumentDataLabel;
+    }
 
-	public String getTemplateLabel() {
-		return templateLabel;
-	}
+    public void setInstrumentDataLabel(String instrumentDataLabel) {
+        this.instrumentDataLabel = instrumentDataLabel;
+    }
 
-	public void setTemplateLabel(String templateLabel) {
-		this.templateLabel = templateLabel;
-	}
+    public String getTemplateLabel() {
+        return templateLabel;
+    }
 
-	public DualListModel getListInstrumentMppingLabels() {
-		return listInstrumentMppingLabels;
-	}
+    public void setTemplateLabel(String templateLabel) {
+        this.templateLabel = templateLabel;
+    }
 
-	public void setListInstrumentMppingLabels(DualListModel listInstrumentMppingLabels) {
-		this.listInstrumentMppingLabels = listInstrumentMppingLabels;
-	}
+    public DualListModel getListInstrumentMppingLabels() {
+        return listInstrumentMppingLabels;
+    }
 
-	public Collection<String> getTemplateLabels() {
-		mapTemplateKeyValues=new HashMap<String,String>();
-		if(table!=null){
-			try {
-				for(TableGroup group: table.getGroups()){
-					for(TableItem item: group.getItems()){
-						mapTemplateKeyValues.put( item.getKey(),item.getLabel()+"("+item.getKey()+")");
-					}
-				}
-				templateLabels=mapTemplateKeyValues.values();
-			} catch (Exception e) {
-				// TODO: handle exception
-				WebUtil.addErrorMessage(e, "解析模版失败");
-			}
-		}
-		return templateLabels;
-	}
+    public void setListInstrumentMppingLabels(DualListModel listInstrumentMppingLabels) {
+        this.listInstrumentMppingLabels = listInstrumentMppingLabels;
+    }
 
-	public void setTemplateLabels(Collection<String> templateLabels) {
-		this.templateLabels = templateLabels;
-	}
+    public Collection<String> getTemplateLabels() {
+        mapTemplateKeyValues = new HashMap<String, String>();
+        if (table != null) {
+            try {
+                for (TableGroup group : table.getGroups()) {
+                    for (TableItem item : group.getItems()) {
+                        mapTemplateKeyValues.put(item.getKey(), item.getLabel() + "(" + item.getKey() + ")");
+                    }
+                }
+                templateLabels = mapTemplateKeyValues.values();
+            } catch (Exception e) {
+                // TODO: handle exception
+                WebUtil.addErrorMessage(e, "解析模版失败");
+            }
+        }
+        return templateLabels;
+    }
+    
+
+    public void setTemplateLabels(Collection<String> templateLabels) {
+        this.templateLabels = templateLabels;
+    }
+
+    public OrgInfo getSelectedOrg() {
+        return selectedOrg;
+    }
+
+    public void setSelectedOrg(OrgInfo selectedOrg) {
+        this.selectedOrg = selectedOrg;
+    }
+
+    public List<OrgInfo> getSelectedOrgList() {
+        return selectedOrgList;
+    }
+    
 }

@@ -56,23 +56,23 @@
                                                 </c:if>
                                                 <br/>
                                                 <p:commandLink actionListener="#{tableCreateController.prepareEditItem(groupItem,fieldItem)}" value="修改" update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()"/>
-                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'up')}" value="上移"  update=":CreateTemplateForm"   />
-                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'down')}" value="下移"  update=":CreateTemplateForm"  />
-                                                <p:commandLink actionListener="#{tableCreateController.removeItem(groupItem,fieldItem)}" value="删除"  update=":CreateTemplateForm"  />
+                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'up')}" value="上移"  update=":CreateTemplateForm"   disabled="#{tableCreateController.isReadOnly}"/>
+                                                <p:commandLink actionListener="#{tableCreateController.moveItem(groupItem,fieldItem,'down')}" value="下移"  update=":CreateTemplateForm"  disabled="#{tableCreateController.isReadOnly}"/>
+                                                <p:commandLink actionListener="#{tableCreateController.removeItem(groupItem,fieldItem)}" value="删除"  update=":CreateTemplateForm"  disabled="#{tableCreateController.isReadOnly}"/>
                                             </h:panelGroup>
                                         </c:forEach>
                                         <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
                                             <h:panelGroup>
-                                                <p:commandLink actionListener="#{tableCreateController.prepareAddItem(groupItem)}" value="添加"  update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()" process="@this"/>
+                                                <p:commandLink actionListener="#{tableCreateController.prepareAddItem(groupItem)}" value="添加"  update=":editItemDialogForm" oncomplete="PF('editItemDialog').show()" process="@this" disabled="#{tableCreateController.isReadOnly}"/>
                                             </h:panelGroup>
                                         </p:panelGrid>
                                     </p:panelGrid>
 
                                     <h:panelGroup style="float:right">
-                                        <p:commandLink  actionListener="#{tableCreateController.prepareEditGroup(groupItem)}" value="修改"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()"/>
-                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'up')}" value="上移"  update=":CreateTemplateForm" />
-                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'down')}" value="下移"  update=":CreateTemplateForm" />
-                                        <p:commandLink  actionListener="#{tableCreateController.removeGroup(groupItem)}" value="删除"  update=":CreateTemplateForm" />
+                                        <p:commandLink  actionListener="#{tableCreateController.prepareEditGroup(groupItem)}" value="修改"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'up')}" value="上移"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.moveGroup(groupItem,'down')}" value="下移"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
+                                        <p:commandLink  actionListener="#{tableCreateController.removeGroup(groupItem)}" value="删除"  update=":CreateTemplateForm" disabled="#{tableCreateController.isReadOnly}"/>
                                     </h:panelGroup>
                                 </p:fieldset>
 
@@ -82,7 +82,7 @@
 
                                 <h:panelGroup>
 
-                                    <p:commandLink process="@this" actionListener="#{tableCreateController.prepareAddGroup}" value="添加Group"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" />
+                                    <p:commandLink process="@this" actionListener="#{tableCreateController.prepareAddGroup}" value="添加Group"  update=":editGroupDialogForm" oncomplete="PF('editGroupDialog').show()" disabled="#{tableCreateController.isReadOnly}"/>
                                     <br/>
                                     <p:commandLink immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                                     <br />
@@ -104,8 +104,8 @@
                                 <h:panelGroup id="jsonString">
                                     <label class="label">#{msg.jsonString}</label>
                                     <p:inputTextarea id="jsonStringText"  value="#{tableCreateController.tableString}" cols="100"  readonly="#{!tableCreateController.isStringEditable}" />
-                                    <p:commandButton  value="编辑" actionListener="#{tableCreateController.onStringEdit()}" process="jsonString" update="jsonString :growl" rendered="#{!tableCreateController.isStringEditable}"/>
-                                    <p:commandButton  value="保存" actionListener="#{tableCreateController.onStringSave()}" process="jsonString" update=":CreateTemplateForm jsonString :growl" rendered="#{tableCreateController.isStringEditable}"/>
+                                    <p:commandButton  value="编辑" actionListener="#{tableCreateController.onStringEdit()}" process="jsonString" update="jsonString :growl" rendered="#{!tableCreateController.isStringEditable}" disabled="#{tableCreateController.isReadOnly}"/>
+                                    <p:commandButton  value="保存" actionListener="#{tableCreateController.onStringSave()}" process="jsonString" update=":CreateTemplateForm jsonString :growl" rendered="#{tableCreateController.isStringEditable}" disabled="#{tableCreateController.isReadOnly}"/>
                                 </h:panelGroup>
                             </p:panelGrid>
                         </p:tab>
@@ -116,53 +116,60 @@
                                 </p:inputText>
                             </div>
                             <h:panelGroup id="importExcel">
-                                <p:commandButton value="导入模版"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
+                                <p:commandButton value="导入模版"  process="@this" update="importExcel" oncomplete="PF('uploadDialog').show()" rendered="#{empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                                 <h:outputText value="#{tableCreateController.uploadedFile.fileName}" />
                                 <p:link href="#{fileDownloadService.getFileUrl(tableCreateController.selectedTableDefinition.excelStorageId)}" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId and empty tableCreateController.uploadedFile}">#{tableCreateController.selectedTableDefinition.name}</p:link>
-                                <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}"/>
+                                <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" process="@this" actionListener="#{tableCreateController.removeExcelTemplate}" update="importExcel :uploadDialogForm preview" rendered="#{not empty tableCreateController.selectedTableDefinition.excelStorageId}" disabled="#{tableCreateController.isReadOnly}"/>
                             </h:panelGroup>
                             <p:fieldset legend="预览" id="preview">
-                                    <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}" showLineNumber="false" />
-                                    <p:panel rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId }">
-                                        <p:commandButton value="测试"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
-                                        <h:outputText value="#{tableCreateController.tableFields}" />
-                                    </p:panel>
+                                <tie:websheet id="sheet1" webSheetBean="#{tableCreateController}"  maxRowsPerPage="30" rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId}" showLineNumber="false" />
+                                <p:panel rendered="#{not empty tableCreateController.uploadedFile or not empty tableCreateController.selectedTableDefinition.excelStorageId }">
+                                    <p:commandButton value="测试"  update="preview" actionListener="#{tableCreateController.testSubmit()}" />
+                                    <h:outputText value="#{tableCreateController.tableFields}" />
+                                </p:panel>
                             </p:fieldset>
                         </p:tab>
                         <p:tab title="仪器数据导入配置">
                             <div class="ui-g-12 card">
                             </div>
                             <h:panelGrid columns="6" id="instrumentDataImportConfig">
-                          	  <label class="label">模板标签</label>
-	                            <p:selectOneMenu value="#{tableCreateController.templateLabel}" id="idTemplateLabel">
-		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-		                            <f:selectItems value="#{tableCreateController.templateLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
-	                            </p:selectOneMenu>
-                            	<label class="label">仪器数据字段</label>
-	                            <p:selectOneMenu value="#{tableCreateController.instrumentDataLabel}" id="idInstrumentLabel">
-		                            <f:selectItem itemLabel="#{msg.selectOneMessage}" />
-		                            <f:selectItems value="#{tableCreateController.instrumentDataLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
-	                            </p:selectOneMenu>
-	                            <p:commandButton value="绑定键值对" update="idInstrumentDataBind" actionListener="#{tableCreateController.bindInstrumentData()}" />
+                                <label class="label">模板标签</label>
+                                <p:selectOneMenu value="#{tableCreateController.templateLabel}" id="idTemplateLabel">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                                    <f:selectItems value="#{tableCreateController.templateLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+                                </p:selectOneMenu>
+                                <label class="label">仪器数据字段</label>
+                                <p:selectOneMenu value="#{tableCreateController.instrumentDataLabel}" id="idInstrumentLabel">
+                                    <f:selectItem itemLabel="#{msg.selectOneMessage}" />
+                                    <f:selectItems value="#{tableCreateController.instrumentDataLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" />
+                                </p:selectOneMenu>
+                                <p:commandButton value="绑定键值对" update="idInstrumentDataBind" actionListener="#{tableCreateController.bindInstrumentData()}" />
                             </h:panelGrid>
                             <h:panelGrid id="idInstrumentDataBind" columns="2">
-							    <p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" >
-							    	<f:facet name="sourceCaption">待绑定键值对</f:facet>
-        							<f:facet name="targetCaption">已绑定键值对</f:facet>
-							    </p:pickList>
+                                <p:pickList value="#{tableCreateController.listInstrumentMppingLabels}" var="item" itemLabel="#{item}" itemValue="#{item}" >
+                                    <f:facet name="sourceCaption">待绑定键值对</f:facet>
+                                    <f:facet name="targetCaption">已绑定键值对</f:facet>
+                                </p:pickList>
                             </h:panelGrid>
                         </p:tab>
                     </p:tabView>
                     <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 
+                        <h:panelGroup>
+                            <label class="label">#{msg.hospitalId}</label>
+                            <p:selectOneMenu id="hospitalIdSelect_list" value="#{tableCreateController.selectedOrg}"  autoWidth="false" converter="orgInfoConverter" style="max-width: 150px;"  disabled="#{tableCreateController.selectedTableDefinition.status ne 'Draft' or tableCreateController.isReadOnly}">
+                                <p:ajax  listener="#{tableCreateController.onSiteChange}" process="@this"/>
+                                <f:selectItems value="#{tableCreateController.selectedOrgList}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
+                            </p:selectOneMenu>
+                        </h:panelGroup>
                         <h:panelGroup >
                             <label class="label">备注</label>
-                            <p:inputTextarea value="#{tableCreateController.selectedTableDefinition.description}" cols="50"  />
+                            <p:inputTextarea value="#{tableCreateController.selectedTableDefinition.description}" cols="50"  readonly="#{tableCreateController.isReadOnly}"/>
                         </h:panelGroup>
 
                         <h:panelGroup>
                             <label class="label">#{msg.assetGroup}</label>
-                            <p:selectOneMenu id="assetGroup" value="#{tableCreateController.selectedTableDefinition.assetGroup}">
+                            <p:selectOneMenu id="assetGroup" value="#{tableCreateController.selectedTableDefinition.assetGroup}" disabled="#{tableCreateController.isReadOnly}">
                                 <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -171,7 +178,7 @@
                     </p:panelGrid>
                     <h:panelGroup>
                         <!--<p:commandButton icon="ui-icon-remove-red-eye" immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>-->
-                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":CreateTemplateForm :growl" />
+                        <p:commandButton icon="ui-icon-check" actionListener="#{tableCreateController.saveTemplate}" value="保存" style="float:left" validateClient="true" update=":CreateTemplateForm :growl" disabled="#{tableCreateController.isReadOnly}"/>
                         <!--<p:remoteCommand name="saveExcel" actionListener="#{excelTableCreateController.saveTemplate}" update=":CreateTemplateForm :growl" />-->
                         <p:commandButton value="#{msg.Return}"  icon="ui-icon-arrow-back" action="schemaList.xhtml?faces-redirect=true" immediate="true"  update=":growl" style="float:left"/>
                     </h:panelGroup>
