@@ -92,7 +92,7 @@ public class CustomConfigConstant {
             exportFields.put("折旧算法", "depreciationMethod");
             exportFields.put("是否PM", "isPm");
             exportFields.put("是否盘点", "isChecked");
-            exportFields.put("上次维护日期", "lastPmDate");
+            exportFields.put("上次保养日期", "lastPmDate");
             exportFields.put("上次质检日期", "lastQaDate");
             exportFields.put("上次计量日期", "lastMeteringDate");
             exportFields.put("是否对质保到期提醒", "warranty");
