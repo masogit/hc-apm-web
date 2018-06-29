@@ -188,7 +188,7 @@ public class CustomConfigConstant {
         return Arrays.asList("parentAssetId", "deviceName", "systemId", "financingNum", "departNum",
                 "barcode", "registrationNo", "modalityId", "qrCode", "functionType", "functionGroup", "assetCode68", "functionGrade",
                 "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "assetUsage",
-                "capitalSource", "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
+                "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
                 "lastQaDate", "lastMeteringDate", "warranty");
@@ -211,7 +211,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsEditpageCatalogFields() {
-        return Arrays.asList("assetUsage", "capitalSource", "capitalSource2", "measureGrade", "riskGrade",
+        return Arrays.asList("assetUsage", "capitalSource", "measureGrade", "riskGrade",
                 "emergencyEquipment", "importEquipment", "measuringItemCategory", "accountingCategory");
     }
 
