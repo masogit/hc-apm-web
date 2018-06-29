@@ -40,7 +40,7 @@
                         <!--</h:panelGroup>-->
                     <!--</h:panelGrid>-->
                 </h:form>
-                <h:form id="xxxForm">
+                <h:form id="measuringResultForm">
                     <p:dataTable id="datalist" value="#{assetInfoController.lazyModel}" var="item" widgetVar="varDataList"
                                  selectionMode="single" selection="#{assetInfoController.selected}"
                                  lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
@@ -92,7 +92,6 @@
                             <h:outputText value="#{item.clinicalDeptName}"/>
                         </p:column>
 
-
                         <p:column headerText="#{msg.assetCategory}"  exportable="true" visible="false">
                             <h:outputText value="#{fieldMsg.fieldValue('assetCategory', item.assetCategory)}"/>
                         </p:column>
@@ -124,10 +123,8 @@
                             <h:outputText value="#{fieldMsg.fieldValue('accountingCategory', item.accountingCategory)}"/>
                         </p:column>
                         <p:column headerText="#{msg.lastMeteringDate}"  exportable="true" visible="true">
-                            <h:outputText value=" #{fieldMsg.fieldValue('lastMeteringDate',item.lastMeteringDate)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('lastMeteringDate',item.lastMeteringDate)}"/>
                         </p:column>
-
-
                         <p:column headerText="#{msg.functionGrade}"  exportable="true" visible="false">
                             <h:outputText value="#{item.functionGrade}"/>
                         </p:column>
