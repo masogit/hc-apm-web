@@ -195,13 +195,18 @@ public class MeasuringService {
                 detail.setInstitutionUID(user.getInstitutionUID());
                 detail.setHospitalUID(user.getHospitalUID());
                 detail.setSiteUID(user.getSiteUID());
-                detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")) == null ? null : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+
+                if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
+                    detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+                }
 
                 if(row.getCell(header.get("MODEL_CELL")) != null) {
                     detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
                 }
 
-                detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                if(row.getCell(header.get("APPLIANCE_NAME_CELL")) != null){
+                    detail.setAssetName(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NAME_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NAME_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                }
 
                 if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
                     detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
@@ -233,20 +238,31 @@ public class MeasuringService {
 
                     detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
                 }
-                //detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
-                detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
-                detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")) == null ? null : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
-                detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+                if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
+                    detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
+                }
+                if(row.getCell(header.get("VERIFIER_CELL")) != null){
+                    detail.setCheckPerson(CellType.NUMERIC.equals(row.getCell(header.get("VERIFIER_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFIER_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
+                }
+                if(row.getCell(header.get("REMARK_CELL")) != null){
+                    detail.setComments(CellType.NUMERIC.equals(row.getCell(header.get("REMARK_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("REMARK_CELL")).getNumericCellValue()) : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+                }
                 //detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
-                detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                if(row.getCell(header.get("CLINICAL_DEPT_CELL")) != null){
+                    detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                }
                 if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
                     detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
                     detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
                 }
-                detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
-                detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+                if(row.getCell(header.get("ITEM_CELL")) != null){
+                    detail.setCheckItem(CellType.NUMERIC.equals(row.getCell(header.get("ITEM_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ITEM_CELL")).getNumericCellValue()) : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                }
+                if(row.getCell(header.get("CATEGORY_CELL")) != null){
+                    detail.setType(CellType.NUMERIC.equals(row.getCell(header.get("CATEGORY_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CATEGORY_CELL")).getNumericCellValue()) : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+                }
                 //detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 if(row.getCell(header.get("FILE_NO_CELL")) != null) {
                     detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
