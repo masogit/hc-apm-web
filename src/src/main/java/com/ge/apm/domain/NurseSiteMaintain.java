@@ -100,6 +100,10 @@ public class NurseSiteMaintain implements Serializable {
 	@Column(name = "config_id")
 	private String configId;
 	
+	//0：未检查,1:通过，2有问题
+	@Column(name = "status")
+	private Integer status;
+	
 	@Transient
 	private List<Pair> listCheckItems;
 	
@@ -237,6 +241,14 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setListCheckItems(List<Pair> listCheckItems) {
 		this.listCheckItems = listCheckItems;
+	}
+
+	public Integer getStatus() {
+		return status;
+	}
+
+	public void setStatus(Integer status) {
+		this.status = status;
 	}
 
 	@Override
