@@ -77,6 +77,8 @@ public class MaintainController {
 	//validate
 	private boolean isDeleteDisable;
     private boolean isSaveDisable;
+    
+    private boolean isDeptHead;
 
 	@PostConstruct
 	protected void init() {
@@ -88,6 +90,12 @@ public class MaintainController {
 		this.loadMaintainData(orgUidList);
 		this.loadMaintainConfig();
 		checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
+		if(UserContextService.getRoles().contains("DeptHead")){
+			isDeptHead=true;
+		}
+		else{
+			isDeptHead=false;
+		}
 	}
 
 	private void loadMaintainData(List<String> userOrgList) {
@@ -101,7 +109,7 @@ public class MaintainController {
 				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters);
 				for (NurseSiteMaintain data : listData) {
-					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(), data.getScheduleDate(), data.getScheduleDate(), true);
+					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data), data.getScheduleDate(), data.getScheduleDate(), true);
 					tempEvent.setData(data);
 					addEvent(tempEvent);
 				}
@@ -109,19 +117,21 @@ public class MaintainController {
 		};
 	}
 	
-	private void parseContentJson(String contentJSON){
+	private SimplePair parseContentJson(String contentJSON){
 		try {
 			SimplePair p=new SimplePair();
 			p.parseStr(listCheckItems,contentJSON, false);
+			return p;
 		} catch (Exception e) {
 			// TODO: handle exception
 			LOGGER.error(e.getMessage());
 		}
+		return null;
 	}
 
-	private String getContentJson() {
+	private SimplePair getContentJson() {
 		SimplePair p=new SimplePair(listCheckItems);
-		return p.toString();
+		return p;
 	}
 
 	public void saveMaintainData(ActionEvent actionEvent) {
@@ -154,8 +164,18 @@ public class MaintainController {
 		}
 	}
 
-	private String getShowTitle() {
-		return new Date().toString();
+	private String getShowTitle(NurseSiteMaintain tempNurseSiteMaintain) {
+		String strStatus="未检查";
+		if(tempNurseSiteMaintain.getStatus()==null){
+		}
+		else if(tempNurseSiteMaintain.getStatus()==1){
+			strStatus="已通过";
+		}
+		else if(tempNurseSiteMaintain.getStatus()==2){
+			strStatus="有问题";
+		}
+		String str=sdf.format(tempNurseSiteMaintain.getScheduleDate())+"-"+strStatus;
+		return str;
 	}
 
 	public void onEventSelect(SelectEvent selectEvent) {
@@ -166,7 +186,11 @@ public class MaintainController {
 
 	public void onDateSelect(SelectEvent selectEvent) {
 		Date date=(Date) selectEvent.getObject();
-		nurseSiteMaintain=createMaintainData(date);
+		Calendar ca=Calendar.getInstance();
+		int currentHour=ca.get(Calendar.HOUR_OF_DAY);
+		ca.setTime(date);
+		ca.set(Calendar.HOUR_OF_DAY,currentHour);
+		nurseSiteMaintain=createMaintainData(ca.getTime());
 		parseContentJson(nurseSiteMaintain.getContentJSON());
 		DefaultScheduleEvent tempEvent = new DefaultScheduleEvent("", date, date, true);
 		tempEvent.setData(nurseSiteMaintain);
@@ -174,6 +198,7 @@ public class MaintainController {
 	}
 
 	public void onMaintainDataValidate() {
+		
 	}
 
 	public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -313,37 +338,40 @@ public class MaintainController {
 		tempNurseSiteMaintain.setInstitutionUID(currentUser.getInstitutionUID());
 		tempNurseSiteMaintain.setHospitalUID(currentUser.getHospitalUID());
 		tempNurseSiteMaintain.setSiteUID(currentUser.getSiteUID());
-		tempNurseSiteMaintain.setCheckDate(null);
+		tempNurseSiteMaintain.setCheckDate(currentDate);
 		tempNurseSiteMaintain.setConfigId(nurseSiteMaintainConfig.getId());
 		tempNurseSiteMaintain.setContentJSON(null);
 		tempNurseSiteMaintain.setCreateBy(currentUser);
 		tempNurseSiteMaintain.setCreateByUid(currentUser.getUid());
 		tempNurseSiteMaintain.setCreateDate(currentDate);
-		tempNurseSiteMaintain.setModifyBy(null);
-		tempNurseSiteMaintain.setModifyByUid(null);
-		tempNurseSiteMaintain.setModifyDate(null);
+		tempNurseSiteMaintain.setModifyBy(currentUser);
+		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
+		tempNurseSiteMaintain.setModifyDate(currentDate);
 		tempNurseSiteMaintain.setScheduleDate(date);
 		return tempNurseSiteMaintain;
 	}
 	
 	private void updateMaintainData(NurseSiteMaintain obj,boolean batchUpdate){
+		SimplePair p=getContentJson();
 		if(batchUpdate){
 			if(obj.getContentJSON()==null){
-				obj.setContentJSON(getContentJson());
+				obj.setContentJSON(p.toString());
 				Date currentDate=new Date();
 				obj.setCheckDate(currentDate);
 				obj.setModifyBy(currentUser);
 				obj.setModifyByUid(currentUser.getUid());
 				obj.setModifyDate(currentDate);
+				obj.setStatus(p.getStatus());
 			}
 		}
 		else{
-			obj.setContentJSON(getContentJson());
+			obj.setContentJSON(p.toString());
 			Date currentDate=new Date();
 			obj.setCheckDate(currentDate);
 			obj.setModifyBy(currentUser);
 			obj.setModifyByUid(currentUser.getUid());
 			obj.setModifyDate(currentDate);
+			obj.setStatus(p.getStatus());
 		}
 	}
 	
@@ -358,9 +386,9 @@ public class MaintainController {
 			Calendar ca=Calendar.getInstance();
 			ca.setTime(endBatchDate);
 			ca.set(Calendar.DATE,ca.get(Calendar.DATE)+1);
-			if(date.getTime()<ca.getTime().getTime()){
+			if(date.getTime()>=startBatchDate.getTime()&&date.getTime()<ca.getTime().getTime()){
 				NurseSiteMaintain tempNurseSiteMaintain=createMaintainData(date);
-				DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(), date, date, true);
+				DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(tempNurseSiteMaintain), date, date, true);
 		        tempEvent.setData(tempNurseSiteMaintain);
 		        this.lazyEventModel.addEvent(tempEvent);
 		        listMaintainData.add(tempNurseSiteMaintain);
@@ -692,8 +720,14 @@ public class MaintainController {
 	public void setCheckListAssets(List<AssetInfo> checkListAssets) {
 		this.checkListAssets = checkListAssets;
 	}
-	
-	
+
+	public boolean isDeptHead() {
+		return isDeptHead;
+	}
+
+	public void setDeptHead(boolean isDeptHead) {
+		this.isDeptHead = isDeptHead;
+	}
 	
 	
 }
