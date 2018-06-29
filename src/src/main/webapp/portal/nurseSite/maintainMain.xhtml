@@ -15,8 +15,8 @@
             <div class="ui-g-12 card">
                 <h:form>
                 	<p:commandButton id="batchCompleteButton" icon="ui-icon-extlink" value="批量完成保养报告" title="批量完成保养报告" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()" actionListener="#{maintainController.batchCompleteInit}"/>
-                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建保养报告" title="批量创建保养记录" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
-                    <p:commandButton id="maintainConfigButton" icon="ui-icon-extlink" value="保养报告设置" title="保养报告设置" update=":maintainConfigDlg" oncomplete="PF('maintainConfigDialog').show()" onclick="NurseSiteMaintain.on()"/>
+                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建保养报告" title="批量创建保养记录" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{maintainController.deptHead}"/>
+                    <p:commandButton id="maintainConfigButton" icon="ui-icon-extlink" value="保养报告设置" title="保养报告设置" update=":maintainConfigDlg" oncomplete="PF('maintainConfigDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{maintainController.deptHead}"/>
                 </h:form>
                 <h:form id="maintainForm">
                     <p:growl widgetVar="messages" id="messages" showDetail="true" />

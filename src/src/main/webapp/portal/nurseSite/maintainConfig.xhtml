@@ -6,14 +6,20 @@
 <ui:composition>
 	<p:dialog id="maintainConfigDlg" widgetVar="maintainConfigDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="保养工单设置">
 		<h:form id="maintainConfigForm" rendered="#{not empty maintainController.nurseSiteMaintainConfig}">
+			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+				<h:panelGroup>
+					<label class="label">名称*</label>
+					<p:inputText value="#{maintainController.nurseSiteMaintainConfig.name}" required="true" requiredMessage="名称不能为空"></p:inputText>
+				</h:panelGroup>
+			</p:panelGrid>
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 				<h:panelGroup>
 					<label class="label">检查项*</label>
-					<p:inputText value="#{maintainController.nurseSiteMaintainConfig.checkItems}" required="false" requiredMessage="检查项不能为空" placeholder="请输入检查项并以空格分割"></p:inputText>
+					<p:inputText value="#{maintainController.nurseSiteMaintainConfig.checkItems}" required="true" requiredMessage="检查项不能为空" placeholder="请输入检查项并以空格分割"></p:inputText>
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">检查设备*</label>
-					<p:selectManyMenu value="#{maintainController.listCheckAssets}" var="t" required="false" converter="assetInfoConverter"
+					<p:selectManyMenu value="#{maintainController.listCheckAssets}" var="t" required="true" converter="assetInfoConverter"
 						filter="true" filterMatchMode="contains" showCheckbox="true">
 						<f:selectItems value="#{maintainController.checkListAssets}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 						<p:column>
@@ -23,8 +29,7 @@
 				</h:panelGroup>
 				<h:panelGroup>
 					<label class="label">保养报告类型*</label>
-					<p:selectOneRadio value="#{maintainController.nurseSiteMaintainConfig.type}" required="false" requiredMessage="保养报告类型不能为空"
-						onclick="NurseSiteMaintain.showHide(this);">
+					<p:selectOneRadio value="#{maintainController.nurseSiteMaintainConfig.type}" required="true" requiredMessage="保养报告类型不能为空" onclick="NurseSiteMaintain.showHide(this);">
 						<p:ajax update="@parent"></p:ajax>
 						<f:selectItem itemLabel="每天" itemValue="1" />
 						<f:selectItem itemLabel="每周" itemValue="2" />
@@ -34,7 +39,7 @@
 				<h:panelGroup >
 					<span id="type1Span" style="#{maintainController.nurseSiteMaintainConfig.type==1?'display:block;':'display:none;'}">
 						<label class="label">生成报告频率</label>
-						<p:selectManyMenu value="#{maintainController.listCheckDate}" var="t" required="false" filter="true" filterMatchMode="contains" showCheckbox="true">
+						<p:selectManyMenu value="#{maintainController.listCheckDate}" var="t" required="#{maintainController.nurseSiteMaintainConfig.type==1?true:false}" filter="true" filterMatchMode="contains" showCheckbox="true">
 							<f:selectItems value="#{maintainController.checkListHours}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
 								<h:outputText value="#{t}时" />
@@ -43,7 +48,7 @@
 					</span>
 					<span id="type2Span" style="#{maintainController.nurseSiteMaintainConfig.type==2?'display:block;':'display:none;'}">
 						<label class="label">生成报告频率</label>
-						<p:selectManyMenu value="#{maintainController.listWeekDay}" var="t" required="false" filter="true" filterMatchMode="contains" showCheckbox="true">
+						<p:selectManyMenu value="#{maintainController.listWeekDay}" var="t" required="#{maintainController.nurseSiteMaintainConfig.type==2?true:false}" filter="true" filterMatchMode="contains" showCheckbox="true">
 							<f:selectItems value="#{maintainController.checkListWeekDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
 								<h:outputText value="#{t==2?'星期一':t==3?'星期二':t==4?'星期三':t==5?'星期四':t==6?'星期五':t==7?'星期六':t==1?'星期日':''}" />
@@ -52,7 +57,7 @@
 					</span>
 					<span id="type3Span" style="#{maintainController.nurseSiteMaintainConfig.type==3?'display:block;':'display:none;'}">
 						<label class="label">生成报告频率</label>
-						<p:selectManyMenu value="#{maintainController.listMonthDay}" var="t" required="false" filter="true" filterMatchMode="contains" showCheckbox="true">
+						<p:selectManyMenu value="#{maintainController.listMonthDay}" var="t" required="#{maintainController.nurseSiteMaintainConfig.type==3?true:false}" filter="true" filterMatchMode="contains" showCheckbox="true">
 							<f:selectItems value="#{maintainController.checkListMonthDays}" var="item" itemLabel="#{item.key}" itemValue="#{item.intValue}" />
 							<p:column>
 								<h:outputText value="#{t}日" />
@@ -63,7 +68,7 @@
 			</p:panelGrid>
 			<br />
 			<br />
-			<p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.saveMaintainConfig}" update=":growl" icon="ui-icon-check"
+			<p:commandButton validateClient="true" value="#{msg.Save}" process="@parent" action="#{maintainController.saveMaintainConfig}" update=":growl" icon="ui-icon-check"
 				oncomplete="PF('maintainConfigDialog').hide()" />
 			<p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainConfigDialog').hide()" />
 		</h:form>
