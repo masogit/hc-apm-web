@@ -60,7 +60,7 @@
                                         <h:outputText />
                                         <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('UsingFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
                                     </f:facet>
-                                    <p:commandLink value="修改" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsEditForm" oncomplete="PF('AssetFieldsEditDialog').show()"/>
+                                    <p:commandLink value="修改" actionListener="#{customConfigController.prepareEditAssetField(item.key)}" update="assetFieldsTable :AssetFieldsEditForm" oncomplete="PF('AssetFieldsEditDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.removeAssetField(item.key)}" disabled="#{customConfigController.isSystemFields(item.key)}" update=":customConfigForm"/>
                                 </p:column>
                             </p:dataTable>
@@ -87,12 +87,12 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <p:fieldset legend="基本信息字段组">
                                     <p:orderList id="BasicFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('BasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('BasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="详细信息字段组">
                                     <p:orderList id="DetailFieldsList" value="#{customConfigController.customConfigObject.assetsDetailpageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('DetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('DetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                             </p:panelGrid>
@@ -101,32 +101,32 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <p:fieldset legend="基本信息字段组">
                                     <p:orderList id="EditpageBasicFields" value="#{customConfigController.customConfigObject.assetsEditpageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="编码信息字段组">
                                     <p:orderList id="EditpageCodesFields" value="#{customConfigController.customConfigObject.assetsEditpageCodesFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageCodesFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageCodesFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageCodesFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="状态信息字段组">
                                     <p:orderList id="EditpageStatusFields" value="#{customConfigController.customConfigObject.assetsEditpageStatusFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageStatusFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageStatusFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageStatusFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="分类信息字段组">
                                     <p:orderList id="EditpageCatalogFields" value="#{customConfigController.customConfigObject.assetsEditpageCatalogFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageCatalogFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageCatalogFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageCatalogFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="日期信息字段组">
                                     <p:orderList id="EditpageDateFields" value="#{customConfigController.customConfigObject.assetsEditpageDateFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageDateFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageDateFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageDateFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="财务信息字段组">
                                     <p:orderList id="EditpageFinicialFields" value="#{customConfigController.customConfigObject.assetsEditpageFinicialFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageFinicialFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('EditpageFinicialFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveEditpageFinicialFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                             </p:panelGrid>
@@ -135,17 +135,17 @@
                             <p:panelGrid columns="3" layout="grid" styleClass="ui-panelgrid-blank form-group" >
                                 <p:fieldset legend="头部信息字段组">
                                     <p:orderList id="MobileHeaderFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageHeaderFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileHeaderFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileHeaderFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileHeaderFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="基本信息字段组">
                                     <p:orderList id="MobileBasicFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageBasicFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileBasicFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileBasicFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                                 <p:fieldset legend="详细信息字段组">
                                     <p:orderList id="MobileDetailFieldsList" value="#{customConfigController.customConfigObject.assetsMobilepageDetailFields}"  var="item" controlsLocation="none" itemLabel="#{customConfigController.allFields[item]}" itemValue="#{item}" />
-                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileDetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()"/>
+                                    <p:commandLink value="添加" actionListener="#{customConfigController.prepareAddAssetField('MobileDetailFields')}" update=":FieldsAddForm"  oncomplete="PF('FieldsAddDialog').show()" style="padding:10px"/>
                                     <p:commandLink value="删除" actionListener="#{customConfigController.prepareAddAssetField('RemoveMobileDetailFields')}" update=":FieldsAddForm" oncomplete="PF('FieldsAddDialog').show()"/>
                                 </p:fieldset>
                             </p:panelGrid>

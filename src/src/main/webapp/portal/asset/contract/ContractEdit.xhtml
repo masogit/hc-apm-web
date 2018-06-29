@@ -262,9 +262,9 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
-                                <!--<p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" oncomplete="PF('viewContractItemDlg').show()" value="#{msg.View}"  update=":viewContractItemForm" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>-->
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
+<!--                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
+                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>-->
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
                             </p:column>
 

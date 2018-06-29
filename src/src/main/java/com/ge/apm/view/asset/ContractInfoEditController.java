@@ -322,17 +322,24 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         return supplier == null ? null : supplier.getName();
     }
 
-    public void viewContractItemPage(ContractInfoItem item) {
+    public String getDetailPageLink(ContractInfoItem item) {
+        String url = "";
         if (null != item.getAssetInfo()) {
             AssetInfo asset = item.getAssetInfo();
-            String url = "actionName=View&selectedid="
+            url = "actionName=View&selectedid="
                     + asset.getId().toString()
                     + "&asset_name=" + asset.getName()
                     + "&terminate=" + !asset.getIsValid();
-            url = "../info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
-            RequestContext requestContext = RequestContext.getCurrentInstance();
-            requestContext.addCallbackParam("url", url);
+            url = "/portal/asset/info/AssetDetail.xhtml?str=" + UrlParamUtil.encodeUrlQueryString(url);
+
         }
+        return url;
+    }
+
+    public void viewContractItemPage(ContractInfoItem item) {
+        String url = getDetailPageLink(item);
+        RequestContext requestContext = RequestContext.getCurrentInstance();
+        requestContext.addCallbackParam("url", url);
     }
 
     public void onPlannedArrivalDateChange() {
