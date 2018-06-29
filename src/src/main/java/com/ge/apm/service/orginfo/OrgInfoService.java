@@ -2,16 +2,19 @@ package com.ge.apm.service.orginfo;
 
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.domain.OrgInfo;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.view.uaa.ClinicalDepartment;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
+import org.primefaces.model.UploadedFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.IOException;
+import java.text.ParseException;
+import java.util.*;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import webapp.framework.dao.SearchFilter;
 
@@ -75,4 +78,10 @@ public class OrgInfoService {
         }
 
     }
+
+    public List<ClinicalDepartment> importOrg(UploadedFile file, UserAccount user) throws IOException, ParseException {
+
+        return Collections.emptyList();
+    }
+
 }

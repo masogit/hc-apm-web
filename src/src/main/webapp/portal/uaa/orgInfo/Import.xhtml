@@ -2,10 +2,66 @@
         xmlns="http://www.w3.org/1999/xhtml"
         xmlns:f="http://xmlns.jcp.org/jsf/core"
         xmlns:h="http://xmlns.jcp.org/jsf/html"
-        xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+        xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+        xmlns:p="http://primefaces.org/ui">
 
     <div class="ui-g">
-        导入
+        <div class="ui-g-12 card">
+            <h:form enctype="multipart/form-data">
+                <p:fieldset legend="批量导入 科室信息" id="uploaderContainer">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                        <p:fileUpload fileUploadListener="#{orgImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
+                                      invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M" update="@(form)"
+                                      sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
+                    </p:panelGrid>
+                    <h:panelGroup>
+                        <p>说明</p>
+                        <p>
+                            1. <a href="OrgImport_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+                        </p>
+                        <p>2. 文件中填入要导入的用户数据</p>
+                        <p>3. 上传文件进行导入</p>
+                    </h:panelGroup>
+                </p:fieldset>
+            </h:form>
+        </div>
+
+        <div class="ui-g-12 card">
+            <h:form id="dataListForm">
+                <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false">
+                </p:messages>
+                <p:fieldset legend="导入失败的数据">
+                    <p:dataTable id="datalist2" rendered="#{not empty orgImportController.importFailedDataList}"
+                                 value="#{orgImportController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
+                                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="10,20,50">
+
+                        <p:column headerText="EXCEL行数">
+                            <h:outputText value="#{item.excelIdex}" />
+                        </p:column>
+                        <p:column headerText="#{msg.Institution}">
+                            <h:outputText value="#{item.institutionName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.Hospital}">
+                            <h:outputText value="#{item.hospitalName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.Site}">
+                            <h:outputText value="#{item.siteName}" />
+                        </p:column>
+                        <p:column headerText="#{msg.Department}">
+                            <h:outputText value="#{item.departName}" />
+                        </p:column>
+
+                        <f:facet name="{Toolbar}">
+                            <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
+                                <p:dataExporter type="xls" target="datalist2" fileName="OrgImportFailed_export" />
+                            </p:commandButton>
+                        </f:facet>
+                    </p:dataTable>
+                </p:fieldset>
+            </h:form>
+
+        </div>
     </div>
 
 </ui:composition>
