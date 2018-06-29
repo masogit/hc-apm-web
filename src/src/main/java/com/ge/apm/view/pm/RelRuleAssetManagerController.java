@@ -24,6 +24,7 @@ import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -45,6 +46,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
+	private boolean deleteRule2 = false;
+	private boolean deleteRule3 = false;
 	
 	@Override
 	protected void init() {
@@ -56,8 +59,8 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
-		assetMap = new HashMap<String, AssetInfo>();
-		ruleMap = new HashMap<String, PmOrderRule>();
+		assetMap = new HashMap<>();
+		ruleMap = new HashMap<>();
 		isInsulate = UserContextService.isOnlyLocalITAdmin();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
@@ -285,7 +288,44 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.assetUids = assetUids;
 	}
 
-	
+	@Transactional
+	public void deleteRule(){
+		if(deleteRule3){
+			selected.setRuleUID(null);
+		}
+		if(deleteRule2){
+			selected.setRuleUID2(null);
+		}
+		if(selected.getRuleUID2() == null && selected.getRuleUID() == null){
+			dao.delete(selected);
+			return;
+		}
+		dao.save(selected);
+	}
+
+	public void deleteRule2(){
+		this.deleteRule2 = true;
+	}
+
+	public void deleteRule3(){
+		this.deleteRule3 = true;
+	}
+
+	public boolean isDeleteRule2() {
+		return deleteRule2;
+	}
+
+	public void setDeleteRule2(boolean deleteRule2) {
+		this.deleteRule2 = deleteRule2;
+	}
+
+	public boolean isDeleteRule3() {
+		return deleteRule3;
+	}
+
+	public void setDeleteRule3(boolean deleteRule3) {
+		this.deleteRule3 = deleteRule3;
+	}
 	/*
 	 * @Override public void onBeforeNewObject(RelRuleAsset object) { }
 	 * 
