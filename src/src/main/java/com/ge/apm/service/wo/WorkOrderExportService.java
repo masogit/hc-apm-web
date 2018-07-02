@@ -275,7 +275,7 @@ public class WorkOrderExportService {
     }
 
     private void putServiceRequestMessage(V2_WorkOrder workOrder, Map<String, Object> workOrderMap) {
-        List<ServiceRequestMsg> serviceRequestMsgs = serviceRequestMsgRepository.findBySrIdOrderBySendTime(workOrder.getSrId());
+        List<ServiceRequestMsg> serviceRequestMsgs = serviceRequestMsgRepository.findBySrIdOrderBySendTime(workOrder.getId());
         List<Map<String, Object>> srMsgs = new ArrayList<>();
         for (ServiceRequestMsg srMessage : serviceRequestMsgs) {
             Map<String, Object> map = new HashedMap();
