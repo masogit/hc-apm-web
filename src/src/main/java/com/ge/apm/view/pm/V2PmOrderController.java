@@ -652,6 +652,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         removeFilterOnField("dispatchMode");
         removeFilterOnField("ownerId");
         removeFilterOnField("approvalStatus");
+        if(queryIndex==10){
+            Page<V2_PmOrder> result =dao.findBySearchFilter(this.searchFilters, pageRequest);
+            currentPagePmOrders = result.getContent();
+            return result;
+        }
         if(queryIndex==-2){
             searchFilters.add(new SearchFilter("simplify", SearchFilter.Operator.EQ, true));
         }

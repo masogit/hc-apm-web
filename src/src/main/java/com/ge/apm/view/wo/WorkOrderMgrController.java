@@ -357,7 +357,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-        } else {//全部
+        } else if(queryIndex ==-10){ //全部维修单
+
+        } else {//待办
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
 
