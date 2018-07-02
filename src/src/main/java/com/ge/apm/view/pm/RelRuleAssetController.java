@@ -182,6 +182,9 @@ public class RelRuleAssetController extends GenericCRUDUUIDController<RelRuleAss
 					rel.setAssetUID(ai.getUid());
 					rel.setCreatedDate(new Date());
 					rel.setTenantUID(ai.getTenantUID());
+					rel.setInstitutionUID(ai.getInstitutionUID());
+					rel.setHospitalUID(ai.getHospitalUID());
+					rel.setSiteUID(ai.getSiteUID());
 				}
 				if (level != null) {
 					if (level == 1) {

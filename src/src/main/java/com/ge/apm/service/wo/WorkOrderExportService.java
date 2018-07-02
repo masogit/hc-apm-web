@@ -321,19 +321,13 @@ public class WorkOrderExportService {
         if (status != null) {
             switch (status) {
                 case 1:
-                    assetStatus = "正常";
+                    assetStatus = "未关单";
                     break;
                 case 2:
-                    assetStatus = "停机";
+                    assetStatus = "已关单";
                     break;
                 case 3:
-                    assetStatus = "限制功能使用";
-                    break;
-                case 4:
-                    assetStatus = "待报废";
-                    break;
-                case 5:
-                    assetStatus = "停用";
+                    assetStatus = "取消";
                     break;
                 default:
                     break;
