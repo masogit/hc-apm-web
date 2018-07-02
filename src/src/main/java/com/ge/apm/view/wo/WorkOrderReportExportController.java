@@ -85,6 +85,8 @@ public class WorkOrderReportExportController implements Serializable {
 
     private List<Map<String, Object>> selectedItems;
 
+    private Boolean isInsulate;
+
     @PostConstruct
     protected void init() {
 
@@ -106,6 +108,8 @@ public class WorkOrderReportExportController implements Serializable {
         isStatusOpen = Boolean.TRUE;
         isStatusClose = Boolean.TRUE;
         isStatusCancel = Boolean.TRUE;
+
+        isInsulate = UserContextService.isOnlyLocalITAdmin();
 
         initOrgTree();
 
@@ -160,7 +164,7 @@ public class WorkOrderReportExportController implements Serializable {
             return;
         }
         try {
-            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
+            byte[] templateBytes = workOrderExportTemplateService.getActiveTemplateBytes(isInsulate, currentSiteUID, currentUser.getHospitalUID(), currentUser.getInstitutionUID(), currentUser.getTenantUID());
             WorkOrderPublishRenderService.RenderResult renderResult = workOrderPublishRenderService.render(data, templateBytes);
             exportDocx = new DefaultStreamedContent((new ByteArrayInputStream(renderResult.result)), renderResult.contentType, renderResult.fileName);
         } catch (IOException e) {

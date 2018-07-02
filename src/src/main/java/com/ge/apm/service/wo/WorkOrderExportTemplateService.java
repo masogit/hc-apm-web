@@ -27,14 +27,15 @@ public class WorkOrderExportTemplateService {
     @Autowired
     private BlobFileService blobService;
 
-    public byte[] getActiveTemplateBytes(String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
+    public byte[] getActiveTemplateBytes(boolean isInsulate, String siteUID, String hospitalUID, String institutionUID, String tenantUID) throws IOException {
         byte[] templateBytes = null;
         List<String> uids = new ArrayList<>();
         populateUidList(uids, siteUID);
-        populateUidList(uids, hospitalUID);
-        populateUidList(uids, institutionUID);
-        populateUidList(uids, tenantUID);
-
+        if (!isInsulate) {
+            populateUidList(uids, hospitalUID);
+            populateUidList(uids, institutionUID);
+            populateUidList(uids, tenantUID);
+        }
         List<WorkOrderExportTemplate> templates = templateRepository.findBySiteUIDList(uids);
         WorkOrderExportTemplate template = getPrioritizedTemplate(templates, uids);
 
