@@ -67,7 +67,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         uaaService = WebUtil.getBean(UaaService.class);
         orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
-        isInsulate = UserContextService.isOnlyLocalITAdmin();
+        isInsulate = UserContextService.isInsulate();
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
         initTree(user.getTenantUID());
@@ -75,7 +75,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     private void initTree(String tenantUid) {
         TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
-        if(UserContextService.isOnlyLocalITAdmin()){
+        if(UserContextService.isInsulate()){
             //隔离租户
             selectedTenant = tempTenantInfo;
             orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
