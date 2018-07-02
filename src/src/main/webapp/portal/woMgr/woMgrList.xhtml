@@ -12,6 +12,7 @@
 
             <h:form id="woMgrListForm">
                 <h:panelGrid id="buttonSet" columns="12" cellpadding="5">
+                    <p:commandButton value="全部"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==-10}" rendered="true" action="workOrderList.xhtml?faces-redirect=true&amp;query=-10" />
                     <p:commandButton value="待办"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==0}" rendered="true" action="workOrderList.xhtml?faces-redirect=true&amp;query=0" />
                     <p:commandButton value="报修"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" actionListener="#{workOrderMgrController.createServiceRequest()}" rendered="true" oncomplete="PF('createSRDialog').show()"/>
                     <p:commandButton value="#{msg.repaired}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm"  disabled="#{workOrderMgrController.queryIndex==1}" rendered="true" onclick="onButtonChange()" action="workOrderList.xhtml?faces-redirect=true&amp;query=1" />
