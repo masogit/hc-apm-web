@@ -157,34 +157,43 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
         this.checkItemLists.clear();
     }
 
-    public List<TableDefinition> getTableDefinition() {
-        List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
-        if(selectedUserOrg != null){
-            tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,selectedUserOrg.getOrgType()));
-        }else{
-            tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
-        }
-
-        tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
-        if (this.selected != null && this.selected.getAssetGroup() != null) {
-            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
-        }else{
-            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNotNull, null));
-        }
-        return templateDao.findBySearchFilter(tempFilter);
-    }
-
+    /**
+     * 电气安全检测报告，不关联设备分类
+     * @return
+     */
     public List<TableDefinition> getTableDefinitionForES() {
         List<SearchFilter> tempFilter = new ArrayList<SearchFilter>();
-        if(selectedUserOrg != null){
+/*        if(selectedUserOrg != null){
             tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,selectedUserOrg.getOrgType()));
         }else{
             tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
-        }
+        }*/
+        //tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
+        tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
         tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNull, null));
         return templateDao.findBySearchFilter(tempFilter);
     }
+
+    /***
+     * 性能检测报告，关联设备分类
+     * @return
+     */
+    public List<TableDefinition> getTableDefinition() {
+        List<SearchFilter> tempFilter = new ArrayList<>();
+        //tempFilter.addAll(userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType));
+        tempFilter.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+        tempFilter.add(new SearchFilter("status", SearchFilter.Operator.EQ, "Released"));
+        if (this.selected != null && this.selected.getAssetGroup() != null) {
+            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, selected.getAssetGroup()));
+        }
+/*        else{
+            tempFilter.add(new SearchFilter("assetGroup", SearchFilter.Operator.IsNotNull, null));
+        }*/
+        return templateDao.findBySearchFilter(tempFilter);
+    }
+
+
 
     @Override
     @Transactional
