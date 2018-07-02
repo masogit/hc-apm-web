@@ -13,10 +13,10 @@
               header="#{workOrderExportTemplateController.CRUDActionName} #{msg.ExportTemplateConfig}">
         <h:form id="WoExportTemplateEditForm">
             <h:panelGroup id="display">
-                <p:fieldset id="basic" legend="报表模板配置">
+                <p:fieldset id="basic" legend="报表模版配置">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <h:panelGroup>
-                            <p:commandButton update=":growl" icon="ui-icon-file-download" value="下载当前生效模板"
+                            <p:commandButton update=":growl" icon="ui-icon-file-download" value="下载当前生效模版"
                                              onclick="PrimeFaces.monitorDownload(start, stop);">
                                 <p:fileDownload
                                         value="#{workOrderExportTemplateController.getActiveTemplate()}"/>
