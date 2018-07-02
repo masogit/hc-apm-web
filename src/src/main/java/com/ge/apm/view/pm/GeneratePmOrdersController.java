@@ -86,7 +86,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		siteUid = user.getSiteUID();
 		initAssets();
 		userCommonService = WebUtil.getBean(UserCommonService.class);
-		isInsulate = UserContextService.isOnlyLocalITAdmin();
+		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
 

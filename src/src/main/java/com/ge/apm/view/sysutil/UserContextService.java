@@ -427,4 +427,14 @@ public class UserContextService implements Serializable {
         }
     }
 
+    public static boolean isInsulate() {
+        UserContextService userContextService = WebUtil.getBean(UserContextService.class);
+        UserAccount user = userContextService.getLoginUser();
+        TenantInfoRepository tenantDao = WebUtil.getBean(TenantInfoRepository.class);
+        TenantInfo tenant = tenantDao.findByuid(user.getTenantUID());
+        if(tenant.getInsulate() != null && tenant.getInsulate()) {
+            return true;
+        }
+        return false;
+    }
 }

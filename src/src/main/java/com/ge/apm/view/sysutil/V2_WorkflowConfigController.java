@@ -76,7 +76,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		uaaService = WebUtil.getBean(UaaService.class);
-		isInsulate = UserContextService.isOnlyLocalITAdmin();
+		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 		selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
 		setTenantUid(user.getTenantUID());
@@ -123,7 +123,7 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 		//this.tenantUid = tenantUid;
 		TenantInfo tempTenantInfo = tenantInfoRepository.findByuid(user.getTenantUID());
 		//判断登陆用户是否是LocalITAdmin(本地后台运营管理)
-		if(UserContextService.isOnlyLocalITAdmin()){
+		if(UserContextService.isInsulate()){
 			selectedTenant = tempTenantInfo;
 			orgTree = uaaService.getOrgTreeBySiteWithoutClinical(user.getSiteUID());
 		}else{
