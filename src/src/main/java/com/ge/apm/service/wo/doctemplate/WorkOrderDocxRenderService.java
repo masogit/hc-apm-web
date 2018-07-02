@@ -43,7 +43,7 @@ public class WorkOrderDocxRenderService {
     private Map<String, Object> mapMyMap(Map<String, Object> map) {
         Map<String, Object> datas = new HashMap<>();
         datas.put("device_name", map.get("设备名称"));
-        datas.put("device_type", map.get("设备类型"));
+        datas.put("device_type", map.get("设备型号"));
         datas.put("device_serial", map.get("设备序列号"));
         datas.put("device_qr", map.get("二维码"));
         datas.put("device_department", map.get("科室"));
