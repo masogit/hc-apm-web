@@ -69,7 +69,8 @@ public class WorkOrderExportTemplateController extends GenericCRUDUUIDController
         tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         userCommonService = WebUtil.getBean(UserCommonService.class);
         uaaService = WebUtil.getBean(UaaService.class);
-        isInsulate = UserContextService.isOnlyLocalITAdmin();
+        isInsulate = tenantInfoRepository.findByuid(user.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
         loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
         selectedUserOrg = orgInfoRepository.getByUid(user.getOrgInfoUID());
         setTenantUid(user.getTenantUID());
