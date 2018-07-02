@@ -1,18 +1,15 @@
 package com.ge.apm.view.uaa;
 
 import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.orginfo.OrgInfoService;
-import com.ge.apm.service.uaa.UserAccountService;
 import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.event.FileUploadEvent;
 import org.primefaces.model.UploadedFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import webapp.framework.dao.GenericRepository;
-import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDController;
 import webapp.framework.web.mvc.ServerEventInterface;
@@ -22,8 +19,8 @@ import javax.faces.bean.ViewScoped;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @ManagedBean
 @ViewScoped
@@ -33,7 +30,7 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
     private UserAccount currentUser;
     private OrgInfoService service;
     private UploadedFile file;
-    private List<ClinicalDepartment> importFailedDataList;
+    private List<Map> importFailedDataList;
     
     @Override
     protected void init() {
@@ -71,11 +68,11 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
         this.file = file;
     }
 
-	public List<ClinicalDepartment> getImportFailedDataList() {
+	public List<Map> getImportFailedDataList() {
 		return importFailedDataList;
 	}
 
-	public void setImportFailedDataList(List<ClinicalDepartment> importFailedDataList) {
+	public void setImportFailedDataList(List<Map> importFailedDataList) {
 		this.importFailedDataList = importFailedDataList;
 	}
 
