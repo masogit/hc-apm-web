@@ -9,7 +9,7 @@
         <div class="ui-g">
             <div class="ui-g-12">
                 <div class="ui-g-12 card cardTitle">
-                    <p:outputLabel class="pageTitle" value="报表模板管理"/>
+                    <p:outputLabel class="pageTitle" value="报表模版管理"/>
                 </div>
                 <h:form id="WoExportTemplateListForm">
                     <p:dataTable id="datalist" value="#{workOrderExportTemplateController.lazyModel}" var="item"
@@ -43,7 +43,7 @@
                                   filterMatchMode="EQ">
                             <h:outputText value="#{workOrderExportTemplateController.getSiteNameByUId(item.siteUID)}"/>
                         </p:column>
-                        <p:column headerText="模板文件" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
+                        <p:column headerText="模版文件" sortBy="#{item.fileName}" filterBy="#{item.fileName}"
                                   filterMatchMode="EQ">
                             <p:link href="#{fileDownloadService.getFileUrl(item.storageId)}">
                                 <h:outputText value="#{item.fileName}"/>
