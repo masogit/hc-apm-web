@@ -1,6 +1,7 @@
 package com.ge.apm.view.wo;
 
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.TenantInfoRepository;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
@@ -55,8 +56,8 @@ public class WorkOrderReportExportController implements Serializable {
     private StreamedContent exportDocx;
 
     private UserAccount currentUser;
-
     private OrgInfoRepository orgDao;
+    private TenantInfoRepository tenantInfoRepository;
 
     private List<OrgInfo> institutionList;
     private List<OrgInfo> hospitalList;
@@ -89,7 +90,7 @@ public class WorkOrderReportExportController implements Serializable {
 
     @PostConstruct
     protected void init() {
-
+        tenantInfoRepository = WebUtil.getBean(TenantInfoRepository.class);
         workOrderExportService = WebUtil.getBean(WorkOrderExportService.class);
         workOrderPublishRenderService = WebUtil.getBean(WorkOrderPublishRenderService.class);
         workOrderExportTemplateService = WebUtil.getBean(WorkOrderExportTemplateService.class);
@@ -109,7 +110,8 @@ public class WorkOrderReportExportController implements Serializable {
         isStatusClose = Boolean.TRUE;
         isStatusCancel = Boolean.TRUE;
 
-        isInsulate = UserContextService.isOnlyLocalITAdmin();
+        isInsulate = tenantInfoRepository.findByuid(currentUser.getTenantUID()).getInsulate();
+        isInsulate = isInsulate == null ? false : isInsulate;
 
         initOrgTree();
 

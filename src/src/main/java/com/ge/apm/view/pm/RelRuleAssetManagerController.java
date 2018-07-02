@@ -61,7 +61,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		userCommonService = WebUtil.getBean(UserCommonService.class);
 		assetMap = new HashMap<>();
 		ruleMap = new HashMap<>();
-		isInsulate = UserContextService.isOnlyLocalITAdmin();
+		isInsulate = UserContextService.isInsulate();
 		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
 
