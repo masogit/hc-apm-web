@@ -1,15 +1,12 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.OrgInfo;
-
-import java.util.Collection;
-import java.util.List;
-import javax.persistence.QueryHint;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
 import webapp.framework.dao.GenericRepository;
+
+import java.util.List;
 
 public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
@@ -71,5 +68,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> findByParentUIDAndOrgType(String parentUID, Integer orgType);
 
     public List<OrgInfo> findBySiteUIDAndOrgType(String siteUID,Integer orgType);
+
+    public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
 
 }
