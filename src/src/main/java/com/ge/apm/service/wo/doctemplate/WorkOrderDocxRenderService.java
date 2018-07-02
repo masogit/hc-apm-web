@@ -67,7 +67,7 @@ public class WorkOrderDocxRenderService {
         datas.put("fix_sign_time", map.get("签到时间"));
         datas.put("fix_type", map.get("工单类型"));
         datas.put("fix_error_type", map.get("故障类型"));
-        //todo
+
         datas.put("fix_owner", map.get("当前责任人"));
         datas.put("fix_reason", map.get("原因描述"));
         datas.put("fix_solution", map.get("解决方案"));

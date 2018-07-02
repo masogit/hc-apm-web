@@ -30,7 +30,6 @@ abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPolicy {
         XWPFRun run = paragraph.createRun();
         run.setFontFamily("Calibri");
         run.setFontSize(9);
-        run.setColor("1F497D");
         run.setText(textValue);
     }
 }
