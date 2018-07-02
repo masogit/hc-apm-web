@@ -190,8 +190,8 @@ public class AssetFileImportServiceTest {
         assertEquals("2017-12-09", df.format(assetInfo.getLastMeteringDate()));
         assertEquals("2017-12-10", df.format(assetInfo.getLastQaDate()));
 
-        assertEquals("维护商A", assetInfo.getMaitanance());
-        assertEquals("维护商电话A", assetInfo.getMaitananceTel());
+        assertEquals("维修商A", assetInfo.getMaitanance());
+        assertEquals("维修商电话A", assetInfo.getMaitananceTel());
 //        assertEquals("二维码A", assetInfo.getQrCode());
         assertEquals("安装位置编码A", assetInfo.getLocationCode());
         assertEquals("安装位置A", assetInfo.getLocationName());
@@ -400,8 +400,8 @@ public class AssetFileImportServiceTest {
         rowData.put("上次保养日期", "2017-12-08");
         rowData.put("上次计量日期", "2017-12-09");
         rowData.put("上次质检日期", "2017-12-10");
-        rowData.put("维护商", "维护商A");
-        rowData.put("维护商电话", "维护商电话A");
+        rowData.put("维修商", "维修商A");
+        rowData.put("维修商电话", "维修商电话A");
 //        rowData.put("二维码", "二维码A");
         rowData.put("安装位置编码", "安装位置编码A");
         rowData.put("安装位置", "安装位置A");

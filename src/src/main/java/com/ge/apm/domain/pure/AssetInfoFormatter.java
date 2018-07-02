@@ -665,8 +665,8 @@ public class AssetInfoFormatter {
         map.put("上次计量日期", this.getLastMeteringDate());
         map.put("上次质检日期", this.getLastQaDate());
 
-        map.put("维护商", this.getMaitanance());
-        map.put("维护商电话", this.getMaitananceTel());
+        map.put("维修商", this.getMaitanance());
+        map.put("维修商电话", this.getMaitananceTel());
         map.put("二维码", this.getQrCode());
         map.put("安装位置编码", this.getLocationCode());
         map.put("安装位置", this.getLocationName());
