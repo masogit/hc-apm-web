@@ -1,0 +1,89 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui">
+
+            <div class="ui-g-12">
+
+                <h:form id="orgEditForm">
+
+                    <div class="ui-g-12 ui-lg-5">
+                        <div class="card" style="height:400px;">
+                            <h:panelGroup>
+                                <p:inputText id="retrieval" value="#{orgInfoController.retrieval}"/>
+                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
+                            </h:panelGroup>
+                            <p:scrollPanel style="height:98%;border: 0" mode="native">
+                                <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgInfoController.orgTree}" var="node" selectionMode="single" selection="#{orgInfoController.selectedNode}" highlight="true">
+                                    <p:ajax process="@this" event="select" listener="#{orgInfoController.onSelectTreeNode}" update="@form:editPanel"/>
+
+                                    <p:treeNode type="org">
+                                        <h:outputText value="#{node.name}"/>
+                                    </p:treeNode>
+                                </p:tree>
+                            </p:scrollPanel>
+                        </div>
+                    </div>
+
+                    <div class="ui-g-12 ui-lg-7">
+                        <div class="card" style="height:400px;">
+                            <h:panelGroup id="editPanel">
+                                <h:panelGrid columns="8">
+                                    <p:commandButton id="createInstution" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Institution}" actionListener="#{orgInfoController.prepareCreateInstitution}" update="@form:editPanel" disabled="#{orgInfoController.isCreateInstitutionDisabled}"/>
+                                    <p:commandButton id="createHospital" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Hospital}" actionListener="#{orgInfoController.prepareCreateHospital}" update="@form:editPanel" disabled="#{orgInfoController.isCreateHospitalDisabled}"/>
+                                    <p:commandButton id="createSite" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Site}" actionListener="#{orgInfoController.prepareCreateSite}" update="@form:editPanel" disabled="#{orgInfoController.isCreateSiteDisabled}"/>
+                                    <p:commandButton id="createDept" process="@this" icon="ui-icon-plus" value="#{msg.Create} #{msg.Department}" actionListener="#{orgInfoController.prepareCreateDepartment}" update="@form:editPanel" disabled="#{orgInfoController.isCreateDepartmentDisabled}"/>
+                                    <p:commandButton id="deleteButton" process="@this" icon="ui-icon-close" value="#{msg.Delete}" actionListener="#{orgInfoController.deleteSelectedOrg}" update="@form" disabled="#{empty orgInfoController.selected or empty orgInfoController.selected.id}">
+                                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+                                    </p:commandButton>
+                                </h:panelGrid>
+                                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" style="width: 70%" rendered="#{orgInfoController.selected ne null}">
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.parentId}</label>
+                                        <p:outputLabel value="#{orgInfoController.selected.parentOrg}" rendered="#{orgInfoController.selected.parentOrg ne null}"/>
+                                        <p:outputLabel value="N/A" rendered="#{orgInfoController.selected.parentOrg eq null}"/>
+                                    </h:panelGroup>
+                                    <h:panelGroup>
+                                        <label class="label">类型</label>
+                                        <p:outputLabel value="#{orgInfoController.selected.orgTypeName}"/>
+                                    </h:panelGroup>
+                                            <h:panelGroup rendered="#{orgInfoController.acShow and false}">
+                                                <label class="label">设备负责人A</label>
+                                                <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+
+                                            <h:panelGroup rendered="#{orgInfoController.acShow and false}">
+                                                <label class="label">设备负责人B</label>
+                                                <p:selectOneMenu value="#{orgInfoController.selected.assetOwnerId2}" requiredMessage="#{msg.caseType} #{msg.ValidationRequire}">
+                                                    <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                    <f:selectItems value="#{orgInfoController.findPerson()}" var="item" itemLabel="#{item.name}" itemValue="#{item.id}"/>
+                                                </p:selectOneMenu>
+                                            </h:panelGroup>
+                                      <!-- </p:panelGrid>-->
+                                        <!--gl end-->
+
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.name}*</label>
+                                        <p:inputText id="name" value="#{orgInfoController.orgName}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
+                                            <p:ajax listener="#{orgInfoController.checkName()}" process="@this" update=":growl"></p:ajax></p:inputText>
+                                    </h:panelGroup>
+                                    <p:spacer></p:spacer>
+                                    <h:panelGroup>
+                                        <label class="label">#{msg.nameEn}</label>
+                                        <p:inputText id="nameEn" value="#{orgInfoController.orgNameEn}"/>
+                                    </h:panelGroup>
+                                    <p:spacer></p:spacer>
+
+                                    <p:commandButton style="width: 90px;" validateClient="true" icon="ui-icon-check" actionListener="#{orgInfoController.saveSelectedOrg}" value="#{msg.Save}" update="orgTree :growl"/>
+                                </p:panelGrid>
+                            </h:panelGroup>
+                        </div>
+                    </div>
+                </h:form>
+            </div>
+
+</ui:composition>
