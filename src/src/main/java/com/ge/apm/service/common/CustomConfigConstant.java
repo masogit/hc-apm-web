@@ -49,8 +49,8 @@ public class CustomConfigConstant {
             exportFields.put("制造商", "manufacture");
             exportFields.put("品牌/制造商简称", "makerShortName");
             exportFields.put("供应商", "vendor");
-            exportFields.put("维护商", "maitanance");
-            exportFields.put("维护商电话", "maitananceTel");
+            exportFields.put("维修商", "maitanance");
+            exportFields.put("维修商电话", "maitananceTel");
             exportFields.put("2010国家编码", "nationalStandardCode");
             exportFields.put(WebUtil.getMessage("parentAsset"), "parentAssetId");
             exportFields.put("设备标准名称", "deviceName");

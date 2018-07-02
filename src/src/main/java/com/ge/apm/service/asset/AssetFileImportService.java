@@ -236,8 +236,8 @@ public class AssetFileImportService {
                 assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
                 assetRow.setFieldDateValue("上次质检日期", "setLastQaDate");
 
-                assetRow.setFieldStringValue("维护商", "setMaitanance");
-                assetRow.setFieldStringValue("维护商电话", "setMaitananceTel");
+                assetRow.setFieldStringValue("维修商", "setMaitanance");
+                assetRow.setFieldStringValue("维修商电话", "setMaitananceTel");
                 assetRow.setFieldStringValue("安装位置编码", "setLocationCode");
                 assetRow.setFieldStringValue("安装位置", "setLocationName");
                 assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
