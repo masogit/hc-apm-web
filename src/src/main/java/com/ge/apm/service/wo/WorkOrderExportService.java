@@ -238,7 +238,7 @@ public class WorkOrderExportService {
             workOrderMap.put("设备编号", assetInfo.getDepartNum());
             workOrderMap.put("当前位置", serviceRequest.getAssetLocation() == null ? assetInfo.getLocationName()
                     : serviceRequest.getAssetLocation());
-            workOrderMap.put("报修状态", getPdfStatus(serviceRequest.getStatus()));
+            workOrderMap.put("报修状态", getPdfStatus(assetInfo.getStatus()));
 			/*if(serviceRequest.getStatus() == 2)
 			{
 				workOrderMap.put("停机时间", (serviceRequest.getConfirmedDownTime() != null ? serviceRequest.getConfirmedDownTime():null));
@@ -321,13 +321,19 @@ public class WorkOrderExportService {
         if (status != null) {
             switch (status) {
                 case 1:
-                    assetStatus = "未关单";
+                    assetStatus = "正常";
                     break;
                 case 2:
-                    assetStatus = "已关单";
+                    assetStatus = "停机";
                     break;
                 case 3:
-                    assetStatus = "取消";
+                    assetStatus = "限制功能使用";
+                    break;
+                case 4:
+                    assetStatus = "待报废";
+                    break;
+                case 5:
+                    assetStatus = "停用";
                     break;
                 default:
                     break;
