@@ -35,6 +35,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import org.primefaces.model.UploadedFile;
 import java.io.InputStream;
 import java.util.logging.Level;
@@ -54,6 +55,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     private QrCodeService qrCodeService;
     private UaaService uaaService;
     private CustomConfigService ccService;
+    private AssetInfoService assetInfoService;
 
     //选定的院区
     private OrgInfo selectSite;
@@ -94,6 +96,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     
     List<String> customedColumns;
     
+    private List<OrgInfo> clinicalDeptList;
+    
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -111,12 +115,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         acService = WebUtil.getBean(AssetCreateService.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        assetInfoService = WebUtil.getBean(AssetInfoService.class);
 
         importService = WebUtil.getBean(AssetFileImportService.class);
 
         this.filterBySite = false;
         this.selectedMap = new HashMap();
         loadCustomConfig();
+        loadClinicalDeptList();
 
     }
 
@@ -155,7 +161,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("clinicalDeptUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             this.updateSearchFilter(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
-            onSelectSiteTreeNode(null);
+//            onSelectSiteTreeNode(null);
         }
 
         if (oneSearchStr != null && !oneSearchStr.isEmpty()) {
@@ -193,19 +199,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
                 selectSite = null;
             }
             onClinicalDeptFilter(null);
+            loadClinicalDeptList();
         }
     }
 
     public void onClinicalDeptFilter(NodeSelectEvent event) {
-        this.selectedMap.clear();
-        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
-            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
-            if (deptOrg.getOrgType() == 4) {
-                fileterOrg = deptOrg;
-                return;
-            }
+//        this.selectedMap.clear();
+//        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
+//            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
+//            if (deptOrg.getOrgType() == 4) {
+//                fileterOrg = deptOrg;
+//                return;
+//            }
+//        }
+//        fileterOrg = null;
+    }
+    
+    private void loadClinicalDeptList(){
+        if (null != selectSite) {
+            clinicalDeptList = assetInfoService.getClinicalDeptList(selectSite.getSiteUID());
+        }else{
+            clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
+                    .stream().filter(item -> item.getOrgType()==4).collect(Collectors.toList());
         }
-        fileterOrg = null;
+        
     }
 
     public void setOneSearchStr(String oneSearchStr) {
@@ -398,7 +415,18 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setWarrantyFormatTime(String warrantyFormatTime) {
         this.warrantyFormatTime = warrantyFormatTime;
     }
+    
+    public List<OrgInfo> autoCompleteDept(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
 
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    
     //getter and setter
     public Boolean getNeedShowAssetApproval() {
         if (null == needShowAssetApproval) {
