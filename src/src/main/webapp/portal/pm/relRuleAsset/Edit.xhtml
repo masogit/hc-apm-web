@@ -20,12 +20,12 @@
                         <h:panelGroup >
                             <label class ="label">二级规则</label>
                             <p:inputText id="rule2" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.selected.ruleUID2)}" readonly="true" />
-                            <p:commandButton name = "删除" class="btn btn-sm btn-gray" rendered="#{relRuleAssetManagerController.selected.ruleUID2 != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.deleteRule2()}" process="@this"/>
+                            <p:commandButton name = "删除" class="btn btn-sm btn-gray" rendered="#{relRuleAssetManagerController.selected.ruleUID2 != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.deleteRule2()}" update="display"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">三级规则</label>
                             <p:inputText id="rule3" value="#{relRuleAssetManagerController.getRuleName(relRuleAssetManagerController.selected.ruleUID)}" readonly="true"/>
-                            <p:commandButton name = "删除" class="btn btn-lg btn-gray" rendered="#{relRuleAssetManagerController.selected.ruleUID != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.deleteRule3()}" process="@this"/>
+                            <p:commandButton name = "删除" class="btn btn-lg btn-gray" rendered="#{relRuleAssetManagerController.selected.ruleUID != null}" icon="ui-icon-close" actionListener="#{relRuleAssetManagerController.deleteRule3()}" update="display"/>
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.departNum}</label>
