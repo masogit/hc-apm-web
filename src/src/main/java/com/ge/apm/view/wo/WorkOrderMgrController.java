@@ -120,6 +120,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> tagNoGroupAssets;
 
     private String requestAssetUid;
+    private String queryAssetUid;
 
     private List<V2_WorkOrder_Detail> approvedDetails;
     private Map<String, Boolean> selectedMap;
@@ -140,6 +141,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
 
         String query = WebUtil.getRequestParameter("query");
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        if (!Strings.isNullOrEmpty(enCodeParameters)) {
+            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+            if(null !=  UrlEncryptController.getValueFromMap(enCodeParameters, "query")){
+                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+            }
+        }
         if (Strings.isNullOrEmpty(query)) {
             queryIndex = 0;
         } else {
@@ -149,10 +158,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.filterBySite = false;
         this.filterByHospital = false;
 
-        String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-        }
+        
+        
 
     }
 
@@ -264,6 +271,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.assetOwnerId");
         removeFilterOnField("assetInfo.assetOwnerId2");
         removeFilterOnField("assetInfo.assetOwnerId3");
+        removeFilterOnField("assetInfo.uid");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -360,9 +368,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-        } else if(queryIndex ==-10){ //全部维修单
+        } else if(queryIndex ==11){ //全部维修单
 
-        } else {//待办
+        } else if(queryIndex ==12){ //指定设备queryAssetUid 工单 设备详细页面跳转
+            if(!Strings.isNullOrEmpty(queryAssetUid)){
+                searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+            }
+        }else {//待办
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
 
