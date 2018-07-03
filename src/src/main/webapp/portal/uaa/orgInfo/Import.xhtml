@@ -51,7 +51,9 @@
                         <p:column headerText="#{msg.Department}">
                             <h:outputText value="#{item.departName}" />
                         </p:column>
-
+                        <p:column headerText="备注">
+                            <h:outputText value="#{item.status}" />
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist2" fileName="OrgImportFailed_export" />

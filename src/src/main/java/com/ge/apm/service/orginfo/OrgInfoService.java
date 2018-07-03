@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.io.IOException;
 import java.util.*;
 
 @Service
@@ -83,11 +84,11 @@ public class OrgInfoService {
     }
 
     @Transactional
-    public List<Map> importOrg(UploadedFile file, UserAccount user) {
+    public List<Map> importOrg(UploadedFile file, UserAccount user) throws IOException {
 
         List<Map> resultList = new ArrayList<>();
 
-        try {
+//        try {
 
             TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
 
@@ -114,6 +115,11 @@ public class OrgInfoService {
                     result.put("hospitalName", hospitalName);
                     result.put("siteName", siteName);
                     result.put("departName", departName);
+                    result.put("excelIdex", String.valueOf(dataRow));
+
+                    checkRowData(institutionName, hospitalName, siteName, departName);
+
+
 
                     OrgInfo institution = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 1, institutionName);
 
@@ -149,21 +155,39 @@ public class OrgInfoService {
 
 
                 } catch(Exception e){
-                    result.put("reason", e.getMessage());
-                    throw new Exception("第" + dataRow + "行数据错误" + e.getMessage());
+                    result.put("status", e.getMessage());
                 } finally {
                     resultList.add(result);
                 }
 
             }//for
 
-        } catch (Exception e) {
-
-        }
+//        } catch (Exception e) {
+//
+//        }
 
 
 
         return resultList;
+    }
+
+    public void checkRowData(String institutionName, String hospitalName, String siteName, String deptName) throws Exception {
+        if (StringUtils.isEmpty(institutionName)) {
+            throw new Exception("集团不能为空!");
+        }
+
+        if (StringUtils.isEmpty(hospitalName)) {
+            throw new Exception("医院不能为空!");
+        }
+
+        if (StringUtils.isEmpty(siteName)) {
+            throw new Exception("院区不能为空!");
+        }
+
+        if (StringUtils.isEmpty(deptName)) {
+            throw new Exception("科室不能为空!");
+        }
+
     }
 
 }
