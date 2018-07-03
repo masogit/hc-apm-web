@@ -663,7 +663,7 @@ public class AssetInfoFormatter {
         map.put("报废日期", this.getTerminateDate());
         map.put("上次保养日期", this.getLastPmDate());
         map.put("上次计量日期", this.getLastMeteringDate());
-        map.put("上次质检日期", this.getLastQaDate());
+        map.put("上次巡检日期", this.getLastQaDate());
 
         map.put("维修商", this.getMaitanance());
         map.put("维修商电话", this.getMaitananceTel());

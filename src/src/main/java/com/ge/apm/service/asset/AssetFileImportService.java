@@ -234,7 +234,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDateValue("报废日期", "setTerminateDate");
                 assetRow.setFieldDateValue("上次保养日期", "setLastPmDate");
                 assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
-                assetRow.setFieldDateValue("上次质检日期", "setLastQaDate");
+                assetRow.setFieldDateValue("上次巡检日期", "setLastQaDate");
 
                 assetRow.setFieldStringValue("维修商", "setMaitanance");
                 assetRow.setFieldStringValue("维修商电话", "setMaitananceTel");
