@@ -1,7 +1,14 @@
 package com.ge.apm.view.pm;
 
+import com.deepoove.poi.XWPFTemplate;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
+import com.ge.apm.domain.bo.MaintenanceTemplate;
+import com.ge.apm.domain.pure.TableSchema;
+import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.common.UserCommonService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.TreeNodeUtil;
@@ -9,9 +16,9 @@ import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.FileUploadEvent;
+import org.primefaces.model.*;
 import org.primefaces.event.NodeSelectEvent;
-import org.primefaces.model.DefaultTreeNode;
-import org.primefaces.model.TreeNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,7 +29,13 @@ import webapp.framework.web.mvc.JpaCRUDController;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 @ManagedBean
@@ -41,6 +54,13 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private List<PmOrderRuleCheckList> checkItemLists;
     private PmOrderRuleCheckList pmRuleCheckItem;
 
+    // for report template
+    private UploadedFile uploadedFile;
+    private BlobFileService blobService;
+    private V2_BlobObject uploadedFileObject;
+
+    private StreamedContent reportTemplateFile;
+
     private OrgInfoRepository orgInfoRepository;
     private Boolean isInsulate;
     private Integer loginUserOrgType;
@@ -58,6 +78,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     protected void init() {
         filterBySite = false;
         dao = WebUtil.getBean(PmOrderRuleRepository.class);
+        blobService = WebUtil.getBean(BlobFileService.class);
         user = UserContextService.getCurrentUserAccount();
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
@@ -513,6 +534,137 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
     public void setCheckItemLists(List<PmOrderRuleCheckList> checkItemLists) {
         this.checkItemLists = checkItemLists;
+    }
+
+    public void generateReportTemplateFile() {
+        InputStream stream = this.getClass().getClassLoader().getResourceAsStream("report/maintenance-template.docx");
+
+        try {
+            MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
+            if (selected != null) {
+                TableSchema schema;
+                schema = getTableSchemaById(selected.getSafetyReport());
+                if (schema != null) {
+                    builder.safetyReport(schema);
+                }
+                schema = getTableSchemaById(selected.getPerformanceReport());
+                if (schema != null) {
+                    builder.performanceReport(schema);
+                }
+            }
+
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
+            template.write(out);
+            InputStream doc = new ByteArrayInputStream(out.toByteArray());
+            this.reportTemplateFile = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report-template.docx");
+        } catch (IOException e)  {
+            Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template");
+            WebUtil.addErrorMessage("Word模版生成失败");
+        }
+    }
+
+    private TableSchema getTableSchemaById(String id) {
+        TableSchema schema = null;
+        if (!Strings.isNullOrEmpty(id)) {
+            TableDefinition definition = templateDao.findById(id);
+            if (definition != null && !Strings.isNullOrEmpty(definition.getSchema())) {
+                try {
+                    ObjectMapper objectMapper = new ObjectMapper();
+                    schema = objectMapper.readValue(definition.getSchema(), TableSchema.class);
+                } catch (JsonParseException e) {
+                    Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while parsing schema in table definition", e);
+                } catch (JsonMappingException e) {
+                    Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Wrong Json mapping", e);
+                } catch (IOException e) {
+                    Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Bad IO while parsing Json", e);
+                }
+            }
+        }
+
+        return schema;
+    }
+
+    /**
+     * Remote Report template from master-data.
+     */
+    public void removeReportTemplate() {
+        if (selected != null) {
+            blobService.deleteBlobFileById(selected.getReportStorageId());
+            selected.setReportStorageId(null);
+            selected.setReportTemplateName(null);
+            this.dao.save(selected);
+            this.uploadedFile = null;
+        }
+    }
+
+
+    /**
+     * Save uploaded file to master-data service.
+     *
+     * @param event {@link FileUploadEvent} object.
+     */
+    public void uploadDataFile(FileUploadEvent event) {
+        this.uploadedFile = event.getFile();
+        uploadedFileObject = blobService.uploadFile(uploadedFile);
+        this.selected.setReportTemplateName(uploadedFile.getFileName());
+    }
+
+    /**
+     * Cancel upload.
+     */
+    public void cancelUpload() {
+        this.uploadedFile = null;
+        if (null != uploadedFileObject) {
+            uploadedFileObject = null;
+        }
+    }
+
+    /**
+     * Update report storage id after finish upload.
+     */
+    public void finishUpload() {
+        if (uploadedFileObject != null) {
+            String storageId = uploadedFileObject.getObjectStorageId();
+            this.selected.setReportStorageId(storageId);
+            this.dao.save(selected);
+        }
+    }
+
+    /**
+     * Getter for uploaded file.
+     *
+     * @return {@link UploadedFile} object.
+     */
+    public UploadedFile getUploadedFile() {
+        return uploadedFile;
+    }
+
+    /**
+     * Setter for {@code uploadedFile}.
+     *
+     * @param uploadedFile {@link UploadedFile} object.
+     */
+    public void setUploadedFile(UploadedFile uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+
+    /**
+     * Getter for report template file.
+     *
+     * @return {@link StreamedContent} object.
+     */
+    public StreamedContent getReportTemplateFile() {
+        return reportTemplateFile;
+    }
+
+    /**
+     * Setter for {@code reportTemplateFile}.
+     *
+     * @param reportTemplateFile {@link StreamedContent} object.
+     */
+    public void setReportTemplateFile(StreamedContent reportTemplateFile) {
+        this.reportTemplateFile = reportTemplateFile;
     }
 
     public Boolean getInsulate() {
