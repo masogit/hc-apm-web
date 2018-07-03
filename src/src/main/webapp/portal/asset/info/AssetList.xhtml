@@ -122,7 +122,7 @@
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <!--<p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>-->
-                                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.fileterOrg}"  size="5"
+                                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.fileterOrg}"
                                                     scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
                                         <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
