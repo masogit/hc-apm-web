@@ -5,8 +5,8 @@ import org.apache.poi.xwpf.usermodel.*;
 
 import java.util.Map;
 
-abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPolicy {
-    String extractValue(Map<String, Object> part, String key) {
+public abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPolicy {
+    protected String extractValue(Map<String, Object> part, String key) {
         Object obj = part.get(key);
         if (obj == null) {
             return "";
@@ -14,7 +14,7 @@ abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPolicy {
         return String.valueOf(obj);
     }
 
-    XWPFTableRow addRow(XWPFTable table) {
+    protected XWPFTableRow addRow(XWPFTable table) {
         XWPFTableRow row = table.insertNewTableRow(table.getNumberOfRows());
         row.setHeight(300);
         row.setCantSplitRow(false);
@@ -22,7 +22,7 @@ abstract class AbstractWoTableRenderPolicy extends DynamicTableRenderPolicy {
         return row;
     }
 
-    void addCell(XWPFTableRow row, String textValue) {
+    protected void addCell(XWPFTableRow row, String textValue) {
         XWPFTableCell xwpfTableCell = row.addNewTableCell();
         xwpfTableCell.setVerticalAlignment(XWPFTableCell.XWPFVertAlign.CENTER);
         XWPFParagraph paragraph = xwpfTableCell.getParagraphs().get(0);

@@ -74,6 +74,12 @@ public class PmOrderRule implements Serializable{
     
     @Column(name = "performance_report")
 	private String performanceReport;//性能报告
+
+	@Column(name = "report_storage_id")
+	private String reportStorageId; // 报告模版
+
+	@Column(name = "report_template_name")
+	private String reportTemplateName; // 报告模版名称
     
     @Column(name = "remark")
     private String remark;//备注
@@ -210,6 +216,18 @@ public class PmOrderRule implements Serializable{
 	}
 	public void setCheckListUID(String checkListUID) {
 		this.checkListUID = checkListUID;
+	}
+	public String getReportStorageId() {
+		return reportStorageId;
+	}
+	public void setReportStorageId(String reportStorageId) {
+		this.reportStorageId = reportStorageId;
+	}
+	public String getReportTemplateName() {
+		return reportTemplateName;
+	}
+	public void setReportTemplateName(String reportTemplateName) {
+		this.reportTemplateName = reportTemplateName;
 	}
 
 	public String getInstitutionUID() {
