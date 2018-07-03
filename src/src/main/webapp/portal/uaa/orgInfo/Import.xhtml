@@ -17,7 +17,7 @@
                     <h:panelGroup>
                         <p>说明</p>
                         <p>
-                            1. <a href="OrgImport_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
+                            1. <a href="APM_Org_Template.xlsx" title="download">#{msg.downloadTemplateFile}</a>
                         </p>
                         <p>2. 文件中填入要导入的用户数据</p>
                         <p>3. 上传文件进行导入</p>
@@ -30,7 +30,7 @@
             <h:form id="dataListForm">
                 <p:messages id="messages" showDetail="true" closable="false" autoUpdate="false">
                 </p:messages>
-                <p:fieldset legend="导入失败的数据">
+                <p:fieldset legend="导入的数据">
                     <p:dataTable id="datalist2" rendered="#{not empty orgImportController.importFailedDataList}"
                                  value="#{orgImportController.importFailedDataList}" var="item" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
                                  paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
@@ -51,7 +51,9 @@
                         <p:column headerText="#{msg.Department}">
                             <h:outputText value="#{item.departName}" />
                         </p:column>
-
+                        <p:column headerText="备注">
+                            <h:outputText value="#{item.status}" />
+                        </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton title="#{msg.exportToXLS}" icon="ui-icon-arrowstop-1-s" class="btn btn-sm btn-gray" ajax="false">
                                 <p:dataExporter type="xls" target="datalist2" fileName="OrgImportFailed_export" />
