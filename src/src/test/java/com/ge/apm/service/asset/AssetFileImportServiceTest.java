@@ -399,7 +399,7 @@ public class AssetFileImportServiceTest {
         rowData.put("报废日期", "2017-12-07");
         rowData.put("上次保养日期", "2017-12-08");
         rowData.put("上次计量日期", "2017-12-09");
-        rowData.put("上次质检日期", "2017-12-10");
+        rowData.put("上次巡检日期", "2017-12-10");
         rowData.put("维修商", "维修商A");
         rowData.put("维修商电话", "维修商电话A");
 //        rowData.put("二维码", "二维码A");
