@@ -99,7 +99,7 @@ public class OrgInfoService {
 
             for (Map< String, Object> rowMap = doc.getDataRowMap(keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(keyRow, ++dataRow)) {
 
-                Map<String, String> result = new HashMap<>();
+                Map<String, String> result = null;
 
                 try {
 //                    ClinicalDepartment depart = new ClinicalDepartment();
@@ -111,6 +111,7 @@ public class OrgInfoService {
 
                     if (StringUtils.isEmpty(institutionName)) break;
 
+                    result = new HashMap<>();
                     result.put("institutionName", institutionName);
                     result.put("hospitalName", hospitalName);
                     result.put("siteName", siteName);
@@ -154,10 +155,15 @@ public class OrgInfoService {
                     }
 
 
+                    result.put("status", "导入成功");
+
                 } catch(Exception e){
                     result.put("status", e.getMessage());
                 } finally {
-                    resultList.add(result);
+                    if (result != null) {
+                        resultList.add(result);
+                    }
+
                 }
 
             }//for
@@ -172,20 +178,33 @@ public class OrgInfoService {
     }
 
     public void checkRowData(String institutionName, String hospitalName, String siteName, String deptName) throws Exception {
+
         if (StringUtils.isEmpty(institutionName)) {
             throw new Exception("集团不能为空!");
+        }
+        if (institutionName.length() > 64) {
+            throw new Exception("集团名称不能超过64个字符");
         }
 
         if (StringUtils.isEmpty(hospitalName)) {
             throw new Exception("医院不能为空!");
         }
+        if (hospitalName.length() > 64) {
+            throw new Exception("医院名称不能超过64个字符");
+        }
 
         if (StringUtils.isEmpty(siteName)) {
             throw new Exception("院区不能为空!");
         }
+        if (siteName.length() > 64) {
+            throw new Exception("院区名称不能超过64个字符");
+        }
 
         if (StringUtils.isEmpty(deptName)) {
             throw new Exception("科室不能为空!");
+        }
+        if (deptName.length() > 64) {
+            throw new Exception("科室名称不能超过64个字符");
         }
 
     }
