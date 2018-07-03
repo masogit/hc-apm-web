@@ -49,7 +49,7 @@ public class WorkOrderPublishRenderService {
         RenderResult renderResult = null;
         for (Map<String, Object> map : data) {
             byte[] bytes = workOrderDocxRenderService.renderDocx(map, templateBytes);
-            renderResult = new RenderResult(bytes, "application/msword", "WorkOrderDetails.docx");
+            renderResult = new RenderResult(bytes, "application/msword", getFileName(map, 1));
         }
         return renderResult;
     }

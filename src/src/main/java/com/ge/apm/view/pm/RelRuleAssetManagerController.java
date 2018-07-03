@@ -288,30 +288,41 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.assetUids = assetUids;
 	}
 
-	@Transactional
+	//@Transactional
 	public void deleteRule(){
+	    String alert = null;
 		if(deleteRule3){
-			selected.setRuleUID(null);
+            selected.setRuleUID(null);
+            alert = "三级规则成功删除！";
 		}
 		if(deleteRule2){
+		    if(StringUtils.isEmpty(alert)){
+                alert = "二级规则成功删除！";
+            }else{
+                alert = "二级规则和三级规则都已成功删除！";
+            }
 			selected.setRuleUID2(null);
 		}
 		if(selected.getRuleUID2() == null && selected.getRuleUID() == null){
 			dao.delete(selected);
+            WebUtil.addSuccessMessage(alert);
 			return;
 		}
 		dao.save(selected);
+        WebUtil.addSuccessMessage(alert);
 	}
 
 	public void deleteRule2(){
+		this.selected.setRuleUID2(null);
 		this.deleteRule2 = true;
 	}
 
 	public void deleteRule3(){
+		this.selected.setRuleUID(null);
 		this.deleteRule3 = true;
 	}
 
-	public boolean isDeleteRule2() {
+	public boolean getDeleteRule2() {
 		return deleteRule2;
 	}
 
@@ -319,7 +330,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.deleteRule2 = deleteRule2;
 	}
 
-	public boolean isDeleteRule3() {
+	public boolean getDeleteRule3() {
 		return deleteRule3;
 	}
 
