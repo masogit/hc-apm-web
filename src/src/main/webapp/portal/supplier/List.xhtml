@@ -44,7 +44,7 @@
                         <p:column headerText="#{msg.tel}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.tel}"/>
                         </p:column>
-                        <p:column headerText="供应商类型" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
+                        <p:column headerText="类型" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
                             <f:facet name="filter">
                                 <p:selectOneMenu value="#{supplierController.supplierType}" onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
