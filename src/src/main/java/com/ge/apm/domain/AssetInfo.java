@@ -81,6 +81,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;//制造商
+    
+    @Size(max = 64)
+    @Column(name = "manufacture_id")
+    private String manufactureId;//制造商Id
 
     @Size(max = 64)
     @Column(name = "vendor")
@@ -1458,6 +1462,14 @@ public class AssetInfo implements ChineseName,Serializable {
         this.isChecked = isChecked;
     }
 
+    public String getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(String manufactureId) {
+        this.manufactureId = manufactureId;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

@@ -157,6 +157,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selectedObjectMap.put("clinicalDept", selected.getClinicalDeptId() == null ? null : orgDao.findById(selected.getClinicalDeptId()));
         selectedObjectMap.put("supplier", selected.getSupplierId() == null ? null : supplierDao.findById(selected.getSupplierId()));
         selectedObjectMap.put("maintainer", selected.getMaitananceId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getMaitananceId())));
+        selectedObjectMap.put("manufacture", selected.getManufactureId() == null ? null : supplierDao.findById(Integer.valueOf(selected.getManufactureId())));
         selectedObjectMap.put("selectedOrg", selected.getSiteUID() == null ? null : orgDao.findByUid(selected.getSiteUID()));
         qrCode = selected.getQrCode();
         parentAssetList = aimService.getParentsAssetsList(this.selected);
@@ -249,6 +250,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             case "maintainer":
                 selected.setMaitananceId(supplier == null ? null : supplier.getId().toString());
                 selected.setMaitanance(supplier == null ? null : supplier.getName());
+                break;
+            case "manufacture":
+                selected.setManufactureId(supplier == null ? null : supplier.getId().toString());
+                selected.setManufacture(supplier == null ? null : supplier.getName());
                 break;
         }
     }
@@ -599,7 +604,14 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public List<Supplier> autoCompleteSupplier(String query) {
 
-        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("1", "3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getSupplierT()==null || item.getSupplierT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+    public List<Supplier> autoCompleteManufacture(String query) {
+
+        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT()==null || item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
@@ -607,7 +619,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
 
     public List<Supplier> autoCompleteMaintainer(String query) {
 
-        List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("2", "3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT()==null || item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
         res.sort(new PinYinComparatorByName());
         return res;
