@@ -24,10 +24,7 @@ import javax.faces.context.FacesContext;
 import javax.faces.event.AjaxBehaviorEvent;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -42,7 +39,7 @@ public class AssetFileImportController {
 
     private UploadedFile file;
 
-    private Map<String, Map<String, Object>> importOrgMap;
+//    private Map<String, Map<String, Object>> importOrgMap;
     private List<Map<String, Object>> importAssetMap;
 
     private AssetFileImportService aiService;
@@ -96,10 +93,10 @@ public class AssetFileImportController {
                 return;
             }
 
-            importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
+//            importOrgMap = aiService.getOrgInfoMapFromTemplate(doc);
             importAssetMap = aiService.getAssetMapFromTemplate(doc);
             
-            canbeImported = aiService.checkData(importOrgMap,importAssetMap);
+            canbeImported = aiService.checkData(importAssetMap);
 
             filterErrorRecords();
 
@@ -118,7 +115,7 @@ public class AssetFileImportController {
 
     public void importData() {
         if (null != importAssetMap) {
-            aiService.importData(importOrgMap, importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
+            aiService.importData(importAssetMap, autoGenerateQrcode,isGeneratePmOrder);
             isImported = true;
 
             filterErrorRecords();
@@ -126,7 +123,7 @@ public class AssetFileImportController {
             try {
                 InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/asset/assetImport/APM_Asset_Template.xlsx");
                 ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
-                hasExportData = aiService.exportFailData(doc, importOrgMap, importAssetMap);
+                hasExportData = aiService.exportFailData(doc, Collections.emptyMap(), importAssetMap);
                 exportFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "failedData.xlsx");
             } catch (IOException ex) {
                 Logger.getLogger(AssetFileImportController.class.getName()).log(Level.SEVERE, null, ex);
@@ -156,13 +153,13 @@ public class AssetFileImportController {
         return errors;
     }
     
-    public Integer getOrgErrorCounts(){
-        if(null!=importOrgMap &&!importOrgMap.isEmpty()){
-           return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
-        }else{
-            return 0;
-        }
-    }
+//    public Integer getOrgErrorCounts(){
+//        if(null!=importOrgMap &&!importOrgMap.isEmpty()){
+//           return Integer.parseInt(String.valueOf(importOrgMap.entrySet().stream().filter(item -> item.getValue().get("status").equals(AssetFileImportService.ImportStatus.CheckFail)).count()));
+//        }else{
+//            return 0;
+//        }
+//    }
 
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
@@ -222,23 +219,23 @@ public class AssetFileImportController {
 
         displayAssets = result;
 
-        if (importOrgMap == null) return;
-
-        Map<String, Map<String, Object>> resultMap = new LinkedHashMap<>();
-
-        for (Map.Entry<String, Map<String, Object>> entry: importOrgMap.entrySet()) {
-            Map<String, Object> map = entry.getValue();
-
-            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
-            if (importStatus == null) continue;
-
-            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
-                resultMap.put(entry.getKey(), entry.getValue());
-            }
-
-        }
-
-        displayOrgs = resultMap;
+//        if (importOrgMap == null) return;
+//
+//        Map<String, Map<String, Object>> resultMap = new LinkedHashMap<>();
+//
+//        for (Map.Entry<String, Map<String, Object>> entry: importOrgMap.entrySet()) {
+//            Map<String, Object> map = entry.getValue();
+//
+//            AssetFileImportService.ImportStatus importStatus = (AssetFileImportService.ImportStatus) map.get("status");
+//            if (importStatus == null) continue;
+//
+//            if (importStatus == AssetFileImportService.ImportStatus.CheckFail || importStatus == AssetFileImportService.ImportStatus.Failure) {
+//                resultMap.put(entry.getKey(), entry.getValue());
+//            }
+//
+//        }
+//
+//        displayOrgs = resultMap;
     }
 
     List<Map<String, Object>> displayAssets;
@@ -253,22 +250,22 @@ public class AssetFileImportController {
 
     }
 
-    Map<String, Map<String, Object>> displayOrgs;
+//    Map<String, Map<String, Object>> displayOrgs;
 
-    public Map<String, Map<String, Object>> getDisplayOrgs() {
-
-        if (displayErrorsOnly) {
-            return displayOrgs;
-        } else {
-            return importOrgMap;
-        }
-
-    }
+//    public Map<String, Map<String, Object>> getDisplayOrgs() {
+//
+//        if (displayErrorsOnly) {
+//            return displayOrgs;
+//        } else {
+//            return null;
+//        }
+//
+//    }
 
     //Getter and Setter
-    public Map<String, Map<String, Object>> getImportOrgMap() {
-        return importOrgMap;
-    }
+//    public Map<String, Map<String, Object>> getImportOrgMap() {
+//        return importOrgMap;
+//    }
 
     public List<Map<String, Object>> getImportAssetMap() {
         return importAssetMap;
