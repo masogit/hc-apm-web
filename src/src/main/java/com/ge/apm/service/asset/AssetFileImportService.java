@@ -464,6 +464,7 @@ public class AssetFileImportService {
                 List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
                 if (null == supplierList || supplierList.isEmpty()) {
                     Supplier newSupplier = new Supplier();
+                    newSupplier.setSupplierT(true);
                     newSupplier.setSiteId(selectedOrgToImport.getSiteId());
                     newSupplier.setName(newAsset.getVendor());
                     newSupplier.setTenantUID(selectedOrgToImport.getTenantUID());
@@ -710,6 +711,7 @@ public class AssetFileImportService {
         List<SearchFilter> supplierFilters = new ArrayList<>();
         supplierFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         supplierFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, supplierName));
+        supplierFilters.add(new SearchFilter("supplierT", SearchFilter.Operator.EQ, true));
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
