@@ -18,6 +18,16 @@
                         <label class="label">结束时间*</label>
                         <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.endBatchDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
+                    <h:panelGroup>
+						<label class="label">请选择模板</label>
+						<p:selectOneMenu id="nurseSiteMaintainConfigId" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" >
+							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":maintainDlg,:maintainHeaderForm"></p:ajax>
+	                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+	                        <p:column>
+								<h:outputText value="#{t.name}" />
+							</p:column>
+	                    </p:selectOneMenu>
+					</h:panelGroup>
                 </p:panelGrid>
 
                 <br/>
