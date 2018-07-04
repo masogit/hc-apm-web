@@ -123,7 +123,7 @@
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <!--<p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>-->
                                         <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.fileterOrg}"
-                                                    scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}"
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="1"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
                                         <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                         <p:ajax listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
