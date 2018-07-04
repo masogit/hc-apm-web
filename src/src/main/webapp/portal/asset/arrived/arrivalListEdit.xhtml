@@ -63,7 +63,11 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.arrivalListManufacture}</label>
-                                        <p:inputText value="#{assetArrivedListEditController.selected.manufacture}" readonly="#{assetArrivedListEditController.getInstalledCount() gt 0}" />
+                                        <p:autoComplete dropdown="true" value="#{assetArrivedListEditController.manufacture}"  scrollHeight="300"  forceSelection="true" 
+                                                        disabled="#{assetArrivedListEditController.getInstalledCount() gt 0}" completeMethod="#{assetArrivedListEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetArrivedListEditController.onManufactureChange}" />
+                                            <p:ajax listener="#{assetArrivedListEditController.onManufactureChange}" />
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.quantity}*</label>
