@@ -15,6 +15,7 @@ import com.ge.apm.service.asset.AssetCreateService;
 import com.ge.apm.service.asset.AssetFinacingNumGenerateService;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.GbCodeService;
+import com.ge.apm.service.utils.PinYinComparatorByName;
 import com.ge.apm.service.utils.TimeUtils;
 import com.google.common.base.Strings;
 import org.apache.commons.lang.StringUtils;
@@ -30,7 +31,9 @@ import javax.faces.bean.ViewScoped;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -49,8 +52,9 @@ public class AssetCreateController {
 
     private GbCodeRepository gbDao;
     private GbCodeService gbCodeService;
-    
+
     private AssetInfoMgrService assetMgrService;
+    private AssetInfoMgrService aimService;
 
     private String[] selectedPictures;
 
@@ -79,6 +83,9 @@ public class AssetCreateController {
     private TreeNode selectedGbNode;
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
 
+    private List<Supplier> supplierList = Collections.emptyList();
+    private Map<String, Object> selectedObjectMap = new HashMap();
+
     @PostConstruct
     protected void init() {
         String qrCode = WebUtil.getRequestParameter("qrCode");
@@ -90,9 +97,10 @@ public class AssetCreateController {
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
         gbCodeService = WebUtil.getBean(GbCodeService.class);
         assetMgrService = WebUtil.getBean(AssetInfoMgrService.class);
+        aimService = WebUtil.getBean(AssetInfoMgrService.class);
         assetFinacingNumGenerateService = WebUtil.getBean(AssetFinacingNumGenerateService.class);
 
-        createRequest = acService.getCreateRequest(qrCode,siteUid);
+        createRequest = acService.getCreateRequest(qrCode, siteUid);
         assetInfo = createAssetInfo();
 
         pictureList = acService.getQrCodePictureList(createRequest.getUid());
@@ -113,10 +121,11 @@ public class AssetCreateController {
             Collections.addAll(commentsList, createRequest.getComment().split("\\|"));
         }
 
-        if(null!= createRequest.getOrgId()){
-            clinicalDept =  orgDao.findById(createRequest.getOrgId());
+        if (null != createRequest.getOrgId()) {
+            clinicalDept = orgDao.findById(createRequest.getOrgId());
         }
-        
+
+        supplierList = aimService.getSuplierListBySiteUid(createRequest.getTenantUID());
         initGbTree();
 
     }
@@ -125,6 +134,35 @@ public class AssetCreateController {
         if (null != brand) {
             assetInfo.setBrand(brandDao.findById(brand.getId()));
         }
+    }
+
+    public void onSupplierChange(String idx) {
+        Supplier supplier = (Supplier) selectedObjectMap.get(idx);
+        switch (idx) {
+            case "maintainer":
+                assetInfo.setMaitananceId(supplier == null ? null : supplier.getId().toString());
+                assetInfo.setMaitanance(supplier == null ? null : supplier.getName());
+                assetInfo.setMaitananceTel(supplier == null ? null : supplier.getTel());
+                break;
+            case "manufacture":
+                assetInfo.setManufactureId(supplier == null ? null : supplier.getId().toString());
+                assetInfo.setManufacture(supplier == null ? null : supplier.getName());
+                break;
+        }
+    }
+
+    public List<Supplier> autoCompleteManufacture(String query) {
+        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT() == null || item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<Supplier> autoCompleteMaintainer(String query) {
+        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT() == null || item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
     }
 
     private AssetInfo createAssetInfo() {
@@ -159,10 +197,10 @@ public class AssetCreateController {
             newAsset.setAssetOwnerName(owner.getName());
             newAsset.setAssetOwnerTel(owner.getTelephone());
         }
-        
-        if(!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())){
+
+        if (!Strings.isNullOrEmpty(createRequest.getSubmitWechatId())) {
             UserAccount submitter = acService.getUserByWechatId(createRequest.getSubmitWechatId());
-            if(null != submitter){
+            if (null != submitter) {
                 newAsset.setCreatedBy(submitter.getUid());
             }
         }
@@ -201,12 +239,12 @@ public class AssetCreateController {
             assetInfo.setClinicalDeptUID(clinicalDept.getUid());
         }
         Boolean res = acService.createAsset(assetInfo, isGeneratePmOrder);
-        if(null!=isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())){
+        if (null != isGeneratePmOrder && isGeneratePmOrder && Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())) {
             WebUtil.putGrowlMsg("使用科室未填，不能生成保养工单");
         }
         if (res) {
             acService.createAttachments(assetInfo, selectedPictures);
-            acService.updateQrLib(assetInfo.getQrCode(), 3,createRequest.getSiteUID());
+            acService.updateQrLib(assetInfo.getQrCode(), 3, createRequest.getSiteUID());
             WebUtil.addSuccessMessage("创建成功");
             return "RequestsList?faces-redirect=true";
         } else {
@@ -322,7 +360,7 @@ public class AssetCreateController {
 
         }
     }
-    
+
     private void updateSelectedOrgGb(GbCode gbCode) {
         if (gbCode == null || gbCode.getId() == -1) {
             selectedGb = null;
@@ -336,8 +374,8 @@ public class AssetCreateController {
     public void gennerateFinancingNum() {
         String prifix = assetInfo.getFinancingNum() == null ? "" : assetInfo.getFinancingNum();
         String financingNum = assetFinacingNumGenerateService.autoGenerateFinacingNum(null,
-                assetInfo.getNationalStandardCode() == null ? null : assetInfo.getNationalStandardCode().split("/")[0], 
-                Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID())?assetInfo.getSiteUID():assetInfo.getClinicalDeptUID(), assetInfo.getParentAssetId(), prifix);
+                assetInfo.getNationalStandardCode() == null ? null : assetInfo.getNationalStandardCode().split("/")[0],
+                Strings.isNullOrEmpty(assetInfo.getClinicalDeptUID()) ? assetInfo.getSiteUID() : assetInfo.getClinicalDeptUID(), assetInfo.getParentAssetId(), prifix);
         if (null != financingNum && financingNum.startsWith("error:")) {
             WebUtil.addErrorMessage(financingNum.replace("error:", ""));
             financingNum = "";
@@ -347,9 +385,10 @@ public class AssetCreateController {
         }
     }
 
-     public List<AssetInfo> getParentAssetList() {
+    public List<AssetInfo> getParentAssetList() {
         return assetMgrService.getParentsAssetsList(assetInfo);
     }
+
     //getter and setter
     public QrCodeLib getCreateRequest() {
         return createRequest;
@@ -454,4 +493,13 @@ public class AssetCreateController {
     public void setClinicalDept(OrgInfo clinicalDept) {
         this.clinicalDept = clinicalDept;
     }
+
+    public Map<String, Object> getSelectedObjectMap() {
+        return selectedObjectMap;
+    }
+
+    public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+        this.selectedObjectMap = selectedObjectMap;
+    }
+
 }

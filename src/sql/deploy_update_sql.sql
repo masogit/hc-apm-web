@@ -167,5 +167,6 @@ update asset_tag_msg_subscriber set level_0=true, level_1=true, level_2=true;
 -- 国标码
 DELETE FROM gb_code WHERE code = '2020000' AND "level" = 1 ;
 DELETE FROM gb_code WHERE code = '2020100' AND "level" = 1 AND "name" = '电话机' AND parent_code = '2020000';
+DELETE FROM gb_code WHERE code = '2019900' AND "level" = 1 AND "name" = '其他计算机设备及软件' AND parent_code IS NULL;
 
 
