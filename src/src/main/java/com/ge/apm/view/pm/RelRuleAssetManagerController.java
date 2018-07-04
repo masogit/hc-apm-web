@@ -306,9 +306,13 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		if(selected.getRuleUID2() == null && selected.getRuleUID() == null){
 			dao.delete(selected);
             WebUtil.addSuccessMessage(alert);
+            deleteRule3 = false;
+            deleteRule2 = false;
 			return;
 		}
 		dao.save(selected);
+		deleteRule3 = false;
+		deleteRule2 = false;
         WebUtil.addSuccessMessage(alert);
 	}
 
