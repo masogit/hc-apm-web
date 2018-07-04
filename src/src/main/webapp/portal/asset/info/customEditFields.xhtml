@@ -202,8 +202,8 @@
             <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('maitanance')}" 
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
             </p:autoComplete>
         </h:panelGroup>
     </c:if>
@@ -211,7 +211,7 @@
         <h:panelGroup>
             <label class="label">#{msg.maitananceTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required? '*':''}</span></label>
             <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" required="#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required}" 
-                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('maitananceTel')}" />
+                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" class="maitananceChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nationalStandardCode')}" >

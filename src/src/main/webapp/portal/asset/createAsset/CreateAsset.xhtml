@@ -133,8 +133,19 @@
 
                                     <h:panelGroup>
                                         <label class="label">#{msg.manufacture}</label>
-                                        <p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>
+                                        <!--<p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>-->
+                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['manufacture']}" scrollHeight="300" 
+                                                        forceSelection="true" 
+                                                        completeMethod="#{assetCreateController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('manufacture')}"/>
+                                            <p:ajax listener="#{assetCreateController.onSupplierChange('manufacture')}"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
+
+                                    <!--                                    <h:panelGroup>
+                                                                            <label class="label">#{msg.manufacture}</label>
+                                                                            <p:inputText id="manufacture" value="#{assetCreateController.assetInfo.manufacture}"/>
+                                                                        </h:panelGroup>-->
 
                                     <h:panelGroup rendered="false">
                                         <label class="label">#{msg.brand}</label>
@@ -213,20 +224,26 @@
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.maitanance}</label>
-                                        <p:inputText id="maitanance" value="#{assetCreateController.assetInfo.maitanance}"/>
+                                        <!--<p:inputText id="maitanance" value="#{assetCreateController.assetInfo.maitanance}"/>-->
+                                        <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['maintainer']}" scrollHeight="300" 
+                                                        forceSelection="true" 
+                                                        completeMethod="#{assetCreateController.autoCompleteMaintainer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('maintainer')}"/>
+                                            <p:ajax listener="#{assetCreateController.onSupplierChange('maintainer')}"/>
+                                        </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.maitananceTel}</label>
                                         <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}"/>
                                     </h:panelGroup>
-<!--                                    <h:panelGroup>
-                                        <label class="label">同时生成保养工单*</label>
-                                        <p:selectOneMenu  value="#{assetCreateController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
-                                            <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
-                                            <f:selectItem itemLabel="是" itemValue="true"/>
-                                            <f:selectItem itemLabel="否" itemValue="false"/>
-                                        </p:selectOneMenu>
-                                    </h:panelGroup>-->
+                                    <!--                                    <h:panelGroup>
+                                                                            <label class="label">同时生成保养工单*</label>
+                                                                            <p:selectOneMenu  value="#{assetCreateController.isGeneratePmOrder}" required="true" requiredMessage="同时生成保养工单 #{msg.ValidationRequire}">
+                                                                                <f:selectItem itemLabel="#{msg.selectOneMessage}"/>
+                                                                                <f:selectItem itemLabel="是" itemValue="true"/>
+                                                                                <f:selectItem itemLabel="否" itemValue="false"/>
+                                                                            </p:selectOneMenu>
+                                                                        </h:panelGroup>-->
 
                                 </p:panelGrid>
                             </p:fieldset>

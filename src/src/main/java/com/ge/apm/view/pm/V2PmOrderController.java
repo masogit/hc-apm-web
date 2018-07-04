@@ -18,6 +18,7 @@ import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
+import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.ge.apm.web.PmOrderActionForm;
 import com.google.common.base.Strings;
@@ -252,11 +253,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());
         content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? dateTimeFormatter.print(pmOrder.getPlanTime().getTime()) : "");
         content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? dateTimeFormatter.print(pmOrder.getEndTime().getTime()) : "");
+        content.put(MaintenanceTemplate.Maintenance.TYPE.toString(), FieldValueMessageController.fieldValue("pmType", String.valueOf(pmOrder.getPmType())));
         content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
-        content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), pmOrder.getComments());
+        content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qaStatus", pmOrder.getQualityChecking()));
         // Coworker List
-        List<V2_WorkOrderCoworker> coworkers = this.getWorkOrderCoworker(pmOrderId);
+        List<V2_WorkOrderCoworker> coworkers = this.getCoWorkerList();
         if (coworkers != null && coworkers.size() > 0) {
             V2_WorkOrderCoworker coworker = coworkers.get(0);
             content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
@@ -305,13 +307,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
         // Check List
         List<Map<String, Object>> checkListTable = new ArrayList<>();
-        if (this.getPmOrderRuleCheckList() != null) {
-            for (PmOrderRuleCheckList item : this.getPmOrderRuleCheckList()) {
+        if (this.getPmCheckItemList() != null) {
+            for (PmOrderRuleCheckList item : this.getPmCheckItemList()) {
                 Map<String, Object> checkListMap = new HashMap<>();
                 checkListMap.put(MaintenanceTemplate.CheckListInfo.NAME.toString(), item.getName());
                 checkListMap.put(MaintenanceTemplate.CheckListInfo.PERIOD.toString(), item.getPeriod());
                 checkListMap.put(MaintenanceTemplate.CheckListInfo.CONTENT.toString(), item.getRemark());
-                checkListMap.put(MaintenanceTemplate.CheckListInfo.RESULT.toString(), item.getExecutable().toString());
+                checkListMap.put(MaintenanceTemplate.CheckListInfo.RESULT.toString(), FieldValueMessageController.fieldValue("checkItem", getCheckListResult(item.getUid())));
 
                 checkListTable.add(checkListMap);
             }
@@ -319,6 +321,24 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), checkListTable);
 
         return content;
+    }
+
+    /**
+     * Translate check item description.
+     *
+     * @param uid check item uid
+     * @return description, or 'n/a'
+     */
+    private String getCheckListResult(String uid) {
+        UnstructuredData data = this.hmCheck.get(uid);
+        if (data != null) {
+            try {
+                return (String) data.getValue();
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
+            }
+        }
+        return "n/a";
     }
 
     /**
@@ -915,10 +935,20 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             //没有打过标签的设备
             tagGroupAssets = getNoTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+"));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*4+owner*"));
             } else {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+"));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*4+owner*"));
             }
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*4+owner*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner1*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner2*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*4+owner*6+owner3*"));
+            
             searchFilters.add(new SearchFilter("isFinished", SearchFilter.Operator.NE, true));
         } else if (queryIndex == 6) { //待关单
             searchFilters.add(new SearchFilter("ownerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getUid()));

@@ -99,12 +99,13 @@ public class CustomConfigController {
                         .filter(item -> !customConfigObject.getAssetsMobilepageHeaderFields().contains(item)).collect(Collectors.toList());
                 break;
             case "MobileBasicFields":
-                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
-                break;
+//                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+//                        .filter(item -> !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
+//                break;
             case "MobileDetailFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)).collect(Collectors.toList());
+                        .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)
+                        && customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
@@ -351,9 +352,9 @@ public class CustomConfigController {
     private void updateConfigInfo() {
         if (null != customConfig) {
             configInfo.put("CreatedBy", userService.getUserByUid(customConfig.getCreatedBy()).getName());
-            configInfo.put("CreatedDate",customConfig.getCreatedDate()==null?"": DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
+            configInfo.put("CreatedDate", customConfig.getCreatedDate() == null ? "" : DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
             configInfo.put("LastModifiedBy", userService.getUserByUid(customConfig.getLastModifiedBy()).getName());
-            configInfo.put("LastModifiedDate",customConfig.getLastModifiedDate()==null?"": DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
+            configInfo.put("LastModifiedDate", customConfig.getLastModifiedDate() == null ? "" : DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
     }
 
@@ -390,7 +391,7 @@ public class CustomConfigController {
 
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
-            customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item-> !Objects.equals(item, key)).collect(Collectors.toList()));
+            customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
 //            customConfigObject.getAssetsListPageFields().remove(key);
         }
     }
@@ -455,5 +456,5 @@ public class CustomConfigController {
     public CustomConfig getCustomConfig() {
         return customConfig;
     }
-    
+
 }
