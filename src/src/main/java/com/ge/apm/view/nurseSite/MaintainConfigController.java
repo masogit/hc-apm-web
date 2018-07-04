@@ -1,0 +1,468 @@
+package com.ge.apm.view.nurseSite;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.faces.bean.ManagedBean;
+import javax.faces.bean.ViewScoped;
+
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
+import com.ge.apm.dao.I18nMessageRepository;
+import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
+import com.ge.apm.domain.AssetInfo;
+import com.ge.apm.domain.MaintainDataPair;
+import com.ge.apm.domain.NurseSiteMaintainCheckItem;
+import com.ge.apm.domain.NurseSiteMaintainConfig;
+import com.ge.apm.domain.UserAccount;
+import com.ge.apm.service.asset.SmallAssetPerformanceConfigService;
+import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.view.sysutil.UserContextService;
+
+import webapp.framework.dao.GenericRepositoryUUID;
+import webapp.framework.dao.SearchFilter;
+import webapp.framework.web.WebUtil;
+import webapp.framework.web.mvc.GenericCRUDUUIDController;
+import webapp.framework.web.mvc.ServerEventInterface;
+
+/**
+ * Created by 212605082 on 2017/10/11.
+ */
+@ManagedBean
+@ViewScoped
+public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface {
+
+    private I18nMessageRepository i18nDao;
+    private UserAccount currentUser;
+    private SmallAssetPerformanceConfigService service;
+    private NurseSiteMaintainService nurseSiteMaintainService;
+    private NurseSiteMaintainConfigRepository dao;
+    private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
+    private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
+    //config
+  	private NurseSiteMaintainCheckItem objCheckItem;
+  	private List<AssetInfo> listCheckAssets;
+  	private List<String> listCheckDate;
+  	private List<String> listWeekDay;
+  	private List<String> listMonthDay;
+  	private List<NurseSiteMaintainCheckItem> listPairCheckItems;
+  	
+  	//dropdownlist
+  	private Integer perDayCount;
+  	private List<MaintainDataPair> checkListHours;
+  	private List<MaintainDataPair> checkListWeekDays;
+  	private List<MaintainDataPair> checkListMonthDays;
+  	private List<AssetInfo> checkListAssets;
+  	
+  	
+  	private boolean isSaveDisable=true;
+  	
+    @Override
+    protected void init() {
+        i18nDao = WebUtil.getBean(I18nMessageRepository.class);
+        currentUser = UserContextService.getCurrentUserAccount();
+        nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
+        dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
+        checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
+        
+//        listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
+//		listStrNurseSiteMaintainConfig=new ArrayList<SimplePair>();
+//		if(listNurseSiteMaintainConfig!=null&&listNurseSiteMaintainConfig.size()>0){
+////			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
+//			for(int i=0;i<listNurseSiteMaintainConfig.size();++i){
+//				NurseSiteMaintainConfig tempConfig=listNurseSiteMaintainConfig.get(i);
+//				SimplePair p=new SimplePair(tempConfig.getName(),tempConfig.getId());
+//				listStrNurseSiteMaintainConfig.add(p);
+//			}
+//		}
+        
+        //test
+    }
+
+    @Override
+    protected GenericRepositoryUUID<NurseSiteMaintainConfig> getDAO() {
+        return dao;
+    }
+
+    @Override
+    protected Page<NurseSiteMaintainConfig> loadData(PageRequest pageRequest) {
+    	List<SearchFilter> searchFilters = this.searchFilters;
+        if (searchFilters == null) {
+            searchFilters = new ArrayList<>();
+        }
+        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+        if(currentUser.getOrgLevel() != 0){
+            if(currentUser.getOrgLevel() == 1){
+                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+            }else if(currentUser.getOrgLevel() == 2){
+                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+            }else{
+                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+            }
+        }
+        return dao.findBySearchFilter(searchFilters, pageRequest);
+    }
+
+    @Override
+    public void onServerEvent(String eventName, Object eventObject) {
+
+    }
+
+    @Override
+    public void onBeforeNewObject(NurseSiteMaintainConfig object) {
+        super.onBeforeNewObject(object);
+        object.setTenantUID(currentUser.getTenantUID());
+        object.setInstitutionUID(currentUser.getInstitutionUID());
+        object.setHospitalUID(currentUser.getHospitalUID());
+        object.setSiteUID(currentUser.getSiteUID());
+    }
+
+    @Override
+    public void save() {
+    	if(saveMaintainConfig(this.selected)){
+    		super.save();
+    	}
+        this.selected=null;
+    }
+    
+    @Override
+    public void delete() {
+    	// TODO Auto-generated method stub
+    	super.delete();
+    	this.selected=null;
+    }
+
+	
+	@Override
+	protected String getActionMessage(String actionName) {
+		// TODO Auto-generated method stub
+		return "日常维护设置"+" "+WebUtil.getMessage(actionName);
+	}
+	
+	@Override
+	public void prepareCreate() throws InstantiationException, IllegalAccessException {
+		// TODO Auto-generated method stub
+		super.prepareCreate();
+		initValues();
+	}
+	
+	@Override
+	public void prepareEdit() {
+		// TODO Auto-generated method stub
+		super.prepareEdit();
+		initValues();
+		loadMaintainConfig(this.selected);
+	}
+	private void initValues(){
+		this.listCheckAssets=new ArrayList<AssetInfo>();
+		this.listCheckDate=new ArrayList<String>();
+		this.listMonthDay=new ArrayList<String>();
+		this.listWeekDay=new ArrayList<String>();
+		objCheckItem=new NurseSiteMaintainCheckItem();
+		listPairCheckItems=null;
+	}
+	private void loadMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
+		if(nurseSiteMaintainConfig!=null){
+			String assets=nurseSiteMaintainConfig.getAssets();
+			if(StringUtils.isNotEmpty(assets)){
+				String arr[]=assets.split(",");
+				if(arr!=null && arr.length>0){
+					listCheckAssets=nurseSiteMaintainService.getListAssetInfoByUid(Arrays.asList(arr));
+				}
+			}
+			Integer type=nurseSiteMaintainConfig.getType();
+			String typeValue=nurseSiteMaintainConfig.getTypeValue();
+			if(type!=null && StringUtils.isNotEmpty(typeValue)){
+				List<String> listTemp=Arrays.asList(typeValue.split(","));
+				if(type==1){
+//					listCheckDate=listTemp;
+					perDayCount=Integer.parseInt(typeValue);
+				}
+				else if(type==2){
+					listWeekDay=listTemp;
+				}
+				else if(type==3){
+					listMonthDay=listTemp;
+				}
+			}
+		}
+	}
+	
+	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
+		System.out.println("saveMaintainConfig");
+		Date currentDate=new Date();
+		if(nurseSiteMaintainConfig.getId()==null){
+			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
+			nurseSiteMaintainConfig.setInstitutionUID(currentUser.getInstitutionUID());
+			nurseSiteMaintainConfig.setHospitalUID(currentUser.getHospitalUID());
+			nurseSiteMaintainConfig.setSiteUID(currentUser.getSiteUID());
+			nurseSiteMaintainConfig.setCreateBy(currentUser);
+			nurseSiteMaintainConfig.setCreateByUid(currentUser.getUid());
+			nurseSiteMaintainConfig.setCreateDate(currentDate);
+			nurseSiteMaintainConfig.setModifyBy(currentUser);
+			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
+			nurseSiteMaintainConfig.setModifyDate(currentDate);
+		}
+		else{
+			nurseSiteMaintainConfig.setModifyBy(currentUser);
+			nurseSiteMaintainConfig.setModifyByUid(currentUser.getUid());
+			nurseSiteMaintainConfig.setModifyDate(currentDate);
+		}
+		//1:day,2:week,3:month,4:year
+		Integer type=nurseSiteMaintainConfig.getType();
+		String typeValue="";
+		if(type!=null){
+			if(type==1){
+//				if(listCheckDate!=null){
+//					for(int i=0;i<listCheckDate.size();++i){
+//						typeValue+=listCheckDate.get(i)+",";
+//					}
+//				}
+				if(perDayCount!=null){
+					typeValue=perDayCount+"";
+				}
+				else{
+					typeValue="";
+				}
+			}
+			else if(type==2){
+				if(listWeekDay!=null){
+					for(int i=0;i<listWeekDay.size();++i){
+						typeValue+=listWeekDay.get(i)+",";
+					}
+				}
+			}
+			else if(type==3){
+				if(listMonthDay!=null){
+					for(int i=0;i<listMonthDay.size();++i){
+						typeValue+=listMonthDay.get(i)+",";
+					}
+				}
+			}
+		}
+		if(listCheckAssets!=null && listCheckAssets.size()>0){
+			String temp="";
+			for(int i=0;i<listCheckAssets.size();++i){
+				temp+=listCheckAssets.get(i).getUid()+",";
+			}
+			nurseSiteMaintainConfig.setAssets(temp);
+		}
+		nurseSiteMaintainConfig.setTypeValue(typeValue);
+		String tempResult="";
+		JSONArray jsonArray=new JSONArray();
+		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
+			for(int i=0;i<listPairCheckItems.size();++i){
+				JSONObject jsonObject=new JSONObject();
+				NurseSiteMaintainCheckItem p=listPairCheckItems.get(i);
+				if(StringUtils.isNotEmpty(p.getName())){
+					tempResult+=p.getName()+",";
+					jsonObject=(JSONObject) jsonObject.toJSON(p);
+					jsonArray.add(jsonObject);
+				}
+			}
+			nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
+		}
+		nurseSiteMaintainConfig.setCheckItems(tempResult);
+		return true;
+	}
+	
+	public List<MaintainDataPair> getCheckListHours() {
+		if(checkListHours==null){
+			checkListHours=new ArrayList<MaintainDataPair>();
+			for(int i=1;i<=24;++i){
+				MaintainDataPair p=new MaintainDataPair(i+"时",i);
+				checkListHours.add(p);
+			}
+		}
+		return checkListHours;
+	}
+
+	public void setCheckListHours(List<MaintainDataPair> checkListHours) {
+		this.checkListHours = checkListHours;
+	}
+	
+	public void addCheckListItem(){
+		System.out.println("addCheckListItem");
+		System.out.println(objCheckItem.getName());
+		listPairCheckItems.add(listPairCheckItems.size()-1,objCheckItem);
+		if(listPairCheckItems.size()>1){
+			isSaveDisable=false;
+		}
+		else{
+			isSaveDisable=true;
+		}
+	}
+	public void deleteItemDetail(String str){
+		System.out.println("addCheckListItem");
+		System.out.println(objCheckItem.getName());
+		for(int i=0;i<listPairCheckItems.size();++i){
+			NurseSiteMaintainCheckItem p=listPairCheckItems.get(i);
+			if(p.getName()!=null &&p.getName().equals(str)){
+				listPairCheckItems.remove(i);
+				--i;
+			}
+		}
+		if(listPairCheckItems.size()>1){
+			isSaveDisable=false;
+		}
+		else{
+			isSaveDisable=true;
+		}
+	}
+
+	public List<MaintainDataPair> getCheckListWeekDays() {
+		if(checkListWeekDays==null){
+			checkListWeekDays=new ArrayList<MaintainDataPair>();
+			MaintainDataPair p=new MaintainDataPair("星期日",1);
+			checkListWeekDays.add(p);
+			p=new MaintainDataPair("星期一",2);
+			checkListWeekDays.add(p);
+			p=new MaintainDataPair("星期二",3);
+			checkListWeekDays.add(p);
+			p=new MaintainDataPair("星期三",4);
+			checkListWeekDays.add(p);
+			p=new MaintainDataPair("星期四",5);
+			checkListWeekDays.add(p);
+			p=new MaintainDataPair("星期五",6);
+			checkListWeekDays.add(p);
+			p=new MaintainDataPair("星期六",7);
+			checkListWeekDays.add(p);
+		}
+		return checkListWeekDays;
+	}
+
+	public void setCheckListWeekDays(List<MaintainDataPair> checkListWeekDays) {
+		this.checkListWeekDays = checkListWeekDays;
+	}
+
+	public List<MaintainDataPair> getCheckListMonthDays() {
+		if(checkListMonthDays==null){
+			checkListMonthDays=new ArrayList<MaintainDataPair>();
+			for(int i=1;i<=31;++i){
+				MaintainDataPair p=new MaintainDataPair(i+"日", i);
+				checkListMonthDays.add(p);
+			}
+		}
+		return checkListMonthDays;
+	}
+
+	public void setCheckListMonthDays(List<MaintainDataPair> checkListMonthDays) {
+		this.checkListMonthDays = checkListMonthDays;
+	}
+
+	public List<AssetInfo> getListCheckAssets() {
+		return listCheckAssets;
+	}
+
+	public void setListCheckAssets(List<AssetInfo> listCheckAssets) {
+		this.listCheckAssets = listCheckAssets;
+	}
+	
+	public List<String> getListCheckDate() {
+		return listCheckDate;
+	}
+
+	public void setListCheckDate(List<String> listCheckDate) {
+		this.listCheckDate = listCheckDate;
+	}
+
+	public List<String> getListWeekDay() {
+		return listWeekDay;
+	}
+
+	public void setListWeekDay(List<String> listWeekDay) {
+		this.listWeekDay = listWeekDay;
+	}
+
+	public List<String> getListMonthDay() {
+		return listMonthDay;
+	}
+
+	public void setListMonthDay(List<String> listMonthDay) {
+		this.listMonthDay = listMonthDay;
+	}
+
+	public List<AssetInfo> getCheckListAssets() {
+		return checkListAssets;
+	}
+
+	public void setCheckListAssets(List<AssetInfo> checkListAssets) {
+		this.checkListAssets = checkListAssets;
+	}
+
+	public List<NurseSiteMaintainConfig> getListNurseSiteMaintainConfig() {
+		return listNurseSiteMaintainConfig;
+	}
+
+	public void setListNurseSiteMaintainConfig(List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig) {
+		this.listNurseSiteMaintainConfig = listNurseSiteMaintainConfig;
+	}
+
+	public List<MaintainDataPair> getListStrNurseSiteMaintainConfig() {
+		return listStrNurseSiteMaintainConfig;
+	}
+
+	public void setListStrNurseSiteMaintainConfig(List<MaintainDataPair> listStrNurseSiteMaintainConfig) {
+		this.listStrNurseSiteMaintainConfig = listStrNurseSiteMaintainConfig;
+	}
+	public NurseSiteMaintainCheckItem getObjCheckItem() {
+		if(objCheckItem==null){
+			objCheckItem=new NurseSiteMaintainCheckItem();
+		}
+		return objCheckItem;
+	}
+
+	public void setObjCheckItem(NurseSiteMaintainCheckItem objCheckItem) {
+		this.objCheckItem = objCheckItem;
+	}
+
+	public List<NurseSiteMaintainCheckItem> getListPairCheckItems() {
+		String strTemp=this.selected.getCheckItemsDetail();
+		if(listPairCheckItems==null){
+			List<NurseSiteMaintainCheckItem> list=new ArrayList<NurseSiteMaintainCheckItem>();
+			if(StringUtils.isNotEmpty(strTemp)){
+				JSONArray jsonArray=JSONObject.parseArray(strTemp);
+				for(int i=0;i<jsonArray.size();++i){
+					NurseSiteMaintainCheckItem p=(NurseSiteMaintainCheckItem) JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
+					list.add(p);
+				}
+			}
+			NurseSiteMaintainCheckItem p=new NurseSiteMaintainCheckItem();
+			p.setName("");
+			list.add(p);
+			listPairCheckItems=list;
+			if(listPairCheckItems.size()>1){
+				isSaveDisable=false;
+			}
+		}
+		return listPairCheckItems;
+	}
+
+	public void setListPairCheckItems(List<NurseSiteMaintainCheckItem> listPairCheckItems) {
+		this.listPairCheckItems = listPairCheckItems;
+	}
+
+	public Integer getPerDayCount() {
+		return perDayCount;
+	}
+
+	public void setPerDayCount(Integer perDayCount) {
+		this.perDayCount = perDayCount;
+	}
+
+	public boolean isSaveDisable() {
+		return isSaveDisable;
+	}
+
+	public void setSaveDisable(boolean isSaveDisable) {
+		this.isSaveDisable = isSaveDisable;
+	}
+	
+}
