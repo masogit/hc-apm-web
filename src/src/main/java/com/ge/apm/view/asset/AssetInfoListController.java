@@ -198,12 +198,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             } else {
                 selectSite = null;
             }
-            onClinicalDeptFilter(null);
+//            onClinicalDeptFilter(null);
+            fileterOrg = null;
             loadClinicalDeptList();
         }
     }
 
-    public void onClinicalDeptFilter(NodeSelectEvent event) {
+//    public void onClinicalDeptFilter(NodeSelectEvent event) {
 //        this.selectedMap.clear();
 //        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
 //            OrgInfo deptOrg = (OrgInfo) event.getTreeNode().getData();
@@ -213,7 +214,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //            }
 //        }
 //        fileterOrg = null;
-    }
+//    }
     
     private void loadClinicalDeptList(){
         if (null != selectSite) {
