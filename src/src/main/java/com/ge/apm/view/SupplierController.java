@@ -128,17 +128,17 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     }
 
     public String getGongyingshangLeixing(Supplier supplier){
-     if(supplier==null || supplier.getMaintainerT()==null|| supplier.getManufacturerT()==null||supplier.getSupplierT()==null){
+     if(supplier==null){
          return "";
      }
         String name =new String();
-        if(supplier.getMaintainerT()){
+        if(supplier.getMaintainerT() != null && supplier.getMaintainerT()){
            name= name.concat("维修商 ");
         }
-        if(supplier.getManufacturerT()){
+        if(supplier.getManufacturerT() != null && supplier.getManufacturerT()){
             name= name.concat("制造商 ");
         }
-        if(supplier.getSupplierT()){
+        if(supplier.getSupplierT() != null && supplier.getSupplierT()){
             name= name.concat("供应商");
         }
 
