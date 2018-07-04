@@ -20,10 +20,8 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.StringReader;
+import java.io.*;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -49,7 +47,7 @@ public class WorkOrderPublishRenderService {
         RenderResult renderResult = null;
         for (Map<String, Object> map : data) {
             byte[] bytes = workOrderDocxRenderService.renderDocx(map, templateBytes);
-            renderResult = new RenderResult(bytes, "application/msword", getFileName(map, 1));
+            renderResult = new RenderResult(bytes, "application/msword", encoding(getFileName(map, 1)));
         }
         return renderResult;
     }
@@ -76,6 +74,16 @@ public class WorkOrderPublishRenderService {
     private String getFileName(Map<String, Object> map, int index) {
         return "WO" + index + "-" + map.get("设备名称") + "-" + map.get("报修单号") + ".docx";
     }
+
+    private String encoding(String fileName) {
+        try {
+            return URLEncoder.encode(fileName, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            //return original name if the encode is failed.
+            return fileName;
+        }
+    }
+
 
     public class RenderResult {
         RenderResult(byte[] result, String contentType, String fileName) {
