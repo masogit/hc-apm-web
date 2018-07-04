@@ -541,6 +541,8 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
 
         try {
             MaintenanceTemplate.Builder builder = new MaintenanceTemplate.Builder();
+            /*
+            //TODO add dynamic table in the next release.
             if (selected != null) {
                 TableSchema schema;
                 schema = getTableSchemaById(selected.getSafetyReport());
@@ -552,6 +554,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
                     builder.performanceReport(schema);
                 }
             }
+            */
 
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             XWPFTemplate template = XWPFTemplate.compile(stream).render(builder.build().data());
