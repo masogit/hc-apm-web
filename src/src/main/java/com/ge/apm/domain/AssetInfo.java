@@ -93,6 +93,9 @@ public class AssetInfo implements ChineseName,Serializable {
     @Column(name = "supplier_id")
     private Integer supplierId; //供应商Id =Supplier.id
 
+    @Transient
+    private String vendorTel;//供应商电话
+
     @Column(name = "maitanance_id")
     private String maitananceId;
 
@@ -793,6 +796,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
+    }
+
+    public String getVendorTel() {
+        return vendorTel;
+    }
+
+    public void setVendorTel(String vendorTel) {
+        this.vendorTel = vendorTel;
     }
 
     public String getMaitanance() {
