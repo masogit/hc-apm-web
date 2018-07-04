@@ -336,27 +336,27 @@ public class AssetFileImportService {
 
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
+    public void importData(List<Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-        importOrgMap.values().forEach(item -> {
-            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-            if (null == orgs || orgs.isEmpty()) {
-                orgDao.save((OrgInfo) item.get("org"));
-                item.put("status", ImportStatus.Created);
-            } else if (orgs.size() > 1) {
-                item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
-            } else {
-                OrgInfo existingOrgInfo = orgs.get(0);
-                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-                item.put("org", existingOrgInfo);
-                item.put("status", ImportStatus.Exist);
-            }
-        });
+//        importOrgMap.values().forEach(item -> {
+//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
+//            if (null == orgs || orgs.isEmpty()) {
+//                orgDao.save((OrgInfo) item.get("org"));
+//                item.put("status", ImportStatus.Created);
+//            } else if (orgs.size() > 1) {
+//                item.put("status", ImportStatus.Failure);
+//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
+//            } else {
+//                OrgInfo existingOrgInfo = orgs.get(0);
+//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+//                item.put("org", existingOrgInfo);
+//                item.put("status", ImportStatus.Exist);
+//            }
+//        });
 
         //release qrcode in use in order to exchange qrcode in two different asset
         releaseQRCodeInUse(importAssetMap);
@@ -384,21 +384,18 @@ public class AssetFileImportService {
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "警告:科室为空");
-            } else if (importOrgMap.containsKey(orgName)) {
-                OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
-                if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
+            } else {
+                OrgInfo orgInfo = getOrgInfoByName(orgName);
+
+                if (orgInfo == null) {
                     item.put("status", ImportStatus.Failure);
                     AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "无法关联");
                     newAsset.setClinicalDeptName(null);
                 } else {
                     newAsset.setClinicalDeptName(orgName);
-                    newAsset.setClinicalDeptId(clinicalDept.getId());
-                    newAsset.setClinicalDeptUID(clinicalDept.getUid());
+                    newAsset.setClinicalDeptId(orgInfo.getId());
+                    newAsset.setClinicalDeptUID(orgInfo.getUid());
                 }
-            } else {
-                item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "不在列表页中");
-                newAsset.setClinicalDeptName(null);
             }
 
             //for AssetOwner
@@ -648,12 +645,17 @@ public class AssetFileImportService {
         return true;
     }
 
-    private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
+    private OrgInfo getOrgInfoByName(String name) {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrgToImport.getUid()));
         OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, org.getName()));
-        return orgDao.findBySearchFilter(OrgInfoFilters);
+        OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, name));
+        List<OrgInfo> orgInfos = orgDao.findBySearchFilter(OrgInfoFilters);
+        if (orgInfos.size() == 0) {
+            return null;
+        } else {
+            return orgInfos.get(0);
+        }
     }
 
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
@@ -715,27 +717,27 @@ public class AssetFileImportService {
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
+    public Boolean checkData(List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         HashSet<Boolean> result = new HashSet<>();
-        importOrgMap.values().forEach(item -> {
-            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-            if (null == orgs || orgs.isEmpty()) {
-                item.put("status", ImportStatus.New);
-            } else if (orgs.size() > 1) {
-                item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
-                result.add(Boolean.FALSE);
-            } else {
-                OrgInfo existingOrgInfo = orgs.get(0);
-                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-                item.put("org", existingOrgInfo);
-                item.put("status", ImportStatus.Exist);
-            }
-        });
+//        importOrgMap.values().forEach(item -> {
+//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
+//            if (null == orgs || orgs.isEmpty()) {
+//                item.put("status", ImportStatus.New);
+//            } else if (orgs.size() > 1) {
+//                item.put("status", ImportStatus.CheckFail);
+//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
+//                result.add(Boolean.FALSE);
+//            } else {
+//                OrgInfo existingOrgInfo = orgs.get(0);
+//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+//                item.put("org", existingOrgInfo);
+//                item.put("status", ImportStatus.Exist);
+//            }
+//        });
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
