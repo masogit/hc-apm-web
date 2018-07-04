@@ -66,6 +66,7 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
 
     private List<V2_BlobObject> attachements;
     private List<Supplier> supplierList = Collections.emptyList();
+    private List<Supplier> manufactureList = Collections.emptyList();
     private Map<String, Object> selectedObjectMap = new HashMap();
 
     private TreeNode orgTree;
@@ -122,7 +123,9 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
         }
 
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
-        supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        //supplierList = aimService.getSuplierListBySiteUid(selected.getTenantUID());
+        supplierList = supplierDao.findBySupplierTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
+        manufactureList = supplierDao.findByManufacturerTAndTenantUID(Boolean.TRUE, UserContextService.getCurrentUserAccount().getTenantUID());
         initOrgTree();
     }
 
@@ -211,6 +214,22 @@ public class ContractInfoEditController extends GenericCRUDUUIDController<Contra
     public List<Supplier> autoCompleteSupplier(String query) {
         List<Supplier> res = supplierList.stream().filter(item -> Arrays.asList("1", "3").contains(item.getSupplierType())).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
                 || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<Supplier> autoCompleteSupplierByPY(String query) {
+        List<Supplier> res = supplierList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
+        res.sort(new PinYinComparatorByName());
+        return res;
+    }
+
+    public List<Supplier> autoCompleteManufactureByPY(String query) {
+        List<Supplier> res = manufactureList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+
         res.sort(new PinYinComparatorByName());
         return res;
     }
