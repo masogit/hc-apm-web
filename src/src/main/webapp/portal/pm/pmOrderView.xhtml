@@ -89,9 +89,6 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.description}">
-                            <h:outputText value="#{stepItem.comments}" />
-                        </p:column>
                     </p:dataTable>
 
                     <h:panelGroup rendered="#{v2PmOrderController.accessoryList.size()>0}">

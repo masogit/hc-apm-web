@@ -24,6 +24,13 @@ public class SupplierController extends JpaCRUDController<Supplier> {
     Boolean manufacturerT =false;
     Boolean supplierT =false;
 
+    @Override
+    public void prepareCreate() throws InstantiationException, IllegalAccessException {
+        super.prepareCreate();
+        supplierT=null;
+        maintainerT=null;
+        manufacturerT=null;
+    }
 
     @Override
     protected void init() {
@@ -61,6 +68,16 @@ public class SupplierController extends JpaCRUDController<Supplier> {
         if (!requiredCheck()) {
             return;
         }
+        if(!selected.getMaintainerT()){
+            selected.setMaintainerT(false);
+        }
+        if(!selected.getSupplierT()){
+            selected.setSupplierT(false);
+        }
+        if(!selected.getManufacturerT()){
+            selected.setManufacturerT(false);
+        }
+
         super.save();
         selected=null;
         maintainerT=null;

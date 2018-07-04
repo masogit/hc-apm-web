@@ -1508,7 +1508,7 @@ INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '1', '供应商', 'vendor', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '2', '维修商', 'maintainer', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '供应/维修商', 'vendor and maintainer', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '制造商', 'manufactuer', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isAssetPMed', '是否PM', 'need PM?', NULL, '-1');

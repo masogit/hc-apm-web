@@ -1,7 +1,9 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -13,7 +15,9 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -77,9 +81,11 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Column(name="check_items")
 	private String checkItems;
 	
+	@Column(name="check_items_detail",columnDefinition="text")
+	private String checkItemsDetail;
+	
 	@Column(name="asset")
 	private String assets;
-	
 	
 	//1:day,2:week,3:month,4:year
 	@Column(name="type")
@@ -218,6 +224,14 @@ public class NurseSiteMaintainConfig implements Serializable {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getCheckItemsDetail() {
+		return checkItemsDetail;
+	}
+
+	public void setCheckItemsDetail(String checkItemsDetail) {
+		this.checkItemsDetail = checkItemsDetail;
 	}
 
 	@Override

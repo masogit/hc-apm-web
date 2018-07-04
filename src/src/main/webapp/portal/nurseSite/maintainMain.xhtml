@@ -7,65 +7,73 @@
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
 
     <ui:define name="content">
-    	<h:outputScript name="js/nurseSiteMaintain.js"></h:outputScript>
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
                 <p:outputLabel class="pageTitle" value="护士站设备保养"/>
             </div>
             <div class="ui-g-12 card">
-                <h:form>
-                	<p:commandButton id="batchCompleteButton" icon="ui-icon-extlink" value="批量完成保养报告" title="批量完成保养报告" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()" actionListener="#{maintainController.batchCompleteInit}"/>
-                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建保养报告" title="批量创建保养记录" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{maintainController.deptHead}"/>
-                    <p:commandButton id="maintainConfigButton" icon="ui-icon-extlink" value="保养报告设置" title="保养报告设置" update=":maintainConfigDlg" oncomplete="PF('maintainConfigDialog').show()" onclick="NurseSiteMaintain.on()" rendered="#{maintainController.deptHead}"/>
+            	<p:growl widgetVar="messages" id="messages" showDetail="true" />
+                <h:form id="maintainHeaderForm">
+                	<p:commandButton id="batchCompleteButton" icon="ui-icon-extlink" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()" actionListener="#{maintainController.batchCompleteInit}"/>
+                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{maintainController.deptHead}"/>
+                    <h:panelGroup>
+						<label class="label">当前启用模板: #{maintainController.nurseSiteMaintainConfig.name}</label>
+						<p:selectOneMenu value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true">
+							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":maintainDlg"></p:ajax>
+	                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+	                        <p:column>
+								<h:outputText value="#{t.name}" />
+							</p:column>
+	                    </p:selectOneMenu>
+					</h:panelGroup>
                 </h:form>
                 <h:form id="maintainForm">
-                    <p:growl widgetVar="messages" id="messages" showDetail="true" />
-
                     <h:panelGrid columnClasses="value">
-                        <h3>保养报告</h3>
+                    	 <h3>-</h3>
                         <p:schedule id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title" rightHeaderTemplate="" tooltip="true">
-                            <p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="maintainDialog" oncomplete="PF('maintainDialog').show();" />
-                            <p:ajax event="eventSelect" listener="#{maintainController.onEventSelect}" update="maintainDialog" oncomplete="PF('maintainDialog').show();" />
+                            <p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="maintainDlg" oncomplete="PF('maintainDialog').show();" />
+                            <p:ajax event="eventSelect" listener="#{maintainController.onEventSelect}" update="maintainDlg" oncomplete="PF('maintainDialog').show();" />
                         </p:schedule>
                     </h:panelGrid>
-
-                    <p:dialog id="maintainDialog" widgetVar="maintainDialog" header="报告详情" showEffect="clip" hideEffect="clip">
-                    	<table>
-                    		<c:forEach items="#{maintainController.listCheckItems}" var="item">
-                    			<tr>
-                    				<td>
-                    					<label class="label">#{item.key}</label>
-                    				</td>
-                    				<c:forEach items="#{item.listSimplePairValue}" var="item2">
-                    					<td>
+                </h:form>
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" showEffect="clip" hideEffect="clip">
+                   	<h:form id="maintainDlgTable">
+                   		<table>
+	                   		<c:forEach items="#{maintainController.listCheckItems}" var="item">
+	                   			<tr>
+	                   				<td>
+	                   					<label class="label">#{item.key}</label>
+	                   				</td>
+	                   				<c:forEach items="#{item.listSimplePairValue}" var="item2">
+	                   					<td>
 	                    					<label class="label">#{item2.key}</label>
 			                           	 <p:selectBooleanCheckbox value="#{item2.blnValue}" />
 	                    				</td>
 									</c:forEach>
 	                    		</tr>
 							</c:forEach>
-                    	</table>
-                    	<h:panelGrid columnClasses="value" columns="1">
-                    		<h:panelGroup>
-                    			<label>负责人: </label>
-                    			<h:outputText value="#{maintainController.nurseSiteMaintain.modifyBy.name}"></h:outputText>
-                    		</h:panelGroup>
-                    		<h:panelGroup>
-                    			<label>检测时间: </label>
-                    			<h:outputText value="#{maintainController.nurseSiteMaintain.checkDate}">
-                    				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
-                    			</h:outputText>
-                    		</h:panelGroup>
+	                   	</table>
+	                   	<h:panelGrid columnClasses="value" columns="1">
+	                   		<h:panelGroup>
+	                   			<label>负责人: </label>
+	                   			<h:outputText value="#{maintainController.nurseSiteMaintain.modifyBy.name}"></h:outputText>
+	                   		</h:panelGroup>
+	                   		<h:panelGroup>
+	                   			<label>检测时间: </label>
+	                   			<h:outputText value="#{maintainController.nurseSiteMaintain.checkDate}">
+	                   				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
+	                   			</h:outputText>
+	                   		</h:panelGroup>
 	                    </h:panelGrid>
-                        <p:commandButton id="addButton" value="保存" validateClient="true" actionListener="#{maintainController.saveMaintainData}" update="messages" disabled="#{maintainController.saveDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
-                        <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintainData}" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
-                            <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
-                        </p:commandButton>
-                    </p:dialog>
-                </h:form>
+	                    <p:commandButton id="checkRightButton" value="通过" actionListener="#{maintainController.checkRightAll}" update="maintainDlgTable" disabled="#{maintainController.saveDisable}" />
+	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintainData()}" update=":messages,:maintainForm" oncomplete="PF('maintainDialog').hide();" />
+	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintainData}" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
+	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+	                    </p:commandButton>
+                   	</h:form>
+                </p:dialog>
                 <ui:include src="maintainBatchCreate.xhtml"/>
                 <ui:include src="maintainBatchComplete.xhtml"/>
-                <ui:include src="maintainConfig.xhtml"/>
             </div>
         </div>
     </ui:define>
