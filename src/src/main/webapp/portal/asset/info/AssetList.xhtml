@@ -125,8 +125,8 @@
                                         <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.fileterOrg}"
                                                         scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="1"
                                                     var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
-                                        <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                        <p:ajax listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                        <p:ajax event="itemSelect" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                        <p:ajax process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
                                     </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptName}"/>
