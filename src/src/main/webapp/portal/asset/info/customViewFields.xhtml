@@ -106,6 +106,10 @@
             <label class="label">#{msg.vendor}</label>
             <p:inputText value="#{assetInfoDetailController.selected.vendor}" readonly="true"/>
         </h:panelGroup>
+        <h:panelGroup >
+            <label class="label">#{msg.vendorTel}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.vendorTel}" readonly="true"/>
+        </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'maitanance')}">
         <h:panelGroup >
