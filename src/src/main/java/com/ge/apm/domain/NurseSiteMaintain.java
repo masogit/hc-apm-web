@@ -3,6 +3,7 @@ package com.ge.apm.domain;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -18,14 +19,12 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.ge.apm.view.nurseSite.MaintainController;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -83,6 +82,9 @@ public class NurseSiteMaintain implements Serializable {
 
 	@Column(name = "modify_by")
 	private String modifyByUid;
+	
+	@Column(name="name")
+	private String name;
 
 	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid")
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
@@ -100,15 +102,36 @@ public class NurseSiteMaintain implements Serializable {
 	@Column(name = "config_id")
 	private String configId;
 	
-	//0：未检查,1:通过，2有问题
+	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
 	private Integer status;
 	
+	@Column(name="check_items")
+	private String checkItems;
+	
+	@Column(name="asset")
+	private String assets;
+	
 	@Transient
-	private List<Pair> listCheckItems;
+	private List<MaintainDataPair> listCheckItems;
 	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
+	
+	private void parseContentJson(){
+		try {
+			MaintainDataPair p=new MaintainDataPair();
+			p.parseStr(listCheckItems,contentJSON, false);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
+	}
+	
+	public NurseSiteMaintain() {
+		super();
+		this.status=0;
+	}
 
 	public String getId() {
 		return id;
@@ -224,7 +247,7 @@ public class NurseSiteMaintain implements Serializable {
 	}
 
 	public void setContentJSON(String contentJSON) {
-		this.contentJSON = contentJSON;
+		this.contentJSON=contentJSON;
 	}
 
 	public String getConfigId() {
@@ -235,12 +258,22 @@ public class NurseSiteMaintain implements Serializable {
 		this.configId = configId;
 	}
 
-	public List<Pair> getListCheckItems() {
+	public List<MaintainDataPair> getListCheckItems() {
+		if(listCheckItems==null){
+			listCheckItems=new ArrayList<MaintainDataPair>();
+		}
+		parseContentJson();
 		return listCheckItems;
 	}
 
-	public void setListCheckItems(List<Pair> listCheckItems) {
+	public void setListCheckItems(List<MaintainDataPair> listCheckItems) {
 		this.listCheckItems = listCheckItems;
+		if(listCheckItems==null){
+			listCheckItems=new ArrayList<MaintainDataPair>();
+		}
+		MaintainDataPair p=new MaintainDataPair(listCheckItems);
+		this.contentJSON = p.getJsonStr();
+		this.status=p.getStatus();
 	}
 
 	public Integer getStatus() {
@@ -249,6 +282,30 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setStatus(Integer status) {
 		this.status = status;
+	}
+	
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getCheckItems() {
+		return checkItems;
+	}
+
+	public void setCheckItems(String checkItems) {
+		this.checkItems = checkItems;
+	}
+
+	public String getAssets() {
+		return assets;
+	}
+
+	public void setAssets(String assets) {
+		this.assets = assets;
 	}
 
 	@Override

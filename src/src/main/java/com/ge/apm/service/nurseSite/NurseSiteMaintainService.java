@@ -36,12 +36,12 @@ public class NurseSiteMaintainService{
 	@Autowired
     private UaaService uaaService;
 	
-	public NurseSiteMaintainConfig getMaintainConfigBySiteUid(String siteUid){
+	public List<NurseSiteMaintainConfig> getMaintainConfigBySiteUid(String siteUid){
 		return nurseSiteMaintainConfigRepository.findBySiteUid(siteUid);
 	}
 	
-	public NurseSiteMaintainConfig getMaintainConfigByUid(String id){
-		return nurseSiteMaintainConfigRepository.findByUid(id);
+	public NurseSiteMaintainConfig getMaintainConfigById(String id){
+		return nurseSiteMaintainConfigRepository.findById(id);
 	}
 	
 	
@@ -62,6 +62,10 @@ public class NurseSiteMaintainService{
 	
 	public AssetInfo getAssetInfoByUid(String uid){
 		return assetInfoRepository.getByUid(uid);
+	}
+	
+	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids){
+		return assetInfoRepository.findByUidIn(assetUids);
 	}
 	
 	public boolean canAddMaintainData(Date scheduleDate,String siteUid,String userUid){
@@ -91,4 +95,30 @@ public class NurseSiteMaintainService{
 	public List<String> getOrgListByUser(String userUid){
 		return uaaService.getOrgListByUser(userUid).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
 	}
+
+	public NurseSiteMaintainRepository getNurseSiteMaintainRepository() {
+		return nurseSiteMaintainRepository;
+	}
+
+	public void setNurseSiteMaintainRepository(NurseSiteMaintainRepository nurseSiteMaintainRepository) {
+		this.nurseSiteMaintainRepository = nurseSiteMaintainRepository;
+	}
+
+	public NurseSiteMaintainConfigRepository getNurseSiteMaintainConfigRepository() {
+		return nurseSiteMaintainConfigRepository;
+	}
+
+	public void setNurseSiteMaintainConfigRepository(NurseSiteMaintainConfigRepository nurseSiteMaintainConfigRepository) {
+		this.nurseSiteMaintainConfigRepository = nurseSiteMaintainConfigRepository;
+	}
+
+	public AssetInfoRepository getAssetInfoRepository() {
+		return assetInfoRepository;
+	}
+
+	public void setAssetInfoRepository(AssetInfoRepository assetInfoRepository) {
+		this.assetInfoRepository = assetInfoRepository;
+	}
+	
+	
 }

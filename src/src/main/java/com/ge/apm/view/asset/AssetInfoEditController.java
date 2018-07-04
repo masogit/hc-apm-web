@@ -53,6 +53,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private SupplierController supplierController;
     private UserAccountRepository userDao;
     private SupplierRepository supplierDao;
+    private AutoCompleteService autoCompleteService;
 
     private Boolean terminate = false;
     private CustomConfigObject customConfig;
@@ -75,8 +76,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     private Map<String, Object> selectedObjectMap = new HashMap();
     private List<String> readableFieldsList;
     private List<String> editableFieldsList;
-    
-    
 
     @Override
     protected void init() {
@@ -99,6 +98,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         gbDao = WebUtil.getBean(GbCodeRepository.class);
         userDao = WebUtil.getBean(UserAccountRepository.class);
         supplierController = WebUtil.getBean(SupplierController.class);
+        autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "actionName");
@@ -107,7 +107,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             try {
                 prepareCreate();
                 selectedObjectMap.put("selectedOrg", orgDao.findByUid(UserContextService.getCurrentUserAccount().getSiteUID()));
-                changeAssetOrg((OrgInfo)selectedObjectMap.get("selectedOrg"));
+                changeAssetOrg((OrgInfo) selectedObjectMap.get("selectedOrg"));
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
             }
@@ -164,7 +164,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         getClinicalOwnerList();
 
     }
-    
+
     public void initOrgTree() {
         UserAccount loginUser = UserContextService.getCurrentUserAccount();
         TreeNode treeNode = uaaService.getOrgTreeByParentIdWithSelectedChildren(loginUser.getSiteUID(), loginUser.getUid());
@@ -179,12 +179,12 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         }
         rootNode.setExpanded(true);
     }
-    
+
     public void onSelectTreeNode(NodeSelectEvent event) {
         TreeNode node = event.getTreeNode();
         OrgInfo orgInfo = (OrgInfo) node.getData();
         changeAssetOrg(orgInfo);
-        selectedObjectMap.put("selectedOrg",orgInfo);
+        selectedObjectMap.put("selectedOrg", orgInfo);
     }
 
     public List<UserAccount> completeOwnerList(String query) {
@@ -209,7 +209,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
         selected.setSiteUID(orgInfo.getSiteUID());
         config = configService.findConfigBySite(selected.getSiteUID());
         clinicalDeptList = assetInfoService.getClinicalDeptList(selected.getSiteUID());
-        selectedObjectMap.put("clinicalDept",null);
+        selectedObjectMap.put("clinicalDept", null);
         onClinicalDeptChange();
         parentAssetList.clear();
     }
@@ -469,10 +469,10 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public Boolean needAssetApproval(String siteUid) {
-        if(null!=config && config.getNeedInstorageCheck()!=null && config.getNeedInstorageCheck()){
+        if (null != config && config.getNeedInstorageCheck() != null && config.getNeedInstorageCheck()) {
             return false;
         }
-        return acService.needAssetApproval(siteUid) ;
+        return acService.needAssetApproval(siteUid);
     }
 
     public void renewQrcode() {
@@ -604,26 +604,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     }
 
     public List<Supplier> autoCompleteSupplier(String query) {
-
-        List<Supplier> res = supplierList.stream().filter(item -> item.getSupplierT()==null || item.getSupplierT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return autoCompleteService.autoCompleteVendor(query, supplierList);
     }
-    public List<Supplier> autoCompleteManufacture(String query) {
 
-        List<Supplier> res = supplierList.stream().filter(item -> item.getManufacturerT()==null || item.getManufacturerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+    public List<Supplier> autoCompleteManufacture(String query) {
+        return autoCompleteService.autoCompleteManufacture(query, supplierList);
     }
 
     public List<Supplier> autoCompleteMaintainer(String query) {
-
-        List<Supplier> res = supplierList.stream().filter(item -> item.getMaintainerT()==null || item.getMaintainerT()).filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
-                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
-        res.sort(new PinYinComparatorByName());
-        return res;
+        return autoCompleteService.autoCompleteMaintainer(query, supplierList);
     }
 
     public List<String> completeAssetName(String prefix) {
@@ -667,7 +656,7 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
             clinicalOwnerList = Collections.emptyList();
         }
     }
-    
+
     public String submitApproval() {
         selected.setUsageStatus(2);
         return applyChange();
@@ -677,15 +666,15 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void onAfterUpdateObject(AssetInfo object, boolean isOK) {
         resultStatus = isOK;
     }
-    
-    public boolean needShow(String itemKey, String fieldKey){
+
+    public boolean needShow(String itemKey, String fieldKey) {
         return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
     }
-    
-    public boolean needEdit(String fieldKey){
+
+    public boolean needEdit(String fieldKey) {
         return editableFieldsList.contains(fieldKey);
     }
-    
+
 //getter and setter
     public Boolean getTerminate() {
         return terminate;
@@ -738,7 +727,6 @@ public class AssetInfoEditController extends JpaCRUDController<AssetInfo> {
     public void setSelectedGb(GbCode selectedGb) {
         this.selectedGb = selectedGb;
     }
-
 
     public TreeNode getOrgTree() {
         return orgTree;

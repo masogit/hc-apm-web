@@ -20,7 +20,7 @@
                         <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.endBatchDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
                     </h:panelGroup>
                 </p:panelGrid>
-				<table>
+				<!-- <table>
                		<c:forEach items="#{maintainController.listCheckItems}" var="item">
                			<tr>
                				<td>
@@ -34,7 +34,7 @@
 							</c:forEach>
                 		</tr>
 					</c:forEach>
-                </table>
+                </table> -->
                 <br/>
                 <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":growl,:maintainForm" icon="ui-icon-check" oncomplete="PF('maintainBatchCompleteDialog').hide()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
