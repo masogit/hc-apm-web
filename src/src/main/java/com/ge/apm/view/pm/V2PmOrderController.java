@@ -205,7 +205,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      * Generate maintenance report.
      */
     public void doExportMaintenanceReport() {
-        //TODO: generate report
         if (this.selected != null) {
             PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
             StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
@@ -226,7 +225,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
                 InputStream doc = new ByteArrayInputStream(out.toByteArray());
                 maintenanceReport = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report.docx");
-            } catch (IOException e) {
+            } catch (Exception e) {
                 Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report");
                 WebUtil.addErrorMessage("保养报告生成失败");
             }
@@ -259,7 +258,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qaStatus", pmOrder.getQualityChecking()));
         // Coworker List
         List<V2_WorkOrderCoworker> coworkers = this.getCoWorkerList();
-        if (coworkers != null && coworkers.size() > 0) {
+        if (coworkers != null && coworkers.size() > 0 &&
+                // ignore fake empty coworker
+                !(coworkers.size() == 1 && "000".equalsIgnoreCase(coworkers.get(0).getId()))) {
             V2_WorkOrderCoworker coworker = coworkers.get(0);
             content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
             content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
@@ -281,7 +282,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.NAME.toString(), item.getParts());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.QUANTITY.toString(), item.getApartsQuantity());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.PRICE.toString(), item.getPartsPrice());
-                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.TYPE.toString(), item.getPartsType());
+                accessoryMap.put(MaintenanceTemplate.AccessoryInfo.TYPE.toString(), FieldValueMessageController.fieldValue("partsType", item.getPartsType()));
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.SERIAL_NUM.toString(), item.getSerialNum());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.WARRANTY_DATE.toString(), item.getWarrantyDate());
                 accessoryMap.put(MaintenanceTemplate.AccessoryInfo.ARRIVED.toString(), item.getArrived());
@@ -299,7 +300,6 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.OWNER.toString(), item.getOwnerName());
             maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.START_TIME.toString(), item.getStartTime());
             maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.END_TIME.toString(), item.getEndTime());
-            maintenanceInfoMap.put(MaintenanceTemplate.MaintenanceInfo.DESCRIPTION.toString(), item.getComments());
 
             maintenanceInfoTable.add(maintenanceInfoMap);
         }

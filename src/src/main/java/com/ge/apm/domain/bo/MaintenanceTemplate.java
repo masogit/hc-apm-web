@@ -144,8 +144,7 @@ public class MaintenanceTemplate {
         STEP("step"),
         OWNER("owner"),
         START_TIME("start_time"),
-        END_TIME("end_time"),
-        DESCRIPTION("description");
+        END_TIME("end_time");
 
         private final String key;
 
