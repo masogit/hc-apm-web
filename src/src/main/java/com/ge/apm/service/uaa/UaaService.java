@@ -357,7 +357,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
        // if(treeNode.getParent()!=null) {
             OrgInfo orgInfo = (OrgInfo) treeNode.getData();
 
-            if (orgInfo.getName().contains(keyWords)) {
+            if (orgInfo.getName().contains(keyWords) || orgInfo.getNamePyCode().contains(keyWords)) {
                 treeNodeMap.put(orgInfo.getUid(), treeNode);
                 //如果找到 xx机构 就将其包括其父节点到到根节点都放到 treeNodeMap中
                 buidUpFromNodeYuanQu(treeNodeMap, treeNode);
