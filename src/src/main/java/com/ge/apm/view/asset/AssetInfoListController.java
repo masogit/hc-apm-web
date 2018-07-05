@@ -64,6 +64,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     //选定科室过滤
     private OrgInfo fileterOrg;
+    private String fileterOrgName;
 
     //复选的设备
     private Map<String, Boolean> selectedMap;
@@ -95,13 +96,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     //custom config
     private CustomConfigObject customConfig;
 //    private CustomDataTable customTable;
-    
+
     List<String> customedColumns;
-    
+
     private List<OrgInfo> clinicalDeptList;
-    
+
     private Map<String, Object> selectedObjectMap = new HashMap();
-    
 
     @Override
     protected AssetInfoRepository getDAO() {
@@ -184,6 +184,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
             searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptUID".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
         }
 
+        if (!Strings.isNullOrEmpty(fileterOrgName)) {
+            this.updateSearchFilter(new SearchFilter("clinicalDeptName", SearchFilter.Operator.EQ, fileterOrgName, "1*"));
+        } else {
+            searchFilters.removeAll(searchFilters.stream().filter(item -> "clinicalDeptName".equals(item.fieldName) && item.conditionPath.equals("1*")).collect(Collectors.toList()));
+        }
+
         if (null != selectSite) {
             this.updateSearchFilter(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
             this.updateSearchFilter(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, selectSite.getUid(), "1*5+"));
@@ -209,14 +215,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     }
 
     public void onClinicalDeptFilter(SelectEvent event) {
-        fileterOrg = (OrgInfo)selectedObjectMap.get("clinicalDept");
-        if(null == fileterOrg){
-            fileterOrg = (OrgInfo)event.getObject();
+        fileterOrg = (OrgInfo) selectedObjectMap.get("clinicalDept");
+        if (null == fileterOrg) {
+            fileterOrg = (OrgInfo) event.getObject();
         }
     }
-    
+
     public void onClinicalDeptFilter2(AjaxBehaviorEvent event) {
-        fileterOrg = (OrgInfo)selectedObjectMap.get("clinicalDept");
+        fileterOrg = (OrgInfo) selectedObjectMap.get("clinicalDept");
     }
 //    public void onClinicalDeptFilter(NodeSelectEvent event) {
 //        this.selectedMap.clear();
@@ -229,15 +235,15 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //        }
 //        fileterOrg = null;
 //    }
-    
-    private void loadClinicalDeptList(){
+
+    private void loadClinicalDeptList() {
         if (null != selectSite) {
             clinicalDeptList = assetInfoService.getClinicalDeptList(selectSite.getSiteUID());
-        }else{
+        } else {
             clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
-                    .stream().filter(item -> item.getOrgType()==4).collect(Collectors.toList());
+                    .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
         }
-        
+
     }
 
     public void setOneSearchStr(String oneSearchStr) {
@@ -290,30 +296,29 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
     }
 
-
     public void exportExcel() throws IOException {
 
-            List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+        List<String> exportFields = ccService.getExportAssetFieldsByRoles(customConfig, UserContextService.getRoles());
 
-            //非设备科的人导出的时候，导出部分数据
-            boolean allColumns = false;
-            if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
-                allColumns = true;
-            }
+        //非设备科的人导出的时候，导出部分数据
+        boolean allColumns = false;
+        if (userContextService.hasRole("AssetHead") || userContextService.hasRole("AssetStaff")) {
+            allColumns = true;
+        }
 
-            Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
+        Pageable pageable = new PageRequest(0, 100000000, lastPageSort);
 
 //        List<AssetInfo> assetList = dao.findBySearchFilter(this.searchFilters, pageable).getContent();
-            List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
-            orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
+        List<OrgInfo> orgList = orgDao.findByParentUID(UserContextService.getCurrentUserAccount().getSiteUID());
+        orgList = orgList.stream().filter(orgInfo -> orgInfo.getOrgType() == 4).collect(Collectors.toList());
 
-            List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
+        List<OrgInfo> sites = orgDao.getSitesByTenantUID(UserContextService.getCurrentUserAccount().getTenantUID());
 
-            List<AssetInfo> assetList = getExportList();
+        List<AssetInfo> assetList = getExportList();
 
-            ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, exportFields);
+        ExcelDocument doc = importService.exportAsset(assetList, sites, orgList, exportFields);
 
-            excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
+        excelFile = new DefaultStreamedContent(doc.getStream(), "application/vnd.ms-excel", "AssetInfo_export.xlsx");
     }
 
     public void batchProcessToBeTerminated() {
@@ -397,8 +402,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
         this.selectedMap.clear();
     }
-    
-    public boolean isShowColumn(String fieldName){
+
+    public boolean isShowColumn(String fieldName) {
         return customedColumns.contains(fieldName);
     }
 
@@ -430,7 +435,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setWarrantyFormatTime(String warrantyFormatTime) {
         this.warrantyFormatTime = warrantyFormatTime;
     }
-    
+
     public List<OrgInfo> autoCompleteDept(String query) {
         if (clinicalDeptList == null) {
             return Collections.emptyList();
@@ -441,7 +446,30 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         res.sort(new PinYinComparatorByName());
         return res;
     }
-    
+
+    public List<String> autoCompleteDeptName(String query) {
+        if (clinicalDeptList == null) {
+            return Collections.emptyList();
+        }
+
+        List<OrgInfo> res = this.clinicalDeptList.stream().filter(item -> Strings.isNullOrEmpty(query) || item.getName().contains(query)
+                || (item.getNamePyCode() == null ? false : item.getNamePyCode().contains(query.toLowerCase()))).collect(Collectors.toList());
+        res.sort(new PinYinComparatorByName());
+        return res.stream().map(item -> item.getName()).distinct().collect(Collectors.toList());
+    }
+
+    public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
+        if (event instanceof SelectEvent) {
+            fileterOrgName = (String)((SelectEvent) event).getObject();
+            return;
+        } else {
+            if (!Strings.isNullOrEmpty(fileterOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterOrgName.equals(item.getName()))) {
+                fileterOrgName = "";
+            }
+        }
+
+    }
+
     //getter and setter
     public Boolean getNeedShowAssetApproval() {
         if (null == needShowAssetApproval) {
@@ -545,6 +573,13 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
         this.selectedObjectMap = selectedObjectMap;
     }
-    
+
+    public String getFileterOrgName() {
+        return fileterOrgName;
+    }
+
+    public void setFileterOrgName(String fileterOrgName) {
+        this.fileterOrgName = fileterOrgName;
+    }
 
 }
