@@ -18,22 +18,18 @@ public class MaintainDataPair {
 	private List<MaintainDataPair> listSimplePairValue;
 	private List<String> listStrValue;
 	private List<Boolean> listBlnValue;
+	private String description;
 	//0：未检查,1:通过，2有问题
 	private Integer status;
 	
-	private final String COMMONKEY="result";
-	
 	public MaintainDataPair() {
-		this.key=COMMONKEY;
 	}
 	
 	public MaintainDataPair(List<MaintainDataPair> listSimplePairValue){
-		this.key=COMMONKEY;
 		this.listSimplePairValue=listSimplePairValue;
 	}
 	
 	public MaintainDataPair(String strValue){
-		this.key=COMMONKEY;
 		this.strValue=strValue;
 	}
 	
@@ -135,13 +131,22 @@ public class MaintainDataPair {
 		this.status = status;
 	}
 	
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
 	public String getJsonStr(){
 		if(status==null){
 			status=0;
 		}
 		List<MaintainDataPair> listCheckItems=this.getListSimplePairValue();
 		if(listCheckItems!=null &&listCheckItems.size()>0){
-			String str="{\""+COMMONKEY+"\":[";
+			String str="[";
 			for (int i = 0; i < listCheckItems.size(); ++i) {
 				MaintainDataPair p = listCheckItems.get(i);
 				List<MaintainDataPair> listInner=p.getListSimplePairValue();
@@ -169,10 +174,10 @@ public class MaintainDataPair {
 				}
 			}
 			str=str.substring(0, str.length()-1);
-			str+="]}";
+			str+="]";
 			return str;
 		}
-		return "";
+		return null;
 	}
 	
 	public void parseStr(List<MaintainDataPair> listP,String content,Object defaultValue){
@@ -183,8 +188,7 @@ public class MaintainDataPair {
 			listP.clear();
 		}
 		if(StringUtils.isNotEmpty(content)){
-			JSONObject obj=JSONObject.parseObject(content);
-			JSONArray array=(JSONArray) obj.get(COMMONKEY);
+			JSONArray array=JSONArray.parseArray(content);
 			for(int i=0;i<array.size();++i){
 				JSONObject objInner=array.getJSONObject(i);
 				Set<String> setKey=objInner.keySet();

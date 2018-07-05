@@ -3,10 +3,11 @@ package com.ge.apm.domain;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -14,6 +15,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -25,6 +27,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -95,38 +98,17 @@ public class NurseSiteMaintain implements Serializable {
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
 	@JsonBackReference
 	private UserAccount modifyBy;
-
-	@Column(name = "content_json",columnDefinition="text")
-	private String contentJSON;
-
-	@Column(name = "config_id")
-	private String configId;
+	
+	@JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.EAGER)
+    private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
 	private Integer status;
 	
-	@Column(name="check_items")
-	private String checkItems;
-	
-	@Column(name="asset")
-	private String assets;
-	
-	@Transient
-	private List<MaintainDataPair> listCheckItems;
-	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
-	
-	private void parseContentJson(){
-		try {
-			MaintainDataPair p=new MaintainDataPair();
-			p.parseStr(listCheckItems,contentJSON, false);
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(e.getMessage());
-		}
-	}
 	
 	public NurseSiteMaintain() {
 		super();
@@ -242,40 +224,6 @@ public class NurseSiteMaintain implements Serializable {
 		this.modifyBy = modifyBy;
 	}
 
-	public String getContentJSON() {
-		return contentJSON;
-	}
-
-	public void setContentJSON(String contentJSON) {
-		this.contentJSON=contentJSON;
-	}
-
-	public String getConfigId() {
-		return configId;
-	}
-
-	public void setConfigId(String configId) {
-		this.configId = configId;
-	}
-
-	public List<MaintainDataPair> getListCheckItems() {
-		if(listCheckItems==null){
-			listCheckItems=new ArrayList<MaintainDataPair>();
-		}
-		parseContentJson();
-		return listCheckItems;
-	}
-
-	public void setListCheckItems(List<MaintainDataPair> listCheckItems) {
-		this.listCheckItems = listCheckItems;
-		if(listCheckItems==null){
-			listCheckItems=new ArrayList<MaintainDataPair>();
-		}
-		MaintainDataPair p=new MaintainDataPair(listCheckItems);
-		this.contentJSON = p.getJsonStr();
-		this.status=p.getStatus();
-	}
-
 	public Integer getStatus() {
 		return status;
 	}
@@ -292,20 +240,22 @@ public class NurseSiteMaintain implements Serializable {
 		this.name = name;
 	}
 
-	public String getCheckItems() {
-		return checkItems;
+	public Set<NurseSiteMaintainItem> getListNurseSiteMaintainItem() {
+		return listNurseSiteMaintainItem;
 	}
 
-	public void setCheckItems(String checkItems) {
-		this.checkItems = checkItems;
+	public void setListNurseSiteMaintainItem(Set<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
+		this.listNurseSiteMaintainItem = listNurseSiteMaintainItem;
 	}
-
-	public String getAssets() {
-		return assets;
-	}
-
-	public void setAssets(String assets) {
-		this.assets = assets;
+	
+	public void addItem(NurseSiteMaintainItem item){
+		if(this.listNurseSiteMaintainItem==null){
+			this.listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
+		}
+		if(!listNurseSiteMaintainItem.contains(item)){
+			item.setNurseSiteMaintain(this);
+			listNurseSiteMaintainItem.add(item);
+		}
 	}
 
 	@Override

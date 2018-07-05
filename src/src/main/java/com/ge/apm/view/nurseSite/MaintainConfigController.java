@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
@@ -19,13 +20,15 @@ import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MaintainDataPair;
-import com.ge.apm.domain.NurseSiteMaintainCheckItem;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
+import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
+import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.asset.SmallAssetPerformanceConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
 
+import net.sf.json.util.WebUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -47,12 +50,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
     private List<MaintainDataPair> listStrNurseSiteMaintainConfig;
     //config
-  	private NurseSiteMaintainCheckItem objCheckItem;
+  	private NurseSiteMaintainConfigCheckItem objPairCheckItem;
   	private List<AssetInfo> listCheckAssets;
   	private List<String> listCheckDate;
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
-  	private List<NurseSiteMaintainCheckItem> listPairCheckItems;
+  	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
   	
   	//dropdownlist
   	private Integer perDayCount;
@@ -126,17 +129,17 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
     @Override
     public void save() {
-    	if(saveMaintainConfig(this.selected)){
-    		super.save();
-    	}
+    	saveMaintainConfig(this.selected);
         this.selected=null;
+        WebUtil.addSuccessMessage("保存成功");
     }
     
     @Override
     public void delete() {
     	// TODO Auto-generated method stub
-    	super.delete();
+    	nurseSiteMaintainService.deleteMaintainConfig(this.selected);
     	this.selected=null;
+    	WebUtil.addSuccessMessage("删除成功");
     }
 
 	
@@ -165,17 +168,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		this.listCheckDate=new ArrayList<String>();
 		this.listMonthDay=new ArrayList<String>();
 		this.listWeekDay=new ArrayList<String>();
-		objCheckItem=new NurseSiteMaintainCheckItem();
 		listPairCheckItems=null;
+		initObjPairCheckItem();
+	}
+	private void initObjPairCheckItem(){
+		objPairCheckItem=new NurseSiteMaintainConfigCheckItem();
+		objPairCheckItem.setKey(new Date().getTime()+"");
 	}
 	private void loadMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
 		if(nurseSiteMaintainConfig!=null){
-			String assets=nurseSiteMaintainConfig.getAssets();
-			if(StringUtils.isNotEmpty(assets)){
-				String arr[]=assets.split(",");
-				if(arr!=null && arr.length>0){
-					listCheckAssets=nurseSiteMaintainService.getListAssetInfoByUid(Arrays.asList(arr));
-				}
+			String parentId=nurseSiteMaintainConfig.getId();
+			if(StringUtils.isNotEmpty(parentId)){
+				listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(parentId);
 			}
 			Integer type=nurseSiteMaintainConfig.getType();
 			String typeValue=nurseSiteMaintainConfig.getTypeValue();
@@ -196,7 +200,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public boolean saveMaintainConfig(NurseSiteMaintainConfig nurseSiteMaintainConfig) {
-		System.out.println("saveMaintainConfig");
 		Date currentDate=new Date();
 		if(nurseSiteMaintainConfig.getId()==null){
 			nurseSiteMaintainConfig.setTenantUID(currentUser.getTenantUID());
@@ -247,20 +250,13 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 				}
 			}
 		}
-		if(listCheckAssets!=null && listCheckAssets.size()>0){
-			String temp="";
-			for(int i=0;i<listCheckAssets.size();++i){
-				temp+=listCheckAssets.get(i).getUid()+",";
-			}
-			nurseSiteMaintainConfig.setAssets(temp);
-		}
 		nurseSiteMaintainConfig.setTypeValue(typeValue);
 		String tempResult="";
 		JSONArray jsonArray=new JSONArray();
 		if(listPairCheckItems!=null && listPairCheckItems.size()>0){
 			for(int i=0;i<listPairCheckItems.size();++i){
 				JSONObject jsonObject=new JSONObject();
-				NurseSiteMaintainCheckItem p=listPairCheckItems.get(i);
+				NurseSiteMaintainConfigCheckItem p=listPairCheckItems.get(i);
 				if(StringUtils.isNotEmpty(p.getName())){
 					tempResult+=p.getName()+",";
 					jsonObject=(JSONObject) jsonObject.toJSON(p);
@@ -270,6 +266,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			nurseSiteMaintainConfig.setCheckItemsDetail(jsonArray.toJSONString());
 		}
 		nurseSiteMaintainConfig.setCheckItems(tempResult);
+		nurseSiteMaintainService.saveMaintainConfig(nurseSiteMaintainConfig, listCheckAssets);
 		return true;
 	}
 	
@@ -289,9 +286,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	}
 	
 	public void addCheckListItem(){
-		System.out.println("addCheckListItem");
-		System.out.println(objCheckItem.getName());
-		listPairCheckItems.add(listPairCheckItems.size()-1,objCheckItem);
+		listPairCheckItems.add(listPairCheckItems.size()-1,objPairCheckItem);
+		initObjPairCheckItem();
 		if(listPairCheckItems.size()>1){
 			isSaveDisable=false;
 		}
@@ -300,10 +296,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	public void deleteItemDetail(String str){
-		System.out.println("addCheckListItem");
-		System.out.println(objCheckItem.getName());
 		for(int i=0;i<listPairCheckItems.size();++i){
-			NurseSiteMaintainCheckItem p=listPairCheckItems.get(i);
+			NurseSiteMaintainConfigCheckItem p=listPairCheckItems.get(i);
 			if(p.getName()!=null &&p.getName().equals(str)){
 				listPairCheckItems.remove(i);
 				--i;
@@ -412,29 +406,29 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	public void setListStrNurseSiteMaintainConfig(List<MaintainDataPair> listStrNurseSiteMaintainConfig) {
 		this.listStrNurseSiteMaintainConfig = listStrNurseSiteMaintainConfig;
 	}
-	public NurseSiteMaintainCheckItem getObjCheckItem() {
-		if(objCheckItem==null){
-			objCheckItem=new NurseSiteMaintainCheckItem();
+	public NurseSiteMaintainConfigCheckItem getObjCheckItem() {
+		if(objPairCheckItem==null){
+			initObjPairCheckItem();
 		}
-		return objCheckItem;
+		return objPairCheckItem;
 	}
 
-	public void setObjCheckItem(NurseSiteMaintainCheckItem objCheckItem) {
-		this.objCheckItem = objCheckItem;
+	public void setObjCheckItem(NurseSiteMaintainConfigCheckItem objCheckItem) {
+		this.objPairCheckItem = objCheckItem;
 	}
 
-	public List<NurseSiteMaintainCheckItem> getListPairCheckItems() {
+	public List<NurseSiteMaintainConfigCheckItem> getListPairCheckItems() {
 		String strTemp=this.selected.getCheckItemsDetail();
 		if(listPairCheckItems==null){
-			List<NurseSiteMaintainCheckItem> list=new ArrayList<NurseSiteMaintainCheckItem>();
+			List<NurseSiteMaintainConfigCheckItem> list=new ArrayList<NurseSiteMaintainConfigCheckItem>();
 			if(StringUtils.isNotEmpty(strTemp)){
 				JSONArray jsonArray=JSONObject.parseArray(strTemp);
 				for(int i=0;i<jsonArray.size();++i){
-					NurseSiteMaintainCheckItem p=(NurseSiteMaintainCheckItem) JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainCheckItem.class);
+					NurseSiteMaintainConfigCheckItem p=(NurseSiteMaintainConfigCheckItem) JSONObject.parseObject(jsonArray.getString(i), NurseSiteMaintainConfigCheckItem.class);
 					list.add(p);
 				}
 			}
-			NurseSiteMaintainCheckItem p=new NurseSiteMaintainCheckItem();
+			NurseSiteMaintainConfigCheckItem p=new NurseSiteMaintainConfigCheckItem();
 			p.setName("");
 			list.add(p);
 			listPairCheckItems=list;
@@ -445,7 +439,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		return listPairCheckItems;
 	}
 
-	public void setListPairCheckItems(List<NurseSiteMaintainCheckItem> listPairCheckItems) {
+	public void setListPairCheckItems(List<NurseSiteMaintainConfigCheckItem> listPairCheckItems) {
 		this.listPairCheckItems = listPairCheckItems;
 	}
 

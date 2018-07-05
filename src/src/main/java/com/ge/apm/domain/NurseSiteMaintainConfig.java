@@ -84,8 +84,6 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Column(name="check_items_detail",columnDefinition="text")
 	private String checkItemsDetail;
 	
-	@Column(name="asset")
-	private String assets;
 	
 	//1:day,2:week,3:month,4:year
 	@Column(name="type")
@@ -191,15 +189,6 @@ public class NurseSiteMaintainConfig implements Serializable {
 
 	public void setCheckItems(String checkItems) {
 		this.checkItems = checkItems;
-	}
-
-
-	public String getAssets() {
-		return assets;
-	}
-
-	public void setAssets(String assets) {
-		this.assets = assets;
 	}
 
 	public Integer getType() {
