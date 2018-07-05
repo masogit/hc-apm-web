@@ -237,13 +237,12 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 //    }
 
     private void loadClinicalDeptList() {
+        clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
+                .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
         if (null != selectSite) {
-            clinicalDeptList = assetInfoService.getClinicalDeptList(selectSite.getSiteUID());
-        } else {
-            clinicalDeptList = uaaService.getUserAccessibleSiteListWithClinicalDept(UserContextService.getCurrentUserAccount().getUid())
-                    .stream().filter(item -> item.getOrgType() == 4).collect(Collectors.toList());
+            clinicalDeptList = clinicalDeptList.stream().filter(item -> item.getSiteUID().equals(selectSite.getSiteUID()) || item.getHospitalUID().equals(selectSite.getSiteUID())
+                    || item.getInstitutionUID().equals(selectSite.getSiteUID()) || item.getTenantUID().equals(selectSite.getSiteUID())).collect(Collectors.toList());
         }
-
     }
 
     public void setOneSearchStr(String oneSearchStr) {
@@ -460,7 +459,7 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
 
     public void onClinicalDeptNameFilterChange(AjaxBehaviorEvent event) {
         if (event instanceof SelectEvent) {
-            fileterOrgName = (String)((SelectEvent) event).getObject();
+            fileterOrgName = (String) ((SelectEvent) event).getObject();
             return;
         } else {
             if (!Strings.isNullOrEmpty(fileterOrgName) && !clinicalDeptList.stream().anyMatch(item -> fileterOrgName.equals(item.getName()))) {
