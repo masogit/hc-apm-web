@@ -228,13 +228,13 @@
                                         <p:autoComplete dropdown="true" value="#{assetCreateController.selectedObjectMap['maintainer']}" scrollHeight="300" 
                                                         forceSelection="true" 
                                                         completeMethod="#{assetCreateController.autoCompleteMaintainer}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('maintainer')}"/>
-                                            <p:ajax listener="#{assetCreateController.onSupplierChange('maintainer')}"/>
+                                            <p:ajax event="itemSelect" listener="#{assetCreateController.onSupplierChange('maintainer')}" update="maitananceTel"/>
+                                            <p:ajax listener="#{assetCreateController.onSupplierChange('maintainer')}" update="maitananceTel"/>
                                         </p:autoComplete>
                                     </h:panelGroup>
                                     <h:panelGroup>
                                         <label class="label">#{msg.maitananceTel}</label>
-                                        <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}"/>
+                                        <p:inputText id="maitananceTel" value="#{assetCreateController.assetInfo.maitananceTel}" readonly="true"/>
                                     </h:panelGroup>
                                     <!--                                    <h:panelGroup>
                                                                             <label class="label">同时生成保养工单*</label>
