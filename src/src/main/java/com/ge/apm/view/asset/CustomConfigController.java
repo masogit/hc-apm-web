@@ -105,7 +105,7 @@ public class CustomConfigController {
             case "MobileDetailFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)
-                        && customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
+                        && !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()

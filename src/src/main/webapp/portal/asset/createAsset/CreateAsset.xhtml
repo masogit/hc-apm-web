@@ -172,7 +172,7 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.clinicalDeptName}</label>
                                         <p:selectOneMenu id="clinicalDeptName" value="#{assetCreateController.clinicalDept}" required="false" requiredMessage="#{msg.clinicalDeptName} #{msg.ValidationRequire}" var="t"  filter="true" filterMatchMode="startsWith" converter="orgInfoConverter">
-                                            <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel assetOwnerName parentAssetList" />
+                                            <p:ajax  listener="#{assetCreateController.onClinicalDeptChange()}" update="clinicalOwnerName clinicalOwnerTel parentAssetList" />
                                             <f:selectItems value="#{assetCreateController.getClinicalDeptListWithEmptyValue()}" var="item" itemLabel="#{item.name}" itemValue="#{item}"/>
                                             <p:column>
                                                 <h:outputText value="#{t.name}"/>
