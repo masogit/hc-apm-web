@@ -209,6 +209,9 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
             return false;
         }
         PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
+       if(rule==null){
+           return false;
+       }
         return !Strings.isNullOrEmpty(rule.getReportStorageId());
     }
 
