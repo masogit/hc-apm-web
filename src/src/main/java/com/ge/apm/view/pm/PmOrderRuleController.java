@@ -561,7 +561,7 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             template.write(out);
             InputStream doc = new ByteArrayInputStream(out.toByteArray());
             this.reportTemplateFile = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report-template.docx");
-        } catch (IOException e)  {
+        } catch (Exception e)  {
             Logger.getLogger(PmOrderRuleController.class.getName()).log(Level.WARNING, "Error happens while generate word template");
             WebUtil.addErrorMessage("Word模版生成失败");
         }

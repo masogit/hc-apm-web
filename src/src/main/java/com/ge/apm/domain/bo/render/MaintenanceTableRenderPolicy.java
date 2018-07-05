@@ -24,7 +24,6 @@ public class MaintenanceTableRenderPolicy extends AbstractWoTableRenderPolicy {
             addCell(row, extractValue(mi, OWNER.toString()));
             addCell(row, extractValue(mi, START_TIME.toString()));
             addCell(row, extractValue(mi, END_TIME.toString()));
-            addCell(row, extractValue(mi, DESCRIPTION.toString()));
         }
         table.removeRow(1);
     }
