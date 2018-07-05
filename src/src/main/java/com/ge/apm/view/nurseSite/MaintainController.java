@@ -3,19 +3,18 @@ package com.ge.apm.view.nurseSite;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 
 import org.apache.commons.lang3.StringUtils;
 import org.primefaces.event.ScheduleEntryMoveEvent;
@@ -23,7 +22,6 @@ import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.LazyScheduleModel;
-import org.primefaces.model.ScheduleEvent;
 import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +29,8 @@ import org.slf4j.LoggerFactory;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
-import com.ge.apm.domain.MaintainDataPair;
+import com.ge.apm.domain.NurseSiteMaintainData;
+import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -56,15 +55,13 @@ public class MaintainController {
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
 	private NurseSiteMaintainConfig nurseSiteMaintainConfig;
 	private List<AssetInfo> listCheckAssets;
-	private List<String> listCheckAssetsName;
-	//use modify values
-	private List<MaintainDataPair> listCheckItems;
 	//from config default
 	private NurseSiteMaintain nurseSiteMaintain;
 	private List<Date> existMaintainDate;
 	private List<NurseSiteMaintain> existMaintainData;
 	private Date startBatchDate;
   	private Date endBatchDate;
+  	private Date userClickDate;
 	//validate
 	private boolean isDeleteDisable;
     private boolean isSaveDisable;
@@ -85,14 +82,11 @@ public class MaintainController {
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
 		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
 			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
-			System.out.println("init config");
-			System.out.println(nurseSiteMaintainConfig.getName());
 			loadMaintainConfig();
 		}
 	}
 
 	private void loadMaintainData(List<String> userOrgList) {
-		System.out.println("loadMaintainData");
 		lazyEventModel = new LazyScheduleModel() {
 			@Override
 			public void loadEvents(Date start, Date end) {
@@ -111,10 +105,11 @@ public class MaintainController {
 		};
 	}
 
-	private MaintainDataPair getContentJsonObj() {
-		MaintainDataPair p=new MaintainDataPair(listCheckItems);
-		return p;
-	}
+//	private MaintainDataPair getContentJsonObj() {
+//		MaintainDataPair p=new MaintainDataPair(listCheckItems);
+//		return p;
+//	}
+	
 	private String getShowTitle(NurseSiteMaintain tempNurseSiteMaintain) {
 		//0：未检查,1:已检查，2:通过，3有问题
 		String strStatus="未检查";
@@ -135,172 +130,18 @@ public class MaintainController {
 	
 	private void loadMaintainConfig() {
 		if(nurseSiteMaintainConfig!=null){
-			String assets=nurseSiteMaintainConfig.getAssets();
-			if(StringUtils.isNotEmpty(assets)){
-				String arr[]=assets.split(",");
-				if(arr!=null && arr.length>0){
-					listCheckAssets=nurseSiteMaintainService.getListAssetInfoByUid(Arrays.asList(arr));
-					if(listCheckAssets!=null){
-						listCheckAssetsName=new ArrayList<String>();
-						for(int i=0;i<listCheckAssets.size();++i){
-							listCheckAssetsName.add(listCheckAssets.get(i).getName());
-						}
-					}
-				}
+			String configId=nurseSiteMaintainConfig.getId();
+			listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(configId);
+			if(userClickDate==null){
+				userClickDate=new Date();
 			}
-			loadConfigCheckItems();
+			Calendar ca=Calendar.getInstance();
+			int currentHour=ca.get(Calendar.HOUR_OF_DAY);
+			ca.setTime(userClickDate);
+			ca.set(Calendar.HOUR_OF_DAY,currentHour);
+			nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets);
 		}
 	}
-	
-	private void loadConfigCheckItems(){
-		if(listCheckItems==null){
-			listCheckItems = new ArrayList<MaintainDataPair>();
-		}
-		else{
-			listCheckItems.clear();
-		}
-		String strCheckItems = nurseSiteMaintainConfig.getCheckItems();
-		if (StringUtils.isNotEmpty(strCheckItems) && listCheckAssets!=null) {
-			String arr2[] = strCheckItems.split(",");
-			for (int i = 0; i < listCheckAssets.size(); ++i) {
-				List<MaintainDataPair> listTemp=new ArrayList<MaintainDataPair>();
-				for (int j = 0; j < arr2.length; ++j) {
-					MaintainDataPair p = new MaintainDataPair(arr2[j], false);
-					listTemp.add(p);
-				}
-				MaintainDataPair p2 = new MaintainDataPair();
-				p2.setKey(listCheckAssets.get(i).getName());
-				p2.setListSimplePairValue(listTemp);
-				listCheckItems.add(p2);
-			}
-		}
-	}
-	private NurseSiteMaintain createMaintainData(Date date){
-		NurseSiteMaintain tempNurseSiteMaintain=new NurseSiteMaintain();
-		Date currentDate=new Date();
-		tempNurseSiteMaintain.setTenantUID(currentUser.getTenantUID());
-		tempNurseSiteMaintain.setInstitutionUID(currentUser.getInstitutionUID());
-		tempNurseSiteMaintain.setHospitalUID(currentUser.getHospitalUID());
-		tempNurseSiteMaintain.setSiteUID(currentUser.getSiteUID());
-		tempNurseSiteMaintain.setCheckDate(currentDate);
-		tempNurseSiteMaintain.setConfigId(nurseSiteMaintainConfig.getId());
-		tempNurseSiteMaintain.setContentJSON(getContentJsonObj().getJsonStr());
-		tempNurseSiteMaintain.setCreateBy(currentUser);
-		tempNurseSiteMaintain.setCreateByUid(currentUser.getUid());
-		tempNurseSiteMaintain.setCreateDate(currentDate);
-		tempNurseSiteMaintain.setModifyBy(currentUser);
-		tempNurseSiteMaintain.setModifyByUid(currentUser.getUid());
-		tempNurseSiteMaintain.setModifyDate(currentDate);
-		tempNurseSiteMaintain.setScheduleDate(date);
-		tempNurseSiteMaintain.setStatus(0);
-		String assetNames=listCheckAssetsName.toString();
-		tempNurseSiteMaintain.setAssets(assetNames.substring(1, assetNames.length()-1));
-		tempNurseSiteMaintain.setCheckItems(nurseSiteMaintainConfig.getCheckItems());
-		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
-		return tempNurseSiteMaintain;
-	}
-	
-	private void updateMaintainData(NurseSiteMaintain obj,boolean batchUpdate){
-		
-		if(batchUpdate){
-			//insert new record
-			//0：未检查,1:已检查，2:通过，3有问题
-			if(obj.getStatus()==null || obj.getStatus()==0){
-				MaintainDataPair p=new MaintainDataPair(obj.getListCheckItems());
-				MaintainDataPair.replaceWithDefaultValue(p.getListSimplePairValue(), true);
-				p.setStatus(1);
-				obj.setContentJSON(p.getJsonStr());
-				obj.setStatus(p.getStatus());
-				Date currentDate=new Date();
-				obj.setCheckDate(currentDate);
-				obj.setModifyBy(currentUser);
-				obj.setModifyByUid(currentUser.getUid());
-				obj.setModifyDate(currentDate);
-			}
-		}
-		else{
-			//update exist record
-			MaintainDataPair p=getContentJsonObj();
-			p.setStatus(1);
-			obj.setContentJSON(p.getJsonStr());
-			obj.setStatus(p.getStatus());
-			Date currentDate=new Date();
-			obj.setCheckDate(currentDate);
-			obj.setModifyBy(currentUser);
-			obj.setModifyByUid(currentUser.getUid());
-			obj.setModifyDate(currentDate);
-		}
-	}
-	
-	private void mergeMaintainData(NurseSiteMaintain data){
-		String itemsStr=nurseSiteMaintainConfig.getCheckItems();
-		if(StringUtils.isNotEmpty(itemsStr)){
-			String[] itemsArr=itemsStr.split(",");
-			String[] assetsArrData=data.getAssets().split(",");
-			String[] itemsArrData=data.getCheckItems().split(",");
-			List<String> assetsResult=mergeList(listCheckAssets, assetsArrData);
-			List<String> itemsResult=mergeList(itemsArr, itemsArrData);
-			List<MaintainDataPair> listPairTemp=new ArrayList<MaintainDataPair>();
-			for(int i=0;i<assetsResult.size();++i){
-				List<MaintainDataPair> innerList=new ArrayList<MaintainDataPair>();
-				MaintainDataPair p=new MaintainDataPair(assetsResult.get(i),innerList);
-				for(int j=0;j<itemsResult.size();++j){
-					MaintainDataPair innerP=new MaintainDataPair(itemsResult.get(j),false);
-					innerList.add(innerP);
-				}
-				listPairTemp.add(p);
-			}
-			MaintainDataPair.copyCheckItems(data.getListCheckItems(), listPairTemp);
-			System.out.println("print xxx");
-			MaintainDataPair.print(listPairTemp);
-			data.setListCheckItems(listPairTemp);
-			String result=assetsResult.toString();
-			data.setAssets(result.substring(1, result.length()-1));
-			result=itemsResult.toString();
-			data.setCheckItems(result.substring(1,result.length()-1));
-			String []nameArr=data.getName().split(",");
-			List<String> nameList=mergeList(nurseSiteMaintainConfig.getName(), nameArr);
-			result=nameList.toString();
-			data.setName(result.substring(1,result.length()-1));
-		}
-	}
-	private List<String> mergeList(String[] source,String[] dest){
-		List<String> newList=new ArrayList<String>();
-		for(int i=0;i<source.length;++i){
-			newList.add(source[i]);
-		}
-		for(int i=0;i<dest.length;++i){
-			if(!newList.contains(dest[i])){
-				newList.add(dest[i]);
-			}
-		}
-		return newList;
-	}
-	
-	private List<String> mergeList(List<AssetInfo> source,String[] dest){
-		List<String> newList=new ArrayList<String>();
-		for(int i=0;i<source.size();++i){
-			newList.add(source.get(i).getName());
-		}
-		for(int i=0;i<dest.length;++i){
-			if(!newList.contains(dest[i])){
-				newList.add(dest[i]);
-			}
-		}
-		return newList;
-	}
-	
-	private List<String> mergeList(String source,String[] dest){
-		List<String> newList=new ArrayList<String>();
-		newList.add(source);
-		for(int i=0;i<dest.length;++i){
-			if(!newList.contains(dest[i])){
-				newList.add(dest[i]);
-			}
-		}
-		return newList;
-	}
-	
 	
 	private void batchCreateMaintainData(Date date,List<NurseSiteMaintain> listMaintainData){
 		try {
@@ -320,23 +161,15 @@ public class MaintainController {
 					if(existMaintainDate.get(i).getTime()==date.getTime()){
 						findExist=true;
 						NurseSiteMaintain tempNurseSiteMaintain=existMaintainData.get(i);
-						System.out.println("print listcheckitems");
-						MaintainDataPair.print(listCheckItems);
-						System.out.println("print tempNurseSiteMaintain");
-						MaintainDataPair.print(tempNurseSiteMaintain.getListCheckItems());
 						//merge
-						mergeMaintainData(tempNurseSiteMaintain);
-						System.out.println("print after tempNurseSiteMaintain");
-						MaintainDataPair.print(tempNurseSiteMaintain.getListCheckItems());
+						nurseSiteMaintainService.mergeMaintainData(tempNurseSiteMaintain, nurseSiteMaintainConfig, currentUser);
 						listMaintainData.add(tempNurseSiteMaintain);
+						tempNurseSiteMaintain.setStatus(3);
 					}
 				}
 			}
 			if(!findExist){
-				NurseSiteMaintain tempNurseSiteMaintain=createMaintainData(date);
-//				DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(tempNurseSiteMaintain), date, date, true);
-//		        tempEvent.setData(tempNurseSiteMaintain);
-//		        this.lazyEventModel.addEvent(tempEvent);
+				NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets);
 		        listMaintainData.add(tempNurseSiteMaintain);
 			}
 		}
@@ -362,7 +195,6 @@ public class MaintainController {
 			try {
 				tempList.add(sdf.parse(sdf.format(date)));
 			} catch (ParseException e) {
-				// TODO Auto-generated catch block
 				LOGGER.error(e.getMessage());
 			}
 		}
@@ -375,39 +207,37 @@ public class MaintainController {
 	}
 	
 	public void checkRightAll(){
-		MaintainDataPair.replaceWithDefaultValue(listCheckItems, true);
-	}
-
-	public void saveMaintainData() {
-		System.out.println("xxx save data");
-		updateMaintainData(nurseSiteMaintain, false);
-//		event.setTitle(getShowTitle(nurseSiteMaintain));
-		System.out.println(getShowTitle(nurseSiteMaintain));
-		nurseSiteMaintainService.save(nurseSiteMaintain);
-//		if (event.getId() == null) {
-//			// 新增记录
-//			lazyEventModel.addEvent(event);
-//			nurseSiteMaintainService.save(nurseSiteMaintain);
-//		} else {
-//			// 更新记录
-//			if (event.getData() != null) {
-//				lazyEventModel.updateEvent(event);
-//				nurseSiteMaintainService.save(nurseSiteMaintain);
-//			}
-//		}
-		addMessage("报告已保存");
-	}
-
-	public void deleteMaintainData() {
-		if (event.getId() != null) {
-			if (lazyEventModel.deleteEvent(event)) {
-				nurseSiteMaintainService.delete((NurseSiteMaintain) event.getData());
-				addMessage("报告已删除");
+		Iterator<NurseSiteMaintainItem> it=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator();
+		while(it.hasNext()){
+			NurseSiteMaintainItem tempItem=it.next();
+			Set<NurseSiteMaintainData> listData=tempItem.getListData();
+			Iterator<NurseSiteMaintainData> itData=listData.iterator();
+			while(itData.hasNext()){
+				NurseSiteMaintainData tempData=itData.next();
+				tempData.setCheck_value(true);
 			}
 		}
 	}
 
+	public void saveMaintain() {
+		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain, false);
+		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
+		addMessage("报告已保存");
+	}
 	
+	public void createMaintain() {
+		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
+		addMessage("报告已创建");
+	}
+
+	public void deleteMaintain() {
+		if (event.getId() != null) {
+			if (lazyEventModel.deleteEvent(event)) {
+				nurseSiteMaintainService.deleteMaintain((NurseSiteMaintain) event.getData());
+				addMessage("报告已删除");
+			}
+		}
+	}
 	
 	public void onNurseSiteMaintainConfigChange(){
 		loadMaintainConfig();
@@ -416,7 +246,6 @@ public class MaintainController {
 	public void onEventSelect(SelectEvent selectEvent) {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
-		this.listCheckItems=nurseSiteMaintain.getListCheckItems();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
@@ -427,30 +256,20 @@ public class MaintainController {
 			addMessage("请创建并选择配置模板");
 			return;
 		}
-		Date date=(Date) selectEvent.getObject();
+		userClickDate=(Date) selectEvent.getObject();
 		Calendar ca=Calendar.getInstance();
 		int currentHour=ca.get(Calendar.HOUR_OF_DAY);
-		ca.setTime(date);
+		ca.setTime(userClickDate);
 		ca.set(Calendar.HOUR_OF_DAY,currentHour);
-		loadConfigCheckItems();
-		nurseSiteMaintain=createMaintainData(ca.getTime());
-//		DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(nurseSiteMaintain), date, date, true);
-//		tempEvent.setData(nurseSiteMaintain);
-//		event = tempEvent;
-	}
-
-	public void onMaintainDataValidate() {
-		
+		nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets);
 	}
 
 	public void onEventMove(ScheduleEntryMoveEvent event) {
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-//		addMessage(message);
 	}
 
 	public void onEventResize(ScheduleEntryResizeEvent event) {
 		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-//		addMessage(message);
 	}
 
 	//1:day,2:week,3:month,4:year
@@ -477,27 +296,11 @@ public class MaintainController {
 		int currentMonth=currentCalendar.get(Calendar.MONTH);
 		if(StringUtils.isNotEmpty(typeValue)){
 			findExistMaintainData();
-			loadConfigCheckItems();
 			String arr[]=typeValue.split(",");
 			if(type==1){
 				//value,hours,1-24
 				int startDay=startCalendar.get(Calendar.DAY_OF_MONTH);
 				int endDay=endCalendar.get(Calendar.DAY_OF_MONTH);
-//				for(int j=startDay;j<=endDay;++j){
-//					for(int i=0;i<arr.length;++i){
-//						Date date=null;
-//						try {
-//							currentCalendar=Calendar.getInstance();
-//							currentCalendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(arr[i]));
-//							currentCalendar.set(Calendar.DAY_OF_MONTH,j);
-//							date=currentCalendar.getTime();
-//							
-//						} catch (Exception e) {
-//							LOGGER.error(e.getMessage());
-//						}
-//						batchCreateMaintainData(date, listMaintainData);
-//					}
-//				}
 				Integer intTypeValue=Integer.parseInt(typeValue);
 				for(int j=startDay;j<=endDay;++j){
 					for(int i=0;i<intTypeValue;++i){
@@ -527,7 +330,6 @@ public class MaintainController {
 							Date date=currentCalendar.getTime();
 							batchCreateMaintainData(date, listMaintainData);
 						} catch (Exception e) {
-							// TODO: handle exception
 							LOGGER.error(e.getMessage());
 						}
 					}
@@ -549,7 +351,6 @@ public class MaintainController {
 								batchCreateMaintainData(date, listMaintainData);
 							}
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							LOGGER.error(e.getMessage());
 						}
 					}
@@ -561,9 +362,6 @@ public class MaintainController {
 		}
 		addMessage("报告已批量生成");
 	}
-	public void batchCompleteInit(){
-		nurseSiteMaintain=createMaintainData(new Date());
-	}
 	public void batchCompleteMaintainData(){
 		if(startBatchDate==null){
 			startBatchDate=new Date();
@@ -574,7 +372,7 @@ public class MaintainController {
 		List<NurseSiteMaintain> listMaintainData=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
 		if(listMaintainData!=null && listMaintainData.size()>0){
 			for(int i=0;i<listMaintainData.size();++i){
-				updateMaintainData(listMaintainData.get(i),true);
+				nurseSiteMaintainService.updateMaintainDataStatus(listMaintainData.get(i),true);
 			}
 		}
 		nurseSiteMaintainService.save(listMaintainData);
@@ -587,8 +385,6 @@ public class MaintainController {
 		calender.add(Calendar.DAY_OF_MONTH, -1);
 		return true;
 	}
-
-	
 
 	public UserAccount getCurrentUser() {
 		return currentUser;
@@ -686,14 +482,5 @@ public class MaintainController {
 	public void setListCheckAssets(List<AssetInfo> listCheckAssets) {
 		this.listCheckAssets = listCheckAssets;
 	}
-
-	public List<MaintainDataPair> getListCheckItems() {
-		return listCheckItems;
-	}
-
-	public void setListCheckItems(List<MaintainDataPair> listCheckItems) {
-		this.listCheckItems = listCheckItems;
-	}
-
 	
 }

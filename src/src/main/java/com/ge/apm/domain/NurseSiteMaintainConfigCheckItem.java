@@ -26,20 +26,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 /**
  * Created by 212605082 on 2018/3/7.
  */
-public class NurseSiteMaintainCheckItem implements Serializable {
+public class NurseSiteMaintainConfigCheckItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private String id;
+	private String key;
 	private String name;
 	private String description;
 
-	public String getId() {
-		return id;
+	
+	public String getKey() {
+		return key;
 	}
 
-	public void setId(String id) {
-		this.id = id;
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 	public String getName() {
@@ -58,29 +59,4 @@ public class NurseSiteMaintainCheckItem implements Serializable {
 		this.description = description;
 	}
 
-	@Override
-	public int hashCode() {
-		int hash = 0;
-		hash += (id != null ? id.hashCode() : 0);
-		return hash;
-	}
-
-	@Override
-	public boolean equals(Object object) {
-		// TODO: Warning - this method won't work in the case the id fields are
-		// not set
-		if (!(object instanceof NurseSiteMaintainCheckItem)) {
-			return false;
-		}
-		NurseSiteMaintainCheckItem other = (NurseSiteMaintainCheckItem) object;
-		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public String toString() {
-		return "NurseSiteMaintainCheckItem [ id=" + id + " ]";
-	}
 }
