@@ -40,6 +40,8 @@ import org.primefaces.model.UploadedFile;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.faces.event.AjaxBehaviorEvent;
+import org.primefaces.event.SelectEvent;
 
 @ManagedBean
 @ViewScoped
@@ -97,6 +99,8 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     List<String> customedColumns;
     
     private List<OrgInfo> clinicalDeptList;
+    
+    private Map<String, Object> selectedObjectMap = new HashMap();
     
 
     @Override
@@ -204,6 +208,16 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
         }
     }
 
+    public void onClinicalDeptFilter(SelectEvent event) {
+        fileterOrg = (OrgInfo)selectedObjectMap.get("clinicalDept");
+        if(null == fileterOrg){
+            fileterOrg = (OrgInfo)event.getObject();
+        }
+    }
+    
+    public void onClinicalDeptFilter2(AjaxBehaviorEvent event) {
+        fileterOrg = (OrgInfo)selectedObjectMap.get("clinicalDept");
+    }
 //    public void onClinicalDeptFilter(NodeSelectEvent event) {
 //        this.selectedMap.clear();
 //        if (null != event && null != event.getTreeNode() && null != event.getTreeNode().getData()) {
@@ -523,5 +537,14 @@ public class AssetInfoListController extends JpaCRUDController<AssetInfo> {
     public List<String> getCustomedColumns() {
         return customedColumns;
     }
+
+    public Map<String, Object> getSelectedObjectMap() {
+        return selectedObjectMap;
+    }
+
+    public void setSelectedObjectMap(Map<String, Object> selectedObjectMap) {
+        this.selectedObjectMap = selectedObjectMap;
+    }
+    
 
 }

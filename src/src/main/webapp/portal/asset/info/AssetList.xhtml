@@ -122,12 +122,12 @@
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <!--<p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>-->
-                                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.fileterOrg}" size="5"
-                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}"
-                                                    var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
-                                        <p:ajax event="itemSelect" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                        <p:ajax process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
-                                    </p:autoComplete>
+                                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.selectedObjectMap['clinicalDept']}" 
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5"
+                                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
+                                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoListController.onClinicalDeptFilter}"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptFilter2}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                        </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptName}"/>
                                 </p:column>
