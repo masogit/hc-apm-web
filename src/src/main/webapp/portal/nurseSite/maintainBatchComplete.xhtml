@@ -36,7 +36,7 @@
 					</c:forEach>
                 </table> -->
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":growl,:maintainForm" icon="ui-icon-check" oncomplete="PF('maintainBatchCompleteDialog').hide()"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchCompleteDialog').hide()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
             </h:form>
         </p:dialog>

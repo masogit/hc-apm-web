@@ -30,10 +30,10 @@ public class NurseSiteMaintainData {
 	private String parentId;
 	
 	@Column(name="check_item")
-	private String check_item;
+	private String checkItem;
 	
 	@Column(name="check_value")
-	private Boolean check_value;
+	private Boolean checkValue;
 	
 	@JoinColumn(name = "parent_id", referencedColumnName = "id")
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
@@ -54,23 +54,23 @@ public class NurseSiteMaintainData {
 	public void setParentId(String parentId) {
 		this.parentId = parentId;
 	}
-
-	public String getCheck_item() {
-		return check_item;
-	}
-
-	public void setCheck_item(String check_item) {
-		this.check_item = check_item;
-	}
-
-	public Boolean getCheck_value() {
-		return check_value;
-	}
-
-	public void setCheck_value(Boolean check_value) {
-		this.check_value = check_value;
-	}
 	
+	public String getCheckItem() {
+		return checkItem;
+	}
+
+	public void setCheckItem(String checkItem) {
+		this.checkItem = checkItem;
+	}
+
+	public Boolean getCheckValue() {
+		return checkValue;
+	}
+
+	public void setCheckValue(Boolean checkValue) {
+		this.checkValue = checkValue;
+	}
+
 	public NurseSiteMaintainItem getItem() {
 		return item;
 	}

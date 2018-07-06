@@ -21,7 +21,7 @@
                     <h:panelGroup>
 						<label class="label">请选择模板</label>
 						<p:selectOneMenu id="nurseSiteMaintainConfigId" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true" >
-							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}" update=":maintainDlg,:maintainHeaderForm"></p:ajax>
+							<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
 	                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 	                        <p:column>
 								<h:outputText value="#{t.name}" />
@@ -32,7 +32,7 @@
 
                 <br/>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchSaveMaintainData}" update=":growl,:maintainForm" icon="ui-icon-check" oncomplete="PF('maintainBatchDialog').hide()"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchSaveMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchDialog').hide()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchDialog').hide()"/>
             </h:form>
         </p:dialog>
