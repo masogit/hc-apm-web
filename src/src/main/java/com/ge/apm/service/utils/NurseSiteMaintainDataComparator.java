@@ -9,7 +9,7 @@ public class NurseSiteMaintainDataComparator implements Comparator<NurseSiteMain
     @Override
     public int compare(NurseSiteMaintainData org1, NurseSiteMaintainData org2) {
         try {
-        	return org1.getCheck_item().compareTo(org2.getCheck_item());
+        	return org1.getCheckItem().compareTo(org2.getCheckItem());
         }catch(Exception e) {
             return 0;
         }

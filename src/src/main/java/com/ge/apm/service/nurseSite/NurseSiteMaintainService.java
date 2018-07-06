@@ -182,8 +182,8 @@ public class NurseSiteMaintainService{
 				item.setListData(listData);
 				for (int j = 0; j < arr2.length; ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
-					p.setCheck_item(arr2[j]);
-					p.setCheck_value(false);
+					p.setCheckItem(arr2[j]);
+					p.setCheckValue(false);
 					p.setItem(item);
 					listData.add(p);
 				}
@@ -203,9 +203,9 @@ public class NurseSiteMaintainService{
 			Iterator<NurseSiteMaintainData> itData=listData.iterator();
 			while(itData.hasNext()){
 				NurseSiteMaintainData tempData=itData.next();
-				Boolean value=tempData.getCheck_value();
+				Boolean value=tempData.getCheckValue();
 				if(defaultValue!=null){
-					tempData.setCheck_value(defaultValue);
+					tempData.setCheckValue(defaultValue);
 				}
 				if(value!=null && value==false && (status==1 || status==2)){
 					status=3;
@@ -390,8 +390,8 @@ public class NurseSiteMaintainService{
 				Iterator<NurseSiteMaintainData> itAddCheckItem=listOldData.iterator();
 				while(itAddCheckItem.hasNext()){
 					NurseSiteMaintainData dataAddCheckItem=itAddCheckItem.next();
-					if(!listCheckItem.contains(dataAddCheckItem.getCheck_item())){
-						listCheckItem.add(dataAddCheckItem.getCheck_item());
+					if(!listCheckItem.contains(dataAddCheckItem.getCheckItem())){
+						listCheckItem.add(dataAddCheckItem.getCheckItem());
 					}
 				}
 				addCheckItem=true;
@@ -442,15 +442,15 @@ public class NurseSiteMaintainService{
 			Iterator<NurseSiteMaintainData> it=list.iterator();
 			while(it.hasNext()){
 				NurseSiteMaintainData data=it.next();
-				if(data.getCheck_item().equals(listCheckItem.get(i))){
+				if(data.getCheckItem().equals(listCheckItem.get(i))){
 					contains=true;
 					break;
 				}
 			}
 			if(!contains){
 				NurseSiteMaintainData temp=new NurseSiteMaintainData();
-				temp.setCheck_item(listCheckItem.get(i));
-				temp.setCheck_value(false);
+				temp.setCheckItem(listCheckItem.get(i));
+				temp.setCheckValue(false);
 				temp.setItem(item);
 				list.add(temp);
 			}

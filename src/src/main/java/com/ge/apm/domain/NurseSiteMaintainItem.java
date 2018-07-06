@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -220,6 +221,19 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setListData(Set<NurseSiteMaintainData> listData) {
 		this.listData = listData;
+	}
+	
+	public NurseSiteMaintainData getDataValue(String label){
+		if(listData!=null){
+			Iterator<NurseSiteMaintainData> it=listData.iterator();
+			while(it.hasNext()){
+				NurseSiteMaintainData tempData=it.next();
+				if(tempData.getCheckItem().equals(label)){
+					return tempData;
+				}
+			}
+		}
+		return new NurseSiteMaintainData();
 	}
 
 	@Override
