@@ -30,7 +30,7 @@
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" showEffect="clip" hideEffect="clip">
                    	<h:form id="maintainDlgTable">
                    		<table>
-	                   		<c:forEach items="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item">
+	                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
 	                   			<tr>
 	                   				<td>
 	                   					<label class="label">#{item.assetInfo.name}</label>
@@ -57,7 +57,7 @@
 	                   		</h:panelGroup>
 	                    </h:panelGrid>
 	                    <p:commandButton id="checkRightButton" value="通过" actionListener="#{maintainController.checkRightAll}" update="maintainDlgTable" disabled="#{maintainController.saveDisable}" />
-	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages,:maintainForm" oncomplete="PF('maintainDialog').hide();" />
+	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
 	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
 	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
 	                    </p:commandButton>
@@ -81,7 +81,7 @@
                 		</h:panelGrid>
                 		<br/>
                 		<br/>
-                		<p:commandButton id="addButton" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages,:maintainForm" oncomplete="PF('createMaintainDlg').hide();" />
+                		<p:commandButton id="addButton" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
                 		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
                 	</h:form>
                 </p:dialog>

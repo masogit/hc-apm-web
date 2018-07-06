@@ -251,16 +251,6 @@ public class NurseSiteMaintain implements Serializable {
 	public void setListNurseSiteMaintainItem(Set<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
 		this.listNurseSiteMaintainItem = listNurseSiteMaintainItem;
 	}
-	
-	public void addItem(NurseSiteMaintainItem item){
-		if(this.listNurseSiteMaintainItem==null){
-			this.listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
-		}
-		if(!listNurseSiteMaintainItem.contains(item)){
-			item.setNurseSiteMaintain(this);
-			listNurseSiteMaintainItem.add(item);
-		}
-	}
 
 	@Override
 	public int hashCode() {
