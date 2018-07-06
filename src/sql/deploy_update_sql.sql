@@ -172,4 +172,6 @@ DELETE FROM gb_code WHERE code = '2019900' AND "level" = 1 AND "name" = '其他�
 
 update supplier set supplier_t=true,maintainer_t=false,manufacturer_t=false where supplier_type='1' and supplier_t is NUll;
 update supplier set maintainer_t=true,supplier_t=false,manufacturer_t=false where supplier_type='2' and maintainer_t is NULL;
-update supplier set maintainer_t=false,supplier_t=false,manufacturer_t=true where supplier_type='3' and manufacturer_t is NUll;
+update supplier set maintainer_t=true,supplier_t=true,manufacturer_t=false where supplier_type='3' and manufacturer_t is NUll;
+update supplier set maintainer_t=false,supplier_t=true,manufacturer_t=false,supplier_type=1 where supplier_type is NUll and  supplier_t is NULL and maintainer_t is NULL and manufacturer_t is NUll;
+
