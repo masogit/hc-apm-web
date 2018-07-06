@@ -57,7 +57,6 @@ public class MaintainController {
 	private List<AssetInfo> listCheckAssets;
 	//from config default
 	private NurseSiteMaintain nurseSiteMaintain;
-	private List<Date> existMaintainDate;
 	private List<NurseSiteMaintain> existMaintainData;
 	private Date startBatchDate;
   	private Date endBatchDate;
@@ -157,55 +156,25 @@ public class MaintainController {
 		ca.setTime(endBatchDate);
 		ca.set(Calendar.DATE,ca.get(Calendar.DATE)+1);
 		if(date.getTime()>=startBatchDate.getTime()&&date.getTime()<ca.getTime().getTime()){
-			boolean findExist=false;
-			if(existMaintainDate.size()>0){
-				for(int i=0;i>-1&&i<existMaintainDate.size();++i){
-					if(existMaintainDate.get(i).getTime()==date.getTime()){
-						findExist=true;
-						NurseSiteMaintain tempNurseSiteMaintain=existMaintainData.get(i);
-						//merge
-						nurseSiteMaintainService.mergeMaintainData(tempNurseSiteMaintain, nurseSiteMaintainConfig, currentUser);
-						listMaintainData.add(tempNurseSiteMaintain);
-						tempNurseSiteMaintain.setStatus(0);
-						existMaintainData.remove(i);
-						existMaintainDate.remove(i);
-						--i;
-					}
-				}
-			}
-			if(!findExist){
-				NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets);
-		        listMaintainData.add(tempNurseSiteMaintain);
-			}
+			NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets);
+	        listMaintainData.add(tempNurseSiteMaintain);
 		}
 	}
 	
 	private void findExistMaintainData(){
-		existMaintainDate=new ArrayList<Date>();
-		existMaintainData=new ArrayList<NurseSiteMaintain>();
-		List<NurseSiteMaintain> listNurseSiteMaintain=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
-		if(listNurseSiteMaintain!=null && listNurseSiteMaintain.size()>0){
-			for(int i=0;i<listNurseSiteMaintain.size();++i){
-				existMaintainDate.add(listNurseSiteMaintain.get(i).getScheduleDate());
-				existMaintainData.add(listNurseSiteMaintain.get(i));
+		existMaintainData=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
+		if(existMaintainData!=null && existMaintainData.size()>0){
+			for(int i=0;i>-1&&i<existMaintainData.size();++i){
+				NurseSiteMaintain temp=existMaintainData.get(i);
+				if((temp.getStatus()!=null && temp.getStatus()!=0)||(!temp.getConfigId().equals(nurseSiteMaintainConfig.getId()))){
+					existMaintainData.remove(i);
+					--i;
+				}
 			}
 		}
-		formatExistMaintainDate();
 	}
 	
-	private void formatExistMaintainDate(){
-		List<Date> tempList=new ArrayList<Date>();
-		for(int i=0;i<existMaintainDate.size();++i){
-			Date date=existMaintainDate.get(i);
-			try {
-				date=sdf.parse(sdf.format(date));
-				tempList.add(date);
-			} catch (ParseException e) {
-				LOGGER.error(e.getMessage());
-			}
-		}
-		existMaintainDate=tempList;
-	}
+
 	
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str,null);
@@ -364,7 +333,7 @@ public class MaintainController {
 			}
 		}
 		if(listMaintainData.size()>0){
-			nurseSiteMaintainService.save(listMaintainData);
+			nurseSiteMaintainService.saveAndDelete(listMaintainData,existMaintainData);
 		}
 		addMessage("报告已批量生成");
 	}
