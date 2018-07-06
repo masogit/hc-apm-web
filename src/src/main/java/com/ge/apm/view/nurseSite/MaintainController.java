@@ -164,10 +164,9 @@ public class MaintainController {
 						findExist=true;
 						NurseSiteMaintain tempNurseSiteMaintain=existMaintainData.get(i);
 						//merge
-						System.out.println("merge times");
 						nurseSiteMaintainService.mergeMaintainData(tempNurseSiteMaintain, nurseSiteMaintainConfig, currentUser);
 						listMaintainData.add(tempNurseSiteMaintain);
-						tempNurseSiteMaintain.setStatus(3);
+						tempNurseSiteMaintain.setStatus(0);
 						existMaintainData.remove(i);
 						existMaintainDate.remove(i);
 						--i;
@@ -206,7 +205,6 @@ public class MaintainController {
 			}
 		}
 		existMaintainDate=tempList;
-		System.out.println(tempList.toString());
 	}
 	
 	private void addMessage(String str) {
@@ -406,8 +404,6 @@ public class MaintainController {
 			// TODO: handle exception
 			LOGGER.error("getLables error"+e.getMessage());
 		}
-		System.out.println("showlabels size="+showLables.size());
-		System.out.println(showLables.toString());
 	}
 
 	public boolean isValideDate() {

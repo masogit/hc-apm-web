@@ -282,13 +282,10 @@ public class MaintainDataPair {
 	}
 	
 	public static void print(MaintainDataPair p){
-		System.out.println(p.getKey());
-		System.out.println(p.getBlnValue());
 	}
 	public static void print(List<MaintainDataPair> list){
 		for(int i=0;i<list.size();++i){
 			List<MaintainDataPair> innerList=list.get(i).getListSimplePairValue();
-			System.out.println(list.get(i).getKey());
 			for(int j=0;j<innerList.size();++j){
 				print(innerList.get(j));
 			}
