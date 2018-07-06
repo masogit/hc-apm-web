@@ -5,7 +5,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -33,6 +32,7 @@ import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
+import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 
 import webapp.framework.dao.SearchFilter;
@@ -66,6 +66,8 @@ public class MaintainController {
 	private boolean isDeleteDisable;
     private boolean isSaveDisable;
     private boolean isDeptHead;
+    //show
+    private List<String> showLables;
 
 	@PostConstruct
 	protected void init() {
@@ -157,14 +159,17 @@ public class MaintainController {
 		if(date.getTime()>=startBatchDate.getTime()&&date.getTime()<ca.getTime().getTime()){
 			boolean findExist=false;
 			if(existMaintainDate.size()>0){
-				for(int i=0;i<existMaintainDate.size();++i){
+				for(int i=0;i>-1&&i<existMaintainDate.size();++i){
 					if(existMaintainDate.get(i).getTime()==date.getTime()){
 						findExist=true;
 						NurseSiteMaintain tempNurseSiteMaintain=existMaintainData.get(i);
 						//merge
 						nurseSiteMaintainService.mergeMaintainData(tempNurseSiteMaintain, nurseSiteMaintainConfig, currentUser);
 						listMaintainData.add(tempNurseSiteMaintain);
-						tempNurseSiteMaintain.setStatus(3);
+						tempNurseSiteMaintain.setStatus(0);
+						existMaintainData.remove(i);
+						existMaintainDate.remove(i);
+						--i;
 					}
 				}
 			}
@@ -193,7 +198,8 @@ public class MaintainController {
 		for(int i=0;i<existMaintainDate.size();++i){
 			Date date=existMaintainDate.get(i);
 			try {
-				tempList.add(sdf.parse(sdf.format(date)));
+				date=sdf.parse(sdf.format(date));
+				tempList.add(date);
 			} catch (ParseException e) {
 				LOGGER.error(e.getMessage());
 			}
@@ -214,7 +220,7 @@ public class MaintainController {
 			Iterator<NurseSiteMaintainData> itData=listData.iterator();
 			while(itData.hasNext()){
 				NurseSiteMaintainData tempData=itData.next();
-				tempData.setCheck_value(true);
+				tempData.setCheckValue(true);
 			}
 		}
 	}
@@ -378,6 +384,27 @@ public class MaintainController {
 		nurseSiteMaintainService.save(listMaintainData);
 		addMessage("报告已批量填写");
 	}
+	
+	private void generateShowLables(){
+		if(showLables==null){
+			showLables=new ArrayList<String>();
+		}
+		else{
+			showLables.clear();
+		}
+		try {
+			Set<NurseSiteMaintainData> listTempData=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator().next().getListData();
+			Iterator<NurseSiteMaintainData> it=listTempData.iterator();
+			while(it.hasNext()){
+				NurseSiteMaintainData tempData=it.next();
+				showLables.add(tempData.getCheckItem());
+			}
+			showLables.sort(new StringComparator());
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("getLables error"+e.getMessage());
+		}
+	}
 
 	public boolean isValideDate() {
 		Calendar calender = Calendar.getInstance();
@@ -433,8 +460,6 @@ public class MaintainController {
 		this.endBatchDate = endBatchDate;
 	}
 
-	
-
 	public boolean isDeleteDisable() {
 		return isDeleteDisable;
 	}
@@ -481,6 +506,15 @@ public class MaintainController {
 
 	public void setListCheckAssets(List<AssetInfo> listCheckAssets) {
 		this.listCheckAssets = listCheckAssets;
+	}
+
+	public List<String> getShowLables() {
+		generateShowLables();
+		return showLables;
+	}
+
+	public void setShowLables(List<String> showLables) {
+		this.showLables = showLables;
 	}
 	
 }

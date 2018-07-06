@@ -3,8 +3,10 @@ package com.ge.apm.domain;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ge.apm.service.utils.NurseSiteMaintainItemComparator;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -102,6 +105,7 @@ public class NurseSiteMaintain implements Serializable {
 	@JsonIgnore
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.EAGER)
     private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
+	
 	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
@@ -246,16 +250,6 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setListNurseSiteMaintainItem(Set<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
 		this.listNurseSiteMaintainItem = listNurseSiteMaintainItem;
-	}
-	
-	public void addItem(NurseSiteMaintainItem item){
-		if(this.listNurseSiteMaintainItem==null){
-			this.listNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
-		}
-		if(!listNurseSiteMaintainItem.contains(item)){
-			item.setNurseSiteMaintain(this);
-			listNurseSiteMaintainItem.add(item);
-		}
 	}
 
 	@Override

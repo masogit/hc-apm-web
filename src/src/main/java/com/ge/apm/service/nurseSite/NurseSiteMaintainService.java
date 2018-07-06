@@ -1,6 +1,7 @@
 package com.ge.apm.service.nurseSite;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
@@ -66,7 +67,6 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainConfigRepository.findById(id);
 	}
 	
-	
 	public List<NurseSiteMaintain> getMaintainData(Date startDate,Date endDate,String siteUid,String userUid){
 		Calendar ca=Calendar.getInstance();
 		ca.setTime(endDate);
@@ -77,8 +77,6 @@ public class NurseSiteMaintainService{
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters){
 		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters);
 	}
-	
-	
 	
 	public AssetInfo getAssetInfoByUid(String uid){
 		return assetInfoRepository.getByUid(uid);
@@ -180,11 +178,14 @@ public class NurseSiteMaintainService{
 				NurseSiteMaintainItem item=new NurseSiteMaintainItem();
 				item.setAssetInfo(listCheckAssets.get(i));
 				item.setAssetUid(listCheckAssets.get(i).getUid());
+				Set<NurseSiteMaintainData> listData=new HashSet<NurseSiteMaintainData>();
+				item.setListData(listData);
 				for (int j = 0; j < arr2.length; ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
-					p.setCheck_item(arr2[j]);
-					p.setCheck_value(false);
-					item.addData(p);
+					p.setCheckItem(arr2[j]);
+					p.setCheckValue(false);
+					p.setItem(item);
+					listData.add(p);
 				}
 				listMaintainItem.add(item);
 			}
@@ -202,9 +203,9 @@ public class NurseSiteMaintainService{
 			Iterator<NurseSiteMaintainData> itData=listData.iterator();
 			while(itData.hasNext()){
 				NurseSiteMaintainData tempData=itData.next();
-				Boolean value=tempData.getCheck_value();
+				Boolean value=tempData.getCheckValue();
 				if(defaultValue!=null){
-					tempData.setCheck_value(defaultValue);
+					tempData.setCheckValue(defaultValue);
 				}
 				if(value!=null && value==false && (status==1 || status==2)){
 					status=3;
@@ -364,16 +365,49 @@ public class NurseSiteMaintainService{
 	}
 	
 	public void mergeMaintainData(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
+		String checkItems=newConfig.getCheckItems();
+		if(StringUtils.isEmpty(checkItems)){
+			return;
+		}
+		String name=nurseSiteMaintain.getName();
+		String newName="-"+newConfig.getName();
+		if(!name.contains(newName)){
+			nurseSiteMaintain.setName(name+newName);
+		}
+		List<String> listCheckItem=new ArrayList<String>(Arrays.asList(checkItems.split(",")));
+		boolean addCheckItem=false;
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
 		if(listOldNurseSiteMaintainItem==null){
 			listOldNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
 		}
+		//upload old item
+		Iterator<NurseSiteMaintainItem> itOldItem=listOldNurseSiteMaintainItem.iterator();
+		while(itOldItem.hasNext()){
+			NurseSiteMaintainItem tempOldItem=itOldItem.next();
+			if(addCheckItem==false){
+				Set<NurseSiteMaintainData> listOldData=tempOldItem.getListData();
+				Iterator<NurseSiteMaintainData> itAddCheckItem=listOldData.iterator();
+				while(itAddCheckItem.hasNext()){
+					NurseSiteMaintainData dataAddCheckItem=itAddCheckItem.next();
+					if(!listCheckItem.contains(dataAddCheckItem.getCheckItem())){
+						listCheckItem.add(dataAddCheckItem.getCheckItem());
+					}
+				}
+				addCheckItem=true;
+			}
+			Set<NurseSiteMaintainData> listOldData=tempOldItem.getListData();
+			if(listOldData==null){
+				listOldData=new HashSet<NurseSiteMaintainData>();
+			}
+			addNurseSiteMaintainData(listCheckItem, listOldData,tempOldItem);
+		}
+		//insert new item
 		if(listNewAssetInfo!=null){
 			for(int j=0;j<listNewAssetInfo.size();++j){
 				String newAssetUid=listNewAssetInfo.get(j).getUid();
 				NurseSiteMaintainItem findOldItem=null;
-				Iterator<NurseSiteMaintainItem> itOldItem=listOldNurseSiteMaintainItem.iterator();
+				itOldItem=listOldNurseSiteMaintainItem.iterator();
 				while(itOldItem.hasNext()){
 					NurseSiteMaintainItem tempOldItem=itOldItem.next();
 					String oldAssetUid=tempOldItem.getAssetUid();
@@ -382,14 +416,7 @@ public class NurseSiteMaintainService{
 						break;
 					}
 				}
-				if(findOldItem!=null){
-					Set<NurseSiteMaintainData> listOldData=findOldItem.getListData();
-					if(listOldData==null){
-						listOldData=new HashSet<NurseSiteMaintainData>();
-					}
-					addNurseSiteMaintainData(newConfig.getCheckItems(), listOldData,findOldItem);
-				}
-				else{
+				if(findOldItem==null){
 					Date date=new Date();
 					NurseSiteMaintainItem tempItem=new NurseSiteMaintainItem();
 					tempItem.setAssetUid(listNewAssetInfo.get(j).getUid());
@@ -401,32 +428,27 @@ public class NurseSiteMaintainService{
 					Set<NurseSiteMaintainData> listNewData=new HashSet<NurseSiteMaintainData>();
 					tempItem.setListData(listNewData);
 					listOldNurseSiteMaintainItem.add(tempItem);
-					addNurseSiteMaintainData(newConfig.getCheckItems(), tempItem.getListData(),tempItem);
+					addNurseSiteMaintainData(listCheckItem, tempItem.getListData(),tempItem);
 				}
 			}
 		}
-		
 	}
 	
-	private void addNurseSiteMaintainData(String checkItems,Set<NurseSiteMaintainData> list,NurseSiteMaintainItem item){
-		if(StringUtils.isEmpty(checkItems)){
-			return;
-		}
-		String[] arr=checkItems.split(",");
-		for(int i=0;i<arr.length;++i){
+	private void addNurseSiteMaintainData(List<String> listCheckItem,Set<NurseSiteMaintainData> list,NurseSiteMaintainItem item){
+		for(int i=0;i<listCheckItem.size();++i){
 			boolean contains=false;
 			Iterator<NurseSiteMaintainData> it=list.iterator();
 			while(it.hasNext()){
 				NurseSiteMaintainData data=it.next();
-				if(data.getCheck_item().equals(arr[i])){
+				if(data.getCheckItem().equals(listCheckItem.get(i))){
 					contains=true;
 					break;
 				}
 			}
 			if(!contains){
 				NurseSiteMaintainData temp=new NurseSiteMaintainData();
-				temp.setCheck_item(arr[i]);
-				temp.setCheck_value(false);
+				temp.setCheckItem(listCheckItem.get(i));
+				temp.setCheckValue(false);
 				temp.setItem(item);
 				list.add(temp);
 			}
