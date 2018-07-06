@@ -178,11 +178,14 @@ public class NurseSiteMaintainService{
 				NurseSiteMaintainItem item=new NurseSiteMaintainItem();
 				item.setAssetInfo(listCheckAssets.get(i));
 				item.setAssetUid(listCheckAssets.get(i).getUid());
+				Set<NurseSiteMaintainData> listData=new HashSet<NurseSiteMaintainData>();
+				item.setListData(listData);
 				for (int j = 0; j < arr2.length; ++j) {
 					NurseSiteMaintainData p = new NurseSiteMaintainData();
 					p.setCheck_item(arr2[j]);
 					p.setCheck_value(false);
-					item.addData(p);
+					p.setItem(item);
+					listData.add(p);
 				}
 				listMaintainItem.add(item);
 			}
