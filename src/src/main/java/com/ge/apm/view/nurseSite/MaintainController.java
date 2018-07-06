@@ -157,14 +157,18 @@ public class MaintainController {
 		if(date.getTime()>=startBatchDate.getTime()&&date.getTime()<ca.getTime().getTime()){
 			boolean findExist=false;
 			if(existMaintainDate.size()>0){
-				for(int i=0;i<existMaintainDate.size();++i){
+				for(int i=0;i>-1&&i<existMaintainDate.size();++i){
 					if(existMaintainDate.get(i).getTime()==date.getTime()){
 						findExist=true;
 						NurseSiteMaintain tempNurseSiteMaintain=existMaintainData.get(i);
 						//merge
+						System.out.println("merge times");
 						nurseSiteMaintainService.mergeMaintainData(tempNurseSiteMaintain, nurseSiteMaintainConfig, currentUser);
 						listMaintainData.add(tempNurseSiteMaintain);
 						tempNurseSiteMaintain.setStatus(3);
+						existMaintainData.remove(i);
+						existMaintainDate.remove(i);
+						--i;
 					}
 				}
 			}
@@ -193,12 +197,14 @@ public class MaintainController {
 		for(int i=0;i<existMaintainDate.size();++i){
 			Date date=existMaintainDate.get(i);
 			try {
-				tempList.add(sdf.parse(sdf.format(date)));
+				date=sdf.parse(sdf.format(date));
+				tempList.add(date);
 			} catch (ParseException e) {
 				LOGGER.error(e.getMessage());
 			}
 		}
 		existMaintainDate=tempList;
+		System.out.println(tempList.toString());
 	}
 	
 	private void addMessage(String str) {
