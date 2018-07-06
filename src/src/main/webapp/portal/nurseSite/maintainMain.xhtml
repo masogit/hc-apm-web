@@ -30,7 +30,7 @@
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" showEffect="clip" hideEffect="clip">
                    	<h:form id="maintainDlgTable">
                    		<table>
-	                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
+	                   		<c:forEach items="#{maintainController.nurseSiteMaintain.showListNurseSiteMaintainItem}" var="item">
 	                   			<tr>
 	                   				<td>
 	                   					<label class="label">#{item.assetInfo.name}</label>

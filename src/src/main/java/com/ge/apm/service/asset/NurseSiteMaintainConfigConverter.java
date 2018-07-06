@@ -26,45 +26,40 @@ import webapp.framework.web.WebUtil;
  */
 @FacesConverter("nurseSiteMaintainConfigConverter")
 public class NurseSiteMaintainConfigConverter implements Converter {
-    @Override
-    public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
-    	System.out.println("getAsObject");
-    	System.out.println(value);
-    	if(value != null && value.trim().length() > 0) {
-            try {
-            	NurseSiteMaintainService nurseSiteMaintainService = (NurseSiteMaintainService) WebUtil.getBean(NurseSiteMaintainService.class);
-                return nurseSiteMaintainService.getMaintainConfigById(value);
-            } catch(NumberFormatException e) {
-            	return null;
-            }
-        }
-        else {
-            return null;
-        }
-    }
+	@Override
+	public Object getAsObject(FacesContext fc, UIComponent uic, String value) {
+		if (value != null && value.trim().length() > 0) {
+			try {
+				NurseSiteMaintainService nurseSiteMaintainService = (NurseSiteMaintainService) WebUtil.getBean(NurseSiteMaintainService.class);
+				return nurseSiteMaintainService.getMaintainConfigById(value);
+			} catch (NumberFormatException e) {
+				return null;
+			}
+		} else {
+			return null;
+		}
+	}
 
-    @Override
-    public String getAsString(FacesContext fc, UIComponent uic, Object object) {
-        if (object == null) {
-            return "";
-        }
-        if(object instanceof NurseSiteMaintainConfig){
-        	NurseSiteMaintainConfig config=(NurseSiteMaintainConfig) object;
-        	System.out.println("getAsString");
-        	System.out.println(config.getName());
-            if (Strings.isNullOrEmpty(config.getId())) {
-                return "";
-            }
-            return String.valueOf(config.getId());
-        }
-        if (object instanceof LinkedHashMap) {
-            if (Strings.isNullOrEmpty(((LinkedHashMap) object).get("id").toString())) {
-                return "";
-            }
-            return String.valueOf(((LinkedHashMap) object).get("id"));
-        } else {
-            return "";
-        }
-    }
+	@Override
+	public String getAsString(FacesContext fc, UIComponent uic, Object object) {
+		if (object == null) {
+			return "";
+		}
+		if (object instanceof NurseSiteMaintainConfig) {
+			NurseSiteMaintainConfig config = (NurseSiteMaintainConfig) object;
+			if (Strings.isNullOrEmpty(config.getId())) {
+				return "";
+			}
+			return String.valueOf(config.getId());
+		}
+		if (object instanceof LinkedHashMap) {
+			if (Strings.isNullOrEmpty(((LinkedHashMap) object).get("id").toString())) {
+				return "";
+			}
+			return String.valueOf(((LinkedHashMap) object).get("id"));
+		} else {
+			return "";
+		}
+	}
 
 }
