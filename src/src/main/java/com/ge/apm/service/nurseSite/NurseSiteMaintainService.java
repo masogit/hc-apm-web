@@ -396,8 +396,6 @@ public class NurseSiteMaintainService{
 				}
 				addCheckItem=true;
 			}
-			System.out.println("listcheckItems");
-			System.out.println(listCheckItem.toString());
 			Set<NurseSiteMaintainData> listOldData=tempOldItem.getListData();
 			if(listOldData==null){
 				listOldData=new HashSet<NurseSiteMaintainData>();
