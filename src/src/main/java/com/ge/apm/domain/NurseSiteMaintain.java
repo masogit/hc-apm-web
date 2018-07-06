@@ -106,10 +106,12 @@ public class NurseSiteMaintain implements Serializable {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.EAGER)
     private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
-	
 	//0：未检查,1:已检查，2:通过，3有问题
 	@Column(name = "status")
 	private Integer status;
+	
+	@Column(name="config_id")
+	private String configId;
 	
 	@Transient
 	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
@@ -250,6 +252,14 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setListNurseSiteMaintainItem(Set<NurseSiteMaintainItem> listNurseSiteMaintainItem) {
 		this.listNurseSiteMaintainItem = listNurseSiteMaintainItem;
+	}
+
+	public String getConfigId() {
+		return configId;
+	}
+
+	public void setConfigId(String configId) {
+		this.configId = configId;
 	}
 
 	@Override
