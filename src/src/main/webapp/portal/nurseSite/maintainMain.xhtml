@@ -29,21 +29,53 @@
                 </h:form>
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" showEffect="clip" hideEffect="clip">
                    	<h:form id="maintainDlgTable">
-                   		<table>
-	                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
-	                   			<tr>
-	                   				<td>
-	                   					<label class="label">#{item.assetInfo.name}</label>
-	                   				</td>
-	                   				<c:forEach items="#{item.listData}" var="item2">
-	                   					<td>
-	                    					<label class="label">#{item2.check_item}</label>
-			                           	 <p:selectBooleanCheckbox value="#{item2.check_value}" />
-	                    				</td>
+                   		<div class="ui-datatable ui-widget">
+                   			<div class="ui-datatable-tablewrapper">
+                   				<table>
+                					<tr>
+                						<th>
+                							<label class="label">名称</label>
+                						</th>
+                						<th>
+                							<label class="label">设备编号</label>
+                						</th>
+                						<th>
+                							<label class="label">制造商序列号</label>
+                						</th>
+                						<th>
+                							<label class="label">设备型号</label>
+                						</th>
+               							<c:forEach items="#{maintainController.showLables}" var="item">
+                							<th>
+                								<label class="label">#{item}</label>
+                							</th>
+               							</c:forEach>
+                					</tr>
+			                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
+			                   			<tr>
+			                   				<td>
+			                   					#{item.assetInfo.name}
+			                   				</td>
+			                   				<td>
+			                   					#{item.assetInfo.departNum}
+			                   				</td>
+			                   				<td>
+			                   					#{item.assetInfo.serialNum}
+			                   				</td>
+			                   				<td>
+			                   					#{item.assetInfo.functionType}
+			                   				</td>
+			                   				<c:forEach items="#{maintainController.showLables}" var="item2">
+			                   					<td>
+			                    					#{item2}
+					                           	 	<p:selectBooleanCheckbox value="#{item.getDataValue(item2).checkValue}" />
+			                    				</td>
+											</c:forEach>
+			                    		</tr>
 									</c:forEach>
-	                    		</tr>
-							</c:forEach>
-	                   	</table>
+			                   	</table>
+                   			</div>
+                   		</div>
 	                   	<h:panelGrid columnClasses="value" columns="1">
 	                   		<h:panelGroup>
 	                   			<label>负责人: </label>
