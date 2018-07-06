@@ -120,12 +120,20 @@ public class NurseSiteMaintainService{
 	public void save(List<NurseSiteMaintain> obj){
 		nurseSiteMaintainRepository.save(obj);
 	}
+	@Transactional
+	public void saveAndDelete(List<NurseSiteMaintain> obj,List<NurseSiteMaintain> obj2){
+		nurseSiteMaintainRepository.save(obj);
+		nurseSiteMaintainRepository.delete(obj2);
+	}
 	
 	public void save(NurseSiteMaintainConfig obj){
 		nurseSiteMaintainConfigRepository.save(obj);
 	}
 	
 	public void delete(NurseSiteMaintain obj){
+		nurseSiteMaintainRepository.delete(obj);
+	}
+	public void deleteMaintain(List<NurseSiteMaintain> obj){
 		nurseSiteMaintainRepository.delete(obj);
 	}
 
@@ -278,6 +286,7 @@ public class NurseSiteMaintainService{
 		tempNurseSiteMaintain.setStatus(0);
 		tempNurseSiteMaintain.setName(nurseSiteMaintainConfig.getName());
 		tempNurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
+		tempNurseSiteMaintain.setConfigId(nurseSiteMaintainConfig.getId());
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		while(it.hasNext()){
 			NurseSiteMaintainItem tempItem=it.next();
@@ -364,7 +373,51 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
-	public void mergeMaintainData(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
+	public void updateMaintainData(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
+		String checkItems=newConfig.getCheckItems();
+		if(StringUtils.isEmpty(checkItems)){
+			return;
+		}
+		if(nurseSiteMaintain.getStatus()!=null && nurseSiteMaintain.getStatus()!=0){
+			return;
+		}
+		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
+		if(listOldNurseSiteMaintainItem==null){
+			listOldNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
+		}
+		Set<NurseSiteMaintainItem> listItem=loadConfigCheckItems(newConfig, listNewAssetInfo);
+        Date currentDate=new Date();
+        nurseSiteMaintain.setTenantUID(user.getTenantUID());
+        nurseSiteMaintain.setInstitutionUID(user.getInstitutionUID());
+        nurseSiteMaintain.setHospitalUID(user.getHospitalUID());
+        nurseSiteMaintain.setSiteUID(user.getSiteUID());
+        nurseSiteMaintain.setCheckDate(currentDate);
+        nurseSiteMaintain.setCreateBy(user);
+        nurseSiteMaintain.setCreateByUid(user.getUid());
+        nurseSiteMaintain.setCreateDate(currentDate);
+        nurseSiteMaintain.setModifyBy(user);
+        nurseSiteMaintain.setModifyByUid(user.getUid());
+        nurseSiteMaintain.setModifyDate(currentDate);
+//        nurseSiteMaintain.setScheduleDate(date);
+        nurseSiteMaintain.setStatus(0);
+        nurseSiteMaintain.setName(newConfig.getName());
+        nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
+        nurseSiteMaintain.setConfigId(newConfig.getId());
+        Iterator<NurseSiteMaintainItem> it=listItem.iterator();
+        while(it.hasNext()){
+            NurseSiteMaintainItem tempItem=it.next();
+            tempItem.setNurseSiteMaintain(nurseSiteMaintain);
+            tempItem.setCheckDate(currentDate);
+            tempItem.setCreateByUid(user.getUid());
+            tempItem.setCreateDate(currentDate);
+            tempItem.setModifyByUid(user.getUid());
+            tempItem.setModifyDate(currentDate);
+            tempItem.setStatus(0);
+        }
+	}
+	
+	private void mergeMaintainDataBackup(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
 		String checkItems=newConfig.getCheckItems();
 		if(StringUtils.isEmpty(checkItems)){
 			return;
@@ -400,7 +453,7 @@ public class NurseSiteMaintainService{
 			if(listOldData==null){
 				listOldData=new HashSet<NurseSiteMaintainData>();
 			}
-			addNurseSiteMaintainData(listCheckItem, listOldData,tempOldItem);
+//			addNurseSiteMaintainData(listCheckItem, listOldData,tempOldItem);
 		}
 		//insert new item
 		if(listNewAssetInfo!=null){
@@ -428,30 +481,45 @@ public class NurseSiteMaintainService{
 					Set<NurseSiteMaintainData> listNewData=new HashSet<NurseSiteMaintainData>();
 					tempItem.setListData(listNewData);
 					listOldNurseSiteMaintainItem.add(tempItem);
-					addNurseSiteMaintainData(listCheckItem, tempItem.getListData(),tempItem);
+//					addNurseSiteMaintainData(listCheckItem, tempItem.getListData(),tempItem);
 				}
 			}
 		}
 	}
 	
-	private void addNurseSiteMaintainData(List<String> listCheckItem,Set<NurseSiteMaintainData> list,NurseSiteMaintainItem item){
-		for(int i=0;i<listCheckItem.size();++i){
+	private void addNurseSiteMaintainData(String checkItems,Set<NurseSiteMaintainData> list,NurseSiteMaintainItem item){
+		String []arr=checkItems.split(",");
+		for(int i=0;i<arr.length;++i){
 			boolean contains=false;
 			Iterator<NurseSiteMaintainData> it=list.iterator();
 			while(it.hasNext()){
 				NurseSiteMaintainData data=it.next();
-				if(data.getCheckItem().equals(listCheckItem.get(i))){
+				if(data.getCheckItem().equals(arr[i])){
 					contains=true;
 					break;
 				}
 			}
 			if(!contains){
 				NurseSiteMaintainData temp=new NurseSiteMaintainData();
-				temp.setCheckItem(listCheckItem.get(i));
+				temp.setCheckItem(arr[i]);
 				temp.setCheckValue(false);
 				temp.setItem(item);
 				list.add(temp);
 			}
 		}
 	}
+	
+//	private void formatExistMaintainDate(){
+//	List<Date> tempList=new ArrayList<Date>();
+//	for(int i=0;i<existMaintainDate.size();++i){
+//		Date date=existMaintainDate.get(i);
+//		try {
+//			date=sdf.parse(sdf.format(date));
+//			tempList.add(date);
+//		} catch (ParseException e) {
+//			LOGGER.error(e.getMessage());
+//		}
+//	}
+//	existMaintainDate=tempList;
+//}
 }
