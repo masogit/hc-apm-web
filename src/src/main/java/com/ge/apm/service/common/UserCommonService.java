@@ -170,7 +170,9 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(isInsulate){
-            if(loginUserOrgType == 1){
+            if(loginUserOrgType == 0){
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+            }else if(loginUserOrgType == 1){
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
             }else if(loginUserOrgType == 2){
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
