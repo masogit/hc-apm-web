@@ -48,12 +48,17 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and o.siteUID=?2")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
     
-//    @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and (o.siteUID=?2 or o.siteUID in ?3 or o.hospitalUID in ?3 or o.institutionUID in ?3 or o.tenantUID in ?3 or o.clinicalDeptUID in ?3)")
     @Query(value="select o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumAccessScope(String financingNum,String siteUID,String userUid);
     
+    @Query(value="select o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
+    public List<AssetInfo> findByFinancingNumSelfScope(String financingNum,String siteUID,String userUid);
+    
     @Query(value="select o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
     public List<AssetInfo> findByAccessScope(String siteUID,String userUid);
+    
+    @Query(value="select o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
+    public List<AssetInfo> findBySelfScope(String siteUID,String userUid);
 
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);

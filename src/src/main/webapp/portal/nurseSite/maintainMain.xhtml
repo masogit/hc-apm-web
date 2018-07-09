@@ -5,7 +5,9 @@
                 xmlns:p="http://primefaces.org/ui"
                 template="/WEB-INF/template.xhtml"
                 xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
-
+	<ui:define name="head">
+        <h:outputStylesheet name="css/inspection.css" />
+    </ui:define>
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
@@ -15,19 +17,19 @@
             	<p:growl widgetVar="messages" id="messages" showDetail="true" />
                 <h:form id="maintainHeaderForm">
                 	<p:commandButton id="batchCompleteButton" icon="ui-icon-extlink" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
-                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()" rendered="#{maintainController.deptHead}"/>
+                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
                     
                 </h:form>
                 <h:form id="maintainForm">
                     <h:panelGrid columnClasses="value">
                     	 <h3>-</h3>
                         <p:schedule id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title" rightHeaderTemplate="" tooltip="true">
-                            <p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="createMaintainDlg" oncomplete="PF('createMaintainDlg').show();" disabled="#{maintainController.deptHead==false}"/>
+                            <p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="createMaintainDlg" oncomplete="PF('createMaintainDlg').show();"/>
                             <p:ajax event="eventSelect" listener="#{maintainController.onEventSelect}" update="maintainDlg" oncomplete="PF('maintainDialog').show();" />
                         </p:schedule>
                     </h:panelGrid>
                 </h:form>
-                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" showEffect="clip" hideEffect="clip">
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="70%"  resizable="true" draggable="true" appendTo="@(body)">
                    	<h:form id="maintainDlgTable">
                    		<div class="ui-datatable ui-widget">
                    			<div class="ui-datatable-tablewrapper">
@@ -94,7 +96,7 @@
 	                    </p:commandButton>
                    	</h:form>
                 </p:dialog>
-                <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护" showEffect="clip" hideEffect="clip">
+                <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
                 	<h:form id="createMaintainForm">
                 		<h:panelGrid columnClasses="value" columns="1">
                 			<h:panelGroup>

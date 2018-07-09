@@ -128,9 +128,9 @@
 				<p:menuitem id="um403" value="SAP" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceMain.xhtml"/>
 				<p:menuitem id="um404" value="SAPReport" outcome="/portal/asset/smallAssetPerformance/smallAssetPerformanceReportList.xhtml"/> -->
             </p:submenu>
-            <p:submenu id="um70" label="护士站" icon="fa fa-file-excel-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,ClinicalStaff,DeptHead')}">
-                       <p:menuitem id="um701" value="日常维护" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,ClinicalStaff,DeptHead')}"/>
-                       <p:menuitem id="um702" value="日常维护设置" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,DeptHead')}"/>
+            <p:submenu id="um70" label="护士站" icon="fa fa-file-excel-o" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff')}">
+                       <p:menuitem id="um701" value="日常维护" outcome="/portal/nurseSite/maintainMain.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff')}"/>
+                       <p:menuitem id="um702" value="日常维护设置" outcome="/portal/nurseSite/maintainConfig.xhtml" rendered="#{userContextService.hasAnyRole('SuperAdmin,HospitalHead,NursingStaff')}"/>
             </p:submenu>
             <p:submenu id="um31" label="#{msg.AssetKnowledgeBaseMgmt}" icon="fa fa-book"
                        rendered="#{userContextService.hasRole('SuperAdmin') or userContextService.hasRole('HospitalHead') or userContextService.hasRole('AssetHead') or userContextService.hasRole('AssetStaff')}">
