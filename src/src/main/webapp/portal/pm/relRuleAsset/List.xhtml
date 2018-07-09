@@ -93,7 +93,7 @@
                             <p:dataExporter type="xls" target="datalist" fileName="RelRuleAsset_export"/>
                         </p:commandButton>
 
-                        <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
+                        <p:commandButton id="editButton" icon="ui-icon-close" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareEdit}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
 
                         <!--<p:commandButton render="false" id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" actionListener="#{relRuleAssetManagerController.prepareCreate}" update=":RelRuleAssetEditDlg" oncomplete="PF('RelRuleAssetEditDialog').show()" disabled="true"/>
                         <p:commandButton render="false" id="viewButton" icon="ui-icon-search" class="btn btn-sm btn-gray"  actionListener="#{relRuleAssetManagerController.prepareView}" update=":RelRuleAssetViewDlg" oncomplete="PF('RelRuleAssetViewDialog').show()" disabled="#{empty relRuleAssetManagerController.selected}"/>
