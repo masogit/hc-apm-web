@@ -71,7 +71,7 @@
                                     <h:panelGroup>
                                         <label class="label">#{msg.name}*</label>
                                         <p:inputText id="name" value="#{orgInfoController.orgName}"  required="true" requiredMessage="#{msg.name} #{msg.ValidationRequire}">
-                                            <p:ajax listener="#{orgInfoController.checkName()}" process="@this" update=":growl"></p:ajax></p:inputText>
+                                            <p:ajax listener="#{orgInfoController.checkNameDuplicate()}" process="@this" update=":growl"></p:ajax></p:inputText>
                                     </h:panelGroup>
                                     <p:spacer></p:spacer>
                                     <h:panelGroup>
