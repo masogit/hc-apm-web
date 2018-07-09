@@ -19,7 +19,7 @@
 							<h:outputText value="当前状态" />
 							<h:outputText value="#{fieldMsg.fieldValue('assetStatus', item.status)}" />
 							<h:outputText value="盘点结果" />
-							<h:outputText value="#{item.inventoryStatus==0?'未盘点':item.inventoryStatus==1?'已盘点':item.inventoryStatus==2?'无台账':'有问题'}" />
+							<h:outputText value="#{item.inventoryStatus==1?'已盘点':item.inventoryStatus==2?'无台账':'未盘点'}" />
 							<!-- <h:outputText value="所属单位" />
 							<h:outputText value="#{item.orgPath}" /> -->
 							<h:outputText value="使用科室" />

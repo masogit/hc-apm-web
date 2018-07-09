@@ -57,7 +57,7 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value="select o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
     public List<AssetInfo> findByAccessScope(String siteUID,String userUid);
     
-    @Query(value="select o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
+    @Query(value="select o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
     public List<AssetInfo> findBySelfScope(String siteUID,String userUid);
 
 
