@@ -287,16 +287,26 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 //        }
 //        return false;
 //    }
-    public void checkName() {
 
-        // String orgNameTmp =selected.getName();
-        List<OrgInfo> orgTypeList = dao.findByParentUID(selected.getParentUID());
-        for (OrgInfo orgInfo : orgTypeList) {
-            if (orgInfo.getName().equalsIgnoreCase(orgName)) {
+    public boolean checkNameDuplicate() {
+
+        OrgInfo orgInfo = dao.findFirstByParentUIDAndName(selected.getParentUID(), orgName);
+        if (orgInfo != null) {
+            if (selected.getId() == null) {
+                //new
                 WebUtil.addErrorMessage(orgName + "已经存在");
-                return;
+                return true;
+
+            } else {
+                //update
+                if (selected.getId().intValue() != orgInfo.getId().intValue()) {
+                    WebUtil.addErrorMessage(orgName + "已经存在");
+                    return true;
+                }
             }
         }
+
+        return false;
     }
 
     public void saveSelectedOrg() {
@@ -307,13 +317,8 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         }
 
         //重复增加不被允许
-        //  String orgName =selected.getName();
-        List<OrgInfo> orgTypeList = dao.findByParentUID(selected.getParentUID());
-
-        if (orgTypeList.stream().anyMatch(item -> item.getName().equalsIgnoreCase(orgName))) {
-            WebUtil.addErrorMessage(orgName + "," + orgNameEn + "已经存在");
-            return;
-        }
+        boolean isDuplicate = checkNameDuplicate();
+        if (isDuplicate) return;
 
         assetInfoRepository.updateClinicalName(orgName, selected.getUid());
         selected.setName(orgName);
