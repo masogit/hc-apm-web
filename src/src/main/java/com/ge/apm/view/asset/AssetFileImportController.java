@@ -69,9 +69,6 @@ public class AssetFileImportController {
         uaaService = WebUtil.getBean(UaaService.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
 
-        selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
-        aiService.setSelectedOrgToImport(selectedOrg);
-
         initOrgTree();
 
     }
@@ -183,13 +180,14 @@ public class AssetFileImportController {
         OrgInfo orgInfo = (OrgInfo) node.getData();
 
         if (orgInfo == null || orgInfo.getId() == -1) {
-
-            selectedOrg = orgDao.getByUid(UserContextService.getCurrentUserAccount().getSiteUID());
+            selectedOrg = null;
         } else {
             selectedOrg = orgInfo;
         }
 
-        aiService.setSelectedOrgToImport(selectedOrg);
+        if (selectedOrg != null) {
+            aiService.setSelectedOrgToImport(selectedOrg);
+        }
 
     }
 
@@ -345,5 +343,13 @@ public class AssetFileImportController {
 
     public boolean isEmpty() {
         return (importAssetMap == null || importAssetMap.isEmpty());
+    }
+
+    public String getSelectedOrgName() {
+        if (selectedOrg == null) {
+            return "";
+        } else {
+            return selectedOrg.getName();
+        }
     }
 }
