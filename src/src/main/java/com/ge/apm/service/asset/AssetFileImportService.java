@@ -389,8 +389,8 @@ public class AssetFileImportService {
 
                 if (orgInfo == null) {
                     item.put("status", ImportStatus.Failure);
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "无法关联");
-                    newAsset.setClinicalDeptName(null);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
+                    return;
                 } else {
                     newAsset.setClinicalDeptName(orgName);
                     newAsset.setClinicalDeptId(orgInfo.getId());
@@ -782,6 +782,19 @@ public class AssetFileImportService {
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
                 continue;
+            }
+
+            String orgName = newAsset.getClinicalDeptName();
+            if (StringUtils.isEmpty(orgName)) {
+                item.put("status", ImportStatus.CheckFail);
+                AssetRow.addErrMessage(item, "警告:科室为空");
+            } else {
+                OrgInfo orgInfo = getOrgInfoByName(orgName);
+
+                if (orgInfo == null) {
+                    item.put("status", ImportStatus.CheckFail);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
+                }
             }
 
             //check depart num to avoid duplicate when update
