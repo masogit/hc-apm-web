@@ -75,6 +75,7 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
+        searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
         Sort sort=new Sort(Sort.Direction.DESC,"assetInfo.installDate");
         sort.and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode"));
 		PageRequest newPageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
