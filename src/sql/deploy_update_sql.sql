@@ -175,3 +175,7 @@ update supplier set maintainer_t=true,supplier_t=false,manufacturer_t=false wher
 update supplier set maintainer_t=true,supplier_t=true,manufacturer_t=false where supplier_type='3' and manufacturer_t is NUll;
 update supplier set maintainer_t=false,supplier_t=true,manufacturer_t=false,supplier_type=1 where supplier_type is NUll and  supplier_t is NULL and maintainer_t is NULL and manufacturer_t is NUll;
 
+INSERT INTO public.sys_role
+(id, name, role_desc, home_page, created_by, created_date, last_modified_by, last_modified_date)
+VALUES(13, 'NursingStaff', '护理人员', '/homeAssetStaff.xhtml', NULL, NULL, NULL, NULL);
+
