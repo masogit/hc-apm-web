@@ -15,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.ge.apm.dao.InventoryOrderDetailAssetInfoRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
@@ -81,7 +82,10 @@ public class InventoryOrderDetailAssetInfoController extends GenericCRUDUUIDCont
 		searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
 		searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
 		searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
-		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+		Sort sort=new Sort(Sort.Direction.DESC,"assetInfo.installDate");
+		sort.and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode"));
+		PageRequest newPageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
+		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters, newPageRequest);
 		//after
 		return pageAssetInfo;
 	}
