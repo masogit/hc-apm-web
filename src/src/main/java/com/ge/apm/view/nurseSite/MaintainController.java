@@ -1,7 +1,5 @@
 package com.ge.apm.view.nurseSite;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -24,6 +22,8 @@ import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -48,7 +48,6 @@ public class MaintainController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
-	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 
 	private ScheduleModel lazyEventModel;
 	private DefaultScheduleEvent event;
@@ -89,7 +88,8 @@ public class MaintainController {
 //				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 //				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*"));
-				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters);
+				Sort sort=new Sort(Sort.Direction.ASC,"scheduleDate");
+				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters,sort);
 				for (NurseSiteMaintain data : listData) {
 					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data), data.getScheduleDate(), data.getScheduleDate(), true);
 					tempEvent.setData(data);
@@ -149,14 +149,7 @@ public class MaintainController {
 		}
 	}
 	
-	private void batchCreateMaintainData(Date date,List<NurseSiteMaintain> listMaintainData){
-		try {
-			date=sdf.parse(sdf.format(date));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			LOGGER.error(e.getMessage());
-		}
-		
+	private void batchCreateMaintainData(Date date,List<NurseSiteMaintain> listMaintainData){		
 		Calendar ca=Calendar.getInstance();
 		ca.setTime(endBatchDate);
 		ca.set(Calendar.DATE,ca.get(Calendar.DATE)+1);

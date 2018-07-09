@@ -64,6 +64,17 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     }
     
     @Override
+	public List<E> findBySearchFilter(List<SearchFilter> filterFilter, Sort sort) {
+		// TODO Auto-generated method stub
+    	if(filterFilter==null)
+            return findAll(sort);
+        else{
+            Specification<E> spec = BySearchFilterSpecification.bySearchFilter(filterFilter, type);
+            return findAll(spec,sort);
+        }
+	}
+    
+    @Override
     public E findById(String id){
         return entityManager.find(this.type, id);
     }
@@ -113,4 +124,6 @@ public class GenericRepositoryUUIDImpl<E> extends SimpleJpaRepository<E, String>
     	entityManager.merge(entity);
         return entity;
     }
+
+	
 }
