@@ -12,6 +12,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,8 +75,8 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainRepository.findBySiteUidAndDate(startDate,ca.getTime(),siteUid,userUid);
 	}
 	
-	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters){
-		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters);
+	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters,Sort sort){
+		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters,sort);
 	}
 	
 	public AssetInfo getAssetInfoByUid(String uid){
