@@ -111,9 +111,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 //                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
 //            }
 //        }
-        if(orgUidList!=null&&orgUidList.size()>1){
-        	searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*"));
-        }
+        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*"));
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
 
