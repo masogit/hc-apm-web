@@ -8,13 +8,13 @@
 
                 <h:form id="orgEditForm">
 
-                    <div class="ui-g-12 ui-lg-5">
+                    <div class="ui-g-12 ui-lg-4">
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
                                 <p:inputText id="retrieval" value="#{orgInfoController.retrieval}">
                                     <p:ajax listener="#{orgInfoController.filterNode()}" event="keyup" update="orgTree editPanel :growl"/>
                                 </p:inputText>
-                                <!--<p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>-->
+                                <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
                             </h:panelGroup>
                             <p:scrollPanel style="height:98%;border: 0" mode="native">
                                 <p:tree id="orgTree"  class="tree" style="width:98%;border:0;" value="#{orgInfoController.orgTree}" var="node" selectionMode="single" selection="#{orgInfoController.selectedNode}" highlight="true">
@@ -28,7 +28,7 @@
                         </div>
                     </div>
 
-                    <div class="ui-g-12 ui-lg-7">
+                    <div class="ui-g-12 ui-lg-8">
                         <div class="card" style="height:400px;">
                             <h:panelGroup id="editPanel">
                                 <h:panelGrid columns="8">
