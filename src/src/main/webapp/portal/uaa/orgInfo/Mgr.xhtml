@@ -12,7 +12,7 @@
                         <div class="card" style="height:400px;">
                             <h:panelGroup>
                                 <p:inputText id="retrieval" value="#{orgInfoController.retrieval}">
-                                    <p:ajax listener="#{orgInfoController.filterNode()}" event="keyup" update="orgTree editPanel :growl"/>
+                                    <!--<p:ajax listener="#{orgInfoController.filterNode()}" event="keyup" update="orgTree editPanel :growl"/>-->
                                 </p:inputText>
                                 <p:commandButton  icon="ui-icon-location-searching" style="width: 90px;"  validateClient="true"  actionListener="#{orgInfoController.filterNode()}" value="检索"  update="orgTree editPanel :growl"/>
                             </h:panelGroup>
