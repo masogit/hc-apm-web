@@ -74,12 +74,12 @@ public class OrgInfoBuilder {
         return orgInfo;
     }
 
-    public static OrgInfo buildOrgClinicalDept(TenantInfo tenantInfo, String name, OrgInfo parentOrg) {
+    public static OrgInfo buildOrgClinicalDept(TenantInfo tenantInfo, String name, OrgInfo parentOrg, int orgLevel) {
 
         OrgInfo orgInfo = new OrgInfo();
         orgInfo.initializeUid();
 
-        orgInfo.setOrgLevel(3);
+        orgInfo.setOrgLevel(orgLevel);
         orgInfo.setOrgType(4);
         orgInfo.setName(name);
 
