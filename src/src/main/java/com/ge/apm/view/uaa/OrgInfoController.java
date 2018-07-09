@@ -288,10 +288,11 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
 //        return false;
 //    }
     public void checkName() {
+
         // String orgNameTmp =selected.getName();
         List<OrgInfo> orgTypeList = dao.findByParentUID(selected.getParentUID());
         for (OrgInfo orgInfo : orgTypeList) {
-            if (orgInfo.getName().equalsIgnoreCase(orgName) && orgNameEn.equalsIgnoreCase(orgInfo.getNameEn())) {
+            if (orgInfo.getName().equalsIgnoreCase(orgName)) {
                 WebUtil.addErrorMessage(orgName + "已经存在");
                 return;
             }
@@ -299,6 +300,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
     }
 
     public void saveSelectedOrg() {
+
         //判断是否有权限(只能操作当前登陆用户级别以下的和自己相同siteuid的数据)
         if (!userCommonService.isCanOperate(UserContextService.getCurrentUserAccount(), selected)) {
             return;
@@ -308,7 +310,7 @@ public class OrgInfoController extends JpaCRUDController<OrgInfo> {
         //  String orgName =selected.getName();
         List<OrgInfo> orgTypeList = dao.findByParentUID(selected.getParentUID());
 
-        if (orgTypeList.stream().anyMatch(item -> item.getName().equalsIgnoreCase(orgName) && item.getNameEn().equalsIgnoreCase(orgNameEn))) {
+        if (orgTypeList.stream().anyMatch(item -> item.getName().equalsIgnoreCase(orgName))) {
             WebUtil.addErrorMessage(orgName + "," + orgNameEn + "已经存在");
             return;
         }
