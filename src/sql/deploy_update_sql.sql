@@ -179,3 +179,21 @@ INSERT INTO public.sys_role
 (id, name, role_desc, home_page, created_by, created_date, last_modified_by, last_modified_date)
 VALUES(13, 'NursingStaff', '护理人员', '/homeAssetStaff.xhtml', NULL, NULL, NULL, NULL);
 
+update pm_order_rule por
+set site_uid = (select site_uid from user_account where id = por.approve_user_id),
+hospital_uid = (select hospital_uid from user_account where id = por.approve_user_id),
+institution_uid = (select institution_uid from user_account where id = por.approve_user_id)
+where tenant_uid is not null and status = 1;
+
+update pm_order_rule por
+set site_uid = (select site_uid from user_account where id = por.owner_id),
+hospital_uid = (select hospital_uid from user_account where id = por.owner_id),
+institution_uid = (select institution_uid from user_account where id = por.owner_id)
+where tenant_uid is not null and status = 0;
+
+update rel_rule_asset rra
+set site_uid = (select site_uid from asset_info where uid = rra.asset_uid),
+hospital_uid = (select hospital_uid from asset_info where uid = rra.asset_uid),
+institution_uid = (select institution_uid from asset_info where uid = rra.asset_uid)
+where site_uid is null;
+
