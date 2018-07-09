@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import com.ge.apm.dao.InventoryIssueRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
@@ -74,7 +75,10 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
-		Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+        Sort sort=new Sort(Sort.Direction.DESC,"assetInfo.installDate");
+        sort.and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode"));
+		PageRequest newPageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),sort);
+		Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, newPageRequest);
 		return pageAssetInfo;
 	}
 
