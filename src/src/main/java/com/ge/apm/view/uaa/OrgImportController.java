@@ -31,11 +31,13 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
     private OrgInfoService service;
     private UploadedFile file;
     private List<Map> importFailedDataList;
+    private OrgInfoController orgInfoController;
     
     @Override
     protected void init() {
         dao = WebUtil.getBean(OrgInfoRepository.class);
         service = WebUtil.getBean(OrgInfoService.class);
+
         currentUser = UserContextService.getCurrentUserAccount();
     }
     
@@ -58,6 +60,9 @@ public class OrgImportController extends GenericCRUDController<OrgInfo> implemen
     public void handleFileUpload(FileUploadEvent event) throws IOException, ParseException {
         this.file = event.getFile();
         importFailedDataList = service.importOrg(this.file, currentUser);
+
+        orgInfoController = WebUtil.getBean(OrgInfoController.class);
+        orgInfoController.buildOrdTree();
     }
     
     public UploadedFile getFile() {

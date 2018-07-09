@@ -11,7 +11,7 @@
                 <p:fieldset legend="批量导入 科室信息" id="uploaderContainer">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
                         <p:fileUpload fileUploadListener="#{orgImportController.handleFileUpload}" mode="advanced" dragDropSupport="false" multiple="false" auto="true"
-                                      invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M" update="@(form)"
+                                      invalidFileMessage="只支持xls或xlsx格式的文件" invalidSizeMessage="文件大小不得超过5M" update="@(form) :tabview:orgEditForm:orgTree"
                                       sizeLimit="5242880" allowTypes="/(\.|\/)(xls|xlsx)$/" label="从Excel导入" cancelLabel="取消" uploadLabel="确认上传" />
                     </p:panelGrid>
                     <h:panelGroup>
