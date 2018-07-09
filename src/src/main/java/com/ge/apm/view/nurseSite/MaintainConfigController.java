@@ -63,7 +63,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<MaintainDataPair> checkListWeekDays;
   	private List<MaintainDataPair> checkListMonthDays;
   	private List<AssetInfo> checkListAssets;
-  	
+  	private List<String> orgUidList;
   	
   	private boolean isSaveDisable=true;
   	
@@ -74,6 +74,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
         checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
+        orgUidList = nurseSiteMaintainService.getOrgListByUser(currentUser.getUid());
         
 //        listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
 //		listStrNurseSiteMaintainConfig=new ArrayList<SimplePair>();
@@ -100,15 +101,18 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-        if(currentUser.getOrgLevel() != 0){
-            if(currentUser.getOrgLevel() == 1){
-                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-            }else if(currentUser.getOrgLevel() == 2){
-                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
-            }else{
-                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-            }
+//        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
+//        if(currentUser.getOrgLevel() != 0){
+//            if(currentUser.getOrgLevel() == 1){
+//                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
+//            }else if(currentUser.getOrgLevel() == 2){
+//                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
+//            }else{
+//                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
+//            }
+//        }
+        if(orgUidList!=null&&orgUidList.size()>1){
+        	searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*"));
         }
         return dao.findBySearchFilter(searchFilters, pageRequest);
     }
