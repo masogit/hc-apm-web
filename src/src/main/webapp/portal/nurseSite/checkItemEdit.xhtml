@@ -7,7 +7,7 @@
       xmlns:p="http://primefaces.org/ui">
 
     <ui:composition>
-        <p:dialog id="checkItemDlg" widgetVar="checkItemDlg" width="350" height="250" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRuleItem}">
+        <p:dialog id="checkItemDlg" widgetVar="checkItemDlg" width="350" height="130" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRuleItem}">
             <h:form id="checkItemForm" rendered="#{maintainConfigController.objCheckItem!=null}">
                 <h:panelGroup id="display" class="checkItemDlg">
                     <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
@@ -26,6 +26,5 @@
                 </h:panelGroup>
             </h:form>
         </p:dialog>
-
     </ui:composition>
 </html>
