@@ -113,9 +113,6 @@ public class NurseSiteMaintain implements Serializable {
 	@Column(name="config_id")
 	private String configId;
 	
-	@Transient
-	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd HH");
-	
 	public NurseSiteMaintain() {
 		super();
 		this.status=0;
@@ -190,12 +187,7 @@ public class NurseSiteMaintain implements Serializable {
 	}
 
 	public void setScheduleDate(Date scheduleDate) {
-		try {
-			this.scheduleDate = sdf.parse(sdf.format(scheduleDate));
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			LOGGER.error(e.getMessage());
-		}
+		this.scheduleDate=scheduleDate;
 	}
 
 	public String getCreateByUid() {
