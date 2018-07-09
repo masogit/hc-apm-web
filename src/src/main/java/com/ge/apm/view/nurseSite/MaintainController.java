@@ -64,7 +64,6 @@ public class MaintainController {
 	//validate
 	private boolean isDeleteDisable;
     private boolean isSaveDisable;
-    private boolean isDeptHead;
     //show
     private List<String> showLables;
 
@@ -74,12 +73,6 @@ public class MaintainController {
 		currentUser = UserContextService.getCurrentUserAccount();
 		List<String> orgUidList = nurseSiteMaintainService.getOrgListByUser(currentUser.getUid());
 		this.loadMaintainData(orgUidList);
-		if(UserContextService.getRoles().contains("DeptHead")){
-			isDeptHead=true;
-		}
-		else{
-			isDeptHead=false;
-		}
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
 		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
 			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
@@ -100,6 +93,18 @@ public class MaintainController {
 				for (NurseSiteMaintain data : listData) {
 					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data), data.getScheduleDate(), data.getScheduleDate(), true);
 					tempEvent.setData(data);
+					Integer status=data.getStatus();
+					if(status!=null){
+						if(status==0){
+							tempEvent.setStyleClass("schedule-item-nocheck");
+						}
+						else if(status==2){
+							tempEvent.setStyleClass("schedule-item-pass");
+						}
+						else if(status==3){
+							tempEvent.setStyleClass("schedule-item-nopass");
+						}
+					}
 					addEvent(tempEvent);
 				}
 			}
@@ -224,9 +229,6 @@ public class MaintainController {
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
-		if (!isDeptHead) {
-			return;
-		}
 		if(nurseSiteMaintainConfig==null){
 			addMessage("请创建并选择配置模板");
 			return;
@@ -443,14 +445,6 @@ public class MaintainController {
 
 	public void setSaveDisable(boolean isSaveDisable) {
 		this.isSaveDisable = isSaveDisable;
-	}
-
-	public boolean isDeptHead() {
-		return isDeptHead;
-	}
-
-	public void setDeptHead(boolean isDeptHead) {
-		this.isDeptHead = isDeptHead;
 	}
 
 	public List<NurseSiteMaintainConfig> getListNurseSiteMaintainConfig() {
