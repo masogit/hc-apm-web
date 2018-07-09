@@ -91,6 +91,7 @@ public class OrgInfoService {
 //        try {
 
             TenantInfo tenantInfo = tenantInfoDao.findByuid(user.getTenantUID());
+            OrgInfo tenantOrgInfo = orgDao.findByUid(tenantInfo.getUid());
 
             ExcelDocument doc = new ExcelDocument(file.getInputstream(), ExcelDocument.parseTypeByFileName(file.getFileName()));
 
@@ -98,6 +99,11 @@ public class OrgInfoService {
             int dataRow = 2;
 
             for (Map< String, Object> rowMap = doc.getDataRowMap(keyRow, dataRow); rowMap != null; rowMap = doc.getDataRowMap(keyRow, ++dataRow)) {
+
+                //make tenant as default parent of clinical dept
+                OrgInfo clinicalParent = tenantOrgInfo;
+                int clinicalOrgLevel = 0;
+                String message = "已经存在";
 
                 Map<String, String> result = null;
 
@@ -109,7 +115,7 @@ public class OrgInfoService {
                     String siteName = ExcelDocument.getCellStringValue(rowMap.get("院区"));
                     String departName = ExcelDocument.getCellStringValue(rowMap.get("科室"));
 
-                    if (StringUtils.isEmpty(institutionName)) break;
+                    if (getLastRow(institutionName, hospitalName, siteName, departName)) break;
 
                     result = new HashMap<>();
                     result.put("institutionName", institutionName);
@@ -120,42 +126,65 @@ public class OrgInfoService {
 
                     checkRowData(institutionName, hospitalName, siteName, departName);
 
-
-
-                    OrgInfo institution = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 1, institutionName);
-
-                    if (institution == null) {
-                        institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, institutionName);
-                        orgDao.save(institution);
+                    OrgInfo institution = null;
+                    if (!StringUtils.isEmpty(institutionName)) {
                         institution = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 1, institutionName);
+                        if (institution == null) {
+                            institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, institutionName);
+                            orgDao.save(institution);
+                            institution = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 1, institutionName);
+                            message = "导入成功";
+                        }
+
+                        clinicalParent = institution;
+                        clinicalOrgLevel = 1;
+
                     }
 
-                    OrgInfo hospital = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 2, hospitalName);
-
-                    if (hospital == null) {
-                        hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
-                        orgDao.save(hospital);
+                    OrgInfo hospital = null;
+                    if (!StringUtils.isEmpty(hospitalName)) {
                         hospital = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 2, hospitalName);
+
+                        if (hospital == null) {
+                            hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
+                            orgDao.save(hospital);
+                            hospital = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 2, hospitalName);
+                            message = "导入成功";
+                        }
+
+                        clinicalParent = hospital;
+                        clinicalOrgLevel = 2;
+
                     }
 
-                    OrgInfo site = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 3, siteName);
-
-                    if (site == null) {
-                        site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
-                        orgDao.save(site);
+                    OrgInfo site = null;
+                    if (!StringUtils.isEmpty(siteName)) {
                         site = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 3, siteName);
+
+                        if (site == null) {
+                            site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
+                            orgDao.save(site);
+                            site = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 3, siteName);
+                            message = "导入成功";
+                        }
+
+                        clinicalParent = site;
+                        clinicalOrgLevel = 3;
                     }
 
-                    OrgInfo depart = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 4, departName);
+                    if (!StringUtils.isEmpty(departName)) {
+                        OrgInfo depart = orgDao.findFirstByParentUIDAndName(clinicalParent.getUid(),departName);
 
-                    if (depart == null) {
-                        depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, site);
-                        orgDao.save(depart);
-                        depart = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 4, departName);
+                        if (depart == null) {
+                            depart = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, departName, clinicalParent, clinicalOrgLevel);
+                            orgDao.save(depart);
+                            message = "导入成功";
+//                            depart = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 4, departName);
+                        }
+
                     }
 
-
-                    result.put("status", "导入成功");
+                    result.put("status", message);
 
                 } catch(Exception e){
                     result.put("status", e.getMessage());
@@ -179,33 +208,62 @@ public class OrgInfoService {
 
     public void checkRowData(String institutionName, String hospitalName, String siteName, String deptName) throws Exception {
 
-        if (StringUtils.isEmpty(institutionName)) {
+        if (StringUtils.isEmpty(institutionName) && !StringUtils.isEmpty(hospitalName)) {
             throw new Exception("集团不能为空!");
         }
-        if (institutionName.length() > 64) {
+        if (!StringUtils.isEmpty(institutionName) && institutionName.length() > 64) {
             throw new Exception("集团名称不能超过64个字符");
         }
 
-        if (StringUtils.isEmpty(hospitalName)) {
+        if (StringUtils.isEmpty(hospitalName) && !StringUtils.isEmpty(siteName)) {
             throw new Exception("医院不能为空!");
         }
-        if (hospitalName.length() > 64) {
+        if (!StringUtils.isEmpty(hospitalName) && hospitalName.length() > 64) {
             throw new Exception("医院名称不能超过64个字符");
         }
 
-        if (StringUtils.isEmpty(siteName)) {
-            throw new Exception("院区不能为空!");
-        }
-        if (siteName.length() > 64) {
+//        if (StringUtils.isEmpty(siteName)) {
+//            throw new Exception("院区不能为空!");
+//        }
+        if (!StringUtils.isEmpty(siteName) && siteName.length() > 64) {
             throw new Exception("院区名称不能超过64个字符");
         }
 
-        if (StringUtils.isEmpty(deptName)) {
-            throw new Exception("科室不能为空!");
-        }
-        if (deptName.length() > 64) {
+//        if (StringUtils.isEmpty(deptName)) {
+//            throw new Exception("科室不能为空!");
+//        }
+        if (!StringUtils.isEmpty(deptName) && deptName.length() > 64) {
             throw new Exception("科室名称不能超过64个字符");
         }
+
+    }
+
+    public int getOrgLevelForClinicalDept(String institutionName, String hospitalName, String siteName) throws Exception {
+
+
+        if (StringUtils.isEmpty(institutionName) && StringUtils.isEmpty(hospitalName) && StringUtils.isEmpty(siteName)) {
+            return 0;
+        }
+        if (StringUtils.isEmpty(hospitalName) && StringUtils.isEmpty(siteName)) {
+            return 1;
+        }
+        if (StringUtils.isEmpty(siteName)) {
+            return 2;
+        }
+
+        return 3;
+
+    }
+
+    public boolean getLastRow(String institutionName, String hospitalName, String siteName, String clinicalDeptName) throws Exception {
+
+
+        if (StringUtils.isEmpty(institutionName) && StringUtils.isEmpty(hospitalName)
+                && StringUtils.isEmpty(siteName) && StringUtils.isEmpty(clinicalDeptName)) {
+            return true;
+        }
+
+        return false;
 
     }
 
