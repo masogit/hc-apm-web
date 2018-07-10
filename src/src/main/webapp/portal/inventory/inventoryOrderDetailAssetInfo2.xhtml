@@ -25,16 +25,16 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.clinicalDeptName}" />
 		</p:column>
-		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE">
+		<p:column headerText="设备二维码" filterBy="#{item.assetInfo.qrCode}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.qrCode}">
 			<h:outputText value="#{item.assetInfo.qrCode}" />
 		</p:column>
-		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE">
+		<p:column headerText="设备编号" filterBy="#{item.assetInfo.departNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.departNum}">
 			<h:outputText value="#{item.assetInfo.departNum}" />
 		</p:column>
-		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE">
+		<p:column headerText="设备型号" filterBy="#{item.assetInfo.functionType}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.functionType}">
 			<h:outputText value="#{item.assetInfo.functionType}" />
 		</p:column>
-		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE">
+		<p:column headerText="设备财产号" filterBy="#{item.assetInfo.financingNum}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.financingNum}">
 			<h:outputText value="#{item.assetInfo.financingNum}" />
 		</p:column>
 		<p:column headerText="资产状态" filterBy="#{item.assetInfo.status}" filterMatchMode="EQ">
@@ -50,13 +50,13 @@
 			</f:facet>
 			<h:outputText value="#{item.assetInfo.status==1?'正常':item.assetInfo.status==2?'停机':item.assetInfo.status==3?'限制功能使用':item.assetInfo.status==4?'待报废':item.assetInfo.status==5?'停用':item.assetInfo.status}" />
 		</p:column>
-		<p:column headerText="安装位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE">
+		<p:column headerText="安装位置" filterBy="#{item.assetInfo.locationName}" filterMatchMode="LIKE" sortBy="#{item.assetInfo.locationName}">
 			<h:outputText value="#{item.assetInfo.locationName}" />
 		</p:column>
-		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+		<p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
 			<h:outputText value="#{item.lastModifiedBy}" />
 		</p:column>
-		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+		<p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
 			<f:facet name="filter">
 				<p:inputText id="filterLastModifiedDate2" widgetVar="varFilterLastModifiedDate2" />
 			</f:facet>
