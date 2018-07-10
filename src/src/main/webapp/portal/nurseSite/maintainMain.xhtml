@@ -16,8 +16,8 @@
             <div class="ui-g-12 card">
             	<p:growl widgetVar="messages" id="messages" showDetail="true" />
                 <h:form id="maintainHeaderForm">
-                	<p:commandButton id="batchCompleteButton" icon="ui-icon-extlink" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
-                    <p:commandButton id="batchCreateButton" icon="ui-icon-extlink" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
+                	<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
+                    <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
                     
                 </h:form>
                 <h:form id="maintainForm">
