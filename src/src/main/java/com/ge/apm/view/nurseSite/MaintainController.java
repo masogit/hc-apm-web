@@ -65,6 +65,9 @@ public class MaintainController {
     private boolean isSaveDisable;
     //show
     private List<String> showLables;
+    //inner
+    private int dayIndex=0;
+    private Date dayDate;
 
 	@PostConstruct
 	protected void init() {
@@ -94,8 +97,6 @@ public class MaintainController {
 					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data),data.getScheduleDate(),data.getScheduleDate(), true);
 					tempEvent.setData(data);
 					Integer status=data.getStatus();
-//					System.out.println(getShowTitle(data));
-//					System.out.println(data.getScheduleDate());
 					if(status!=null){
 						if(status==0){
 							tempEvent.setStyleClass("schedule-item-nocheck");
@@ -132,7 +133,24 @@ public class MaintainController {
 		else if(tempNurseSiteMaintain.getStatus()==3){
 			strStatus="有问题";
 		}
-		String str=tempNurseSiteMaintain.getName().replaceAll(",", "-")+"-"+strStatus;
+		Date newDate=tempNurseSiteMaintain.getScheduleDate();
+		Calendar newCa=Calendar.getInstance();
+		newCa.setTime(newDate);
+		if(dayDate==null){
+			dayIndex=1;
+		}
+		else{
+			Calendar oldCa=Calendar.getInstance();
+			oldCa.setTime(dayDate);
+			if(oldCa.get(Calendar.DAY_OF_YEAR)==newCa.get(Calendar.DAY_OF_YEAR)){
+				dayIndex++;
+			}
+			else{
+				dayIndex=1;
+			}
+		}
+		dayDate=newDate;
+		String str=tempNurseSiteMaintain.getName()+"-"+dayIndex+"-"+strStatus;
 		return str;
 	}
 	
