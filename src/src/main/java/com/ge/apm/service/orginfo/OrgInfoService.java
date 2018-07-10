@@ -128,11 +128,11 @@ public class OrgInfoService {
 
                     OrgInfo institution = null;
                     if (!StringUtils.isEmpty(institutionName)) {
-                        institution = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 1, institutionName);
+                        institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
                         if (institution == null) {
                             institution = OrgInfoBuilder.buildOrgInstitution(tenantInfo, institutionName);
                             orgDao.save(institution);
-                            institution = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 1, institutionName);
+                            institution = orgDao.findFirstByParentUIDAndName(user.getTenantUID(),institutionName);
                             message = "导入成功";
                         }
 
@@ -143,12 +143,12 @@ public class OrgInfoService {
 
                     OrgInfo hospital = null;
                     if (!StringUtils.isEmpty(hospitalName)) {
-                        hospital = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 2, hospitalName);
+                        hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
 
                         if (hospital == null) {
                             hospital = OrgInfoBuilder.buildOrgHospital(tenantInfo, hospitalName, institution);
                             orgDao.save(hospital);
-                            hospital = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 2, hospitalName);
+                            hospital = orgDao.findFirstByParentUIDAndName(institution.getUid(), hospitalName);
                             message = "导入成功";
                         }
 
@@ -159,12 +159,12 @@ public class OrgInfoService {
 
                     OrgInfo site = null;
                     if (!StringUtils.isEmpty(siteName)) {
-                        site = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 3, siteName);
+                        site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
 
                         if (site == null) {
                             site = OrgInfoBuilder.buildOrgSite(tenantInfo, siteName, hospital);
                             orgDao.save(site);
-                            site = orgDao.findFirstByTenantUIDAndOrgTypeAndName(user.getTenantUID(), 3, siteName);
+                            site = orgDao.findFirstByParentUIDAndName(hospital.getUid(), siteName);
                             message = "导入成功";
                         }
 
