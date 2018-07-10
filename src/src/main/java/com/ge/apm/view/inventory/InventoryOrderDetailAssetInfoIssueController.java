@@ -17,6 +17,7 @@ import org.springframework.data.domain.Sort;
 import com.ge.apm.dao.InventoryIssueRepository;
 import com.ge.apm.dao.InventoryOrderRepository;
 import com.ge.apm.domain.InventoryIssue;
+import com.ge.apm.domain.InventoryOrderDetail;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.inventory.InventoryOrderService;
 import com.ge.apm.service.uaa.UaaService;
@@ -76,9 +77,8 @@ public class InventoryOrderDetailAssetInfoIssueController extends GenericCRUDUUI
         searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
-        Sort sort=pageRequest.getSort();
-		sort.and(new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
-		Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+        PageRequest newPageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
+		Page<InventoryIssue> pageAssetInfo = dao.findBySearchFilter(searchFilters, newPageRequest);
 		return pageAssetInfo;
 	}
 
