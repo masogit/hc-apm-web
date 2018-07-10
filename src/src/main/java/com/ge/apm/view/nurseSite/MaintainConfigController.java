@@ -132,6 +132,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     @Override
     public void save() {
     	saveMaintainConfig(this.selected);
+    	nurseSiteMaintainService.updateUnCheckedMaintainData(this.selected, currentUser, 0, listCheckAssets);
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功");
     }
