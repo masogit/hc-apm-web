@@ -41,7 +41,7 @@
                                 <label class="label">#{msg.choseFileToUpload}</label>
                                 <h:outputText   value="#{assetFileImportController.file.fileName}"  rendered="#{not empty assetFileImportController.file}"/>
                                 <p:fileUpload  id="fileUpload" fileUploadListener="#{assetFileImportController.uploadDataFile}" value="#{assetFileImportController.file}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
-                                               multiple="false" sizeLimit="10000000" update="uploaderContainer :importDataForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty assetFileImportController.file}" disabled="#{assetFileImportController.selectedOrg == null}"/>
+                                               multiple="false" sizeLimit="10000000" update="uploaderContainer :importDataForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(xls|xlsx)$/" label="#{msg.Add}" rendered="#{empty assetFileImportController.file}" />
                             </h:panelGroup>
 
                             <h:panelGroup>
