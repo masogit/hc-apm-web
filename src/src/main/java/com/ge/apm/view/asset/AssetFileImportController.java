@@ -74,6 +74,12 @@ public class AssetFileImportController {
     }
 
     public void uploadDataFile(FileUploadEvent event) {
+
+        if (selectedOrg == null) {
+            WebUtil.addErrorMessage("请先选择所属院区！");
+            return;
+        }
+
         ExcelDocument doc = null;
 
         try {
