@@ -94,8 +94,8 @@ public class MaintainController {
 					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data),data.getScheduleDate(),data.getScheduleDate(), true);
 					tempEvent.setData(data);
 					Integer status=data.getStatus();
-					System.out.println(getShowTitle(data));
-					System.out.println(data.getScheduleDate());
+//					System.out.println(getShowTitle(data));
+//					System.out.println(data.getScheduleDate());
 					if(status!=null){
 						if(status==0){
 							tempEvent.setStyleClass("schedule-item-nocheck");
