@@ -510,6 +510,19 @@ public class NurseSiteMaintainService{
 		}
 	}
 	
+	@Transactional
+	public void updateUnCheckedMaintainData(NurseSiteMaintainConfig nurseSiteMaintainConfig,UserAccount currentUser,Integer status,List<AssetInfo> listCheckAssets){
+		List<NurseSiteMaintain> listMaintain=nurseSiteMaintainRepository.findByConfigAndStatus(nurseSiteMaintainConfig.getId(), status);
+		List<NurseSiteMaintain> listNewMaintain=new ArrayList<NurseSiteMaintain>();
+		if(listMaintain!=null && listMaintain.size()>0){
+			for(int i=0;i<listMaintain.size();++i){
+				listNewMaintain.add(createMaintain(listMaintain.get(i).getScheduleDate(), currentUser, nurseSiteMaintainConfig, listCheckAssets));
+			}
+		}
+		nurseSiteMaintainRepository.delete(listMaintain);
+		nurseSiteMaintainRepository.save(listNewMaintain);
+	}
+	
 //	private void formatExistMaintainDate(){
 //	List<Date> tempList=new ArrayList<Date>();
 //	for(int i=0;i<existMaintainDate.size();++i){
