@@ -21,7 +21,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.hospitalId}<span style="color:red">*</span></label><!--所属医院-->
                                 <p:inputText id="selectedUserOrgName" value="#{assetFileImportController.getSelectedOrgName()}" readonly="true" />
-                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
+                                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton" disabled="#{assetFileImportController.file != null}"/>
                                 <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
                                     <p:scrollPanel style="height:300px;border: 0" mode="native">
                                         <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{assetFileImportController.orgTree}" selection="#{assetFileImportController.selectedNode}" var="node" selectionMode="single">
