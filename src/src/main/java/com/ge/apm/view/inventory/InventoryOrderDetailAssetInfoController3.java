@@ -79,9 +79,8 @@ public class InventoryOrderDetailAssetInfoController3 extends GenericCRUDUUIDCon
         searchFilters.add(new SearchFilter("inventoryOrderId", SearchFilter.Operator.EQ, orderId,"1*"));
         searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, inventoryStatus,"1*"));
         searchFilters.add(new SearchFilter("assetInfo.isChecked", SearchFilter.Operator.EQ, true,"1*"));
-        Sort sort=pageRequest.getSort();
-		sort.and(new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
-		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters, pageRequest);
+        PageRequest newPageRequest=new PageRequest(pageRequest.getPageNumber(),pageRequest.getPageSize(),new Sort(Sort.Direction.DESC,"assetInfo.installDate").and(new Sort(Sort.Direction.ASC,"assetInfo.namePyCode")));
+		Page<InventoryOrderDetail> pageAssetInfo = dao.findBySearchFilter(searchFilters,newPageRequest);
 		
 		//after
 		return pageAssetInfo;
