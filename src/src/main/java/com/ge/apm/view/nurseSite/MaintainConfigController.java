@@ -11,6 +11,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -41,7 +43,7 @@ import webapp.framework.web.mvc.ServerEventInterface;
 @ManagedBean
 @ViewScoped
 public class MaintainConfigController extends GenericCRUDUUIDController<NurseSiteMaintainConfig> implements Serializable, ServerEventInterface {
-
+	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
     private SmallAssetPerformanceConfigService service;
@@ -73,7 +75,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
-        checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getUid());
+        checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
         orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
         
 //        listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
@@ -115,18 +117,23 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         List<NurseSiteMaintainConfig> listResult=pageResult.getContent();
         List<NurseSiteMaintainConfig> listNewResult=new ArrayList<NurseSiteMaintainConfig>();
-        if(listResult!=null && listResult.size()>0){
-        	for(int i=0;i<listResult.size();++i){
-        		Iterator<UserOrgInfo> it=listResult.get(i).getCreateBy().getSetUserOrgInfo().iterator();
-        		while(it.hasNext()){
-        			String orgUid=it.next().getOrgUid();
-        			if(orgUidList.contains(orgUid)){
-        				listNewResult.add(listResult.get(i));
-        				break;
-        			}
-        		}
-        	}
-        }
+        try {
+        	if(listResult!=null && listResult.size()>0 && orgUidList!=null){
+            	for(int i=0;i<listResult.size();++i){
+            		Iterator<UserOrgInfo> it=listResult.get(i).getCreateBy().getSetUserOrgInfo().iterator();
+            		while(it.hasNext()){
+            			String orgUid=it.next().getOrgUid();
+            			if(orgUidList.contains(orgUid)){
+            				listNewResult.add(listResult.get(i));
+            				break;
+            			}
+            		}
+            	}
+            }
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error(e.getMessage());
+		}
         PageImpl<NurseSiteMaintainConfig> pageNewResult=new PageImpl<NurseSiteMaintainConfig>(listNewResult);
         return pageNewResult;
     }
