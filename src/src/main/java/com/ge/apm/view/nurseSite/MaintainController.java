@@ -87,25 +87,8 @@ public class MaintainController {
 			@Override
 			public void loadEvents(Date start, Date end) {
 				List<SearchFilter> searchFilters = new ArrayList<>();
-//				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
-//				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
-//				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
-//				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*"));
-				Sort sort=new Sort(Sort.Direction.ASC,"scheduleDate");
-				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters,sort);
+				List<NurseSiteMaintain> listData=nurseSiteMaintainService.getDefaultMaintainData(currentUser.getSiteUID(), currentUser.getUid(), start, end);
 				for (NurseSiteMaintain data : listData) {
-					Iterator<UserOrgInfo> it=data.getCreateBy().getSetUserOrgInfo().iterator();
-					boolean contains=false;
-					while(it.hasNext()){
-						String orgUid=it.next().getOrgUid();
-						if(userOrgList.contains(orgUid)){
-							contains=true;
-							break;
-						}
-					}
-					if(!contains){
-						continue;
-					}
 					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data),data.getScheduleDate(),data.getScheduleDate(), true);
 					tempEvent.setData(data);
 					Integer status=data.getStatus();
