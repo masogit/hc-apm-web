@@ -60,8 +60,8 @@ public class NurseSiteMaintainService{
 	@Autowired
     private UaaService uaaService;
 	
-	public List<NurseSiteMaintainConfig> getMaintainConfigBySiteUid(String siteUid){
-		return nurseSiteMaintainConfigRepository.findBySiteUid(siteUid);
+	public List<NurseSiteMaintainConfig> getMaintainConfigBySiteUid(String siteUid,String userUid){
+		return nurseSiteMaintainConfigRepository.findBySiteUid(siteUid,userUid);
 	}
 	
 	public NurseSiteMaintainConfig getMaintainConfigById(String id){
