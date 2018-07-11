@@ -35,8 +35,12 @@ public class UaaService {
     public static final String TEMPORARY_ACCOUNT = "";
     private static Map<String, SysRole> sysRoles;
     public static final String TEMP_STAFF = "仅报修权限账号";
+
     @Autowired
     OrgInfoRepository orgInfoDao;
+
+    @Autowired
+    UserOrgInfoRepository userOrgDao;
 
     @Autowired
     WorkflowConfigRepository wfcfigDao;
@@ -527,23 +531,31 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
         List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
 
+        UserOrgInfo foundUserOrg = null;
+
         if (ownnedOrg.getOrgType() == 4 && workflowConfigs.size() == 0) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
-            UserOrgInfo userOrg = new UserOrgInfo();
-            userOrg.setUserUid(user.getUid());
-            userOrg.setOrgUid(ownnedOrg.getUid());
-            userOrg.setOrgType(ownnedOrg.getOrgType());
-            UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-            userOrgDao.save(userOrg);
+
+            foundUserOrg = userOrgDao.findFirstByUserUidAndOrgUid(user.getUid(), ownnedOrg.getUid());
+            if (foundUserOrg == null) {
+                UserOrgInfo userOrg = new UserOrgInfo();
+                userOrg.setUserUid(user.getUid());
+                userOrg.setOrgUid(ownnedOrg.getUid());
+                userOrg.setOrgType(ownnedOrg.getOrgType());
+                userOrgDao.save(userOrg);
+            }
+
         } else {
             OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
             if (org != null) {
-                UserOrgInfo userOrg = new UserOrgInfo();
-                userOrg.setUserUid(user.getUid());
-                userOrg.setOrgUid(org.getUid());
-                userOrg.setOrgType(org.getOrgType());
-                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-                userOrgDao.save(userOrg);
+                foundUserOrg = userOrgDao.findFirstByUserUidAndOrgUid(user.getUid(), org.getUid());
+                if (foundUserOrg == null) {
+                    UserOrgInfo userOrg = new UserOrgInfo();
+                    userOrg.setUserUid(user.getUid());
+                    userOrg.setOrgUid(org.getUid());
+                    userOrg.setOrgType(org.getOrgType());
+                    userOrgDao.save(userOrg);
+                }
             }
         }
 
