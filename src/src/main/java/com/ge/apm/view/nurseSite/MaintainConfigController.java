@@ -4,14 +4,15 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
-import java.util.UUID;
 
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 
 import com.alibaba.fastjson.JSONArray;
@@ -22,13 +23,12 @@ import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.MaintainDataPair;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigCheckItem;
-import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.asset.SmallAssetPerformanceConfigService;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import net.sf.json.util.WebUtils;
 import webapp.framework.dao.GenericRepositoryUUID;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -73,8 +73,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         currentUser = UserContextService.getCurrentUserAccount();
         nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
-        checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
-        orgUidList = nurseSiteMaintainService.getOrgListByUser(currentUser.getUid());
+        checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getUid());
+        orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
         
 //        listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
 //		listStrNurseSiteMaintainConfig=new ArrayList<SimplePair>();
@@ -111,8 +111,24 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 //                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
 //            }
 //        }
-        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*"));
-        return dao.findBySearchFilter(searchFilters, pageRequest);
+//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1+"));
+        Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
+        List<NurseSiteMaintainConfig> listResult=pageResult.getContent();
+        List<NurseSiteMaintainConfig> listNewResult=new ArrayList<NurseSiteMaintainConfig>();
+        if(listResult!=null && listResult.size()>0){
+        	for(int i=0;i<listResult.size();++i){
+        		Iterator<UserOrgInfo> it=listResult.get(i).getCreateBy().getSetUserOrgInfo().iterator();
+        		while(it.hasNext()){
+        			String orgUid=it.next().getOrgUid();
+        			if(orgUidList.contains(orgUid)){
+        				listNewResult.add(listResult.get(i));
+        				break;
+        			}
+        		}
+        	}
+        }
+        PageImpl<NurseSiteMaintainConfig> pageNewResult=new PageImpl<NurseSiteMaintainConfig>(listNewResult);
+        return pageNewResult;
     }
 
     @Override

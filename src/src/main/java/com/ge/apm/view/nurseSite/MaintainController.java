@@ -22,8 +22,6 @@ import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -31,6 +29,7 @@ import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -73,7 +72,7 @@ public class MaintainController {
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-		List<String> orgUidList = nurseSiteMaintainService.getOrgListByUser(currentUser.getUid());
+		List<String> orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
 		this.loadMaintainData(orgUidList);
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
 		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
@@ -90,10 +89,22 @@ public class MaintainController {
 //				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 //				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 //				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
-				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*"));
-				Sort sort=new Sort(Sort.Direction.ASC,"scheduleDate");
-				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters,sort);
+//				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*"));
+//				Sort sort=new Sort(Sort.Direction.ASC,"scheduleDate");
+				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters);
 				for (NurseSiteMaintain data : listData) {
+					Iterator<UserOrgInfo> it=data.getCreateBy().getSetUserOrgInfo().iterator();
+					boolean contains=false;
+					while(it.hasNext()){
+						String orgUid=it.next().getOrgUid();
+						if(userOrgList.contains(orgUid)){
+							contains=true;
+							break;
+						}
+					}
+					if(!contains){
+						continue;
+					}
 					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data),data.getScheduleDate(),data.getScheduleDate(), true);
 					tempEvent.setData(data);
 					Integer status=data.getStatus();

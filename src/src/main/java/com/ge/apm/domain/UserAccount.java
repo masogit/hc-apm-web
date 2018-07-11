@@ -2,10 +2,35 @@
  */
 package com.ge.apm.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.ge.apm.service.utils.ChineseName;
-import com.ge.apm.service.utils.Digests;
-import com.ge.apm.service.utils.PinyinUtil;
+import java.io.Serializable;
+import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.UUID;
+
+import javax.persistence.Basic;
+import javax.persistence.Cacheable;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
+import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Cache;
@@ -16,16 +41,10 @@ import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.annotation.LastModifiedDate;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-import java.io.Serializable;
-import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ge.apm.service.utils.ChineseName;
+import com.ge.apm.service.utils.Digests;
+import com.ge.apm.service.utils.PinyinUtil;
 
 /**
  *
@@ -223,6 +242,10 @@ public class UserAccount implements ChineseName, Serializable {
 	@Column(name = "active_time")
 	@Temporal(TemporalType.TIMESTAMP)
 	private Date activeTime;
+	
+	@JsonIgnore
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "userAccount", fetch = FetchType.EAGER)
+    private Set<UserOrgInfo> setUserOrgInfo;
 
 	@Transient
 	private Integer excelIdex;
@@ -846,5 +869,13 @@ public class UserAccount implements ChineseName, Serializable {
 
 	public String getPinYin() {
 		return getNamePyCode();
+	}
+
+	public Set<UserOrgInfo> getSetUserOrgInfo() {
+		return setUserOrgInfo;
+	}
+
+	public void setSetUserOrgInfo(Set<UserOrgInfo> setUserOrgInfo) {
+		this.setUserOrgInfo = setUserOrgInfo;
 	}
 }

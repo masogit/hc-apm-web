@@ -79,12 +79,16 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters,sort);
 	}
 	
+	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters){
+		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters);
+	}
+	
 	public AssetInfo getAssetInfoByUid(String uid){
 		return assetInfoRepository.getByUid(uid);
 	}
 	
-	public List<AssetInfo> getListAsset(String siteUid,String userUid){
-		return assetInfoRepository.findBySelfScope(siteUid,userUid);
+	public List<AssetInfo> getListAsset(String userUid){
+		return assetInfoRepository.findBySelfScope(userUid);
 	}
 	
 	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids){
@@ -152,6 +156,10 @@ public class NurseSiteMaintainService{
 	
 	public List<String> getOrgListByUser(String userUid){
 		return uaaService.getOrgListByUser(userUid).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
+	}
+	
+	public List<String> getOrgUidListByUser(String userUid){
+		return uaaService.getOrgListByUser(userUid).stream().map(item -> item.getUid()).collect(Collectors.toList());
 	}
 
 	public NurseSiteMaintainRepository getNurseSiteMaintainRepository() {
