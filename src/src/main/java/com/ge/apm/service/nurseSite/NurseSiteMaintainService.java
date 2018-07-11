@@ -87,8 +87,8 @@ public class NurseSiteMaintainService{
 		return assetInfoRepository.getByUid(uid);
 	}
 	
-	public List<AssetInfo> getListAsset(String userUid){
-		return assetInfoRepository.findBySelfScope(userUid);
+	public List<AssetInfo> getListAsset(String siteUid,String userUid){
+		return assetInfoRepository.findBySelfScope(siteUid,userUid);
 	}
 	
 	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids){
