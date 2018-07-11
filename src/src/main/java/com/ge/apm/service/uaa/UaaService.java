@@ -525,6 +525,11 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         List<UserOrgInfo> orgList = userOrgDao.findByUserUid(userUid);
         userOrgDao.delete(orgList);
     }
+
+    @Transactional
+    public void clearUserOrgAfterOrgUpdate(String userUid){
+        userOrgDao.deleteByUserUid(userUid);
+    }
     
     @Transactional
     public void setDefaultScope(UserAccount user) {
