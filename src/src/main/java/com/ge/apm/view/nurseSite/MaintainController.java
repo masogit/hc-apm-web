@@ -22,6 +22,7 @@ import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Sort;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -90,8 +91,8 @@ public class MaintainController {
 //				searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 //				searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, userOrgList, "1*2+"));
 //				searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, userOrgList, "1*"));
-//				Sort sort=new Sort(Sort.Direction.ASC,"scheduleDate");
-				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters);
+				Sort sort=new Sort(Sort.Direction.ASC,"scheduleDate");
+				List<NurseSiteMaintain> listData = nurseSiteMaintainService.findBySearchFilter(searchFilters,sort);
 				for (NurseSiteMaintain data : listData) {
 					Iterator<UserOrgInfo> it=data.getCreateBy().getSetUserOrgInfo().iterator();
 					boolean contains=false;
