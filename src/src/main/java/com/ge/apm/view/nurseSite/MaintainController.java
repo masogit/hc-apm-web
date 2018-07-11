@@ -3,8 +3,10 @@ package com.ge.apm.view.nurseSite;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -22,7 +24,6 @@ import org.primefaces.model.LazyScheduleModel;
 import org.primefaces.model.ScheduleModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Sort;
 
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -30,7 +31,6 @@ import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
 import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -66,7 +66,7 @@ public class MaintainController {
     //show
     private List<String> showLables;
     //inner
-    private int dayIndex=0;
+    private Map<String,Integer> mapDayIndex=new HashMap<String,Integer>();
     private Date dayDate;
 
 	@PostConstruct
@@ -128,6 +128,10 @@ public class MaintainController {
 		else if(tempNurseSiteMaintain.getStatus()==3){
 			strStatus="有问题";
 		}
+		int dayIndex=0;
+		if(mapDayIndex.containsKey(tempNurseSiteMaintain.getConfigId())){
+			dayIndex=mapDayIndex.get(tempNurseSiteMaintain.getConfigId());
+		}
 		Date newDate=tempNurseSiteMaintain.getScheduleDate();
 		Calendar newCa=Calendar.getInstance();
 		newCa.setTime(newDate);
@@ -142,9 +146,11 @@ public class MaintainController {
 			}
 			else{
 				dayIndex=1;
+				mapDayIndex.clear();
 			}
 		}
 		dayDate=newDate;
+		mapDayIndex.put(tempNurseSiteMaintain.getConfigId(), dayIndex);
 		String str=tempNurseSiteMaintain.getName()+"-"+dayIndex+"-"+strStatus;
 		return str;
 	}
