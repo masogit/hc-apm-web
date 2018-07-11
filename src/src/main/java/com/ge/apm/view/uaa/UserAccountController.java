@@ -567,8 +567,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void updateUserScope() {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
-        userOrgDao.delete(orgList);
+        //below not working!!!!!!!
+//        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
+//        userOrgDao.delete(orgList);
+        userOrgDao.deleteByUserUid(selected.getUid());
+
         List<TreeNode> selectedOrgList = new ArrayList();
         readSelectedOrgTree(accessOrgTree, selectedOrgList);
         List<UserOrgInfo> userOrgList = new ArrayList();
