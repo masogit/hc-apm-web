@@ -8,4 +8,6 @@ public interface UserOrgInfoRepository extends GenericRepositoryUUID<UserOrgInfo
 
     List<UserOrgInfo> findByUserUid(String userUid);
 
+    UserOrgInfo findFirstByUserUidAndOrgUid(String userUid, String orgUid);
+
 }
