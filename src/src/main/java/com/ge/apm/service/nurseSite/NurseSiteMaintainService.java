@@ -386,7 +386,7 @@ public class NurseSiteMaintainService{
 		return true;
 	}
 	
-	public void updateMaintainData(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
+	private void updateMaintainData(NurseSiteMaintain nurseSiteMaintain,NurseSiteMaintainConfig newConfig,UserAccount user){
 		String checkItems=newConfig.getCheckItems();
 		if(StringUtils.isEmpty(checkItems)){
 			return;
