@@ -75,6 +75,10 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainRepository.findBySiteUidAndDate(startDate,ca.getTime(),siteUid,userUid);
 	}
 	
+	public List<NurseSiteMaintain> getDefaultMaintainData(String siteUid,String userUid,Date startDate,Date endDate){
+		return nurseSiteMaintainRepository.findDefaultData(siteUid, userUid, startDate, endDate);
+	}
+	
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters,Sort sort){
 		return nurseSiteMaintainRepository.findBySearchFilter(searchFilters,sort);
 	}
