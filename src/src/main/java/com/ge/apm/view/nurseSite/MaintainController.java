@@ -75,7 +75,7 @@ public class MaintainController {
 		currentUser = UserContextService.getCurrentUserAccount();
 		List<String> orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
 		this.loadMaintainData(orgUidList);
-		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
+		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID(),currentUser.getUid());
 		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
 			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
 			loadMaintainConfig();
