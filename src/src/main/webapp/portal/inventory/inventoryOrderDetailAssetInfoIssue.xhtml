@@ -5,7 +5,7 @@
 <h:form id="inventoryOrderDetailAssetInfoIssueListForm">
 	<p:dataTable id="datalist4" value="#{inventoryOrderDetailAssetInfoIssueController.lazyModel}" var="item" widgetVar="varDataList4" selectionMode="single"
 		selection="#{inventoryOrderDetailAssetInfoIssueController.selected}" lazy="true" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-		rowKey="#{item.assetInfo.id}" sortMode="single" sortOrder="descending" sortBy="#{item.assetInfo.id}"
+		rowKey="#{item.assetInfo.id}" sortMode="single" sortOrder="descending" sortBy="#{item.id}"
 		paginatorTemplate="{Toolbar} {CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
 		currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" rows="20" emptyMessage="#{msg.noRecordFound}" rowsPerPageTemplate="20,40,60,90">
 		<p:ajax event="filter" listener="#{inventoryOrderDetailAssetInfoIssueController.onFilter}" />
