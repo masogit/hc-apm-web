@@ -31,7 +31,7 @@
                 </h:form>
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="650" resizable="true" draggable="true">
                    	<h:form id="maintainDlgTable">
-                   		<div class="ui-datatable ui-widget" style="overflow: auto; height:600px; width:600px">
+                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:600px':''}">
                    			<div class="ui-datatable-tablewrapper">
                    				<table>
                 					<tr>
