@@ -290,6 +290,9 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	//@Transactional
 	public void deleteRule(){
+		if((!deleteRule2) && (!deleteRule3)){
+			return;
+		}
 	    String alert = null;
 		if(deleteRule3){
             selected.setRuleUID(null);
