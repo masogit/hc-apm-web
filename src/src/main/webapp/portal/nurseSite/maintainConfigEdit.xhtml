@@ -8,7 +8,7 @@
 
 
 <ui:composition>
-	<p:dialog id="maintainConfigEditDlg" widgetVar="maintainConfigEditDialog" header="保养工单设置" height="600" width="650" appendTo="@(body)">
+	<p:dialog id="maintainConfigEditDlg" widgetVar="maintainConfigEditDialog" header="保养工单设置" height="600" width="950" appendTo="@(body)">
 		<h:form id="maintainConfigEditForm"  rendered="#{maintainConfigController.selected!=null}">
 			<p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
 				<h:panelGroup>
@@ -20,7 +20,7 @@
                 <h:panelGroup>
                     <label class="label">增加检查项*</label>
                     <p:dataTable id="addCheckList" value="#{maintainConfigController.listPairCheckItems}" var="item" widgetVar="addCheckList" lazy="false" paginator="false"
-                                 rowKey="#{item.key}" rows="1000" emptyMessage="#{msg.noRecordFound}" style="width:600px">
+                                 rowKey="#{item.key}" rows="1000" emptyMessage="#{msg.noRecordFound}" style="width:900px">
                         <p:column headerText="#{msg.name}">
                             <h:outputText value="#{item.name}" />
                         </p:column>
@@ -80,10 +80,10 @@
 				<h:panelGroup>
 					<label class="label">检查设备*</label>
 					<p:selectManyMenu value="#{maintainConfigController.listCheckAssets}" var="t" required="true" converter="assetInfoConverter"
-						filter="true" filterMatchMode="contains" showCheckbox="true">
+						filter="true" filterMatchMode="contains" showCheckbox="true" style="width:300px;">
 						<f:selectItems value="#{maintainConfigController.checkListAssets}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 						<p:column>
-							<h:outputText value="#{t.name}" />
+							<h:outputText value="#{t.name} / #{t.departNum}" />
 						</p:column>
 					</p:selectManyMenu>
 				</h:panelGroup>
