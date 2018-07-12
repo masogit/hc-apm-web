@@ -21,6 +21,7 @@ import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import javax.persistence.Transient;
 
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -224,7 +225,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	}
 	
 	public NurseSiteMaintainData getDataValue(String label){
-		if(listData!=null){
+		if(listData!=null && StringUtils.isNotEmpty(label)){
 			Iterator<NurseSiteMaintainData> it=listData.iterator();
 			while(it.hasNext()){
 				NurseSiteMaintainData tempData=it.next();
@@ -233,7 +234,12 @@ public class NurseSiteMaintainItem implements Serializable {
 				}
 			}
 		}
-		return new NurseSiteMaintainData();
+		NurseSiteMaintainData tempData=new NurseSiteMaintainData();
+		tempData.setItem(this);
+		tempData.setCheckItem(label);
+		tempData.setCheckValue(false);
+		this.listData.add(tempData);
+		return tempData;
 	}
 
 	@Override
