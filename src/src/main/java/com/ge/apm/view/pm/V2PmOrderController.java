@@ -5,16 +5,23 @@
  */
 package com.ge.apm.view.pm;
 
+import com.alibaba.fastjson.JSONObject;
 import com.deepoove.poi.XWPFTemplate;
 import com.ge.apm.dao.*;
 import com.ge.apm.domain.*;
 import com.ge.apm.domain.bo.MaintenanceTemplate;
+import com.ge.apm.domain.bo.parser.SchemaParser;
 import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
+import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
 import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
 import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
+import com.ge.apm.domain.pure.TableGroup;
+import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.PmOrderSteps;
 import com.ge.apm.service.pm.V2_PmOrderService;
+import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.wo.V2_WorkOrderService;
 import com.ge.apm.view.sysutil.CheckItem;
@@ -56,6 +63,9 @@ import java.util.stream.Collectors;
 @ManagedBean
 @ViewScoped
 public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> implements Serializable, ServerEventInterface {
+
+    private static final DateTimeFormatter DEFAULT_DAY = DateTimeFormat.forPattern("yyyy-MM-dd");
+
     V2_PmOrderRepository dao;
     private Double totalManHours;
     private String dptName;
@@ -121,6 +131,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     private Integer pmType;
     private I18nMessageRepository i18nMessageRepository;
     private String head;
+    private TableDefinitionService tableService;
 
     // cache for maintenance report
     private StreamedContent maintenanceReport;
@@ -220,21 +231,21 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 template.registerPolicy(MaintenanceTemplate.Component.MAINTENANCE_WORKFLOW.toString(), new MaintenanceTableRenderPolicy());
                 // render policy for check list
                 template.registerPolicy(MaintenanceTemplate.Component.CHECK_LIST.toString(), new CheckListTableRenderPolicy());
+                // render policy for audit record
+                template.registerPolicy(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), new AuditMsgTableRenderPolicy());
                 template.render(datas);
                 template.write(out);
 
                 InputStream doc = new ByteArrayInputStream(out.toByteArray());
                 maintenanceReport = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report.docx");
             } catch (Exception e) {
-                Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report");
+                Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
                 WebUtil.addErrorMessage("保养报告生成失败");
             }
         }
     }
 
     private Map<String, Object> populateReportContent(V2_PmOrder pmOrder) {
-        DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
-
         Map<String, Object> content = new HashMap<>();
 
         // Device information
@@ -250,8 +261,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Maintenance.NUMBER.toString(), pmOrder.getPmNum());
         content.put(MaintenanceTemplate.Maintenance.CREATOR.toString(), pmOrder.getCreatorName());
         content.put(MaintenanceTemplate.Maintenance.LEVEL.toString(), pmOrder.getRuleLevel());
-        content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? dateTimeFormatter.print(pmOrder.getPlanTime().getTime()) : "");
-        content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? dateTimeFormatter.print(pmOrder.getEndTime().getTime()) : "");
+        content.put(MaintenanceTemplate.Maintenance.PLAN_TIME.toString(), pmOrder.getPlanTime() != null ? DEFAULT_DAY.print(pmOrder.getPlanTime().getTime()) : "");
+        content.put(MaintenanceTemplate.Maintenance.COMPLETE_TIME.toString(), pmOrder.getEndTime() != null ? DEFAULT_DAY.print(pmOrder.getEndTime().getTime()) : "");
         content.put(MaintenanceTemplate.Maintenance.TYPE.toString(), FieldValueMessageController.fieldValue("pmType", String.valueOf(pmOrder.getPmType())));
         content.put(MaintenanceTemplate.Maintenance.OPERATOR.toString(), pmOrder.getOwnerName());
         content.put(MaintenanceTemplate.Maintenance.OP_TIME.toString(), pmOrder.getManHours());
@@ -320,7 +331,124 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         }
         content.put(MaintenanceTemplate.Component.CHECK_LIST.toString(), checkListTable);
 
+
+        // Audit Message List
+        List<Map<String, Object>> auditMsgTable = new ArrayList<>();
+        if (this.getServiceRequestMessageList(selected.getId()) != null) {
+            for (ServiceRequestMsg item : this.getServiceRequestMessageList(selected.getId())) {
+                Map<String, Object> auditMsgMap = new HashMap<>();
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.TIME.toString(), item.getSendTime());
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.OWNER.toString(), item.getSenderUserName());
+                auditMsgMap.put(MaintenanceTemplate.AuditMsgInfo.INFO.toString(), item.getMessage());
+
+                auditMsgTable.add(auditMsgMap);
+            }
+        }
+        content.put(MaintenanceTemplate.Component.AUDIT_RECORDS.toString(), auditMsgTable);
+
+        if (reportList != null) {
+            for (UnstructuredDataCollection item : reportList) {
+                // ignore invalid data
+                if(item == null || Strings.isNullOrEmpty(item.getBoType())) {
+                    continue;
+                }
+                MaintenanceTemplate.Component tableType;
+                switch (item.getBoType()) {
+                    case "pm-safety-report":
+                        tableType = MaintenanceTemplate.Component.SAFETY_REPORT;
+                        break;
+                    case "pm-performance-report":
+                        tableType = MaintenanceTemplate.Component.PERFORMANCE_REPORT;
+                        break;
+                    default:
+                        continue;
+                }
+                renderDynamicTable(item, content, tableType);
+            }
+        }
         return content;
+    }
+
+    /**
+     * Render Dynamic Table content.
+     *
+     * @param collection data collection
+     * @param content content map
+     */
+    private void renderDynamicTable(UnstructuredDataCollection collection, Map<String, Object> content, MaintenanceTemplate.Component component) {
+        TableDefinition tableDefinition = tableDao.findById(collection.getSchemaId());
+        TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+        List<UnstructuredData> dataList = collection.getData();
+
+        // Get raw data
+        Map<String, Object> rawTableValue = new HashMap<>();
+        dataList.forEach(item -> {
+            try {
+                rawTableValue.put(item.getKey(), item.getValue());
+            } catch(ClassNotFoundException e) {
+                rawTableValue.put(item.getKey(), item.getValueSerialized());
+            }
+        });
+
+        // update select box option values
+        Map<String, Object> tableValue = tableService.changSelectFommDataByJSON(tableDefinition, rawTableValue);
+
+        final String emptyStr = "";
+        final String prefix = component.toString();
+        for(TableGroup group : table.getGroups()) {
+            for(TableItem item : group.getItems()) {
+                if (item == null) {
+                    continue;
+                }
+                switch (item.getComponent()) {
+                    case Number:
+                        if (item.getResKey() != null) {
+                            content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                        }
+                        if (item.getKey() != null) {
+                            content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                        }
+                        break;
+                    case Label:
+                        if (item.getResKey() != null) {
+                            content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                        }
+                        break;
+                    case Switch:
+                        if (item.getKey() != null) {
+                            try {
+                                boolean res = (Boolean) tableValue.getOrDefault(item.getKey(), false);
+                                content.put(wrap(prefix, item.getKey()), res ? "是" : "否");
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                            }
+                        }
+                        break;
+                    case Date:
+                        if (item.getKey() != null) {
+                            try {
+                                Date dt = (Date) tableValue.getOrDefault(item.getKey(), null);
+                                content.put(wrap(prefix, item.getKey()), dt == null ? "" : DEFAULT_DAY.print(dt.getTime()));
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                            }
+                        }
+                        break;
+                    case Select:
+                    case Text:
+                    case TextArea:
+                    default:
+                        if (item.getKey() != null) {
+                            content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    private String wrap(String prefix, String key) {
+        return SchemaParser.UNDERSCORE_JOINER.join(prefix, key);
     }
 
     /**
@@ -737,6 +865,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         i18nMessageRepository = WebUtil.getBean(I18nMessageRepository.class);
         terminate = Boolean.valueOf(WebUtil.getRequestParameter("terminate"));
+        tableService = WebUtil.getBean(TableDefinitionService.class);
         this.selectedMap = new HashMap();
         /*backup  if((userContextService.hasAnyRole("DeptHead") && !userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest")) ||(userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest") ) || (userContextService.hasAnyRole("DeptHead")&&userContextService.hasAnyRole("ClinicalStaff")&&!userContextService.hasAnyRole("HospitalHead,AssetHead,AssetStaff,ITAdmin,Guest"))||userContextService.hasAnyRole("HospitalHead") && !userContextService.hasAnyRole("AssetHead,AssetStaff,ITAdmin,Guest") || userContextService.hasAnyRole("ITAdmin") &&( userContextService.hasAnyRole("HospitalHead")|| userContextService.hasAnyRole("ClinicalStaff")|| userContextService.hasAnyRole("DeptHead")) )*/
 
