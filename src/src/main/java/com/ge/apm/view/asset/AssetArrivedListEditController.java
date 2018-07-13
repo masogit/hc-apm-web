@@ -69,6 +69,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private Supplier supplier;
     private Supplier maitanance;
+    private Supplier manufacture;
 
     private TreeNode selectedNode;
 
@@ -92,7 +93,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-    private String supplierName;
+//    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     private boolean needInstorageCheck;
@@ -146,7 +147,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
-                supplierName = supplier == null ? null : supplier.getName();
+//                supplierName = supplier == null ? null : supplier.getName();
+            }
+            if (selected.getManufactureId() != null) {
+                manufacture = aiService.getSupplierById(Integer.parseInt(selected.getManufactureId()));
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
@@ -473,6 +477,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public List<Supplier> autoCompleteMaintainer(String query) {
         return autoCompleteService.autoCompleteMaintainer(query, suppliersList);
     }
+    
+    public List<Supplier> autoCompleteManufacture(String query) {
+        return autoCompleteService.autoCompleteManufacture(query, suppliersList);
+    }
 
     public void onSupplierChange() {
         if (null != supplier) {
@@ -483,14 +491,26 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selected.setVendor(null);
         }
     }
+    
+    public void onManufactureChange() {
+        if (null != manufacture) {
+            selected.setManufactureId(manufacture.getId().toString());
+            selected.setManufacture(manufacture.getName());
+        } else {
+            selected.setManufactureId(null);
+            selected.setManufacture(null);
+        }
+    }
 
     public void onMaintainerChange() {
         if (null != maitanance) {
             this.easyInstallItem.setMaitanance(maitanance.getName());
             this.easyInstallItem.setMaitananceId(maitanance.getId() + "");
+            this.easyInstallItem.setMaitananceTel(maitanance.getTel());
         } else {
             this.easyInstallItem.setMaitanance(null);
             this.easyInstallItem.setMaitananceId(null);
+            this.easyInstallItem.setMaitananceTel(null);
         }
     }
 
@@ -626,14 +646,6 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.generatePmorder = generatePmorder;
     }
 
-    public String getSupplierName() {
-        return supplierName;
-    }
-
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
-    }
-
     public boolean isNeedInstorageCheck() {
         return needInstorageCheck;
     }
@@ -674,5 +686,12 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.contractItemList = contractItemList;
     }
 
-    
+    public Supplier getManufacture() {
+        return manufacture;
+    }
+
+    public void setManufacture(Supplier manufacture) {
+        this.manufacture = manufacture;
+    }
+
 }

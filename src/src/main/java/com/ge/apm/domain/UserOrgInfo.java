@@ -5,12 +5,17 @@
  */
 package com.ge.apm.domain;
 import java.io.Serializable;
+
 import javax.persistence.Cacheable;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -40,6 +45,10 @@ public class UserOrgInfo implements Serializable{
     private String orgUid;
     @Column(name = "org_type")
     private Integer orgType;
+    
+    @JoinColumn(name = "user_uid", referencedColumnName = "uid", insertable = false, updatable = false)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    private UserAccount userAccount;
     
 
     public String getId() {
@@ -73,11 +82,16 @@ public class UserOrgInfo implements Serializable{
     public void setOrgType(Integer orgType) {
         this.orgType = orgType;
     }
-    
-    
 
+    public UserAccount getUserAccount() {
+		return userAccount;
+	}
 
-    @Override
+	public void setUserAccount(UserAccount userAccount) {
+		this.userAccount = userAccount;
+	}
+
+	@Override
     public int hashCode() {
         int hash = 0;
         hash += (id != null ? id.hashCode() : 0);

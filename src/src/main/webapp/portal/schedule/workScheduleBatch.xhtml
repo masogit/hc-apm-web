@@ -21,7 +21,7 @@
 
                     <h:panelGroup>
                         <label class="label">人员*</label>
-                        <p:selectManyMenu value="#{workScheduleController.selectedUserList}" var="t" converter="userAccountConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true">
+                        <p:selectManyMenu value="#{workScheduleController.selectedUserList}" var="t" converter="userAccountConverter" required="true" filter="true" filterMatchMode="contains" showCheckbox="true" requiredMessage="人员不能为空">
                             <f:selectItems value="#{workScheduleController.userList}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
                             <p:column>
                                 <h:outputText value="#{t.name}" />

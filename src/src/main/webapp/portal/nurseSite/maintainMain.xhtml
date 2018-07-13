@@ -1,0 +1,127 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:h="http://java.sun.com/jsf/html"
+                xmlns:f="http://java.sun.com/jsf/core"
+                xmlns:ui="http://java.sun.com/jsf/facelets"
+                xmlns:p="http://primefaces.org/ui"
+                template="/WEB-INF/template.xhtml"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+	<ui:define name="head">
+        <h:outputStylesheet name="css/inspection.css" />
+    </ui:define>
+    <ui:define name="content">
+        <div class="ui-g">
+            <div class="ui-g-12 card cardTitle">
+                <p:outputLabel class="pageTitle" value="护士站设备保养"/>
+            </div>
+            <div class="ui-g-12 card">
+            	<p:growl widgetVar="messages" id="messages" showDetail="true" />
+                <h:form id="maintainHeaderForm">
+                	<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
+                    <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
+                    
+                </h:form>
+                <h:form id="maintainForm">
+                    <h:panelGrid columnClasses="value">
+                    	 <h3>-</h3>
+                        <p:schedule id="maintain" value="#{maintainController.lazyEventModel}" widgetVar="maintain" timeZone="GMT+8" centerHeaderTemplate="title" rightHeaderTemplate="" tooltip="true">
+                            <p:ajax event="dateSelect" listener="#{maintainController.onDateSelect}" update="createMaintainDlg" oncomplete="PF('createMaintainDlg').show();"/>
+                            <p:ajax event="eventSelect" listener="#{maintainController.onEventSelect}" update="maintainDlg" oncomplete="PF('maintainDialog').show();" />
+                        </p:schedule>
+                    </h:panelGrid>
+                </h:form>
+                <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="650" resizable="true" draggable="true">
+                   	<h:form id="maintainDlgTable">
+                   		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:600px':''}">
+                   			<div class="ui-datatable-tablewrapper">
+                   				<table>
+                					<tr>
+                						<th>
+                							<label class="label">名称</label>
+                						</th>
+                						<th>
+                							<label class="label">设备编号</label>
+                						</th>
+                						<th>
+                							<label class="label">制造商序列号</label>
+                						</th>
+                						<th>
+                							<label class="label">设备型号</label>
+                						</th>
+               							<c:forEach items="#{maintainController.showLables}" var="item">
+                							<th>
+                								<label class="label">#{item}</label>
+                							</th>
+               							</c:forEach>
+                					</tr>
+			                   		<c:forEach items="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem}" var="item">
+			                   			<tr>
+			                   				<td>
+			                   					#{item.assetInfo.name}
+			                   				</td>
+			                   				<td>
+			                   					#{item.assetInfo.departNum}
+			                   				</td>
+			                   				<td>
+			                   					#{item.assetInfo.serialNum}
+			                   				</td>
+			                   				<td>
+			                   					#{item.assetInfo.functionType}
+			                   				</td>
+			                   				<c:forEach items="#{maintainController.showLables}" var="item2">
+			                   					<td>
+					                           	 	<p:selectBooleanCheckbox value="#{item.getDataValue(item2).checkValue}" />
+			                    				</td>
+											</c:forEach>
+			                    		</tr>
+									</c:forEach>
+			                   	</table>
+                   			</div>
+                   		</div>
+	                   	<h:panelGrid columnClasses="value" columns="1">
+	                   		<h:panelGroup>
+	                   			<label>负责人: </label>
+	                   			<h:outputText value="#{maintainController.nurseSiteMaintain.modifyBy.name}"></h:outputText>
+	                   		</h:panelGroup>
+	                   		<h:panelGroup>
+	                   			<label>检测时间: </label>
+	                   			<h:outputText value="#{maintainController.nurseSiteMaintain.checkDate}">
+	                   				<f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd HH:mm"/>
+	                   			</h:outputText>
+	                   		</h:panelGroup>
+	                    </h:panelGrid>
+	                    <p:commandButton id="checkRightButton" value="全部通过" actionListener="#{maintainController.checkRightAll}" update="maintainDlgTable" disabled="#{maintainController.saveDisable}" />
+	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
+	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
+	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
+	                    </p:commandButton>
+                   	</h:form>
+                </p:dialog>
+                <p:dialog id="createMaintainDlg" widgetVar="createMaintainDlg" header="创建维护">
+                	<h:form id="createMaintainForm">
+                		<h:panelGrid columnClasses="value" columns="1">
+                			<h:panelGroup>
+                				<label>请选择配置: </label>
+                			</h:panelGroup>
+                			<h:panelGroup>
+								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true">
+									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
+			                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+			                        <p:column>
+										<h:outputText value="#{t.name}" />
+									</p:column>
+			                    </p:selectOneMenu>
+							</h:panelGroup>
+                		</h:panelGrid>
+                		<br/>
+                		<br/>
+                		<p:commandButton id="addButton" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
+                		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
+                	</h:form>
+                </p:dialog>
+                <ui:include src="maintainBatchCreate.xhtml"/>
+                <ui:include src="maintainBatchComplete.xhtml"/>
+            </div>
+        </div>
+    </ui:define>
+
+</ui:composition>

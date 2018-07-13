@@ -48,9 +48,18 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and o.siteUID=?2")
     public List<AssetInfo> findByFinancingNum(String financingNum,String siteUID);
     
-//    @Query("select o from AssetInfo o where o.financingNum = ?1 and o.isValid = true and (o.siteUID=?2 or o.siteUID in ?3 or o.hospitalUID in ?3 or o.institutionUID in ?3 or o.tenantUID in ?3 or o.clinicalDeptUID in ?3)")
-    @Query(value="select o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
     public List<AssetInfo> findByFinancingNumAccessScope(String financingNum,String siteUID,String userUid);
+    
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.financing_num = ?1 and o.is_valid = true and (o.site_uid=?2 or o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
+    public List<AssetInfo> findByFinancingNumSelfScope(String financingNum,String siteUID,String userUid);
+    
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and (o.site_uid=?1 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
+    public List<AssetInfo> findByAccessScope(String siteUID,String userUid);
+    
+    @Query(value="select distinct o.* from asset_info o,user_org b where o.is_valid = true and o.site_uid=?1 and ( o.site_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2",nativeQuery=true)
+    public List<AssetInfo> findBySelfScope(String siteUID,String userUid);
+
 
     public List<AssetInfo> getByQrCodeAndHospitalId(String qrCode, Integer hospitalId);
 
@@ -147,6 +156,9 @@ public interface AssetInfoRepository extends GenericRepository<AssetInfo> {
     @Query(value = "select count(1) as totalTimes, ai.asset_owner_id,ai.asset_owner_id2,ai.asset_owner_id3 from asset_info ai where ai.asset_owner_id=:assetOwnerId and ai.site_uid=:siteUID "
             + "group by ai.asset_owner_id2,ai.asset_owner_id3,ai.asset_owner_id order by totalTimes desc limit 1",nativeQuery = true)
     public List<Object[]> findAssetOwnerComposition(@Param("assetOwnerId") Integer assetOwnerId, @Param("siteUID") String siteUID);
+    
+    @Query(value="select o.* from asset_info o where o.uid in (select b.asset_uid from nurse_site_maintain_config_item b where b.parent_id=?1)",nativeQuery=true)
+    public List<AssetInfo> findAssetByMaintainConfigParentId(String configParentId);
 
     @Query("select w.deptForSharedAsset from WorkflowConfig w where w.siteUID = :siteUID")
     public List<String> getOrgId(@Param("siteUID") String siteUID);

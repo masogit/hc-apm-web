@@ -2,6 +2,7 @@ package com.ge.apm.view.measuring;
 
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.BlobObjectRepository;
+import com.ge.apm.dao.I18nMessageRepository;
 import com.ge.apm.dao.MeasuringCertificateDetailRepository;
 import com.ge.apm.domain.*;
 import com.ge.apm.service.asset.BlobFileService;
@@ -44,6 +45,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
     private AssetInfoRepository dao;
     private MeasuringCertificateDetailRepository measuringCertificateDetailDao;
+    private I18nMessageRepository i18nMessageDao;
 
     private List<MeasuringCertificateDetail> measuringCertificateList;
 
@@ -61,6 +63,7 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
 
         dao = WebUtil.getBean(AssetInfoRepository.class);
         measuringCertificateDetailDao = WebUtil.getBean(MeasuringCertificateDetailRepository.class);
+        i18nMessageDao = WebUtil.getBean(I18nMessageRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         uaaService = WebUtil.getBean(UaaService.class);
@@ -209,6 +212,21 @@ public class MeasureAssetListController extends JpaCRUDController<AssetInfo> {
             RequestContext requestContext = RequestContext.getCurrentInstance();
             requestContext.addCallbackParam("url", "measuringResultMain.xhtml");
         }
+    }
+
+    public List<I18nMessage> getMeasureGradeList(){
+        List<I18nMessage> msgList = i18nMessageDao.getByMsgType("measureGrade");
+
+        I18nMessage tempI18m = null;
+        for (I18nMessage i18m : msgList) {
+            if(i18m.getMsgKey().equals("4")){
+                tempI18m = i18m;
+            }
+        }
+
+        msgList.remove(tempI18m);
+
+        return msgList;
     }
 
     public List<MeasuringCertificateDetail> getMeasuringCertificateList() {

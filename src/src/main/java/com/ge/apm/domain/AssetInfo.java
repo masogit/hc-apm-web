@@ -81,6 +81,10 @@ public class AssetInfo implements ChineseName,Serializable {
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;//制造商
+    
+    @Size(max = 64)
+    @Column(name = "manufacture_id")
+    private String manufactureId;//制造商Id
 
     @Size(max = 64)
     @Column(name = "vendor")
@@ -88,6 +92,9 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "supplier_id")
     private Integer supplierId; //供应商Id =Supplier.id
+
+    @Transient
+    private String vendorTel;//供应商电话
 
     @Column(name = "maitanance_id")
     private String maitananceId;
@@ -199,7 +206,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "last_pm_date")
     @Temporal(TemporalType.DATE)
-    private Date lastPmDate;//上次维护日期
+    private Date lastPmDate;//上次保养日期
 
     @Column(name = "last_metering_date")
     @Temporal(TemporalType.DATE)
@@ -207,7 +214,7 @@ public class AssetInfo implements ChineseName,Serializable {
 
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
-    private Date lastQaDate;//上次质检日期
+    private Date lastQaDate;//上次巡检日期
 
     @Column(name = "last_stocktake_date")
     @Temporal(TemporalType.DATE)
@@ -789,6 +796,14 @@ public class AssetInfo implements ChineseName,Serializable {
 
     public void setVendor(String vendor) {
         this.vendor = vendor;
+    }
+
+    public String getVendorTel() {
+        return vendorTel;
+    }
+
+    public void setVendorTel(String vendorTel) {
+        this.vendorTel = vendorTel;
     }
 
     public String getMaitanance() {
@@ -1458,6 +1473,14 @@ public class AssetInfo implements ChineseName,Serializable {
         this.isChecked = isChecked;
     }
 
+    public String getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(String manufactureId) {
+        this.manufactureId = manufactureId;
+    }
+    
     @Override
     public int hashCode() {
         int hash = 0;

@@ -94,13 +94,18 @@ public class CustomConfigController {
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
                         .filter(item -> !customConfigObject.getAssetsDetailpageDetailFields().contains(item)).collect(Collectors.toList());
                 break;
-            case "MobileBasicFields":
+            case "MobileHeaderFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
+                        .filter(item -> !customConfigObject.getAssetsMobilepageHeaderFields().contains(item)).collect(Collectors.toList());
                 break;
+            case "MobileBasicFields":
+//                addFieldsList = customConfigObject.getAssetFields().keySet().stream()
+//                        .filter(item -> !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
+//                break;
             case "MobileDetailFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
-                        .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)).collect(Collectors.toList());
+                        .filter(item -> !customConfigObject.getAssetsMobilepageDetailFields().contains(item)
+                        && !customConfigObject.getAssetsMobilepageBasicFields().contains(item)).collect(Collectors.toList());
                 break;
             case "ListPageFields":
                 addFieldsList = customConfigObject.getAssetFields().keySet().stream()
@@ -153,6 +158,9 @@ public class CustomConfigController {
             case "RemoveMobileDetailFields":
                 addFieldsList.addAll(customConfigObject.getAssetsMobilepageDetailFields());
                 break;
+            case "RemoveMobileHeaderFields":
+                addFieldsList.addAll(customConfigObject.getAssetsMobilepageHeaderFields());
+                break;
         }
     }
 
@@ -161,6 +169,9 @@ public class CustomConfigController {
             case "BasicFields":
             case "RemoveBasicFields":
                 return ":customConfigForm:tabView:BasicFieldsList";
+            case "MobileHeaderFields":
+            case "RemoveMobileHeaderFields":
+                return ":customConfigForm:tabView:MobileHeaderFieldsList";
             case "MobileBasicFields":
             case "RemoveMobileBasicFields":
                 return ":customConfigForm:tabView:MobileBasicFieldsList";
@@ -207,6 +218,10 @@ public class CustomConfigController {
                 customConfigObject.getAssetsDetailpageDetailFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsDetailpageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
+            case "MobileHeaderFields":
+                customConfigObject.getAssetsMobilepageHeaderFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && !customConfigObject.getAssetsMobilepageHeaderFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
             case "MobileBasicFields":
                 customConfigObject.getAssetsMobilepageBasicFields().addAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && !customConfigObject.getAssetsMobilepageBasicFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
@@ -231,6 +246,10 @@ public class CustomConfigController {
             case "RemoveDetailFields":
                 customConfigObject.getAssetsDetailpageDetailFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
                         && customConfigObject.getAssetsDetailpageDetailFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
+                break;
+            case "RemoveMobileHeaderFields":
+                customConfigObject.getAssetsMobilepageHeaderFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
+                        && customConfigObject.getAssetsMobilepageHeaderFields().contains(item.getKey())).map(item -> item.getKey()).collect(Collectors.toList()));
                 break;
             case "RemoveMobileBasicFields":
                 customConfigObject.getAssetsMobilepageBasicFields().removeAll(selectedAddFields.entrySet().stream().filter(item -> item.getValue() != null && item.getValue()
@@ -333,9 +352,9 @@ public class CustomConfigController {
     private void updateConfigInfo() {
         if (null != customConfig) {
             configInfo.put("CreatedBy", userService.getUserByUid(customConfig.getCreatedBy()).getName());
-            configInfo.put("CreatedDate",customConfig.getCreatedDate()==null?"": DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
+            configInfo.put("CreatedDate", customConfig.getCreatedDate() == null ? "" : DateUtil.formatDate(customConfig.getCreatedDate(), "yyyy-MM-dd"));
             configInfo.put("LastModifiedBy", userService.getUserByUid(customConfig.getLastModifiedBy()).getName());
-            configInfo.put("LastModifiedDate",customConfig.getLastModifiedDate()==null?"": DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
+            configInfo.put("LastModifiedDate", customConfig.getLastModifiedDate() == null ? "" : DateUtil.formatDate(customConfig.getLastModifiedDate(), "yyyy-MM-dd"));
         }
     }
 
@@ -372,7 +391,7 @@ public class CustomConfigController {
 
     public void removeListPageField(String key) {
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
-            customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item-> !Objects.equals(item, key)).collect(Collectors.toList()));
+            customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item -> !Objects.equals(item, key)).collect(Collectors.toList()));
 //            customConfigObject.getAssetsListPageFields().remove(key);
         }
     }
@@ -437,5 +456,5 @@ public class CustomConfigController {
     public CustomConfig getCustomConfig() {
         return customConfig;
     }
-    
+
 }

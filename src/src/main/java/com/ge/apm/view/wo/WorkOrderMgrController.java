@@ -120,6 +120,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
     private List<Integer> tagNoGroupAssets;
 
     private String requestAssetUid;
+    private String queryAssetUid;
 
     private List<V2_WorkOrder_Detail> approvedDetails;
     private Map<String, Boolean> selectedMap;
@@ -140,6 +141,14 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         coWorkerDao = WebUtil.getBean(V2_WorkOrderCoworkerRepository.class);
 
         String query = WebUtil.getRequestParameter("query");
+        String enCodeParameters = WebUtil.getRequestParameter("str");
+        if (!Strings.isNullOrEmpty(enCodeParameters)) {
+            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
+            queryAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "queryAssetUID");
+            if(null !=  UrlEncryptController.getValueFromMap(enCodeParameters, "query")){
+                query = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "query");
+            }
+        }
         if (Strings.isNullOrEmpty(query)) {
             queryIndex = 0;
         } else {
@@ -149,10 +158,8 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         this.filterBySite = false;
         this.filterByHospital = false;
 
-        String enCodeParameters = WebUtil.getRequestParameter("str");
-        if (!Strings.isNullOrEmpty(enCodeParameters)) {
-            requestAssetUid = (String) UrlEncryptController.getValueFromMap(enCodeParameters, "assetUID");
-        }
+        
+        
 
     }
 
@@ -205,46 +212,49 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             (
                 v2_workord0_.dispatch_mode in (
                     2 , 3
-                )                                             //1*3+4*
+                )
             ) 
-            and v2_workord0_.current_person_id<>?             //1*3+4*
             and (
-                assetinfo4_.asset_owner_id=?                  //1*3+4*6+
-                or assetinfo4_.asset_owner_id2=?              //1*3+4*6+
-                or assetinfo4_.asset_owner_id3=?              //1*3+4*6+
-                or (
-                    assetinfo4_.asset_owner_id2 is null
-                )                                             //1*3+4*6+owner1*
-                and (
-                    assetinfo4_.asset_owner_id3 is null
-                )                                             //1*3+4*6+owner1*
-                or (
-                    assetinfo4_.asset_owner_id is null
-                )                                             //1*3+4*6+owner2*
-                and (
-                    assetinfo4_.asset_owner_id3 is null
-                )                                             //1*3+4*6+owner2*
-                or (
-                    assetinfo4_.asset_owner_id is null
-                )                                             //1*3+4*6+owner3*
-                and (
-                    assetinfo4_.asset_owner_id2 is null
-                )                                             //1*3+4*6+owner3*
+                v2_workord0_.current_person_id<>348 
+                or v2_workord0_.current_person_id=348 
+                and v2_workord0_.current_step_id=2
             ) 
             and (
                 v2_workord0_.asset_id in (
-                    ?
-                )                                             //1*3+4*5+
-                or v2_workord0_.asset_id in (                 //1*3+4*5+
-                    ?
+                    0
+                ) 
+                or (
+                    v2_workord0_.asset_id in (
+                        0
+                    )
+                ) 
+                and (
+                    assetinfo1_.asset_owner_id=348 
+                    or assetinfo1_.asset_owner_id2=348 
+                    or assetinfo1_.asset_owner_id3=348 
+                    or (
+                        assetinfo1_.asset_owner_id2 is null
+                    ) 
+                    and (
+                        assetinfo1_.asset_owner_id3 is null
+                    ) 
+                    or (
+                        assetinfo1_.asset_owner_id is null
+                    ) 
+                    and (
+                        assetinfo1_.asset_owner_id3 is null
+                    ) 
+                    or (
+                        assetinfo1_.asset_owner_id is null
+                    ) 
+                    and (
+                        assetinfo1_.asset_owner_id2 is null
+                    )
                 )
             ) 
-            or v2_workord0_.current_person_id=2342             //1*3+7*
-            and (
-                v2_workord0_.dispatch_mode<>4                  //1*3+7*8+
-                or v2_workord0_.current_step_id<>2             //1*3+7*8+
-            )
-        ) 
+            or v2_workord0_.current_person_id=348 
+            and v2_workord0_.current_step_id=3
+        )
 
      */
     @Override
@@ -261,6 +271,7 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
         removeFilterOnField("assetInfo.assetOwnerId");
         removeFilterOnField("assetInfo.assetOwnerId2");
         removeFilterOnField("assetInfo.assetOwnerId3");
+        removeFilterOnField("assetInfo.uid");
 
         if (queryIndex == 1) {//已报修 可取消
             if (userContextService.hasRole("AssetStaff")) {
@@ -285,15 +296,15 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.NE, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+"));
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*A+B*"));
             searchFilters.add(new SearchFilter("currentStepId", SearchFilter.Operator.EQ, 2, "1*3+4*A+B*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*6+"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner1*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner1*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner2*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner2*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
-            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*6+owner3*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+4*5+owner*6+"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner1*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner1*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner2*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId3", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner2*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
+            searchFilters.add(new SearchFilter("assetInfo.assetOwnerId2", SearchFilter.Operator.IsNull, null, "1*3+4*5+owner*6+owner3*"));
             //去除派工模式4且待派工的单子
             searchFilters.add(new SearchFilter("currentPersonId", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getId(), "1*3+7*"));
 //            searchFilters.add(new SearchFilter("dispatchMode", SearchFilter.Operator.IN, Arrays.asList(4,5), "1*3+7*"));
@@ -309,9 +320,9 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             }
             tagGroupAssets = getNoTagGroupAssets();
             if (tagGroupAssets != null && !tagGroupAssets.isEmpty()) {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+"));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, tagGroupAssets, "1*3+4*5+owner*"));
             } else {
-                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+"));
+                searchFilters.add(new SearchFilter("assetId", SearchFilter.Operator.IN, Arrays.asList(0), "1*3+4*5+owner*"));
             }
 
         } else if (queryIndex == 4) { //维修中
@@ -357,7 +368,13 @@ public class WorkOrderMgrController extends GenericCRUDUUIDController<V2_WorkOrd
             searchFilters.add(new SearchFilter("approvalStatus", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("serviceRequest.status", SearchFilter.Operator.EQ, "1"));
             searchFilters.add(new SearchFilter("approverId", SearchFilter.Operator.EQ, userContextService.getCurrentUserAccount().getId()));
-        } else {//全部
+        } else if(queryIndex ==11){ //全部维修单
+
+        } else if(queryIndex ==12){ //指定设备queryAssetUid 工单 设备详细页面跳转
+            if(!Strings.isNullOrEmpty(queryAssetUid)){
+                searchFilters.add(new SearchFilter("assetInfo.uid", SearchFilter.Operator.EQ, queryAssetUid, "1*"));
+            }
+        }else {//待办
             searchFilters.add(new SearchFilter("status", SearchFilter.Operator.EQ, 1));
         }
 

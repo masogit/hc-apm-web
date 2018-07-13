@@ -33,6 +33,18 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class MicroServiceUtil extends MicroServiceInvoker {
 
+
+    public InputStream downloadRepeatedReadFile(String fileId) {
+        HttpHeaders headers = new HttpHeaders();
+        String gatewayURL = getGatewayURL(GatewayURL.DOWNLOAD_FILE);
+        ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+        HttpHeaders responseHeader = response.getHeaders();
+        byte[] result = response.getBody();
+        ByteArrayInputStream bios = new ByteArrayInputStream(result);
+        bios.reset();
+        return bios;
+    }
+
     public StreamedContent downloadSingleFile(String fileId) {
         HttpHeaders headers = new HttpHeaders();
         String gatewayURL = getGatewayURL(GatewayURL.DOWNLOAD_FILE);

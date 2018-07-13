@@ -55,7 +55,6 @@ public class ElectricSafetyService {
     private final String UPDATE="UPDATE";
     private final String INSERT="INSERT";
     private UserAccount user;
-    private String userOrgListStr;
     
     @Autowired
     AssetInfoRepository assetInfoRepository;
@@ -81,21 +80,10 @@ public class ElectricSafetyService {
     @Autowired
     UnstructuredDataRepository unstructuredDataRepository;
     
-    @Autowired
-    private UaaService uaaService;
-    
     
     public List<ElectricSafetyData> handlerPsFile(UploadedFile file, UserAccount user) throws IOException, ParseException {
 		String[] strArr=readFileByLine(file);
 		this.user=user;
-		List<String> userOrgList=uaaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
-		if(userOrgList!=null){
-			userOrgListStr="(";
-			for(int i=0;i<userOrgList.size();++i){
-				userOrgListStr+="'"+userOrgList.get(i)+"',";
-			}
-			userOrgListStr+=")";
-		}
 		return analysis(strArr,file.getFileName());
     }
     

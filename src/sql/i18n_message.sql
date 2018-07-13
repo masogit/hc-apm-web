@@ -388,6 +388,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'updatePersonName', '变更人', 'Update Person Name', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'updateTime', '处理时间', 'Update Time', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'vendor', '供应商', 'Vendor', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'vendorTel', '供应商电话', 'Vendor Telephone', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'warrantyDate', '维保截止日期', 'Warranty Date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'zipcode', '邮编', 'Zipcode', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'contactEmail', 'Email', 'Contact Email', NULL, '-1');
@@ -415,7 +416,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'siteDescription', '详细描述', 'Description', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'userName', '姓名', 'Name', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'workOrderName', '工单名称', 'work Order Name', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'lastPmDate', '上次维护日期', 'Last Maintainance Date', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'lastPmDate', '上次保养日期', 'Last Maintainance Date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'lastQaDate', '上次巡检日期', 'Last Quality Control Date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'lastMeteringDate', '上次计量日期', 'Last Metering Date', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('field_name', 'assetName', '资产名称', 'Asset Name', NULL, '-1');
@@ -719,7 +720,7 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6807', '6807胸腔心血管外科手术器械', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6808', '6808腹部外科手术器械', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6809', '6809泌尿肛肠外科手术器械', NULL, NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6810', '6810矫形外科（骨科）手术器械', NULL, NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6810', '6810矫形外科(骨科)手术器械', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6812', '6812妇产科用手术器械', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6813', '6813计划生育手术器械', NULL, NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('assetFunctionType', '6815', '6815注射穿刺器械', NULL, NULL, '-1');
@@ -1508,13 +1509,14 @@ INSERT INTO public.i18n_message (msg_type, msg_key, value_zh, value_en, value_tw
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '1', '供应商', 'vendor', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '2', '维修商', 'maintainer', NULL, '-1');
-INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '供应/维修商', 'vendor and maintainer', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('supplierType', '3', '制造商', 'manufactuer', NULL, '-1');
 
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isAssetPMed', '是否PM', 'need PM?', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isAssetChecked', '是否盘点', 'need store check?', NULL, '-1');
 
 
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'isWarrantyNotice', '是否对质保到期提醒', '是否对质保到期提醒', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ContractInfo', '合同', '合同', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'contractNum', '合同编号', '合同编号', NULL, '-1');
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'reportNum', '报告号', '报告号', NULL, '-1');
@@ -1571,3 +1573,6 @@ INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('tenderType', 'Continue', '续标 ', '50万元以上 ', NULL, '-1');
 
 INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('pmTypeWeb', '1', '周期性', 'Cycle', NULL, '-1');
+
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'ExportTemplateConfig', '报表模版配置', 'Export template configure', NULL, '-1');
+INSERT INTO i18n_message( msg_type, msg_key, value_zh, value_en, value_tw, site_id) VALUES('label', 'WorkOrderExportTemplate', '报表模版', 'WorkOrder Export Template', NULL, '-1');

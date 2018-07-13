@@ -79,6 +79,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
 
     private String protocol;
 
+    private String previousOrgUid;  //used in update
+
     @Override
     protected void init() {
         this.searchFilters = new ArrayList<SearchFilter>();
@@ -343,6 +345,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void onAfterUpdateObject(UserAccount object, boolean isOk) {
         if (isOk && this.crudActionName.equals("Edit")) {
             uaaService.clearUserScope(object.getUid());
+
+            //if org change, delete old user org
+            if (!object.getOrgInfoUID().equals(previousOrgUid) ) {
+                uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
+            }
+
             uaaService.setDefaultScope(object);
 
         }
@@ -415,6 +423,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginName = loginName.replace(" ", "");
         user.setLoginName(loginName);
         if (selectedUserOrg != null) {
+
+            //keep old org uid to use in update
+            previousOrgUid = user.getOrgInfoUID();
+
             user.setOrgInfoId(selectedUserOrg.getId());
             user.setOrgInfoUID(selectedUserOrg.getUid());
             user.setSiteId(selectedUserOrg.getSiteId());
@@ -555,8 +567,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void updateUserScope() {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
-        userOrgDao.delete(orgList);
+        //below not working!!!!!!!
+//        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
+//        userOrgDao.delete(orgList);
+        userOrgDao.deleteByUserUid(selected.getUid());
+
         List<TreeNode> selectedOrgList = new ArrayList();
         readSelectedOrgTree(accessOrgTree, selectedOrgList);
         List<UserOrgInfo> userOrgList = new ArrayList();

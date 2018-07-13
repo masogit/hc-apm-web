@@ -54,8 +54,16 @@ public class ReportTemplateDocument {
         this.cellMap = new HashMap<>();
     }
 
+    /**
+     * Write {@link ReportTemplateDocument} to {@link OutputStream}.
+     *
+     * @param out target {@link OutputStream}.
+     * @throws IOException while error happens.
+     */
     public void write(OutputStream out) throws IOException {
-        int row = 0;
+        // start from the second line.
+        // See: POI bug 59393
+        int row = 1;
 
         writeTitle(row++);
 
@@ -325,7 +333,7 @@ public class ReportTemplateDocument {
                 return pattern();
             }
         },
-        FORM_BODY("Form", "tie:form(name=\"Template\" length=\"%s\" headerLength=\"2\" footerLength=\"0\")") {
+        FORM_BODY("Form", "tie:form(name=\"Template\" length=\"%s\" headerLength=\"1\" footerLength=\"0\")") {
             String apply(String... value) {
                 return String.format(pattern(), value[0]);
             }

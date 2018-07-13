@@ -49,8 +49,8 @@ public class CustomConfigConstant {
             exportFields.put("制造商", "manufacture");
             exportFields.put("品牌/制造商简称", "makerShortName");
             exportFields.put("供应商", "vendor");
-            exportFields.put("维护商", "maitanance");
-            exportFields.put("维护商电话", "maitananceTel");
+            exportFields.put("维修商", "maitanance");
+            exportFields.put("维修商电话", "maitananceTel");
             exportFields.put("2010国家编码", "nationalStandardCode");
             exportFields.put(WebUtil.getMessage("parentAsset"), "parentAssetId");
             exportFields.put("设备标准名称", "deviceName");
@@ -92,8 +92,8 @@ public class CustomConfigConstant {
             exportFields.put("折旧算法", "depreciationMethod");
             exportFields.put("是否PM", "isPm");
             exportFields.put("是否盘点", "isChecked");
-            exportFields.put("上次维护日期", "lastPmDate");
-            exportFields.put("上次质检日期", "lastQaDate");
+            exportFields.put("上次保养日期", "lastPmDate");
+            exportFields.put("上次巡检日期", "lastQaDate");
             exportFields.put("上次计量日期", "lastMeteringDate");
             exportFields.put("是否对质保到期提醒", "warranty");
         }
@@ -167,7 +167,7 @@ public class CustomConfigConstant {
             allFields.put("lastPmDate", WebUtil.getMessage("lastPmDate"));
             allFields.put("lastQaDate", WebUtil.getMessage("lastQaDate"));
             allFields.put("lastMeteringDate", WebUtil.getMessage("lastMeteringDate"));
-            allFields.put("warranty", "是否对质保到期提醒");
+            allFields.put("warranty", WebUtil.getMessage("isWarrantyNotice"));
         }
         return allFields;
     }
@@ -188,7 +188,7 @@ public class CustomConfigConstant {
         return Arrays.asList("parentAssetId", "deviceName", "systemId", "financingNum", "departNum",
                 "barcode", "registrationNo", "modalityId", "qrCode", "functionType", "functionGroup", "assetCode68", "functionGrade",
                 "repairForm", "locationCode", "locationName", "status", "deviceStatus", "isPm", "isChecked", "comments", "assetUsage",
-                "capitalSource", "capitalSource2", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
+                "capitalSource", "measureGrade", "riskGrade", "emergencyEquipment", "importEquipment", "measuringItemCategory",
                 "accountingCategory", "manufactDate", "purchaseDate", "arriveDate", "installDate", "factoryWarrantyDate",
                 "warrantyDate", "terminateDate", "purchasePrice", "salvageValue", "lifecycle", "depreciationMethod", "lastPmDate",
                 "lastQaDate", "lastMeteringDate", "warranty");
@@ -211,7 +211,7 @@ public class CustomConfigConstant {
     }
 
     public static List<String> getAssetsEditpageCatalogFields() {
-        return Arrays.asList("assetUsage", "capitalSource", "capitalSource2", "measureGrade", "riskGrade",
+        return Arrays.asList("assetUsage", "capitalSource", "measureGrade", "riskGrade",
                 "emergencyEquipment", "importEquipment", "measuringItemCategory", "accountingCategory");
     }
 
@@ -235,5 +235,9 @@ public class CustomConfigConstant {
                 "isPm", "isChecked", "accountingCategory", "measuringItemCategory", "financingNum", "barcode", "registrationNo", "modalityId", "locationCode",
                 "locationName", "functionType", "manufactDate", "purchaseDate", "warrantyDate", "arriveDate", "installDate", "factoryWarrantyDate", "terminateDate",
                 "lastPmDate", "lastQaDate", "lastMeteringDate", "salvageValue", "purchasePrice", "lifecycle", "depreciationMethod");
+    }
+    
+    public static List<String> getAssetsMobilepageHeaderFields() {
+        return Arrays.asList("clinicalDeptName", "departNum", "installDate", "assetGroup", "siteUID");
     }
 }

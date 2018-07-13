@@ -270,6 +270,9 @@ public class WorkScheduleController{
             if(ussc_all != null){
                 this.startTime_all = ussc_all.getStartTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + ussc_all.getStartTime()) : null;
                 this.endTime_all = ussc_all.getEndTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + ussc_all.getEndTime()) : null;
+            }else{
+                this.startTime_all = sdf.parse(currentDateStr.split(" ")[0] + " 8:00:00");
+                this.endTime_all = sdf.parse(currentDateStr.split(" ")[0] + " 8:00:00");
             }
             if(ussc_am != null){
                 this.startTime_am = ussc_am.getStartTime() != null ? sdf.parse(currentDateStr.split(" ")[0] + " " + ussc_am.getStartTime()) : null;

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui">
+
+    <ui:composition>
+        <p:dialog id="checkItemDlg" widgetVar="checkItemDlg" width="350" height="130" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="#{msg.PmOrderRuleItem}">
+            <h:form id="checkItemForm" rendered="#{maintainConfigController.objCheckItem!=null}">
+                <h:panelGroup id="display" class="checkItemDlg">
+                    <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+                        <h:panelGroup>
+                            <label>#{msg.name} *：</label>
+                            <p:inputText id="name" value="#{maintainConfigController.objCheckItem.name}" required="true"/>
+                        </h:panelGroup>
+                         <h:panelGroup>
+                            <label>备注：</label>
+                            <p:inputText id="description" value="#{maintainConfigController.objCheckItem.description}"/>
+                        </h:panelGroup>
+                    </p:panelGrid>
+                    <p:commandButton validateClient="true" actionListener="#{maintainConfigController.addCheckListItem}" update=":growl,:maintainConfigEditForm:addCheckList,:maintainConfigEditForm:saveButtonId" value="#{msg.Save}" icon="ui-icon-check" oncomplete="handleSubmit(args, 'checkItemDlg');"/>
+                    &nbsp;&nbsp;
+                    <p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('checkItemDlg').hide()"/>
+                </h:panelGroup>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

@@ -6,14 +6,8 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.V2_PmScheduleRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmScheduleData;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.CustomConfigService;
@@ -44,6 +38,7 @@ public class AssetInfoDetailController {
     private OrgInfoRepository orgDao;
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
+    private SupplierRepository supplierDao;
     private CustomConfigService ccService;
     private AssetInfoMgrService aimService;
     private Boolean terminate;
@@ -61,6 +56,7 @@ public class AssetInfoDetailController {
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -70,6 +66,13 @@ public class AssetInfoDetailController {
         selected = assetDao.findById(Integer.parseInt(selectedId));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        if (selected.getSupplierId() != null) {
+            Supplier supplier = supplierDao.findById(selected.getSupplierId());
+            if (supplier != null) {
+                selected.setVendorTel(supplier.getTel());
+            }
+        }
     }
     
     public OrgInfo getOrgInfoByUid(String uid) {

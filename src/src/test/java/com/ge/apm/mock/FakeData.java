@@ -240,7 +240,7 @@ public class FakeData {
         OrgInfo orgInfo = new OrgInfo();
         orgInfo.initializeUid();
 
-        orgInfo.setOrgLevel(4);
+        orgInfo.setOrgLevel(3);
         orgInfo.setOrgType(4);
         orgInfo.setName(name);
 
