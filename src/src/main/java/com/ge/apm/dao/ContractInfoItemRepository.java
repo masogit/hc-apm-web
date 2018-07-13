@@ -6,6 +6,7 @@
 package com.ge.apm.dao;
 
 import com.ge.apm.domain.ContractInfoItem;
+import org.springframework.data.jpa.repository.Query;
 import webapp.framework.dao.GenericRepositoryUUID;
 import java.util.List;
 /**
@@ -19,4 +20,7 @@ public interface ContractInfoItemRepository extends GenericRepositoryUUID<Contra
    List<ContractInfoItem>  findByAssetUid(String id);
    
    ContractInfoItem getByArrivalItemId(String id);
+
+   @Query("select cii from ContractInfoItem cii, ContractInfo ci where cii.contractId = ci.id and cii.assetUid = ?1 and ci.contractType not in ('ZZB','ZYB','ZXB')")
+   List<ContractInfoItem> getByAssetUidAndContractType(String assetUid);
 }

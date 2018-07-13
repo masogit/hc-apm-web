@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain.pure;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public class TableGroup {
     private String title;
-    private List<TableItem> items;
+    private List<TableItem> items =new ArrayList();;
 
     public String getTitle() {
         return title;

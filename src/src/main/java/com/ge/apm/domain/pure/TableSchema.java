@@ -5,6 +5,7 @@
  */
 package com.ge.apm.domain.pure;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -15,7 +16,7 @@ public class TableSchema {
 
     private String schemaId;
     private String title;
-    private List<TableGroup> groups;
+    private List<TableGroup> groups=new ArrayList();
 
     public String getTitle() {
         return title;

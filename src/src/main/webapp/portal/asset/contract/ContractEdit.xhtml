@@ -54,7 +54,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.vendor}</label>
                                 <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['supplier']}"  scrollHeight="300"  forceSelection="true" 
-                                                completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                completeMethod="#{contractInfoEditController.autoCompleteSupplierByPY}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                     <p:ajax event="itemSelect" process="@this" listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
                                     <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('supplier')}" />
                                 </p:autoComplete>
@@ -136,7 +136,7 @@
                             <h:panelGroup>
                                 <label class="label">#{msg.bidWinner}</label>
                                 <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['bidWinner']}"  scrollHeight="300"  forceSelection="true" 
-                                                completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                                completeMethod="#{contractInfoEditController.autoCompleteSupplierByPY}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                     <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('bidWinner')}" update="@(.bidWinner)" />
                                     <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('bidWinner')}" update="@(.bidWinner)"/>
                                 </p:autoComplete>
@@ -262,9 +262,9 @@
                                 <f:facet name="header" >
                                     <h:outputText value="操作" />
                                 </f:facet>
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
-                                <!--<p:commandLink actionListener="#{contractInfoEditController.prepareEditPurchaseAsset(item)}" oncomplete="PF('viewContractItemDlg').show()" value="#{msg.View}"  update=":viewContractItemForm" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}"/>-->
-                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>
+<!--                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType eq 'Equipment'}" disabled="#{empty item.arrivalListItem.assetUID}"/>
+                                <p:commandLink actionListener="#{contractInfoEditController.viewContractItemPage(item)}" onstart="prepareAssetViewWindow();" oncomplete="openAssetViewWindow(xhr, status, args)"  value="#{msg.View}"  update="itemList" style="padding:10px" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}"/>-->
+                                <p:link  outcome="#{contractInfoEditController.getDetailPageLink(item)}" style="padding:10px" disabled="#{contractInfoEditController.selected.contractType eq 'Equipment' and empty item.arrivalListItem.assetUID}" >#{msg.View}</p:link>
                                 <p:commandLink process="@this" actionListener="#{contractInfoEditController.remomveContractItem(item)}" value="#{msg.Delete}"  update="itemList" rendered="#{contractInfoEditController.selected.contractType ne 'Equipment'}" />
                             </p:column>
 
@@ -368,7 +368,7 @@
                         <h:panelGroup>
                             <label class="label">#{msg.manufacture}</label>
                             <p:autoComplete dropdown="true" value="#{contractInfoEditController.selectedObjectMap['manufacture']}"  scrollHeight="300"  forceSelection="true" appendTo="@this"
-                                            completeMethod="#{contractInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                                            completeMethod="#{contractInfoEditController.autoCompleteManufactureByPY}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
                                 <p:ajax event="itemSelect" listener="#{contractInfoEditController.onSelectedObjectChange('manufacture')}" />
                                 <p:ajax listener="#{contractInfoEditController.onSelectedObjectChange('manufacture')}"/>
                             </p:autoComplete>

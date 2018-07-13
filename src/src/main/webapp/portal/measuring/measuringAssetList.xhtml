@@ -54,7 +54,7 @@
                         <f:facet name="filter">
                             <p:selectOneMenu onchange="PF('varDataList_measuringAsset').filter()">
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-                                <f:selectItems value="#{fieldMsg.getFieldValueList('measureGrade')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                <f:selectItems value="#{measureAssetListController.measureGradeList}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </f:facet>
                     </p:column>
@@ -66,6 +66,9 @@
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('measuringItemCategory')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
                         </f:facet>
+                    </p:column>
+                    <p:column headerText="计量证书编号" filterBy="#{item.meteringNO}" filterMatchMode="LIKE">
+                        <h:outputText value="#{item.meteringNO}"/>
                     </p:column>
                     <p:column headerText="最后计量日期" sortBy="#{item.lastMeteringDate}" filterBy="#{item.lastMeteringDate}" filterMatchMode="GTE">
                         <f:facet name="filter">

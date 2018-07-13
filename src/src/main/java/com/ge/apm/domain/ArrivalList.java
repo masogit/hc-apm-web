@@ -72,6 +72,10 @@ public class ArrivalList implements Serializable {
     @Size(max = 64)
     @Column(name = "manufacture")
     private String manufacture;
+    
+    @Size(max = 64)
+    @Column(name = "manufacture_id")
+    private String manufactureId;//制造商Id
 
     //品牌
     @Size(max = 64)
@@ -379,6 +383,15 @@ public class ArrivalList implements Serializable {
     public void setCannotDeleted(boolean cannotDeleted) {
         this.cannotDeleted = cannotDeleted;
     }
+
+    public String getManufactureId() {
+        return manufactureId;
+    }
+
+    public void setManufactureId(String manufactureId) {
+        this.manufactureId = manufactureId;
+    }
+    
 
     @Override
     public int hashCode() {

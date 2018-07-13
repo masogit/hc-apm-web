@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+
+    <ui:composition>
+        <p:dialog id="maintainBatchCompleteDlg" widgetVar="maintainBatchCompleteDialog" modal="true" resizable="true" draggable="true" appendTo="@(body)" header="批量完成保养工单">
+            <h:form id="maintainBatchCompleteForm">
+                <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+                    <h:panelGroup>
+                        <label class="label">开始时间*</label>
+                        <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.startBatchDate}" required="true" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup>
+                        <label class="label">结束时间*</label>
+                        <p:calendar timeZone="GMT+8" pattern="yyyy-MM-dd" value="#{maintainController.endBatchDate}" required="true" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" disabled="false" showButtonPanel="true" navigator="true" mask="true"/>
+                    </h:panelGroup>
+                </p:panelGrid>
+				<!-- <table>
+               		<c:forEach items="#{maintainController.listCheckItems}" var="item">
+               			<tr>
+               				<td>
+               					<label class="label">#{item.key}</label>
+               				</td>
+               				<c:forEach items="#{item.listSimplePairValue}" var="item2">
+               					<td>
+                					<label class="label">#{item2.key}</label>
+                         	 <p:selectBooleanCheckbox value="#{item2.blnValue}" />
+                				</td>
+							</c:forEach>
+                		</tr>
+					</c:forEach>
+                </table> -->
+                <br/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchCompleteMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchCompleteDialog').hide()"/>
+                <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchCompleteDialog').hide()"/>
+            </h:form>
+        </p:dialog>
+    </ui:composition>
+</html>

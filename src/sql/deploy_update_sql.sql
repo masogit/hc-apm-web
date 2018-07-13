@@ -162,4 +162,38 @@ end  from asset_contract);
 insert into contract_info_item (id,item_type,contract_id,asset_uid) (select replace('' || uuid_generate_v4(),'-',''),'ExistAsset',ac.uid,ai.uid  from asset_contract ac, asset_info ai where ac.asset_id=ai.id);
 update asset_tag_msg_subscriber set level_0=true, level_1=true, level_2=true;
 
+--v7.1
+
+-- 国标码
+DELETE FROM gb_code WHERE code = '2020000' AND "level" = 1 ;
+DELETE FROM gb_code WHERE code = '2020100' AND "level" = 1 AND "name" = '电话机' AND parent_code = '2020000';
+DELETE FROM gb_code WHERE code = '2019900' AND "level" = 1 AND "name" = '其他计算机设备及软件' AND parent_code IS NULL;
+
+
+update supplier set supplier_t=true,maintainer_t=false,manufacturer_t=false where supplier_type='1' and supplier_t is NUll;
+update supplier set maintainer_t=true,supplier_t=false,manufacturer_t=false where supplier_type='2' and maintainer_t is NULL;
+update supplier set maintainer_t=true,supplier_t=true,manufacturer_t=false where supplier_type='3' and manufacturer_t is NUll;
+update supplier set maintainer_t=false,supplier_t=true,manufacturer_t=false,supplier_type=1 where supplier_type is NUll and  supplier_t is NULL and maintainer_t is NULL and manufacturer_t is NUll;
+
+INSERT INTO public.sys_role
+(id, name, role_desc, home_page, created_by, created_date, last_modified_by, last_modified_date)
+VALUES(13, 'NursingStaff', '护理人员', '/homeAssetStaff.xhtml', NULL, NULL, NULL, NULL);
+
+update pm_order_rule por
+set site_uid = (select site_uid from user_account where id = por.approve_user_id),
+hospital_uid = (select hospital_uid from user_account where id = por.approve_user_id),
+institution_uid = (select institution_uid from user_account where id = por.approve_user_id)
+where tenant_uid is not null and status = 1;
+
+update pm_order_rule por
+set site_uid = (select site_uid from user_account where id = por.owner_id),
+hospital_uid = (select hospital_uid from user_account where id = por.owner_id),
+institution_uid = (select institution_uid from user_account where id = por.owner_id)
+where tenant_uid is not null and status = 0;
+
+update rel_rule_asset rra
+set site_uid = (select site_uid from asset_info where uid = rra.asset_uid),
+hospital_uid = (select hospital_uid from asset_info where uid = rra.asset_uid),
+institution_uid = (select institution_uid from asset_info where uid = rra.asset_uid)
+where site_uid is null;
 

@@ -16,13 +16,13 @@
         <p:column headerText="设备名" exportable="true" visible="false">
             <h:outputText value="#{item.assetInfo.name}" />
         </p:column> -->
-        <p:column headerText="设备二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE">
+        <p:column headerText="设备二维码" filterBy="#{item.qrCode}" filterMatchMode="LIKE" sortBy="#{item.qrCode}">
             <h:outputText value="#{item.qrCode}" />
         </p:column>
-        <p:column headerText="设备类型" filterBy="#{item.assetGroupName}" filterMatchMode="LIKE">
+        <p:column headerText="设备类型" filterBy="#{item.assetGroupName}" filterMatchMode="LIKE" sortBy="#{item.assetGroupName}">
             <h:outputText value="#{item.assetGroupName}" />
         </p:column>
-        <p:column headerText="使用科室" filterBy="#{item.orgName}" filterMatchMode="EQ">
+        <p:column headerText="使用科室" filterBy="#{item.orgName}" filterMatchMode="EQ" sortBy="#{item.assetInfo.clinicalDeptNamePyCode}">
             <f:facet name="filter">
                 <p:selectOneMenu onchange="PF('varDataList3').filter()" autoWidth="false" style="max-width: 150px;">
                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
@@ -34,10 +34,10 @@
         <p:column headerText="备注" filterBy="#{item.comment}" filterMatchMode="LIKE">
             <h:outputText value="#{item.comment}" />
         </p:column>
-        <p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE">
+        <p:column headerText="盘点人" filterBy="#{item.lastModifiedBy}" filterMatchMode="LIKE" sortBy="#{item.lastModifiedBy}">
             <h:outputText value="#{item.lastModifiedBy}" />
         </p:column>
-        <p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE">
+        <p:column headerText="盘点时间" filterBy="#{item.lastModifiedDate}" filterMatchMode="GTE" sortBy="#{item.lastModifiedDate}">
             <f:facet name="filter">
                 <p:inputText id="filterLastModifiedDate3" widgetVar="varFilterLastModifiedDate3" />
             </f:facet>

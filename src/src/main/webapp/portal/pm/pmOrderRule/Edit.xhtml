@@ -14,10 +14,28 @@
 			}
 		</style>
 
-        <p:dialog id="PmOrderRuleEditDlg" widgetVar="PmOrderRuleEditDialog" width="750" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header=" #{msg.PmOrderRule}">
+        <p:dialog id="PmOrderRuleEditDlg" widgetVar="PmOrderRuleEditDialog" width="1000" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header=" #{msg.PmOrderRule}">
             <h:form id="PmOrderRuleEditForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.orgId}*</label>
+                            <p:inputText id="selectedUserOrgName" value="#{pmOrderRuleController.getOrgFullName(pmOrderRuleController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                            <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                            <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{pmOrderRuleController.orgTree}" selection="#{pmOrderRuleController.selectedNode}" var="node" selectionMode="single">
+                                        <p:ajax process="@this" event="select" update=":PmOrderRuleEditForm" listener="#{pmOrderRuleController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
+
                         <h:panelGroup >
                             <label class ="label">#{msg.assetName} *</label>
                             <p:inputText id="assetName" value="#{pmOrderRuleController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
@@ -25,7 +43,7 @@
                         <h:panelGroup >
                             <label class ="label">#{msg.assetGroup}</label>
                             <p:selectOneMenu value="#{pmOrderRuleController.selected.assetGroup}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
-                               	<p:ajax  update="report" />
+                               	<p:ajax update="report" />
                                 <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                 <f:selectItems value="#{fieldMsg.getFieldValueList('assetGroup')}" var="item"  itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                             </p:selectOneMenu>
@@ -61,9 +79,9 @@
                     	<h:panelGroup>
 	                    	 <label class ="label" >#{msg.safetyReport}</label>
 		                   <p:selectOneMenu  value="#{pmOrderRuleController.selected.safetyReport}"  >
-                                       <p:ajax   update="report" />
-	                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
-	                                <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
+                               <p:ajax update="report" />
+                               <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                               <f:selectItems value="#{pmOrderRuleController.getTableDefinitionForES()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.baseId}"/>
 	                       </p:selectOneMenu>
                                  <h:outputText id="safetyReport"  value="#{pmOrderRuleController.getJsonValueById(pmOrderRuleController.selected.safetyReport)}"  style="display:none" />
 	                        &nbsp;&nbsp;
@@ -81,6 +99,19 @@
                        	 &nbsp;&nbsp;
                      	<p:commandButton rendered="#{not empty pmOrderRuleController.selected.performanceReport}"  immediate="true" value="预览" onclick="preparePreview(2,'PmOrderRuleEditForm');"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                      </h:panelGroup>
+
+                       <h:panelGroup rendered="#{not empty pmOrderRuleController.selected.id}">
+                           <!-- hide while creation -->
+                           <label class="label">保养模版</label>
+                           <p:commandLink value="下载模版示例" actionListener="#{pmOrderRuleController.generateReportTemplateFile()}" ajax="false">
+                               <p:fileDownload value="#{pmOrderRuleController.reportTemplateFile}"/>
+                           </p:commandLink><br/>
+                           <h:panelGroup id="importReportTemplate">
+                               <p:commandButton value="导入模版" process="@this" update="importReportTemplate" oncomplete="PF('uploadDialog').show()" rendered="#{empty pmOrderRuleController.selected.reportStorageId}"/>
+                               <p:link href="#{fileDownloadService.getFileUrl(pmOrderRuleController.selected.reportStorageId)}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}">#{pmOrderRuleController.selected.reportTemplateName}</p:link>
+                               <p:commandButton icon="ui-icon-close" class="btn btn-sm btn-gray" title="${msg.Delete}" update=":PmOrderRuleEditForm:importReportTemplate :uploadDialogForm :growl" process="@this" actionListener="#{pmOrderRuleController.removeReportTemplate}" rendered="#{not empty pmOrderRuleController.selected.reportStorageId}"/>
+                           </h:panelGroup>
+                       </h:panelGroup>
                    </p:panelGrid>
 					 &nbsp;&nbsp;
 
@@ -125,5 +156,30 @@
             </h:form>
         </p:dialog>
         <ui:include src="ItemEdit.xhtml"/>
+
+
+<p:dialog id="uploadDialog" widgetVar="uploadDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="上传模版文件">
+<h:form id="uploadDialogForm" >
+    <h:panelGroup id="display" >
+        <p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+            <h:panelGroup>
+                <label class="label">#{msg.choseFileToUpload}</label>
+                <h:outputText   value="#{pmOrderRuleController.uploadedFile.fileName}"  rendered="#{not empty pmOrderRuleController.uploadedFile}"/>
+                <p:fileUpload  fileUploadListener="#{pmOrderRuleController.uploadDataFile}" value="#{pmOrderRuleController.uploadedFile}" mode="advanced" dragDropSupport="false" style="width:100%" process="@this"
+                               multiple="false" sizeLimit="10000000" update=":uploadDialogForm" auto="true"  invalidSizeMessage="#{msg.invalidSizeMessage}10M"  allowTypes="/(\.|\/)(docx)$/" label="#{msg.Add}" rendered="#{empty pmOrderRuleController.uploadedFile}" />
+            </h:panelGroup>
+            <h:panelGroup>
+                <p>说明</p>
+                <p>上传文件进行导入</p>
+            </h:panelGroup>
+        </p:panelGrid>
+        <h:panelGroup>
+            <p:commandButton immediate="false" validateClient="true" actionListener="#{pmOrderRuleController.finishUpload()}" disabled="#{empty pmOrderRuleController.uploadedFile}" value="#{msg.Confirm}"
+                             update=":PmOrderRuleEditForm:importReportTemplate :uploadDialogForm :growl" icon="ui-icon-check" oncomplete="handleSubmit(args, 'uploadDialog');"/>
+            <p:commandButton immediate="true" value="#{msg.Cancel}" actionListener="#{pmOrderRuleController.cancelUpload()}" icon="ui-icon-cancel" onclick="PF('uploadDialog').hide()"/>
+        </h:panelGroup>
+    </h:panelGroup>
+</h:form>
+</p:dialog>
     </ui:composition>
 </html>

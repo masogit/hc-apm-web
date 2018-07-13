@@ -76,7 +76,8 @@ public class AssetInfoService {
 
     public List<ContractInfoItem> getContractList(String assetUid) {
 //        return contractDao.findByAssetId(assetId);
-            return contractItemDao.findByAssetUid(assetUid);
+            //return contractItemDao.findByAssetUid(assetUid);
+        return contractItemDao.getByAssetUidAndContractType(assetUid);
     }
 
     public List<OrgInfo> getHospitalList() {

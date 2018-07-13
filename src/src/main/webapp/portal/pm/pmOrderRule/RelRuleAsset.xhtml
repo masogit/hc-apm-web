@@ -84,12 +84,15 @@
 <!--                        <p:column style="float: left;width:20%;">
                             <h:outputText value="#{relRuleAssetController.getStrDate(item.lastPmDate)}" />
                         </p:column> -->
-                        <p:column style="float: left;width:20%;">
+                        <!--<p:column style="float: left;width:20%;">
                             <h:outputText value="#{relRuleAssetController.getOrgName(item.siteUID)}" />
-                        </p:column>
+                        </p:column>-->
                          <p:column style="float: left;width:25%;">
                             <h:outputText value="#{item.clinicalDeptName}" />
-                        </p:column> 
+                        </p:column>
+                        <p:column>
+                            <h:outputText value="#{item.functionType}" />
+                        </p:column>
                     </p:pickList>
                     <br/> <br/>
                     <p:commandButton id ="hidden1" value="hello1" style="display:none"/>

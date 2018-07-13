@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 public class AssetFileImportService {
     private static final Logger logger = LoggerFactory.getLogger(AssetFileImportService.class);
 
-    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.2";
+    public static final String EXCEL_ASSET_TEMPLATE_VERSION = "v2.3";
 
     public static final String SHEET_ASSET = "Asset List";
     public static final String SHEET_ORG = "Org List";
@@ -232,12 +232,12 @@ public class AssetFileImportService {
                 assetRow.setFieldDateValue("质保日期", "setFactoryWarrantyDate");
                 assetRow.setFieldDateValue("维保截止日期", "setWarrantyDate");
                 assetRow.setFieldDateValue("报废日期", "setTerminateDate");
-                assetRow.setFieldDateValue("上次维护日期", "setLastPmDate");
+                assetRow.setFieldDateValue("上次保养日期", "setLastPmDate");
                 assetRow.setFieldDateValue("上次计量日期", "setLastMeteringDate");
-                assetRow.setFieldDateValue("上次质检日期", "setLastQaDate");
+                assetRow.setFieldDateValue("上次巡检日期", "setLastQaDate");
 
-                assetRow.setFieldStringValue("维护商", "setMaitanance");
-                assetRow.setFieldStringValue("维护商电话", "setMaitananceTel");
+                assetRow.setFieldStringValue("维修商", "setMaitanance");
+                assetRow.setFieldStringValue("维修商电话", "setMaitananceTel");
                 assetRow.setFieldStringValue("安装位置编码", "setLocationCode");
                 assetRow.setFieldStringValue("安装位置", "setLocationName");
                 assetRow.setFieldStringValue("使用责任人", "setClinicalOwnerName");
@@ -336,27 +336,27 @@ public class AssetFileImportService {
 
     }
 
-    public void importData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
+    public void importData(List<Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-        importOrgMap.values().forEach(item -> {
-            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-            if (null == orgs || orgs.isEmpty()) {
-                orgDao.save((OrgInfo) item.get("org"));
-                item.put("status", ImportStatus.Created);
-            } else if (orgs.size() > 1) {
-                item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
-            } else {
-                OrgInfo existingOrgInfo = orgs.get(0);
-                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-                item.put("org", existingOrgInfo);
-                item.put("status", ImportStatus.Exist);
-            }
-        });
+//        importOrgMap.values().forEach(item -> {
+//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
+//            if (null == orgs || orgs.isEmpty()) {
+//                orgDao.save((OrgInfo) item.get("org"));
+//                item.put("status", ImportStatus.Created);
+//            } else if (orgs.size() > 1) {
+//                item.put("status", ImportStatus.Failure);
+//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
+//            } else {
+//                OrgInfo existingOrgInfo = orgs.get(0);
+//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+//                item.put("org", existingOrgInfo);
+//                item.put("status", ImportStatus.Exist);
+//            }
+//        });
 
         //release qrcode in use in order to exchange qrcode in two different asset
         releaseQRCodeInUse(importAssetMap);
@@ -384,21 +384,18 @@ public class AssetFileImportService {
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "警告:科室为空");
-            } else if (importOrgMap.containsKey(orgName)) {
-                OrgInfo clinicalDept = (OrgInfo) importOrgMap.get(orgName).get("org");
-                if (clinicalDept.getId() == null || clinicalDept.getId() <= 0) {
+            } else {
+                OrgInfo orgInfo = getOrgInfoByName(orgName);
+
+                if (orgInfo == null) {
                     item.put("status", ImportStatus.Failure);
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "无法关联");
-                    newAsset.setClinicalDeptName(null);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
+                    return;
                 } else {
                     newAsset.setClinicalDeptName(orgName);
-                    newAsset.setClinicalDeptId(clinicalDept.getId());
-                    newAsset.setClinicalDeptUID(clinicalDept.getUid());
+                    newAsset.setClinicalDeptId(orgInfo.getId());
+                    newAsset.setClinicalDeptUID(orgInfo.getUid());
                 }
-            } else {
-                item.put("status", ImportStatus.Failure);
-                AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("OrgInfo") + orgName + "不在列表页中");
-                newAsset.setClinicalDeptName(null);
             }
 
             //for AssetOwner
@@ -464,6 +461,7 @@ public class AssetFileImportService {
                 List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
                 if (null == supplierList || supplierList.isEmpty()) {
                     Supplier newSupplier = new Supplier();
+                    newSupplier.setSupplierT(true);
                     newSupplier.setSiteId(selectedOrgToImport.getSiteId());
                     newSupplier.setName(newAsset.getVendor());
                     newSupplier.setTenantUID(selectedOrgToImport.getTenantUID());
@@ -647,12 +645,17 @@ public class AssetFileImportService {
         return true;
     }
 
-    private List<OrgInfo> getOrgInfoByName(OrgInfo org) {
+    private OrgInfo getOrgInfoByName(String name) {
         List<SearchFilter> OrgInfoFilters = new ArrayList<>();
         OrgInfoFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, selectedOrgToImport.getUid()));
         OrgInfoFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
-        OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, org.getName()));
-        return orgDao.findBySearchFilter(OrgInfoFilters);
+        OrgInfoFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, name));
+        List<OrgInfo> orgInfos = orgDao.findBySearchFilter(OrgInfoFilters);
+        if (orgInfos.size() == 0) {
+            return null;
+        } else {
+            return orgInfos.get(0);
+        }
     }
 
     private List<AssetInfo> getAssetInfos(AssetInfo asset) {
@@ -673,6 +676,10 @@ public class AssetFileImportService {
     }
 
     private boolean isAssetDepartNumDuplicate(AssetInfo asset) {
+
+        if (StringUtils.isEmpty(asset.getDepartNum())) {
+            return false;
+        }
 
         List<SearchFilter> assetFilters = new ArrayList<>();
         String orgUid = selectedOrgToImport.getUid();
@@ -706,30 +713,31 @@ public class AssetFileImportService {
         List<SearchFilter> supplierFilters = new ArrayList<>();
         supplierFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, tenantUID));
         supplierFilters.add(new SearchFilter("name", SearchFilter.Operator.EQ, supplierName));
+        supplierFilters.add(new SearchFilter("supplierT", SearchFilter.Operator.EQ, true));
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(Map<String, Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
+    public Boolean checkData(List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         HashSet<Boolean> result = new HashSet<>();
-        importOrgMap.values().forEach(item -> {
-            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-            if (null == orgs || orgs.isEmpty()) {
-                item.put("status", ImportStatus.New);
-            } else if (orgs.size() > 1) {
-                item.put("status", ImportStatus.CheckFail);
-                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
-                result.add(Boolean.FALSE);
-            } else {
-                OrgInfo existingOrgInfo = orgs.get(0);
-                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-                item.put("org", existingOrgInfo);
-                item.put("status", ImportStatus.Exist);
-            }
-        });
+//        importOrgMap.values().forEach(item -> {
+//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
+//            if (null == orgs || orgs.isEmpty()) {
+//                item.put("status", ImportStatus.New);
+//            } else if (orgs.size() > 1) {
+//                item.put("status", ImportStatus.CheckFail);
+//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
+//                result.add(Boolean.FALSE);
+//            } else {
+//                OrgInfo existingOrgInfo = orgs.get(0);
+//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
+//                item.put("org", existingOrgInfo);
+//                item.put("status", ImportStatus.Exist);
+//            }
+//        });
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
@@ -774,6 +782,19 @@ public class AssetFileImportService {
                 result.add(Boolean.FALSE);
                 AssetRow.addErrMessage(item, "错误: 设备编号是必须的");
                 continue;
+            }
+
+            String orgName = newAsset.getClinicalDeptName();
+            if (StringUtils.isEmpty(orgName)) {
+                item.put("status", ImportStatus.CheckFail);
+                AssetRow.addErrMessage(item, "警告:科室为空");
+            } else {
+                OrgInfo orgInfo = getOrgInfoByName(orgName);
+
+                if (orgInfo == null) {
+                    item.put("status", ImportStatus.CheckFail);
+                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
+                }
             }
 
             //check depart num to avoid duplicate when update
@@ -842,13 +863,12 @@ public class AssetFileImportService {
         String[] columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
         List<String> fields = Arrays.asList(columnKeys).stream().filter(item-> !CustomConfigConstant.getExportFields().containsKey(item) || 
                 exportFields.contains(CustomConfigConstant.getExportFields().get(item))).collect(Collectors.toList());
-        doc.clearRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
-        for(int i=0;i<fields.size();i++){
-            doc.writeCellData(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, i+1, fields.get(i));
+        for(int i=0;i<columnKeys.length;i++){
+            if(!fields.contains(columnKeys[i])){
+                doc.writeCellData(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW, i+1, "");
+                columnKeys[i]="";
+            }
         }
-        
-        columnKeys = doc.getKeyRow(AssetFileImportService.SHEET_ASSET, AssetFileImportService.EXCEL_ASSET_HEADER_ROW);
-
         int startRow = AssetFileImportService.EXCEL_ASSET_DATA_ROW;
         for (AssetInfo assetInfo: assetList) {
             AssetInfoFormatter formatter = new AssetInfoFormatter(assetInfo,  sites ,this);

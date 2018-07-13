@@ -17,7 +17,11 @@ public interface MeasuringCertificateDetailRepository extends GenericRepositoryU
 
     public MeasuringCertificateDetail findByFinanceNoAndCheckDateAndTenantUID(String financeNo, Date checkDate, String tenantUID);
 
-    public MeasuringCertificateDetail findByAssetUIDAndCheckDateAndTenantUID(String assetUID, Date checkDate, String tenantUID);
+    public List<MeasuringCertificateDetail> findByAssetUIDAndCheckDateAndTenantUID(String assetUID, Date checkDate, String tenantUID);
+
+    public List<MeasuringCertificateDetail> findByAssetUIDAndCertificateNoAndTenantUID(String assetUID, String certificateNo, String tenantUID);
 
     public List<MeasuringCertificateDetail> findByAssetUIDOrderByCheckDateDesc(String assetUID);
+
+    public List<MeasuringCertificateDetail> findByAssetUIDAndTenantUIDOrderByCheckDateDesc(String assetUID, String tenantUID);
 }

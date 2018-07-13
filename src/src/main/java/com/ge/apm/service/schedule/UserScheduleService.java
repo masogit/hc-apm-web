@@ -189,7 +189,7 @@ public class UserScheduleService {
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-        for(int i = 1 ; i < 3 ; i++){
+        for(int i = 0 ; i < 3 ; i++){
             UserScheduleStageConfig ussc = new UserScheduleStageConfig();
             ussc.setTenantUID(userAccount.getTenantUID());
             ussc.setInstitutionUID(userAccount.getInstitutionUID());
