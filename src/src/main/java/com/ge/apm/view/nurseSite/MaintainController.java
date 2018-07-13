@@ -171,13 +171,8 @@ public class MaintainController {
 	}
 	
 	private void batchCreateMaintainData(Date date,List<NurseSiteMaintain> listMaintainData){		
-		Calendar ca=Calendar.getInstance();
-		ca.setTime(endBatchDate);
-		ca.set(Calendar.DATE,ca.get(Calendar.DATE)+1);
-		if(date.getTime()>=startBatchDate.getTime()&&date.getTime()<ca.getTime().getTime()){
-			NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets);
-	        listMaintainData.add(tempNurseSiteMaintain);
-		}
+		NurseSiteMaintain tempNurseSiteMaintain=nurseSiteMaintainService.createMaintain(date,currentUser,nurseSiteMaintainConfig,listCheckAssets);
+        listMaintainData.add(tempNurseSiteMaintain);
 	}
 	
 	private void findExistMaintainData(){
