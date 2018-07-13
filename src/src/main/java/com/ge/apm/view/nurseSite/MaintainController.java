@@ -259,10 +259,10 @@ public class MaintainController {
 	}
 
 	//1:day,2:week,3:month,4:year
-	public void batchSaveMaintainData() {
+	public String batchSaveMaintainData() {
 		if(nurseSiteMaintainConfig==null){
 			addMessage("请创建并选择配置模板");
-			return;
+			return "maintainMain?faces-redirect=false";
 		}
 		if(startBatchDate==null){
 			startBatchDate=new Date();
@@ -320,8 +320,9 @@ public class MaintainController {
 			nurseSiteMaintainService.saveAndDelete(listMaintainData,existMaintainData);
 		}
 		addMessage("报告已批量生成");
+		return "maintainMain?faces-redirect=true";
 	}
-	public void batchCompleteMaintainData(){
+	public String batchCompleteMaintainData(){
 		if(startBatchDate==null){
 			startBatchDate=new Date();
 		}
@@ -336,6 +337,7 @@ public class MaintainController {
 		}
 		nurseSiteMaintainService.save(listMaintainData);
 		addMessage("报告已批量填写");
+		return "maintainMain?faces-redirect=true";
 	}
 	
 	private void generateShowLables(){
