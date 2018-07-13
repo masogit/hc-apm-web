@@ -283,68 +283,41 @@ public class MaintainController {
 		startCalendar.setTime(startBatchDate);
 		Calendar endCalendar=Calendar.getInstance();
 		endCalendar.setTime(endBatchDate);
-		int currentYear=currentCalendar.get(Calendar.YEAR);
-		int currentMonth=currentCalendar.get(Calendar.MONTH);
 		if(StringUtils.isNotEmpty(typeValue)){
 			findExistMaintainData();
 			String arr[]=typeValue.split(",");
 			if(type==1){
 				//value,hours,1-24
-				int startDay=startCalendar.get(Calendar.DAY_OF_MONTH);
-				int endDay=endCalendar.get(Calendar.DAY_OF_MONTH);
 				Integer intTypeValue=Integer.parseInt(typeValue);
-				for(int j=startDay;j<=endDay;++j){
+				while(startCalendar.getTimeInMillis()<=endCalendar.getTimeInMillis()){
 					for(int i=0;i<intTypeValue;++i){
 						Date date=null;
 						try {
-							currentCalendar=Calendar.getInstance();
-							currentCalendar.set(Calendar.HOUR_OF_DAY, i);
-							currentCalendar.set(Calendar.DAY_OF_MONTH,j);
-							date=currentCalendar.getTime();
+							startCalendar.set(Calendar.HOUR_OF_DAY, i);
+							date=startCalendar.getTime();
 						} catch (Exception e) {
 							LOGGER.error(e.getMessage());
 						}
 						batchCreateMaintainData(date, listMaintainData);
 					}
+					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 				}
 			}
 			else if(type==2){
 				//weekday,1-7
-				int startWeek=startCalendar.get(Calendar.WEEK_OF_MONTH);
-				int endWeek=endCalendar.get(Calendar.WEEK_OF_MONTH);
-				for(int j=startWeek;j<=endWeek;++j){
+				while(startCalendar.getTimeInMillis()<=endCalendar.getTimeInMillis()){
 					for(int i=0;i<arr.length;++i){
 						try {
-							currentCalendar=Calendar.getInstance();
-							currentCalendar.set(Calendar.DAY_OF_WEEK,Integer.parseInt(arr[i]));
-							currentCalendar.set(Calendar.WEEK_OF_MONTH,j);
-							Date date=currentCalendar.getTime();
-							batchCreateMaintainData(date, listMaintainData);
-						} catch (Exception e) {
-							LOGGER.error(e.getMessage());
-						}
-					}
-				}
-			}
-			else if(type==3){
-				//value:day,1-31
-				int startMonth=startCalendar.get(Calendar.MONTH);
-				int endMonth=endCalendar.get(Calendar.MONTH);
-				for(int j=startMonth;j<=endMonth;++j){
-					for(int i=0;i<arr.length;++i){
-						try {
-							currentCalendar=Calendar.getInstance();
-							int monthDays=DateUtil.getMonthDays(currentYear, j);
-							if(Integer.parseInt(arr[i])<=monthDays){
-								currentCalendar.set(Calendar.DAY_OF_MONTH,Integer.parseInt(arr[i]));
-								currentCalendar.set(Calendar.MONTH,j);
-								Date date=currentCalendar.getTime();
-								batchCreateMaintainData(date, listMaintainData);
+							if(startCalendar.get(Calendar.DAY_OF_WEEK)==Integer.parseInt(arr[i])){
+								startCalendar.set(Calendar.HOUR_OF_DAY,currentCalendar.get(Calendar.HOUR_OF_DAY));
+								batchCreateMaintainData(startCalendar.getTime(), listMaintainData);
 							}
 						} catch (Exception e) {
+							// TODO: handle exception
 							LOGGER.error(e.getMessage());
 						}
 					}
+					startCalendar.add(Calendar.DAY_OF_YEAR, 1);
 				}
 			}
 		}
