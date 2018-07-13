@@ -32,7 +32,7 @@
 
                 <br/>
                 <br/>
-                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchSaveMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintain').update();PF('maintainBatchDialog').hide()"/>
+                <p:commandButton validateClient="true" value="#{msg.Save}" action="#{maintainController.batchSaveMaintainData}" update=":growl" icon="ui-icon-check" oncomplete="PF('maintainBatchDialog').hide()"/>
                 <p:commandButton immediate="true" process="@this" value="#{msg.Cancel}" icon="ui-icon-cancel" onclick="PF('maintainBatchDialog').hide()"/>
             </h:form>
         </p:dialog>
