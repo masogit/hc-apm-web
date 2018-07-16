@@ -197,3 +197,7 @@ hospital_uid = (select hospital_uid from asset_info where uid = rra.asset_uid),
 institution_uid = (select institution_uid from asset_info where uid = rra.asset_uid)
 where site_uid is null;
 
+--v8.1
+INSERT INTO public.sys_role
+(id, name, role_desc, home_page, created_by, created_date, last_modified_by, last_modified_date)
+VALUES(12, 'ExternalStaff', '维修商医工', '/homeAssetStaff.xhtml', NULL, NULL, NULL, NULL);
