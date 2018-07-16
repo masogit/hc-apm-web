@@ -430,6 +430,11 @@ public class V2_WorkflowConfigController extends JpaCRUDController<WorkflowConfi
 				WebUtil.addErrorMessage(WebUtil.getMessage("prefixIsNull"));
 				return;
 			}else{
+    			if(selected.getPrefix().length() > 3){
+					RequestContext.getCurrentInstance().addCallbackParam("validationFailed", true);
+					WebUtil.addErrorMessage(WebUtil.getMessage("moreThanThree"));
+					return;
+				}
     			List<WorkflowConfig> prefixList = dao.findAllPrefixByTenantUID(user.getTenantUID());
     			if(CollectionUtils.isNotEmpty(prefixList)){
 					for (WorkflowConfig temp:prefixList) {

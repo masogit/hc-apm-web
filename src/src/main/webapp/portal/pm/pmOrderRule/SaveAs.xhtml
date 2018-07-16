@@ -49,7 +49,11 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                            <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.manufacture}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                            </p:selectOneMenu>
+                            <!--<p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>-->
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.functionType}</label>

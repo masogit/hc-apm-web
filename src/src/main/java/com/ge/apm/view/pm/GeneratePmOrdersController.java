@@ -8,6 +8,8 @@ import java.util.stream.Collectors;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -17,18 +19,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.fastjson.JSON;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.PmOrderRuleRepository;
-import com.ge.apm.dao.RelRuleAssetRepository;
-import com.ge.apm.dao.V2_PmOrderRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmOrderRule;
-import com.ge.apm.domain.QueryAsset;
-import com.ge.apm.domain.RelRuleAsset;
-import com.ge.apm.domain.UserAccount;
-import com.ge.apm.domain.V2_PmOrder;
 import com.ge.apm.domain.pure.AssetRuleModel;
 import com.ge.apm.domain.pure.AssetRuleModelList;
 import com.ge.apm.service.pm.PmOrderRequestApiService;
@@ -67,6 +57,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 	private Boolean isInsulate;
 	private Integer loginUserOrgType;
 	private UserCommonService userCommonService;
+	private SupplierRepository supplierDao;
 
 	@Override
 	protected void init() {
@@ -79,6 +70,7 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
 		pmOrderRequestApiService = WebUtil.getBean(PmOrderRequestApiService.class);
 		pmOrderRepository =  WebUtil.getBean(V2_PmOrderRepository.class);
+		supplierDao = WebUtil.getBean(SupplierRepository.class);
 		targetAssets = new ArrayList<AssetInfo>();
 		queryAsset = new QueryAsset();
 		queryAsset.setTenantUID(user.getTenantUID());
@@ -116,8 +108,11 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 		if (StringUtils.isNotEmpty(queryAsset.getName())) {
 			assetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryAsset.getName()));
 		}
-		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
+/*		if (StringUtils.isNotEmpty(queryAsset.getManufacture())) {
 			assetFilters.add(new SearchFilter("manufacture", SearchFilter.Operator.LIKE, queryAsset.getManufacture()));
+		}*/
+		if(null != queryAsset.getManufactureId()){
+			assetFilters.add(new SearchFilter("manufactureId", SearchFilter.Operator.EQ, queryAsset.getManufactureId()));
 		}
 		if (null != queryAsset.getAssetGroup()) {
 			assetFilters.add(new SearchFilter("assetGroup", SearchFilter.Operator.EQ, queryAsset.getAssetGroup()));
@@ -283,6 +278,10 @@ public class GeneratePmOrdersController extends GenericCRUDUUIDController<RelRul
 
 	public QueryAsset getQueryAsset() {
 		return queryAsset;
+	}
+
+	public List<Supplier> getSupplier(){
+		return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
 	}
 
 	public void setQueryAsset(QueryAsset queryAsset) {
