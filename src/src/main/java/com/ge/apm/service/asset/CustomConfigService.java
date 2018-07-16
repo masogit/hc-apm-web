@@ -12,7 +12,6 @@ import com.ge.apm.dao.SysRoleRepository;
 import com.ge.apm.domain.CustomConfig;
 import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.SysRole;
-import com.ge.apm.domain.pure.CustomConfigAssetField;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
@@ -21,8 +20,8 @@ import com.ge.apm.view.sysutil.UserContextService;
 import java.util.List;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -46,7 +45,7 @@ public class CustomConfigService {
     @Autowired
     SysRoleRepository sysRoleDao;
 
-    private static CustomConfigObject defaultConfig;
+//    private static CustomConfigObject defaultConfig;
 
     public List<SysRole> getConfigRoles() {
         return sysRoleDao.getByNameIn(CustomConfigConstant.getConfigRolesName());
@@ -75,23 +74,7 @@ public class CustomConfigService {
     }
 
     private CustomConfigObject getDefalutCustomConfigObject() {
-        if (null == defaultConfig) {
-            defaultConfig = new CustomConfigObject();
-            defaultConfig.setAssetFields(new HashMap());
-            CustomConfigConstant.getAllFields().entrySet().stream().forEach(item -> defaultConfig.getAssetFields().put(item.getKey(), new CustomConfigAssetField(item.getKey(), CustomConfigConstant.getConfigRolesName())));
-            CustomConfigConstant.getSysTemFields().forEach(item -> {
-                defaultConfig.getAssetFields().get(item).setRequired(true);
-            });
-            defaultConfig.setAssetsListPageFields(CustomConfigConstant.getAssetsListPageFields());
-            defaultConfig.setAssetsDetailpageBasicFields(CustomConfigConstant.getAssetsDetailpageBasicFields());
-            defaultConfig.setAssetsDetailpageDetailFields(CustomConfigConstant.getAssetsDetailpageDetailFields());
-            defaultConfig.setAssetsEditpageBasicFields(CustomConfigConstant.getAssetsEditpageBasicFields());
-            defaultConfig.setAssetsEditpageCatalogFields(CustomConfigConstant.getAssetsEditpageCatalogFields());
-            defaultConfig.setAssetsEditpageCodesFields(CustomConfigConstant.getAssetsEditpageCodesFields());
-            defaultConfig.setAssetsEditpageDateFields(CustomConfigConstant.getAssetsEditpageDateFields());
-            defaultConfig.setAssetsEditpageFinicialFields(CustomConfigConstant.getAssetsEditpageFinicialFields());
-            defaultConfig.setAssetsEditpageStatusFields(CustomConfigConstant.getAssetsEditpageStatusFields());
-        }
+        CustomConfigObject   defaultConfig = new CustomConfigObject();
         return defaultConfig;
     }
 
@@ -154,7 +137,8 @@ public class CustomConfigService {
             customConfigObject.getAssetFields().remove(key);
         }
         if (customConfigObject.getAssetsListPageFields().contains(key)) {
-            customConfigObject.getAssetsListPageFields().remove(key);
+            customConfigObject.setAssetsListPageFields(customConfigObject.getAssetsListPageFields().stream().filter(item-> !Objects.equals(item, key)).collect(Collectors.toList()));
+//            customConfigObject.getAssetsListPageFields().remove(key);
         }
         if (customConfigObject.getAssetsDetailpageBasicFields().contains(key)) {
             customConfigObject.getAssetsDetailpageBasicFields().remove(key);
@@ -179,6 +163,15 @@ public class CustomConfigService {
         }
         if (customConfigObject.getAssetsEditpageDateFields().contains(key)) {
             customConfigObject.getAssetsEditpageDateFields().remove(key);
+        }
+        if (customConfigObject.getAssetsMobilepageBasicFields().contains(key)) {
+            customConfigObject.getAssetsMobilepageBasicFields().remove(key);
+        }
+        if (customConfigObject.getAssetsMobilepageDetailFields().contains(key)) {
+            customConfigObject.getAssetsMobilepageDetailFields().remove(key);
+        }
+        if (customConfigObject.getAssetsMobilepageHeaderFields().contains(key)) {
+            customConfigObject.getAssetsMobilepageHeaderFields().remove(key);
         }
     }
 

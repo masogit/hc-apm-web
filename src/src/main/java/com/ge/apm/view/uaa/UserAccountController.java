@@ -25,6 +25,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import webapp.framework.web.mvc.JpaCRUDController;
 import com.ge.apm.service.uaa.UaaService;
+import com.ge.apm.service.utils.MicroServiceUtil;
 import com.ge.apm.service.utils.PasswordUtil;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.security.NoSuchAlgorithmException;
@@ -77,6 +78,8 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     private JsonTemplateRepository jsonTemplateRepository;
 
     private String protocol;
+
+    private String previousOrgUid;  //used in update
 
     @Override
     protected void init() {
@@ -342,6 +345,12 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     public void onAfterUpdateObject(UserAccount object, boolean isOk) {
         if (isOk && this.crudActionName.equals("Edit")) {
             uaaService.clearUserScope(object.getUid());
+
+            //if org change, delete old user org
+            if (!object.getOrgInfoUID().equals(previousOrgUid) ) {
+                uaaService.clearUserOrgAfterOrgUpdate(object.getUid());
+            }
+
             uaaService.setDefaultScope(object);
 
         }
@@ -414,6 +423,10 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         loginName = loginName.replace(" ", "");
         user.setLoginName(loginName);
         if (selectedUserOrg != null) {
+
+            //keep old org uid to use in update
+            previousOrgUid = user.getOrgInfoUID();
+
             user.setOrgInfoId(selectedUserOrg.getId());
             user.setOrgInfoUID(selectedUserOrg.getUid());
             user.setSiteId(selectedUserOrg.getSiteId());
@@ -554,8 +567,11 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
     @Transactional
     public void updateUserScope() {
         UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
-        userOrgDao.delete(orgList);
+        //below not working!!!!!!!
+//        List<UserOrgInfo> orgList = userOrgDao.findByUserUid(selected.getUid());
+//        userOrgDao.delete(orgList);
+        userOrgDao.deleteByUserUid(selected.getUid());
+
         List<TreeNode> selectedOrgList = new ArrayList();
         readSelectedOrgTree(accessOrgTree, selectedOrgList);
         List<UserOrgInfo> userOrgList = new ArrayList();
@@ -742,4 +758,21 @@ public class UserAccountController extends JpaCRUDController<UserAccount> {
         this.agree = agree;
     }
 
+    public void loginAs() {
+        if(this.selected==null) return;
+        
+        UserContextService.setLoginUser(this.selected);
+        
+        //call microServices to get Access Token...
+        try{
+            ExternalContext ctx = FacesContext.getCurrentInstance().getExternalContext();
+            HttpServletRequest request = (HttpServletRequest) ctx.getRequest();
+            MicroServiceUtil msUtil = WebUtil.getBean(MicroServiceUtil.class);
+
+            String accessToken = msUtil.getAuthenticateByUserPasswordEncrypted(selected.getLoginName(), selected.getPassword());
+            request.getSession().setAttribute("ACCESS_TOKEN", accessToken);
+        }catch(Exception e){
+            Logger.getLogger(UserAccountController.class.getName()).log(Level.SEVERE, null, e);
+        }
+    }
 }

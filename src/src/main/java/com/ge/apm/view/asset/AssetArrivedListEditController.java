@@ -26,6 +26,8 @@ import com.ge.apm.dao.QrCodeLibRepository;
 import com.ge.apm.dao.SupplierRepository;
 import com.ge.apm.domain.ArrivalList;
 import com.ge.apm.domain.ArrivalListItem;
+import com.ge.apm.domain.ContractInfo;
+import com.ge.apm.domain.ContractInfoItem;
 import com.ge.apm.domain.GbCode;
 import com.ge.apm.domain.I18nMessage;
 import com.ge.apm.domain.OrgInfo;
@@ -37,6 +39,7 @@ import com.ge.apm.service.asset.AssetInstallationService;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.asset.GbCodeService;
 import com.ge.apm.service.asset.AutoCompleteService;
+import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.orginfo.OrgInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.service.utils.PinYinComparator;
@@ -60,11 +63,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     private List<ArrivalListItem> arrivalItemList;
 
     private AssetInstallationService aiService;
+    private ContractInfoService contractService;
     private UaaService uaaService;
     private TreeNode orgTree;
 
     private Supplier supplier;
     private Supplier maitanance;
+    private Supplier manufacture;
 
     private TreeNode selectedNode;
 
@@ -88,11 +93,16 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private BlobFileService blobService;
 
-    private String supplierName;
+//    private String supplierName;
     SupplierRepository supplierDao = null;
     List<Supplier> suppliersList;
     private boolean needInstorageCheck;
     private AutoCompleteService autoCompleteService;
+
+    private String selectedContractItemId;
+    private String selectedContractId;
+    private List<ContractInfo> contractList;
+    private List<ContractInfoItem> contractItemList = new ArrayList();
 
     @Override
     protected void init() {
@@ -101,6 +111,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         itemDao = WebUtil.getBean(ArrivalListItemRepository.class);
         aiService = WebUtil.getBean(AssetInstallationService.class);
         autoCompleteService = WebUtil.getBean(AutoCompleteService.class);
+        contractService = WebUtil.getBean(ContractInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
         orgService = WebUtil.getBean(OrgInfoService.class);
         i18nDao = WebUtil.getBean(I18nMessageRepository.class);
@@ -116,7 +127,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
         String encodeStr = WebUtil.getRequestParameter("str");
         String actionName = (String) UrlEncryptController.getValueFromMap(encodeStr, "action");
-        
+
         if ("Create".equalsIgnoreCase(actionName)) {
             try {
                 String copyFrom = (String) UrlEncryptController.getValueFromMap(encodeStr, "copyFrom");
@@ -124,6 +135,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
                 if (!Strings.isNullOrEmpty(copyFrom)) {
                     copyFiledsValueById(copyFrom);
                 }
+                contractList = contractService.getContractListByTenant(selected.getTenantUID());
 
             } catch (InstantiationException | IllegalAccessException ex) {
                 Logger.getLogger(AssetInfoController.class.getName()).log(Level.SEVERE, null, ex);
@@ -135,7 +147,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
             selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
             if (selected.getSupplierId() != null) {
                 supplier = aiService.getSupplierById(selected.getSupplierId());
-                supplierName = supplier==null? null:supplier.getName();
+//                supplierName = supplier == null ? null : supplier.getName();
+            }
+            if (selected.getManufactureId() != null) {
+                manufacture = aiService.getSupplierById(Integer.parseInt(selected.getManufactureId()));
             }
             initEasyInstallItem();
             this.changeFunctionGroup();
@@ -150,7 +165,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
         suppliersList = aiService.getSupplierListBySiteUid(selected.getSiteUID());
         UserContextService userContextService = WebUtil.getBean(UserContextService.class);
-        needInstorageCheck=userContextService.needInstorageCheck();
+        needInstorageCheck = userContextService.needInstorageCheck();
     }
 
     @Override
@@ -168,6 +183,7 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         object.setAgent(user.getName());
         object.setArrivalDate(new Date());
         selectedOrg = aiService.getOrgInfoByUid(user.getSiteUID());
+        object.setTenantUID(user.getTenantUID());
 
     }
 
@@ -205,6 +221,13 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public void submitArrivalList() {
+        if(!Strings.isNullOrEmpty(selected.getContractItemId())){
+            ContractInfoItem contractInfoItem = contractService.getContractItem(selected.getContractItemId());
+            if(selected.getQuantity() > contractInfoItem.getContractAssetQuantity()){
+                WebUtil.addErrorMessage("到货数量多于合同数量!");
+                return;
+            }
+        }
         saveArrivalList();
         if (aiService.submitArrivalList(selected.getId())) {
             WebUtil.addSuccessMessage("到货清单已经提交");
@@ -214,6 +237,9 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         arrivalItemList = itemDao.findByArrivalListId(selected.getId());
         initEasyInstallItem();
         selected = dao.findById(selected.getId());
+        if(!Strings.isNullOrEmpty(selected.getContractItemId())){
+            contractService.contractItemArrival(arrivalItemList);
+        }
     }
 
     public void onSelectOrgFromTree(NodeSelectEvent event) {
@@ -274,10 +300,10 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
 
     private void initEasyInstallItem() {
         easyInstallItem = getNewInstallAssetList().stream().findAny().orElse(new ArrivalListItem());
-        String maitananceName=easyInstallItem.getMaitanance();
-        if(maitananceName!=null){
-        	maitanance=new Supplier();
-        	maitanance.setName(maitananceName);
+        String maitananceName = easyInstallItem.getMaitanance();
+        if (maitananceName != null) {
+            maitanance = new Supplier();
+            maitanance.setName(maitananceName);
         }
         nationalStandardCode = easyInstallItem.getNationalStandardCode();
     }
@@ -447,31 +473,70 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     public List<Supplier> autoCompleteVendor(String query) {
         return autoCompleteService.autoCompleteVendor(query, suppliersList);
     }
-    
+
     public List<Supplier> autoCompleteMaintainer(String query) {
         return autoCompleteService.autoCompleteMaintainer(query, suppliersList);
     }
+    
+    public List<Supplier> autoCompleteManufacture(String query) {
+        return autoCompleteService.autoCompleteManufacture(query, suppliersList);
+    }
 
     public void onSupplierChange() {
-    	if (null != supplier) {
+        if (null != supplier) {
             selected.setSupplierId(supplier.getId());
             selected.setVendor(supplier.getName());
+        } else {
+            selected.setSupplierId(null);
+            selected.setVendor(null);
         }
-    	else{
-    		selected.setSupplierId(null);
-    		selected.setVendor(null);
-    	}
     }
     
-    public void onMaintainerChange() {
-    	if (null != maitanance) {
-            this.easyInstallItem.setMaitanance(maitanance.getName());
-            this.easyInstallItem.setMaitananceId(maitanance.getId()+"");
+    public void onManufactureChange() {
+        if (null != manufacture) {
+            selected.setManufactureId(manufacture.getId().toString());
+            selected.setManufacture(manufacture.getName());
+        } else {
+            selected.setManufactureId(null);
+            selected.setManufacture(null);
         }
-    	else{
-    		this.easyInstallItem.setMaitanance(null);
-    		this.easyInstallItem.setMaitananceId(null);
-    	}
+    }
+
+    public void onMaintainerChange() {
+        if (null != maitanance) {
+            this.easyInstallItem.setMaitanance(maitanance.getName());
+            this.easyInstallItem.setMaitananceId(maitanance.getId() + "");
+            this.easyInstallItem.setMaitananceTel(maitanance.getTel());
+        } else {
+            this.easyInstallItem.setMaitanance(null);
+            this.easyInstallItem.setMaitananceId(null);
+            this.easyInstallItem.setMaitananceTel(null);
+        }
+    }
+
+    public void onContractChange() {
+        if (!Strings.isNullOrEmpty(selectedContractId)) {
+            contractItemList = contractService.getContractItems(selectedContractId).stream()
+                    .filter(item -> ContractInfoItem.ContractInfoItemType.Purchase.toString().equals(item.getItemType())).collect(Collectors.toList());
+            //TODO 去除到货数量等于订购数量的条目
+        }else{
+            contractItemList = new ArrayList();
+            selectedContractItemId = null;
+        }
+    }
+
+    public void finishChoseContractItem() {
+        ContractInfoItem selectedContractItem = contractItemList.stream().filter(item -> item.getId().equals(selectedContractItemId)).findAny().orElse(null);
+        this.selected.setContractItemId(selectedContractItem.getId());
+        this.selected.setAssetName(selectedContractItem.getContractAssetName());
+        this.selected.setContractNum(selectedContractItem.getContractInfo().getContractNum());
+        this.selected.setContractPrice(selectedContractItem.getContractInfo().getAmount());
+        this.selected.setQuantity(selectedContractItem.getContractAssetQuantity());
+        this.selected.setSiteUID(selectedContractItem.getContractInfo().getSiteUID());
+        this.selected.setHospitalUID(selectedContractItem.getContractInfo().getHospitalUID());
+        this.selected.setInstitutionUID(selectedContractItem.getContractInfo().getInstitutionUID());
+        this.selected.setTenantUID(selectedContractItem.getContractInfo().getTenantUID());
+        selectedOrg = aiService.getOrgInfoByUid(selected.getSiteUID());
     }
 
     //geter and setter
@@ -516,14 +581,14 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
     }
 
     public Supplier getMaitanance() {
-		return maitanance;
-	}
+        return maitanance;
+    }
 
-	public void setMaitanance(Supplier maitanance) {
-		this.maitanance = maitanance;
-	}
+    public void setMaitanance(Supplier maitanance) {
+        this.maitanance = maitanance;
+    }
 
-	public ArrivalListItem getEasyInstallItem() {
+    public ArrivalListItem getEasyInstallItem() {
         return easyInstallItem;
     }
 
@@ -581,20 +646,52 @@ public class AssetArrivedListEditController extends GenericCRUDUUIDController<Ar
         this.generatePmorder = generatePmorder;
     }
 
-    public String getSupplierName() {
-        return supplierName;
+    public boolean isNeedInstorageCheck() {
+        return needInstorageCheck;
     }
 
-    public void setSupplierName(String supplierName) {
-        this.supplierName = supplierName;
+    public void setNeedInstorageCheck(boolean needInstorageCheck) {
+        this.needInstorageCheck = needInstorageCheck;
     }
 
-	public boolean isNeedInstorageCheck() {
-		return needInstorageCheck;
-	}
+    public String getSelectedContractItemId() {
+        return selectedContractItemId;
+    }
 
-	public void setNeedInstorageCheck(boolean needInstorageCheck) {
-		this.needInstorageCheck = needInstorageCheck;
-	}
+    public void setSelectedContractItemId(String selectedContractItemId) {
+        this.selectedContractItemId = selectedContractItemId;
+    }
+
+    public String getSelectedContractId() {
+        return selectedContractId;
+    }
+
+    public void setSelectedContractId(String selectedContractId) {
+        this.selectedContractId = selectedContractId;
+    }
+
+    public List<ContractInfo> getContractList() {
+        return contractList;
+    }
+
+    public void setContractList(List<ContractInfo> contractList) {
+        this.contractList = contractList;
+    }
+
+    public List<ContractInfoItem> getContractItemList() {
+        return contractItemList;
+    }
+
+    public void setContractItemList(List<ContractInfoItem> contractItemList) {
+        this.contractItemList = contractItemList;
+    }
+
+    public Supplier getManufacture() {
+        return manufacture;
+    }
+
+    public void setManufacture(Supplier manufacture) {
+        this.manufacture = manufacture;
+    }
 
 }

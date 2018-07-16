@@ -25,11 +25,13 @@ import com.ge.apm.domain.UnstructuredData;
 import com.ge.apm.domain.UnstructuredDataCollection;
 import com.ge.apm.domain.V2_BlobObject;
 import com.ge.apm.domain.pure.TableItem;
+import com.ge.apm.domain.pure.TableOption;
 import com.ge.apm.domain.pure.TableSchema;
 import com.ge.apm.service.asset.BlobFileService;
 import com.ge.apm.service.pm.V2_PmOrderService;
 import com.ge.apm.view.sysutil.UserContextService;
 import com.google.common.base.Strings;
+import java.util.Objects;
 
 import webapp.framework.web.WebUtil;
 
@@ -152,6 +154,7 @@ public class TableDefinitionService {
             newTemplate.setStatus(selectedTableDefinition.getStatus());
             newTemplate.setExcelStorageId(blobObject == null ? null : blobObject.getObjectStorageId());
             newTemplate.setSchema(selectedTableDefinition.getSchema());
+            newTemplate.setInstrumentKeyValues(selectedTableDefinition.getInstrumentKeyValues());
             newTemplate = templateDao.save(newTemplate);
             selectedTableDefinition.setStatus(TableDefinition.TableDefinitionStatus.Expired.toString());
             selectedTableDefinition.setLastModifiedBy(UserContextService.getCurrentUserAccount().getUid());
@@ -265,5 +268,24 @@ public class TableDefinitionService {
         selectedTableDefinition.setLastModifiedDate(new Date());
         templateDao.save(selectedTableDefinition);
         return newTemplate;
+    }
+
+    public Map<String, Object> changSelectFommDataByJSON(TableDefinition tableDefinition, Map<String, Object> tableValue) {
+        
+        TableSchema table = JSONObject.parseObject(tableDefinition.getSchema(), TableSchema.class);
+        if(null == table.getGroups() || table.getGroups().isEmpty()){
+            return tableValue;
+        }
+        table.getGroups().stream().filter(groupItem-> null!= groupItem.getItems()).forEach(groupItem-> {
+            groupItem.getItems().stream().filter(item-> TableItem.ComponentType.Select.equals(item.getComponent()))
+                    .filter(item -> tableValue.containsKey(item.getKey()))
+                    .forEach(item->{
+                        TableOption option = item.getOptions().stream().filter(optionItem-> Objects.equals(optionItem.getKey(), tableValue.get(item.getKey())))
+                                .findAny().get();
+                        tableValue.put(item.getKey(), option.getValue());
+                    });
+                });
+        
+        return tableValue;
     }
 }

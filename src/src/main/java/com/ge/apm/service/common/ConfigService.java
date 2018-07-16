@@ -14,6 +14,7 @@ import com.ge.apm.domain.WorkflowConfig;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 /**
  *
@@ -85,6 +86,54 @@ public class ConfigService {
         }
         configList = configDao.findBySiteUID(org.getTenantUID());
         if (null != configList && !configList.isEmpty() && configList.get(0).getAssetApprover() != null) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean isAssetNeedAudit(String siteUid) {
+        OrgInfo org = orgDao.findByUid(siteUid);
+        TenantInfo tenant = tenantDao.findByuid(org.getTenantUID());
+        WorkflowConfig workflowConfig = configDao.findFirstBySiteUID(siteUid);
+        if (tenant.getInsulate()!=null && tenant.getInsulate()) {
+            return isAssetNeedAudit(workflowConfig);
+        }
+
+        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
+            return true;
+        }
+
+        workflowConfig = configDao.findFirstBySiteUID(org.getHospitalUID());
+        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
+            return true;
+        }
+
+        workflowConfig = configDao.findFirstBySiteUID(org.getInstitutionUID());
+        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
+            return true;
+        }
+
+        workflowConfig = configDao.findFirstBySiteUID(org.getTenantUID());
+        if (null != workflowConfig && isAssetNeedAudit(workflowConfig)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private boolean isAssetNeedAudit(WorkflowConfig workflowConfig) {
+        if (null == workflowConfig) {
+            return false;
+        }
+
+        Boolean needInstorageCheck = workflowConfig.getNeedInstorageCheck();
+        if (needInstorageCheck != null && needInstorageCheck.booleanValue()) {
+            return false;
+        }
+
+        String approver = workflowConfig.getAssetApprover();
+        if (!StringUtils.isEmpty(approver)) {
             return true;
         }
 

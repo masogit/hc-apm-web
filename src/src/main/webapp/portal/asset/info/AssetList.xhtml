@@ -28,7 +28,7 @@
                             <p:overlayPanel widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" modal="false">
                                 <p:scrollPanel style="height:300px;border: 0" mode="native">
                                     <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.siteOrgTree}" selection="#{orgTreeController.selectedOrgNode}" var="node" selectionMode="single" dynamic="true">
-                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?':idVarPanelDeptOrg':''}" oncomplete="PF('varPanelOrg').hide();"/>
+                                        <p:ajax process="@this" event="select" listener="#{assetInfoListController.onSelectSiteTreeNode}" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" oncomplete="PF('varPanelOrg').hide();"/>
                                         <p:ajax process="@this" event="expand"/>
                                         <p:ajax process="@this" event="collapse"/>
                                         <p:treeNode type="org">
@@ -39,12 +39,12 @@
                             </p:overlayPanel>
                         </h:panelGroup>
                         <p:inputText id="searchText" value="#{assetInfoListController.oneSearchStr}" placeholder="#{msg.name}/#{msg.departNum}/#{msg.financingNum}/#{msg.qrCode}/#{msg.serialNum}/#{msg.manufacture}/#{msg.clinicalDeptName}" maxlength="100" style="width: 500px">
-                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?':idVarPanelDeptOrg':''} searchButtons " />
+                            <p:ajax event="keyup" update=":AssetInfoListForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''} searchButtons " />
                         </p:inputText>
 
                         <h:panelGroup id='searchButtons'>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?':idVarPanelDeptOrg':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
-                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?':idVarPanelDeptOrg':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-search" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}"  rendered="#{empty assetInfoListController.oneSearchStr}"/>
+                            <p:commandButton style="zoom:0.8" icon="ui-icon-close" class="btn btn-sm btn-gray" update=":AssetInfoListForm :searchForm #{assetInfoListController.isShowColumn('warrantyDate')?':idPanelFilterWarrantyDate':''} #{assetInfoListController.isShowColumn('clinicalDeptName')?'':''}" actionListener="#{assetInfoListController.setOneSearchStr('')}" rendered="#{not empty assetInfoListController.oneSearchStr}"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </h:form>
@@ -117,11 +117,32 @@
                                     </f:facet>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'clinicalDeptName'}">
-                                <p:column headerText="#{msg.clinicalDeptName}" >
+<!--                            <c:if test="#{columnItem eq 'clinicalDeptName'}">
+                                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
                                     <f:facet name="header">
                                         <h:outputText value="#{msg.clinicalDeptName}"/><br/>
                                         <p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>
+                                        <p:autoComplete id="clinicalDeptName" dropdown="true" value="#{assetInfoListController.selectedObjectMap['clinicalDept']}" 
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDept}" size="5"
+                                                        var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="orgInfoConverter">
+                                            <p:ajax event="itemSelect" process="@this" listener="#{assetInfoListController.onClinicalDeptFilter}"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptFilter2}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                        </p:autoComplete>
+                                    </f:facet>
+                                    <h:outputText value="#{item.clinicalDeptName}"/>
+                                </p:column>
+                            </c:if>-->
+                            <c:if test="#{columnItem eq 'clinicalDeptName'}">
+                                <p:column headerText="#{msg.clinicalDeptName}"  width="100">
+                                    <f:facet name="header">
+                                        <h:outputText value="#{msg.clinicalDeptName}"/><br/>
+                                        <!--<p:inputText id="clinicalDept"  value="#{assetInfoListController.fileterOrg.name}"  readonly="true"/>-->
+                                        <p:autoComplete dropdown="true" value="#{assetInfoListController.fileterOrgName}" 
+                                                        scrollHeight="300"  forceSelection="true" completeMethod="#{assetInfoListController.autoCompleteDeptName}" size="5"
+                                                        >
+                                            <p:ajax event="itemSelect" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" process="@this"  update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                            <p:ajax process="@this" listener="#{assetInfoListController.onClinicalDeptNameFilterChange}" update=":AssetInfoListForm:datalist  :idPanelFilterWarrantyDate" />
+                                        </p:autoComplete>
                                     </f:facet>
                                     <h:outputText value="#{item.clinicalDeptName}"/>
                                 </p:column>
@@ -173,47 +194,47 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'aliasName'}">
-                                <p:column  headerText="#{msg.aliasName}" >
+                                <p:column  headerText="#{msg.aliasName}" sortBy="#{item.aliasName}" filterBy="#{item.aliasName}" filterMatchMode="LIKE" >
                                     <h:outputText value="#{item.aliasName}"/>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'assetOwnerName'}">
-                                <p:column  headerText="#{msg.assetOwnerName}" >
+                            <c:if test="#{columnItem eq 'assetOwnerName'}" >
+                                <p:column  headerText="#{msg.assetOwnerName}" sortBy="#{item.assetOwnerName}" filterBy="#{item.assetOwnerName}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetOwnerName}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetOwnerTel'}">
-                                <p:column  headerText="#{msg.assetOwnerTel}" >
+                                <p:column  headerText="#{msg.assetOwnerTel}" sortBy="#{item.assetOwnerTel}" filterBy="#{item.assetOwnerTel}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetOwnerTel}"/>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'assetOwnerName2'}">
-                                <p:column  headerText="#{msg.assetOwnerName2}" >
+                            <c:if test="#{columnItem eq 'assetOwnerName2'}" >
+                                <p:column  headerText="#{msg.assetOwnerName2}" sortBy="#{item.assetOwnerName2}" filterBy="#{item.assetOwnerName2}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetOwnerName2}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetOwnerTel2'}">
-                                <p:column headerText="#{msg.assetOwnerTel2}" >
+                                <p:column headerText="#{msg.assetOwnerTel2}" sortBy="#{item.assetOwnerTel2}" filterBy="#{item.assetOwnerTel2}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetOwnerTel2}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetOwnerName3'}">
-                                <p:column headerText="#{msg.assetOwnerName3}" >
+                                <p:column headerText="#{msg.assetOwnerName3}" sortBy="#{item.assetOwnerName3}" filterBy="#{item.assetOwnerName3}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetOwnerName3}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'assetOwnerTel3'}">
-                                <p:column headerText="#{msg.assetOwnerTel3}" >
+                                <p:column headerText="#{msg.assetOwnerTel3}" sortBy="#{item.assetOwnerTel3}" filterBy="#{item.assetOwnerTel3}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.assetOwnerTel3}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'clinicalOwnerName'}">
-                                <p:column headerText="#{msg.clinicalOwnerName}" >
+                                <p:column headerText="#{msg.clinicalOwnerName}" sortBy="#{item.clinicalOwnerName}" filterBy="#{item.clinicalOwnerName}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.clinicalOwnerName}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'clinicalOwnerTel'}">
-                                <p:column headerText="#{msg.clinicalOwnerTel}" >
+                                <p:column headerText="#{msg.clinicalOwnerTel}" sortBy="#{item.clinicalOwnerTel}" filterBy="#{item.clinicalOwnerTel}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.clinicalOwnerTel}"/>
                                 </p:column>
                             </c:if>
@@ -268,7 +289,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'systemId'}">
-                                <p:column  headerText="#{msg.systemId}" >
+                                <p:column  headerText="#{msg.systemId}" sortBy="#{item.systemId}" filterBy="#{item.systemId}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.systemId}"/>
                                 </p:column>
                             </c:if>
@@ -298,27 +319,27 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'barcode'}">
-                                <p:column headerText="#{msg.barcode}" >
+                                <p:column headerText="#{msg.barcode}" sortBy="#{item.barcode}" filterBy="#{item.barcode}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.barcode}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'modalityId'}">
-                                <p:column headerText="#{msg.modalityId}" >
+                                <p:column headerText="#{msg.modalityId}" sortBy="#{item.modalityId}" filterBy="#{item.modalityId}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.modalityId}"/>
                                 </p:column>
                             </c:if>
-                            <c:if test="#{columnItem eq 'locationCode'}">
-                                <p:column headerText="#{msg.locationCode}" >
+                            <c:if test="#{columnItem eq 'locationCode'}" >
+                                <p:column headerText="#{msg.locationCode}" sortBy="#{item.locationCode}" filterBy="#{item.locationCode}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.locationCode}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'locationName'}">
-                                <p:column headerText="#{msg.locationName}" >
+                                <p:column headerText="#{msg.locationName}" sortBy="#{item.locationName}" filterBy="#{item.locationName}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.locationName}"/>
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'registrationNo'}">
-                                <p:column headerText="#{msg.registrationNo}" >
+                                <p:column headerText="#{msg.registrationNo}" sortBy="#{item.registrationNo}" filterBy="#{item.registrationNo}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.registrationNo}"/>
                                 </p:column>
                             </c:if>
@@ -390,7 +411,7 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'makerShortName'}">
-                                <p:column headerText="#{msg.makerShortName}" >
+                                <p:column headerText="#{msg.makerShortName}" sortBy="#{item.makerShortName}" filterBy="#{item.makerShortName}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.makerShortName}"/>
                                 </p:column>
                             </c:if>
@@ -405,8 +426,18 @@
                                 </p:column>
                             </c:if>
                             <c:if test="#{columnItem eq 'comments'}">
-                                <p:column headerText="#{msg.comments}"  >
+                                <p:column headerText="#{msg.comments}"  sortBy="#{item.comments}" filterBy="#{item.comments}" filterMatchMode="LIKE">
                                     <h:outputText value="#{item.comments}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isPm'}">
+                                <p:column headerText="#{msg.isAssetPMed}"  >
+                                    <h:outputText value="#{item.isPm?msg.True2Yes:msg.False2No}"/>
+                                </p:column>
+                            </c:if>
+                            <c:if test="#{columnItem eq 'isChecked'}">
+                                <p:column headerText="#{msg.isAssetChecked}"  >
+                                    <h:outputText value="#{item.isChecked?msg.True2Yes:msg.False2No}"/>
                                 </p:column>
                             </c:if>
                         </c:forEach>
@@ -456,7 +487,7 @@
             <p:commandButton onclick="PF('panelFilterWarrantyDate').hide()" title="#{msg.Close}" icon="ui-icon-close" immediate="true" type="button" style="zoom: 0.8;"/>
         </p:overlayPanel>
 
-        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;" rendered="#{assetInfoListController.isShowColumn('clinicalDeptName')}">
+<!--        <p:overlayPanel id="idVarPanelDeptOrg" widgetVar="varPanelDeptOrg" for=":AssetInfoListForm:datalist:clinicalDept" dismissable="true" style="text-align: left;" rendered="#{assetInfoListController.isShowColumn('clinicalDeptName')}">
             <p:scrollPanel style="height:300px;border: 0" mode="native">
                 <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{orgTreeController.getDeptOrgTree(assetInfoListController.selectSite==null? '':assetInfoListController.selectSite.uid)}"  var="node" selectionMode="single" dynamic="false">
                     <p:ajax process="@this" event="select"  listener="#{assetInfoListController.onClinicalDeptFilter}" update=":AssetInfoListForm:datalist :idVarPanelDeptOrg :idPanelFilterWarrantyDate" oncomplete="PF('varPanelDeptOrg').hide();"/>
@@ -467,7 +498,7 @@
                     </p:treeNode>
                 </p:tree>
             </p:scrollPanel>
-        </p:overlayPanel>
+        </p:overlayPanel>-->
         <p:dialog id="exportQrCodeDialog" widgetVar="exportQrCodeDialog" modal="true" width="500"  resizable="true" draggable="true" appendTo="@(body)" header="导出二维码">
             <h:form id="exportQrCodeForm" >
                 <h:panelGroup id="display" >
@@ -493,12 +524,12 @@
 
         <script>
             //<![CDATA[
-            window.onload = function () {
+            afterPageLoad = function () {
                 $("#searchForm\\:searchText").keypress(function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();
                     }
-                });
+                })
                 var isActive = "#{userContextService.isActive()}";
                 if (isActive == '1') {
                     PF('ActiveDlg').show();

@@ -169,9 +169,12 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'manufacture')}" >
         <h:panelGroup>
             <label class="label">#{msg.manufacture}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['manufacture'].required? '*':''}</span></label>
-            <p:autoComplete id="manufacture" value="#{assetInfoEditController.selected.manufacture}" required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}" 
-                         requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('manufacture')}" 
-                            completeMethod="#{assetInfoEditController.completeManufacture}"/>
+            <p:autoComplete id="manufacture" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['manufacture']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
+                            forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['manufacture'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" 
+                            completeMethod="#{assetInfoEditController.autoCompleteManufacture}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('manufacture')}"/>
+            </p:autoComplete>
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'makerShortName')}" >
@@ -185,12 +188,16 @@
         <h:panelGroup>
             <label class="label">#{msg.vendor}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['vendor'].required? '*':''}</span></label>
 
-            <p:autoComplete id="vendor2" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}" 
+            <p:autoComplete id="vendor" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['supplier']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('vendor')}"
                             forceSelection="true"  required="#{assetInfoEditController.customConfig.assetFields['vendor'].required}"  requiredMessage="#{msg.vendor} #{msg.ValidationRequire}" 
                             completeMethod="#{assetInfoEditController.autoCompleteSupplier}" var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}"/>
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('supplier')}" update="@(.vendorChange)"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('supplier')}" />
             </p:autoComplete>
+        </h:panelGroup>
+        <h:panelGroup>
+            <label class="label">#{msg.vendorTel}</label>
+            <p:inputText id="vendorTel" value="#{assetInfoEditController.selected.vendorTel}" class="vendorChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'maitanance')}" >
@@ -199,8 +206,8 @@
             <p:autoComplete id="vendor3" dropdown="true" value="#{assetInfoEditController.selectedObjectMap['maintainer']}" scrollHeight="300" readonly="#{!assetInfoEditController.needEdit('maitanance')}" 
                             forceSelection="true" required="#{assetInfoEditController.customConfig.assetFields['maitanance'].required}" requiredMessage="维修商 #{msg.ValidationRequire}" completeMethod="#{assetInfoEditController.autoCompleteMaintainer}"
                             var="t" itemLabel="#{t.name}" itemValue="#{t}" converter="supplierConverter">
-                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
-                <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}"/>
+                <p:ajax event="itemSelect" listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
+                <p:ajax listener="#{assetInfoEditController.onSupplierChange('maintainer')}" update="@(.maitananceChange)"/>
             </p:autoComplete>
         </h:panelGroup>
     </c:if>
@@ -208,7 +215,7 @@
         <h:panelGroup>
             <label class="label">#{msg.maitananceTel}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required? '*':''}</span></label>
             <p:inputText id="maitananceTel" value="#{assetInfoEditController.selected.maitananceTel}" required="#{assetInfoEditController.customConfig.assetFields['maitananceTel'].required}" 
-                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" readonly="#{!assetInfoEditController.needEdit('maitananceTel')}" />
+                         requiredMessage="#{msg.maitananceTel} #{msg.ValidationRequire}" class="maitananceChange" readonly="true" />
         </h:panelGroup>
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'nationalStandardCode')}" >
@@ -304,7 +311,7 @@
     </c:if>
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'qrCode')}" >
         <h:panelGroup>
-            <label class="label">#{msg.qrCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</span></label>
+            <label class="label">#{msg.QRCode}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['qrCode'].required? '*':''}</span></label>
             <p:inputText id="qrCode" value="#{assetInfoEditController.qrCode}" required="#{assetInfoEditController.customConfig.assetFields['qrCode'].required}" class="SiteUIDChange financingNumChange"
                          requiredMessage="#{msg.qrCode} #{msg.ValidationRequire}" readonly="#{not empty assetInfoEditController.selected.qrCode or !assetInfoEditController.needEdit('qrCode')}">
                 <p:ajax process="@this" listener="#{assetInfoEditController.onDepartNumChange('qrCode')}" update="@(.financingNumChange)"/>
@@ -536,7 +543,7 @@
     <c:if test="#{assetInfoEditController.needShow(fieldItem, 'installDate')}" >
         <h:panelGroup>
             <label class="label">#{msg.installDate}<span style="color:red">#{assetInfoEditController.customConfig.assetFields['installDate'].required? '*':''}</span></label>
-            <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.installDate}" maxdate="#{appContextService.curentDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}" 
+            <p:calendar timeZone="GMT+8"  id="installDate" pattern="yyyy/MM/dd" value="#{assetInfoEditController.selected.installDate}" readonly="#{!assetInfoEditController.needEdit('installDate')}"
                         showOn="button" readonlyInput="false" showButtonPanel="true" navigator="true" mask="true" required="#{assetInfoEditController.customConfig.assetFields['installDate'].required}" requiredMessage="#{msg.installDate} #{msg.ValidationRequire}"/>
         </h:panelGroup>
     </c:if>

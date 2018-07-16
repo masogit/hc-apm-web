@@ -1,0 +1,448 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="http://primefaces.org/ui"
+                xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'serialNum')}">
+        <h:panelGroup >
+            <label class="label">#{msg.serialNum}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.serialNum}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'name')}">
+        <h:panelGroup  >
+            <label class="label">#{msg.name}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.name}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'aliasName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.aliasName}</label>
+            <p:inputText id="aliasName" value="#{assetInfoDetailController.selected.aliasName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetGroup')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetGroup}</label>
+            <p:inputText id="assetGroup" value="#{fieldMsg.fieldValue('assetGroup', assetInfoDetailController.selected.assetGroup)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName}</label>
+            <p:inputText id="assetOwnerName" value="#{assetInfoDetailController.selected.assetOwnerName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel}</label>
+            <p:inputText id="assetOwnerTel" value="#{assetInfoDetailController.selected.assetOwnerTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerName2')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName2}</label>
+            <p:inputText id="assetOwnerName2" value="#{assetInfoDetailController.selected.assetOwnerName2}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerTel2')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel2}</label>
+            <p:inputText id="assetOwnerTel2" value="#{assetInfoDetailController.selected.assetOwnerTel2}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerName3')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerName3}</label>
+            <p:inputText id="assetOwnerName3" value="#{assetInfoDetailController.selected.assetOwnerName3}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetOwnerTel3')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetOwnerTel3}</label>
+            <p:inputText id="assetOwnerTel3" value="#{assetInfoDetailController.selected.assetOwnerTel3}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'siteUID')}">
+        <h:panelGroup >
+            <label class="label">#{msg.hospitalId}</label>
+            <p:inputText id="hospitalId" value="#{assetInfoDetailController.getOrgInfoByUid(assetInfoDetailController.selected.siteUID).name}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'clinicalDeptName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.clinicalDeptName}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.clinicalDeptName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'clinicalOwnerName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.clinicalOwnerName}</label>
+            <p:inputText id="clinicalOwnerName" value="#{assetInfoDetailController.selected.clinicalOwnerName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'clinicalOwnerTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.clinicalOwnerTel}</label>
+            <p:inputText id="clinicalOwnerTel" value="#{assetInfoDetailController.selected.clinicalOwnerTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'manufacture')}">
+        <h:panelGroup >
+            <label class="label">#{msg.manufacture}</label>
+            <p:inputText id="manufacture" value="#{assetInfoDetailController.selected.manufacture}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'makerShortName')}">
+        <h:panelGroup >
+            <label class="label">品牌/制造商简称</label>
+            <p:inputText id="makerShortName" value="#{assetInfoDetailController.selected.makerShortName}"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'vendor')}">
+        <h:panelGroup >
+            <label class="label">#{msg.vendor}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.vendor}" readonly="true"/>
+        </h:panelGroup>
+        <h:panelGroup >
+            <label class="label">#{msg.vendorTel}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.vendorTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'maitanance')}">
+        <h:panelGroup >
+            <label class="label">#{msg.maitanance}</label>
+            <p:inputText id="maitanance" value="#{assetInfoDetailController.selected.maitanance}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'maitananceTel')}">
+        <h:panelGroup >
+            <label class="label">#{msg.maitananceTel}</label>
+            <p:inputText id="maitananceTel" value="#{assetInfoDetailController.selected.maitananceTel}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'nationalStandardCode')}">
+        <h:panelGroup >
+            <label class="label">#{msg.nationalStandardCode}</label>
+            <p:inputText id="nationalStandardCode" value="#{assetInfoDetailController.selected.nationalStandardCode}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'parentAssetId')}">
+        <h:panelGroup >
+            <label class="label">#{msg.parentAsset}</label>
+            <p:inputText id="parentAssetId" value="#{assetInfoDetailController.getParentAssetName()}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'deviceName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.deviceName}</label>
+            <p:inputText id="deviceName" value="#{assetInfoDetailController.selected.deviceName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'systemId')}">
+        <h:panelGroup >
+            <label class="label">#{msg.systemId}</label>
+            <p:inputText id="systemId" value="#{assetInfoDetailController.selected.systemId}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'financingNum')}">
+        <h:panelGroup >
+            <label class="label">#{msg.financingNum}</label>
+            <p:inputText id="financingNum2" value="#{assetInfoDetailController.selected.financingNum}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'departNum')}">
+        <h:panelGroup >
+            <label class="label">#{msg.departNum}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.departNum}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'barcode')}">
+        <h:panelGroup >
+            <label class="label">#{msg.barcode}</label>
+            <p:inputText id="barcode" value="#{assetInfoDetailController.selected.barcode}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'registrationNo')}">
+        <h:panelGroup >
+            <label class="label">#{msg.registrationNo}</label>
+            <p:inputText id="registrationNo" value="#{assetInfoDetailController.selected.registrationNo}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'modalityId')}">
+        <h:panelGroup >
+            <label class="label">#{msg.modalityId}</label>
+            <p:inputText id="modalityId" value="#{assetInfoDetailController.selected.modalityId}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'qrCode')}">
+        <h:panelGroup >
+            <label class="label">#{msg.qrCode}</label>
+            <p:inputText id="qrCode" value="#{assetInfoDetailController.selected.qrCode}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'functionType')}">
+
+        <h:panelGroup >
+            <label class="label">#{msg.functionType}</label>
+            <p:inputText id="functionType" value="#{assetInfoDetailController.selected.functionType}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'functionGroup')}">
+        <h:panelGroup >
+            <label class="label">#{msg.functionGroup}</label>
+            <p:inputText id="functionGroup" value="#{fieldMsg.fieldValue('assetFunctionType', assetInfoDetailController.selected.functionGroup)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetCode68')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetCode68}</label>
+            <p:inputText id="assetCode68" value="#{fieldMsg.fieldValue(assetInfoDetailController.selected.functionGroup, assetInfoDetailController.selected.assetCode68)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'functionGrade')}">
+        <h:panelGroup >
+            <label class="label">#{msg.functionGrade}</label>
+            <p:inputText id="functionGrade" value="#{fieldMsg.fieldValue('assetFunctionGrade', assetInfoDetailController.selected.functionGrade)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'repairForm')}">
+        <h:panelGroup >
+            <label class="label">#{msg.repairForm}</label>
+            <p:inputText id="repairForm" value="#{fieldMsg.fieldValue('repairForm', assetInfoDetailController.selected.repairForm)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'locationCode')}">
+        <h:panelGroup >
+            <label class="label">#{msg.locationCode}</label>
+            <p:inputText id="locationCode" value="#{assetInfoDetailController.selected.locationCode}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'locationName')}">
+        <h:panelGroup >
+            <label class="label">#{msg.locationName}</label>
+            <p:inputText id="locationName" value="#{assetInfoDetailController.selected.locationName}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'status')}">
+        <h:panelGroup >
+            <label class="label">#{msg.status}</label>
+            <p:selectOneRadio id="status"  label="#{msg.status}" value="#{assetInfoDetailController.selected.status}" disabled="true">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('assetStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'deviceStatus')}">
+        <h:panelGroup >
+            <label class="label">#{msg.deviceStatus}</label>
+            <p:selectOneRadio id="deviceStatus"  label="#{msg.status}" value="#{assetInfoDetailController.selected.deviceStatus}" disabled="true">
+                <f:selectItems value="#{fieldMsg.getFieldValueList('deviceStatus')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'comments')}">
+        <h:panelGroup >
+            <label class="label">#{msg.comments}</label>
+            <p:inputText  value="#{assetInfoDetailController.selected.comments}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'assetUsage')}">
+        <h:panelGroup >
+            <label class="label">#{msg.assetUsage}</label>
+            <p:inputText id="assetUsage" value="#{fieldMsg.fieldValue('assetUsage', assetInfoDetailController.selected.assetUsage)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'capitalSource')}">
+        <h:panelGroup >
+            <label class="label">#{msg.capitalSource}</label>
+            <p:inputText id="capitalSource" value="#{fieldMsg.fieldValue('capitalSource', assetInfoDetailController.selected.capitalSource)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'capitalSource2')}">
+        <h:panelGroup >
+            <label class="label">#{msg.capitalSource2}</label>
+            <p:inputText id="capitalSource2" value="#{fieldMsg.fieldValue('capitalSource2', assetInfoDetailController.selected.capitalSource2)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'measureGrade')}">
+        <h:panelGroup >
+            <label class="label">#{msg.measureGrade}</label>
+            <p:inputText id="measureGrade" value="#{fieldMsg.fieldValue('measureGrade', assetInfoDetailController.selected.measureGrade)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'riskGrade')}">
+        <h:panelGroup >
+            <label class="label">#{msg.riskGrade}</label>
+            <p:inputText id="riskGrade" value="#{fieldMsg.fieldValue('riskGrade', assetInfoDetailController.selected.riskGrade)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'emergencyEquipment')}">
+        <h:panelGroup >
+            <label class="label">#{msg.emergencyEquipment}</label>
+            <p:inputText id="emergencyEquipment" value="#{fieldMsg.fieldValue('emergencyEquipment', assetInfoDetailController.selected.emergencyEquipment)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'importEquipment')}">
+        <h:panelGroup >
+            <label class="label">#{msg.importEquipment}</label>
+            <p:inputText id="importEquipment" value="#{fieldMsg.fieldValue('importEquipment', assetInfoDetailController.selected.importEquipment)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'measuringItemCategory')}">
+        <h:panelGroup >
+            <label class="label">#{msg.measuringItemCategory}</label>
+            <p:inputText id="measuringItemCategory" value="#{fieldMsg.fieldValue('measuringItemCategory', assetInfoDetailController.selected.measuringItemCategory)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'usageStatus')}">
+        <h:panelGroup >
+            <label class="label">#{msg.usageStatus}</label>
+            <p:inputText id="usageStatus" value="#{fieldMsg.fieldValue('usageStatus', assetInfoDetailController.selected.usageStatus)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'accountingCategory')}">
+        <h:panelGroup >
+            <label class="label">#{msg.accountingCategory}</label>
+            <p:inputText id="accountingCategory" value="#{fieldMsg.fieldValue('accountingCategory', assetInfoDetailController.selected.accountingCategory)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'manufactDate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.manufactDate}</label>
+            <p:inputText id="manufactDate" value="#{assetInfoDetailController.selected.manufactDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'purchaseDate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.purchaseDate}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.purchaseDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'arriveDate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.arriveDate}</label>
+            <p:inputText id="arriveDate" value="#{assetInfoDetailController.selected.arriveDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'installDate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.installDate}</label>
+            <p:inputText id="installDate" value="#{assetInfoDetailController.selected.installDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'factoryWarrantyDate')}">
+        <h:panelGroup >
+            <label class="label">#{msg.factoryWarrantyDate}</label>
+            <p:inputText id="factoryWarrantyDate" value="#{assetInfoDetailController.selected.factoryWarrantyDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warrantyDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.warrantyDate}</label>
+            <p:inputText value="#{assetInfoDetailController.selected.warrantyDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'terminateDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.terminateDate}</label>
+            <p:inputText id="terminateDate" value="#{assetInfoDetailController.selected.terminateDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'purchasePrice')}">
+        <h:panelGroup>
+            <label class="label">#{msg.purchasePrice}</label>
+            <p:inputText id="purchasePrice" value="#{assetInfoDetailController.selected.purchasePrice}" readonly="true">
+                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'salvageValue')}">
+        <h:panelGroup>
+            <label class="label">#{msg.salvageValue}</label>
+            <p:inputText  id="salvageValue" value="#{assetInfoDetailController.selected.salvageValue}" readonly="true">
+                <f:convertNumber maxFractionDigits="2" minFractionDigits="2" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'lifecycle')}">
+        <h:panelGroup>
+            <label class="label">#{msg.lifecycle}</label>
+            <p:inputText id="lifecycle" value="#{assetInfoDetailController.selected.lifecycleInYear}" readonly="true">
+                <f:convertNumber maxFractionDigits="1" minFractionDigits="1" />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'depreciationMethod')}">
+        <h:panelGroup>
+            <label class="label">#{msg.depreciationMethod}</label>
+            <p:inputText id="depreciationMethod" value="#{fieldMsg.fieldValue('depreciationMethodList', assetInfoDetailController.selected.depreciationMethod)}" readonly="true"/>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'lastPmDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.lastPmDate}</label>
+            <p:inputText id="lastPmDate" value="#{assetInfoDetailController.selected.lastPmDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'lastQaDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.lastQaDate}</label>
+            <p:inputText id="lastQaDate" value="#{assetInfoDetailController.selected.lastQaDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'lastMeteringDate')}">
+        <h:panelGroup>
+            <label class="label">#{msg.lastMeteringDate}</label>
+            <p:inputText id="lastMeteringDate" value="#{assetInfoDetailController.selected.lastMeteringDate}" readonly="true">
+                <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd " />
+            </p:inputText>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'warranty')}">
+        <h:panelGroup>
+            <label class="label">是否对质保到期进行提醒</label>
+            <p:selectOneRadio value="#{assetInfoDetailController.selected.warranty}" disabled="true">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'isPm')}">
+        <h:panelGroup>
+            <label class="label">#{msg.isAssetPMed}</label>
+            <p:selectOneRadio value="#{assetInfoDetailController.selected.isPm}" disabled="true">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+    <c:if test="#{assetInfoDetailController.needShow(fieldItem, 'isChecked')}">
+        <h:panelGroup >
+            <label class="label">#{msg.isAssetChecked}</label>
+            <p:selectOneRadio value="#{assetInfoDetailController.selected.isChecked}" disabled="true">
+                <f:selectItem itemLabel="#{msg.True2Yes}" itemValue="true"/>
+                <f:selectItem itemLabel="#{msg.False2No}" itemValue="false"/>
+            </p:selectOneRadio>
+        </h:panelGroup>
+    </c:if>
+</ui:composition>

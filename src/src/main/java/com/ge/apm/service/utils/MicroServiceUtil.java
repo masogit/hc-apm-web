@@ -33,6 +33,18 @@ import org.springframework.util.MultiValueMap;
 @Component
 public class MicroServiceUtil extends MicroServiceInvoker {
 
+
+    public InputStream downloadRepeatedReadFile(String fileId) {
+        HttpHeaders headers = new HttpHeaders();
+        String gatewayURL = getGatewayURL(GatewayURL.DOWNLOAD_FILE);
+        ResponseEntity<byte[]> response = template.exchange(gatewayURL.concat("/").concat(fileId), HttpMethod.GET, new HttpEntity<byte[]>(headers), byte[].class);
+        HttpHeaders responseHeader = response.getHeaders();
+        byte[] result = response.getBody();
+        ByteArrayInputStream bios = new ByteArrayInputStream(result);
+        bios.reset();
+        return bios;
+    }
+
     public StreamedContent downloadSingleFile(String fileId) {
         HttpHeaders headers = new HttpHeaders();
         String gatewayURL = getGatewayURL(GatewayURL.DOWNLOAD_FILE);
@@ -140,8 +152,14 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         return null;
 
     }
-
     public String getAuthenticateByUserPassword(String userName, String password) {
+        return doGetAuthenticateByUserPassword(userName, password, false); //password is in plain text
+    }
+    public String getAuthenticateByUserPasswordEncrypted(String userName, String password) {
+        return doGetAuthenticateByUserPassword(userName, password, true); //password is already encrypted
+    }
+
+    public String doGetAuthenticateByUserPassword(String userName, String password, boolean isPasswordEncrypted) {
         HttpHeaders headers = new HttpHeaders();
         MediaType type = MediaType.parseMediaType("application/json; charset=UTF-8");
         headers.setContentType(type);
@@ -153,8 +171,12 @@ public class MicroServiceUtil extends MicroServiceInvoker {
         HttpEntity<Map> requestEntity = new HttpEntity<Map>(
                 postParameters, headers);
 
-        String gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD);
-
+        String gatewayURL;
+        if(isPasswordEncrypted)
+            gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD_ENCRYPTED);
+        else
+            gatewayURL = getGatewayURL(GatewayURL.GET_AUTHENTICATE_BY_USER_PASSWORD);
+        
         ResponseEntity<LinkedHashMap> response = template.postForEntity(gatewayURL, requestEntity, LinkedHashMap.class);
 
         if (isOkay(response)) {

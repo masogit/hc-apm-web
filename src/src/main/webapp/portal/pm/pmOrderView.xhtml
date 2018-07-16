@@ -89,9 +89,6 @@
                                 <f:convertDateTime timeZone="GMT+8" pattern="yyyy/MM/dd" />
                             </h:outputText>
                         </p:column>
-                        <p:column headerText="#{msg.description}">
-                            <h:outputText value="#{stepItem.comments}" />
-                        </p:column>
                     </p:dataTable>
 
                     <h:panelGroup rendered="#{v2PmOrderController.accessoryList.size()>0}">
@@ -130,6 +127,11 @@
 
                             <p:column headerText="预计到达时间">
                                 <h:outputText value="#{item.estimatedArriveTime}">
+                                    <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
+                                </h:outputText>
+                            </p:column>
+                            <p:column headerText="到达确认时间">
+                                <h:outputText value="#{item.arrivedTime}">
                                     <f:convertDateTime pattern="yyyy-MM-dd HH:mm:ss"/>
                                 </h:outputText>
                             </p:column>

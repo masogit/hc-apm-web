@@ -35,8 +35,12 @@ public class UaaService {
     public static final String TEMPORARY_ACCOUNT = "";
     private static Map<String, SysRole> sysRoles;
     public static final String TEMP_STAFF = "仅报修权限账号";
+
     @Autowired
     OrgInfoRepository orgInfoDao;
+
+    @Autowired
+    UserOrgInfoRepository userOrgDao;
 
     @Autowired
     WorkflowConfigRepository wfcfigDao;
@@ -357,7 +361,7 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
        // if(treeNode.getParent()!=null) {
             OrgInfo orgInfo = (OrgInfo) treeNode.getData();
 
-            if (orgInfo.getName().contains(keyWords)) {
+            if (orgInfo.getName().contains(keyWords) || (orgInfo.getNamePyCode() != null && orgInfo.getNamePyCode().contains(keyWords))) {
                 treeNodeMap.put(orgInfo.getUid(), treeNode);
                 //如果找到 xx机构 就将其包括其父节点到到根节点都放到 treeNodeMap中
                 buidUpFromNodeYuanQu(treeNodeMap, treeNode);
@@ -521,29 +525,42 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         List<UserOrgInfo> orgList = userOrgDao.findByUserUid(userUid);
         userOrgDao.delete(orgList);
     }
+
+    @Transactional
+    public void clearUserOrgAfterOrgUpdate(String userUid){
+        userOrgDao.deleteByUserUid(userUid);
+    }
     
     @Transactional
     public void setDefaultScope(UserAccount user) {
         OrgInfo ownnedOrg = orgInfoDao.getByUid(user.getOrgInfoUID());
         List<WorkflowConfig> workflowConfigs = wfcfigDao.findByDeptForSharedAsset(ownnedOrg.getUid());
 
+        UserOrgInfo foundUserOrg = null;
+
         if (ownnedOrg.getOrgType() == 4 && workflowConfigs.size() == 0) {
             //if chosen org is clinical dept, then only select the current clinical dept instead of the whole site.
-            UserOrgInfo userOrg = new UserOrgInfo();
-            userOrg.setUserUid(user.getUid());
-            userOrg.setOrgUid(ownnedOrg.getUid());
-            userOrg.setOrgType(ownnedOrg.getOrgType());
-            UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-            userOrgDao.save(userOrg);
+
+            foundUserOrg = userOrgDao.findFirstByUserUidAndOrgUid(user.getUid(), ownnedOrg.getUid());
+            if (foundUserOrg == null) {
+                UserOrgInfo userOrg = new UserOrgInfo();
+                userOrg.setUserUid(user.getUid());
+                userOrg.setOrgUid(ownnedOrg.getUid());
+                userOrg.setOrgType(ownnedOrg.getOrgType());
+                userOrgDao.save(userOrg);
+            }
+
         } else {
             OrgInfo org = orgInfoDao.getByUid(user.getSiteUID());
             if (org != null) {
-                UserOrgInfo userOrg = new UserOrgInfo();
-                userOrg.setUserUid(user.getUid());
-                userOrg.setOrgUid(org.getUid());
-                userOrg.setOrgType(org.getOrgType());
-                UserOrgInfoRepository userOrgDao = WebUtil.getBean(UserOrgInfoRepository.class);
-                userOrgDao.save(userOrg);
+                foundUserOrg = userOrgDao.findFirstByUserUidAndOrgUid(user.getUid(), org.getUid());
+                if (foundUserOrg == null) {
+                    UserOrgInfo userOrg = new UserOrgInfo();
+                    userOrg.setUserUid(user.getUid());
+                    userOrg.setOrgUid(org.getUid());
+                    userOrg.setOrgType(org.getOrgType());
+                    userOrgDao.save(userOrg);
+                }
             }
         }
 
@@ -741,14 +758,27 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
     
     //用户对指定医院访问的科室列表
     public List<OrgInfo> getOrgDeptList(String siteUid,String userUid) {
+        if(logger.isDebugEnabled()) {
+            logger.debug("getOrgDeptList siteUID: " + siteUid + ", userUid: " + userUid);
+        }
+        List<OrgInfo> deptList;
         List<OrgInfo> accessList = getOrgListByUser(userUid);
         Set<String> orgUidSet = accessList.stream().filter(item -> item.getOrgType() == 4).map(item -> item.getSiteUID()).collect(Collectors.toSet());
-        List<SearchFilter> orgInfoFilters = new ArrayList<>();
         if (orgUidSet.contains(siteUid)) {
-            return accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
+            deptList = accessList.stream().filter(item -> item.getSiteUID().equals(siteUid) && item.getOrgType() == 4).collect(Collectors.toList());
         } else {
-            return getClinicalDeptListBySiteUID(siteUid);
+            deptList = getClinicalDeptListBySiteUID(siteUid);
         }
+        if(logger.isDebugEnabled()) {
+            logger.debug("deptList: " + deptList.stream().map(item -> item.getUid()).collect(Collectors.joining(",")));
+        }
+        List<String> regulatorUids = this.getRegulatorUidsBySiteUid(siteUid);
+        if(regulatorUids != null && regulatorUids.size() > 0) {
+            deptList = deptList.stream()
+                                .filter(item -> !regulatorUids.contains(item.getUid()))
+                                .collect(Collectors.toList());
+        }
+        return deptList;
     }
     
     public List<OrgInfo> getClinicalDeptListBySiteUID(String siteUID) {
@@ -958,6 +988,20 @@ public void buildTreeByKey(TreeNode treeNode,String keyWords){
         }
 
         return null;
+    }
+    
+    // 根据院区UID(siteUID)获取工作流中配置的调剂中心UID列表
+    public List<String> getRegulatorUidsBySiteUid(String siteUID) {
+        List<WorkflowConfig> workflows = wfcfigDao.findBySiteUID(siteUID);
+        List<String> regulatorUids = workflows.stream()
+                                                .map(workflow -> workflow.getDeptForSharedAsset())
+                                                .distinct()
+                                                .collect(Collectors.toList());
+        if(logger.isDebugEnabled()) {
+            logger.debug("getRegulatorUidsBySiteUid siteUID: " + siteUID + ", regulatorUids: " + regulatorUids.stream().collect(Collectors.joining(",")));
+        }
+        return regulatorUids;
+                
     }
 
 }

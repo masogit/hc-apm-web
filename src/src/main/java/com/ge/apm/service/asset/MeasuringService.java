@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ public class MeasuringService {
     private final String HEADER_ASSET_SN = "设备序列号SN";
     private final String HEADER_ASSET_NO = "资产编号";
     private final String HEADER_APPLIANCE_NO = "器具编号";
-    private final String HEADER_PAYED = "付款否";
+    //private final String HEADER_PAYED = "付款否";
     private final String HEADER_VERIFICATION_CONCLUSION = "检定结论";
     private final String HEADER_VERIFICATION_DATE = "检定日期";
     private final String HEADER_EXPIRE_DATE = "有效期至";
@@ -49,7 +50,7 @@ public class MeasuringService {
     private final String HEADER_CATEGORY = "种别";
     private final String HEADER_CLINICAL_DEPT = "送检单位";
     private final String HEADER_REMARK = "备注";
-    private final String HEADER_OVERDUE = "过期否";
+    //private final String HEADER_OVERDUE = "过期否";
     private final String HEADER_FILE_NO = "存档记录";
 
     @Autowired
@@ -57,75 +58,122 @@ public class MeasuringService {
     @Autowired
     private AssetInfoRepository assetInfoDao;
 
-    public boolean operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
+    public MeasuringCertificateDetail operateMeasuringAndAssetInfo(MeasuringCertificateDetail measuringCertificateDetail) {
         boolean flag = false;
         AssetInfo tempAssetInfo = null;
+        String errorInfo = "";
+        List<AssetInfo> tempAssetInfoList = null;
 
-        List<AssetInfo> tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getTenantUID());
-
-        if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
-            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getTenantUID());
+        if(null != measuringCertificateDetail.getAssetSN()){
+            tempAssetInfoList = this.getAssetInfoBySerialNum(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[设备序列号SN不能匹配到资产设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[设备序列号SN匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
         }
 
-        if(tempAssetInfoList != null && !tempAssetInfoList.isEmpty()){
+        if(null != measuringCertificateDetail.getFinanceNo() && !flag){
+            tempAssetInfoList = this.getAssetInfoByFinancingNum(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getSiteUID());
+            if(tempAssetInfoList == null || tempAssetInfoList.isEmpty()){
+                errorInfo += "[资产编号不能匹配到设备]";
+            }else{
+                if(tempAssetInfoList.size() == 1){
+                    flag = true;
+                }else{
+                    errorInfo += "[资产编号匹配到(" + tempAssetInfoList.size() + ")个资产设备]";
+                }
+            }
+        }
+
+        if(flag){
             if(tempAssetInfoList.size() == 1){
                 tempAssetInfo = tempAssetInfoList.get(0);
             }
         }
 
         if(tempAssetInfo != null){
-            tempAssetInfo.setNextMeteringDate(measuringCertificateDetail.getValidDateTo());
-            tempAssetInfo.setLastMeteringDate(measuringCertificateDetail.getCheckDate());
-            tempAssetInfo.setAccountingCategory(measuringCertificateDetail.getStatus());
-            tempAssetInfo.setMeteringNO(measuringCertificateDetail.getCertificateNo());
-            if (measuringCertificateDetail.getStatus() == 2) {//计量不合格
-                tempAssetInfo.setUsageStatus(2);//停用
+            List<MeasuringCertificateDetail> mcdList = null;
+            MeasuringCertificateDetail needUpdateAssetMcd = measuringCertificateDetail;
+
+            if(measuringCertificateDetail.getCertificateNo() != null){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCertificateNoAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCertificateNo(), measuringCertificateDetail.getTenantUID());
             }
 
-            assetInfoDao.save(tempAssetInfo);
-
-            //向MeasuringCertificateDetail表中插入导入记录
-            /*MeasuringCertificateDetail tempMeasuringCertificateDetail = measuringCertificateDetailDao.findByAssetSNAndCheckDateAndTenantUID(measuringCertificateDetail.getAssetSN(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            if(tempMeasuringCertificateDetail == null){
-                tempMeasuringCertificateDetail = measuringCertificateDetailDao.findByFinanceNoAndCheckDateAndTenantUID(measuringCertificateDetail.getFinanceNo(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-            }*/
-
-            MeasuringCertificateDetail tempMeasuringCertificateDetail = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
-
-            if (tempMeasuringCertificateDetail != null) {
-                measuringCertificateDetail.setId(tempMeasuringCertificateDetail.getId());
+            if(mcdList == null || mcdList.isEmpty()){
+                mcdList = measuringCertificateDetailDao.findByAssetUIDAndCheckDateAndTenantUID(tempAssetInfo.getUid(), measuringCertificateDetail.getCheckDate(), measuringCertificateDetail.getTenantUID());
             }
+
+            //如果查询到具体的计量记录,做更新操作，否则新增计量记录
+            if(mcdList != null && !mcdList.isEmpty()) {
+                MeasuringCertificateDetail tempMcd = mcdList.get(0);
+                measuringCertificateDetail.setId(tempMcd.getId());
+            }
+
             measuringCertificateDetail.setAssetUID(tempAssetInfo.getUid());
             measuringCertificateDetailDao.save(measuringCertificateDetail);
 
-            flag = true;
+            //目标设备的所有计量记录
+            List<MeasuringCertificateDetail> allMcdList = measuringCertificateDetailDao.findByAssetUIDAndTenantUIDOrderByCheckDateDesc(tempAssetInfo.getUid(), measuringCertificateDetail.getTenantUID());
+            if(allMcdList != null && !allMcdList.isEmpty()){
+                //目标设备的所有计量记录中计量日期最大的记录
+                MeasuringCertificateDetail maxMcd = allMcdList.get(0);
+
+                if(measuringCertificateDetail.getCheckDate().before(maxMcd.getCheckDate())){
+
+                    needUpdateAssetMcd = maxMcd;
+
+                }
+            }
+
+            //更新设备台账
+            tempAssetInfo.setNextMeteringDate(needUpdateAssetMcd.getValidDateTo());
+            tempAssetInfo.setLastMeteringDate(needUpdateAssetMcd.getCheckDate());
+            tempAssetInfo.setMeteringNO(needUpdateAssetMcd.getCertificateNo());
+            if (needUpdateAssetMcd.getStatus() == 2) {//计量不合格
+                tempAssetInfo.setUsageStatus(2);//停用
+                tempAssetInfo.setStatus(5);
+            }
+            assetInfoDao.save(tempAssetInfo);
+
         }
 
-        return flag;
+        if(!flag){
+            measuringCertificateDetail.setErrorInfo(errorInfo);
+            return measuringCertificateDetail;
+        }else{
+            return null;
+        }
     }
 
-    private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String tenantUID){
+    private List<AssetInfo> getAssetInfoByFinancingNum(String financingNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(financingNum)){
-            tempAssetInfoList = assetInfoDao.findByFinancingNumAndTenantUID(financingNum, tenantUID);
+            tempAssetInfoList = assetInfoDao.getByFinancingNumAndSiteUID(financingNum, siteUID);
         }
 
         return tempAssetInfoList;
     }
 
-    private List<AssetInfo> getAssetInfoBySerialNum(String serialNum, String tenantUID){
+    private List<AssetInfo> getAssetInfoBySerialNum(String serialNum, String siteUID){
         List<AssetInfo> tempAssetInfoList = null;
 
         if(!StringHelper.isNullOrEmptyString(serialNum)){
-            tempAssetInfoList = assetInfoDao.findBySerialNumAndTenantUID(serialNum, tenantUID);
+            tempAssetInfoList = assetInfoDao.getBySerialNumAndSiteUID(serialNum, siteUID);
         }
 
         return tempAssetInfoList;
     }
 
     public List<MeasuringCertificateDetail> handleExcel(UploadedFile file, UserAccount user) throws IOException, ParseException {
+
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+        sdf.setLenient(false);
         List<MeasuringCertificateDetail> tempMCDList = new ArrayList<>();
         HSSFWorkbook workbook = new HSSFWorkbook(file.getInputstream());
         //for (int i = 0; i < workbook.getNumberOfSheets(); i++) {
@@ -138,6 +186,8 @@ public class MeasuringService {
                 return null;
             }
             for (int j = header.get("HEADER_ROW") + 1; j <= sheet.getLastRowNum(); j++) {
+                String errorInfo = "";
+
                 HSSFRow row = sheet.getRow(j);
 
                 MeasuringCertificateDetail detail = new MeasuringCertificateDetail();
@@ -145,45 +195,77 @@ public class MeasuringService {
                 detail.setInstitutionUID(user.getInstitutionUID());
                 detail.setHospitalUID(user.getHospitalUID());
                 detail.setSiteUID(user.getSiteUID());
-                detail.setAssetManufacturer(row.getCell(header.get("MANUFACTURE_CELL")) == null ? null : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+
+                if(row.getCell(header.get("MANUFACTURE_CELL")) != null){
+                    detail.setAssetManufacturer(CellType.NUMERIC.equals(row.getCell(header.get("MANUFACTURE_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("MANUFACTURE_CELL")).getNumericCellValue()) : row.getCell(header.get("MANUFACTURE_CELL")).getStringCellValue());
+                }
 
                 if(row.getCell(header.get("MODEL_CELL")) != null) {
                     detail.setAssetModel(CellType.NUMERIC.equals(row.getCell(header.get("MODEL_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("MODEL_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("MODEL_CELL")).getStringCellValue());
                 }
 
-                detail.setAssetName(row.getCell(header.get("APPLIANCE_NAME_CELL")) == null ? null : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                if(row.getCell(header.get("APPLIANCE_NAME_CELL")) != null){
+                    detail.setAssetName(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NAME_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NAME_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NAME_CELL")).getStringCellValue());
+                }
 
                 if(row.getCell(header.get("APPLIANCE_NO_CELL")) != null) {
-                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
+                    detail.setAssetNo(CellType.NUMERIC.equals(row.getCell(header.get("APPLIANCE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("APPLIANCE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("APPLIANCE_NO_CELL")).getStringCellValue());
                 }
 
                 if(row.getCell(header.get("CERTIFICATION_NO_CELL")) != null) {
-                    detail.setCertificateNo(CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue());
+                    String tempCertificateNo = CellType.NUMERIC.equals(row.getCell(header.get("CERTIFICATION_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CERTIFICATION_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("CERTIFICATION_NO_CELL")).getStringCellValue();
+                    if(tempCertificateNo == null || tempCertificateNo.trim().equals("")){
+                        tempCertificateNo = null;
+                    }
+                    detail.setCertificateNo(tempCertificateNo);
                 }
 
                 if(row.getCell(header.get("VERIFICATION_DATE_CELL")) != null) {
-                    detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                    try {
+                        detail.setCheckDate(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue()));
+                    }catch (Exception ex){
+                        errorInfo += "[检定日期格式不对]";
+                    }
+
+                    detail.setCheckDateDisplay(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("VERIFICATION_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("VERIFICATION_DATE_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("EXPIRE_DATE_CELL")) != null) {
-                    detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                    try {
+                        detail.setValidDateTo(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue() : sdf.parse(row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue()));
+                    }catch (Exception ex){
+                        errorInfo += "[有效期至格式不对]";
+                    }
+
+                    detail.setValidDateToDisplay(CellType.NUMERIC.equals(row.getCell(header.get("EXPIRE_DATE_CELL")).getCellTypeEnum()) ? sdf.format(row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue()) : row.getCell(header.get("EXPIRE_DATE_CELL")).getStringCellValue());
                 }
-                //detail.setValidDateTo(row.getCell(header.get("EXPIRE_DATE_CELL")) == null ? null : row.getCell(header.get("EXPIRE_DATE_CELL")).getDateCellValue());
-                detail.setCheckCompany(row.getCell(header.get("VERIFICATION_UNIT_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
-                detail.setCheckPerson(row.getCell(header.get("VERIFIER_CELL")) == null ? null : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
-                detail.setComments(row.getCell(header.get("REMARK_CELL")) == null ? null : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
-                detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
-                detail.setDepartment(row.getCell(header.get("CLINICAL_DEPT_CELL")) == null ? null : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                if(row.getCell(header.get("VERIFICATION_UNIT_CELL")) != null){
+                    detail.setCheckCompany(CellType.NUMERIC.equals(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFICATION_UNIT_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFICATION_UNIT_CELL")).getStringCellValue());
+                }
+                if(row.getCell(header.get("VERIFIER_CELL")) != null){
+                    detail.setCheckPerson(CellType.NUMERIC.equals(row.getCell(header.get("VERIFIER_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("VERIFIER_CELL")).getNumericCellValue()) : row.getCell(header.get("VERIFIER_CELL")).getStringCellValue());
+                }
+                if(row.getCell(header.get("REMARK_CELL")) != null){
+                    detail.setComments(CellType.NUMERIC.equals(row.getCell(header.get("REMARK_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("REMARK_CELL")).getNumericCellValue()) : row.getCell(header.get("REMARK_CELL")).getStringCellValue());
+                }
+                //detail.setExpired(row.getCell(header.get("OVERDUE_CELL")) == null ? null : "待检".equals(row.getCell(header.get("OVERDUE_CELL")).getStringCellValue()) ? false : true);
+                if(row.getCell(header.get("CLINICAL_DEPT_CELL")) != null){
+                    detail.setDepartment(CellType.NUMERIC.equals(row.getCell(header.get("CLINICAL_DEPT_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CLINICAL_DEPT_CELL")).getNumericCellValue()) : row.getCell(header.get("CLINICAL_DEPT_CELL")).getStringCellValue());
+                }
                 if(row.getCell(header.get("ASSET_SN_CELL")) != null) {
-                    detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()).intValue()): row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
+                    detail.setAssetSN(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_SN_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_SN_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_SN_CELL")).getStringCellValue());
                 }
                 if(row.getCell(header.get("ASSET_NO_CELL")) != null) {
-                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()).intValue()): row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
+                    detail.setFinanceNo(CellType.NUMERIC.equals(row.getCell(header.get("ASSET_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ASSET_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("ASSET_NO_CELL")).getStringCellValue());
                 }
-                detail.setCheckItem(row.getCell(header.get("ITEM_CELL")) == null ? null : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
-                detail.setType(row.getCell(header.get("CATEGORY_CELL")) == null ? null : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+                if(row.getCell(header.get("ITEM_CELL")) != null){
+                    detail.setCheckItem(CellType.NUMERIC.equals(row.getCell(header.get("ITEM_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("ITEM_CELL")).getNumericCellValue()) : row.getCell(header.get("ITEM_CELL")).getStringCellValue());
+                }
+                if(row.getCell(header.get("CATEGORY_CELL")) != null){
+                    detail.setType(CellType.NUMERIC.equals(row.getCell(header.get("CATEGORY_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("CATEGORY_CELL")).getNumericCellValue()) : row.getCell(header.get("CATEGORY_CELL")).getStringCellValue());
+                }
                 //detail.setPay(row.getCell(header.get("PAYED_CELL")) == null ? null : row.getCell(header.get("PAYED_CELL")).getBooleanCellValue());
                 if(row.getCell(header.get("FILE_NO_CELL")) != null) {
-                    detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? String.valueOf(Double.valueOf(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()).intValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
+                    detail.setFileNo(CellType.NUMERIC.equals(row.getCell(header.get("FILE_NO_CELL")).getCellTypeEnum()) ? new DecimalFormat("##############.#####").format(row.getCell(header.get("FILE_NO_CELL")).getNumericCellValue()) : row.getCell(header.get("FILE_NO_CELL")).getStringCellValue());
                 }
                 detail.setStatusDisplay(row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")) == null ? null : row.getCell(header.get("VERIFICATION_CONCLUSION_CELL")).getStringCellValue());
                 Integer status = 3;
@@ -209,13 +291,28 @@ public class MeasuringService {
                 detail.setStatus(status);
                 detail.setExcelIdex(j + 1);
 
+                if(detail.getCheckDate() != null && detail.getCheckDate().after(sdf.parse("99999/12/31"))){
+                    errorInfo += "[检定日期不能超过99999/12/31]";
+                }
+
+                if(detail.getValidDateTo() != null && detail.getValidDateTo().after(sdf.parse("99999/12/31"))){
+                    errorInfo += "[有效期至不能超过99999/12/31]";
+                }
+
                 //检定日期不能为空，设备序列号和资产编号不能全为空
-                if (row == null || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null || (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null)) {
+                if (row == null || !errorInfo.equals("") || row.getCell(header.get("VERIFICATION_DATE_CELL")) == null || (row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null)) {
+                    if(row.getCell(header.get("ASSET_SN_CELL")) == null && row.getCell(header.get("ASSET_NO_CELL")) == null){
+                        errorInfo += "[(设备序列号SN)和(资产编号)不能同时为空]";
+                    }
+                    if(row.getCell(header.get("VERIFICATION_DATE_CELL")) == null){
+                        errorInfo += "[检定日期不能为空]";
+                    }
+                    detail.setErrorInfo(errorInfo);
                     tempMCDList.add(detail);
                     continue;
                 }
 
-                if(!operateMeasuringAndAssetInfo(detail)){
+                if(operateMeasuringAndAssetInfo(detail) != null){
                     tempMCDList.add(detail);
                 }
             }
@@ -241,7 +338,7 @@ public class MeasuringService {
             boolean hasAssetSN = false;
             boolean hasAssetNo = false;
             boolean hasApplianceNo = false;
-            boolean hasPayed = false;
+            //boolean hasPayed = false;
             boolean hasVerificationConclusion = false;
             boolean hasVerificationDate = false;
             boolean hasExpireDate = false;
@@ -251,7 +348,7 @@ public class MeasuringService {
             boolean hasCategory = false;
             boolean hasClinicalDept = false;
             boolean hasRemark = false;
-            boolean hasOverdue = false;
+            //boolean hasOverdue = false;
             boolean hasFileNo = false;
 
             for (int j = row.getFirstCellNum(); j <= row.getLastCellNum(); j++) {
@@ -267,7 +364,7 @@ public class MeasuringService {
                     hasAssetSN = HEADER_ASSET_SN.equals(cell.getStringCellValue()) ? true : hasAssetSN;
                     hasAssetNo = HEADER_ASSET_NO.equals(cell.getStringCellValue()) ? true : hasAssetNo;
                     hasApplianceNo = HEADER_APPLIANCE_NO.equals(cell.getStringCellValue()) ? true : hasApplianceNo;
-                    hasPayed = HEADER_PAYED.equals(cell.getStringCellValue()) ? true : hasPayed;
+                    //hasPayed = HEADER_PAYED.equals(cell.getStringCellValue()) ? true : hasPayed;
                     hasVerificationConclusion = HEADER_VERIFICATION_CONCLUSION.equals(cell.getStringCellValue()) ? true : hasVerificationConclusion;
                     hasVerificationDate = HEADER_VERIFICATION_DATE.equals(cell.getStringCellValue()) ? true : hasVerificationDate;
                     hasExpireDate = HEADER_EXPIRE_DATE.equals(cell.getStringCellValue()) ? true : hasExpireDate;
@@ -277,7 +374,7 @@ public class MeasuringService {
                     hasCategory = HEADER_CATEGORY.equals(cell.getStringCellValue()) ? true : hasCategory;
                     hasClinicalDept = HEADER_CLINICAL_DEPT.equals(cell.getStringCellValue()) ? true : hasClinicalDept;
                     hasRemark = HEADER_REMARK.equals(cell.getStringCellValue()) ? true : hasRemark;
-                    hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
+                    //hasOverdue = HEADER_OVERDUE.equals(cell.getStringCellValue()) ? true : hasOverdue;
                     hasFileNo = HEADER_FILE_NO.equals(cell.getStringCellValue()) ? true : hasFileNo;
                     switch (cell.getStringCellValue()) {
                         case HEADER_CERTIFICATION_NO:
@@ -308,10 +405,10 @@ public class MeasuringService {
                             hasApplianceNo = true;
                             header.put("APPLIANCE_NO_CELL", j);
                             break;
-                        case HEADER_PAYED:
+                        /*case HEADER_PAYED:
                             hasPayed = true;
                             header.put("PAYED_CELL", j);
-                            break;
+                            break;*/
                         case HEADER_VERIFICATION_CONCLUSION:
                             hasVerificationConclusion = true;
                             header.put("VERIFICATION_CONCLUSION_CELL", j);
@@ -348,10 +445,10 @@ public class MeasuringService {
                             hasRemark = true;
                             header.put("REMARK_CELL", j);
                             break;
-                        case HEADER_OVERDUE:
+                        /*case HEADER_OVERDUE:
                             hasOverdue = true;
                             header.put("OVERDUE_CELL", j);
-                            break;
+                            break;*/
                         case HEADER_FILE_NO:
                             hasFileNo = true;
                             header.put("FILE_NO_CELL", j);
@@ -365,8 +462,8 @@ public class MeasuringService {
                 }
             }
             if (hasCertificationNo && hasApplianceName && hasManufacture && hasModel && hasAssetSN && hasAssetNo
-                    && hasApplianceNo && hasPayed && hasVerificationConclusion && hasVerificationDate && hasExpireDate
-                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasOverdue && hasFileNo) {
+                    && hasApplianceNo && hasVerificationConclusion && hasVerificationDate && hasExpireDate
+                    && hasVerificationUnit && hasVerifier && hasItem && hasCategory && hasClinicalDept && hasRemark && hasFileNo) {
                 header.put("HEADER_ROW", i);
                 break;
             }

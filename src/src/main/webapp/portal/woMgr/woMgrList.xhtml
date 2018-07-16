@@ -24,6 +24,7 @@
                     <p:commandButton value="#{msg.waitClose}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=7"  disabled="#{workOrderMgrController.queryIndex==7}" rendered="#{userContextService.hasRole('AssetStaff')}"/>
                     <p:commandButton value="#{msg.closed}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=8"  disabled="#{workOrderMgrController.queryIndex==8}" rendered="true"/>
                     <p:commandButton value="#{msg.canceled}"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" action="workOrderList.xhtml?faces-redirect=true&amp;query=9"  disabled="#{workOrderMgrController.queryIndex==9}" rendered="true"/>
+                    <p:commandButton value="全部"  process="@this" update="datalist buttonSet woTab:woMgrDetailForm woTab:ServiceRequestCreateForm" disabled="#{workOrderMgrController.queryIndex==11}" rendered="true" action="workOrderList.xhtml?faces-redirect=true&amp;query=11" />
 <!--                        <p:commandButton value="已派工" id="btn1" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(3)}"  disabled="#{workOrderMgrController.queryIndex==3}" />
                     <p:commandButton value="已关单" id="btn2" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(4)}" disabled="#{workOrderMgrController.queryIndex==4}"/>-->
                     <!--<p:commandButton value="已取消" id="btn5" process="@this" update="datalist buttonSet woTab:woMgrDetailForm " actionListener="#{workOrderMgrController.searchList(5)}" disabled="#{workOrderMgrController.queryIndex==5}"/>-->
@@ -243,7 +244,7 @@
         </p:dialog>
 
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 var requestAssetUid = "#{workOrderMgrController.requestAssetUid}";
                 if (requestAssetUid != "") {
                     createSR();

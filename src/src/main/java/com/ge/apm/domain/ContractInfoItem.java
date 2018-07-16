@@ -30,7 +30,7 @@ import org.hibernate.annotations.GenericGenerator;
 public class ContractInfoItem implements Serializable {
 
     public enum ContractInfoItemType {
-        ExistAsset, Purchase
+        ExistAsset, Purchase, ArrivalledItem
     }
 
     @Id
@@ -49,6 +49,7 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "item_type")
     private String itemType;
 
+    //'ExistAsset',  'ArrivalledItem'
     @Column(name = "asset_uid", columnDefinition = "CHAR(32)")
     private String assetUid;
 
@@ -60,11 +61,23 @@ public class ContractInfoItem implements Serializable {
     @Column(name = "arrival_item_id", columnDefinition = "CHAR(32)")
     private String arrivalItemId;
 
-    //交货期
-    @Basic(optional = true)
-    @Column(name = "delivered_date")
-    @Temporal(TemporalType.DATE)
-    private Date deliveredDate;
+    @JoinColumn(name = "arrival_item_id", referencedColumnName = "id", insertable = false, updatable = false, nullable = true)
+    @ManyToOne(fetch = FetchType.EAGER)
+    private ArrivalListItem arrivalListItem;
+
+    //订购项
+    @Column(name = "purchase_item_id", columnDefinition = "CHAR(32)")
+    private String PurchaseItemId;
+
+    
+    //申请科室
+    @Column(name = "apply_dept")
+    private String applyDept;
+//    //交货期
+//    @Basic(optional = true)
+//    @Column(name = "delivered_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date deliveredDate;
 
     //通知供货时间
     @Basic(optional = true)
@@ -78,19 +91,15 @@ public class ContractInfoItem implements Serializable {
     @Temporal(TemporalType.DATE)
     private Date plannedArriveDate;
 
-    //实际到货时间
-    @Basic(optional = true)
-    @Column(name = "arrive_date")
-    @Temporal(TemporalType.DATE)
-    private Date arriveDate;
+//    //实际到货时间
+//    @Basic(optional = true)
+//    @Column(name = "arrive_date")
+//    @Temporal(TemporalType.DATE)
+//    private Date arriveDate;
 
-    //是否在规定时间内到货
-    @Column(name = "in_time_arrived")
-    private Boolean inTimeArrived;
-
-    //购入方式
-    @Column(name = "tender_type")
-    private String tenderType;
+//    //是否在规定时间内到货
+//    @Column(name = "in_time_arrived")
+//    private Boolean inTimeArrived;
 
     //合同内设备名称
     @Column(name = "contract_asset_name")
@@ -115,6 +124,37 @@ public class ContractInfoItem implements Serializable {
     //交货期(天)
     @Column(name = "delivery_days")
     private Integer deliveryDays;
+
+    //预估单价(万元)
+    @Column(name = "estimated_price")
+    private Double estimatedPrice;
+
+    //价值类别
+    @Column(name = "price_type")
+    private String priceType;
+
+    //发票号
+    @Size(max = 64)
+    @Column(name = "invoice_num")
+    private String invoiceNum;
+
+    //报送首付日期
+    @Basic(optional = true)
+    @Column(name = "down_payment_date")
+    @Temporal(TemporalType.DATE)
+    private Date downPaymentDate;
+
+    //供应商申请尾款日期
+    @Basic(optional = true)
+    @Column(name = "apply_payment_date")
+    @Temporal(TemporalType.DATE)
+    private Date applyPaymentDate;
+
+    //报送尾款日期
+    @Basic(optional = true)
+    @Column(name = "tail_payment_date")
+    @Temporal(TemporalType.DATE)
+    private Date tailPaymentDate;
 
     //备注
     @Column(name = "comments")
@@ -161,14 +201,6 @@ public class ContractInfoItem implements Serializable {
         this.pattern = pattern;
     }
 
-    public Date getDeliveredDate() {
-        return deliveredDate;
-    }
-
-    public void setDeliveredDate(Date deliveredDate) {
-        this.deliveredDate = deliveredDate;
-    }
-
     public Date getNoticeDate() {
         return noticeDate;
     }
@@ -183,22 +215,6 @@ public class ContractInfoItem implements Serializable {
 
     public void setPlannedArriveDate(Date plannedArriveDate) {
         this.plannedArriveDate = plannedArriveDate;
-    }
-
-    public Date getArriveDate() {
-        return arriveDate;
-    }
-
-    public void setArriveDate(Date arriveDate) {
-        this.arriveDate = arriveDate;
-    }
-
-    public Boolean getInTimeArrived() {
-        return inTimeArrived;
-    }
-
-    public void setInTimeArrived(Boolean inTimeArrived) {
-        this.inTimeArrived = inTimeArrived;
     }
 
     public String getComments() {
@@ -223,14 +239,6 @@ public class ContractInfoItem implements Serializable {
 
     public void setArrivalItemId(String arrivalItemId) {
         this.arrivalItemId = arrivalItemId;
-    }
-
-    public String getTenderType() {
-        return tenderType;
-    }
-
-    public void setTenderType(String tenderType) {
-        this.tenderType = tenderType;
     }
 
     public String getContractAssetName() {
@@ -280,7 +288,79 @@ public class ContractInfoItem implements Serializable {
     public void setItemType(String itemType) {
         this.itemType = itemType;
     }
-    
+
+    public String getPurchaseItemId() {
+        return PurchaseItemId;
+    }
+
+    public void setPurchaseItemId(String PurchaseItemId) {
+        this.PurchaseItemId = PurchaseItemId;
+    }
+
+    public ArrivalListItem getArrivalListItem() {
+        return arrivalListItem;
+    }
+
+    public void setArrivalListItem(ArrivalListItem arrivalListItem) {
+        this.arrivalListItem = arrivalListItem;
+    }
+
+    public Double getEstimatedPrice() {
+        return estimatedPrice;
+    }
+
+    public void setEstimatedPrice(Double estimatedPrice) {
+        this.estimatedPrice = estimatedPrice;
+    }
+
+    public String getPriceType() {
+        return priceType;
+    }
+
+    public void setPriceType(String priceType) {
+        this.priceType = priceType;
+    }
+
+    public String getInvoiceNum() {
+        return invoiceNum;
+    }
+
+    public void setInvoiceNum(String invoiceNum) {
+        this.invoiceNum = invoiceNum;
+    }
+
+    public Date getDownPaymentDate() {
+        return downPaymentDate;
+    }
+
+    public void setDownPaymentDate(Date downPaymentDate) {
+        this.downPaymentDate = downPaymentDate;
+    }
+
+    public Date getApplyPaymentDate() {
+        return applyPaymentDate;
+    }
+
+    public void setApplyPaymentDate(Date applyPaymentDate) {
+        this.applyPaymentDate = applyPaymentDate;
+    }
+
+    public Date getTailPaymentDate() {
+        return tailPaymentDate;
+    }
+
+    public void setTailPaymentDate(Date tailPaymentDate) {
+        this.tailPaymentDate = tailPaymentDate;
+    }
+
+    public String getApplyDept() {
+        return applyDept;
+    }
+
+    public void setApplyDept(String applyDept) {
+        this.applyDept = applyDept;
+    }
+
     @Override
     public int hashCode() {
         Integer hash = 0;

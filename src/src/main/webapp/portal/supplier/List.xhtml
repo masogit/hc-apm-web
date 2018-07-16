@@ -23,7 +23,7 @@
                                  rows="20" emptyMessage="#{msg.noRecordFound}"
                                  rowsPerPageTemplate="20,40,60,90">
 
-                        <p:ajax event="rowSelect" update="createButton editButton deleteButton"/>
+                        <p:ajax event="rowSelect" listener="#{supplierController.onSelectSupplier()}" update="createButton editButton deleteButton"/>
                         <p:ajax event="filter" listener="#{supplierController.onFilter}" oncomplete="rc();"/>
 
                         <p:column headerText="#{msg.name}" sortBy="#{item.name}" filterBy="#{item.name}" filterMatchMode="LIKE">
@@ -44,14 +44,14 @@
                         <p:column headerText="#{msg.tel}" sortBy="#{item.tel}" filterBy="#{item.tel}" filterMatchMode="LIKE">
                             <h:outputText value="#{item.tel}"/>
                         </p:column>
-                        <p:column headerText="供应商类型" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
+                        <p:column headerText="类型" sortBy="#{item.supplierType}" filterBy="#{item.supplierType}" filterMatchMode="EQ">
                             <f:facet name="filter">
-                                <p:selectOneMenu onchange="PF('varDataList').filter()" >
-                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <p:selectOneMenu value="#{supplierController.supplierType}" onchange="PF('varDataList').filter()" >
+                                    <f:selectItem itemLabel="#{msg.SelectOneMessage}"  noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('supplierType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('supplierType',item.supplierType)}"/>
+                            <h:outputText value="#{supplierController.getGongyingshangLeixing(item)}"/>
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" title="#{msg.Create}" actionListener="#{supplierController.prepareCreate}" update=":SupplierEditDlg" oncomplete="PF('SupplierEditDialog').show()"/>

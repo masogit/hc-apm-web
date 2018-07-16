@@ -43,6 +43,15 @@ public class RelRuleAsset {
     
     @Column(name="tenant_uid",columnDefinition = "CHAR(32)")
     private String tenantUID;
+
+	@Column(name="institution_uid",columnDefinition = "CHAR(32)")
+	private String institutionUID;
+
+	@Column(name="hospital_uid",columnDefinition = "CHAR(32)")
+	private String hospitalUID;
+
+	@Column(name="site_uid",columnDefinition = "CHAR(32)")
+	private String siteUID;
     
 	public String getTenantUID() {
 		return tenantUID;
@@ -107,6 +116,47 @@ public class RelRuleAsset {
 	public void setId(String id) {
 		this.id = id;
 	}
-	
-    
+
+	public String getInstitutionUID() {
+		return institutionUID;
+	}
+
+	public void setInstitutionUID(String institutionUID) {
+		this.institutionUID = institutionUID;
+	}
+
+	public String getHospitalUID() {
+		return hospitalUID;
+	}
+
+	public void setHospitalUID(String hospitalUID) {
+		this.hospitalUID = hospitalUID;
+	}
+
+	public String getSiteUID() {
+		return siteUID;
+	}
+
+	public void setSiteUID(String siteUID) {
+		this.siteUID = siteUID;
+	}
+
+	@Override
+	public int hashCode() {
+		int hash = 0;
+		hash += (id != null ? id.hashCode() : 0);
+		return hash;
+	}
+
+	@Override
+	public boolean equals(Object object) {
+		if (!(object instanceof RelRuleAsset)) {
+			return false;
+		}
+		RelRuleAsset other = (RelRuleAsset) object;
+		if ((this.id == null && other.id != null) || (this.id != null && !this.id.equals(other.id))) {
+			return false;
+		}
+		return true;
+	}
 }

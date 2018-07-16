@@ -192,6 +192,15 @@ public class WorkflowConfig implements Serializable {
     @Column(name="emergency_max_message_count")
     private Integer emergencyMaxMessageCount;//推送消息的次数上限
 
+    /***
+     * 计量提醒配置
+     */
+    @Column(name="measuring_remind_days")
+    private Integer measuringRemindDays;//计量提前通知时间，单位：天
+
+    @Column(name = "measuring_reminder_times")
+    private Integer measuringReminderTimes;//提醒次数
+
     public Integer getEmergencyTimeoutDispatch() {
         return emergencyTimeoutDispatch;
     }
@@ -640,6 +649,22 @@ public class WorkflowConfig implements Serializable {
 
     public void setTelReportEnd(String telReportEnd) {
         this.telReportEnd = telReportEnd;
+    }
+
+    public Integer getMeasuringRemindDays() {
+        return measuringRemindDays;
+    }
+
+    public void setMeasuringRemindDays(Integer measuringRemindDays) {
+        this.measuringRemindDays = measuringRemindDays;
+    }
+
+    public Integer getMeasuringReminderTimes() {
+        return measuringReminderTimes;
+    }
+
+    public void setMeasuringReminderTimes(Integer measuringReminderTimes) {
+        this.measuringReminderTimes = measuringReminderTimes;
     }
 
     @Override

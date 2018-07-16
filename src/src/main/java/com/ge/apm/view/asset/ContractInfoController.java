@@ -1,11 +1,14 @@
 package com.ge.apm.view.asset;
 
 import com.ge.apm.dao.ContractInfoRepository;
+
+import java.util.Arrays;
 import java.util.List;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import com.ge.apm.domain.*;
+import com.ge.apm.service.asset.ContractInfoService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import org.springframework.data.domain.Page;
@@ -22,12 +25,14 @@ import webapp.framework.web.mvc.GenericCRUDUUIDController;
 @ViewScoped
 public class ContractInfoController extends GenericCRUDUUIDController<ContractInfo> {
 
-    UaaService uaaService;
-    ContractInfoRepository dao = null;
+    private UaaService uaaService;
+    private ContractInfoService contractService;
+    private ContractInfoRepository dao = null;
 
     @Override
     protected void init() {
         dao = WebUtil.getBean(ContractInfoRepository.class);
+        contractService = WebUtil.getBean(ContractInfoService.class);
         uaaService = WebUtil.getBean(UaaService.class);
     }
 
@@ -43,6 +48,9 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         }
 
         if (!this.hasFilterOnField("siteUID")) {
+            List<String> contractTypeList = Arrays.asList(ContractInfo.ContractType.values()).stream().map(item -> item.name()).collect(Collectors.toList());
+            searchFilters.add(new SearchFilter("contractType", SearchFilter.Operator.IN, contractTypeList, "1*"));
+
             List<String> orgUidList = uaaService.getOrgListByUser(UserContextService.getCurrentUserAccount().getUid()).stream().map(item -> item.getSiteUID()).collect(Collectors.toList());
             searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
@@ -51,6 +59,15 @@ public class ContractInfoController extends GenericCRUDUUIDController<ContractIn
         }
 
         return dao.findBySearchFilter(this.searchFilters, pageRequest);
+    }
+    
+    
+    public void deleteContract(){
+        if(contractService.deleteContract(selected)){
+            WebUtil.addSuccessMessage("已删除");
+        }else{
+            WebUtil.addErrorMessage("不能删除");
+        }
     }
     
     public String createAction() {

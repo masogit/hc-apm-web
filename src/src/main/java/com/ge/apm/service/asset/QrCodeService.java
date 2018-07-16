@@ -286,6 +286,8 @@ public class QrCodeService {
             asset.setModalityId("(待定)");
             asset.setFunctionType("(待定)");
             asset.setQrCode(qrCode);
+            
+			if(!"".equals(SiteUid)) asset.setSiteUID(SiteUid);
         }
         return getElementsValue(template, elements, asset);
     }

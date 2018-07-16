@@ -176,10 +176,10 @@ public class V2_PmOrderService {
         }
     }
 
-    public void createPMrequestApi(String assetUID,PmOrderActionForm formData){
+    public Map<String, Object> createPMrequestApi(String assetUID,PmOrderActionForm formData){
         String token = UserContextService.getAccessToken();
         formData.setAssetUid(assetUID);
-        srApi.createPmRequest(token,formData);
+        return srApi.createPmRequest(token,formData);
     }
 
     //创建一次性保养

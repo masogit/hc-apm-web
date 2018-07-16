@@ -170,13 +170,18 @@ public List<PmOrderSteps> getPmOrderStepsList(String pmOrderId){
         UserAccount user = UserContextService.getCurrentUserAccount();
         List<SearchFilter> searchFilters = new ArrayList<SearchFilter>();
         if(isInsulate){
-            if(loginUserOrgType == 1){
+            if(loginUserOrgType == 0){
+                searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
+            }else if(loginUserOrgType == 1){
                 searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, user.getInstitutionUID()));
             }else if(loginUserOrgType == 2){
                 searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, user.getHospitalUID()));
-            }else if(loginUserOrgType == 3){
+            }else if(loginUserOrgType == 3 || loginUserOrgType == 4){
                 searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, user.getSiteUID()));
             }
+/*            else if(loginUserOrgType == 4){//挂在科室下
+                searchFilters.add(new SearchFilter("clinicalDeptUid", SearchFilter.Operator.EQ, user.getOrgInfoUID()));
+            }*/
         }else{
             searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
         }
