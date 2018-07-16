@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.util.SystemPropertyUtils;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -66,6 +67,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<MaintainDataPair> checkListMonthDays;
   	private List<AssetInfo> checkListAssets;
   	private List<String> orgUidList;
+  	private List<String> userUidList;
   	
   	private boolean isSaveDisable=true;
   	
@@ -77,7 +79,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         dao=nurseSiteMaintainService.getNurseSiteMaintainConfigRepository();
         checkListAssets=nurseSiteMaintainService.getListAsset(currentUser.getSiteUID(), currentUser.getUid());
         orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
-        
+        loadUserUidList();
 //        listNurseSiteMaintainConfig = nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID());
 //		listStrNurseSiteMaintainConfig=new ArrayList<SimplePair>();
 //		if(listNurseSiteMaintainConfig!=null&&listNurseSiteMaintainConfig.size()>0){
@@ -103,17 +105,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-//        searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, currentUser.getTenantUID()));
-//        if(currentUser.getOrgLevel() != 0){
-//            if(currentUser.getOrgLevel() == 1){
-//                searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.EQ, currentUser.getInstitutionUID()));
-//            }else if(currentUser.getOrgLevel() == 2){
-//                searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.EQ, currentUser.getHospitalUID()));
-//            }else{
-//                searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.EQ, currentUser.getSiteUID()));
-//            }
-//        }
-//        searchFilters.add(new SearchFilter("siteUID", SearchFilter.Operator.IN, orgUidList, "1+"));
+        searchFilters.add(new SearchFilter("createByUid", SearchFilter.Operator.IN, userUidList, "1*"));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
         List<NurseSiteMaintainConfig> listResult=pageResult.getContent();
         List<NurseSiteMaintainConfig> listNewResult=new ArrayList<NurseSiteMaintainConfig>();
@@ -222,6 +214,12 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 					listMonthDay=listTemp;
 				}
 			}
+		}
+	}
+	
+	private void loadUserUidList(){
+		if(orgUidList!=null && orgUidList.size()>0){
+			userUidList=nurseSiteMaintainService.findUserUidListByOrgUids(orgUidList);
 		}
 	}
 	

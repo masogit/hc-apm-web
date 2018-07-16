@@ -1,13 +1,13 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -15,9 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import javax.persistence.Transient;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.annotations.GenericGenerator;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -68,13 +66,15 @@ public class NurseSiteMaintainConfig implements Serializable {
 	@Column(name = "modify_by")
 	private String modifyByUid;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
 	

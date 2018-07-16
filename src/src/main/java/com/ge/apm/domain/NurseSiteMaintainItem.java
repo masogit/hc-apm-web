@@ -9,8 +9,10 @@ import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -69,13 +71,15 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name = "modify_by")
 	private String modifyByUid;
 
-	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "create_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount createBy;
 
-	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "modify_by", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private UserAccount modifyBy;
 
@@ -85,12 +89,14 @@ public class NurseSiteMaintainItem implements Serializable {
 	@Column(name="asset_uid")
 	private String assetUid;
 	
-	@JoinColumn(name = "parent_id", referencedColumnName = "id")
+	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@org.hibernate.annotations.ForeignKey(name = "none")
     private NurseSiteMaintain nurseSiteMaintain;
 	
-	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid")
+	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
 	@ManyToOne(optional = true, fetch = FetchType.EAGER)
+	@org.hibernate.annotations.ForeignKey(name = "none")
 	@JsonBackReference
 	private AssetInfo assetInfo;
 	
