@@ -1,14 +1,14 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.OrgInfo;
-
-import java.util.Collection;
 import java.util.List;
-import javax.persistence.QueryHint;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.jpa.repository.QueryHints;
+
+import com.ge.apm.domain.OrgInfo;
+
 import webapp.framework.dao.GenericRepository;
 
 public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
@@ -48,6 +48,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> getByUser(String userUid);
     @Query(value = "select name from org_info where id=?1",nativeQuery = true)
     public String getDepName(int id);
+    
+    @Query(value = "select o.* from org_info o where o.uid in ?1 and o.org_type=4",nativeQuery = true)
+    public List<OrgInfo> findClinicalByUids(Set<String> listUid);
     
     public OrgInfo getByUid(String uid);
     

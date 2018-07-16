@@ -1,8 +1,10 @@
 package com.ge.apm.domain;
 
 import javax.persistence.Column;
+import javax.persistence.ConstraintMode;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ForeignKey;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
@@ -35,8 +37,9 @@ public class NurseSiteMaintainData {
 	@Column(name="check_value")
 	private Boolean checkValue;
 	
-	@JoinColumn(name = "parent_id", referencedColumnName = "id")
+	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@org.hibernate.annotations.ForeignKey(name = "none")
     private NurseSiteMaintainItem item;
 
 	public String getId() {
