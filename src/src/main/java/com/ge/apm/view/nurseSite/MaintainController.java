@@ -4,10 +4,12 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.annotation.PostConstruct;
 import javax.faces.application.FacesMessage;
@@ -16,8 +18,6 @@ import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
 
 import org.apache.commons.lang3.StringUtils;
-import org.primefaces.event.ScheduleEntryMoveEvent;
-import org.primefaces.event.ScheduleEntryResizeEvent;
 import org.primefaces.event.SelectEvent;
 import org.primefaces.model.DefaultScheduleEvent;
 import org.primefaces.model.LazyScheduleModel;
@@ -30,13 +30,13 @@ import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
+import com.ge.apm.domain.UserOrgInfo;
 import com.ge.apm.service.nurseSite.NurseSiteMaintainService;
 import com.ge.apm.service.utils.StringComparator;
 import com.ge.apm.view.sysutil.UserContextService;
 
-import webapp.framework.dao.SearchFilter;
-import webapp.framework.util.DateUtil;
 import webapp.framework.web.WebUtil;
 
 /**
@@ -54,9 +54,13 @@ public class MaintainController {
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
 	private NurseSiteMaintainConfig nurseSiteMaintainConfig;
 	private List<AssetInfo> listCheckAssets;
+	private OrgInfo currentClicinalOrgInfo;
 	//from config default
 	private NurseSiteMaintain nurseSiteMaintain;
 	private List<NurseSiteMaintain> existMaintainData;
+	private List<NurseSiteMaintain> listMaintainData;
+	private Date initStartDate;
+	private Date initEndDate;
 	private Date startBatchDate;
   	private Date endBatchDate;
   	private Date userClickDate;
@@ -65,6 +69,7 @@ public class MaintainController {
     private boolean isSaveDisable;
     //show
     private List<String> showLables;
+    private List<OrgInfo> listOrgInfo; 
     //inner
     private Map<String,Integer> mapDayIndex=new HashMap<String,Integer>();
     private Date dayDate;
@@ -73,46 +78,91 @@ public class MaintainController {
 	protected void init() {
 		nurseSiteMaintainService = WebUtil.getBean(NurseSiteMaintainService.class);
 		currentUser = UserContextService.getCurrentUserAccount();
-		List<String> orgUidList = nurseSiteMaintainService.getOrgUidListByUser(currentUser.getUid());
-		this.loadMaintainData(orgUidList);
+		this.loadMaintainData();
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID(),currentUser.getUid());
 		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
 			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
 			loadMaintainConfig();
 		}
+		loadUserOrgInfo();
+	}
+	
+	private List<NurseSiteMaintain> searchMaintainData(Date start,Date end){
+		List<NurseSiteMaintain> listData=null;
+		Calendar ca=Calendar.getInstance();
+		if(start==null){
+			ca.set(Calendar.DAY_OF_MONTH, 1);
+			start=ca.getTime();
+		}
+		if(end==null){
+			ca.add(Calendar.MONTH, 1);
+			end=ca.getTime();
+		}
+		if(currentClicinalOrgInfo==null){
+			listData=nurseSiteMaintainService.getDefaultMaintainData(currentUser.getSiteUID(), currentUser.getUid(), start, end);
+		}
+		else{
+			listData=nurseSiteMaintainService.getDataByClinicalOrgUid(currentUser.getSiteUID(), currentClicinalOrgInfo.getUid(), start, end);
+		}
+		return listData;
 	}
 
-	private void loadMaintainData(List<String> userOrgList) {
+	private void loadMaintainData() {
+		if(initStartDate!=null && initEndDate!=null){
+			listMaintainData=searchMaintainData(initStartDate, initEndDate);
+		}
 		lazyEventModel = new LazyScheduleModel() {
+			private static final long serialVersionUID = 1L;
 			@Override
 			public void loadEvents(Date start, Date end) {
-				List<SearchFilter> searchFilters = new ArrayList<>();
-				List<NurseSiteMaintain> listData=nurseSiteMaintainService.getDefaultMaintainData(currentUser.getSiteUID(), currentUser.getUid(), start, end);
-				for (NurseSiteMaintain data : listData) {
-					DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data),data.getScheduleDate(),data.getScheduleDate(), true);
-					tempEvent.setData(data);
-					Integer status=data.getStatus();
-					if(status!=null){
-						if(status==0){
-							tempEvent.setStyleClass("schedule-item-nocheck");
+				mapDayIndex.clear();
+				if(initStartDate==null || initEndDate==null || start.getTime()!=initStartDate.getTime() || end.getTime()!=initEndDate.getTime()){
+					listMaintainData=searchMaintainData(start, end);
+					initStartDate=start;
+					initEndDate=end;
+				}
+				if(listMaintainData!=null){
+					for (NurseSiteMaintain data : listMaintainData) {
+						DefaultScheduleEvent tempEvent = new DefaultScheduleEvent(getShowTitle(data),data.getScheduleDate(),data.getScheduleDate(), true);
+						tempEvent.setData(data);
+						Integer status=data.getStatus();
+						if(status!=null){
+							if(status==0){
+								tempEvent.setStyleClass("schedule-item-nocheck");
+							}
+							else if(status==2){
+								tempEvent.setStyleClass("schedule-item-pass");
+							}
+							else if(status==3){
+								tempEvent.setStyleClass("schedule-item-nopass");
+							}
 						}
-						else if(status==2){
-							tempEvent.setStyleClass("schedule-item-pass");
+						tempEvent.setId(UUID.randomUUID().toString());
+						if(lazyEventModel.getEvents().add(tempEvent)){
 						}
-						else if(status==3){
-							tempEvent.setStyleClass("schedule-item-nopass");
+						else{
+							updateEvent(tempEvent);
 						}
 					}
-					addEvent(tempEvent);
 				}
 			}
 		};
 	}
-
-//	private MaintainDataPair getContentJsonObj() {
-//		MaintainDataPair p=new MaintainDataPair(listCheckItems);
-//		return p;
-//	}
+	
+	private void loadUserOrgInfo(){
+		Set<String> listUid=new HashSet<String>();
+		Set<UserOrgInfo> setUserOrg=currentUser.getSetUserOrgInfo();
+		if(setUserOrg!=null){
+			Iterator<UserOrgInfo> it=setUserOrg.iterator();
+			while(it.hasNext()){
+				UserOrgInfo userOrgInfo=it.next();
+				listUid.add(userOrgInfo.getOrgUid());
+			}
+		}
+		if(listUid.size()>0){
+			listOrgInfo=nurseSiteMaintainService.getListClinicalByUid(listUid);
+		}
+	}
 	
 	private String getShowTitle(NurseSiteMaintain tempNurseSiteMaintain) {
 		//0：未检查,1:已检查，2:通过，3有问题
@@ -188,8 +238,6 @@ public class MaintainController {
 		}
 	}
 	
-
-	
 	private void addMessage(String str) {
 		FacesMessage message = new FacesMessage(str,null);
 		FacesContext.getCurrentInstance().addMessage(null, message);
@@ -211,18 +259,28 @@ public class MaintainController {
 	public void saveMaintain() {
 		nurseSiteMaintainService.updateMaintainDataStatus(nurseSiteMaintain, false);
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
+		lazyEventModel.updateEvent(event);
 		addMessage("报告已保存");
 	}
 	
 	public void createMaintain() {
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
+		event = new DefaultScheduleEvent("",userClickDate, userClickDate, true);
+		event.setData(nurseSiteMaintain);
+		lazyEventModel.addEvent(event);
+		if(listMaintainData==null){
+			listMaintainData=new ArrayList<NurseSiteMaintain>();
+		}
+		listMaintainData.add(nurseSiteMaintain);
 		addMessage("报告已创建");
 	}
 
 	public void deleteMaintain() {
 		if (event.getId() != null) {
 			if (lazyEventModel.deleteEvent(event)) {
-				nurseSiteMaintainService.deleteMaintain((NurseSiteMaintain) event.getData());
+				nurseSiteMaintain=(NurseSiteMaintain) event.getData();
+				nurseSiteMaintainService.deleteMaintain(nurseSiteMaintain);
+				listMaintainData.remove(nurseSiteMaintain);
 				addMessage("报告已删除");
 			}
 		}
@@ -230,6 +288,10 @@ public class MaintainController {
 	
 	public void onNurseSiteMaintainConfigChange(){
 		loadMaintainConfig();
+	}
+	
+	public void onClinicalOrgInfoChange(){
+		loadMaintainData();
 	}
 
 	public void onEventSelect(SelectEvent selectEvent) {
@@ -250,13 +312,12 @@ public class MaintainController {
 		nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets);
 	}
 
-	public void onEventMove(ScheduleEntryMoveEvent event) {
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-	}
-
-	public void onEventResize(ScheduleEntryResizeEvent event) {
-		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
-	}
+//	public void onEventMove(ScheduleEntryMoveEvent event) {
+//		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event moved", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
+//	}
+//	public void onEventResize(ScheduleEntryResizeEvent event) {
+//		FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Event resized", "Day delta:" + event.getDayDelta() + ", Minute delta:" + event.getMinuteDelta());
+//	}
 
 	//1:day,2:week,3:month,4:year
 	public String batchSaveMaintainData() {
@@ -462,6 +523,22 @@ public class MaintainController {
 
 	public void setShowLables(List<String> showLables) {
 		this.showLables = showLables;
+	}
+
+	public List<OrgInfo> getListOrgInfo() {
+		return listOrgInfo;
+	}
+
+	public void setListOrgInfo(List<OrgInfo> listOrgInfo) {
+		this.listOrgInfo = listOrgInfo;
+	}
+
+	public OrgInfo getCurrentClicinalOrgInfo() {
+		return currentClicinalOrgInfo;
+	}
+
+	public void setCurrentClicinalOrgInfo(OrgInfo currentClicinalOrgInfo) {
+		this.currentClicinalOrgInfo = currentClicinalOrgInfo;
 	}
 	
 }

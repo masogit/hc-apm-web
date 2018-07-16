@@ -49,7 +49,6 @@ public class UserOrgInfo implements Serializable{
     @JoinColumn(name = "user_uid", referencedColumnName = "uid", insertable = false, updatable = false)
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private UserAccount userAccount;
-    
 
     public String getId() {
         return id;
