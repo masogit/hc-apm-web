@@ -55,8 +55,7 @@ public class TenantInfoController extends JpaCRUDController<TenantInfo> {
 
     @Override
     public List<TenantInfo> getItemList() {
-        //to do: change the code if necessary
-        return dao.find();
+        return dao.getAllOrderByName();
     }
     
     @Override

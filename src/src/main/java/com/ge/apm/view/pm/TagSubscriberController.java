@@ -37,17 +37,10 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	UserContextService userContextService;
 	List<AssetTagMsgSubscriber> assetTagMsgSubscribers;
 	HashMap<Integer,String> hmMsgMode = new HashMap<Integer,String>();
-	private Integer receiveMsgMode;
-	private Integer receiveMsgModeInteger =new Integer(0);
+	private Integer receiveMsgMode =new Integer(0);
 	private int selectType=1;
 	private Boolean isReceiveTimeoutMsg;
-	/*public boolean subscriberShow(){
-		//xiugai   if(xiu gai and fei admin) return true
-		if(!userContextService.hasRole("ITAdmin")&  WebUtil.getMessage(crudActionName)=="修改")
-			return true;
-		else
-			 return false;
-	}*/
+
 	//如果是新增，只有后台itadmin进来 可以修改。 如果是修改 全灰色
 	public Boolean subscribe(){
 		if(this.getCRUDActionName().equals("修改")){
@@ -60,7 +53,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 				}
 		}
 		public void gongdantuisongxuanxiang(){
-		if(isReceiveTimeoutMsg==false && receiveMsgModeInteger==2){
+		if(isReceiveTimeoutMsg==false && receiveMsgMode==2){
 			level0=false;
 			level1=false;
 			level2=false;
@@ -71,23 +64,23 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		}
      public Boolean prioritySetFalse(){
 		/*如果 不推送工单消息 并且 工单超时推送不选 ,返回true,让紧急 重要 一般 变成灰色*/
-		/*if(receiveMsgModeInteger==null){
+		/*if(receiveMsgMode==null){
 			return null;
 		}*/
-         if(isReceiveTimeoutMsg==false && receiveMsgModeInteger==2){
+         if(isReceiveTimeoutMsg==false && receiveMsgMode==2){
          	return false;
 		 }else
 		 	return true;
 
 	 }
-	 public void gondantuisongxuanxiang(){
-     	if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){//如果选中"所有.."或"仅.."那么默认 优先级和工单超时都选上
+	 /*public void gondantuisongxuanxiang(){
+     	if(receiveMsgMode==0 || receiveMsgMode==1){//如果选中"所有.."或"仅.."那么默认 优先级和工单超时都选上
 		  level0=true;
 		  level1=true;
 		  level2=true;
 		  isReceiveTimeoutMsg=true;
 		}
-	 }
+	 }*/
 	public Boolean priorityShow(){
 		//selected.getReceiveMsgMode() = 2  //不推送消息
 		if(selected.getReceiveMsgMode()!=null && selected.getReceiveMsgMode()==2)
@@ -108,6 +101,13 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		level1=false;
 		level2=false;
 	}
+	public void level0Set(){
+		System.out.println(level0);
+	}
+/*	public void level1Set(){level1=this.selected.getLevel1();}
+	public void level2Set(){level2=this.selected.getLevel2();}*/
+
+
 
 // 关注人tentant下的tag
 	public void takeAssetTags(){
@@ -123,8 +123,23 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		selected=null;
 	}
 	public boolean requiredCheck(){
+      //不推送工单消息  情况下 必须选工单超时消息
+		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
+			WebUtil.addErrorMessage("务必选择工单超时消息推送");
+			RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+			return false;
+		}
 
-		if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){
+		//选了工单超时消息 必须选择紧急程度
+		if(isReceiveTimeoutMsg==true && receiveMsgMode==2){
+			if(level0==false && level1==false && level2==false) {
+				WebUtil.addErrorMessage("务必选择工单紧急程度");
+				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
+				return false;
+			}
+		}
+		///
+		if(receiveMsgMode==0 || receiveMsgMode==1){
 			if(level0==false && level1==false && level2==false){
 				WebUtil.addErrorMessage("务必选择紧急程度");
 				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
@@ -132,7 +147,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 			}
 		}
 		/*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*/
-		if(receiveMsgModeInteger==2 && isReceiveTimeoutMsg==false){
+		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
 			if(level0==true || level1==true || level2==true){
 				RequestContext.getCurrentInstance().addCallbackParam("xyz", true);
 				return false;
@@ -146,14 +161,14 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		}
 
 		/*如果 消息推送选项是 "所有.."和"仅.., ",那么紧急度必须选一个*//*
-		  if(receiveMsgModeInteger==0 || receiveMsgModeInteger==1){
+		  if(receiveMsgMode==0 || receiveMsgMode==1){
 		  	if(level0==false && level1==false && level2==false){
 		  		WebUtil.addErrorMessage("务必选择紧急程度");
 		  		return;
 			}
 		  }
 		*//*如果 消息推送选项是"不推..",并且超时推送也不选，那么紧急度不应该选上*//*
-		if(receiveMsgModeInteger==2 && isReceiveTimeoutMsg==false){
+		if(receiveMsgMode==2 && isReceiveTimeoutMsg==false){
 			if(level0==true || level1==true || level2==true){
 				WebUtil.addErrorMessage("不推送工单和超时消息，不需要选择紧急度");
 				return;
@@ -163,6 +178,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 			if (selectType == 1) {//维修
 				List<AssetTagMsgSubscriber> tagUserMode012 = dao.getTagUserMode012(selected.getTagId(), selected.getSubscribeUserId());
 				if(tagUserMode012.isEmpty()) {
+					selected.setReceiveMsgMode(receiveMsgMode);
+					selected.setIsReceiveTimeoutMsg(isReceiveTimeoutMsg);
+					selected.setLevel0(level0);
+					selected.setLevel1(level1);
+					selected.setLevel2(level2);
 					super.save();
 					return;
 				}
@@ -182,6 +202,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 				}
 			}
 		}else{
+			selected.setReceiveMsgMode(receiveMsgMode);
+			selected.setIsReceiveTimeoutMsg(isReceiveTimeoutMsg);
+			selected.setLevel0(level0);
+			selected.setLevel1(level1);
+			selected.setLevel2(level2);
 			super.save();
 		}
 	}
@@ -235,7 +260,7 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 
 	@Override
 	protected Page<AssetTagMsgSubscriber> loadData(PageRequest pageRequest) {
-		selected = null;
+	//	selected = null;
 		if(this.searchFilters ==null){
 			searchFilters =  new ArrayList<>();
 		}else{
@@ -277,9 +302,22 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	public void prepareEdit() {
 		super.prepareEdit();
 		Integer se=selected.getSelectType();
-		level0=selected.getLevel0();
-		level1=selected.getLevel1();
-		level2=selected.getLevel2();
+		if(selected.getLevel0()!=null){
+			level0=selected.getLevel0();
+		}else{
+			level0=false;
+		}
+		if(selected.getLevel1()!=null){
+			level1=selected.getLevel1();
+		}else{
+			level1=false;
+		}
+		if(selected.getLevel2()!=null){
+			level2=selected.getLevel2();
+		}else{
+			level2=false;
+		}
+
 		receiveMsgMode= selected.getReceiveMsgMode();
 		isReceiveTimeoutMsg=selected.getIsReceiveTimeoutMsg();
 		if(se!=null)
@@ -314,11 +352,11 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 	}
 
 	public Integer getReceiveMsgMode() {
-		if(this.selected!=null)
+		/*if(this.selected!=null && this.selected.getId()!=null)
 		{
 			return  this.selected.getReceiveMsgMode();
 		}else
-
+*/
 			return receiveMsgMode;
 	}
 
@@ -394,13 +432,4 @@ public class TagSubscriberController extends JpaCRUDController<AssetTagMsgSubscr
 		isReceiveTimeoutMsg = receiveTimeoutMsg;
 	}
 
-
-
-	public Integer getReceiveMsgModeInteger() {
-		return receiveMsgModeInteger;
-	}
-
-	public void setReceiveMsgModeInteger(Integer receiveMsgModeInteger) {
-		this.receiveMsgModeInteger = receiveMsgModeInteger;
-	}
 }

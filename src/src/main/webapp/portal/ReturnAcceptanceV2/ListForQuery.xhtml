@@ -119,9 +119,10 @@
                                 <p:selectOneMenu onchange="PF('varDataList').filter()" >
                                     <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
                                     <f:selectItems value="#{fieldMsg.getFieldValueList('chargingType')}" var="item" itemLabel="#{item.value}" itemValue="#{item.msgKey}"/>
+                                    <f:selectItem itemLabel="维修借用" itemValue="维修借用" />
                                 </p:selectOneMenu>
                             </f:facet>
-                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
+                            <h:outputText value="#{fieldMsg.fieldValue('chargingType',item.chargingType)=='' ? '维修借用' : fieldMsg.fieldValue('chargingType',item.chargingType)}"/>
                         </p:column>
                         <p:column headerText="使用时长">
                             <h:outputText value="#{sharedAssetReqDetailForQueryController.getUseTime(item.chargingBeginTime,item.chargingEndTime,item.chargingType)}"/>
@@ -168,7 +169,7 @@
                 </div>
         </div>
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 $("#searchForm\\:searchText").keypress(function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();

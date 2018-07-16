@@ -6,33 +6,22 @@
 package com.ge.apm.view.asset;
 
 import com.alibaba.fastjson.JSONObject;
-import com.ge.apm.dao.AssetInfoRepository;
-import com.ge.apm.dao.BlobObjectRepository;
-import com.ge.apm.dao.OrgInfoRepository;
-import com.ge.apm.dao.V2_PmScheduleRepository;
-import com.ge.apm.domain.AssetInfo;
-import com.ge.apm.domain.OrgInfo;
-import com.ge.apm.domain.PmScheduleData;
-import com.ge.apm.domain.V2_BlobObject;
+import com.ge.apm.dao.*;
+import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.CustomConfigObject;
 import com.ge.apm.service.asset.AssetInfoMgrService;
 import com.ge.apm.service.asset.CustomConfigService;
 import com.ge.apm.service.utils.TreeNodeUtil;
 import com.ge.apm.service.utils.UrlParamUtil;
-import com.ge.apm.view.asset.components.CustomPanelGrid;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
-import javax.faces.component.UIComponent;
 import org.apache.commons.lang.StringUtils;
-import org.primefaces.context.RequestContext;
 import org.primefaces.model.TreeNode;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
@@ -49,6 +38,7 @@ public class AssetInfoDetailController {
     private OrgInfoRepository orgDao;
     private V2_PmScheduleRepository pmSchDao;
     private BlobObjectRepository blobDao;
+    private SupplierRepository supplierDao;
     private CustomConfigService ccService;
     private AssetInfoMgrService aimService;
     private Boolean terminate;
@@ -57,11 +47,6 @@ public class AssetInfoDetailController {
     
     private CustomConfigObject customConfig;
     
-    private CustomPanelGrid basicFieldsPanelGrid;
-    private CustomPanelGrid detailFieldsPanelGrid;
-    
-    private Map<String, UIComponent> detailFields = new HashMap();
-
     private List<String> readableFieldsList;
     private TreeNode parentsTree;
     
@@ -71,6 +56,7 @@ public class AssetInfoDetailController {
         pmSchDao = WebUtil.getBean(V2_PmScheduleRepository.class);
         blobDao = WebUtil.getBean(BlobObjectRepository.class);
         orgDao = WebUtil.getBean(OrgInfoRepository.class);
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
         ccService = WebUtil.getBean(CustomConfigService.class);
         aimService = WebUtil.getBean(AssetInfoMgrService.class);
         String encodeStr = WebUtil.getRequestParameter("str");
@@ -80,6 +66,13 @@ public class AssetInfoDetailController {
         selected = assetDao.findById(Integer.parseInt(selectedId));
         customConfig = ccService.getCurrentCustomConfig(UserContextService.getCurrentUserAccount().getSiteUID());
         readableFieldsList = ccService.getReadAssetFieldsByRoles(customConfig, UserContextService.getRoles());
+
+        if (selected.getSupplierId() != null) {
+            Supplier supplier = supplierDao.findById(selected.getSupplierId());
+            if (supplier != null) {
+                selected.setVendorTel(supplier.getTel());
+            }
+        }
     }
     
     public OrgInfo getOrgInfoByUid(String uid) {
@@ -104,11 +97,11 @@ public class AssetInfoDetailController {
     }
     
     public String getContractListLink() {
-        return "/portal/asset/contract/List?assetId=" + selected.getId();
+        return "/portal/asset/contract/ContractList?assetId=" + selected.getId();
     }
 
     public String getContractAddLink() {
-        return "/portal/asset/contract/List?assetId=" + selected.getId() + "&actionName=Create";
+        return "/portal/asset/contract/ContractEdit?assetId=" + selected.getId() + "&actionName=Create";
     }
     
     public String getListPageLink() {
@@ -159,6 +152,10 @@ public class AssetInfoDetailController {
         return url;
     }
     
+    public boolean needShow(String itemKey, String fieldKey){
+        return itemKey.equals(fieldKey) && readableFieldsList.contains(fieldKey);
+    }
+    
     //getter and setter
     public Boolean getTerminate() {
         return terminate;
@@ -172,39 +169,4 @@ public class AssetInfoDetailController {
         return customConfig;
     }
 
-    public CustomPanelGrid getBasicFieldsPanelGrid() {
-        if(null==basicFieldsPanelGrid){
-            basicFieldsPanelGrid=new CustomPanelGrid();
-            basicFieldsPanelGrid.setCustomUIComponents(customConfig.getAssetsDetailpageBasicFields().stream()
-                    .filter(item-> readableFieldsList.contains(item)).map(item-> detailFields.get(item)).collect(Collectors.toList()));
-        }
-        return basicFieldsPanelGrid;
-    }
-
-    public CustomPanelGrid getDetailFieldsPanelGrid() {
-        if(null==detailFieldsPanelGrid){
-            detailFieldsPanelGrid=new CustomPanelGrid();
-            detailFieldsPanelGrid.setCustomUIComponents(customConfig.getAssetsDetailpageDetailFields().stream()
-                    .filter(item-> readableFieldsList.contains(item)).map(item-> detailFields.get(item)).collect(Collectors.toList()));
-        }
-        return detailFieldsPanelGrid;
-    }
-
-    public void setBasicFieldsPanelGrid(CustomPanelGrid basicFieldsPanelGrid) {
-        this.basicFieldsPanelGrid = basicFieldsPanelGrid;
-    }
-
-    public void setDetailFieldsPanelGrid(CustomPanelGrid detailFieldsPanelGrid) {
-        this.detailFieldsPanelGrid = detailFieldsPanelGrid;
-    }
-
-    
-    public Map<String, UIComponent> getDetailFields() {
-        return detailFields;
-    }
-
-    public void setDetailFields(Map<String, UIComponent> detailFields) {
-        this.detailFields = detailFields;
-    }
-    
 }

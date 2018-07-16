@@ -7,11 +7,12 @@ import java.util.Map;
 import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
+import com.ge.apm.service.common.UserCommonService;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import com.alibaba.druid.util.StringUtils;
 import com.ge.apm.dao.AssetInfoRepository;
 import com.ge.apm.dao.OrgInfoRepository;
 import com.ge.apm.dao.PmOrderRuleRepository;
@@ -23,6 +24,7 @@ import com.ge.apm.domain.PmOrderRule;
 import com.ge.apm.domain.RelRuleAsset;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.view.sysutil.UserContextService;
+import org.springframework.transaction.annotation.Transactional;
 import webapp.framework.dao.SearchFilter;
 import webapp.framework.web.WebUtil;
 import webapp.framework.web.mvc.GenericCRUDUUIDController;
@@ -41,6 +43,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	private String queryCondition;
 	private List<String> assetUids;
 	private OrgInfoRepository orgInfoRepository;
+	private Boolean isInsulate;
+	private Integer loginUserOrgType;
+	private UserCommonService userCommonService;
+	private boolean deleteRule2 = false;
+	private boolean deleteRule3 = false;
 	
 	@Override
 	protected void init() {
@@ -51,8 +58,11 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		pmOrderRuleRepository = WebUtil.getBean(PmOrderRuleRepository.class);
 		assetInfoRepository = WebUtil.getBean(AssetInfoRepository.class);
 		orgInfoRepository = WebUtil.getBean(OrgInfoRepository.class);
-		assetMap = new HashMap<String, AssetInfo>();
-		ruleMap = new HashMap<String, PmOrderRule>();
+		userCommonService = WebUtil.getBean(UserCommonService.class);
+		assetMap = new HashMap<>();
+		ruleMap = new HashMap<>();
+		isInsulate = UserContextService.isInsulate();
+		loginUserOrgType = orgInfoRepository.findByUid(user.getSiteUID()).getOrgType();
 	}
 
 	@Override
@@ -62,42 +72,32 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 
 	@Override
 	protected Page<RelRuleAsset> loadData(PageRequest pageRequest) {
-		if(searchFilters != null) {
-			searchFilters.clear();
-		}
 		assetMap.clear();
 		ruleMap.clear();
-		if (searchFilters == null) {
-			searchFilters = new ArrayList<SearchFilter>();
+		if(searchFilters != null) {
+			searchFilters.clear();
+		}else{
+			searchFilters = new ArrayList<>();
 		}
-		List<String> uids = getAssetInfoByFilter();
-		if(uids == null) {//查询条件为null
-			if (!this.hasFilterOnField("tenantUID")) {
-				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-				searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoUids()));
-			}
-		}else if(uids.size() == 0) {//查询结果为空
-			 //searchFilters.removeAll(searchFilters.stream().filter(item -> "assetUID".equals(item.fieldName)).collect(Collectors.toList()));
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, uids));
-		}else {
-			if (!this.hasFilterOnField("tenantUID")) {
-				searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.EQ, user.getTenantUID()));
-			}
-			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, uids));
+		List<SearchFilter> userFilters = userCommonService.getLoginUserFilters(isInsulate,loginUserOrgType);
+		searchFilters.addAll(userFilters);
+		if(StringUtils.isNotEmpty(queryCondition)){
+			searchFilters.add(new SearchFilter("assetUID", SearchFilter.Operator.IN, getAssetInfoByFilter()));
 		}
 		Sort sort = new Sort(Sort.Direction.DESC, "createdDate");
 		pageRequest = new PageRequest(pageRequest.getPageNumber(), pageRequest.getPageSize(), sort);
 		Page<RelRuleAsset> result = dao.findBySearchFilter(searchFilters, pageRequest);
 		initMap(result);
 		return result;
-		// return dao.findBySearchFilter(searchFilters, pageRequest);
 	}
+
+
 
 	public void initMap(Page<RelRuleAsset> result) {
 		if (result.hasContent()) {
 			List<RelRuleAsset> rels = result.getContent();
-			List<String> assetUids = new ArrayList<String>();
-			List<String> ruleUids = new ArrayList<String>();
+			List<String> assetUids = new ArrayList<>();
+			List<String> ruleUids = new ArrayList<>();
 			for (RelRuleAsset relRuleAsset : rels) {
 				if(relRuleAsset.getAssetUID() != null) {
 					assetUids.add(relRuleAsset.getAssetUID());
@@ -223,7 +223,7 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 	}
 	
 	public List<String> getAssetInfoByFilter() {
-		if(!StringUtils.isEmpty(queryCondition)) {
+		if(StringUtils.isNotEmpty(queryCondition)) {
 			List<SearchFilter> searchAssetFilters = getFilter(user.getSiteUID());
 			searchAssetFilters.add(new SearchFilter("name", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
 			searchAssetFilters.add(new SearchFilter("departNum", SearchFilter.Operator.LIKE, queryCondition, "1*3+"));
@@ -288,7 +288,62 @@ public class RelRuleAssetManagerController extends GenericCRUDUUIDController<Rel
 		this.assetUids = assetUids;
 	}
 
-	
+	//@Transactional
+	public void deleteRule(){
+		if((!deleteRule2) && (!deleteRule3)){
+			return;
+		}
+	    String alert = null;
+		if(deleteRule3){
+            selected.setRuleUID(null);
+            alert = "三级规则成功删除！";
+		}
+		if(deleteRule2){
+		    if(StringUtils.isEmpty(alert)){
+                alert = "二级规则成功删除！";
+            }else{
+                alert = "二级规则和三级规则都已成功删除！";
+            }
+			selected.setRuleUID2(null);
+		}
+		if(selected.getRuleUID2() == null && selected.getRuleUID() == null){
+			dao.delete(selected);
+            WebUtil.addSuccessMessage(alert);
+            deleteRule3 = false;
+            deleteRule2 = false;
+			return;
+		}
+		dao.save(selected);
+		deleteRule3 = false;
+		deleteRule2 = false;
+        WebUtil.addSuccessMessage(alert);
+	}
+
+	public void deleteRule2(){
+		this.selected.setRuleUID2(null);
+		this.deleteRule2 = true;
+	}
+
+	public void deleteRule3(){
+		this.selected.setRuleUID(null);
+		this.deleteRule3 = true;
+	}
+
+	public boolean getDeleteRule2() {
+		return deleteRule2;
+	}
+
+	public void setDeleteRule2(boolean deleteRule2) {
+		this.deleteRule2 = deleteRule2;
+	}
+
+	public boolean getDeleteRule3() {
+		return deleteRule3;
+	}
+
+	public void setDeleteRule3(boolean deleteRule3) {
+		this.deleteRule3 = deleteRule3;
+	}
 	/*
 	 * @Override public void onBeforeNewObject(RelRuleAsset object) { }
 	 * 

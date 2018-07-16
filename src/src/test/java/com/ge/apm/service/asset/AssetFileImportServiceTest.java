@@ -101,7 +101,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
 
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
@@ -128,7 +128,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
 
         long endTime = System.currentTimeMillis();
         logger.info("finish to import excel");
@@ -190,8 +190,8 @@ public class AssetFileImportServiceTest {
         assertEquals("2017-12-09", df.format(assetInfo.getLastMeteringDate()));
         assertEquals("2017-12-10", df.format(assetInfo.getLastQaDate()));
 
-        assertEquals("维护商A", assetInfo.getMaitanance());
-        assertEquals("维护商电话A", assetInfo.getMaitananceTel());
+        assertEquals("维修商A", assetInfo.getMaitanance());
+        assertEquals("维修商电话A", assetInfo.getMaitananceTel());
 //        assertEquals("二维码A", assetInfo.getQrCode());
         assertEquals("安装位置编码A", assetInfo.getLocationCode());
         assertEquals("安装位置A", assetInfo.getLocationName());
@@ -229,7 +229,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -248,7 +248,7 @@ public class AssetFileImportServiceTest {
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -273,7 +273,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -292,7 +292,7 @@ public class AssetFileImportServiceTest {
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -317,7 +317,7 @@ public class AssetFileImportServiceTest {
         Map<String, Map<String, Object>> orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         List<Map<String, Object>> assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
 
         List<AssetInfo> assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         AssetInfo assetInfo = assetInfoList.get(0);
@@ -336,7 +336,7 @@ public class AssetFileImportServiceTest {
         orgMap = service.getOrgInfoMapFromTemplate(excelDoc);
         assetMap = service.getAssetMapFromTemplate(excelDoc);
 
-        service.importData(orgMap, assetMap, false, false);
+        service.importData(assetMap, false, false);
         assetInfoList = (List<AssetInfo>) assetInfoDao.findAll();
         assetInfo = assetInfoList.get(0);
 
@@ -397,11 +397,11 @@ public class AssetFileImportServiceTest {
         rowData.put("质保日期", "2017-12-05");
         rowData.put("维保截止日期", "2017-12-06");
         rowData.put("报废日期", "2017-12-07");
-        rowData.put("上次维护日期", "2017-12-08");
+        rowData.put("上次保养日期", "2017-12-08");
         rowData.put("上次计量日期", "2017-12-09");
-        rowData.put("上次质检日期", "2017-12-10");
-        rowData.put("维护商", "维护商A");
-        rowData.put("维护商电话", "维护商电话A");
+        rowData.put("上次巡检日期", "2017-12-10");
+        rowData.put("维修商", "维修商A");
+        rowData.put("维修商电话", "维修商电话A");
 //        rowData.put("二维码", "二维码A");
         rowData.put("安装位置编码", "安装位置编码A");
         rowData.put("安装位置", "安装位置A");

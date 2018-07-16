@@ -25,6 +25,14 @@
             document.querySelector('.menu-content').addEventListener('mouseenter', function(evt) {
               evt.target.focus();
             })
+            
+            if("undefined" != typeof activeFunction){
+                activeFunction();
+            }
+            if("undefined" != typeof afterPageLoad){
+                afterPageLoad();
+            }
+            
           }
         </script>
     </h:form>

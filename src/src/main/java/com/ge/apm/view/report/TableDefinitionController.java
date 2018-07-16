@@ -13,6 +13,7 @@ import com.ge.apm.service.report.TableDefinitionService;
 import com.ge.apm.service.uaa.UaaService;
 import com.ge.apm.view.sysutil.UserContextService;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.primefaces.event.data.FilterEvent;
 import webapp.framework.dao.SearchFilter;
@@ -104,6 +105,10 @@ public class TableDefinitionController extends GenericCRUDUUIDController<TableDe
     @Override
     public void prepareCreate() throws InstantiationException, IllegalAccessException {
         super.prepareCreate();
+    }
+    
+     public boolean getIsReadOnly(TableDefinition tableItem){
+        return !Arrays.asList(tableItem.getTenantUID(),tableItem.getInstitutionUID(),tableItem.getHospitalUID(),tableItem.getSiteUID()).contains(UserContextService.getCurrentUserAccount().getSiteUID());
     }
 
     //geter and setter

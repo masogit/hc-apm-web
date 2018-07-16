@@ -14,10 +14,27 @@
 			}
 		</style>
 
-        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  width="750" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 另存为">
+        <p:dialog id="SaveAsDlg" widgetVar="SaveAsDialog"  width="1000" height="480" modal="true" resizable="true" draggable="true" appendTo="@this" header="#{msg.PmOrderRule} 另存为">
             <h:form id="PmOrderRuleSaveAsForm">
                 <h:panelGroup id="display">
                     <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group" rendered="#{pmOrderRuleController.selected != null}">
+                        <h:panelGroup>
+                            <label class="label">#{msg.orgId}*</label>
+                            <p:inputText id="selectedUserOrgName" value="#{pmOrderRuleController.getOrgFullName(pmOrderRuleController.selectedUserOrg)}" readonly="true" required="true" requiredMessage="#{msg.orgId} #{msg.ValidationRequire}"/>
+                            <p:commandButton id="btnOrg4User" process="@this" icon="fa fa-angle-down" style="width: 22px;height: 22px; padding-right: 0px;float: next;"/>
+                            <p:overlayPanel id="panelOrg4User" widgetVar="varPanelOrg4User" for="btnOrg4User" hideEffect="fade" dynamic="false" class="ui-selectonemenu-panel" style="width:300px;" modal="false">
+                                <p:scrollPanel style="height:300px;border: 0" mode="native">
+                                    <p:tree id="orgTree4User" class="tree" style="width:98%;border:0;" value="#{pmOrderRuleController.orgTree}" selection="#{pmOrderRuleController.selectedNode}" var="node" selectionMode="single">
+                                        <p:ajax process="@this" event="select" update=":PmOrderRuleSaveAsForm" listener="#{pmOrderRuleController.onSelectOrgForUser}" oncomplete="PF('varPanelOrg4User').hide();"/>
+                                        <p:ajax process="@this" event="expand"/>
+                                        <p:ajax process="@this" event="collapse"/>
+                                        <p:treeNode type="org">
+                                            <h:outputText value="#{node}"/>
+                                        </p:treeNode>
+                                    </p:tree>
+                                </p:scrollPanel>
+                            </p:overlayPanel>
+                        </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.assetName} *</label>
                             <p:inputText id="assetName" value="#{pmOrderRuleController.selected.assetName}" required="true" requiredMessage="#{msg.assetName} #{msg.ValidationRequire}"/>
@@ -32,7 +49,11 @@
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.manufacture}</label>
-                            <p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>
+                            <p:selectOneMenu value="#{pmOrderRuleController.selected.manufacture}" disabled="false" required="false" requiredMessage="#{msg.assetGroup} #{msg.ValidationRequire}">
+                                <f:selectItem itemLabel="#{msg.SelectOneMessage}" itemValue="#{null}" noSelectionOption="true" />
+                                <f:selectItems value="#{pmOrderRuleController.getSupplier()}" var="item"  itemLabel="#{item.name}" itemValue="#{item.name}"/>
+                            </p:selectOneMenu>
+                            <!--<p:inputText id="manufacture" value="#{pmOrderRuleController.selected.manufacture}" required="false" requiredMessage="#{msg.manufacture} #{msg.ValidationRequire}"/>-->
                         </h:panelGroup>
                         <h:panelGroup >
                             <label class ="label">#{msg.functionType}</label>

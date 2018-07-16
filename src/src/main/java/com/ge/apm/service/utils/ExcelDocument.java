@@ -147,7 +147,7 @@ public class ExcelDocument {
                         Date date = cell.getDateCellValue();
                         dataMap.put(rowKey[cellIndex], TimeUtils.getStrDate(date, "yyyy-MM-dd HH:mm:ss"));
                     } else {
-                        dataMap.put(rowKey[cellIndex], new DecimalFormat("##############.#####").format(cell.getNumericCellValue()));
+                        dataMap.put(rowKey[cellIndex], new DecimalFormat("###################.#####").format(cell.getNumericCellValue()));
                     }
                     break;
                 case BOOLEAN:
@@ -470,7 +470,7 @@ public class ExcelDocument {
         }
         if (data instanceof Double) {
             cell.setCellType(CellType.NUMERIC);
-            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
+//            cell.setCellStyle(DEFAULT_CELL_STYLE_DECIMAL);
 
             cell.setCellValue((Double) data);
         }

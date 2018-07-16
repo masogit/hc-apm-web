@@ -1,137 +1,170 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
       xmlns:p="http://primefaces.org/ui">
 
-    <h:form id="exportDataForm">
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup>
-                    <label class="label">*#{msg.hospitalId}</label>
-                    <p:inputText id="selectedOrgName" value="#{workOrderReportExportController.selectedOrg==null ? '': workOrderReportExportController.selectedOrg.name}" readonly="true" required="true" requiredMessage="所属院区不能为空" />
-                    <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down" class="btn btn-sm popupIconButton"/>
-                    <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false" style="width:300px" modal="false">
-                        <p:scrollPanel style="height:300px;border: 0" mode="native">
-                            <p:tree id="orgTree" class="tree" style="width:98%;border:0;" value="#{workOrderReportExportController.orgTree}" selection="#{workOrderReportExportController.selectedNode}" var="node" selectionMode="single">
-                                <p:ajax process="@this" event="select" update=":woTab:exportDataForm:selectedOrgName" listener="#{workOrderReportExportController.onSelectTreeNode}" oncomplete="PF('varPanelOrg').hide();"/>
-                                <p:ajax process="@this" event="expand"/>
-                                <p:ajax process="@this" event="collapse"/>
-
-                                <p:treeNode type="org">
-                                    <h:outputText value="#{node}"/>
-                                </p:treeNode>
-                            </p:tree>
-                        </p:scrollPanel>
-                    </p:overlayPanel>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup id="statusOpen">
-                    <p:selectBooleanCheckbox itemLabel="在修" value="#{workOrderReportExportController.statusOpen}" >
-                    </p:selectBooleanCheckbox>
-                </h:panelGroup>
-                <h:panelGroup id="statusClose">
-                    <p:selectBooleanCheckbox itemLabel="完成" value="#{workOrderReportExportController.statusClose}" >
-                    </p:selectBooleanCheckbox>
-                </h:panelGroup>
-                <h:panelGroup id="statusCancel">
-                    <p:selectBooleanCheckbox itemLabel="取消" value="#{workOrderReportExportController.statusCancel}" >
-                    </p:selectBooleanCheckbox>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
-        <p:fieldset legend="#{msg.FilterCondition}">
-            <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
-                <h:panelGroup>
-                    <label class="label">最早报修时间</label>
-                    <p:calendar timeZone="GMT+8"  id="startTime" value="#{workOrderReportExportController.startTime}" pattern="yyyy/MM/dd" required="false" requiredMessage="开始时间 #{msg.ValidationRequire}" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">最晚报修时间</label>
-                    <p:calendar timeZone="GMT+8"  id="endTime" value="#{workOrderReportExportController.endTime}" pattern="yyyy/MM/dd" required="false" requiredMessage="结束时间 #{msg.ValidationRequire}" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-				<h:panelGroup>
-                     <label class="label">最早关单时间</label>
-                     <p:calendar timeZone="GMT+8"  id="closedStartTime" value="#{workOrderReportExportController.closedStartTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-                <h:panelGroup>
-                    <label class="label">最晚关单时间</label>
-                    <p:calendar timeZone="GMT+8"  id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}" pattern="yyyy/MM/dd" showOn="button"  showButtonPanel="true" navigator="true" mask="true"/>
-                </h:panelGroup>
-            </p:panelGrid>
-        </p:fieldset>
-
-        <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group" >
+<h:form id="exportDataForm">
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
             <h:panelGroup>
-                <p:commandButton value="预览结果" actionListener="#{workOrderReportExportController.previewData}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
-                </p:commandButton>
+                <label class="label">*#{msg.hospitalId}</label>
+                <p:inputText id="selectedOrgName"
+                             value="#{workOrderReportExportController.selectedOrg==null ? '': workOrderReportExportController.selectedOrg.name}"
+                             readonly="true" required="true" requiredMessage="所属院区不能为空"/>
+                <p:commandButton id="btnOrg" process="@this" icon="fa fa-angle-down"
+                                 class="btn btn-sm popupIconButton"/>
+                <p:overlayPanel id="popupPanel" widgetVar="varPanelOrg" for="btnOrg" hideEffect="fade" dynamic="false"
+                                style="width:300px" modal="false">
+                    <p:scrollPanel style="height:300px;border: 0" mode="native">
+                        <p:tree id="orgTree" class="tree" style="width:98%;border:0;"
+                                value="#{workOrderReportExportController.orgTree}"
+                                selection="#{workOrderReportExportController.selectedNode}" var="node"
+                                selectionMode="single">
+                            <p:ajax process="@this" event="select" update=":woTab:exportDataForm:selectedOrgName"
+                                    listener="#{workOrderReportExportController.onSelectTreeNode}"
+                                    oncomplete="PF('varPanelOrg').hide();"/>
+                            <p:ajax process="@this" event="expand"/>
+                            <p:ajax process="@this" event="collapse"/>
+
+                            <p:treeNode type="org">
+                                <h:outputText value="#{node}"/>
+                            </p:treeNode>
+                        </p:tree>
+                    </p:scrollPanel>
+                </p:overlayPanel>
             </h:panelGroup>
         </p:panelGrid>
-    </h:form>
+    </p:fieldset>
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="4" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup id="statusOpen">
+                <p:selectBooleanCheckbox itemLabel="在修" value="#{workOrderReportExportController.statusOpen}">
+                </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup id="statusClose">
+                <p:selectBooleanCheckbox itemLabel="完成" value="#{workOrderReportExportController.statusClose}">
+                </p:selectBooleanCheckbox>
+            </h:panelGroup>
+            <h:panelGroup id="statusCancel">
+                <p:selectBooleanCheckbox itemLabel="取消" value="#{workOrderReportExportController.statusCancel}">
+                </p:selectBooleanCheckbox>
+            </h:panelGroup>
+        </p:panelGrid>
+    </p:fieldset>
+    <p:fieldset legend="#{msg.FilterCondition}">
+        <p:panelGrid columns="8" layout="grid" styleClass="ui-panelgrid-blank form-group">
+            <h:panelGroup>
+                <label class="label">最早报修时间</label>
+                <p:calendar timeZone="GMT+8" id="startTime" value="#{workOrderReportExportController.startTime}"
+                            pattern="yyyy/MM/dd" required="false" requiredMessage="开始时间 #{msg.ValidationRequire}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">最晚报修时间</label>
+                <p:calendar timeZone="GMT+8" id="endTime" value="#{workOrderReportExportController.endTime}"
+                            pattern="yyyy/MM/dd" required="false" requiredMessage="结束时间 #{msg.ValidationRequire}"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">最早关单时间</label>
+                <p:calendar timeZone="GMT+8" id="closedStartTime"
+                            value="#{workOrderReportExportController.closedStartTime}" pattern="yyyy/MM/dd"
+                            showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+            <h:panelGroup>
+                <label class="label">最晚关单时间</label>
+                <p:calendar timeZone="GMT+8" id="closedEndTime" value="#{workOrderReportExportController.closedEndTime}"
+                            pattern="yyyy/MM/dd" showOn="button" showButtonPanel="true" navigator="true" mask="true"/>
+            </h:panelGroup>
+        </p:panelGrid>
+    </p:fieldset>
 
-    <h:form id="dataListForm">
-        <p:dataTable id="datalist" rendered="#{not empty workOrderReportExportController.workOrderList}" value="#{workOrderReportExportController.workOrderList}" var="item" selection="#{workOrderReportExportController.selectedItems}" 
-	rowKey="#{item.报修单号}" lazy="false" paginator="true" paginatorPosition="both" paginatorAlwaysVisible="true"
-                     paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
-                     currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10" emptyMessage="#{msg.noRecordFound}"
-                     rowsPerPageTemplate="10,20,50">
-	    <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
-            <p:column headerText="报修单号">
-                <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank"><h:outputText value="#{item.报修单号}" /></a>
-            </p:column>
-            <p:column headerText="设备编号">
-                <h:outputText value="#{item.设备编号}" />
-            </p:column>
-            <p:column headerText="资产编号">
-                <h:outputText value="#{item.资产编号}" />
-            </p:column>
-            <p:column headerText="设备名称">
-                <h:outputText value="#{item.设备名称}" />
-            </p:column>
-            <p:column headerText="院区">
-                <h:outputText value="#{item.院区}" />
-            </p:column>
-            <p:column headerText="科室">
-                <h:outputText value="#{item.科室}" />
-            </p:column>
-            <p:column headerText="报修人">
-                <h:outputText value="#{item.报修人}" />
-            </p:column>
-            <p:column headerText="报修时间">
-                <h:outputText value="#{item.报修时间}" />
-            </p:column>
-            <p:column headerText="当前责任人">
-                <h:outputText value="#{item.当前责任人}" />
-            </p:column>
-            <p:column headerText="故障描述">
-                <h:outputText value="#{item.故障描述}" />
-            </p:column>
-            <p:column headerText="当前步骤">
-                <h:outputText value="#{item.当前步骤}" />
-            </p:column>
-            <p:column headerText="工单状态">
-                <h:outputText value="#{item.工单状态}" />
-            </p:column>
+    <p:panelGrid columns="2" layout="grid" styleClass="ui-panelgrid-blank form-group">
+        <h:panelGroup>
+            <p:commandButton value="预览结果" actionListener="#{workOrderReportExportController.previewData}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true"
+                             update=":growl :woTab:dataListForm :woTab:dataListForm:datalist">
+            </p:commandButton>
+        </h:panelGroup>
+    </p:panelGrid>
+</h:form>
 
-            <f:facet name="{Toolbar}">
-                <p:commandButton ajax="false" value="报表全部导出" actionListener="#{workOrderReportExportController.exportAllWo()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                <p:fileDownload value="#{workOrderReportExportController.exportFile}" />
-                            </p:commandButton>
-                            <p:commandButton ajax="false" value="报表选择导出" actionListener="#{workOrderReportExportController.exportSelectedWo()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                <p:fileDownload value="#{workOrderReportExportController.exportFile}" />
-                            </p:commandButton>
-                            <p:commandButton ajax="false" value="详情全部导出" actionListener="#{workOrderReportExportController.exportAllWoPdf()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                <p:fileDownload value="#{workOrderReportExportController.exportPdf}" />
-                            </p:commandButton>
-                            <p:commandButton ajax="false" value="详情选择导出" actionListener="#{workOrderReportExportController.exportSelectedWoPdf()}" icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
-                                <p:fileDownload value="#{workOrderReportExportController.exportPdf}" />
-                            </p:commandButton>
-            </f:facet>
-        </p:dataTable>
-    </h:form>
+<h:form id="dataListForm">
+    <p:dataTable id="datalist" rendered="#{not empty workOrderReportExportController.workOrderList}"
+                 value="#{workOrderReportExportController.workOrderList}" var="item"
+                 selection="#{workOrderReportExportController.selectedItems}"
+                 rowKey="#{item.报修单号}" lazy="false" paginator="true" paginatorPosition="both"
+                 paginatorAlwaysVisible="true"
+                 paginatorTemplate="{CurrentPageReport} {Toolbar} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} #{msg.RowsPerPage}: {RowsPerPageDropdown}"
+                 currentPageReportTemplate="#{msg.recordCount}: {totalRecords}" pageLinks="5" rows="10"
+                 emptyMessage="#{msg.noRecordFound}"
+                 rowsPerPageTemplate="10,20,50">
+        <p:column selectionMode="multiple" style="width:50px;text-align:center"/>
+        <p:column headerText="报修单号">
+            <a href="/geapm/portal/wo/woList.xhtml?woId=#{item.woId}" target="_Blank">
+                <h:outputText value="#{item.报修单号}"/>
+            </a>
+        </p:column>
+        <p:column headerText="设备编号">
+            <h:outputText value="#{item.设备编号}"/>
+        </p:column>
+        <p:column headerText="资产编号">
+            <h:outputText value="#{item.资产编号}"/>
+        </p:column>
+        <p:column headerText="设备名称">
+            <h:outputText value="#{item.设备名称}"/>
+        </p:column>
+        <p:column headerText="院区">
+            <h:outputText value="#{item.院区}"/>
+        </p:column>
+        <p:column headerText="科室">
+            <h:outputText value="#{item.科室}"/>
+        </p:column>
+        <p:column headerText="报修人">
+            <h:outputText value="#{item.报修人}"/>
+        </p:column>
+        <p:column headerText="报修时间">
+            <h:outputText value="#{item.报修时间}"/>
+        </p:column>
+        <p:column headerText="当前责任人">
+            <h:outputText value="#{item.当前责任人}"/>
+        </p:column>
+        <p:column headerText="故障描述">
+            <h:outputText value="#{item.故障描述}"/>
+        </p:column>
+        <p:column headerText="当前步骤">
+            <h:outputText value="#{item.当前步骤}"/>
+        </p:column>
+        <p:column headerText="工单状态">
+            <h:outputText value="#{item.工单状态}"/>
+        </p:column>
+
+        <f:facet name="{Toolbar}">
+            <p:commandButton ajax="false" value="报表全部导出"
+                             actionListener="#{workOrderReportExportController.exportAllWo()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+            </p:commandButton>
+            <p:commandButton ajax="false" value="报表选择导出"
+                             actionListener="#{workOrderReportExportController.exportSelectedWo()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{workOrderReportExportController.exportFile}"/>
+            </p:commandButton>
+            <p:commandButton ajax="false" value="详情全部导出"
+                             actionListener="#{workOrderReportExportController.exportAllWoDocx()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+            </p:commandButton>
+            <p:commandButton ajax="false" value="详情选择导出"
+                             actionListener="#{workOrderReportExportController.exportSelectedWoDocx()}"
+                             icon="ui-icon-arrowthick-1-s" validateClient="true" update=":growl">
+                <p:fileDownload value="#{workOrderReportExportController.exportDocx}"/>
+            </p:commandButton>
+        </f:facet>
+    </p:dataTable>
+</h:form>
 </html>

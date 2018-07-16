@@ -1,0 +1,267 @@
+{
+  "groups": [
+    {
+      "items": [
+        {
+          "component": "Select",
+          "key": "syzsbswg01",
+          "label": "外观检查",
+          "options": [
+            {
+              "key": "syzsbwgfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbwgfh02",
+              "value": "不符合"
+            }
+          ]
+        },
+        {
+          "component": "TextArea",
+          "key": "syzswgbfhsm01",
+          "label": "不符合情况说明"
+        }
+      ],
+      "title": "外观检查"
+    },
+    {
+      "items": [
+        {
+          "component": "Number",
+          "key": "llcsd01",
+          "label": "平均流量测试点25ml/h"
+        },
+        {
+          "component": "Number",
+          "key": "llcsd02",
+          "label": "平均流量测试点100ml/h"
+        },
+        {
+          "component": "Select",
+          "key": "llcsdjg01",
+          "label": "测试结果",
+          "options": [
+            {
+              "key": "llcsdjgfh01",
+              "value": "符合"
+            },
+            {
+              "key": "llcsdjgfh02",
+              "value": "不符合"
+            }
+          ]
+        }
+      ],
+      "title": "流量检测(允许测量误差±10％)"
+    },
+    {
+      "items": [
+        {
+          "component": "Number",
+          "key": "syzszsbj01",
+          "label": "阻塞报警设置值"
+        },
+        {
+          "component": "Number",
+          "key": "syzsbbjsj01",
+          "label": "报警时间(min)"
+        },
+        {
+          "component": "Number",
+          "key": "syzsbbjyl01",
+          "label": "报警压力（mmHg）"
+        },
+        {
+          "component": "Select",
+          "key": "syzsbzsjg01",
+          "label": "测试结果",
+          "options": [
+            {
+              "key": "syzsbzsjgfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbzsjgfh02",
+              "value": "不符合"
+            }
+          ]
+        }
+      ],
+      "title": "阻塞报警检测"
+    },
+    {
+      "items": [
+        {
+          "component": "Select",
+          "key": "syzsbds01",
+          "label": "堵塞",
+          "options": [
+            {
+              "key": "syzsbdsfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbdsfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbdsfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbdc01",
+          "label": "电池电量不足",
+          "options": [
+            {
+              "key": "syzsbdcfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbdcfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbdcfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbgl01",
+          "label": "输液管路安装不妥",
+          "options": [
+            {
+              "key": "syzsbglfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbglfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbglfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbdyx01",
+          "label": "电源线脱开",
+          "options": [
+            {
+              "key": "syzsbdyxfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbdyxfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbdyxfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbkp01",
+          "label": "即将空瓶",
+          "options": [
+            {
+              "key": "syzsbkpfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbkpfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbkpfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbls01",
+          "label": "流速错误",
+          "options": [
+            {
+              "key": "syzsblsfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsblsfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsblsfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbqp01",
+          "label": "气泡报警",
+          "options": [
+            {
+              "key": "syzsbqpfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbqpfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbqpfh03",
+              "value": "不适用"
+            }
+          ]
+        },
+        {
+          "component": "Select",
+          "key": "syzsbkm01",
+          "label": "开门报警",
+          "options": [
+            {
+              "key": "syzsbkmfh01",
+              "value": "符合"
+            },
+            {
+              "key": "syzsbkmfh02",
+              "value": "不符合"
+            },
+            {
+              "key": "syzsbkmfh03",
+              "value": "不适用"
+            }
+          ]
+        }
+      ],
+      "title": "报警系统检测"
+    },
+    {
+      "items": [
+        {
+          "key": "syzsbjcjl01",
+          "label": "检测结论"
+        },
+        {
+          "component": "TextArea",
+          "key": "syzsbjcjlbz01",
+          "label": "备注"
+        }
+      ],
+      "title": "检测结论"
+    }
+  ],
+  "schemaId": "ff808081641cec9501641dab81790000",
+  "title": "输液泵注射泵三级维护性能检测表"
+}

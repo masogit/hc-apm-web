@@ -396,7 +396,7 @@
         </p:overlayPanel>
 
         <script>
-            window.onload = function () {
+            afterPageLoad = function () {
                 $("#searchForm\\:searchText").keypress(function (e) {
                     if (e.keyCode == 13) {
                         e.preventDefault();

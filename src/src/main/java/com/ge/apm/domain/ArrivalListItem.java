@@ -219,7 +219,7 @@ public class ArrivalListItem implements Serializable {
 
     @Column(name = "last_pm_date")
     @Temporal(TemporalType.DATE)
-    private Date lastPmDate;//上次维护日期
+    private Date lastPmDate;//上次保养日期
 
     @Column(name = "last_metering_date")
     @Temporal(TemporalType.DATE)
@@ -227,7 +227,7 @@ public class ArrivalListItem implements Serializable {
 
     @Column(name = "last_qa_date")
     @Temporal(TemporalType.DATE)
-    private Date lastQaDate;//上次质检日期
+    private Date lastQaDate;//上次巡检日期
 
     @Column(name = "last_stocktake_date")
     @Temporal(TemporalType.DATE)

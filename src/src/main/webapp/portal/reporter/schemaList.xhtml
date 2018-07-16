@@ -8,7 +8,7 @@
     <ui:define name="content">
         <div class="ui-g">
             <div class="ui-g-12 card cardTitle">
-                <p:outputLabel class="pageTitle" value="表格模版管理"/>
+                <p:outputLabel class="pageTitle" value="报告模版管理"/>
             </div>
 
             <div class="ui-g-12 card">
@@ -44,15 +44,15 @@
                             <h:outputText value="未启用"  rendered="#{empty item.status or item.status eq 'Draft'}"/>
                             <h:outputText value="已发布"  rendered="#{item.status eq 'Released'}"/>
                             <p:spacer/>
-                            <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{tableDefinitionController.setToUsing(item.id,false)}" update=":SchemaListForm:datalist"  rendered="#{empty item.status or item.status eq 'Draft'}"/>
-                            <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="停止使用" actionListener="#{tableDefinitionController.setToUsing(item.id,true)}" update=":SchemaListForm:datalist"  rendered="#{item.status eq 'Released'}"/>
+                            <p:commandButton icon="ui-icon-play-arrow" style="zoom:0.7" title="#{msg.setToUsing}" actionListener="#{tableDefinitionController.setToUsing(item.id,false)}" update=":SchemaListForm:datalist"  rendered="#{empty item.status or item.status eq 'Draft'}" disabled="#{tableDefinitionController.getIsReadOnly(item)}"/>
+                            <p:commandButton icon="ui-icon-close" style="zoom:0.7" title="停止使用" actionListener="#{tableDefinitionController.setToUsing(item.id,true)}" update=":SchemaListForm:datalist"  rendered="#{item.status eq 'Released'}" disabled="#{tableDefinitionController.getIsReadOnly(item)}"/>
 
                         </p:column>
                         <f:facet name="{Toolbar}">
                             <p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}" action="createTable.xhtml?faces-redirect=true" />
                             <!--<p:commandButton id="createButton" icon="ui-icon-plus" class="btn btn-sm btn-gray" title="#{msg.Create}"  oncomplete="PF('createDialog').show()"/>-->
                             <p:commandButton id="editButton" icon="ui-icon-pencil" class="btn btn-sm btn-gray" title="#{msg.Edit}" action="#{tableDefinitionController.getEditUrl()}"  disabled="#{empty tableDefinitionController.selected}"/>
-                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{tableDefinitionController.deleteTemplate}" update="datalist, :growl" >
+                            <p:commandButton id="deleteButton" icon="ui-icon-close" class="btn btn-sm btn-gray" title="#{msg.Delete}" actionListener="#{tableDefinitionController.deleteTemplate}" update="datalist, :growl" disabled="#{empty tableDefinitionController.selected or tableDefinitionController.getIsReadOnly(tableDefinitionController.selected)}">
                                 <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-warning"/>
                             </p:commandButton>
                             
