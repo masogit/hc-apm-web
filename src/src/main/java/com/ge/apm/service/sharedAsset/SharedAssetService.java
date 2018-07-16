@@ -50,6 +50,26 @@ public class SharedAssetService extends MicroServiceInvoker {
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.POST, requestEntity, LinkedHashMap.class);
         logger.info("Remote confirm rent " + (isOkay(response) ? "successfully." : "failed."));
     }
+
+    public void getAssigneeList() {
+        String url = getGatewayURL(GatewayURL.ASSIGNEE_LIST);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
+        logger.info("Get assignee list " + (isOkay(response) ? "successfully." : "failed."));
+    }
+
+    public void remoteAssignRequest(String requestId, String assigneeUID) {
+        String url = getGatewayURL(GatewayURL.REMOTE_ASSIGN_REQUEST);
+        url = url.replace("{requestId}", requestId);
+        url = url.replace("{assigneeUID}", assigneeUID);
+        String token = UserContextService.getAccessToken();
+        HttpHeaders header = createHttpHeaders(token);
+        HttpEntity<String> requestEntity = new HttpEntity<String>(header);
+        ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.PUT, requestEntity, LinkedHashMap.class);
+        logger.info("Assignee request " + (isOkay(response) ? "successfully." : "failed."));
+    }
 }
 
 
