@@ -18,7 +18,18 @@
                 <h:form id="maintainHeaderForm">
                 	<p:commandButton id="batchCompleteButton" value="批量完成" title="批量完成" update=":maintainBatchCompleteDlg" oncomplete="PF('maintainBatchCompleteDialog').show()"/>
                     <p:commandButton id="batchCreateButton" value="批量创建" title="批量创建" update=":maintainBatchDlg" oncomplete="PF('maintainBatchDialog').show()"/>
-                    
+                    <br/>
+                    <h:panelGroup rendered="#{maintainController.listOrgInfo!=null}">
+                    	<label>科室：</label>
+						<p:selectOneMenu value="#{maintainController.currentClicinalOrgInfo}" var="t" converter="orgInfoConverter">
+							<p:ajax event="change" listener="#{maintainController.onClinicalOrgInfoChange}" update=":maintainForm:maintain"></p:ajax>
+							<f:selectItem itemLabel="#{msg.selectOneMessage}" itemValue="#{null}"/>
+	                        <f:selectItems value="#{maintainController.listOrgInfo}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
+	                        <p:column>
+								<h:outputText value="#{t!=null?t.name:'请选择...'}" />
+							</p:column>
+	                    </p:selectOneMenu>
+					</h:panelGroup>
                 </h:form>
                 <h:form id="maintainForm">
                     <h:panelGrid columnClasses="value">
@@ -30,7 +41,7 @@
                     </h:panelGrid>
                 </h:form>
                 <p:dialog id="maintainDlg" widgetVar="maintainDialog" header="维护详情" modal="true" width="650" resizable="true" draggable="true">
-                   	<h:form id="maintainDlgTable">
+                   	<h:form id="maintainDlgTable" rendered="#{maintainController.nurseSiteMaintain!=null}">
                    		<div class="ui-datatable ui-widget" style="#{maintainController.nurseSiteMaintain.listNurseSiteMaintainItem.size()>8?'overflow: auto; height:480px; width:600px':''}">
                    			<div class="ui-datatable-tablewrapper">
                    				<table>

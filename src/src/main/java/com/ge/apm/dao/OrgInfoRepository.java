@@ -1,12 +1,15 @@
 package com.ge.apm.dao;
 
-import com.ge.apm.domain.OrgInfo;
+import java.util.List;
+import java.util.Set;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
-import webapp.framework.dao.GenericRepository;
 
-import java.util.List;
+import com.ge.apm.domain.OrgInfo;
+
+import webapp.framework.dao.GenericRepository;
 
 public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     //@QueryHints({ @QueryHint(name = "org.hibernate.cacheable", value ="true") })
@@ -46,6 +49,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     @Query(value = "select name from org_info where id=?1",nativeQuery = true)
     public String getDepName(int id);
     
+    @Query(value = "select o.* from org_info o where o.uid in ?1 and o.org_type=4",nativeQuery = true)
+    public List<OrgInfo> findClinicalByUids(Set<String> listUid);
+    
     public OrgInfo getByUid(String uid);
     
     public List<OrgInfo> getByTenantUID(String tenantUID);
@@ -68,7 +74,7 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> findByParentUIDAndOrgType(String parentUID, Integer orgType);
 
     public List<OrgInfo> findBySiteUIDAndOrgType(String siteUID,Integer orgType);
-
+    
     public OrgInfo findFirstByTenantUIDAndOrgTypeAndName(String tenantUID, int orgType, String name);
 
     public OrgInfo findFirstByParentUIDAndName(String parentUID, String name);

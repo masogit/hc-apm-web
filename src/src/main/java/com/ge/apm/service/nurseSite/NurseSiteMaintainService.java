@@ -22,12 +22,15 @@ import com.ge.apm.dao.NurseSiteMaintainConfigRepository;
 import com.ge.apm.dao.NurseSiteMaintainDataRepository;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainRepository;
+import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
 import com.ge.apm.domain.NurseSiteMaintainConfig;
 import com.ge.apm.domain.NurseSiteMaintainConfigItem;
 import com.ge.apm.domain.NurseSiteMaintainData;
 import com.ge.apm.domain.NurseSiteMaintainItem;
+import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.uaa.UaaService;
 
@@ -58,6 +61,12 @@ public class NurseSiteMaintainService{
 	AssetInfoRepository assetInfoRepository;
 	
 	@Autowired
+	OrgInfoRepository orgInfoRepository;
+	
+	@Autowired
+	UserOrgInfoRepository userOrgInfoRepository;
+	
+	@Autowired
     private UaaService uaaService;
 	
 	public List<NurseSiteMaintainConfig> getMaintainConfigBySiteUid(String siteUid,String userUid){
@@ -77,6 +86,10 @@ public class NurseSiteMaintainService{
 	
 	public List<NurseSiteMaintain> getDefaultMaintainData(String siteUid,String userUid,Date startDate,Date endDate){
 		return nurseSiteMaintainRepository.findDefaultData(siteUid, userUid, startDate, endDate);
+	}
+	
+	public List<NurseSiteMaintain> getDataByClinicalOrgUid(String siteUid,String orgUid,Date startDate,Date endDate){
+		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(siteUid, orgUid, startDate, endDate);
 	}
 	
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters,Sort sort){
@@ -103,8 +116,16 @@ public class NurseSiteMaintainService{
 		return assetInfoRepository.findAssetByMaintainConfigParentId(parentId);
 	}
 	
+	public List<OrgInfo> getListClinicalByUid(Set<String> listUid){
+		return orgInfoRepository.findClinicalByUids(listUid);
+	}
+	
 	public List<NurseSiteMaintainConfigItem> findByParentId(String parentId){
 		return nurseSiteMaintainConfigItemRepository.findByParentId(parentId);
+	}
+	
+	public List<String> findUserUidListByOrgUids(List<String> orgUids){
+		return userOrgInfoRepository.findUserUidListByOrgUids(orgUids);
 	}
 	
 	public boolean canAddMaintainData(Date scheduleDate,String siteUid,String userUid){
