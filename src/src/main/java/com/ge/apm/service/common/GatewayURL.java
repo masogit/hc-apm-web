@@ -37,6 +37,8 @@ public enum GatewayURL {
     BATCH_TAKE_ORDER("/hcapmworkflowservice/api/apm/pmOrders/batch"),
     // Allocation Center URLs
     SHARED_ASSET_PUSH_MESSAGE("/hcapmworkflowservice/api/apm/allocation/remote/message/{requestId}"),
+    ASSIGNEE_LIST("/hcapmworkflowservice/api/apm/allocation/assigneeList"),
+    REMOTE_ASSIGN_REQUEST("/hcapmworkflowservice/api/apm/allocation/assign?requestId={requestId}&assigneeUID={assigneeUID}"),
     REMOTE_ACCEPT_RENT("/hcapmworkflowservice/api/apm/allocation/remote/acceptRent/{requestId}");
 
     private final String url;
