@@ -86,7 +86,7 @@
                                     <br/>
                                     <p:commandLink immediate="true" value="手机预览" onclick="preparePreview();"  oncomplete="PF('PmOrderPreviewDlg').show();" update=":PmOrderPreviewForm"/>
                                     <br />
-                                    <p:commandLink value="下载模版" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false">
+                                    <p:commandLink value="下载模版" actionListener="#{tableCreateController.generateExcelTemplateFile()}" ajax="false" rendered="#{not empty tableCreateController.table.title}">
                                         <p:fileDownload value="#{tableCreateController.exportedFile}"/>
                                     </p:commandLink>
                                 </h:panelGroup>
