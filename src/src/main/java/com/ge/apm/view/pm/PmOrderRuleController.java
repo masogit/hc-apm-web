@@ -73,12 +73,14 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
     private TreeNode selectedNode;
     private TenantInfoRepository tenantInfoRepository;
     private OrgInfo selectedOrg;
+    private SupplierRepository supplierDao;
 
     @Override
     protected void init() {
         filterBySite = false;
         dao = WebUtil.getBean(PmOrderRuleRepository.class);
         blobService = WebUtil.getBean(BlobFileService.class);
+        supplierDao = WebUtil.getBean(SupplierRepository.class);
         user = UserContextService.getCurrentUserAccount();
         userAccountRepository = WebUtil.getBean(UserAccountRepository.class);
         pmOrderRuleItemRepository = WebUtil.getBean(PmOrderRuleItemRepository.class);
@@ -631,6 +633,10 @@ public class PmOrderRuleController extends JpaCRUDController<PmOrderRule> {
             this.selected.setReportStorageId(storageId);
             this.dao.save(selected);
         }
+    }
+
+    public List<Supplier> getSupplier(){
+        return supplierDao.findByManufacturerTAndTenantUID(true,user.getTenantUID());
     }
 
     /**
