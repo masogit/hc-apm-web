@@ -468,18 +468,24 @@ public class AssetFileImportService {
             if (!StringUtils.isEmpty(newAsset.getVendor())) {
                 supplier = importSupplierIfNeeded(newAsset.getVendor(), newAsset.getVendorTel());
                 newAsset.setSupplierId(supplier.getId());
+            } else {
+                newAsset.setSupplierId(null);
             }
 
             ////导入维修商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
                 supplier = importMaintainancerIfNeeded(newAsset.getMaitanance(), newAsset.getMaitananceTel());
                 newAsset.setMaitananceId(supplier.getId().toString());
+            } else {
+                newAsset.setMaitananceId(null);
             }
 
             ////导入制造商，并修正ID
             if (!StringUtils.isEmpty(newAsset.getManufacture())) {
                 supplier = importManufacturerIfNeeded(newAsset.getManufacture());
                 newAsset.setManufactureId(supplier.getId().toString());
+            } else {
+                newAsset.setManufactureId(null);
             }
 
             //auto generate financing num
