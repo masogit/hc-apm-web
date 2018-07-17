@@ -25,9 +25,9 @@ public interface NurseSiteMaintainRepository extends GenericRepositoryUUID<Nurse
 	@Query(value="select o.* from nurse_site_maintain o where o.config_id=?1 and o.status=?2",nativeQuery=true)
 	public List<NurseSiteMaintain> findByConfigAndStatus(String configId,Integer status);
 	
-	@Query(value="select distinct o.* from nurse_site_maintain o,user_org a where o.site_uid=?1 and o.create_by=a.user_uid and o.schedule_date>=?3 and o.schedule_date<?4 and a.org_uid in (select b.org_uid from user_org b where b.user_uid=?2) order by o.schedule_date desc",nativeQuery=true)
+	@Query(value="select distinct o.* from nurse_site_maintain o,user_org a where o.site_uid=?1 and o.create_by=a.user_uid and o.schedule_date>=?3 and o.schedule_date<?4 and a.org_uid in (select b.org_uid from user_org b where b.user_uid=?2) order by o.schedule_date asc",nativeQuery=true)
 	public List<NurseSiteMaintain> findDefaultData(String siteUid,String userUid,Date startDate,Date endDate);
 	
-	@Query(value="select distinct o.* from nurse_site_maintain o,user_org a where o.site_uid=?1 and o.create_by=a.user_uid and o.schedule_date>=?3 and o.schedule_date<?4 and a.org_uid =?2 order by o.schedule_date desc",nativeQuery=true)
+	@Query(value="select distinct o.* from nurse_site_maintain o,user_org a where o.site_uid=?1 and o.create_by=a.user_uid and o.schedule_date>=?3 and o.schedule_date<?4 and a.org_uid =?2 order by o.schedule_date asc",nativeQuery=true)
 	public List<NurseSiteMaintain> findDataByClinicalOrgUid(String siteUid,String orgUid,Date startDate,Date endDate);
 }
