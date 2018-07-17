@@ -42,8 +42,8 @@ public class OrgInfoBuilder {
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setHospitalId(parentOrg.getId());
 
-        orgInfo.setTenantUID(tenantInfo.getUid());
-        orgInfo.setInstitutionUID(parentOrg.getUid());
+        orgInfo.setTenantUID(parentOrg.getTenantUID());
+        orgInfo.setInstitutionUID(parentOrg.getInstitutionUID());
         orgInfo.setHospitalUID(orgInfo.getUid());
         orgInfo.setSiteUID(orgInfo.getUid());
 
@@ -64,9 +64,9 @@ public class OrgInfoBuilder {
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setHospitalId(parentOrg.getId());
 
-        orgInfo.setTenantUID(tenantInfo.getUid());
-        orgInfo.setInstitutionUID(parentOrg.getUid());
-        orgInfo.setHospitalUID(parentOrg.getUid());
+        orgInfo.setTenantUID(parentOrg.getTenantUID());
+        orgInfo.setInstitutionUID(parentOrg.getInstitutionUID());
+        orgInfo.setHospitalUID(parentOrg.getHospitalUID());
         orgInfo.setSiteUID(orgInfo.getUid());
 
         orgInfo.setParentUID(parentOrg.getUid());
@@ -86,10 +86,10 @@ public class OrgInfoBuilder {
         orgInfo.setSiteId(tenantInfo.getId());
         orgInfo.setHospitalId(parentOrg.getId());
 
-        orgInfo.setTenantUID(tenantInfo.getUid());
-        orgInfo.setInstitutionUID(parentOrg.getUid());
-        orgInfo.setHospitalUID(parentOrg.getUid());
-        orgInfo.setSiteUID(parentOrg.getUid());
+        orgInfo.setTenantUID(parentOrg.getTenantUID());
+        orgInfo.setInstitutionUID(parentOrg.getInstitutionUID());
+        orgInfo.setHospitalUID(parentOrg.getHospitalUID());
+        orgInfo.setSiteUID(parentOrg.getSiteUID());
 
         orgInfo.setParentUID(parentOrg.getUid());
 
