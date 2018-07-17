@@ -11,6 +11,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -69,6 +71,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<AssetInfo> checkListAssets;
   	private List<String> orgUidList;
   	private List<String> userUidList;
+  	private DualListModel<AssetInfo> availableAssets;
   	
   	private boolean isSaveDisable=true;
   	
@@ -201,6 +204,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			String parentId=nurseSiteMaintainConfig.getId();
 			if(StringUtils.isNotEmpty(parentId)){
 				listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(parentId);
+				checkListAssets.removeAll(listCheckAssets);
+				availableAssets=new DualListModel<>(checkListAssets, listCheckAssets);
 			}
 			Integer type=nurseSiteMaintainConfig.getType();
 			String typeValue=nurseSiteMaintainConfig.getTypeValue();
@@ -295,6 +300,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		nurseSiteMaintainConfig.setCheckItems(tempResult);
 		nurseSiteMaintainService.saveMaintainConfig(nurseSiteMaintainConfig, listCheckAssets);
 		return true;
+	}
+	
+	public void onAssetsTransfer(TransferEvent event) {
+		for (Object item : event.getItems()) {
+			if (event.isAdd()) {
+				listCheckAssets.add((AssetInfo) item);
+			} else {
+				checkListAssets.remove((AssetInfo) item);
+			}
+		}
 	}
 	
 	public List<MaintainDataPair> getCheckListHours() {
@@ -492,6 +507,14 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setBlnModifyAll(boolean blnModifyAll) {
 		this.blnModifyAll = blnModifyAll;
+	}
+
+	public DualListModel<AssetInfo> getAvailableAssets() {
+		return availableAssets;
+	}
+
+	public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
+		this.availableAssets = availableAssets;
 	}
 	
 }
