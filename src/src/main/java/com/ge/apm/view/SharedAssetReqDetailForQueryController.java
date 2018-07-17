@@ -118,7 +118,10 @@ public class SharedAssetReqDetailForQueryController extends GenericCRUDUUIDContr
             searchFilters = new ArrayList<SearchFilter>();
         }
         UserAccount user = UserContextService.getCurrentUserAccount();
-        List<String> orgUidList = uuaService.getOrgListByUser(user.getUid()).stream().map(item -> item.getUid()).collect(Collectors.toList());
+        List<String> orgUidList = uuaService.getUserAccessibleSiteListWithClinicalDept(user.getUid()).stream() 
+									                .filter(item -> item.getOrgType() == 4) 
+									                .map(item -> item.getUid()) 
+									                .collect(Collectors.toList());
         searchFilters.add(new SearchFilter("institutionUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("hospitalUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
         searchFilters.add(new SearchFilter("tenantUID", SearchFilter.Operator.IN, orgUidList, "1*2+"));
