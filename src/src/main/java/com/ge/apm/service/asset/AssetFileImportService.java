@@ -616,7 +616,7 @@ public class AssetFileImportService {
             supplierDao.save(supplier);
         }
 
-        if (!supplier.getSupplierT()) {
+        if (supplier.getSupplierT() == null || !supplier.getSupplierT()) {
             supplier.setSupplierT(true);
             supplierDao.save(supplier);
         }
@@ -641,7 +641,7 @@ public class AssetFileImportService {
             supplierDao.save(supplier);
         }
 
-        if (!supplier.getSupplierT()) {
+        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT()) {
             supplier.setMaintainerT(true);
             supplierDao.save(supplier);
         }
@@ -665,7 +665,7 @@ public class AssetFileImportService {
             supplierDao.save(supplier);
         }
 
-        if (!supplier.getSupplierT()) {
+        if (supplier.getManufacturerT() == null || !supplier.getManufacturerT()) {
             supplier.setManufacturerT(true);
             supplierDao.save(supplier);
         }
