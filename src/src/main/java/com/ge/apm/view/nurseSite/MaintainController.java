@@ -1,5 +1,6 @@
 package com.ge.apm.view.nurseSite;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -48,7 +49,7 @@ public class MaintainController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
-
+	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 	private ScheduleModel lazyEventModel;
 	private DefaultScheduleEvent event;
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
@@ -263,9 +264,9 @@ public class MaintainController {
 		addMessage("报告已保存");
 	}
 	
-	public void createMaintain() {
+	public String createMaintain() {
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
-		event = new DefaultScheduleEvent("",userClickDate, userClickDate, true);
+		event = new DefaultScheduleEvent(getShowTitle(nurseSiteMaintain),userClickDate, userClickDate, true);
 		event.setData(nurseSiteMaintain);
 		lazyEventModel.addEvent(event);
 		if(listMaintainData==null){
@@ -273,6 +274,7 @@ public class MaintainController {
 		}
 		listMaintainData.add(nurseSiteMaintain);
 		addMessage("报告已创建");
+		return "maintainMain?faces-redirect=true";
 	}
 
 	public void deleteMaintain() {

@@ -238,35 +238,47 @@ public class NurseSiteMaintainService{
 	private int updateMaintainData(NurseSiteMaintain obj,Boolean defaultValue){
 		Set<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
-		int status=1;
+		int itemStatus=1;
+		int objStatus=1;
 		while(it.hasNext()){
+			itemStatus=1;
 			NurseSiteMaintainItem tempItem=it.next();
 			Set<NurseSiteMaintainData> listData=tempItem.getListData();
 			Iterator<NurseSiteMaintainData> itData=listData.iterator();
+			if(defaultValue!=null){
+				if(defaultValue){
+					tempItem.setStatus(2);
+				}
+				else{
+					tempItem.setStatus(3);
+				}
+			}
 			while(itData.hasNext()){
 				NurseSiteMaintainData tempData=itData.next();
-				Boolean value=tempData.getCheckValue();
 				if(defaultValue!=null){
 					tempData.setCheckValue(defaultValue);
 				}
-				if(value!=null && value==false && (status==1 || status==2)){
-					status=3;
+				Boolean value=tempData.getCheckValue();
+				if(value!=null && value==false && (itemStatus==1 || itemStatus==2)){
+					itemStatus=3;
+					objStatus=3;
 					if(defaultValue==null){
-						return status;
+						break;
 					}
 				}
-				if(status!=3){
-					status=2;
+				if(itemStatus!=3){
+					itemStatus=2;
 				}
 			}
+			tempItem.setStatus(itemStatus);
 		}
-		return status;
+		if(objStatus!=3){
+			objStatus=2;
+		}
+		return objStatus;
 	}
 	
 	public void updateMaintainDataStatus(NurseSiteMaintain obj,boolean batchUpdate){
-		if(obj.getStatus()==null){
-			obj.setStatus(0);
-		}
 		if(batchUpdate){
 			if(obj.getStatus()==0){
 				obj.setStatus(2);
