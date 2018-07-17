@@ -10,6 +10,7 @@ import com.ge.apm.domain.*;
 import com.ge.apm.domain.pure.AssetInfoFormatter;
 import com.ge.apm.service.common.ConfigService;
 import com.ge.apm.service.common.CustomConfigConstant;
+import com.ge.apm.service.orginfo.OrgInfoBuilder;
 import com.ge.apm.service.utils.ExcelDocument;
 import com.ge.apm.view.sysutil.FieldValueMessageController;
 import com.ge.apm.view.sysutil.UserContextService;
@@ -72,22 +73,33 @@ public class AssetFileImportService {
 
     @Autowired
     private AssetInfoRepository assetDao;
+
     @Autowired
     private OrgInfoRepository orgDao;
+
     @Autowired
     private UserAccountRepository userDao;
+
     @Autowired
     private SupplierRepository supplierDao;
+
     @Autowired
     private QrCodeLibRepository qrcodeDao;
+
     @Autowired
     private AssetCreateService assetCreateService;
+
     @Autowired
     private QrCodeService qrCodeService;
+
     @Autowired
     private AssetFinacingNumGenerateService assetFinacingNumGenerateService;
+
     @Autowired
     ConfigService configService;
+
+    @Autowired
+    private TenantInfoRepository tenantInfoDao;
 
     private OrgInfo selectedOrgToImport;
 
@@ -385,17 +397,11 @@ public class AssetFileImportService {
                 item.put("status", ImportStatus.Failure);
                 AssetRow.addErrMessage(item, "警告:科室为空");
             } else {
-                OrgInfo orgInfo = getOrgInfoByName(orgName);
 
-                if (orgInfo == null) {
-                    item.put("status", ImportStatus.Failure);
-                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
-                    return;
-                } else {
-                    newAsset.setClinicalDeptName(orgName);
-                    newAsset.setClinicalDeptId(orgInfo.getId());
-                    newAsset.setClinicalDeptUID(orgInfo.getUid());
-                }
+                OrgInfo orgInfo = importOrgIfNeeded(orgName);
+                newAsset.setClinicalDeptId(orgInfo.getId());
+                newAsset.setClinicalDeptUID(orgInfo.getUid());
+
             }
 
             //for AssetOwner
@@ -457,28 +463,23 @@ public class AssetFileImportService {
                 newAsset.setClinicalOwnerName(null);
             }
 
-            if (newAsset.getVendor() != null && !newAsset.getVendor().isEmpty()) {
-                List<Supplier> supplierList = getSupplierListByName(newAsset.getVendor());
-                if (null == supplierList || supplierList.isEmpty()) {
-                    Supplier newSupplier = new Supplier();
-                    newSupplier.setSupplierT(true);
-                    newSupplier.setSiteId(selectedOrgToImport.getSiteId());
-                    newSupplier.setName(newAsset.getVendor());
-                    newSupplier.setTenantUID(selectedOrgToImport.getTenantUID());
-                    newSupplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
-                    newSupplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-                    newSupplier.setSiteUID(selectedOrgToImport.getSiteUID());
-                    supplierDao.save(newSupplier);
-                    newAsset.setSupplierId(newSupplier.getId());
-                    newAsset.setVendor(newAsset.getVendor());
-                } else if (supplierList.size() == 1) {
-                    Supplier supplier = supplierList.get(0);
-                    newAsset.setSupplierId(supplier.getId());
-                    newAsset.setVendor(supplier.getName());
-                } else {
-                    AssetRow.addErrMessage(item, "警告:" + WebUtil.getMessage("Vendor") + (String) item.get("superlierName") + "无法关联");
-                    newAsset.setVendor(null);
-                }
+            Supplier supplier;
+            //导入供应商，并修正ID
+            if (!StringUtils.isEmpty(newAsset.getVendor())) {
+                supplier = importSupplierIfNeeded(newAsset.getVendor(), newAsset.getVendorTel());
+                newAsset.setSupplierId(supplier.getId());
+            }
+
+            ////导入维修商，并修正ID
+            if (!StringUtils.isEmpty(newAsset.getMaitanance())) {
+                supplier = importMaintainancerIfNeeded(newAsset.getMaitanance(), newAsset.getMaitananceTel());
+                newAsset.setMaitananceId(supplier.getId().toString());
+            }
+
+            ////导入制造商，并修正ID
+            if (!StringUtils.isEmpty(newAsset.getManufacture())) {
+                supplier = importManufacturerIfNeeded(newAsset.getManufacture());
+                newAsset.setManufactureId(supplier.getId().toString());
             }
 
             //auto generate financing num
@@ -582,6 +583,94 @@ public class AssetFileImportService {
         LocalDateTime endTime = LocalDateTime.now();
         Duration duration = Duration.between(startTime, endTime);
         logger.info("Duration for importData: {} seconds", duration.getSeconds());
+
+    }
+
+    private OrgInfo importOrgIfNeeded(String name) {
+
+        OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), name);
+
+        if (orgInfo == null) {
+            TenantInfo tenantInfo = tenantInfoDao.findByuid(selectedOrgToImport.getTenantUID());
+            orgInfo = OrgInfoBuilder.buildOrgClinicalDept(tenantInfo, name, selectedOrgToImport, selectedOrgToImport.getOrgLevel());
+            orgDao.save(orgInfo);
+        }
+
+        return orgInfo;
+
+    }
+
+    private Supplier importSupplierIfNeeded(String name, String tel) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setSupplierT(true);
+            supplier.setSiteId(selectedOrgToImport.getSiteId());
+            supplier.setName(name);
+            supplier.setTel(tel);
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplierDao.save(supplier);
+        }
+
+        if (!supplier.getSupplierT()) {
+            supplier.setSupplierT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
+
+    private Supplier importMaintainancerIfNeeded(String name, String tel) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setMaintainerT(true);
+            supplier.setSiteId(selectedOrgToImport.getSiteId());
+            supplier.setName(name);
+            supplier.setTel(tel);
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplierDao.save(supplier);
+        }
+
+        if (!supplier.getSupplierT()) {
+            supplier.setMaintainerT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
+
+    }
+
+    private Supplier importManufacturerIfNeeded(String name) {
+
+        Supplier supplier = supplierDao.findFirstByTenantUIDAndName(tenantUID, name);
+        if (supplier == null) {
+            supplier = new Supplier();
+            supplier.setManufacturerT(true);
+            supplier.setSiteId(selectedOrgToImport.getSiteId());
+            supplier.setName(name);
+            supplier.setTenantUID(selectedOrgToImport.getTenantUID());
+            supplier.setHospitalUID(selectedOrgToImport.getHospitalUID());
+            supplier.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+            supplier.setSiteUID(selectedOrgToImport.getSiteUID());
+            supplierDao.save(supplier);
+        }
+
+        if (!supplier.getSupplierT()) {
+            supplier.setManufacturerT(true);
+            supplierDao.save(supplier);
+        }
+
+        return supplier;
 
     }
 
