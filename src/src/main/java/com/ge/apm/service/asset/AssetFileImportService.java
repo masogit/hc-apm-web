@@ -641,8 +641,12 @@ public class AssetFileImportService {
             supplierDao.save(supplier);
         }
 
-        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT()) {
+        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
             supplier.setMaintainerT(true);
+            if (!StringUtils.isEmpty(tel)) {
+                supplier.setTel(tel);
+            }
+
             supplierDao.save(supplier);
         }
 
