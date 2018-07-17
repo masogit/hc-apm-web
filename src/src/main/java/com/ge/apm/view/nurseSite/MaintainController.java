@@ -49,7 +49,6 @@ public class MaintainController {
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainController.class);
 	private NurseSiteMaintainService nurseSiteMaintainService;
 	private UserAccount currentUser;
-	private SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
 	private ScheduleModel lazyEventModel;
 	private DefaultScheduleEvent event;
 	private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
@@ -244,6 +243,24 @@ public class MaintainController {
 		FacesContext.getCurrentInstance().addMessage(null, message);
 	}
 	
+	private void insertMaintain(NurseSiteMaintain data){
+		if(listMaintainData==null){
+			listMaintainData=new ArrayList<NurseSiteMaintain>();
+		}
+		int beforeSize=listMaintainData.size();
+		for(int i=0;i<listMaintainData.size();++i){
+			int result=listMaintainData.get(i).getScheduleDate().compareTo(data.getScheduleDate());
+			if(result>0){
+				listMaintainData.add(i+1, data);
+				return;
+			}
+		}
+		int afterSize=listMaintainData.size();
+		if(afterSize==beforeSize){
+			listMaintainData.add(data);
+		}
+	}
+	
 	public void checkRightAll(){
 		Iterator<NurseSiteMaintainItem> it=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator();
 		while(it.hasNext()){
@@ -264,17 +281,13 @@ public class MaintainController {
 		addMessage("报告已保存");
 	}
 	
-	public String createMaintain() {
+	public void createMaintain() {
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
-		event = new DefaultScheduleEvent(getShowTitle(nurseSiteMaintain),userClickDate, userClickDate, true);
-		event.setData(nurseSiteMaintain);
-		lazyEventModel.addEvent(event);
-		if(listMaintainData==null){
-			listMaintainData=new ArrayList<NurseSiteMaintain>();
-		}
-		listMaintainData.add(nurseSiteMaintain);
+//		event = new DefaultScheduleEvent(getShowTitle(nurseSiteMaintain),userClickDate, userClickDate, true);
+//		event.setData(nurseSiteMaintain);
+//		lazyEventModel.addEvent(event);
+		insertMaintain(nurseSiteMaintain);
 		addMessage("报告已创建");
-		return "maintainMain?faces-redirect=true";
 	}
 
 	public void deleteMaintain() {

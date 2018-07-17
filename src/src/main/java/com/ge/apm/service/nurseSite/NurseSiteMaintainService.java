@@ -342,6 +342,7 @@ public class NurseSiteMaintainService{
 			tempItem.setCreateDate(currentDate);
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
+			tempItem.setScheduleDate(date);
 			tempItem.setStatus(0);
 		}
 		return tempNurseSiteMaintain;

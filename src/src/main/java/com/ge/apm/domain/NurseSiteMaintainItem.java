@@ -64,6 +64,12 @@ public class NurseSiteMaintainItem implements Serializable {
 	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
 	@Column(name = "check_date")
 	private Date checkDate;
+	
+	// scheduleDate
+	@Temporal(TemporalType.TIMESTAMP)
+	@JsonFormat(pattern = "yyyy-MM-dd HH", timezone = "GMT+8")
+	@Column(name = "schedule_date")
+	private Date scheduleDate;
 
 	@Column(name = "create_by")
 	private String createByUid;
@@ -92,6 +98,7 @@ public class NurseSiteMaintainItem implements Serializable {
 	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@org.hibernate.annotations.ForeignKey(name = "none")
+	@JsonIgnore
     private NurseSiteMaintain nurseSiteMaintain;
 	
 	@JoinColumn(insertable = false, updatable = false, name = "asset_uid", referencedColumnName = "uid",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
@@ -220,6 +227,14 @@ public class NurseSiteMaintainItem implements Serializable {
 
 	public void setAssetInfo(AssetInfo assetInfo) {
 		this.assetInfo = assetInfo;
+	}
+
+	public Date getScheduleDate() {
+		return scheduleDate;
+	}
+
+	public void setScheduleDate(Date scheduleDate) {
+		this.scheduleDate = scheduleDate;
 	}
 
 	public Set<NurseSiteMaintainData> getListData() {

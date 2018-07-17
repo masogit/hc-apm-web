@@ -88,7 +88,12 @@
 					</p:selectManyMenu>
 				</h:panelGroup>
 			</p:panelGrid>
-			
+			<p:panelGrid columns="1" layout="grid" styleClass="ui-panelgrid-blank form-group">
+				<h:panelGroup rendered="#{maintainConfigController.selected.id!=null}">
+					<label>立即生效</label>
+					<p:selectBooleanCheckbox value="#{maintainConfigController.blnModifyAll}"/>
+				</h:panelGroup>
+			</p:panelGrid>
 			<br />
 			<br />
 			<p:commandButton id="saveButtonId" validateClient="true" value="#{msg.Save}" process="@parent"  update=":growl,:maintainConfigListForm" icon="ui-icon-check"
