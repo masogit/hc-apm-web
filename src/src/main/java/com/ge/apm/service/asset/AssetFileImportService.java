@@ -641,8 +641,12 @@ public class AssetFileImportService {
             supplierDao.save(supplier);
         }
 
-        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT()) {
+        if (supplier.getMaintainerT() == null || !supplier.getMaintainerT() || (!StringUtils.isEmpty(tel) && !tel.equals(supplier.getTel()))) {
             supplier.setMaintainerT(true);
+            if (!StringUtils.isEmpty(tel)) {
+                supplier.setTel(tel);
+            }
+
             supplierDao.save(supplier);
         }
 
@@ -877,13 +881,13 @@ public class AssetFileImportService {
             if (StringUtils.isEmpty(orgName)) {
                 item.put("status", ImportStatus.CheckFail);
                 AssetRow.addErrMessage(item, "警告:科室为空");
-            } else {
-                OrgInfo orgInfo = getOrgInfoByName(orgName);
-
-                if (orgInfo == null) {
-                    item.put("status", ImportStatus.CheckFail);
-                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
-                }
+//            } else {
+//                OrgInfo orgInfo = getOrgInfoByName(orgName);
+//
+//                if (orgInfo == null) {
+//                    item.put("status", ImportStatus.CheckFail);
+//                    AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("OrgInfo") + orgName + "不存在");
+//                }
             }
 
             //check depart num to avoid duplicate when update
