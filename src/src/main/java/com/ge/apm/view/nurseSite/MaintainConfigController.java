@@ -11,6 +11,8 @@ import javax.faces.bean.ManagedBean;
 import javax.faces.bean.ViewScoped;
 
 import org.apache.commons.lang3.StringUtils;
+import org.primefaces.event.TransferEvent;
+import org.primefaces.model.DualListModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -59,6 +61,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<String> listWeekDay;
   	private List<String> listMonthDay;
   	private List<NurseSiteMaintainConfigCheckItem> listPairCheckItems;
+  	private boolean blnModifyAll=true;
   	
   	//dropdownlist
   	private Integer perDayCount;
@@ -68,6 +71,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
   	private List<AssetInfo> checkListAssets;
   	private List<String> orgUidList;
   	private List<String> userUidList;
+  	private DualListModel<AssetInfo> availableAssets;
   	
   	private boolean isSaveDisable=true;
   	
@@ -105,29 +109,29 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
         if (searchFilters == null) {
             searchFilters = new ArrayList<>();
         }
-        searchFilters.add(new SearchFilter("createByUid", SearchFilter.Operator.IN, userUidList, "1*"));
+        searchFilters.add(new SearchFilter("createBy.uid", SearchFilter.Operator.IN, userUidList, "1*"));
         Page<NurseSiteMaintainConfig> pageResult=dao.findBySearchFilter(searchFilters, pageRequest);
-        List<NurseSiteMaintainConfig> listResult=pageResult.getContent();
-        List<NurseSiteMaintainConfig> listNewResult=new ArrayList<NurseSiteMaintainConfig>();
-        try {
-        	if(listResult!=null && listResult.size()>0 && orgUidList!=null){
-            	for(int i=0;i<listResult.size();++i){
-            		Iterator<UserOrgInfo> it=listResult.get(i).getCreateBy().getSetUserOrgInfo().iterator();
-            		while(it.hasNext()){
-            			String orgUid=it.next().getOrgUid();
-            			if(orgUidList.contains(orgUid)){
-            				listNewResult.add(listResult.get(i));
-            				break;
-            			}
-            		}
-            	}
-            }
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error(e.getMessage());
-		}
-        PageImpl<NurseSiteMaintainConfig> pageNewResult=new PageImpl<NurseSiteMaintainConfig>(listNewResult);
-        return pageNewResult;
+//        List<NurseSiteMaintainConfig> listResult=pageResult.getContent();
+//        List<NurseSiteMaintainConfig> listNewResult=new ArrayList<NurseSiteMaintainConfig>();
+//        try {
+//        	if(listResult!=null && listResult.size()>0 && orgUidList!=null){
+//            	for(int i=0;i<listResult.size();++i){
+//            		Iterator<UserOrgInfo> it=listResult.get(i).getCreateBy().getSetUserOrgInfo().iterator();
+//            		while(it.hasNext()){
+//            			String orgUid=it.next().getOrgUid();
+//            			if(orgUidList.contains(orgUid)){
+//            				listNewResult.add(listResult.get(i));
+//            				break;
+//            			}
+//            		}
+//            	}
+//            }
+//		} catch (Exception e) {
+//			// TODO: handle exception
+//			LOGGER.error(e.getMessage());
+//		}
+//        PageImpl<NurseSiteMaintainConfig> pageNewResult=new PageImpl<NurseSiteMaintainConfig>(listNewResult);
+        return pageResult;
     }
 
     @Override
@@ -147,7 +151,9 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
     @Override
     public void save() {
     	saveMaintainConfig(this.selected);
-    	nurseSiteMaintainService.updateUnCheckedMaintainData(this.selected, currentUser, 0, listCheckAssets);
+    	if(blnModifyAll){
+    		nurseSiteMaintainService.updateUnCheckedMaintainData(this.selected, currentUser, 0, listCheckAssets);
+    	}
         this.selected=null;
         WebUtil.addSuccessMessage("保存成功");
     }
@@ -198,6 +204,8 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			String parentId=nurseSiteMaintainConfig.getId();
 			if(StringUtils.isNotEmpty(parentId)){
 				listCheckAssets=nurseSiteMaintainService.getListAssetInfoByMaintainConfigParentId(parentId);
+				checkListAssets.removeAll(listCheckAssets);
+				availableAssets=new DualListModel<>(checkListAssets, listCheckAssets);
 			}
 			Integer type=nurseSiteMaintainConfig.getType();
 			String typeValue=nurseSiteMaintainConfig.getTypeValue();
@@ -292,6 +300,16 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		nurseSiteMaintainConfig.setCheckItems(tempResult);
 		nurseSiteMaintainService.saveMaintainConfig(nurseSiteMaintainConfig, listCheckAssets);
 		return true;
+	}
+	
+	public void onAssetsTransfer(TransferEvent event) {
+		for (Object item : event.getItems()) {
+			if (event.isAdd()) {
+				listCheckAssets.add((AssetInfo) item);
+			} else {
+				listCheckAssets.remove((AssetInfo) item);
+			}
+		}
 	}
 	
 	public List<MaintainDataPair> getCheckListHours() {
@@ -481,6 +499,22 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 
 	public void setSaveDisable(boolean isSaveDisable) {
 		this.isSaveDisable = isSaveDisable;
+	}
+
+	public boolean isBlnModifyAll() {
+		return blnModifyAll;
+	}
+
+	public void setBlnModifyAll(boolean blnModifyAll) {
+		this.blnModifyAll = blnModifyAll;
+	}
+
+	public DualListModel<AssetInfo> getAvailableAssets() {
+		return availableAssets;
+	}
+
+	public void setAvailableAssets(DualListModel<AssetInfo> availableAssets) {
+		this.availableAssets = availableAssets;
 	}
 	
 }
