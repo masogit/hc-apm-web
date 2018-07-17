@@ -307,7 +307,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 			if (event.isAdd()) {
 				listCheckAssets.add((AssetInfo) item);
 			} else {
-				checkListAssets.remove((AssetInfo) item);
+				listCheckAssets.remove((AssetInfo) item);
 			}
 		}
 	}
