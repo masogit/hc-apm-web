@@ -226,7 +226,7 @@ public class MaintainController {
 	}
 	
 	private void findExistMaintainData(){
-		existMaintainData=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
+		existMaintainData=nurseSiteMaintainService.getMaintainData(currentUser.getSiteUID(),currentUser.getUid(),startBatchDate, endBatchDate);
 		if(existMaintainData!=null && existMaintainData.size()>0){
 			for(int i=0;i>-1&&i<existMaintainData.size();++i){
 				NurseSiteMaintain temp=existMaintainData.get(i);
@@ -405,7 +405,7 @@ public class MaintainController {
 		if(endBatchDate==null){
 			endBatchDate=new Date();
 		}
-		List<NurseSiteMaintain> listMaintainData=nurseSiteMaintainService.getMaintainData(startBatchDate, endBatchDate,currentUser.getSiteUID(),currentUser.getUid());
+		List<NurseSiteMaintain> listMaintainData=nurseSiteMaintainService.getMaintainData(currentUser.getSiteUID(),currentUser.getUid(),startBatchDate, endBatchDate);
 		if(listMaintainData!=null && listMaintainData.size()>0){
 			for(int i=0;i<listMaintainData.size();++i){
 				nurseSiteMaintainService.updateMaintainDataStatus(listMaintainData.get(i),true);

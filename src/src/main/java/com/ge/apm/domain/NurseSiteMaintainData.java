@@ -15,6 +15,8 @@ import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "nurse_site_maintain_data")
 public class NurseSiteMaintainData {
@@ -40,6 +42,7 @@ public class NurseSiteMaintainData {
 	@JoinColumn(name = "parent_id", referencedColumnName = "id",foreignKey = @ForeignKey(value = ConstraintMode.NO_CONSTRAINT))
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
 	@org.hibernate.annotations.ForeignKey(name = "none")
+	@JsonIgnore
     private NurseSiteMaintainItem item;
 
 	public String getId() {
