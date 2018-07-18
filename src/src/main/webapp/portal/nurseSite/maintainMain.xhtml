@@ -102,7 +102,7 @@
 	                    </h:panelGrid>
 	                    <p:commandButton id="checkRightButton" value="全部通过" actionListener="#{maintainController.checkRightAll}" update="maintainDlgTable" disabled="#{maintainController.saveDisable}" />
 	                    <p:commandButton id="addButton" value="保存" actionListener="#{maintainController.saveMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" />
-	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
+	                    <p:commandButton id="deleteButton" value="删除" actionListener="#{maintainController.deleteMaintain}" update=":messages" disabled="#{maintainController.deleteDisable}" oncomplete="PF('maintain').update();PF('maintainDialog').hide();" >
 	                        <p:confirm header="#{msg.DeleteConformation}" message="#{msg.DeleteConformationMsg}" icon="ui-icon-alert"/>
 	                    </p:commandButton>
                    	</h:form>
