@@ -37,6 +37,9 @@
                                 </p:selectOneMenu>
                             </f:facet>
                         </p:column>
+                        <p:column headerText="#{msg.hospitalId}">
+                            <h:outputText value="#{not empty tableDefinitionController.orgInfoMap[item.siteUID] ? tableDefinitionController.orgInfoMap[item.siteUID] : 'NA'}"/>
+                        </p:column>
                         <p:column headerText="说明" >
                             <h:outputText value="#{item.description}"/>
                         </p:column>

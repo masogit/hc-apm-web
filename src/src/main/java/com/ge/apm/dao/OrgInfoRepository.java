@@ -53,6 +53,9 @@ public interface OrgInfoRepository extends GenericRepository<OrgInfo> {
     public List<OrgInfo> findClinicalByUids(Set<String> listUid);
     
     public OrgInfo getByUid(String uid);
+
+    @Query(value = "select o from OrgInfo o where o.uid in ?1")
+    public List<OrgInfo> findByUids(Set<String> idc);
     
     public List<OrgInfo> getByTenantUID(String tenantUID);
 
