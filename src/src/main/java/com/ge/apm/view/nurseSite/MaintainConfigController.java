@@ -49,7 +49,6 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 	private static final Logger LOGGER = LoggerFactory.getLogger(MaintainConfigController.class);
     private I18nMessageRepository i18nDao;
     private UserAccount currentUser;
-    private SmallAssetPerformanceConfigService service;
     private NurseSiteMaintainService nurseSiteMaintainService;
     private NurseSiteMaintainConfigRepository dao;
     private List<NurseSiteMaintainConfig> listNurseSiteMaintainConfig;
