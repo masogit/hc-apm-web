@@ -8,6 +8,8 @@ import com.ge.apm.service.utils.UrlParamUtil;
 import com.ge.apm.view.asset.AssetInfoController;
 import com.ge.apm.view.sysutil.UrlEncryptController;
 import com.ge.apm.view.sysutil.UserContextService;
+
+import org.apache.commons.lang3.StringUtils;
 import org.primefaces.context.RequestContext;
 import org.primefaces.event.RowEditEvent;
 import org.springframework.data.domain.Page;
@@ -1663,6 +1665,14 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
 
     public void setQueryIndex(Integer queryIndex) {
         this.queryIndex = queryIndex;
+    }
+    
+    public String workOrderRouter(String id) {
+    	if(StringUtils.isBlank(id)) {
+    		return UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
+    	} else {
+    		return "";
+    	}
     }
 
 }
