@@ -110,6 +110,9 @@ public class NurseSiteMaintain implements Serializable {
 	@Column(name="config_id")
 	private String configId;
 	
+	@Column(name="signature_id")
+	private String signatureId;
+	
 	public NurseSiteMaintain() {
 		super();
 		this.status=0;
@@ -249,6 +252,14 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setConfigId(String configId) {
 		this.configId = configId;
+	}
+
+	public String getSignatureId() {
+		return signatureId;
+	}
+
+	public void setSignatureId(String signatureId) {
+		this.signatureId = signatureId;
 	}
 
 	@Override

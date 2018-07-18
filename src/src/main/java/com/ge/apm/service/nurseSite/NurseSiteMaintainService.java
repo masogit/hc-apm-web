@@ -77,11 +77,11 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainConfigRepository.findById(id);
 	}
 	
-	public List<NurseSiteMaintain> getMaintainData(Date startDate,Date endDate,String siteUid,String userUid){
+	public List<NurseSiteMaintain> getMaintainData(String siteUid,String userUid,Date startDate,Date endDate){
 		Calendar ca=Calendar.getInstance();
 		ca.setTime(endDate);
 		ca.set(Calendar.DATE, ca.get(Calendar.DATE)+1);
-		return nurseSiteMaintainRepository.findBySiteUidAndDate(startDate,ca.getTime(),siteUid,userUid);
+		return nurseSiteMaintainRepository.findDefaultData(siteUid,userUid,startDate,ca.getTime());
 	}
 	
 	public List<NurseSiteMaintain> getDefaultMaintainData(String siteUid,String userUid,Date startDate,Date endDate){
