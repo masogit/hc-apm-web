@@ -29,7 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Component
 public class V2_WorkOrderService {
-
     @Autowired
     private BiomedGroupRepository groupDao;
 
@@ -96,6 +95,10 @@ public class V2_WorkOrderService {
         srSearchFilters.add(new SearchFilter("fromDeptUID", SearchFilter.Operator.EQ, UserContextService.getCurrentUserAccount().getOrgInfoUID(), "1*2+"));
         return srDao.findBySearchFilter(srSearchFilters).stream().map(item -> item.getId()).collect(Collectors.toList());
     }
+    public void updateAccessPrice(V2_WorkOrder_Detail workOrderDetail){
+        detailDao.save(workOrderDetail);
+    }
+
 
     public void createServiceRequest(V2_ServiceRequest newServiceRequest, AssetInfo asset, List<V2_BlobObject> picList) {
         String token = UserContextService.getAccessToken();
