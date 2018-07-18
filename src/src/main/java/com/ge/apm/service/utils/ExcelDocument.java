@@ -119,13 +119,17 @@ public class ExcelDocument {
 
     public static String[] getKeyRow(Sheet sheet, int keyRowNum) {
         Row keyRow = sheet.getRow(keyRowNum - 1);
-        String[] result = new String[keyRow.getLastCellNum()];
+
+        List<String> resultList = new ArrayList<>();
+
         int firstCellNum = keyRow.getFirstCellNum();
         int lastCellNum = keyRow.getLastCellNum();
         for (int columnIndex = firstCellNum; columnIndex < lastCellNum; columnIndex++) {
-            result[columnIndex] = keyRow.getCell(columnIndex).getStringCellValue();
+            Cell cell = keyRow.getCell(columnIndex);
+            if (cell == null) break;
+            resultList.add(cell.getStringCellValue());
         }
-        return result;
+        return resultList.toArray(new String[]{});
     }
 
     public Map<String, String> getStringDataRowMap(String sheetName, int keyRowNum, Integer dataRowNum) {
