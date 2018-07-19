@@ -124,6 +124,13 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainConfigItemRepository.findByParentId(parentId);
 	}
 	
+	public Set<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId){
+		return nurseSiteMaintainItemRepository.findMaintainItemByParentId(parentId);
+	}
+	public Set<NurseSiteMaintainData> findMaintainDataByMaintainId(String maintainId){
+		return nurseSiteMaintainDataRepository.findMaintainDataByMaintainId(maintainId);
+	}
+	
 	public List<String> findUserUidListByOrgUids(List<String> orgUids){
 		return userOrgInfoRepository.findUserUidListByOrgUids(orgUids);
 	}
@@ -237,6 +244,10 @@ public class NurseSiteMaintainService{
 	
 	private int updateMaintainData(NurseSiteMaintain obj,Boolean defaultValue){
 		Set<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
+		if(obj.isNeedGetItem()){
+			listItem=findMaintainItemByParentId(obj.getId());
+			obj.setNeedGetItem(false);
+		}
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
 		int itemStatus=1;
 		int objStatus=1;
@@ -429,6 +440,10 @@ public class NurseSiteMaintainService{
 			return;
 		}
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(nurseSiteMaintain.isNeedGetItem()){
+			listOldNurseSiteMaintainItem=findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setNeedGetItem(false);
+		}
 		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
 		if(listOldNurseSiteMaintainItem==null){
 			listOldNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();
@@ -477,6 +492,10 @@ public class NurseSiteMaintainService{
 		List<String> listCheckItem=new ArrayList<String>(Arrays.asList(checkItems.split(",")));
 		boolean addCheckItem=false;
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(nurseSiteMaintain.isNeedGetItem()){
+			listOldNurseSiteMaintainItem=findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setNeedGetItem(false);
+		}
 		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
 		if(listOldNurseSiteMaintainItem==null){
 			listOldNurseSiteMaintainItem=new HashSet<NurseSiteMaintainItem>();

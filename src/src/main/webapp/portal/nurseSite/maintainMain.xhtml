@@ -58,7 +58,7 @@
                 						<th>
                 							<label class="label">设备型号</label>
                 						</th>
-               							<c:forEach items="#{maintainController.showLables}" var="item">
+               							<c:forEach items="#{maintainController.nurseSiteMaintain.showLables}" var="item">
                 							<th>
                 								<label class="label">#{item}</label>
                 							</th>
@@ -78,7 +78,7 @@
 			                   				<td>
 			                   					#{item.assetInfo.functionType}
 			                   				</td>
-			                   				<c:forEach items="#{maintainController.showLables}" var="item2">
+			                   				<c:forEach items="#{maintainController.nurseSiteMaintain.showLables}" var="item2">
 			                   					<td>
 					                           	 	<p:selectBooleanCheckbox value="#{item.getDataValue(item2).checkValue}" />
 			                    				</td>
@@ -116,16 +116,17 @@
                 			<h:panelGroup>
 								<p:selectOneMenu id="currentMaintainConfig" value="#{maintainController.nurseSiteMaintainConfig}" var="t" converter="nurseSiteMaintainConfigConverter" required="true">
 									<p:ajax event="change" listener="#{maintainController.onNurseSiteMaintainConfigChange}"></p:ajax>
+									<f:selectItem itemLabel="#{msg.selectOneMessage}"/>
 			                        <f:selectItems value="#{maintainController.listNurseSiteMaintainConfig}" var="item" itemLabel="#{item.name}" itemValue="#{item}" />
 			                        <p:column>
-										<h:outputText value="#{t.name}" />
+										<h:outputText value="#{t!=null?t.name:'请选择...'}" />
 									</p:column>
 			                    </p:selectOneMenu>
 							</h:panelGroup>
                 		</h:panelGrid>
                 		<br/>
                 		<br/>
-                		<p:commandButton id="addButton" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
+                		<p:commandButton id="addButton" validateClient="true" value="创建" actionListener="#{maintainController.createMaintain()}" update=":messages" oncomplete="PF('maintain').update();PF('createMaintainDlg').hide();" />
                 		<p:commandButton immediate="true" value="#{msg.Cancel}" update=":growl" icon="ui-icon-cancel" onclick="PF('createMaintainDlg').hide()"/>
                 	</h:form>
                 </p:dialog>

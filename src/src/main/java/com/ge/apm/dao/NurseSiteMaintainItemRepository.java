@@ -2,6 +2,7 @@ package com.ge.apm.dao;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.data.jpa.repository.Query;
 
@@ -21,4 +22,9 @@ public interface NurseSiteMaintainItemRepository extends GenericRepositoryUUID<N
 	//and (o.site_uid=?1 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid or o.clinical_dept_uid=b.org_uid) and b.user_uid=?2
 	@Query(value="select distinct o.* from nurse_site_maintain_item o,user_org b where o.schedule_date =?1 and (o.site_uid=?2 or o.site_uid=b.org_uid or o.hospital_uid=b.org_uid or o.institution_uid=b.org_uid or o.tenant_uid=b.org_uid) and b.user_uid=?3",nativeQuery=true)
 	public NurseSiteMaintainItem findBySiteUidAndScheduleDate(Date scheduleDate,String siteUID,String userUid);
+	
+	@Query(value="select o.* from nurse_site_maintain_item o where parent_id=?1",nativeQuery=true)
+	public Set<NurseSiteMaintainItem> findMaintainItemByParentId(String parentId);
+	
+	
 }
