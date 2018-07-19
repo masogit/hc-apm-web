@@ -68,7 +68,6 @@ public class MaintainController {
 	private boolean isDeleteDisable;
     private boolean isSaveDisable;
     //show
-    private List<String> showLables;
     private List<OrgInfo> listOrgInfo; 
     //inner
     private Map<String,Integer> mapDayIndex=new HashMap<String,Integer>();
@@ -80,10 +79,10 @@ public class MaintainController {
 		currentUser = UserContextService.getCurrentUserAccount();
 		this.loadMaintainData();
 		listNurseSiteMaintainConfig=nurseSiteMaintainService.getMaintainConfigBySiteUid(currentUser.getSiteUID(),currentUser.getUid());
-		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
-			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
-			loadMaintainConfig();
-		}
+//		if(listNurseSiteMaintainConfig!=null&& listNurseSiteMaintainConfig.size()>0){
+//			nurseSiteMaintainConfig=listNurseSiteMaintainConfig.get(0);
+//			loadMaintainConfig();
+//		}
 		loadUserOrgInfo();
 	}
 	
@@ -261,6 +260,39 @@ public class MaintainController {
 		}
 	}
 	
+	private void generateNurseSiteMaintainData(){
+		List<String> showLables=nurseSiteMaintain.getShowLables();
+		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(nurseSiteMaintain.isNeedGetItem()){
+			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setNeedGetItem(false);
+		}
+		nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
+		if(showLables==null){
+			showLables=new ArrayList<String>();
+		}
+		else{
+			showLables.clear();
+		}
+		try {
+			if(listItem!=null && listItem.size()>0){
+				Set<NurseSiteMaintainData> listTempData=listItem.iterator().next().getListData();
+				if(listTempData!=null){
+					Iterator<NurseSiteMaintainData> it=listTempData.iterator();
+					while(it.hasNext()){
+						NurseSiteMaintainData tempData=it.next();
+						showLables.add(tempData.getCheckItem());
+					}
+					showLables.sort(new StringComparator());
+				}
+			}
+			nurseSiteMaintain.setShowLables(showLables);
+		} catch (Exception e) {
+			// TODO: handle exception
+			LOGGER.error("getLables error"+e.getMessage());
+		}
+	}
+	
 	public void checkRightAll(){
 		Iterator<NurseSiteMaintainItem> it=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator();
 		while(it.hasNext()){
@@ -282,6 +314,15 @@ public class MaintainController {
 	}
 	
 	public void createMaintain() {
+		if(nurseSiteMaintainConfig==null){
+			addMessage("请创建并选择配置模板");
+			return;
+		}
+		Calendar ca=Calendar.getInstance();
+		int currentHour=ca.get(Calendar.HOUR_OF_DAY);
+		ca.setTime(userClickDate);
+		ca.set(Calendar.HOUR_OF_DAY,currentHour);
+		nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets);
 		nurseSiteMaintainService.saveMaintain(nurseSiteMaintain);
 //		event = new DefaultScheduleEvent(getShowTitle(nurseSiteMaintain),userClickDate, userClickDate, true);
 //		event.setData(nurseSiteMaintain);
@@ -312,19 +353,11 @@ public class MaintainController {
 	public void onEventSelect(SelectEvent selectEvent) {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
+		generateNurseSiteMaintainData();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
-		if(nurseSiteMaintainConfig==null){
-			addMessage("请创建并选择配置模板");
-			return;
-		}
 		userClickDate=(Date) selectEvent.getObject();
-		Calendar ca=Calendar.getInstance();
-		int currentHour=ca.get(Calendar.HOUR_OF_DAY);
-		ca.setTime(userClickDate);
-		ca.set(Calendar.HOUR_OF_DAY,currentHour);
-		nurseSiteMaintain=nurseSiteMaintainService.createMaintain(ca.getTime(),currentUser,nurseSiteMaintainConfig,listCheckAssets);
 	}
 
 //	public void onEventMove(ScheduleEntryMoveEvent event) {
@@ -414,27 +447,6 @@ public class MaintainController {
 		nurseSiteMaintainService.save(listMaintainData);
 		addMessage("报告已批量填写");
 		return "maintainMain?faces-redirect=true";
-	}
-	
-	private void generateShowLables(){
-		if(showLables==null){
-			showLables=new ArrayList<String>();
-		}
-		else{
-			showLables.clear();
-		}
-		try {
-			Set<NurseSiteMaintainData> listTempData=nurseSiteMaintain.getListNurseSiteMaintainItem().iterator().next().getListData();
-			Iterator<NurseSiteMaintainData> it=listTempData.iterator();
-			while(it.hasNext()){
-				NurseSiteMaintainData tempData=it.next();
-				showLables.add(tempData.getCheckItem());
-			}
-			showLables.sort(new StringComparator());
-		} catch (Exception e) {
-			// TODO: handle exception
-			LOGGER.error("getLables error"+e.getMessage());
-		}
 	}
 
 	public boolean isValideDate() {
@@ -529,15 +541,6 @@ public class MaintainController {
 
 	public void setListCheckAssets(List<AssetInfo> listCheckAssets) {
 		this.listCheckAssets = listCheckAssets;
-	}
-
-	public List<String> getShowLables() {
-		generateShowLables();
-		return showLables;
-	}
-
-	public void setShowLables(List<String> showLables) {
-		this.showLables = showLables;
 	}
 
 	public List<OrgInfo> getListOrgInfo() {
