@@ -224,7 +224,7 @@ public class AssetFileImportService {
                 assetRow.setFieldDropdownValue("设备分类", "setAssetGroup", assetGroup, map, null);
 
                 assetRow.setFieldIntegerValue("功能等级", "setFunctionGrade");
-                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, null);
+                assetRow.setFieldDropdownValue("维修类型", "setRepairForm", repairFormList, map, isNewAsset ? 1 : null); //新增资产默认内修
                 assetRow.setFieldStringValue("设备型号", "setFunctionType");
                 assetRow.setFieldStringValue("制造商序列号", "setSerialNum");
                 assetRow.setFieldStringValue("SystemID/厂商报修ID", "setSystemId");
