@@ -1,7 +1,10 @@
 package com.ge.apm.domain;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.persistence.CascadeType;
@@ -18,6 +21,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.GenericGenerator;
 import org.slf4j.Logger;
@@ -26,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.ge.apm.service.utils.StringComparator;
 
 /**
  * Created by 212605082 on 2018/3/7.
@@ -100,7 +105,7 @@ public class NurseSiteMaintain implements Serializable {
 	private UserAccount modifyBy;
 	
 	@JsonIgnore
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nurseSiteMaintain", fetch = FetchType.LAZY)
     private Set<NurseSiteMaintainItem> listNurseSiteMaintainItem;
 	
 	//0：未检查,1:已检查，2:通过，3有问题
@@ -112,6 +117,12 @@ public class NurseSiteMaintain implements Serializable {
 	
 	@Column(name="signature_id")
 	private String signatureId;
+	
+	@Transient
+	private List<String> showLables;
+	
+	@Transient
+	private boolean needGetItem=true;
 	
 	public NurseSiteMaintain() {
 		super();
@@ -260,6 +271,22 @@ public class NurseSiteMaintain implements Serializable {
 
 	public void setSignatureId(String signatureId) {
 		this.signatureId = signatureId;
+	}
+
+	public List<String> getShowLables() {
+		return showLables;
+	}
+
+	public void setShowLables(List<String> showLables) {
+		this.showLables = showLables;
+	}
+	
+	public boolean isNeedGetItem() {
+		return needGetItem;
+	}
+
+	public void setNeedGetItem(boolean needGetItem) {
+		this.needGetItem = needGetItem;
 	}
 
 	@Override
