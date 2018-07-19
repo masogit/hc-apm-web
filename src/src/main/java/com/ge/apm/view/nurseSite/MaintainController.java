@@ -262,7 +262,11 @@ public class MaintainController {
 	
 	private void generateNurseSiteMaintainData(){
 		List<String> showLables=nurseSiteMaintain.getShowLables();
-		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
+		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
+		if(nurseSiteMaintain.isNeedGetItem()){
+			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setNeedGetItem(false);
+		}
 		nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
 		if(showLables==null){
 			showLables=new ArrayList<String>();
@@ -349,10 +353,7 @@ public class MaintainController {
 	public void onEventSelect(SelectEvent selectEvent) {
 		event = (DefaultScheduleEvent) selectEvent.getObject();
 		nurseSiteMaintain = (NurseSiteMaintain)event.getData();
-		if(nurseSiteMaintain.isNeedGetItem()){
-			generateNurseSiteMaintainData();
-			nurseSiteMaintain.setNeedGetItem(false);
-		}
+		generateNurseSiteMaintainData();
 	}
 
 	public void onDateSelect(SelectEvent selectEvent) {
