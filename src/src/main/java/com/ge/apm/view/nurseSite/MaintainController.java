@@ -265,6 +265,7 @@ public class MaintainController {
 		Set<NurseSiteMaintainItem> listItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(nurseSiteMaintain.isNeedGetItem()){
 			listItem=nurseSiteMaintainService.findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setModifyBy(nurseSiteMaintainService.getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
 			nurseSiteMaintain.setNeedGetItem(false);
 		}
 		nurseSiteMaintain.setListNurseSiteMaintainItem(listItem);
