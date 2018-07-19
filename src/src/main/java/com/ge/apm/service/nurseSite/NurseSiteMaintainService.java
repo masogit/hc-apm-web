@@ -23,6 +23,7 @@ import com.ge.apm.dao.NurseSiteMaintainDataRepository;
 import com.ge.apm.dao.NurseSiteMaintainItemRepository;
 import com.ge.apm.dao.NurseSiteMaintainRepository;
 import com.ge.apm.dao.OrgInfoRepository;
+import com.ge.apm.dao.UserAccountRepository;
 import com.ge.apm.dao.UserOrgInfoRepository;
 import com.ge.apm.domain.AssetInfo;
 import com.ge.apm.domain.NurseSiteMaintain;
@@ -65,6 +66,9 @@ public class NurseSiteMaintainService{
 	
 	@Autowired
 	UserOrgInfoRepository userOrgInfoRepository;
+	
+	@Autowired
+	UserAccountRepository userAccountRepository;
 	
 	@Autowired
     private UaaService uaaService;
@@ -118,6 +122,10 @@ public class NurseSiteMaintainService{
 	
 	public List<OrgInfo> getListClinicalByUid(Set<String> listUid){
 		return orgInfoRepository.findClinicalByUids(listUid);
+	}
+	
+	public UserAccount getUserAccountByUid(String userUid){
+		return userAccountRepository.getByUid(userUid);
 	}
 	
 	public List<NurseSiteMaintainConfigItem> findByParentId(String parentId){
@@ -246,6 +254,7 @@ public class NurseSiteMaintainService{
 		Set<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
 		if(obj.isNeedGetItem()){
 			listItem=findMaintainItemByParentId(obj.getId());
+			obj.setModifyBy(getUserAccountByUid(obj.getModifyByUid()));
 			obj.setNeedGetItem(false);
 		}
 		Iterator<NurseSiteMaintainItem> it=listItem.iterator();
@@ -442,6 +451,7 @@ public class NurseSiteMaintainService{
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(nurseSiteMaintain.isNeedGetItem()){
 			listOldNurseSiteMaintainItem=findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setModifyBy(getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
 			nurseSiteMaintain.setNeedGetItem(false);
 		}
 		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
@@ -494,6 +504,7 @@ public class NurseSiteMaintainService{
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(nurseSiteMaintain.isNeedGetItem()){
 			listOldNurseSiteMaintainItem=findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setModifyBy(getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
 			nurseSiteMaintain.setNeedGetItem(false);
 		}
 		List<AssetInfo> listNewAssetInfo=getListAssetInfoByMaintainConfigParentId(newConfig.getId());
