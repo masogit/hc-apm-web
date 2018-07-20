@@ -224,6 +224,7 @@ public class MaintainConfigController extends GenericCRUDUUIDController<NurseSit
 		}
 	}
 	
+	//当前user的可见范围的orgUid,
 	private void loadUserUidList(){
 		if(orgUidList!=null && orgUidList.size()>0){
 			userUidList=nurseSiteMaintainService.findUserUidListByOrgUids(orgUidList);
