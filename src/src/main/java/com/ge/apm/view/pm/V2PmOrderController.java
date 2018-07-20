@@ -272,16 +272,19 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         content.put(MaintenanceTemplate.Maintenance.RESULT.toString(), FieldValueMessageController.fieldValue("qaStatus", pmOrder.getQualityChecking()));
         // Coworker List
         List<V2_WorkOrderCoworker> coworkers = this.getCoWorkerList();
-        if (coworkers != null && coworkers.size() > 0 &&
+        if (coworkers != null) {
+            int count = 0;
+            for (V2_WorkOrderCoworker coworker : coworkers) {
                 // ignore fake empty coworker
-                !(coworkers.size() == 1 && "000".equalsIgnoreCase(coworkers.get(0).getId()))) {
-            V2_WorkOrderCoworker coworker = coworkers.get(0);
-            content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
-            content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
-            if (coworkers.size() > 1) {
-                coworker = coworkers.get(1);
-                content.put(MaintenanceTemplate.Maintenance.COWORKER2.toString(), coworker.getCowokerUserName());
-                content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), coworker.getManHours().toString());
+                if ("000".equalsIgnoreCase(coworker.getId())) continue;
+                if (count == 0) {
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER1.toString(), coworker.getCowokerUserName());
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER1_TIME.toString(), coworker.getManHours().toString());
+                } else if (count == 1) {
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER2.toString(), coworker.getCowokerUserName());
+                    content.put(MaintenanceTemplate.Maintenance.COWORKER2_TIME.toString(), coworker.getManHours().toString());
+                }
+                count++;
             }
         }
 
@@ -400,7 +403,7 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
         final String prefix = component.toString();
         for(TableGroup group : table.getGroups()) {
             for(TableItem item : group.getItems()) {
-                if (item == null) {
+                if (item == null || item.getComponent() == null) {
                     continue;
                 }
                 switch (item.getComponent()) {
