@@ -140,7 +140,7 @@ public class NurseSiteMaintainService{
 	}
 	
 	public List<String> findUserUidListByOrgUids(List<String> orgUids){
-		return userOrgInfoRepository.findUserUidListByOrgUids(orgUids);
+		return userAccountRepository.findUserUidListByOrgUids(orgUids);
 	}
 	
 	public boolean canAddMaintainData(Date scheduleDate,String siteUid,String userUid){
@@ -254,6 +254,7 @@ public class NurseSiteMaintainService{
 		Set<NurseSiteMaintainItem> listItem=obj.getListNurseSiteMaintainItem();
 		if(obj.isNeedGetItem()){
 			listItem=findMaintainItemByParentId(obj.getId());
+			obj.setListNurseSiteMaintainItem(listItem);
 			obj.setModifyBy(getUserAccountByUid(obj.getModifyByUid()));
 			obj.setNeedGetItem(false);
 		}
@@ -451,6 +452,7 @@ public class NurseSiteMaintainService{
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(nurseSiteMaintain.isNeedGetItem()){
 			listOldNurseSiteMaintainItem=findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setListNurseSiteMaintainItem(listOldNurseSiteMaintainItem);
 			nurseSiteMaintain.setModifyBy(getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
 			nurseSiteMaintain.setNeedGetItem(false);
 		}
@@ -504,6 +506,7 @@ public class NurseSiteMaintainService{
 		Set<NurseSiteMaintainItem> listOldNurseSiteMaintainItem=nurseSiteMaintain.getListNurseSiteMaintainItem();
 		if(nurseSiteMaintain.isNeedGetItem()){
 			listOldNurseSiteMaintainItem=findMaintainItemByParentId(nurseSiteMaintain.getId());
+			nurseSiteMaintain.setListNurseSiteMaintainItem(listOldNurseSiteMaintainItem);
 			nurseSiteMaintain.setModifyBy(getUserAccountByUid(nurseSiteMaintain.getModifyByUid()));
 			nurseSiteMaintain.setNeedGetItem(false);
 		}
