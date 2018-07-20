@@ -111,9 +111,9 @@ public class AssetFileImportService {
     private final String NEW_FINANCE_NUM_KEY = "new_finance_num";
     private WorkflowConfig workflowConfig;
 
-    public Map<String, Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
+    public List<Map<String, Object>> getOrgInfoMapFromTemplate(ExcelDocument doc) {
 
-        Map<String, Map<String, Object>> result = new LinkedHashMap();
+        List<Map<String, Object>> result = new ArrayList<>();
         int keyRow = 4;
         int dataRow = 5;
 
@@ -127,17 +127,17 @@ public class AssetFileImportService {
             }
 
             org.setName(orgName);
-            org.setHospitalId(selectedOrgToImport.getId());
-            org.setParentOrg(selectedOrgToImport);
-            org.setSiteId(selectedOrgToImport.getSiteId());
-
-            org.setParentUID(selectedOrgToImport.getUid());
-            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
-            org.setTenantUID(selectedOrgToImport.getTenantUID());
-            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
-            org.setSiteUID(selectedOrgToImport.getSiteUID());
-            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
-            org.setOrgType(4);
+//            org.setHospitalId(selectedOrgToImport.getId());
+//            org.setParentOrg(selectedOrgToImport);
+//            org.setSiteId(selectedOrgToImport.getSiteId());
+//
+//            org.setParentUID(selectedOrgToImport.getUid());
+//            org.setHospitalUID(selectedOrgToImport.getHospitalUID());
+//            org.setTenantUID(selectedOrgToImport.getTenantUID());
+//            org.setInstitutionUID(selectedOrgToImport.getInstitutionUID());
+//            org.setSiteUID(selectedOrgToImport.getSiteUID());
+//            org.setOrgLevel(selectedOrgToImport.getOrgLevel());
+//            org.setOrgType(4);
 
             org.setLineNum(dataRow);
 
@@ -145,7 +145,7 @@ public class AssetFileImportService {
             map.put("org", org);
             map.put("status", ImportStatus.New);
             map.put("rowData", rowMap);
-            result.put(orgName, map);
+            result.add(map);
         }
         return result;
     }
@@ -348,27 +348,22 @@ public class AssetFileImportService {
 
     }
 
-    public void importData(List<Map<String, Object>> importAssetMap,
+    public void importData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap,
                            Boolean autoGenerateQrcode, Boolean isGeneratePmOrder) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
-//        importOrgMap.values().forEach(item -> {
-//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-//            if (null == orgs || orgs.isEmpty()) {
-//                orgDao.save((OrgInfo) item.get("org"));
-//                item.put("status", ImportStatus.Created);
-//            } else if (orgs.size() > 1) {
-//                item.put("status", ImportStatus.Failure);
-//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重名的") + WebUtil.getMessage("OrgInfo") + ":" + ((OrgInfo) item.get("org")).getName());
-//            } else {
-//                OrgInfo existingOrgInfo = orgs.get(0);
-//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-//                item.put("org", existingOrgInfo);
-//                item.put("status", ImportStatus.Exist);
-//            }
-//        });
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+
+            if (orgInfo == null) {
+                importOrgIfNeeded(newOrgInfo.getName());
+                item.put("status", ImportStatus.Created);
+            } else {
+                item.put("status", ImportStatus.Exist);
+            }
+        });
 
         //release qrcode in use in order to exchange qrcode in two different asset
         releaseQRCodeInUse(importAssetMap);
@@ -817,27 +812,22 @@ public class AssetFileImportService {
         return supplierDao.findBySearchFilter(supplierFilters);
     }
 
-    public Boolean checkData(List<Map<String, Object>> importAssetMap) {
+    public Boolean checkData(List<Map<String, Object>> importOrgMap, List<Map<String, Object>> importAssetMap) {
 
         LocalDateTime startTime = LocalDateTime.now();
 
         HashSet<Boolean> result = new HashSet<>();
-//        importOrgMap.values().forEach(item -> {
-//            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
-//            List<OrgInfo> orgs = getOrgInfoByName(newOrgInfo);
-//            if (null == orgs || orgs.isEmpty()) {
-//                item.put("status", ImportStatus.New);
-//            } else if (orgs.size() > 1) {
-//                item.put("status", ImportStatus.CheckFail);
-//                AssetRow.addErrMessage(item, "错误:" + WebUtil.getMessage("存在重复的") + WebUtil.getMessage("OrgIngo") + ((OrgInfo) item.get("org")).getName());
-//                result.add(Boolean.FALSE);
-//            } else {
-//                OrgInfo existingOrgInfo = orgs.get(0);
-//                existingOrgInfo.setLineNum(newOrgInfo.getLineNum());
-//                item.put("org", existingOrgInfo);
-//                item.put("status", ImportStatus.Exist);
-//            }
-//        });
+        importOrgMap.forEach(item -> {
+            OrgInfo newOrgInfo = (OrgInfo) item.get("org");
+
+            OrgInfo orgInfo = orgDao.findFirstByParentUIDAndName(selectedOrgToImport.getUid(), newOrgInfo.getName());
+
+            if (orgInfo == null) {
+                item.put("status", ImportStatus.New);
+            } else {
+                item.put("status", ImportStatus.Exist);
+            }
+        });
 
         int row = 0;
         for (Map<String, Object> item: importAssetMap) {
