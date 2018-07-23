@@ -15,6 +15,7 @@ import com.ge.apm.domain.bo.render.AccessoryTableRenderPolicy;
 import com.ge.apm.domain.bo.render.AuditMsgTableRenderPolicy;
 import com.ge.apm.domain.bo.render.CheckListTableRenderPolicy;
 import com.ge.apm.domain.bo.render.MaintenanceTableRenderPolicy;
+import com.ge.apm.domain.exception.BusinessException;
 import com.ge.apm.domain.pure.TableGroup;
 import com.ge.apm.domain.pure.TableItem;
 import com.ge.apm.domain.pure.TableSchema;
@@ -200,19 +201,12 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
     }
 
     /**
-     * Check whether it is OK to export maintenance report.
+     * Check whether the target is selected.
      *
-     * @return true if the maintenance report can be exported, false otherwise.
+     * @return true if the mantenance report item has been selected, false otherwise.
      */
-    public boolean isExportEnabled() {
-        if (this.selected == null) {
-            return false;
-        }
-        PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-       if(rule==null){
-           return false;
-       }
-        return !Strings.isNullOrEmpty(rule.getReportStorageId());
+    public boolean isTargetSelected() {
+        return this.selected != null;
     }
 
     /**
@@ -220,10 +214,13 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
      */
     public void doExportMaintenanceReport() {
         if (this.selected != null) {
-            PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
-            StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
-
+            maintenanceReport = null;
             try {
+                PmOrderRule rule = pmOrderService.acqPmOrderRule(selected);
+                if (rule == null) throw new BusinessException("系统未找到绑定的规则!");
+                if (Strings.isNullOrEmpty(rule.getReportStorageId())) throw new BusinessException("请先上传保养报告模版!");
+
+                StreamedContent rawTemplate = blobService.getBlobObjectByStorageId(rule.getReportStorageId());
                 Map<String, Object> datas = populateReportContent(selected);
 
                 ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -241,6 +238,8 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
 
                 InputStream doc = new ByteArrayInputStream(out.toByteArray());
                 maintenanceReport = new DefaultStreamedContent(doc, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "maintenance-report.docx");
+            } catch (BusinessException e) {
+                WebUtil.addErrorMessage(e.getMessage());
             } catch (Exception e) {
                 Logger.getLogger(V2PmOrderController.class.getName()).log(Level.WARNING, "Error happens while generate maintenance report", e);
                 WebUtil.addErrorMessage("保养报告生成失败");
@@ -409,7 +408,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                 switch (item.getComponent()) {
                     case Number:
                         if (item.getResKey() != null) {
-                            content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                            try {
+                                content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getResKey()), tableValue.getOrDefault(item.getResKey(), emptyStr));
+                            }
                         }
                         if (item.getKey() != null) {
                             content.put(wrap(prefix, item.getKey()), tableValue.getOrDefault(item.getKey(), emptyStr));
@@ -417,7 +420,11 @@ public class V2PmOrderController extends GenericCRUDUUIDController<V2_PmOrder> i
                         break;
                     case Label:
                         if (item.getResKey() != null) {
-                            content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                            try {
+                                content.put(wrap(prefix, item.getResKey()), FieldValueMessageController.fieldValue("TableReportResult", tableValue.getOrDefault(item.getResKey(), emptyStr).toString()));
+                            } catch (RuntimeException e) {
+                                content.put(wrap(prefix, item.getResKey()), tableValue.getOrDefault(item.getResKey(), emptyStr));
+                            }
                         }
                         break;
                     case Switch:
