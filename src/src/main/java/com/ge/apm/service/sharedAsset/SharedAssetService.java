@@ -51,13 +51,14 @@ public class SharedAssetService extends MicroServiceInvoker {
         logger.info("Remote confirm rent " + (isOkay(response) ? "successfully." : "failed."));
     }
 
-    public void getAssigneeList() {
+    public ResponseEntity<LinkedHashMap> getAssigneeList() {
         String url = getGatewayURL(GatewayURL.ASSIGNEE_LIST);
         String token = UserContextService.getAccessToken();
         HttpHeaders header = createHttpHeaders(token);
         HttpEntity<String> requestEntity = new HttpEntity<String>(header);
         ResponseEntity<LinkedHashMap> response = template.exchange(url, HttpMethod.GET, requestEntity, LinkedHashMap.class);
         logger.info("Get assignee list " + (isOkay(response) ? "successfully." : "failed."));
+        return response;
     }
 
     public void remoteAssignRequest(String requestId, String assigneeUID) {
