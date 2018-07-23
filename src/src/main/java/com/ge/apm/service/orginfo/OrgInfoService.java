@@ -6,6 +6,7 @@ import com.ge.apm.domain.OrgInfo;
 import com.ge.apm.domain.TenantInfo;
 import com.ge.apm.domain.UserAccount;
 import com.ge.apm.service.utils.ExcelDocument;
+import com.ge.apm.view.sysutil.UserContextService;
 import org.primefaces.model.DefaultTreeNode;
 import org.primefaces.model.TreeNode;
 import org.primefaces.model.UploadedFile;
@@ -16,8 +17,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.faces.context.FacesContext;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class OrgInfoService {
@@ -264,6 +268,92 @@ public class OrgInfoService {
         }
 
         return false;
+
+    }
+
+    public ExcelDocument exportOrg() throws IOException {
+        UserAccount user = UserContextService.getCurrentUserAccount();
+
+        List<OrgInfo> orgInfoList = orgDao.getByTenantUID(user.getTenantUID());
+
+        Map<String, OrgInfo> orgInfoMap = new HashMap<>();
+
+        orgInfoList.stream().forEach(orgInfo -> { orgInfoMap.put(orgInfo.getUid(), orgInfo); });
+
+
+        List<Map<String, Object>> resultList = new ArrayList<>();
+
+
+        exportOrgByParent(user.getTenantUID(), orgInfoList, orgInfoMap, resultList);
+
+        InputStream stream = FacesContext.getCurrentInstance().getExternalContext().getResourceAsStream("/portal/uaa/orgInfo/APM_Org_Template.xlsx");
+        ExcelDocument doc = new ExcelDocument(stream, ExcelDocument.ExcelType.XLSX);
+        String[] columnKeys = doc.getKeyRow(0, 1);
+        int startRow = 2;
+
+        for (Map<String, Object> map: resultList) {
+
+            doc.writeRowData(0, columnKeys, startRow, map);
+
+            ++startRow;
+
+        }
+
+        return doc;
+
+    }
+
+    private void exportOrgByParent(String parentUid, final List<OrgInfo> orgInfoList, final Map<String, OrgInfo> orgInfoMap, final List<Map<String, Object>> resultList ) {
+
+        List<OrgInfo> children = findOrgByParent(parentUid, orgInfoList);
+
+        for ( OrgInfo orgInfo: children) {
+
+            List<OrgInfo> list = findOrgByParent(orgInfo.getUid(), orgInfoList);
+            if (list.size() > 0) {
+                exportOrgByParent(orgInfo.getUid(), orgInfoList, orgInfoMap, resultList);
+
+            } else {
+                exportOrg(orgInfo, resultList, orgInfoMap);
+
+            }
+
+        }
+    }
+
+    private void exportOrg(OrgInfo orgInfo, List<Map<String, Object>> resultList, final Map<String, OrgInfo> orgInfoMap) {
+        Map<String, Object> map = new HashMap<>();
+        if (orgInfo.getOrgType() == 1 || (orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 0)) {
+            map.put("集团", orgInfo.getName());
+        } else if (orgInfo.getOrgType() == 2 || (orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 1)) {
+            OrgInfo institutionLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+            map.put("集团", institutionLevelOrg.getName());
+            map.put("医院", orgInfo.getName());
+        } else if (orgInfo.getOrgType() == 3 || (orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 2)) {
+            OrgInfo hospitalLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+            OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
+            map.put("集团", institutionLevelOrg.getName());
+            map.put("医院", hospitalLevelOrg.getName());
+            map.put("院区", orgInfo.getName());
+        } else if ((orgInfo.getOrgType() == 4 && orgInfo.getOrgLevel() == 3)) {
+            OrgInfo siteLevelOrg = orgInfoMap.get(orgInfo.getParentUID());
+            OrgInfo hospitalLevelOrg = orgInfoMap.get(siteLevelOrg.getParentUID());
+            OrgInfo institutionLevelOrg = orgInfoMap.get(hospitalLevelOrg.getParentUID());
+            map.put("集团", institutionLevelOrg.getName());
+            map.put("医院", hospitalLevelOrg.getName());
+            map.put("院区", siteLevelOrg.getName());
+            map.put("科室", orgInfo.getName());
+        }
+
+        resultList.add(map);
+
+    }
+
+    private List<OrgInfo> findOrgByParent(String parentUid, final List<OrgInfo> orgInfoList) {
+
+        List<OrgInfo> children = orgInfoList.stream().filter(orgInfo -> parentUid.equals(orgInfo.getParentUID())).collect(Collectors.toList());
+
+        return children;
 
     }
 
