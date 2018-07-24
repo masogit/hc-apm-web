@@ -1687,7 +1687,8 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     	RequestContext requestContext = RequestContext.getCurrentInstance();
     	requestContext.addCallbackParam("showNotification", true);
     	
-    	List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
+    	// Get business hours from database
+    	/*List<SharedAssetConfig> sharedAssetConfigList = sharedAssetConfigDao.findBySiteUID(UserContextService.getCurrentUserAccount().getSiteUID());
     	Optional<SharedAssetConfig> sharedAssetConfig = Optional.ofNullable(sharedAssetConfigList.get(0));
     	if(sharedAssetConfig.isPresent()) {
     		SharedAssetConfig config = sharedAssetConfig.get();
@@ -1719,6 +1720,16 @@ public class SharedAssetRequestV2Controller extends GenericCRUDUUIDController<Sh
     			requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
     			retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
     		}
+    	}*/
+    	
+    	ZoneId east8 = ZoneId.of("Asia/Shanghai");
+    	ZonedDateTime nowZDT = ZonedDateTime.now(east8);
+    	ZonedDateTime startZoneTime = ZonedDateTime.of(nowZDT.getYear(), nowZDT.getMonthValue(), nowZDT.getDayOfMonth(), 8, 0, 0, 0, east8);
+    	ZonedDateTime endZoneTime = ZonedDateTime.of(nowZDT.getYear(), nowZDT.getMonthValue(), nowZDT.getDayOfMonth(), 20, 0, 0, 0, east8);
+    	if(nowZDT.isAfter(startZoneTime) && nowZDT.isBefore(endZoneTime)) {
+    		requestContext.addCallbackParam("showNotification", false);
+    		requestContext.addCallbackParam("url", UrlEncryptController.encodeUrlParam("Edit?actionName=Create"));
+    		retrunUrl = UrlEncryptController.encodeUrlParam("Edit?actionName=Create");
     	}
     	return retrunUrl;
     }
