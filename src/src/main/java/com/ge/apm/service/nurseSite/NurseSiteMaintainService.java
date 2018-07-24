@@ -92,8 +92,8 @@ public class NurseSiteMaintainService{
 		return nurseSiteMaintainRepository.findDefaultData(siteUid, userUid, startDate, endDate);
 	}
 	
-	public List<NurseSiteMaintain> getDataByClinicalOrgUid(String siteUid,String orgUid,Date startDate,Date endDate){
-		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(siteUid, orgUid, startDate, endDate);
+	public List<NurseSiteMaintain> getDataByClinicalOrgUid(String siteUid,List<String> listOrgUid,Date startDate,Date endDate){
+		return nurseSiteMaintainRepository.findDataByClinicalOrgUid(siteUid, listOrgUid, startDate, endDate);
 	}
 	
 	public List<NurseSiteMaintain> findBySearchFilter(List<SearchFilter> searchFilters,Sort sort){
@@ -112,6 +112,10 @@ public class NurseSiteMaintainService{
 		return assetInfoRepository.findBySelfScope(siteUid,userUid);
 	}
 	
+	public List<AssetInfo> getListAssetBySelfClinicalScope(String siteUid,String userUid,String clinicalDeptUid){
+		return assetInfoRepository.findBySelfClinicalScope(siteUid,userUid,clinicalDeptUid);
+	}
+	
 	public List<AssetInfo> getListAssetInfoByUid(List<String> assetUids){
 		return assetInfoRepository.findByUidIn(assetUids);
 	}
@@ -119,9 +123,17 @@ public class NurseSiteMaintainService{
 	public List<AssetInfo> getListAssetInfoByMaintainConfigParentId(String parentId){
 		return assetInfoRepository.findAssetByMaintainConfigParentId(parentId);
 	}
+
+	public List<OrgInfo> getListClinicalByUid(List<String> listUid){
+		return orgInfoRepository.findClinicalByUids(listUid);
+	}
 	
 	public List<OrgInfo> getListClinicalByUid(Set<String> listUid){
 		return orgInfoRepository.findClinicalByUids(listUid);
+	}
+	
+	public OrgInfo findOrgInfoByUid(String uid){
+		return orgInfoRepository.getByUid(uid);
 	}
 	
 	public UserAccount getUserAccountByUid(String userUid){
@@ -167,8 +179,12 @@ public class NurseSiteMaintainService{
 	}
 	@Transactional
 	public void saveAndDelete(List<NurseSiteMaintain> obj,List<NurseSiteMaintain> obj2){
-		nurseSiteMaintainRepository.save(obj);
-		nurseSiteMaintainRepository.delete(obj2);
+		if(obj!=null&&obj.size()>0){
+			nurseSiteMaintainRepository.save(obj);
+		}
+		if(obj2!=null && obj2.size()>0){
+			nurseSiteMaintainRepository.delete(obj2);
+		}
 	}
 	
 	public void save(NurseSiteMaintainConfig obj){
@@ -342,6 +358,8 @@ public class NurseSiteMaintainService{
 		tempNurseSiteMaintain.setInstitutionUID(currentUser.getInstitutionUID());
 		tempNurseSiteMaintain.setHospitalUID(currentUser.getHospitalUID());
 		tempNurseSiteMaintain.setSiteUID(currentUser.getSiteUID());
+		tempNurseSiteMaintain.setClinicalDeptName(nurseSiteMaintainConfig.getClinicalDeptName());
+		tempNurseSiteMaintain.setClinicalDeptUID(nurseSiteMaintainConfig.getClinicalDeptUID());
 		tempNurseSiteMaintain.setCheckDate(currentDate);
 		tempNurseSiteMaintain.setCreateBy(currentUser);
 		tempNurseSiteMaintain.setCreateByUid(currentUser.getUid());
@@ -364,6 +382,8 @@ public class NurseSiteMaintainService{
 			tempItem.setModifyByUid(currentUser.getUid());
 			tempItem.setModifyDate(currentDate);
 			tempItem.setScheduleDate(date);
+			tempItem.setClinicalDeptName(nurseSiteMaintainConfig.getClinicalDeptName());
+			tempItem.setClinicalDeptUID(nurseSiteMaintainConfig.getClinicalDeptUID());
 			tempItem.setStatus(0);
 		}
 		return tempNurseSiteMaintain;
@@ -382,9 +402,46 @@ public class NurseSiteMaintainService{
 	}
 	
 	@Transactional
-	public boolean saveMaintainConfig(NurseSiteMaintainConfig tempConfig,List<AssetInfo> listCheckAssets){
+	public boolean createMaintainConfig(NurseSiteMaintainConfig tempConfig,UserAccount currentUser,List<AssetInfo> listCheckAssets,boolean blnModifyAll){
+		String originName=tempConfig.getName();
+		while(listCheckAssets.size()>0){
+			String clinicalUid="";
+			String clinicalName="";
+			List<AssetInfo> listNew=new ArrayList<AssetInfo>();
+			for(int i=0;i>-1&&i<listCheckAssets.size();++i){
+				AssetInfo assetInfo=listCheckAssets.get(i);
+				if(StringUtils.isEmpty(clinicalUid)){
+					clinicalUid=assetInfo.getClinicalDeptUID();
+					clinicalName=assetInfo.getClinicalDeptName();
+				}
+				if(clinicalUid.equals(assetInfo.getClinicalDeptUID())){
+					listNew.add(assetInfo);
+					listCheckAssets.remove(i);
+					--i;
+				}
+			}
+			NurseSiteMaintainConfig newConfig=tempConfig.cloneObj();
+			if(newConfig!=null){
+				newConfig.setName(originName+"-"+clinicalName);
+				newConfig.setClinicalDeptName(clinicalName);
+				newConfig.setClinicalDeptUID(clinicalUid);
+				save(newConfig);
+				saveConfigChildren(newConfig,listNew);
+				if(blnModifyAll){
+		    		updateUnCheckedMaintainData(newConfig, currentUser, 0, listCheckAssets);
+		    	}
+			}
+		}
+		return true;
+	}
+	
+	@Transactional
+	public boolean updateMaintainConfig(NurseSiteMaintainConfig tempConfig,UserAccount currentUser,List<AssetInfo> listCheckAssets,boolean blnModifyAll){
 		save(tempConfig);
 		saveConfigChildren(tempConfig,listCheckAssets);
+		if(blnModifyAll){
+    		updateUnCheckedMaintainData(tempConfig, currentUser, 0, listCheckAssets);
+    	}
 		return true;
 	}
 	
@@ -407,6 +464,8 @@ public class NurseSiteMaintainService{
 					obj.setCreateDate(tempConfig.getCreateDate());
 					obj.setHospitalUID(tempConfig.getHospitalUID());
 					obj.setInstitutionUID(tempConfig.getInstitutionUID());
+					obj.setClinicalDeptName(tempConfig.getClinicalDeptName());
+					obj.setClinicalDeptUID(tempConfig.getClinicalDeptUID());
 					obj.setModifyBy(tempConfig.getModifyBy());
 					obj.setModifyByUid(tempConfig.getModifyByUid());
 					obj.setModifyDate(tempConfig.getModifyDate());
